@@ -1,0 +1,48 @@
+{
+    "name": "@arkecosystem/core-blockchain",
+    "version": "3.1.1",
+    "description": "Blockchain Manager for ARK Core",
+    "license": "MIT",
+    "contributors": [
+        "François-Xavier Thoorens <fx@ark.io>",
+        "Kristjan Košič <kristjan@ark.io>",
+        "Brian Faust <brian@ark.io>"
+    ],
+    "files": [
+        "dist"
+    ],
+    "main": "dist/index",
+    "types": "dist/index",
+    "scripts": {
+        "build": "yarn clean && yarn compile",
+        "build:watch": "yarn clean && yarn compile -w",
+        "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+        "clean": "rimraf dist",
+        "compile": "node ../../node_modules/typescript/bin/tsc",
+        "prepublishOnly": "yarn build",
+        "pretest": "bash ../../scripts/pre-test.sh"
+    },
+    "dependencies": {
+        "@arkecosystem/core-database": "3.1.1",
+        "@arkecosystem/core-kernel": "3.1.1",
+        "@arkecosystem/core-state": "3.1.1",
+        "@arkecosystem/core-transactions": "3.1.1",
+        "@arkecosystem/crypto": "3.1.1",
+        "joi": "17.4.2",
+        "xstate": "4.23.4"
+    },
+    "devDependencies": {
+        "@types/async": "3.2.7"
+    },
+    "engines": {
+        "node": ">=10.x"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "arkecosystem": {
+        "core": {
+            "alias": "blockchain"
+        }
+    }
+}
