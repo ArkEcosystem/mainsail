@@ -51,12 +51,12 @@ export class BridgechainUpdateTransactionHandler extends MagistrateTransactionHa
             AppUtils.assert.defined<MagistrateInterfaces.IBridgechainUpdateAsset>(transaction.asset?.bridgechainUpdate);
 
             const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
-            const businessAttributes: IBusinessWalletAttributes = wallet.getAttribute<IBusinessWalletAttributes>(
-                "business",
-            );
+            const businessAttributes: IBusinessWalletAttributes =
+                wallet.getAttribute<IBusinessWalletAttributes>("business");
 
             const shallowCloneBridgechainUpdate = { ...transaction.asset.bridgechainUpdate };
             const bridgechainId = shallowCloneBridgechainUpdate.bridgechainId;
+            // @ts-ignore
             delete shallowCloneBridgechainUpdate.bridgechainId; // we don't want id in wallet bridgechain asset
 
             businessAttributes.bridgechains![bridgechainId].bridgechainAsset = {
@@ -84,9 +84,8 @@ export class BridgechainUpdateTransactionHandler extends MagistrateTransactionHa
             transaction.data.asset?.bridgechainUpdate,
         );
 
-        const businessAttributes: IBusinessWalletAttributes = wallet.getAttribute<IBusinessWalletAttributes>(
-            "business",
-        );
+        const businessAttributes: IBusinessWalletAttributes =
+            wallet.getAttribute<IBusinessWalletAttributes>("business");
 
         if (!businessAttributes.bridgechains) {
             throw new BridgechainIsNotRegisteredByWalletError();
@@ -146,12 +145,11 @@ export class BridgechainUpdateTransactionHandler extends MagistrateTransactionHa
 
         const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-        const businessAttributes: IBusinessWalletAttributes = wallet.getAttribute<IBusinessWalletAttributes>(
-            "business",
-        );
+        const businessAttributes: IBusinessWalletAttributes =
+            wallet.getAttribute<IBusinessWalletAttributes>("business");
 
-        const bridgechainUpdate: MagistrateInterfaces.IBridgechainUpdateAsset = transaction.data.asset! // Assertion check inside super.applyToSender
-            .bridgechainUpdate;
+        const bridgechainUpdate: MagistrateInterfaces.IBridgechainUpdateAsset =
+            transaction.data.asset!.bridgechainUpdate; // Assertion check inside super.applyToSender
 
         AppUtils.assert.defined<Record<string, IBridgechainWalletAttributes>>(businessAttributes.bridgechains);
 
@@ -159,6 +157,7 @@ export class BridgechainUpdateTransactionHandler extends MagistrateTransactionHa
             businessAttributes.bridgechains[bridgechainUpdate.bridgechainId];
 
         const shallowCloneBridgechainUpdate = { ...bridgechainUpdate };
+        // @ts-ignore
         delete shallowCloneBridgechainUpdate.bridgechainId; // we don't want id in wallet bridgechain asset
         bridgechainAttributes.bridgechainAsset = {
             ...bridgechainAttributes.bridgechainAsset,
@@ -180,9 +179,8 @@ export class BridgechainUpdateTransactionHandler extends MagistrateTransactionHa
         const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
         AppUtils.assert.defined<string>(sender.getPublicKey());
 
-        const businessAttributes: IBusinessWalletAttributes = sender.getAttribute<IBusinessWalletAttributes>(
-            "business",
-        );
+        const businessAttributes: IBusinessWalletAttributes =
+            sender.getAttribute<IBusinessWalletAttributes>("business");
         const bridgechainId: string = transaction.data.asset.bridgechainUpdate.bridgechainId;
 
         const bridgechainTransactions = await this.transactionHistoryService.findManyByCriteria([

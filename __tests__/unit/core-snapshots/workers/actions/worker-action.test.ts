@@ -101,12 +101,9 @@ beforeEach(() => {
     sandbox.app
         .bind<StreamWriter>(Identifiers.StreamWriterFactory)
         .toFactory<StreamWriter>(
-            (context: Container.interfaces.Context) => (
-                dbStream: Readable,
-                path: string,
-                useCompression: boolean,
-                encode: Function,
-            ) => new StreamWriter(dbStream, path, useCompression, encode),
+            (context: Container.interfaces.Context) =>
+                (dbStream: Readable, path: string, useCompression: boolean, encode: Function) =>
+                    new StreamWriter(dbStream, path, useCompression, encode),
         );
 
     sandbox.app
@@ -212,7 +209,7 @@ describe("WorkerAction", () => {
 
             await expect(waitForMessage(verifyWorkerAction, "start", undefined)).toResolve();
 
-            await new Promise((resolve) => {
+            await new Promise<void>((resolve) => {
                 setTimeout(() => {
                     resolve();
                 }, 10);
@@ -242,7 +239,7 @@ describe("WorkerAction", () => {
 
             await expect(waitForMessage(restoreWorkerAction, "start", undefined)).toResolve();
 
-            await new Promise((resolve) => {
+            await new Promise<void>((resolve) => {
                 setTimeout(() => {
                     resolve();
                 }, 10);
@@ -272,7 +269,7 @@ describe("WorkerAction", () => {
 
             await expect(waitForMessage(restoreWorkerAction, "start", undefined)).toResolve();
 
-            await new Promise((resolve) => {
+            await new Promise<void>((resolve) => {
                 setTimeout(() => {
                     resolve();
                 }, 10);

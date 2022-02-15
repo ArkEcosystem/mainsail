@@ -148,7 +148,7 @@ export class SnapshotDatabaseService implements Database.DatabaseService {
     }
 
     private runSynchronizedAction(action: string, meta: Meta.MetaData): Promise<void> {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             const blocksWorker = new WorkerWrapper(this.prepareWorkerData(action, "blocks", meta));
             const transactionsWorker = new WorkerWrapper(this.prepareWorkerData(action, "transactions", meta));
             const roundsWorker = new WorkerWrapper(this.prepareWorkerData(action, "rounds", meta));
@@ -240,7 +240,7 @@ export class SnapshotDatabaseService implements Database.DatabaseService {
                 }
 
                 await Promise.all([
-                    new Promise((resolve) => {
+                    new Promise<void>((resolve) => {
                         if (!transactionsQueue.isRunning()) {
                             resolve();
                         } else {
@@ -249,7 +249,7 @@ export class SnapshotDatabaseService implements Database.DatabaseService {
                             });
                         }
                     }),
-                    new Promise((resolve) => {
+                    new Promise<void>((resolve) => {
                         if (!roundsQueue.isRunning()) {
                             resolve();
                         } else {

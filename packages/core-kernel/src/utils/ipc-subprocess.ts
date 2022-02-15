@@ -21,6 +21,7 @@ type ErrorReply = {
 type Reply = SuccessReply | ErrorReply;
 
 type RequestCallback<T, K extends Requests<T>> = {
+    // @ts-ignore
     resolve: (result: ReturnType<T[K]>) => void;
     reject: (error: Error) => void;
 };
@@ -41,10 +42,12 @@ export class IpcSubprocess<T> {
         return this.callbacks.size;
     }
 
+    // @ts-ignore
     public sendAction<K extends Actions<T>>(method: K, ...args: Parameters<T[K]>): void {
         this.subprocess.send({ method, args });
     }
 
+    // @ts-ignore
     public sendRequest<K extends Requests<T>>(method: K, ...args: Parameters<T[K]>): Promise<ReturnType<T[K]>> {
         return new Promise((resolve, reject) => {
             const id = this.lastId++;

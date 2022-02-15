@@ -17,6 +17,7 @@ export class IpcHandler<T> {
         process.on("message", (message) => {
             /* istanbul ignore else */
             if (message.method === method) {
+                // @ts-ignore
                 this.handler[method](...message.args);
             }
         });
@@ -27,6 +28,7 @@ export class IpcHandler<T> {
             /* istanbul ignore else */
             if (message.method === method) {
                 try {
+                    // @ts-ignore
                     const result = await this.handler[method](...message.args);
                     process.send!({ id: message.id, result });
                 } catch (error) {
