@@ -38,7 +38,8 @@
         "forger:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark forger:run",
         "forger:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark forger:run --env=test",
         "full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run --networkStart --env=test",
-        "prepublishOnly": "pnpm run build"
+        "prepublishOnly": "pnpm run build",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
     },
     "dependencies": {
         "@arkecosystem/core-api": "workspace:*",
