@@ -319,7 +319,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-logger-pino/
+              run: cd packages/core-logger-pino && pnpm run test
 
     core-p2p:
         runs-on: ubuntu-latest
