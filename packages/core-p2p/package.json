@@ -16,7 +16,7 @@
     "types": "dist/index",
     "scripts": {
         "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -w",
+        "build:watch": "pnpm run clean && pnpm run compile -- -w",
         "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
         "pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
         "pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",

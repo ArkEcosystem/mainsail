@@ -16,7 +16,7 @@
         "pretest": "pnpm run lint && pnpm run build",
         "compile": "node ../../node_modules/typescript/bin/tsc",
         "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -w",
+        "build:watch": "pnpm run clean && pnpm run compile -- -w",
         "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
         "clean": "rimraf dist",
         "test": "cross-env CORE_ENV=test jest --forceExit"
