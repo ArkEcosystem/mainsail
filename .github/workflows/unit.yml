@@ -46,7 +46,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core/
+              run: cd packages/core && pnpm run test
 
     core-api:
         runs-on: ubuntu-latest
@@ -85,7 +85,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-api/
+              run: cd packages/core-api && pnpm run test
 
     core-blockchain:
         runs-on: ubuntu-latest
@@ -124,7 +124,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-blockchain/
+              run: cd packages/core-blockchain && pnpm run test
 
     core-cli:
         runs-on: ubuntu-latest
@@ -163,7 +163,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-cli/
+              run: cd packages/core-cli && pnpm run test
 
     core-database:
         runs-on: ubuntu-latest
@@ -202,7 +202,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-database/
+              run: cd packages/core-database && pnpm run test
 
     core-forger:
         runs-on: ubuntu-latest
@@ -241,7 +241,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-forger/
+              run: cd packages/core-forger && pnpm run test
 
     core-kernel:
         runs-on: ubuntu-latest
@@ -280,7 +280,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-kernel/
+              run: cd packages/core-kernel && pnpm run test
 
     core-logger-pino:
         runs-on: ubuntu-latest
@@ -397,7 +397,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-snapshots/
+              run: cd packages/core-snapshots && pnpm run test
 
     core-state:
         runs-on: ubuntu-latest
@@ -475,7 +475,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-test-framework/
+              run: cd packages/core-test-framework && pnpm run test
 
     core-transaction-pool:
         runs-on: ubuntu-latest
@@ -514,7 +514,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-transaction-pool/
+              run: cd packages/core-transaction-pool && pnpm run test
 
     core-transactions:
         runs-on: ubuntu-latest
@@ -553,7 +553,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-transactions/
+              run: cd packages/core-transactions && pnpm run test
 
     core-webhooks:
         runs-on: ubuntu-latest
@@ -631,4 +631,4 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/crypto/
+              run: cd packages/crypto && pnpm run test

@@ -69,7 +69,7 @@ let spyOnExit;
 let spyOnError;
 let spyOnMessage;
 
-const workerPath = resolve("packages/core-snapshots/dist/workers/worker.js");
+const workerPath = resolve("dist/workers/worker.js");
 
 beforeEach(() => {
     spyOnExit = jest.spyOn(eventListener, "onExit");
