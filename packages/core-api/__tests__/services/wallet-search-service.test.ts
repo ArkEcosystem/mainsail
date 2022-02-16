@@ -1,4 +1,4 @@
-import { WalletSearchService } from "@arkecosystem/core-api/src/services/wallet-search-service";
+import { WalletSearchService } from "@packages/core-api/src/services/wallet-search-service";
 import { Container, Contracts, Services } from "@arkecosystem/core-kernel";
 import { Utils } from "@arkecosystem/crypto";
 

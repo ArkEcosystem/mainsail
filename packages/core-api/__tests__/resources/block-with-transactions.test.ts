@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import { Sandbox } from "@arkecosystem/core-test-framework";
+import { Sandbox } from "@packages/core-test-framework";
 import { Interfaces } from "@arkecosystem/crypto";
 import { BlockWithTransactionsResource } from "@packages/core-api/src/resources";
 import { cloneDeep } from "lodash";
