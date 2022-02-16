@@ -555,6 +555,7 @@ importers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
+      delay: 4.4.1
       immutable: 4.0.0-rc.14
       joi: 17.4.2
     dependencies:
@@ -564,6 +565,8 @@ importers:
       '@arkecosystem/crypto': link:../crypto
       immutable: 4.0.0-rc.14
       joi: 17.4.2
+    devDependencies:
+      delay: 4.4.1
 
   packages/core-test-framework:
     specifiers:
@@ -5803,7 +5806,6 @@ packages:
   /delay/4.4.1:
     resolution: {integrity: sha512-aL3AhqtfhOlT/3ai6sWXeqwnw63ATNpnUiN4HL7x9q+My5QtHlO3OIkasmug9LKzpheLdmUKGRKnYXYAS7FQkQ==}
     engines: {node: '>=6'}
-    dev: false
 
   /delayed-stream/1.0.0:
     resolution: {integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=}

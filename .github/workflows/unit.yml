@@ -436,7 +436,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-state/
+              run: cd packages/core-state && pnpm run test
 
     core-test-framework:
         runs-on: ubuntu-latest

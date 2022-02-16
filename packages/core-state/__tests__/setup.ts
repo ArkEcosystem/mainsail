@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { walletFactory } from "@arkecosystem/core-state/src/wallets/wallet-factory";
+import { walletFactory } from "@packages/core-state/src/wallets/wallet-factory";
 import { Container, Providers, Services } from "@packages/core-kernel";
 import { DposPreviousRoundStateProvider } from "@packages/core-kernel/src/contracts/state";
 import { PluginConfiguration } from "@packages/core-kernel/src/providers";
