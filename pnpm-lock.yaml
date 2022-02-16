@@ -242,6 +242,7 @@ importers:
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@types/async': 3.2.7
+      delay: 4.4.1
       joi: 17.4.2
       xstate: 4.23.4
     dependencies:
@@ -254,6 +255,7 @@ importers:
       xstate: 4.23.4
     devDependencies:
       '@types/async': 3.2.7
+      delay: 4.4.1
 
   packages/core-cli:
     specifiers:
