@@ -1,5 +1,6 @@
 const { Crypto, Transactions, Utils } = require("@arkecosystem/crypto");
 const createHash = require("create-hash");
+const hashWASM = require("hash-wasm");
 
 const nodeSha256 = (bytes) => createHash("sha256").update(bytes).digest();
 
@@ -26,12 +27,12 @@ exports["node.sha256"] = () => {
     nodeSha256(transactionBytes);
 };
 
-exports["bcrypto.sha1"] = () => {
-    Crypto.HashAlgorithms.sha1(transactionBytes);
+exports["hash-wasm.sha256"] = async () => {
+    await hashWASM.sha256(transactionBytes);
 };
 
-exports["node.sha1"] = () => {
-    createHash("sha1").update(transactionBytes).digest();
+exports["noble.sha256"] = async () => {
+    require("@noble/hashes/sha256").sha256(transactionBytes);
 };
 
 exports["bcrypto.ripemd160"] = () => {
@@ -40,6 +41,14 @@ exports["bcrypto.ripemd160"] = () => {
 
 exports["node.ripemd160"] = () => {
     createHash("ripemd160").update(transactionBytes).digest();
+};
+
+exports["hash-wasm.ripemd160"] = async () => {
+    await hashWASM.ripemd160(transactionBytes);
+};
+
+exports["noble.ripemd160"] = async () => {
+    require("@noble/hashes/ripemd160").ripemd160(transactionBytes);
 };
 
 exports["bcrypto.hash160"] = () => {

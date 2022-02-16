@@ -105,5 +105,9 @@
     "workspaces": [
         "packages/*",
         "plugins/*"
-    ]
+    ],
+    "dependencies": {
+        "@noble/hashes": "^1.0.0",
+        "hash-wasm": "^4.9.0"
+    }
 }

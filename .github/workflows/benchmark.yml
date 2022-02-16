@@ -14,20 +14,15 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [14.x]
+                node-version: [16.x]
 
         steps:
             - uses: actions/checkout@v2
+
             - name: Set up Python 2.7
               uses: actions/setup-python@v2
               with:
-                  python-version: '2.7'
-            - name: Cache node modules
-              uses: actions/cache@v1
-              with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
