@@ -249,53 +249,6 @@ describe("Transaction serializer / deserializer", () => {
             configManager.getMilestone().aip11 = true;
         });
 
-        describe("ser/deserialize - ipfs", () => {
-            let ipfsTransaction;
-
-            const ipfsIds = [
-                "QmR45FmbVVrixReBwJkhEKde2qwHYaQzGxu4ZoDeswuF9w",
-                "QmYSK2JyM3RyDyB52caZCTKFR3HKniEcMnNJYdk8DQ6KKB",
-                "QmQeUqdjFmaxuJewStqCLUoKrR9khqb4Edw9TfRQQdfWz3",
-                "Qma98bk1hjiRZDTmYmfiUXDj8hXXt7uGA5roU5mfUb3sVG",
-            ];
-
-            beforeAll(() => {
-                // todo: completely wrap this into a function to hide the generation and setting of the config?
-                configManager.setConfig(Generators.generateCryptoConfigRaw());
-            });
-
-            beforeEach(() => {
-                ipfsTransaction = BuilderFactory.ipfs()
-                    .fee("50000000")
-                    .version(2)
-                    .network(23)
-                    .timestamp(148354645)
-                    .ipfsAsset(ipfsIds[0])
-                    .sign("dummy passphrase")
-                    .getStruct();
-            });
-
-            it("should ser/deserialize giving back original fields", () => {
-                const serialized = TransactionFactory.fromData(ipfsTransaction).serialized.toString("hex");
-                expect(serialized).toEqual(
-                    "ff0217010000000500000000000000000002a47a2f594635737d2ce9898680812ff7fa6aaa64ddea1360474c110e9985a08780f0fa02000000000012202853f0f11ab91d73b73a2a86606103f45dd469ad2e89ec6f9a25febe8758d3fed28df5c7334e86d67074330c8e4418c47ca82a6aff823431c9690213b6983dd82569730fb267ad96750a5249b7f751d2beb3b0958ed48b0517223531d80eaf89",
-                );
-                const deserialized = Deserializer.deserialize(serialized);
-
-                checkCommonFields(deserialized, ipfsTransaction);
-
-                expect(deserialized.data.asset).toEqual(ipfsTransaction.asset);
-            });
-
-            it("should fail to verify", () => {
-                const transaction = TransactionFactory.fromData(ipfsTransaction);
-                configManager.getMilestone().aip11 = false;
-                expect(transaction.verify()).toBeFalse();
-                configManager.getMilestone().aip11 = true;
-                expect(transaction.verify()).toBeTrue();
-            });
-        });
-
         describe("ser/deserialize - delegate resignation", () => {
             it("should ser/deserialize giving back original fields", () => {
                 const delegateResignation = BuilderFactory.delegateResignation()

@@ -304,7 +304,7 @@ describe("TransactionsController", () => {
         it("should return registered schemas", async () => {
             const response = (await controller.schemas(undefined, undefined)) as ItemResponse;
 
-            const coreTransactionHandlersCount = 11;
+            const coreTransactionHandlersCount = 10;
             expect(Object.keys(response.data["1"]).length).toBe(coreTransactionHandlersCount);
         });
     });
@@ -322,7 +322,6 @@ describe("TransactionsController", () => {
                     delegateRegistration: "2500000000",
                     vote: "100000000",
                     multiSignature: "500000000",
-                    ipfs: "500000000",
                     multiPayment: "10000000",
                     delegateResignation: "2500000000",
                     htlcLock: "10000000",

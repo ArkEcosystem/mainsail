@@ -1,5 +1,4 @@
 import { Enums, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import bs58 from "bs58";
 import { createHash } from "crypto";
 
 import secrets from "../../internal/passphrases.json";
@@ -156,19 +155,6 @@ export const registerMultiSignatureFactory = (factory: FactoryBuilder): void => 
     factory.get("MultiSignature").state("multiSign", multiSign);
 };
 
-export const registerIpfsFactory = (factory: FactoryBuilder): void => {
-    factory.set("Ipfs", ({ options }) =>
-        applyModifiers(
-            Transactions.BuilderFactory.ipfs().ipfsAsset(options.id || bs58.encode(Buffer.from(randomHash(), "hex"))),
-            options,
-        ),
-    );
-
-    factory.get("Ipfs").state("sign", sign);
-    factory.get("Ipfs").state("secondSign", secondSign);
-    factory.get("Ipfs").state("multiSign", multiSign);
-};
-
 export const registerHtlcLockFactory = (factory: FactoryBuilder): void => {
     factory.set("HtlcLock", ({ options }) =>
         applyModifiers(
@@ -249,8 +235,6 @@ export const registerTransactionFactory = (factory: FactoryBuilder): void => {
     registerUnvoteFactory(factory);
 
     registerMultiSignatureFactory(factory);
-
-    registerIpfsFactory(factory);
 
     registerHtlcLockFactory(factory);
 

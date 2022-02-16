@@ -37,7 +37,6 @@ export const setUp = async (): Promise<Application> => {
     walletAttributes.set("delegate.voteBalance");
     walletAttributes.set("delegate");
     walletAttributes.set("htlc.locks");
-    walletAttributes.set("ipfs.hashes");
 
     return app;
 };

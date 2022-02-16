@@ -32,7 +32,6 @@ interface DynamicFees {
         delegateRegistration?: number;
         vote?: number;
         multiSignature?: number;
-        ipfs?: number;
         multiPayment?: number;
         delegateResignation?: number;
         htlcLock?: number;
@@ -66,7 +65,6 @@ interface Options {
     feeStaticDelegateRegistration: number;
     feeStaticVote: number;
     feeStaticMultiSignature: number;
-    feeStaticIpfs: number;
     feeStaticMultiPayment: number;
     feeStaticDelegateResignation: number;
     feeStaticHtlcLock: number;
@@ -82,7 +80,6 @@ interface Options {
     feeDynamicBytesDelegateRegistration?: number;
     feeDynamicBytesVote?: number;
     feeDynamicBytesMultiSignature?: number;
-    feeDynamicBytesIpfs?: number;
     feeDynamicBytesMultiPayment?: number;
     feeDynamicBytesDelegateResignation?: number;
     feeDynamicBytesHtlcLock?: number;
@@ -275,7 +272,6 @@ export class Command extends Commands.Command {
             schema: Joi.number(),
             default: 500000000,
         },
-        { name: "feeStaticIpfs", description: "Fee for ipfs transactions.", schema: Joi.number(), default: 500000000 },
         {
             name: "feeStaticMultiPayment",
             description: "Fee for multi payment transactions.",
@@ -332,7 +328,6 @@ export class Command extends Commands.Command {
             description: "Dynamic fee for multi signature transactions.",
             schema: Joi.number(),
         },
-        { name: "feeDynamicBytesIpfs", description: "Dynamic fee for IPFS transactions.", schema: Joi.number() },
         {
             name: "feeDynamicBytesMultiPayment",
             description: "Dynamic fee for multi payment transactions.",
@@ -620,7 +615,6 @@ export class Command extends Commands.Command {
                         delegateRegistration: options.feeStaticDelegateRegistration,
                         vote: options.feeStaticVote,
                         multiSignature: options.feeStaticMultiSignature,
-                        ipfs: options.feeStaticIpfs,
                         multiPayment: options.feeStaticMultiPayment,
                         delegateResignation: options.feeStaticDelegateResignation,
                         htlcLock: options.feeStaticHtlcLock,
@@ -759,10 +753,6 @@ export class Command extends Commands.Command {
         }
         if (options.feeDynamicBytesMultiSignature) {
             dynamicFees.addonBytes.multiSignature = options.feeDynamicBytesMultiSignature;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesIpfs) {
-            dynamicFees.addonBytes.ipfs = options.feeDynamicBytesIpfs;
             includeDynamicFees = true;
         }
         if (options.feeDynamicBytesMultiPayment) {

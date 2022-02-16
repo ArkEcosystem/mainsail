@@ -242,25 +242,6 @@ export const multiSignatureLegacy = extend(transactionBaseSchemaNoSignatures, {
     },
 });
 
-export const ipfs = extend(transactionBaseSchema, {
-    $id: "ipfs",
-    properties: {
-        type: { transactionType: TransactionType.Ipfs },
-        amount: { bignumber: { minimum: 0, maximum: 0 } },
-        fee: { bignumber: { minimum: 1 } },
-        asset: {
-            type: "object",
-            required: ["ipfs"],
-            properties: {
-                ipfs: {
-                    allOf: [{ minLength: 2, maxLength: 90 }, { $ref: "base58" }],
-                    // ipfs hash has varying length but we set max limit to twice the length of base58 ipfs sha-256 hash
-                },
-            },
-        },
-    },
-});
-
 export const htlcLock = extend(transactionBaseSchema, {
     $id: "htlcLock",
     required: ["recipientId"],

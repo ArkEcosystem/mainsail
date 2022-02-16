@@ -3,7 +3,6 @@ import "jest-extended";
 import { BuilderFactory } from "../../../../../packages/crypto/src/transactions";
 import { DelegateRegistrationBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/delegate-registration";
 import { DelegateResignationBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/delegate-resignation";
-import { IPFSBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/ipfs";
 import { MultiPaymentBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/multi-payment";
 import { MultiSignatureBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/multi-signature";
 import { SecondSignatureBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/second-signature";
@@ -17,10 +16,6 @@ describe("Builder Factory", () => {
 
     it("should create DelegateResignationBuilder", () => {
         expect(BuilderFactory.delegateResignation()).toBeInstanceOf(DelegateResignationBuilder);
-    });
-
-    it("should create IPFSBuilder", () => {
-        expect(BuilderFactory.ipfs()).toBeInstanceOf(IPFSBuilder);
     });
 
     it("should create MultiPaymentBuilder", () => {

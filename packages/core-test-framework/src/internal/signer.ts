@@ -95,21 +95,6 @@ export class Signer {
         return transaction.getStruct();
     }
 
-    public makeIpfs(opts: Record<string, any>): any {
-        const transaction = Transactions.BuilderFactory.ipfs()
-            .fee(this.toSatoshi(opts.ipfsFee))
-            .ipfsAsset(opts.ipfs)
-            .nonce(this.nonce.toString())
-            .sign(opts.passphrase);
-
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
-
-        this.incrementNonce();
-        return transaction.getStruct();
-    }
-
     public makeMultipayment(opts: Record<string, any>): any {
         const transaction = Transactions.BuilderFactory.multiPayment()
             .fee(this.toSatoshi(opts.multipaymentFee))

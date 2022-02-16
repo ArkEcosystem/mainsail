@@ -122,12 +122,6 @@ export class TransactionFactory {
         return this;
     }
 
-    public ipfs(ipfsId: string): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.ipfs().ipfsAsset(ipfsId);
-
-        return this;
-    }
-
     public htlcLock(
         lockAsset: Interfaces.IHtlcLockAsset,
         recipientId?: string,

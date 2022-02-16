@@ -90,7 +90,6 @@ describe("ServiceProvider", () => {
             expect(result.value.dynamicFees.addonBytes.delegateRegistration).toBeNumber();
             expect(result.value.dynamicFees.addonBytes.vote).toBeNumber();
             expect(result.value.dynamicFees.addonBytes.multiSignature).toBeNumber();
-            expect(result.value.dynamicFees.addonBytes.ipfs).toBeNumber();
             expect(result.value.dynamicFees.addonBytes.multiPayment).toBeNumber();
             expect(result.value.dynamicFees.addonBytes.delegateResignation).toBeNumber();
             expect(result.value.dynamicFees.addonBytes.htlcLock).toBeNumber();

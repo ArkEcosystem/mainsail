@@ -562,11 +562,6 @@ describe("BlockState", () => {
             .sign("delegatePassphrase")
             .build();
 
-        const ipfs = factory
-            .get("Ipfs")
-            .withOptions({ senderPublicKey: sender.getPublicKey(), recipientId: recipientWallet.getAddress() })
-            .make();
-
         const htlcLock = factory
             .get("HtlcLock")
             .withOptions({ senderPublicKey: sender.getPublicKey(), recipientId: recipientWallet.getAddress() })
@@ -588,7 +583,6 @@ describe("BlockState", () => {
             ${"2nd sign"}             | ${secondSign}
             ${"vote"}                 | ${vote}
             ${"delegateResignation"}  | ${delegateRes}
-            ${"ipfs"}                 | ${ipfs}
             ${"htlcLock"}             | ${htlcLock}
             ${"htlcRefund"}           | ${htlcRefund}
         `("when the transaction is a $type", ({ transaction }) => {

@@ -4,7 +4,6 @@ export enum TransactionType {
     DelegateRegistration = 2,
     Vote = 3,
     MultiSignature = 4,
-    Ipfs = 5,
     MultiPayment = 6,
     DelegateResignation = 7,
     HtlcLock = 8,

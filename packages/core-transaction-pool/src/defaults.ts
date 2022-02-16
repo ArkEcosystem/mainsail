@@ -24,7 +24,6 @@ export const defaults = {
             delegateRegistration: 400000,
             vote: 100,
             multiSignature: 500,
-            ipfs: 250,
             multiPayment: 500,
             delegateResignation: 100,
             htlcLock: 100,

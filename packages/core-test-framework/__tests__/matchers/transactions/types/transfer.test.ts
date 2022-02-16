@@ -19,7 +19,7 @@ describe("Transfer", () => {
         });
 
         it("should not be transfer type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("Ipfs").make();
+            const transaction: Interfaces.ITransaction = factory.get("Vote").make();
 
             expect(transaction.data).not.toBeTransferType();
         });

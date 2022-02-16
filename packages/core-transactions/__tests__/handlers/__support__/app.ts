@@ -5,7 +5,6 @@ import { Wallets } from "@packages/core-state";
 import { StateStore } from "@packages/core-state/src/stores/state";
 import {
     addressesIndexer,
-    ipfsIndexer,
     locksIndexer,
     publicKeysIndexer,
     usernamesIndexer,
@@ -65,12 +64,6 @@ export const initApp = (): Application => {
     app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
         name: Contracts.State.WalletIndexes.Usernames,
         indexer: usernamesIndexer,
-        autoIndex: true,
-    });
-
-    app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-        name: Contracts.State.WalletIndexes.Ipfs,
-        indexer: ipfsIndexer,
         autoIndex: true,
     });
 
@@ -136,7 +129,6 @@ export const initApp = (): Application => {
     app.bind(Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.IpfsTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.HtlcLockTransactionHandler);

@@ -21,9 +21,6 @@ describe("Constants", () => {
         expect(TransactionType.MultiSignature).toBeDefined();
         expect(TransactionType.MultiSignature).toBe(4);
 
-        expect(TransactionType.Ipfs).toBeDefined();
-        expect(TransactionType.Ipfs).toBe(5);
-
         expect(TransactionType.MultiPayment).toBeDefined();
         expect(TransactionType.MultiPayment).toBe(6);
 

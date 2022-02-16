@@ -5,6 +5,7 @@
     "scripts": {
         "setup": "pnpm install && pnpm run build",
         "build": "ultra -r build",
+        "rebuild": "ultra -r rebuild",
         "clean": "ultra -r clean",
         "lint": "./node_modules/eslint/bin/eslint.js packages --ext .ts --fix",
         "lint:tests": "./node_modules/eslint/bin/eslint.js __tests__ --ext .ts --fix",

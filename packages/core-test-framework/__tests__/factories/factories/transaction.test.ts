@@ -275,42 +275,6 @@ describe("TransactionFactory", () => {
         });
     });
 
-    describe("Ipfs", () => {
-        it("should create a builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Ipfs").make();
-
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.secondSignature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
-
-        it("should sign it with a single passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Ipfs").withStates("sign").make();
-
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.secondSignature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
-
-        it("should sign it with a second passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Ipfs").withStates("sign", "secondSign").make();
-
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.secondSignature).not.toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
-
-        it("should sign it with multiple passphrases", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Ipfs").withStates("sign", "multiSign").make();
-
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.secondSignature).toBeUndefined();
-            expect(transaction.data.signatures).not.toBeUndefined();
-        });
-    });
-
     describe("HtlcLock", () => {
         it("should create a builder", () => {
             const transaction: Interfaces.ITransaction = factory.get("HtlcLock").make();

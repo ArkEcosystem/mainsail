@@ -15,7 +15,6 @@ describe("Helpers", () => {
         expect(factory("Vote")).toBeDefined();
         expect(factory("Unvote")).toBeDefined();
         expect(factory("MultiSignature")).toBeDefined();
-        expect(factory("Ipfs")).toBeDefined();
         expect(factory("HtlcLock")).toBeDefined();
         expect(factory("HtlcClaim")).toBeDefined();
         expect(factory("HtlcRefund")).toBeDefined();

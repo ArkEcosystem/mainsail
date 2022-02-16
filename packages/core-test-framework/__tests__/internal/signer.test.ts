@@ -159,35 +159,6 @@ describe("Signer", () => {
         expect(entity.asset?.multiSignature?.publicKeys).toBeArray();
     });
 
-    it("should make ipfs", async () => {
-        const options = {
-            ipfsFee: "5",
-            ipfs: "dummy",
-            passphrase: passphrases[0],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeIpfs(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
-        expect(entity.asset?.ipfs).toBeString();
-    });
-
-    it("should make ipfs with second signature", async () => {
-        const options = {
-            ipfsFee: "5",
-            ipfs: "dummy",
-            passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeIpfs(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
-        expect(entity.asset?.ipfs).toBeString();
-    });
-
     it("should make multi payment", async () => {
         const options = {
             multipaymentFee: "5",

@@ -20,7 +20,6 @@ describe.each([
     BuilderFactory.delegateRegistration,
     BuilderFactory.vote,
     BuilderFactory.multiSignature,
-    BuilderFactory.ipfs,
     BuilderFactory.multiPayment,
     BuilderFactory.delegateResignation,
     BuilderFactory.htlcLock,

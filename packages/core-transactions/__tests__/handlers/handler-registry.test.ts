@@ -17,9 +17,9 @@ import ByteBuffer from "bytebuffer";
 
 let app: Application;
 
-const NUMBER_OF_REGISTERED_CORE_HANDLERS = 16;
+const NUMBER_OF_REGISTERED_CORE_HANDLERS = 15;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 9; // TODO: Check if correct
-const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE = 12;
+const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE = 11;
 
 const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
@@ -137,7 +137,6 @@ beforeEach(() => {
     app.bind(Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.IpfsTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.HtlcLockTransactionHandler);
@@ -228,13 +227,6 @@ describe("Registry", () => {
                 transactionHandlerRegistry.getRegisteredHandlerByType(
                     Transactions.InternalTransactionType.from(
                         Enums.TransactionType.MultiSignature,
-                        Enums.TransactionTypeGroup.Core,
-                    ),
-                    2,
-                ),
-                transactionHandlerRegistry.getRegisteredHandlerByType(
-                    Transactions.InternalTransactionType.from(
-                        Enums.TransactionType.Ipfs,
                         Enums.TransactionTypeGroup.Core,
                     ),
                     2,

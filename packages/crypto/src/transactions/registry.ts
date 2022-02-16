@@ -31,8 +31,6 @@ class TransactionRegistry {
         this.registerTransactionType(One.MultiSignatureRegistrationTransaction);
         this.registerTransactionType(Two.MultiSignatureRegistrationTransaction);
 
-        this.registerTransactionType(Two.IpfsTransaction);
-
         this.registerTransactionType(Two.MultiPaymentTransaction);
 
         this.registerTransactionType(Two.DelegateResignationTransaction);

@@ -112,7 +112,6 @@ export class CryptoGenerator extends Generator {
                         delegateRegistration: 2500000000,
                         vote: 100000000,
                         multiSignature: 500000000,
-                        ipfs: 500000000,
                         multiPayment: 10000000,
                         delegateResignation: 2500000000,
                         htlcLock: 10000000,

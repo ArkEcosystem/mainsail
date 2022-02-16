@@ -28,7 +28,6 @@ export enum WalletIndexes {
     Usernames = "usernames",
     Resignations = "resignations",
     Locks = "locks",
-    Ipfs = "ipfs",
 }
 
 export interface WalletData {
@@ -148,10 +147,6 @@ export interface WalletDelegateAttributes {
 }
 
 export type WalletMultiSignatureAttributes = Interfaces.IMultiSignatureAsset & { legacy?: boolean };
-
-export interface WalletIpfsAttributes {
-    [hash: string]: boolean;
-}
 
 export interface WalletRepository {
     // TODO: use an inversify factory for wallets instead?

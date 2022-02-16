@@ -6,7 +6,6 @@ import { Container, Contracts } from "@packages/core-kernel/src";
 import { Wallet, WalletRepository } from "@packages/core-state/src/wallets";
 import {
     addressesIndexer,
-    ipfsIndexer,
     locksIndexer,
     publicKeysIndexer,
     resignationsIndexer,
@@ -47,14 +46,13 @@ describe("Wallet Repository", () => {
     });
 
     it("should be able to look up indexers", () => {
-        const expected = ["addresses", "publicKeys", "usernames", "resignations", "locks", "ipfs"];
+        const expected = ["addresses", "publicKeys", "usernames", "resignations", "locks"];
         expect(walletRepo.getIndexNames()).toEqual(expected);
         expect(walletRepo.getIndex("addresses").indexer).toEqual(addressesIndexer);
         expect(walletRepo.getIndex("publicKeys").indexer).toEqual(publicKeysIndexer);
         expect(walletRepo.getIndex("usernames").indexer).toEqual(usernamesIndexer);
         expect(walletRepo.getIndex("resignations").indexer).toEqual(resignationsIndexer);
         expect(walletRepo.getIndex("locks").indexer).toEqual(locksIndexer);
-        expect(walletRepo.getIndex("ipfs").indexer).toEqual(ipfsIndexer);
         expect(() => walletRepo.getIndex("iDontExist")).toThrow();
     });
 
@@ -221,7 +219,6 @@ describe("Wallet Repository", () => {
         walletRepo.getIndex("usernames").set("username", wallets[2]);
         walletRepo.getIndex("resignations").set("resign", wallets[3]);
         walletRepo.getIndex("locks").set("lock", wallets[4]);
-        walletRepo.getIndex("ipfs").set("ipfs", wallets[5]);
 
         wallets.forEach((wallet) => walletRepo.index(wallet));
 

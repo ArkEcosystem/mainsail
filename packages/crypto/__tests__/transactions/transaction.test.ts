@@ -149,7 +149,6 @@ describe("Transaction", () => {
             expect(Two.MultiSignatureRegistrationTransaction.staticFee()).toEqual(
                 BigNumber.make(staticFees.multiSignature),
             );
-            expect(Two.IpfsTransaction.staticFee()).toEqual(BigNumber.make(staticFees.ipfs));
             expect(Two.MultiPaymentTransaction.staticFee()).toEqual(BigNumber.make(staticFees.multiPayment));
             expect(Two.DelegateResignationTransaction.staticFee()).toEqual(
                 BigNumber.make(staticFees.delegateResignation),
@@ -169,7 +168,6 @@ describe("Transaction", () => {
             expect(Two.MultiSignatureRegistrationTransaction.staticFee()).toEqual(
                 BigNumber.make(staticFees.multiSignature),
             );
-            expect(Two.IpfsTransaction.staticFee()).toEqual(BigNumber.make(staticFees.ipfs));
             expect(Two.MultiPaymentTransaction.staticFee()).toEqual(BigNumber.make(staticFees.multiPayment));
             expect(Two.DelegateResignationTransaction.staticFee()).toEqual(
                 BigNumber.make(staticFees.delegateResignation),
