@@ -1,5 +1,5 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { PaginationService } from "@arkecosystem/core-kernel/src/services/search/pagination-service";
+import { Container } from "@packages/core-kernel";
+import { PaginationService } from "@packages/core-kernel/src/services/search/pagination-service";
 import { Utils } from "@arkecosystem/crypto";
 
 const container = new Container.Container();

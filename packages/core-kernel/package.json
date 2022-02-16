@@ -18,7 +18,8 @@
         "build": "pnpm run clean && pnpm run compile",
         "build:watch": "pnpm run clean && pnpm run compile -w",
         "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-        "clean": "rimraf dist"
+        "clean": "rimraf dist",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
     },
     "dependencies": {
         "@arkecosystem/crypto": "workspace:*",
