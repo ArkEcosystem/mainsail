@@ -25,7 +25,7 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "strict": true,
+        "strict": false,
         "stripInternal": true,
         "target": "es2020",
         "typeRoots": ["reflect-metadata", "node_modules/@types"],

@@ -592,7 +592,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test:parallel __tests__/unit/core-webhooks/
+              run: cd packages/core-webhooks && pnpm run test
 
     crypto:
         runs-on: ubuntu-latest
