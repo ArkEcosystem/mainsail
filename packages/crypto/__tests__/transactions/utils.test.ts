@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Utils } from "@arkecosystem/crypto";
+import { Utils } from "@packages/crypto";
 import { Generators } from "@packages/core-test-framework/src";
 import { TransactionFactory as TestTransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
 

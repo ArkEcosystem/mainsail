@@ -28,7 +28,8 @@
         "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
         "clean": "rimraf dist",
         "compile": "node ../../node_modules/typescript/bin/tsc",
-        "prepublishOnly": "pnpm run build:rollup"
+        "prepublishOnly": "pnpm run build:rollup",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
     },
     "dependencies": {
         "@arkecosystem/crypto-identities": "1.2.0",

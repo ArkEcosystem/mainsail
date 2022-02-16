@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { PublicKey } from "@arkecosystem/crypto/src/identities";
+import { PublicKey } from "@packages/crypto/src/identities";
 import { Errors } from "@arkecosystem/crypto-identities";
 
 import { Address } from "../../../../packages/crypto/src/identities/address";
