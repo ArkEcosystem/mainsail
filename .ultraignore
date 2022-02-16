@@ -1,0 +1,9 @@
+.DS_Store
+*.build.log
+banner.png
+distribution
+LICENSE
+node_modules
+README.md
+snapshots
+tsconfig.json

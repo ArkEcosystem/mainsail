@@ -1,59 +1,62 @@
 name: Linting
 
 on:
-  push:
-    branches:
-      - "main"
-      - "develop"
-  pull_request:
-    types: [ready_for_review, synchronize, opened]
+    push:
+        branches:
+            - "master"
+            - "develop"
+    pull_request:
+        types: [ready_for_review, synchronize, opened]
 
 jobs:
-  source:
-    runs-on: ubuntu-latest
+    source:
+        runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
+        strategy:
+            matrix:
+                node-version: [14.x]
 
-    steps:
-      - uses: actions/checkout@v2
+        steps:
+            - uses: actions/checkout@v2
 
-      - name: Cache node modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node-
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
 
-      - name: Install & Build
-        run: yarn install && yarn bootstrap
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
 
-      - name: Lint Source
-        run: yarn lint
-  # tests:
-  #     runs-on: ubuntu-latest
-  #     strategy:
-  #         matrix:
-  #             node-version: [14.x]
-  #     steps:
-  #         - uses: actions/checkout@v2
-  #         - name: Cache node modules
-  #           uses: actions/cache@v1
-  #           with:
-  #               path: node_modules
-  #               key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-  #               restore-keys: ${{ runner.os }}-node-
-  #         - name: Use Node.js ${{ matrix.node-version }}
-  #           uses: actions/setup-node@v1
-  #           with:
-  #               node-version: ${{ matrix.node-version }}
-  #         - name: Install & Build
-  #           run: yarn install && yarn bootstrap
-  #         - name: Lint Source
-  #           run: yarn lint:tests
+            - name: Lint Source
+              run: pnpm run lint
+    # tests:
+    #     runs-on: ubuntu-latest
+    #     strategy:
+    #         matrix:
+    #             node-version: [14.x]
+    #     steps:
+    #         - uses: actions/checkout@v2
+    #         - name: Cache node modules
+    #           uses: actions/cache@v1
+    #           with:
+    #               path: node_modules
+    #               key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+    #               restore-keys: ${{ runner.os }}-node-
+    #         - name: Use Node.js ${{ matrix.node-version }}
+    #           uses: actions/setup-node@v1
+    #           with:
+    #               node-version: ${{ matrix.node-version }}
+    #         - name: Install & Build
+    #           run: yarn install && yarn bootstrap
+    #         - name: Lint Source
+    #           run: yarn lint:tests

@@ -1,65 +1,71 @@
 name: Integration Testing
 
 on:
-  push:
-    branches:
-      - "main"
-      - "develop"
-  pull_request:
-    types: [ready_for_review, synchronize, opened]
+    push:
+        branches:
+            - "master"
+            - "develop"
+    pull_request:
+        types: [ready_for_review, synchronize, opened]
 
 jobs:
-  integration:
-    runs-on: ubuntu-latest
+    integration:
+        runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:12
+        services:
+            postgres:
+                image: postgres:12
+                env:
+                    POSTGRES_USER: ark
+                    POSTGRES_PASSWORD: password
+                    POSTGRES_DB: ark_unitnet
+                ports:
+                    - 5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
         env:
-          POSTGRES_USER: ark
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: ark_unitnet
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+            CORE_DB_DATABASE: ark_unitnet
+            CORE_DB_USERNAME: ark
+            POSTGRES_USER: ark
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: ark_unitnet
 
-    strategy:
-      matrix:
-        node-version: [14.x]
+        steps:
+            - uses: actions/checkout@v2
 
-    env:
-      CORE_DB_DATABASE: ark_unitnet
-      CORE_DB_USERNAME: ark
-      POSTGRES_USER: ark
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: ark_unitnet
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
-    steps:
-      - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
 
-      - name: Cache node modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node-
+            - name: Update system
+              run: sudo apt-get update -y
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+            - name: Install xsel & postgresql-client
+              run: sudo apt-get install -q xsel postgresql-client
 
-      - name: Update system
-        run: sudo apt-get update -y
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
 
-      - name: Install xsel & postgresql-client
-        run: sudo apt-get install -q xsel postgresql-client
+            - name: Build
+              run: pnpm run setup
 
-      - name: Install and build packages
-        run: yarn setup
+            - name: Create .core/database directory
+              run: mkdir -p $HOME/.core/database
 
-      - name: Create .core/database directory
-        run: mkdir -p $HOME/.core/database
-
-      - name: Integration tests
-        run: yarn test:integration --coverage --coverageDirectory .coverage/integration/
+            - name: Integration tests
+              run: pnpm run test:integration

@@ -2,7 +2,6 @@
 logs
 *.log
 npm-debug.log*
-lerna-debug.log
 
 # Runtime data
 pids
@@ -44,6 +43,7 @@ docs
 # Optional npm cache directory
 .npm
 package-lock.json
+.ultra.cache.json
 
 # Mac OS X local settings
 .DS_Store

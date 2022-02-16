@@ -1,4 +1,5 @@
-node_modules
-dist
-bin
+.ultra.cache.json
 *.d.ts
+bin
+dist
+node_modules
