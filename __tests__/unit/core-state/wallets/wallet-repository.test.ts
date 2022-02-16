@@ -3,11 +3,6 @@
 import "jest-extended";
 
 import { Container, Contracts } from "@packages/core-kernel/src";
-import {
-    bridgechainIndexer,
-    businessIndexer,
-    MagistrateIndex,
-} from "@packages/core-magistrate-transactions/src/wallet-indexes";
 import { Wallet, WalletRepository } from "@packages/core-state/src/wallets";
 import {
     addressesIndexer,
@@ -25,22 +20,6 @@ let walletRepo: WalletRepository;
 
 beforeAll(async () => {
     const initialEnv = await setUp();
-
-    initialEnv.sandbox.app
-        .bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex)
-        .toConstantValue({
-            name: MagistrateIndex.Businesses,
-            indexer: businessIndexer,
-            autoIndex: true,
-        });
-
-    initialEnv.sandbox.app
-        .bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex)
-        .toConstantValue({
-            name: MagistrateIndex.Bridgechains,
-            indexer: bridgechainIndexer,
-            autoIndex: true,
-        });
 
     // TODO: why does this have to be rebound here?
     initialEnv.sandbox.app.rebind(Container.Identifiers.WalletRepository).to(WalletRepository);
@@ -68,16 +47,7 @@ describe("Wallet Repository", () => {
     });
 
     it("should be able to look up indexers", () => {
-        const expected = [
-            "addresses",
-            "publicKeys",
-            "usernames",
-            "resignations",
-            "locks",
-            "ipfs",
-            "businesses",
-            "bridgechains",
-        ];
+        const expected = ["addresses", "publicKeys", "usernames", "resignations", "locks", "ipfs"];
         expect(walletRepo.getIndexNames()).toEqual(expected);
         expect(walletRepo.getIndex("addresses").indexer).toEqual(addressesIndexer);
         expect(walletRepo.getIndex("publicKeys").indexer).toEqual(publicKeysIndexer);

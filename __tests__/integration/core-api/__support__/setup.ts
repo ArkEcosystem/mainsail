@@ -34,7 +34,6 @@ export const setUp = async (): Promise<Application> => {
                         { package: "@arkecosystem/core-state" },
                         { package: "@arkecosystem/core-database" },
                         { package: "@arkecosystem/core-transactions" },
-                        { package: "@arkecosystem/core-magistrate-transactions" },
                         { package: "@arkecosystem/core-transaction-pool" },
                         { package: "@arkecosystem/core-p2p" },
                         { package: "@arkecosystem/core-blockchain" },

@@ -4,11 +4,10 @@ import Hapi from "@hapi/hapi";
 import { NodeController } from "@packages/core-api/src/controllers/node";
 import { Application, Container, Providers } from "@packages/core-kernel";
 import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { Transactions as MagistrateTransactions } from "@packages/core-magistrate-crypto";
 import { Mocks } from "@packages/core-test-framework";
 import { Generators } from "@packages/core-test-framework/src";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { Interfaces, Managers, Transactions } from "@packages/crypto";
+import { Interfaces, Managers } from "@packages/crypto";
 
 import { initApp, ItemResponse } from "../__support__";
 
@@ -26,17 +25,6 @@ beforeEach(() => {
     app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
 
     controller = app.resolve<NodeController>(NodeController);
-});
-
-afterEach(() => {
-    try {
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BusinessRegistrationTransaction,
-        );
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BridgechainRegistrationTransaction,
-        );
-    } catch {}
 });
 
 describe("NodeController", () => {

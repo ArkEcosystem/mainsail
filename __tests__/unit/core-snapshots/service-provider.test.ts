@@ -79,7 +79,7 @@ describe("ServiceProvider", () => {
             expect(result.error).toBeUndefined();
 
             expect(result.value.updateStep).toBeNumber();
-            expect(result.value.cryptoPackages).toEqual(["@arkecosystem/core-magistrate-crypto"]);
+            expect(result.value.cryptoPackages).toEqual([]);
         });
 
         it("should allow configuration extension", async () => {

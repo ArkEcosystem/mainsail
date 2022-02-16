@@ -474,16 +474,6 @@ describe("API 2.0 - Transactions", () => {
                     HtlcClaim: 9,
                     HtlcRefund: 10,
                 },
-                2: {
-                    // Marketplace stuff
-                    BusinessRegistration: 0,
-                    BusinessResignation: 1,
-                    BusinessUpdate: 2,
-                    BridgechainRegistration: 3,
-                    BridgechainResignation: 4,
-                    BridgechainUpdate: 5,
-                    // Entity: 6, // no "Entity" because aip36 is not enabled
-                },
             });
         });
     });
@@ -636,15 +626,6 @@ describe("API 2.0 - Transactions", () => {
                     secondSignature: "500000000",
                     transfer: "10000000",
                     vote: "100000000",
-                },
-                "2": {
-                    bridgechainRegistration: "5000000000",
-                    bridgechainResignation: "5000000000",
-                    bridgechainUpdate: "5000000000",
-                    businessRegistration: "5000000000",
-                    businessResignation: "5000000000",
-                    businessUpdate: "5000000000",
-                    // entity: "5000000000", // aip36 is disabled
                 },
             });
         });

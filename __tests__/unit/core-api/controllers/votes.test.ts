@@ -4,11 +4,10 @@ import Hapi from "@hapi/hapi";
 import { VotesController } from "@packages/core-api/src/controllers/votes";
 import { Application } from "@packages/core-kernel";
 import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { Transactions as MagistrateTransactions } from "@packages/core-magistrate-crypto";
 import { Mocks } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { Identities, Interfaces, Transactions } from "@packages/crypto";
+import { Identities, Interfaces } from "@packages/crypto";
 import { BuilderFactory } from "@packages/crypto/dist/transactions";
 
 import { initApp, ItemResponse, PaginatedResponse } from "../__support__";
@@ -31,17 +30,6 @@ beforeEach(() => {
     controller = app.resolve<VotesController>(VotesController);
     transactionHistoryService.findOneByCriteria.mockReset();
     transactionHistoryService.listByCriteria.mockReset();
-});
-
-afterEach(() => {
-    try {
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BusinessRegistrationTransaction,
-        );
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BridgechainRegistrationTransaction,
-        );
-    } catch {}
 });
 
 describe("VotesController", () => {

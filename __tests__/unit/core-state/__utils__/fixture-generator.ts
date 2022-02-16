@@ -78,56 +78,6 @@ export class FixtureGenerator {
         return wallets;
     }
 
-    public generateBridgeChainWallets(): Wallet[] {
-        return this.genesisSenders.map((senderPublicKey, i) => {
-            const address = Identities.Address.fromPublicKey(senderPublicKey);
-
-            const wallet = new Wallet(address, new Services.Attributes.AttributeMap(this.attributeSet));
-            wallet.publicKey = senderPublicKey;
-
-            wallet.setAttribute("business", {
-                publicKey: senderPublicKey,
-                businessRegistrationAsset: {},
-                isResigned: false,
-            });
-
-            const bridgechainAsset = {
-                [senderPublicKey]: {
-                    bridgechainAsset: {},
-                    resigned: false,
-                },
-            };
-
-            wallet.setAttribute("business.bridgechains", bridgechainAsset);
-            return wallet;
-        });
-    }
-
-    public generateBusinesses(): Wallet[] {
-        return this.genesisSenders.map((senderPublicKey, i) => {
-            const address = Identities.Address.fromPublicKey(senderPublicKey);
-
-            const wallet = new Wallet(address, new Services.Attributes.AttributeMap(this.attributeSet));
-            wallet.publicKey = senderPublicKey;
-
-            const businessRegistrationAsset = {
-                name: "DummyBusiness",
-                website: "https://www.dummy.example",
-                vat: "EX1234567890",
-                repository: "https://www.dummy.example/repo",
-            };
-
-            wallet.setAttribute("business", {
-                publicKey: senderPublicKey,
-                businessRegistrationAsset,
-                isResigned: false,
-            });
-
-            wallet.setAttribute("business.businessAsset", businessRegistrationAsset);
-            return wallet;
-        });
-    }
-
     public generateVotes(): Wallet[] {
         return this.genesisSenders.map((senderPublicKey) => {
             const address = Identities.Address.fromPublicKey(senderPublicKey);

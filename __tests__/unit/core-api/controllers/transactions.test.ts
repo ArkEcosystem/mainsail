@@ -5,12 +5,11 @@ import { TransactionsController } from "@packages/core-api/src/controllers/trans
 import { Contracts } from "@packages/core-kernel";
 import { Application, Utils } from "@packages/core-kernel";
 import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { Transactions as MagistrateTransactions } from "@packages/core-magistrate-crypto";
 import { Mocks } from "@packages/core-test-framework";
 import { Generators } from "@packages/core-test-framework/src";
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { Identities, Interfaces, Managers, Transactions } from "@packages/crypto";
+import { Identities, Interfaces, Managers } from "@packages/crypto";
 import { BuilderFactory } from "@packages/crypto/dist/transactions";
 import { TransactionType } from "@packages/crypto/src/enums";
 import { configManager } from "@packages/crypto/src/managers";
@@ -74,17 +73,6 @@ beforeEach(() => {
     Mocks.TransactionPoolQuery.setTransactions([]);
     transactionHistoryService.findOneByCriteria.mockReset();
     transactionHistoryService.listByCriteria.mockReset();
-});
-
-afterEach(() => {
-    try {
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BusinessRegistrationTransaction,
-        );
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BridgechainRegistrationTransaction,
-        );
-    } catch {}
 });
 
 describe("TransactionsController", () => {

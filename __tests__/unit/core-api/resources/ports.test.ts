@@ -1,12 +1,10 @@
 import "jest-extended";
 
-import { Transactions } from "@arkecosystem/crypto";
 import { ServiceProvider as CoreApiServiceProvider } from "@packages/core-api/src";
 import { defaults } from "@packages/core-api/src/defaults";
 import { PortsResource } from "@packages/core-api/src/resources";
 import { Application, Container, Providers } from "@packages/core-kernel";
 import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { Transactions as MagistrateTransactions } from "@packages/core-magistrate-crypto";
 import { Mocks } from "@packages/core-test-framework";
 
 import { initApp } from "../__support__";
@@ -23,17 +21,6 @@ beforeEach(() => {
     app.bind(Identifiers.BlockHistoryService).toConstantValue({});
     app.bind(Identifiers.TransactionHistoryService).toConstantValue({});
     app.bind(Identifiers.ServiceProviderRepository).toConstantValue(Mocks.ServiceProviderRepository.instance);
-});
-
-afterEach(() => {
-    try {
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BusinessRegistrationTransaction,
-        );
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BridgechainRegistrationTransaction,
-        );
-    } catch {}
 });
 
 beforeEach(() => {

@@ -14,9 +14,6 @@
                 "package": "@arkecosystem/core-transactions"
             },
             {
-                "package": "@arkecosystem/core-magistrate-transactions"
-            },
-            {
                 "package": "@arkecosystem/core-transaction-pool"
             },
             {
@@ -30,9 +27,6 @@
             },
             {
                 "package": "@arkecosystem/core-api"
-            },
-            {
-                "package": "@arkecosystem/core-magistrate-api"
             },
             {
                 "package": "@arkecosystem/core-webhooks"
@@ -57,9 +51,6 @@
                 "package": "@arkecosystem/core-transactions"
             },
             {
-                "package": "@arkecosystem/core-magistrate-transactions"
-            },
-            {
                 "package": "@arkecosystem/core-transaction-pool"
             },
             {
@@ -73,9 +64,6 @@
             },
             {
                 "package": "@arkecosystem/core-api"
-            },
-            {
-                "package": "@arkecosystem/core-magistrate-api"
             },
             {
                 "package": "@arkecosystem/core-webhooks"

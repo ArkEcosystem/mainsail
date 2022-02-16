@@ -3,7 +3,7 @@ name: "CodeQL Analysis"
 on:
     push:
         branches:
-            - "master"
+            - "main"
             - "develop"
     pull_request:
         types: [ready_for_review, synchronize, opened]

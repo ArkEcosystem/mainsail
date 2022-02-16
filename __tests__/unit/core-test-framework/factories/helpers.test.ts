@@ -20,12 +20,6 @@ describe("Helpers", () => {
         expect(factory("HtlcClaim")).toBeDefined();
         expect(factory("HtlcRefund")).toBeDefined();
         expect(factory("MultiPayment")).toBeDefined();
-        expect(factory("BusinessRegistration")).toBeDefined();
-        expect(factory("BusinessResignation")).toBeDefined();
-        expect(factory("BusinessUpdate")).toBeDefined();
-        expect(factory("BridgechainRegistration")).toBeDefined();
-        expect(factory("BridgechainResignation")).toBeDefined();
-        expect(factory("BridgechainUpdate")).toBeDefined();
         expect(factory("Wallet")).toBeDefined();
     });
 });

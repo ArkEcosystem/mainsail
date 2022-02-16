@@ -4,10 +4,8 @@ import Hapi from "@hapi/hapi";
 import { PeersController } from "@packages/core-api/src/controllers/peers";
 import { Application, Contracts } from "@packages/core-kernel";
 import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { Transactions as MagistrateTransactions } from "@packages/core-magistrate-crypto";
 import { Mocks } from "@packages/core-test-framework";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { Transactions } from "@packages/crypto";
 
 import { initApp, ItemResponse, PaginatedResponse } from "../__support__";
 
@@ -24,17 +22,6 @@ beforeEach(() => {
     controller = app.resolve<PeersController>(PeersController);
 
     Mocks.PeerRepository.setPeers([]);
-});
-
-afterEach(() => {
-    try {
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BusinessRegistrationTransaction,
-        );
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BridgechainRegistrationTransaction,
-        );
-    } catch {}
 });
 
 describe("PeersController", () => {

@@ -41,7 +41,6 @@ export const setUp = async (): Promise<Contracts.Kernel.Application> => {
                     "@arkecosystem/core-state",
                     "@arkecosystem/core-database",
                     "@arkecosystem/core-transactions",
-                    "@arkecosystem/core-magistrate-transactions",
                     "@arkecosystem/core-transaction-pool",
                     "@arkecosystem/core-p2p",
                     "@arkecosystem/core-blockchain",

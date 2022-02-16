@@ -1,20 +1,6 @@
-import { Transactions as MagistrateTransactions } from "@packages/core-magistrate-crypto";
 import { Generators } from "@packages/core-test-framework";
 import { WorkerScriptHandler } from "@packages/core-transaction-pool/src/worker-script-handler";
 import { Identities, Managers, Transactions } from "@packages/crypto";
-
-describe("WorkerScriptHandler.loadCryptoPackage", () => {
-    it("should register crypto package transactions", () => {
-        const workerScriptHandler = new WorkerScriptHandler();
-        workerScriptHandler.loadCryptoPackage("@arkecosystem/core-magistrate-crypto");
-        const check = () => {
-            Transactions.TransactionRegistry.registerTransactionType(
-                MagistrateTransactions.BusinessRegistrationTransaction,
-            );
-        };
-        expect(check).toThrow("Transaction type BusinessRegistrationTransaction is already registered.");
-    });
-});
 
 describe("WorkerScriptHandler.setConfig", () => {
     it("should set crypto configuration", () => {

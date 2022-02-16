@@ -1,14 +1,5 @@
 import { Application, Container, Contracts, Providers, Services } from "@packages/core-kernel";
 import { Identifiers } from "@packages/core-kernel/src/ioc";
-import {
-    BridgechainRegistrationTransactionHandler,
-    BusinessRegistrationTransactionHandler,
-} from "@packages/core-magistrate-transactions/src/handlers";
-import {
-    bridgechainIndexer,
-    businessIndexer,
-    MagistrateIndex,
-} from "@packages/core-magistrate-transactions/src/wallet-indexes";
 import { Wallets } from "@packages/core-state";
 import {
     addressesIndexer,
@@ -107,9 +98,6 @@ export const initApp = (): Application => {
         ServiceProvider.getTransactionHandlerConstructorsBinding(),
     );
 
-    app.bind(Identifiers.TransactionHandler).to(BusinessRegistrationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(BridgechainRegistrationTransactionHandler);
-
     app.bind<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
         .to(Services.Attributes.AttributeSet)
         .inSingletonScope();
@@ -141,18 +129,6 @@ export const initApp = (): Application => {
     app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
         name: Contracts.State.WalletIndexes.Locks,
         indexer: locksIndexer,
-        autoIndex: true,
-    });
-
-    app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-        name: MagistrateIndex.Businesses,
-        indexer: businessIndexer,
-        autoIndex: true,
-    });
-
-    app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-        name: MagistrateIndex.Bridgechains,
-        indexer: bridgechainIndexer,
         autoIndex: true,
     });
 

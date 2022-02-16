@@ -1,22 +1,12 @@
 import "jest-extended";
 
+import { Identities, Managers, Utils } from "@arkecosystem/crypto";
 import { Sandbox } from "@packages/core-test-framework";
 import { Generators } from "@packages/core-test-framework/src";
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
 import { TransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
-import { Identities, Managers, Utils } from "@arkecosystem/crypto";
 
-import {
-    bridgechainRegistrationAsset,
-    bridgechainUpdateAsset,
-    businessRegistrationAsset,
-    businessUpdateAsset,
-    entityAsset,
-    htlcClaimAsset,
-    htlcLockAsset,
-    htlcRefundAsset,
-    passphrasePairsAsset,
-} from "./__fixtures__/assets";
+import { htlcClaimAsset, htlcLockAsset, htlcRefundAsset, passphrasePairsAsset } from "./__fixtures__/assets";
 
 let sandbox: Sandbox;
 let transactionFactory: TransactionFactory;
@@ -172,64 +162,6 @@ describe("TransactionFactory", () => {
                 { recipientId: Identities.Address.fromPassphrase(passphrases[1]), amount: "20" },
                 { recipientId: Identities.Address.fromPassphrase(passphrases[2]), amount: "30" },
             ]);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("businessRegistration", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.businessRegistration(businessRegistrationAsset);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("businessResignation", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.businessResignation();
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("businessUpdate", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.businessUpdate(businessUpdateAsset);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("bridgechainRegistration", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.bridgechainRegistration(bridgechainRegistrationAsset);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("bridgechainResignation", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.bridgechainResignation(
-                "127e6fbfe24a750e72930c220a8e138275656b8e5d8f48a98c3c92df2caba935",
-            );
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("bridgechainUpdate", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.bridgechainUpdate(bridgechainUpdateAsset);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("entity", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.entity(entityAsset);
 
             expect(entity).toBeInstanceOf(TransactionFactory);
         });

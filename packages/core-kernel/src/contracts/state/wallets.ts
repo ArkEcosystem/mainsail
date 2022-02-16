@@ -29,8 +29,6 @@ export enum WalletIndexes {
     Resignations = "resignations",
     Locks = "locks",
     Ipfs = "ipfs",
-    Businesses = "businesses",
-    BridgeChains = "bridgechains",
 }
 
 export interface WalletData {

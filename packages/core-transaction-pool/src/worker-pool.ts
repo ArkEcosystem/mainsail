@@ -23,6 +23,7 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 
         for (let i = 0; i < workerCount; i++) {
             const worker = this.createWorker();
+            // @ts-ignore
             const availableCryptoPackages = cryptoPackages.filter((p) => require.resolve(p.packageName));
             for (const { packageName } of availableCryptoPackages) {
                 worker.loadCryptoPackage(packageName);
@@ -37,6 +38,7 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
         }
 
         const cryptoPackages: CryptoPackagesConfig = this.pluginConfiguration.getRequired("workerPool.cryptoPackages");
+        // @ts-ignore
         return cryptoPackages.some((p) => p.typeGroup === typeGroup);
     }
 

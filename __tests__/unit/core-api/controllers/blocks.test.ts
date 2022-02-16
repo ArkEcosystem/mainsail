@@ -6,12 +6,11 @@ import { BlocksController } from "@packages/core-api/src/controllers/blocks";
 import { Block } from "@packages/core-database/src/models";
 import { Application, Container } from "@packages/core-kernel";
 import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { Transactions as MagistrateTransactions } from "@packages/core-magistrate-crypto";
 import { Wallets } from "@packages/core-state";
 import { Mocks } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { Identities, Interfaces, Transactions, Utils } from "@packages/crypto";
+import { Identities, Interfaces, Utils } from "@packages/crypto";
 import { BuilderFactory } from "@packages/crypto/src/transactions";
 
 import { buildSenderWallet, initApp, ItemResponse, PaginatedResponse } from "../__support__";
@@ -30,9 +29,8 @@ const blockHistoryService = {
     findOneByCriteria: jestfn<Contracts.Shared.BlockHistoryService["findOneByCriteria"]>(),
     listByCriteria: jestfn<Contracts.Shared.BlockHistoryService["listByCriteria"]>(),
     listByCriteriaJoinTransactions: jestfn<Contracts.Shared.BlockHistoryService["listByCriteriaJoinTransactions"]>(),
-    findOneByCriteriaJoinTransactions: jestfn<
-        Contracts.Shared.BlockHistoryService["findOneByCriteriaJoinTransactions"]
-    >(),
+    findOneByCriteriaJoinTransactions:
+        jestfn<Contracts.Shared.BlockHistoryService["findOneByCriteriaJoinTransactions"]>(),
 };
 const transactionHistoryService = {
     listByCriteria: jestfn<Contracts.Shared.TransactionHistoryService["listByCriteria"]>(),
@@ -57,17 +55,6 @@ beforeEach(() => {
 afterEach(() => {
     Mocks.TransactionRepository.setTransactions([]);
     Mocks.StateStore.setBlock(undefined);
-});
-
-afterEach(() => {
-    try {
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BusinessRegistrationTransaction,
-        );
-        Transactions.TransactionRegistry.deregisterTransactionType(
-            MagistrateTransactions.BridgechainRegistrationTransaction,
-        );
-    } catch {}
 });
 
 describe("BlocksController", () => {

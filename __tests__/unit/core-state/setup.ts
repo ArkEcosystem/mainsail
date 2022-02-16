@@ -1,5 +1,6 @@
 import "jest-extended";
 
+import { walletFactory } from "@arkecosystem/core-state/src/wallets/wallet-factory";
 import { Container, Providers, Services } from "@packages/core-kernel";
 import { DposPreviousRoundStateProvider } from "@packages/core-kernel/src/contracts/state";
 import { PluginConfiguration } from "@packages/core-kernel/src/providers";
@@ -16,7 +17,6 @@ import { registerIndexers } from "@packages/core-state/src/wallets/indexers";
 import { Sandbox } from "@packages/core-test-framework/src";
 import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
 import { Managers, Utils } from "@packages/crypto/src";
-import { walletFactory } from "@arkecosystem/core-state/src/wallets/wallet-factory";
 
 export interface Spies {
     applySpy: jest.SpyInstance;
@@ -120,31 +120,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
     sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("ipfs");
 
     sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("ipfs.hashes");
-
-    sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("business");
-
-    sandbox.app
-        .get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
-        .set("business.businessAsset");
-
-    sandbox.app
-        .get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
-        .set("business.bridgechains");
-
-    // TODO: Why does registering these here cause blockstate tests to fail?
-    // sandbox.app
-    //     .bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex)
-    //     .toConstantValue({
-    //         name: MagistrateIndex.Businesses,
-    //         indexer: businessIndexer,
-    //     });
-
-    // sandbox.app
-    //     .bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex)
-    //     .toConstantValue({
-    //         name: MagistrateIndex.Bridgechains,
-    //         indexer: bridgechainIndexer,
-    //     });
 
     registerIndexers(sandbox.app);
 

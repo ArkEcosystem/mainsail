@@ -1,4 +1,3 @@
-import { EntityAction, EntityType } from "@packages/core-magistrate-crypto/src/enums";
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
 import { HtlcLockExpirationType } from "@packages/crypto/src/enums";
 
@@ -146,37 +145,6 @@ export const htlcRefundAsset = {
     lockTransactionId: "12345",
 };
 
-export const businessRegistrationAsset = {
-    name: "DummyBusiness",
-    website: "https://www.dummy.example",
-    vat: "EX1234567890",
-    repository: "https://www.dummy.example/repo",
-};
-
-export const businessUpdateAsset = {
-    name: "DummyBusiness",
-    website: "https://www.dummy.example",
-    vat: "EX1234567890",
-    repository: "https://www.dummy.example/repo",
-};
-
-export const bridgechainRegistrationAsset = {
-    name: "arkecosystem1",
-    seedNodes: ["74.125.224.71", "74.125.224.72", "64.233.173.193", "2001:4860:4860::8888", "2001:4860:4860::8844"],
-    genesisHash: "127e6fbfe24a750e72930c220a8e138275656b8e5d8f48a98c3c92df2caba935",
-    bridgechainRepository: "http://www.repository.com/myorg/myrepo",
-    bridgechainAssetRepository: "http://www.repository.com/myorg/myassetrepo",
-    ports: { "@arkecosystem/core-api": 12345 },
-};
-
-export const bridgechainUpdateAsset = {
-    bridgechainId: "127e6fbfe24a750e72930c220a8e138275656b8e5d8f48a98c3c92df2caba935",
-    seedNodes: ["74.125.224.71", "74.125.224.72", "64.233.173.193", "2001:4860:4860::8888", "2001:4860:4860::8844"],
-    bridgechainRepository: "http://www.repository.com/myorg/myrepo",
-    bridgechainAssetRepository: "http://www.repository.com/myorg/myassetrepo",
-    ports: { "@arkecosystem/core-api": 12345 },
-};
-
 export const passphrasePairsAsset = [
     {
         passphrase: passphrases[0],
@@ -187,13 +155,3 @@ export const passphrasePairsAsset = [
         secondPassphrase: passphrases[4],
     },
 ];
-
-export const entityAsset = {
-    type: EntityType.Business,
-    subType: 0,
-    action: EntityAction.Register,
-    data: {
-        name: "DummyName",
-        ipfsData: "Qmbw6QmF6tuZpyV6WyEsTmExkEG3rW4khattQidPfbpmNZ",
-    },
-};
