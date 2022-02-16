@@ -20,11 +20,13 @@
         "compile": "node ../../node_modules/typescript/bin/tsc",
         "prepublishOnly": "pnpm run build",
         "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
+        "test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
+        "test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
     },
     "dependencies": {
         "@arkecosystem/core-database": "workspace:*",
         "@arkecosystem/core-kernel": "workspace:*",
+        "@arkecosystem/core-transaction-pool": "workspace:*",
         "@arkecosystem/core-transactions": "workspace:*",
         "@arkecosystem/crypto": "workspace:*",
         "@hapi/boom": "9.1.4",
@@ -37,6 +39,11 @@
         "semver": "6.3.0"
     },
     "devDependencies": {
+        "@arkecosystem/core-blockchain": "workspace:*",
+        "@arkecosystem/core-forger": "workspace:*",
+        "@arkecosystem/core-p2p": "workspace:*",
+        "@arkecosystem/core-state": "workspace:*",
+        "@arkecosystem/core-test-framework": "workspace:*",
         "@types/hapi__boom": "7.4.1",
         "@types/hapi__joi": "17.1.7",
         "@types/ip": "1.1.0",

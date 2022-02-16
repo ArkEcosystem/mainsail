@@ -189,8 +189,14 @@ importers:
 
   packages/core-api:
     specifiers:
+      '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-database': workspace:*
+      '@arkecosystem/core-forger': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-state': workspace:*
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/core-transaction-pool': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@hapi/boom': 9.1.4
@@ -209,6 +215,7 @@ importers:
     dependencies:
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto': link:../crypto
       '@hapi/boom': 9.1.4
@@ -220,6 +227,11 @@ importers:
       rate-limiter-flexible: 1.3.2
       semver: 6.3.0
     devDependencies:
+      '@arkecosystem/core-blockchain': link:../core-blockchain
+      '@arkecosystem/core-forger': link:../core-forger
+      '@arkecosystem/core-p2p': link:../core-p2p
+      '@arkecosystem/core-state': link:../core-state
+      '@arkecosystem/core-test-framework': link:../core-test-framework
       '@types/hapi__boom': 7.4.1
       '@types/hapi__joi': 17.1.7
       '@types/ip': 1.1.0

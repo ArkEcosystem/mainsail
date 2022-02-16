@@ -1,7 +1,7 @@
 import { Application, Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Sandbox } from "@arkecosystem/core-test-framework";
 import { Managers, Utils } from "@arkecosystem/crypto";
 import { ServiceProvider } from "@packages/core-api/src";
-import { Sandbox } from "@packages/core-test-framework/src";
 import { EventEmitter } from "events";
 import { resolve } from "path";
 
@@ -68,7 +68,7 @@ export const setUp = async (): Promise<Application> => {
             // We need to manually register the service provider from source so that jest can collect coverage.
             sandbox.registerServiceProvider({
                 name: "@arkecosystem/core-api",
-                path: resolve(__dirname, "../../../../packages/core-api"),
+                path: resolve(__dirname, "../../../../core-api"),
                 klass: ServiceProvider,
             });
 
@@ -97,12 +97,11 @@ export const calculateRanks = async () => {
         "blockchain",
     );
 
-    const delegateWallets = Object.values(
-        walletRepository.allByUsername(),
-    ).sort((a: Contracts.State.Wallet, b: Contracts.State.Wallet) =>
-        b
-            .getAttribute<Utils.BigNumber>("delegate.voteBalance")
-            .comparedTo(a.getAttribute<Utils.BigNumber>("delegate.voteBalance")),
+    const delegateWallets = Object.values(walletRepository.allByUsername()).sort(
+        (a: Contracts.State.Wallet, b: Contracts.State.Wallet) =>
+            b
+                .getAttribute<Utils.BigNumber>("delegate.voteBalance")
+                .comparedTo(a.getAttribute<Utils.BigNumber>("delegate.voteBalance")),
     );
 
     AppUtils.sortBy(delegateWallets, (wallet) => wallet.getPublicKey()).forEach((delegate, i) => {

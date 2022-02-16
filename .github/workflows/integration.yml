@@ -9,7 +9,7 @@ on:
         types: [ready_for_review, synchronize, opened]
 
 jobs:
-    integration:
+    core-api:
         runs-on: ubuntu-latest
 
         services:
@@ -68,4 +68,4 @@ jobs:
               run: mkdir -p $HOME/.core/database
 
             - name: Integration tests
-              run: pnpm run test:integration
+              run: cd packages/core-api && pnpm run test:integration

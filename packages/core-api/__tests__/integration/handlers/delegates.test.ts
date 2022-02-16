@@ -1,8 +1,8 @@
 import "@packages/core-test-framework/src/matchers";
 
-import { Repositories } from "@arkecosystem/core-database";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers } from "@arkecosystem/crypto";
+import { Repositories } from "@packages/core-database";
+import { Container, Contracts, Utils as AppUtils } from "@packages/core-kernel";
+import { Interfaces, Managers } from "@packages/crypto";
 import { ApiHelpers, Factories } from "@packages/core-test-framework/src";
 
 import { calculateRanks, setUp, tearDown } from "../__support__/setup";
