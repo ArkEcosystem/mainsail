@@ -1,0 +1,29 @@
+{
+	"name": "@arkecosystem/crypto-address-ss558",
+	"version": "3.1.1",
+	"description": "ss58 Address Derivation",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
+		"test": "uvu -r tsm source .test.ts"
+	},
+	"dependencies": {
+		"@arkecosystem/crypto-contracts": "workspace:*",
+		"@polkadot/util": "^8.4.1",
+		"@polkadot/util-crypto": "^8.4.1"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-test": "workspace:*",
+		"@arkecosystem/crypto-key-pair-schnorr": "workspace:*",
+		"@arkecosystem/crypto-key-pair-secp256k1": "workspace:*",
+		"uvu": "^0.5.3"
+	}
+}
