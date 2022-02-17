@@ -1,19 +1,19 @@
 export class NesClient {
-    public connect() {
-        return;
-    }
-    public disconnect() {
-        return;
-    }
-    public terminate() {
-        return;
-    }
+	public connect() {
+		return;
+	}
+	public disconnect() {
+		return;
+	}
+	public terminate() {
+		return;
+	}
 
-    public request() {
-        return;
-    }
+	public request() {
+		return;
+	}
 }
 
 export default {
-    Client: jest.fn().mockImplementation((url) => new NesClient()),
+	Client: jest.fn().mockImplementation((url) => new NesClient()),
 };

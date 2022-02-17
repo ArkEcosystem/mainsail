@@ -3,25 +3,25 @@ import { isObject } from "./is-object";
 import { isString } from "./is-string";
 
 export const set = <T>(object: T, path: string | string[], value: unknown): boolean => {
-    if (!isObject(object) || !isString(path)) {
-        return false;
-    }
+	if (!isObject(object) || !isString(path)) {
+		return false;
+	}
 
-    const pathSegments: string[] = getPathSegments(path);
+	const pathSegments: string[] = getPathSegments(path);
 
-    for (let i = 0; i < pathSegments.length; i++) {
-        const pathSegment: string = pathSegments[i];
+	for (let i = 0; i < pathSegments.length; i++) {
+		const pathSegment: string = pathSegments[i];
 
-        if (!isObject(object[pathSegment])) {
-            object[pathSegment] = {};
-        }
+		if (!isObject(object[pathSegment])) {
+			object[pathSegment] = {};
+		}
 
-        if (i === pathSegments.length - 1) {
-            object[pathSegment] = value;
-        }
+		if (i === pathSegments.length - 1) {
+			object[pathSegment] = value;
+		}
 
-        object = object[pathSegment];
-    }
+		object = object[pathSegment];
+	}
 
-    return true;
+	return true;
 };

@@ -3,15 +3,15 @@ import { Interfaces } from "@arkecosystem/crypto";
 import { SenderMempool } from "./sender-mempool";
 
 export interface Mempool {
-    getSize(): number;
+	getSize(): number;
 
-    hasSenderMempool(senderPublicKey: string): boolean;
-    getSenderMempool(senderPublicKey: string): SenderMempool;
-    getSenderMempools(): Iterable<SenderMempool>;
+	hasSenderMempool(senderPublicKey: string): boolean;
+	getSenderMempool(senderPublicKey: string): SenderMempool;
+	getSenderMempools(): Iterable<SenderMempool>;
 
-    addTransaction(transaction: Interfaces.ITransaction): Promise<void>;
-    removeTransaction(senderPublicKey: string, id: string): Promise<Interfaces.ITransaction[]>;
-    removeForgedTransaction(senderPublicKey: string, id: string): Promise<Interfaces.ITransaction[]>;
+	addTransaction(transaction: Interfaces.ITransaction): Promise<void>;
+	removeTransaction(senderPublicKey: string, id: string): Promise<Interfaces.ITransaction[]>;
+	removeForgedTransaction(senderPublicKey: string, id: string): Promise<Interfaces.ITransaction[]>;
 
-    flush(): void;
+	flush(): void;
 }

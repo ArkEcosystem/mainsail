@@ -9,38 +9,38 @@ let cmd;
 beforeAll(() => setGracefulCleanup());
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    cmd = cli.app.resolve(DiscoverCommands);
+	cmd = cli.app.resolve(DiscoverCommands);
 });
 
 describe("DiscoverCommands", () => {
-    describe("#within", () => {
-        it("should discover commands within the given directory", () => {
-            const commandPath: string = resolve(__dirname, "../../../core/dist/commands");
+	describe("#within", () => {
+		it("should discover commands within the given directory", () => {
+			const commandPath: string = resolve(__dirname, "../../../core/dist/commands");
 
-            const commands = cmd.within(commandPath);
+			const commands = cmd.within(commandPath);
 
-            expect(commands).toBeObject();
-            expect(commands).not.toBeEmpty();
-        });
-    });
+			expect(commands).toBeObject();
+			expect(commands).not.toBeEmpty();
+		});
+	});
 
-    describe("#from", () => {
-        it("should not discover commands if no packages are passed in", () => {
-            const commands = cmd.from([]);
+	describe("#from", () => {
+		it("should not discover commands if no packages are passed in", () => {
+			const commands = cmd.from([]);
 
-            expect(commands).toBeObject();
-            expect(commands).toBeEmpty();
-        });
+			expect(commands).toBeObject();
+			expect(commands).toBeEmpty();
+		});
 
-        it.skip("should discover commands within the given packages", () => {
-            const commandPath: string = resolve(__dirname, "./dist");
+		it.skip("should discover commands within the given packages", () => {
+			const commandPath: string = resolve(__dirname, "./dist");
 
-            const commands = cmd.from([commandPath]);
+			const commands = cmd.from([commandPath]);
 
-            expect(commands).toBeObject();
-            expect(commands).toContainAllKeys(["help"]);
-        });
-    });
+			expect(commands).toBeObject();
+			expect(commands).toContainAllKeys(["help"]);
+		});
+	});
 });

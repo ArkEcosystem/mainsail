@@ -7,22 +7,22 @@ import { ProcessManager } from "../services";
  */
 @injectable()
 export class AbortStoppedProcess {
-    /**
-     * @private
-     * @type {ProcessManager}
-     * @memberof Command
-     */
-    @inject(Identifiers.ProcessManager)
-    private readonly processManager!: ProcessManager;
+	/**
+	 * @private
+	 * @type {ProcessManager}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.ProcessManager)
+	private readonly processManager!: ProcessManager;
 
-    /**
-     * @static
-     * @param {string} processName
-     * @memberof AbortStoppedProcess
-     */
-    public execute(processName: string): void {
-        if (this.processManager.isStopped(processName)) {
-            throw new Error(`The "${processName}" process is not running.`);
-        }
-    }
+	/**
+	 * @static
+	 * @param {string} processName
+	 * @memberof AbortStoppedProcess
+	 */
+	public execute(processName: string): void {
+		if (this.processManager.isStopped(processName)) {
+			throw new Error(`The "${processName}" process is not running.`);
+		}
+	}
 }

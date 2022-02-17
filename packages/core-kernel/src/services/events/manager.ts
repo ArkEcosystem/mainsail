@@ -8,25 +8,25 @@ import { MemoryEventDispatcher } from "./drivers/memory";
  * @extends {Manager<EventDispatcher>}
  */
 export class EventDispatcherManager extends InstanceManager<EventDispatcher> {
-    /**
-     * Create an instance of the Memory driver.
-     *
-     * @protected
-     * @returns {Promise<EventDispatcher>}
-     * @memberof EventDispatcherManager
-     */
-    protected async createMemoryDriver(): Promise<EventDispatcher> {
-        return this.app.resolve<EventDispatcher>(MemoryEventDispatcher);
-    }
+	/**
+	 * Create an instance of the Memory driver.
+	 *
+	 * @protected
+	 * @returns {Promise<EventDispatcher>}
+	 * @memberof EventDispatcherManager
+	 */
+	protected async createMemoryDriver(): Promise<EventDispatcher> {
+		return this.app.resolve<EventDispatcher>(MemoryEventDispatcher);
+	}
 
-    /**
-     * Get the default log driver name.
-     *
-     * @protected
-     * @returns {string}
-     * @memberof EventDispatcherManager
-     */
-    protected getDefaultDriver(): string {
-        return "memory";
-    }
+	/**
+	 * Get the default log driver name.
+	 *
+	 * @protected
+	 * @returns {string}
+	 * @memberof EventDispatcherManager
+	 */
+	protected getDefaultDriver(): string {
+		return "memory";
+	}
 }

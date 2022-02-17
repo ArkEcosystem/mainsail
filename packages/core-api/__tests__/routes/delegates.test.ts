@@ -13,82 +13,82 @@ let app;
 let server: Server;
 
 beforeAll(async () => {
-    app = initApp();
-    server = await initServer(app, serverDefaults);
-    // @ts-ignore
-    register(server.server);
+	app = initApp();
+	server = await initServer(app, serverDefaults);
+	// @ts-ignore
+	register(server.server);
 });
 
 afterAll(async () => {
-    await server.dispose();
+	await server.dispose();
 });
 
 describe("Delegates", () => {
-    describe("Index", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(DelegatesController.prototype, "index").mockResolvedValue(paginatedResult);
+	describe("Index", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(DelegatesController.prototype, "index").mockResolvedValue(paginatedResult);
 
-            const injectOptions = {
-                method: "GET",
-                url: "/delegates",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/delegates",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Show", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(DelegatesController.prototype, "show").mockResolvedValue({});
+	describe("Show", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(DelegatesController.prototype, "show").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/delegates/027716e659220085e41389efc7cf6a05f7f7c659cf3db9126caabce6cda9156582",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/delegates/027716e659220085e41389efc7cf6a05f7f7c659cf3db9126caabce6cda9156582",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Voters", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(DelegatesController.prototype, "voters").mockResolvedValue(paginatedResult);
+	describe("Voters", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(DelegatesController.prototype, "voters").mockResolvedValue(paginatedResult);
 
-            const injectOptions = {
-                method: "GET",
-                url: "/delegates/027716e659220085e41389efc7cf6a05f7f7c659cf3db9126caabce6cda9156582/voters",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/delegates/027716e659220085e41389efc7cf6a05f7f7c659cf3db9126caabce6cda9156582/voters",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Blocks", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(DelegatesController.prototype, "blocks").mockResolvedValue(paginatedResult);
+	describe("Blocks", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(DelegatesController.prototype, "blocks").mockResolvedValue(paginatedResult);
 
-            const injectOptions = {
-                method: "GET",
-                url: "/delegates/027716e659220085e41389efc7cf6a05f7f7c659cf3db9126caabce6cda9156582/blocks",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/delegates/027716e659220085e41389efc7cf6a05f7f7c659cf3db9126caabce6cda9156582/blocks",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 });

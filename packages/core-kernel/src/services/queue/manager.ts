@@ -10,25 +10,25 @@ import { MemoryQueue } from "./drivers/memory";
  */
 @injectable()
 export class QueueManager extends ClassManager {
-    /**
-     * Create an instance of the Memory driver.
-     *
-     * @protected
-     * @returns {Promise<Logger>}
-     * @memberof QueueManager
-     */
-    protected async createMemoryDriver(): Promise<Queue> {
-        return this.app.resolve<Queue>(MemoryQueue).make();
-    }
+	/**
+	 * Create an instance of the Memory driver.
+	 *
+	 * @protected
+	 * @returns {Promise<Logger>}
+	 * @memberof QueueManager
+	 */
+	protected async createMemoryDriver(): Promise<Queue> {
+		return this.app.resolve<Queue>(MemoryQueue).make();
+	}
 
-    /**
-     * Get the default driver name.
-     *
-     * @protected
-     * @returns {string}
-     * @memberof ValidationManager
-     */
-    protected getDefaultDriver(): string {
-        return "memory";
-    }
+	/**
+	 * Get the default driver name.
+	 *
+	 * @protected
+	 * @returns {string}
+	 * @memberof ValidationManager
+	 */
+	protected getDefaultDriver(): string {
+		return "memory";
+	}
 }

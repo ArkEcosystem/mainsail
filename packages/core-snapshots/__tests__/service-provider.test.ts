@@ -11,141 +11,141 @@ let sandbox: Sandbox;
 const spyOnGetCustomRepository = jest.spyOn(typeorm, "getCustomRepository").mockReturnValue(undefined);
 
 ServiceProvider.prototype.config = jest.fn().mockReturnValue({
-    all: jest.fn().mockReturnValue({
-        connection: {},
-    }),
+	all: jest.fn().mockReturnValue({
+		connection: {},
+	}),
 });
 
 beforeEach(() => {
-    sandbox = new Sandbox();
+	sandbox = new Sandbox();
 
-    sandbox.app.bind(Container.Identifiers.LogService).toConstantValue({});
+	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue({});
 });
 
 afterEach(() => {
-    jest.clearAllMocks();
+	jest.clearAllMocks();
 });
 
 describe("ServiceProvider", () => {
-    let serviceProvider: ServiceProvider;
+	let serviceProvider: ServiceProvider;
 
-    beforeEach(() => {
-        serviceProvider = sandbox.app.resolve<ServiceProvider>(ServiceProvider);
-    });
+	beforeEach(() => {
+		serviceProvider = sandbox.app.resolve<ServiceProvider>(ServiceProvider);
+	});
 
-    it("should register", async () => {
-        await expect(serviceProvider.register()).toResolve();
-        expect(spyOnGetCustomRepository).toHaveBeenCalledTimes(3);
-    });
+	it("should register", async () => {
+		await expect(serviceProvider.register()).toResolve();
+		expect(spyOnGetCustomRepository).toHaveBeenCalledTimes(3);
+	});
 
-    it("should register is default connection is already active", async () => {
-        sandbox.app.bind(Container.Identifiers.DatabaseConnection).toConstantValue({});
+	it("should register is default connection is already active", async () => {
+		sandbox.app.bind(Container.Identifiers.DatabaseConnection).toConstantValue({});
 
-        await expect(serviceProvider.register()).toResolve();
-        expect(spyOnGetCustomRepository).toHaveBeenCalledTimes(3);
-    });
+		await expect(serviceProvider.register()).toResolve();
+		expect(spyOnGetCustomRepository).toHaveBeenCalledTimes(3);
+	});
 
-    it("should dispose", async () => {
-        await expect(serviceProvider.register()).toResolve();
-        expect(spyOnGetCustomRepository).toHaveBeenCalled();
+	it("should dispose", async () => {
+		await expect(serviceProvider.register()).toResolve();
+		expect(spyOnGetCustomRepository).toHaveBeenCalled();
 
-        await expect(serviceProvider.dispose()).toResolve();
-    });
+		await expect(serviceProvider.dispose()).toResolve();
+	});
 
-    it("should be required", async () => {
-        await expect(serviceProvider.required()).resolves.toBeTrue();
-    });
+	it("should be required", async () => {
+		await expect(serviceProvider.required()).resolves.toBeTrue();
+	});
 
-    it("should depend on core-database", async () => {
-        expect(serviceProvider.dependencies()).toEqual([
-            {
-                name: "@arkecosystem/core-database",
-                required: true,
-            },
-        ]);
-    });
+	it("should depend on core-database", async () => {
+		expect(serviceProvider.dependencies()).toEqual([
+			{
+				name: "@arkecosystem/core-database",
+				required: true,
+			},
+		]);
+	});
 
-    describe("ServiceProvider.configSchema", () => {
-        beforeEach(() => {
-            serviceProvider = sandbox.app.resolve<ServiceProvider>(ServiceProvider);
-        });
+	describe("ServiceProvider.configSchema", () => {
+		beforeEach(() => {
+			serviceProvider = sandbox.app.resolve<ServiceProvider>(ServiceProvider);
+		});
 
-        it("should validate schema using defaults", async () => {
-            jest.resetModules();
-            const result = (serviceProvider.configSchema() as AnySchema).validate(
-                (await import("@packages/core-snapshots/src/defaults")).defaults,
-            );
+		it("should validate schema using defaults", async () => {
+			jest.resetModules();
+			const result = (serviceProvider.configSchema() as AnySchema).validate(
+				(await import("@packages/core-snapshots/src/defaults")).defaults,
+			);
 
-            expect(result.error).toBeUndefined();
+			expect(result.error).toBeUndefined();
 
-            expect(result.value.updateStep).toBeNumber();
-            expect(result.value.cryptoPackages).toEqual([]);
-        });
+			expect(result.value.updateStep).toBeNumber();
+			expect(result.value.cryptoPackages).toEqual([]);
+		});
 
-        it("should allow configuration extension", async () => {
-            jest.resetModules();
-            const defaults = (await import("@packages/core-snapshots/src/defaults")).defaults;
+		it("should allow configuration extension", async () => {
+			jest.resetModules();
+			const defaults = (await import("@packages/core-snapshots/src/defaults")).defaults;
 
-            // @ts-ignore
-            defaults.customField = "dummy";
+			// @ts-ignore
+			defaults.customField = "dummy";
 
-            const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+			const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-            expect(result.error).toBeUndefined();
-            expect(result.value.customField).toEqual("dummy");
-        });
+			expect(result.error).toBeUndefined();
+			expect(result.value.customField).toEqual("dummy");
+		});
 
-        describe("schema restrictions", () => {
-            let defaults;
+		describe("schema restrictions", () => {
+			let defaults;
 
-            beforeEach(async () => {
-                jest.resetModules();
-                defaults = (await import("@packages/core-snapshots/src/defaults")).defaults;
-            });
+			beforeEach(async () => {
+				jest.resetModules();
+				defaults = (await import("@packages/core-snapshots/src/defaults")).defaults;
+			});
 
-            it("updateStep is required && is integer && >= 1 && <= 2000", async () => {
-                defaults.updateStep = false;
-                let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+			it("updateStep is required && is integer && >= 1 && <= 2000", async () => {
+				defaults.updateStep = false;
+				let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"updateStep" must be a number');
+				expect(result.error!.message).toEqual('"updateStep" must be a number');
 
-                defaults.updateStep = 1.12;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+				defaults.updateStep = 1.12;
+				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"updateStep" must be an integer');
+				expect(result.error!.message).toEqual('"updateStep" must be an integer');
 
-                defaults.updateStep = 0;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+				defaults.updateStep = 0;
+				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"updateStep" must be greater than or equal to 1');
+				expect(result.error!.message).toEqual('"updateStep" must be greater than or equal to 1');
 
-                defaults.updateStep = 5000;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+				defaults.updateStep = 5000;
+				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"updateStep" must be less than or equal to 2000');
+				expect(result.error!.message).toEqual('"updateStep" must be less than or equal to 2000');
 
-                delete defaults.updateStep;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+				delete defaults.updateStep;
+				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"updateStep" is required');
-            });
+				expect(result.error!.message).toEqual('"updateStep" is required');
+			});
 
-            it("cryptoPackages is required && is array && contain strings", async () => {
-                defaults.cryptoPackages = false;
-                let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+			it("cryptoPackages is required && is array && contain strings", async () => {
+				defaults.cryptoPackages = false;
+				let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"cryptoPackages" must be an array');
+				expect(result.error!.message).toEqual('"cryptoPackages" must be an array');
 
-                defaults.cryptoPackages = [false];
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+				defaults.cryptoPackages = [false];
+				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"cryptoPackages[0]" must be a string');
+				expect(result.error!.message).toEqual('"cryptoPackages[0]" must be a string');
 
-                delete defaults.cryptoPackages;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+				delete defaults.cryptoPackages;
+				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"cryptoPackages" is required');
-            });
-        });
-    });
+				expect(result.error!.message).toEqual('"cryptoPackages" is required');
+			});
+		});
+	});
 });

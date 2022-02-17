@@ -9,30 +9,30 @@ let processManager;
 let action;
 
 beforeEach(() => {
-    cli = new Console();
-    processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	cli = new Console();
+	processManager = cli.app.get(Container.Identifiers.ProcessManager);
 
-    // Bind from src instead of dist to collect coverage.
-    cli.app.rebind(Container.Identifiers.AbortErroredProcess).to(AbortErroredProcess).inSingletonScope();
-    action = cli.app.get(Container.Identifiers.AbortErroredProcess);
+	// Bind from src instead of dist to collect coverage.
+	cli.app.rebind(Container.Identifiers.AbortErroredProcess).to(AbortErroredProcess).inSingletonScope();
+	action = cli.app.get(Container.Identifiers.AbortErroredProcess);
 });
 
 describe("AbortErroredProcess", () => {
-    it("should not throw if the process does exist", () => {
-        const spy = jest.spyOn(processManager, "isErrored").mockReturnValue(false);
+	it("should not throw if the process does exist", () => {
+		const spy = jest.spyOn(processManager, "isErrored").mockReturnValue(false);
 
-        expect(action.execute(processName)).toBeUndefined();
-        expect(spy).toHaveBeenCalled();
+		expect(action.execute(processName)).toBeUndefined();
+		expect(spy).toHaveBeenCalled();
 
-        spy.mockClear();
-    });
+		spy.mockClear();
+	});
 
-    it("should throw if the process does not exist", () => {
-        const spy = jest.spyOn(processManager, "isErrored").mockReturnValue(true);
+	it("should throw if the process does not exist", () => {
+		const spy = jest.spyOn(processManager, "isErrored").mockReturnValue(true);
 
-        expect(() => action.execute(processName)).toThrow(`The "${processName}" process has errored.`);
-        expect(spy).toHaveBeenCalled();
+		expect(() => action.execute(processName)).toThrow(`The "${processName}" process has errored.`);
+		expect(spy).toHaveBeenCalled();
 
-        spy.mockClear();
-    });
+		spy.mockClear();
+	});
 });

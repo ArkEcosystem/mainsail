@@ -9,20 +9,20 @@ import { Logger } from "../services";
  */
 @injectable()
 export class Success {
-    /**
-     * @private
-     * @type {Logger}
-     * @memberof Command
-     */
-    @inject(Identifiers.Logger)
-    private readonly logger!: Logger;
+	/**
+	 * @private
+	 * @type {Logger}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.Logger)
+	private readonly logger!: Logger;
 
-    /**
-     * @static
-     * @param {string} message
-     * @memberof Success
-     */
-    public render(message: string): void {
-        this.logger.info(white().bgGreen(`[OK] ${message}`));
-    }
+	/**
+	 * @static
+	 * @param {string} message
+	 * @memberof Success
+	 */
+	public render(message: string): void {
+		this.logger.info(white().bgGreen(`[OK] ${message}`));
+	}
 }

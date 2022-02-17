@@ -13,9 +13,9 @@ export class FileException extends RuntimeException {}
  * @extends {FileException}
  */
 export class AccessDenied extends FileException {
-    public constructor(path: string) {
-        super(`The file ${path} could not be accessed.`);
-    }
+	public constructor(path: string) {
+		super(`The file ${path} could not be accessed.`);
+	}
 }
 
 /**
@@ -31,11 +31,11 @@ export class CannotWriteFile extends FileException {}
  * @extends {FileException}
  */
 export class DirectoryCannotBeFound extends FileException {
-    /**
-     * @param {string} value
-     * @memberof DirectoryCannotBeFound
-     */
-    public constructor(value: string) {
-        super(`Directory [${value}] could not be found.`);
-    }
+	/**
+	 * @param {string} value
+	 * @memberof DirectoryCannotBeFound
+	 */
+	public constructor(value: string) {
+		super(`Directory [${value}] could not be found.`);
+	}
 }

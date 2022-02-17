@@ -1,7 +1,7 @@
 export const paginatedResult = {
-    results: [],
-    totalCount: 0,
-    meta: {
-        totalCountIsEstimate: false,
-    },
+	results: [],
+	totalCount: 0,
+	meta: {
+		totalCountIsEstimate: false,
+	},
 };

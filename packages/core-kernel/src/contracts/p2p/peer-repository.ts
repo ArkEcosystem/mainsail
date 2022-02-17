@@ -1,29 +1,29 @@
 import { Peer } from "./peer";
 
 export interface PeerRepository {
-    getPeers(): Peer[];
+	getPeers(): Peer[];
 
-    hasPeers(): boolean;
+	hasPeers(): boolean;
 
-    getPeer(ip: string): Peer;
+	getPeer(ip: string): Peer;
 
-    setPeer(peer: Peer): void;
+	setPeer(peer: Peer): void;
 
-    forgetPeer(peer: Peer): void;
+	forgetPeer(peer: Peer): void;
 
-    hasPeer(ip: string): boolean;
+	hasPeer(ip: string): boolean;
 
-    getPendingPeers(): Peer[];
+	getPendingPeers(): Peer[];
 
-    hasPendingPeers(): boolean;
+	hasPendingPeers(): boolean;
 
-    getPendingPeer(ip: string): Peer;
+	getPendingPeer(ip: string): Peer;
 
-    setPendingPeer(peer: Peer): void;
+	setPendingPeer(peer: Peer): void;
 
-    forgetPendingPeer(peer: Peer): void;
+	forgetPendingPeer(peer: Peer): void;
 
-    hasPendingPeer(ip: string): boolean;
+	hasPendingPeer(ip: string): boolean;
 
-    getSameSubnetPeers(ip: string): Peer[];
+	getSameSubnetPeers(ip: string): Peer[];
 }

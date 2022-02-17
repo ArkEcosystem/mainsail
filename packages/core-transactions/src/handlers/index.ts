@@ -5,8 +5,8 @@ import { TransactionHandler, TransactionHandlerConstructor } from "./transaction
 export * as Two from "./two";
 
 export {
-    TransactionHandler,
-    TransactionHandlerConstructor,
-    TransactionHandlerRegistry as Registry,
-    TransactionHandlerProvider,
+	TransactionHandler,
+	TransactionHandlerConstructor,
+	TransactionHandlerRegistry as Registry,
+	TransactionHandlerProvider,
 };

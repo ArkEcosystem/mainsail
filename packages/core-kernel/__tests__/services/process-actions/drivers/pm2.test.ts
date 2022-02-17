@@ -7,69 +7,69 @@ import pmx from "@pm2/io";
 let pm2: Pm2ProcessActionsService;
 
 class DummyProcessAction implements ProcessAction {
-    public name = "dummy";
+	public name = "dummy";
 
-    public async handler() {
-        return "dummy_response";
-    }
+	public async handler() {
+		return "dummy_response";
+	}
 }
 
 let dummyProcessAction: DummyProcessAction;
 
 beforeEach(() => {
-    pm2 = new Pm2ProcessActionsService();
+	pm2 = new Pm2ProcessActionsService();
 
-    dummyProcessAction = new DummyProcessAction();
+	dummyProcessAction = new DummyProcessAction();
 });
 
 jest.mock("@pm2/io", () => {
-    class MockPmx {
-        private cb?: Function;
+	class MockPmx {
+		private cb?: Function;
 
-        public action(name: string, cb: Function) {
-            this.cb = cb;
-        }
+		public action(name: string, cb: Function) {
+			this.cb = cb;
+		}
 
-        public async runAction(reply: any) {
-            await this.cb!(reply);
-        }
-    }
+		public async runAction(reply: any) {
+			await this.cb!(reply);
+		}
+	}
 
-    return new MockPmx();
+	return new MockPmx();
 });
 
 describe("Pm2ProcessActionsService", () => {
-    it("should register action", async () => {
-        pm2.register(dummyProcessAction);
-    });
+	it("should register action", async () => {
+		pm2.register(dummyProcessAction);
+	});
 
-    it("should run action and return response", async () => {
-        pm2.register(dummyProcessAction);
+	it("should run action and return response", async () => {
+		pm2.register(dummyProcessAction);
 
-        const reply = jest.fn();
+		const reply = jest.fn();
 
-        // @ts-ignore
-        await pmx.runAction(reply);
+		// @ts-ignore
+		await pmx.runAction(reply);
 
-        expect(reply).toHaveBeenCalledWith({ response: "dummy_response" });
-    });
+		expect(reply).toHaveBeenCalledWith({ response: "dummy_response" });
+	});
 
-    it("should run action and return error", async () => {
-        dummyProcessAction.handler = jest.fn().mockImplementation(async () => {
-            throw new Error();
-        });
+	it("should run action and return error", async () => {
+		dummyProcessAction.handler = jest.fn().mockImplementation(async () => {
+			throw new Error();
+		});
 
-        pm2.register(dummyProcessAction);
+		pm2.register(dummyProcessAction);
 
-        const reply = jest.fn();
+		const reply = jest.fn();
 
-        // @ts-ignore
-        await pmx.runAction(reply);
+		// @ts-ignore
+		await pmx.runAction(reply);
 
-        expect(reply).toHaveBeenCalledWith(
-            expect.objectContaining({
-                error: expect.toBeString(),
-            }),
-        );
-    });
+		expect(reply).toHaveBeenCalledWith(
+			expect.objectContaining({
+				error: expect.toBeString(),
+			}),
+		);
+	});
 });

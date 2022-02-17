@@ -9,13 +9,13 @@ import { injectable } from "../ioc";
  */
 @injectable()
 export class Prompt {
-    /**
-     * @static
-     * @param {object} options
-     * @returns {Promise<JsonObject>}
-     * @memberof Prompt
-     */
-    public async render(options: object): Promise<JsonObject> {
-        return prompts(options);
-    }
+	/**
+	 * @static
+	 * @param {object} options
+	 * @returns {Promise<JsonObject>}
+	 * @memberof Prompt
+	 */
+	public async render(options: object): Promise<JsonObject> {
+		return prompts(options);
+	}
 }

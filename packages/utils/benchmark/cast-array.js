@@ -1,8 +1,6 @@
-const {
-    castArray
-} = require('../dist')
-const lodash = require('lodash/castArray')
+const { castArray } = require("../dist");
+const lodash = require("lodash/castArray");
 
-exports['utils'] = () => castArray('abc');
+exports["utils"] = () => castArray("abc");
 
-exports['lodash'] = () => lodash('abc');
+exports["lodash"] = () => lodash("abc");

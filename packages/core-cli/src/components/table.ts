@@ -9,32 +9,32 @@ import { Logger } from "../services";
  */
 @injectable()
 export class Table {
-    /**
-     * @private
-     * @type {Logger}
-     * @memberof Command
-     */
-    @inject(Identifiers.Logger)
-    private readonly logger!: Logger;
+	/**
+	 * @private
+	 * @type {Logger}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.Logger)
+	private readonly logger!: Logger;
 
-    /**
-     * @static
-     * @param {string[]} head
-     * @param {*} callback
-     * @param {object} [opts={}]
-     * @memberof Table
-     */
-    public render(head: string[], callback: any, opts: object = {}): void {
-        const table = new Table3({
-            ...{
-                head,
-                chars: { mid: "", "left-mid": "", "mid-mid": "", "right-mid": "" },
-            },
-            ...opts,
-        });
+	/**
+	 * @static
+	 * @param {string[]} head
+	 * @param {*} callback
+	 * @param {object} [opts={}]
+	 * @memberof Table
+	 */
+	public render(head: string[], callback: any, opts: object = {}): void {
+		const table = new Table3({
+			...{
+				head,
+				chars: { mid: "", "left-mid": "", "mid-mid": "", "right-mid": "" },
+			},
+			...opts,
+		});
 
-        callback(table);
+		callback(table);
 
-        this.logger.log(table.toString());
-    }
+		this.logger.log(table.toString());
+	}
 }

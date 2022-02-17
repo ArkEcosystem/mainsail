@@ -12,21 +12,21 @@ let container: interfaces.Container;
 let scheduleService: Schedule;
 
 beforeEach(() => {
-    container = new Container();
-    container.snapshot();
+	container = new Container();
+	container.snapshot();
 
-    app = new Application(container);
-    app.bind(Identifiers.EventDispatcherService).to(MemoryEventDispatcher);
+	app = new Application(container);
+	app.bind(Identifiers.EventDispatcherService).to(MemoryEventDispatcher);
 
-    scheduleService = app.resolve<Schedule>(Schedule);
+	scheduleService = app.resolve<Schedule>(Schedule);
 });
 
 describe("Schedule", () => {
-    it("should return a cron job instance", () => {
-        expect(scheduleService.cron()).toBeInstanceOf(CronJob);
-    });
+	it("should return a cron job instance", () => {
+		expect(scheduleService.cron()).toBeInstanceOf(CronJob);
+	});
 
-    it("should return a block job instance", () => {
-        expect(scheduleService.block()).toBeInstanceOf(BlockJob);
-    });
+	it("should return a block job instance", () => {
+		expect(scheduleService.block()).toBeInstanceOf(BlockJob);
+	});
 });

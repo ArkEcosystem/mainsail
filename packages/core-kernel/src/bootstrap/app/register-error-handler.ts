@@ -10,12 +10,12 @@ import { Bootstrapper } from "../interfaces";
  */
 @injectable()
 export class RegisterErrorHandler implements Bootstrapper {
-    /**
-     * @returns {Promise<void>}
-     * @memberof RegisterErrorHandler
-     */
-    public async bootstrap(): Promise<void> {
-        // todo: implement passing in of options and ensure handling of critical exceptions
-        logProcessErrors({ exitOn: [] });
-    }
+	/**
+	 * @returns {Promise<void>}
+	 * @memberof RegisterErrorHandler
+	 */
+	public async bootstrap(): Promise<void> {
+		// todo: implement passing in of options and ensure handling of critical exceptions
+		logProcessErrors({ exitOn: [] });
+	}
 }

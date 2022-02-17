@@ -1,25 +1,25 @@
 import { Interfaces } from "@arkecosystem/crypto";
 
 export interface BlockStore {
-    get(key: string | number): Interfaces.IBlockData | undefined;
+	get(key: string | number): Interfaces.IBlockData | undefined;
 
-    set(value: Interfaces.IBlock): void;
+	set(value: Interfaces.IBlock): void;
 
-    has(value: Interfaces.IBlockData): boolean;
+	has(value: Interfaces.IBlockData): boolean;
 
-    delete(value: Interfaces.IBlockData): void;
+	delete(value: Interfaces.IBlockData): void;
 
-    clear(): void;
+	clear(): void;
 
-    resize(maxSize: number): void;
+	resize(maxSize: number): void;
 
-    last(): Interfaces.IBlock | undefined;
+	last(): Interfaces.IBlock | undefined;
 
-    values(): Interfaces.IBlockData[];
+	values(): Interfaces.IBlockData[];
 
-    count(): number;
+	count(): number;
 
-    getIds(): string[];
+	getIds(): string[];
 
-    getHeights(): number[];
+	getHeights(): number[];
 }

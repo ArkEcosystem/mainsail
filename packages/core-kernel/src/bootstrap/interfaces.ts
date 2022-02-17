@@ -3,9 +3,9 @@
  * @interface Bootstrapper
  */
 export interface Bootstrapper {
-    /**
-     * @returns {Promise<void>}
-     * @memberof Bootstrapper
-     */
-    bootstrap(): Promise<void>;
+	/**
+	 * @returns {Promise<void>}
+	 * @memberof Bootstrapper
+	 */
+	bootstrap(): Promise<void>;
 }

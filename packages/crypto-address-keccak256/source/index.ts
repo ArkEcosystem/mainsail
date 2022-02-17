@@ -3,22 +3,22 @@ import { AddressFactory as Contract, IKeyPairFactory } from "@arkecosystem/crypt
 import { ethers } from "ethers";
 
 export class AddressFactory implements Contract {
-    readonly #keyPairFactory: IKeyPairFactory;
+	readonly #keyPairFactory: IKeyPairFactory;
 
-    // @TODO: network type once final structure is known
-    public constructor(_: any, keyPairFactory: IKeyPairFactory) {
-        this.#keyPairFactory = keyPairFactory;
-    }
+	// @TODO: network type once final structure is known
+	public constructor(_: any, keyPairFactory: IKeyPairFactory) {
+		this.#keyPairFactory = keyPairFactory;
+	}
 
-    public fromMnemonic(passphrase: string): string {
-        return this.fromPublicKey(this.#keyPairFactory.fromMnemonic(passphrase).publicKey);
-    }
+	public fromMnemonic(passphrase: string): string {
+		return this.fromPublicKey(this.#keyPairFactory.fromMnemonic(passphrase).publicKey);
+	}
 
-    public fromPublicKey(publicKey: string): string {
-        return ethers.utils.computeAddress(`0x${publicKey}`);
-    }
+	public fromPublicKey(publicKey: string): string {
+		return ethers.utils.computeAddress(`0x${publicKey}`);
+	}
 
-    public validate(address: string): boolean {
-        return ethers.utils.isAddress(address);
-    }
+	public validate(address: string): boolean {
+		return ethers.utils.isAddress(address);
+	}
 }

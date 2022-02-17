@@ -7,15 +7,15 @@ import { getWalletAttributeSet } from "../../internal/wallet-attributes";
 import { FactoryBuilder } from "../factory-builder";
 
 export const registerWalletFactory = (factory: FactoryBuilder): void => {
-    factory.set("Wallet", ({ options }) => {
-        const passphrase: string = options.passphrase || generateMnemonic();
+	factory.set("Wallet", ({ options }) => {
+		const passphrase: string = options.passphrase || generateMnemonic();
 
-        const wallet: Wallets.Wallet = new Wallets.Wallet(
-            Identities.Address.fromPassphrase(passphrase),
-            new Services.Attributes.AttributeMap(getWalletAttributeSet()),
-        );
-        wallet.setPublicKey(Identities.PublicKey.fromPassphrase(passphrase));
+		const wallet: Wallets.Wallet = new Wallets.Wallet(
+			Identities.Address.fromPassphrase(passphrase),
+			new Services.Attributes.AttributeMap(getWalletAttributeSet()),
+		);
+		wallet.setPublicKey(Identities.PublicKey.fromPassphrase(passphrase));
 
-        return wallet;
-    });
+		return wallet;
+	});
 };

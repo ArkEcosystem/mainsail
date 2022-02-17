@@ -8,27 +8,27 @@ import { VoteBuilder } from "./transactions/vote";
 export * from "./transactions/transaction";
 
 export class BuilderFactory {
-    public static transfer(): TransferBuilder {
-        return new TransferBuilder();
-    }
+	public static transfer(): TransferBuilder {
+		return new TransferBuilder();
+	}
 
-    public static delegateRegistration(): DelegateRegistrationBuilder {
-        return new DelegateRegistrationBuilder();
-    }
+	public static delegateRegistration(): DelegateRegistrationBuilder {
+		return new DelegateRegistrationBuilder();
+	}
 
-    public static vote(): VoteBuilder {
-        return new VoteBuilder();
-    }
+	public static vote(): VoteBuilder {
+		return new VoteBuilder();
+	}
 
-    public static multiSignature(): MultiSignatureBuilder {
-        return new MultiSignatureBuilder();
-    }
+	public static multiSignature(): MultiSignatureBuilder {
+		return new MultiSignatureBuilder();
+	}
 
-    public static multiPayment(): MultiPaymentBuilder {
-        return new MultiPaymentBuilder();
-    }
+	public static multiPayment(): MultiPaymentBuilder {
+		return new MultiPaymentBuilder();
+	}
 
-    public static delegateResignation(): DelegateResignationBuilder {
-        return new DelegateResignationBuilder();
-    }
+	public static delegateResignation(): DelegateResignationBuilder {
+		return new DelegateResignationBuilder();
+	}
 }

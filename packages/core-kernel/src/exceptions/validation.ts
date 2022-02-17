@@ -6,7 +6,7 @@ import { InvalidArgumentException } from "./logic";
  * @extends {InvalidArgumentException}
  */
 export class ValidationFailed extends InvalidArgumentException {
-    public constructor() {
-        super("The given data was invalid.");
-    }
+	public constructor() {
+		super("The given data was invalid.");
+	}
 }

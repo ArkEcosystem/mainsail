@@ -15,51 +15,51 @@ let app: Application;
 let controller: RoundsController;
 
 beforeEach(() => {
-    app = initApp();
-    app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
+	app = initApp();
+	app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 
-    // Triggers registration of indexes
-    app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
+	// Triggers registration of indexes
+	app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
 
-    controller = app.resolve<RoundsController>(RoundsController);
+	controller = app.resolve<RoundsController>(RoundsController);
 
-    Mocks.RoundRepository.setRounds([]);
+	Mocks.RoundRepository.setRounds([]);
 });
 
 describe("RoundsController", () => {
-    describe("delegates", () => {
-        it("should return list of delegates", async () => {
-            const round = {
-                publicKey: Identities.PublicKey.fromPassphrase(passphrases[1]),
-                round: Utils.BigNumber.make("12"),
-                balance: Utils.BigNumber.make("555"),
-            };
+	describe("delegates", () => {
+		it("should return list of delegates", async () => {
+			const round = {
+				publicKey: Identities.PublicKey.fromPassphrase(passphrases[1]),
+				round: Utils.BigNumber.make("12"),
+				balance: Utils.BigNumber.make("555"),
+			};
 
-            Mocks.RoundRepository.setRounds([round]);
+			Mocks.RoundRepository.setRounds([round]);
 
-            const request: Hapi.Request = {
-                params: {
-                    id: "12",
-                },
-            };
+			const request: Hapi.Request = {
+				params: {
+					id: "12",
+				},
+			};
 
-            const response = (await controller.delegates(request, undefined)) as ItemResponse;
+			const response = (await controller.delegates(request, undefined)) as ItemResponse;
 
-            expect(response.data[0]).toEqual(
-                expect.objectContaining({
-                    publicKey: round.publicKey,
-                }),
-            );
-        });
+			expect(response.data[0]).toEqual(
+				expect.objectContaining({
+					publicKey: round.publicKey,
+				}),
+			);
+		});
 
-        it("should return error if round does not exist", async () => {
-            const request: Hapi.Request = {
-                params: {
-                    id: "12",
-                },
-            };
+		it("should return error if round does not exist", async () => {
+			const request: Hapi.Request = {
+				params: {
+					id: "12",
+				},
+			};
 
-            await expect(controller.delegates(request, undefined)).resolves.toThrowError("Round not found");
-        });
-    });
+			await expect(controller.delegates(request, undefined)).resolves.toThrowError("Round not found");
+		});
+	});
 });

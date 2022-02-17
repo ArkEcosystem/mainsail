@@ -1,8 +1,6 @@
-const {
-    isUndefined
-} = require('../dist')
-const lodash = require('lodash/isUndefined')
+const { isUndefined } = require("../dist");
+const lodash = require("lodash/isUndefined");
 
-exports['utils'] = () => isUndefined('abc');
+exports["utils"] = () => isUndefined("abc");
 
-exports['lodash'] = () => lodash('abc');
+exports["lodash"] = () => lodash("abc");

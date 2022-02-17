@@ -13,48 +13,48 @@ let app;
 let server: Server;
 
 beforeAll(async () => {
-    app = initApp();
-    server = await initServer(app, serverDefaults);
-    // @ts-ignore
-    register(server.server);
+	app = initApp();
+	server = await initServer(app, serverDefaults);
+	// @ts-ignore
+	register(server.server);
 });
 
 afterAll(async () => {
-    await server.dispose();
+	await server.dispose();
 });
 
 describe("Blockchain", () => {
-    describe("Index", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(PeersController.prototype, "index").mockResolvedValue(paginatedResult);
+	describe("Index", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(PeersController.prototype, "index").mockResolvedValue(paginatedResult);
 
-            const injectOptions = {
-                method: "GET",
-                url: "/peers",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/peers",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Show", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(PeersController.prototype, "show").mockResolvedValue({});
+	describe("Show", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(PeersController.prototype, "show").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/peers/127.0.0.1",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/peers/127.0.0.1",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 });

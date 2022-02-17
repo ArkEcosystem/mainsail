@@ -5,23 +5,23 @@ import { Interfaces } from "@packages/crypto";
 let factory: FactoryBuilder;
 
 beforeEach(() => {
-    factory = new FactoryBuilder();
+	factory = new FactoryBuilder();
 
-    Factories.registerTransactionFactory(factory);
+	Factories.registerTransactionFactory(factory);
 });
 
 describe("Delegate Registration", () => {
-    describe("toBeDelegateRegistrationType", () => {
-        it("should be delegate registrations type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").make();
+	describe("toBeDelegateRegistrationType", () => {
+		it("should be delegate registrations type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").make();
 
-            expect(transaction.data).toBeDelegateRegistrationType();
-        });
+			expect(transaction.data).toBeDelegateRegistrationType();
+		});
 
-        it("should not be delegate registrations type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
+		it("should not be delegate registrations type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
 
-            expect(transaction.data).not.toBeDelegateRegistrationType();
-        });
-    });
+			expect(transaction.data).not.toBeDelegateRegistrationType();
+		});
+	});
 });

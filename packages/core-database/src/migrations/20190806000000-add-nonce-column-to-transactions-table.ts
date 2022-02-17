@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddNonceColumnToTransactionsTable20190806000000 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`
+	public async up(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.query(`
             ALTER TABLE transactions ADD COLUMN nonce BIGINT;
             CREATE UNIQUE INDEX "transactions_sender_nonce" ON transactions ("sender_public_key", "nonce");
 
@@ -139,10 +139,10 @@ export class AddNonceColumnToTransactionsTable20190806000000 implements Migratio
             ALTER TABLE transactions ADD CONSTRAINT "transactions_nonce"
             CHECK (check_transaction_nonce(version, id, sender_public_key, nonce, block_id, sequence));
         `);
-    }
+	}
 
-    public async down(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`
+	public async down(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.query(`
             DROP TRIGGER transactions_set_nonce ON transactions;
             DROP FUNCTION set_row_nonce;
             ALTER TABLE transactions DROP CONSTRAINT "transactions_nonce";
@@ -150,5 +150,5 @@ export class AddNonceColumnToTransactionsTable20190806000000 implements Migratio
             DROP INDEX transactions_sender_nonce;
             ALTER TABLE transactions DROP COLUMN nonce;
         `);
-    }
+	}
 }

@@ -11,19 +11,19 @@ let app: Application;
 beforeEach(() => (app = new Application(new Container())));
 
 describe("LogServiceProvider", () => {
-    it("should register the service", async () => {
-        expect(app.isBound(Identifiers.LogManager)).toBeFalse();
-        expect(app.isBound(Identifiers.LogService)).toBeFalse();
+	it("should register the service", async () => {
+		expect(app.isBound(Identifiers.LogManager)).toBeFalse();
+		expect(app.isBound(Identifiers.LogService)).toBeFalse();
 
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.isBound(Identifiers.LogManager)).toBeTrue();
-        expect(app.isBound(Identifiers.LogService)).toBeTrue();
-    });
+		expect(app.isBound(Identifiers.LogManager)).toBeTrue();
+		expect(app.isBound(Identifiers.LogService)).toBeTrue();
+	});
 
-    it("should create an instance of the MemoryPipeline", async () => {
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+	it("should create an instance of the MemoryPipeline", async () => {
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.get<Logger>(Identifiers.LogService)).toBeInstanceOf(MemoryLogger);
-    });
+		expect(app.get<Logger>(Identifiers.LogService)).toBeInstanceOf(MemoryLogger);
+	});
 });

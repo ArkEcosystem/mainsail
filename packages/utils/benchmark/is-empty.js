@@ -1,8 +1,6 @@
-const {
-    isEmpty
-} = require('../dist')
-const lodash = require('lodash/isEmpty')
+const { isEmpty } = require("../dist");
+const lodash = require("lodash/isEmpty");
 
-exports['utils'] = () => isEmpty('abc');
+exports["utils"] = () => isEmpty("abc");
 
-exports['lodash'] = () => lodash('abc');
+exports["lodash"] = () => lodash("abc");

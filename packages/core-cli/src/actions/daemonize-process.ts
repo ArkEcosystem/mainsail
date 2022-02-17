@@ -14,70 +14,70 @@ import { AbortUnknownProcess } from "./abort-unknown-process";
  */
 @injectable()
 export class DaemonizeProcess {
-    /**
-     * @private
-     * @type {Application}
-     * @memberof Command
-     */
-    @inject(Identifiers.Application)
-    private readonly app!: Application;
+	/**
+	 * @private
+	 * @type {Application}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.Application)
+	private readonly app!: Application;
 
-    /**
-     * @private
-     * @type {ProcessManager}
-     * @memberof Command
-     */
-    @inject(Identifiers.ProcessManager)
-    private readonly processManager!: ProcessManager;
+	/**
+	 * @private
+	 * @type {ProcessManager}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.ProcessManager)
+	private readonly processManager!: ProcessManager;
 
-    /**
-     * @static
-     * @param {ProcessOptions} options
-     * @param {*} flags
-     * @memberof DaemonizeProcess
-     */
-    public execute(options: ProcessOptions, flags): void {
-        const processName: string = options.name;
+	/**
+	 * @static
+	 * @param {ProcessOptions} options
+	 * @param {*} flags
+	 * @memberof DaemonizeProcess
+	 */
+	public execute(options: ProcessOptions, flags): void {
+		const processName: string = options.name;
 
-        if (this.processManager.has(processName)) {
-            this.app.get<AbortRunningProcess>(Identifiers.AbortUnknownProcess).execute(processName);
-            this.app.get<AbortUnknownProcess>(Identifiers.AbortRunningProcess).execute(processName);
-        }
+		if (this.processManager.has(processName)) {
+			this.app.get<AbortRunningProcess>(Identifiers.AbortUnknownProcess).execute(processName);
+			this.app.get<AbortUnknownProcess>(Identifiers.AbortRunningProcess).execute(processName);
+		}
 
-        let spinner;
-        try {
-            spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Starting ${processName}`);
+		let spinner;
+		try {
+			spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Starting ${processName}`);
 
-            const flagsProcess: Record<string, boolean | number | string> = {
-                "max-restarts": 5,
-                "kill-timeout": 30000,
-            };
+			const flagsProcess: Record<string, boolean | number | string> = {
+				"max-restarts": 5,
+				"kill-timeout": 30000,
+			};
 
-            if (flags.daemon !== true) {
-                flagsProcess["no-daemon"] = true;
-            }
+			if (flags.daemon !== true) {
+				flagsProcess["no-daemon"] = true;
+			}
 
-            flagsProcess.name = processName;
+			flagsProcess.name = processName;
 
-            const potato: boolean = totalmem() < 2 * 1024 ** 3;
+			const potato: boolean = totalmem() < 2 * 1024 ** 3;
 
-            this.processManager.start(
-                {
-                    ...options,
-                    ...{
-                        env: {
-                            NODE_ENV: "production",
-                            CORE_ENV: flags.env,
-                        },
-                        node_args: potato ? { max_old_space_size: 500 } : undefined,
-                    },
-                },
-                flagsProcess,
-            );
-        } catch (error) {
-            throw new Error(error.stderr ? `${error.message}: ${error.stderr}` : error.message);
-        } finally {
-            spinner.stop();
-        }
-    }
+			this.processManager.start(
+				{
+					...options,
+					...{
+						env: {
+							NODE_ENV: "production",
+							CORE_ENV: flags.env,
+						},
+						node_args: potato ? { max_old_space_size: 500 } : undefined,
+					},
+				},
+				flagsProcess,
+			);
+		} catch (error) {
+			throw new Error(error.stderr ? `${error.message}: ${error.stderr}` : error.message);
+		} finally {
+			spinner.stop();
+		}
+	}
 }

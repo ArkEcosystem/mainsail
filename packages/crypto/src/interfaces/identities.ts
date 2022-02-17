@@ -1,5 +1,5 @@
 export interface IKeyPair {
-    publicKey: string;
-    privateKey: string;
-    compressed: boolean;
+	publicKey: string;
+	privateKey: string;
+	compressed: boolean;
 }

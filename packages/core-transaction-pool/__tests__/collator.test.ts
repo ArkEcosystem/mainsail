@@ -22,120 +22,120 @@ container.bind(Container.Identifiers.TransactionPoolExpirationService).toConstan
 container.bind(Container.Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
-    jest.resetAllMocks();
-    createTransactionValidator.mockReturnValue(validator);
+	jest.resetAllMocks();
+	createTransactionValidator.mockReturnValue(validator);
 });
 
 describe("Collator.getBlockCandidateTransactions", () => {
-    it("should respect block.maxTransactions milestone limit", async () => {
-        const poolTransactions = [
-            { data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
-        ];
+	it("should respect block.maxTransactions milestone limit", async () => {
+		const poolTransactions = [
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+		];
 
-        const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
-        const lastBlock = { data: { height: 10 } };
+		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
+		const lastBlock = { data: { height: 10 } };
 
-        (Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
-        blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
-        poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
-        expirationService.isExpired.mockResolvedValue(false);
+		(Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
+		blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
+		poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
+		expirationService.isExpired.mockResolvedValue(false);
 
-        const collator = container.resolve(Collator);
-        const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const collator = container.resolve(Collator);
+		const candidateTransaction = await collator.getBlockCandidateTransactions();
 
-        expect(candidateTransaction.length).toBe(5);
-        expect(Managers.configManager.getMilestone).toBeCalled();
-        expect(createTransactionValidator).toBeCalled();
-        expect(validator.validate).toBeCalledTimes(5);
-    });
+		expect(candidateTransaction.length).toBe(5);
+		expect(Managers.configManager.getMilestone).toBeCalled();
+		expect(createTransactionValidator).toBeCalled();
+		expect(validator.validate).toBeCalledTimes(5);
+	});
 
-    it("should respect block.maxPayload milestone limit", async () => {
-        const poolTransactions = [
-            { data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
-        ];
+	it("should respect block.maxPayload milestone limit", async () => {
+		const poolTransactions = [
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+		];
 
-        const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 141 + 10 + 4 + 10 + 4 } };
-        const lastBlock = { data: { height: 10 } };
+		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 141 + 10 + 4 + 10 + 4 } };
+		const lastBlock = { data: { height: 10 } };
 
-        (Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
-        blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
-        poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
-        expirationService.isExpired.mockResolvedValue(false);
+		(Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
+		blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
+		poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
+		expirationService.isExpired.mockResolvedValue(false);
 
-        const collator = container.resolve(Collator);
-        const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const collator = container.resolve(Collator);
+		const candidateTransaction = await collator.getBlockCandidateTransactions();
 
-        expect(candidateTransaction.length).toBe(2);
-        expect(Managers.configManager.getMilestone).toBeCalled();
-        expect(createTransactionValidator).toBeCalled();
-        expect(validator.validate).toBeCalledTimes(2);
-    });
+		expect(candidateTransaction.length).toBe(2);
+		expect(Managers.configManager.getMilestone).toBeCalled();
+		expect(createTransactionValidator).toBeCalled();
+		expect(validator.validate).toBeCalledTimes(2);
+	});
 
-    it("should ignore future sender transactions if one of them expired", async () => {
-        const poolTransactions = [
-            { data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
-        ];
+	it("should ignore future sender transactions if one of them expired", async () => {
+		const poolTransactions = [
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+		];
 
-        const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
-        const lastBlock = { data: { height: 10 } };
+		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
+		const lastBlock = { data: { height: 10 } };
 
-        (Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
-        blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
-        poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
-        expirationService.isExpired.mockResolvedValue(false);
-        expirationService.isExpired.mockResolvedValueOnce(true);
+		(Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
+		blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
+		poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
+		expirationService.isExpired.mockResolvedValue(false);
+		expirationService.isExpired.mockResolvedValueOnce(true);
 
-        const collator = container.resolve(Collator);
-        const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const collator = container.resolve(Collator);
+		const candidateTransaction = await collator.getBlockCandidateTransactions();
 
-        expect(candidateTransaction.length).toBe(4);
-        expect(Managers.configManager.getMilestone).toBeCalled();
-        expect(createTransactionValidator).toBeCalled();
-        expect(validator.validate).toBeCalledTimes(4);
-        expect(logger.warning).toBeCalledTimes(1);
-    });
+		expect(candidateTransaction.length).toBe(4);
+		expect(Managers.configManager.getMilestone).toBeCalled();
+		expect(createTransactionValidator).toBeCalled();
+		expect(validator.validate).toBeCalledTimes(4);
+		expect(logger.warning).toBeCalledTimes(1);
+	});
 
-    it("should ignore future sender transactions if one of them failed", async () => {
-        const poolTransactions = [
-            { data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-            { data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
-        ];
+	it("should ignore future sender transactions if one of them failed", async () => {
+		const poolTransactions = [
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+		];
 
-        const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
-        const lastBlock = { data: { height: 10 } };
+		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
+		const lastBlock = { data: { height: 10 } };
 
-        (Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
-        blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
-        poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
-        expirationService.isExpired.mockResolvedValue(false);
-        validator.validate.mockRejectedValueOnce(new Error("Some error"));
+		(Managers.configManager.getMilestone as jest.Mock).mockReturnValueOnce(milestone);
+		blockchain.getLastBlock.mockReturnValueOnce(lastBlock);
+		poolQuery.getFromHighestPriority.mockReturnValueOnce(poolTransactions);
+		expirationService.isExpired.mockResolvedValue(false);
+		validator.validate.mockRejectedValueOnce(new Error("Some error"));
 
-        const collator = container.resolve(Collator);
-        const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const collator = container.resolve(Collator);
+		const candidateTransaction = await collator.getBlockCandidateTransactions();
 
-        expect(candidateTransaction.length).toBe(4);
-        expect(Managers.configManager.getMilestone).toBeCalled();
-        expect(createTransactionValidator).toBeCalled();
-        expect(validator.validate).toBeCalledTimes(5);
-        expect(logger.warning).toBeCalledTimes(1);
-    });
+		expect(candidateTransaction.length).toBe(4);
+		expect(Managers.configManager.getMilestone).toBeCalled();
+		expect(createTransactionValidator).toBeCalled();
+		expect(validator.validate).toBeCalledTimes(5);
+		expect(logger.warning).toBeCalledTimes(1);
+	});
 });

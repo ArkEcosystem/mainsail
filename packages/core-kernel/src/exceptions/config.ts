@@ -34,12 +34,12 @@ export class EnvParameter extends ConfigurationException {}
  * @extends {ConfigurationException}
  */
 export class ApplicationConfigurationCannotBeLoaded extends ConfigurationException {
-    /**
-     * @memberof ApplicationConfigurationCannotBeLoaded
-     */
-    public constructor(message: string) {
-        super(`Unable to load the application configuration file. ${message}`);
-    }
+	/**
+	 * @memberof ApplicationConfigurationCannotBeLoaded
+	 */
+	public constructor(message: string) {
+		super(`Unable to load the application configuration file. ${message}`);
+	}
 }
 
 /**
@@ -48,12 +48,12 @@ export class ApplicationConfigurationCannotBeLoaded extends ConfigurationExcepti
  * @extends {ConfigurationException}
  */
 export class EnvironmentConfigurationCannotBeLoaded extends ConfigurationException {
-    /**
-     * @memberof EnvironmentConfigurationCannotBeLoaded
-     */
-    public constructor(message: string) {
-        super(`Unable to load the environment file. ${message}`);
-    }
+	/**
+	 * @memberof EnvironmentConfigurationCannotBeLoaded
+	 */
+	public constructor(message: string) {
+		super(`Unable to load the environment file. ${message}`);
+	}
 }
 
 /**
@@ -62,10 +62,10 @@ export class EnvironmentConfigurationCannotBeLoaded extends ConfigurationExcepti
  * @extends {ConfigurationException}
  */
 export class NetworkCannotBeDetermined extends ConfigurationException {
-    /**
-     * @memberof NetworkCannotBeDetermined
-     */
-    public constructor() {
-        super("Unable to discover application token or network.");
-    }
+	/**
+	 * @memberof NetworkCannotBeDetermined
+	 */
+	public constructor() {
+		super("Unable to discover application token or network.");
+	}
 }

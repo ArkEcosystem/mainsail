@@ -8,25 +8,25 @@ import { LocalFilesystem } from "./drivers/local";
  * @extends {Manager<Filesystem>}
  */
 export class FilesystemManager extends InstanceManager<Filesystem> {
-    /**
-     * Create an instance of the Local driver.
-     *
-     * @protected
-     * @returns {Promise<Filesystem>}
-     * @memberof FilesystemManager
-     */
-    protected async createLocalDriver(): Promise<Filesystem> {
-        return this.app.resolve(LocalFilesystem).make();
-    }
+	/**
+	 * Create an instance of the Local driver.
+	 *
+	 * @protected
+	 * @returns {Promise<Filesystem>}
+	 * @memberof FilesystemManager
+	 */
+	protected async createLocalDriver(): Promise<Filesystem> {
+		return this.app.resolve(LocalFilesystem).make();
+	}
 
-    /**
-     * Get the default log driver name.
-     *
-     * @protected
-     * @returns {string}
-     * @memberof FilesystemManager
-     */
-    protected getDefaultDriver(): string {
-        return "local";
-    }
+	/**
+	 * Get the default log driver name.
+	 *
+	 * @protected
+	 * @returns {string}
+	 * @memberof FilesystemManager
+	 */
+	protected getDefaultDriver(): string {
+		return "local";
+	}
 }

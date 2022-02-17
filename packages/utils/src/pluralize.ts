@@ -1,9 +1,9 @@
 export const pluralize = (value: string, count: number = 1, inclusive: boolean = false): string => {
-    let output: string = value;
+	let output: string = value;
 
-    if (count !== 1) {
-        output += "s";
-    }
+	if (count !== 1) {
+		output += "s";
+	}
 
-    return inclusive ? `${count} ${output}` : output;
+	return inclusive ? `${count} ${output}` : output;
 };

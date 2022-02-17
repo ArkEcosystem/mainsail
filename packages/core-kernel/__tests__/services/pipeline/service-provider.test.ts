@@ -11,17 +11,17 @@ let app: Application;
 beforeEach(() => (app = new Application(new Container())));
 
 describe("PipelineServiceProvider", () => {
-    it("should register the service", async () => {
-        expect(app.isBound(Identifiers.PipelineFactory)).toBeFalse();
+	it("should register the service", async () => {
+		expect(app.isBound(Identifiers.PipelineFactory)).toBeFalse();
 
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.isBound(Identifiers.PipelineFactory)).toBeTrue();
-    });
+		expect(app.isBound(Identifiers.PipelineFactory)).toBeTrue();
+	});
 
-    it("should create an instance of the MemoryPipeline", async () => {
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+	it("should create an instance of the MemoryPipeline", async () => {
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.get<PipelineFactory>(Identifiers.PipelineFactory)()).toBeInstanceOf(MemoryPipeline);
-    });
+		expect(app.get<PipelineFactory>(Identifiers.PipelineFactory)()).toBeInstanceOf(MemoryPipeline);
+	});
 });

@@ -7,19 +7,19 @@ let cli;
 let component;
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    // Bind from src instead of dist to collect coverage.
-    cli.app.rebind(Container.Identifiers.Fatal).to(Fatal).inSingletonScope();
-    component = cli.app.get(Container.Identifiers.Fatal);
+	// Bind from src instead of dist to collect coverage.
+	cli.app.rebind(Container.Identifiers.Fatal).to(Fatal).inSingletonScope();
+	component = cli.app.get(Container.Identifiers.Fatal);
 });
 
 describe("Fatal", () => {
-    it("should render the component", () => {
-        const spyLogger = jest.spyOn(cli.app.get(Container.Identifiers.Logger), "error");
+	it("should render the component", () => {
+		const spyLogger = jest.spyOn(cli.app.get(Container.Identifiers.Logger), "error");
 
-        expect(() => component.render("Hello World")).toThrow("Hello World");
+		expect(() => component.render("Hello World")).toThrow("Hello World");
 
-        expect(spyLogger).toHaveBeenCalledWith(white().bgRed(`[ERROR] Hello World`));
-    });
+		expect(spyLogger).toHaveBeenCalledWith(white().bgRed(`[ERROR] Hello World`));
+	});
 });

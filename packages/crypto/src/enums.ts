@@ -1,16 +1,16 @@
 export enum TransactionType {
-    Transfer = 0,
-    DelegateRegistration = 2,
-    Vote = 3,
-    MultiSignature = 4,
-    MultiPayment = 6,
-    DelegateResignation = 7,
+	Transfer = 0,
+	DelegateRegistration = 2,
+	Vote = 3,
+	MultiSignature = 4,
+	MultiPayment = 6,
+	DelegateResignation = 7,
 }
 
 export enum TransactionTypeGroup {
-    Test = 0,
-    Core = 1,
+	Test = 0,
+	Core = 1,
 
-    // Everything above is available to anyone
-    Reserved = 1000,
+	// Everything above is available to anyone
+	Reserved = 1000,
 }

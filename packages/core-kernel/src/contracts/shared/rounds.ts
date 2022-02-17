@@ -1,6 +1,6 @@
 export interface RoundInfo {
-    round: number;
-    nextRound: number;
-    maxDelegates: number;
-    roundHeight: number;
+	round: number;
+	nextRound: number;
+	maxDelegates: number;
+	roundHeight: number;
 }

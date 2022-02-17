@@ -11,17 +11,17 @@ let cmd;
 beforeAll(() => setGracefulCleanup());
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    cmd = cli.app.resolve(CommandHelp);
+	cmd = cli.app.resolve(CommandHelp);
 });
 
 describe("CommandHelp", () => {
-    it("should render the help if a command has arguments and flags", () => {
-        expect(cmd.render(cli.app.resolve(Command))).toBeString();
-    });
+	it("should render the help if a command has arguments and flags", () => {
+		expect(cmd.render(cli.app.resolve(Command))).toBeString();
+	});
 
-    it("should render the help if a command does not have arguments or flags", () => {
-        expect(cmd.render(cli.app.resolve(CommandWithoutDefinition))).toBeString();
-    });
+	it("should render the help if a command does not have arguments or flags", () => {
+		expect(cmd.render(cli.app.resolve(CommandWithoutDefinition))).toBeString();
+	});
 });

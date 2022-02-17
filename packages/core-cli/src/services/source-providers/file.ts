@@ -10,40 +10,40 @@ import { MissingPackageFolder } from "./errors";
  * @implements {Source}
  */
 export class File extends AbstractSource {
-    public constructor(paths: { data: string; temp: string }) {
-        super(paths);
-    }
+	public constructor(paths: { data: string; temp: string }) {
+		super(paths);
+	}
 
-    /**
-     * @param {string} value
-     * @returns {Promise<boolean>}
-     * @memberof File
-     */
-    public async exists(value: string): Promise<boolean> {
-        return existsSync(value);
-    }
+	/**
+	 * @param {string} value
+	 * @returns {Promise<boolean>}
+	 * @memberof File
+	 */
+	public async exists(value: string): Promise<boolean> {
+		return existsSync(value);
+	}
 
-    /**
-     * @param {string} value
-     * @returns {Promise<void>}
-     * @memberof File
-     */
-    public async update(value: string): Promise<void> {
-        await this.install(value);
-    }
+	/**
+	 * @param {string} value
+	 * @returns {Promise<void>}
+	 * @memberof File
+	 */
+	public async update(value: string): Promise<void> {
+		await this.install(value);
+	}
 
-    protected async preparePackage(value: string): Promise<void> {
-        await extract(
-            {
-                gzip: true,
-                file: value,
-                cwd: this.tempPath,
-            },
-            ["package"],
-        );
+	protected async preparePackage(value: string): Promise<void> {
+		await extract(
+			{
+				gzip: true,
+				file: value,
+				cwd: this.tempPath,
+			},
+			["package"],
+		);
 
-        if (!existsSync(this.getOriginPath())) {
-            throw new MissingPackageFolder();
-        }
-    }
+		if (!existsSync(this.getOriginPath())) {
+			throw new MissingPackageFolder();
+		}
+	}
 }

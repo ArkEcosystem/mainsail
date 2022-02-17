@@ -6,15 +6,15 @@ let cli;
 beforeEach(() => (cli = new Console()));
 
 describe("ShareCommand", () => {
-    it("should throw if the process does not exist", async () => {
-        const spyConnect = jest.spyOn(ngrok, "connect").mockImplementation(undefined);
+	it("should throw if the process does not exist", async () => {
+		const spyConnect = jest.spyOn(ngrok, "connect").mockImplementation(undefined);
 
-        await cli.execute(Command);
+		await cli.execute(Command);
 
-        expect(spyConnect).toHaveBeenCalledWith({
-            addr: 4003,
-            proto: "http",
-            region: "eu",
-        });
-    });
+		expect(spyConnect).toHaveBeenCalledWith({
+			addr: 4003,
+			proto: "http",
+			region: "eu",
+		});
+	});
 });

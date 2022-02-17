@@ -10,12 +10,12 @@ let app: Application;
 beforeEach(() => (app = new Application(new Container())));
 
 describe("ProcessActionsServiceProvider", () => {
-    it(".register", async () => {
-        expect(app.isBound(Identifiers.ProcessActionsService)).toBeFalse();
+	it(".register", async () => {
+		expect(app.isBound(Identifiers.ProcessActionsService)).toBeFalse();
 
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.isBound(Identifiers.ProcessActionsService)).toBeTrue();
-        expect(app.get(Identifiers.ProcessActionsService)).toBeInstanceOf(Pm2ProcessActionsService);
-    });
+		expect(app.isBound(Identifiers.ProcessActionsService)).toBeTrue();
+		expect(app.get(Identifiers.ProcessActionsService)).toBeInstanceOf(Pm2ProcessActionsService);
+	});
 });

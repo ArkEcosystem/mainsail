@@ -7,20 +7,20 @@ import { Logger } from "../services";
  */
 @injectable()
 export class Log {
-    /**
-     * @private
-     * @type {Logger}
-     * @memberof Command
-     */
-    @inject(Identifiers.Logger)
-    private readonly logger!: Logger;
+	/**
+	 * @private
+	 * @type {Logger}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.Logger)
+	private readonly logger!: Logger;
 
-    /**
-     * @static
-     * @param {string} message
-     * @memberof Log
-     */
-    public render(message: string): void {
-        this.logger.log(message);
-    }
+	/**
+	 * @static
+	 * @param {string} message
+	 * @memberof Log
+	 */
+	public render(message: string): void {
+		this.logger.log(message);
+	}
 }

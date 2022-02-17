@@ -1,4 +1,4 @@
 module.exports = {
-    core: { plugins: [] },
-    relay: { plugins: [] },
+	core: { plugins: [] },
+	relay: { plugins: [] },
 };

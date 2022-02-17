@@ -8,13 +8,13 @@ import { injectable } from "../ioc";
  */
 @injectable()
 export class Spinner {
-    /**
-     * @static
-     * @param {(string | Options | undefined)} [options]
-     * @returns {Ora}
-     * @memberof Spinner
-     */
-    public render(options?: string | Options | undefined): Ora {
-        return ora(options);
-    }
+	/**
+	 * @static
+	 * @param {(string | Options | undefined)} [options]
+	 * @returns {Ora}
+	 * @memberof Spinner
+	 */
+	public render(options?: string | Options | undefined): Ora {
+		return ora(options);
+	}
 }

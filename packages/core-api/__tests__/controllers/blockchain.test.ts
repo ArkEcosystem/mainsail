@@ -11,43 +11,43 @@ let app: Application;
 let controller: BlockchainController;
 
 beforeEach(() => {
-    app = initApp();
+	app = initApp();
 
-    controller = app.resolve<BlockchainController>(BlockchainController);
+	controller = app.resolve<BlockchainController>(BlockchainController);
 });
 
 afterEach(() => {
-    Mocks.StateStore.setBlock(undefined);
+	Mocks.StateStore.setBlock(undefined);
 });
 
 describe("BlockchainController", () => {
-    describe("index", () => {
-        it("should return last block from store", async () => {
-            const mockBlockData: Partial<Interfaces.IBlockData> = {
-                id: "1",
-                height: 1,
-            };
+	describe("index", () => {
+		it("should return last block from store", async () => {
+			const mockBlockData: Partial<Interfaces.IBlockData> = {
+				id: "1",
+				height: 1,
+			};
 
-            const mockBlock = {
-                data: mockBlockData,
-            };
+			const mockBlock = {
+				data: mockBlockData,
+			};
 
-            Mocks.StateStore.setBlock(mockBlock as Partial<Interfaces.IBlock>);
+			Mocks.StateStore.setBlock(mockBlock as Partial<Interfaces.IBlock>);
 
-            type BlockItemResponse = ItemResponse & {
-                data: {
-                    block: {
-                        id: string;
-                        height: number;
-                    };
-                    supply: string;
-                };
-            };
+			type BlockItemResponse = ItemResponse & {
+				data: {
+					block: {
+						id: string;
+						height: number;
+					};
+					supply: string;
+				};
+			};
 
-            const response = (await controller.index()) as BlockItemResponse;
+			const response = (await controller.index()) as BlockItemResponse;
 
-            expect(response.data.supply).toBeDefined();
-            expect(response.data.block).toEqual(mockBlockData);
-        });
-    });
+			expect(response.data.supply).toBeDefined();
+			expect(response.data.block).toEqual(mockBlockData);
+		});
+	});
 });

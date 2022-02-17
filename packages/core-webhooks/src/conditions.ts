@@ -13,11 +13,11 @@ const toBoolean = (value): boolean => (value.toString().toLowerCase().trim() ===
  * @returns {boolean}
  */
 const compareBigNumber = (value, expected, comparison): boolean => {
-    try {
-        return Utils.BigNumber.make(value)[comparison](expected);
-    } catch {
-        return false;
-    }
+	try {
+		return Utils.BigNumber.make(value)[comparison](expected);
+	} catch {
+		return false;
+	}
 };
 
 /**

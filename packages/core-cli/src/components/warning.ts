@@ -9,20 +9,20 @@ import { Logger } from "../services";
  */
 @injectable()
 export class Warning {
-    /**
-     * @private
-     * @type {Logger}
-     * @memberof Warning
-     */
-    @inject(Identifiers.Logger)
-    private readonly logger!: Logger;
+	/**
+	 * @private
+	 * @type {Logger}
+	 * @memberof Warning
+	 */
+	@inject(Identifiers.Logger)
+	private readonly logger!: Logger;
 
-    /**
-     * @static
-     * @param {string} message
-     * @memberof Warning
-     */
-    public render(message: string): void {
-        this.logger.warning(white().bgYellow(`[WARNING] ${message}`));
-    }
+	/**
+	 * @static
+	 * @param {string} message
+	 * @memberof Warning
+	 */
+	public render(message: string): void {
+		this.logger.warning(white().bgYellow(`[WARNING] ${message}`));
+	}
 }

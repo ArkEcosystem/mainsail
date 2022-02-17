@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class EnforceChainedBlocks20190626000000 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`
+	public async up(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.query(`
             CREATE FUNCTION check_previous_block(
                 id_arg VARCHAR(64),
                 previous_block_arg VARCHAR(64),
@@ -45,12 +45,12 @@ export class EnforceChainedBlocks20190626000000 implements MigrationInterface {
 
             ALTER TABLE blocks ADD CONSTRAINT "chained_blocks" CHECK (check_previous_block(id, previous_block, height));
         `);
-    }
+	}
 
-    public async down(queryRunner: QueryRunner): Promise<any> {
-        queryRunner.query(`
+	public async down(queryRunner: QueryRunner): Promise<any> {
+		queryRunner.query(`
             ALTER TABLE blocks DROP CONSTRAINT "chained_blocks";
             DROP FUNCTION check_previous_block;
         `);
-    }
+	}
 }

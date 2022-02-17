@@ -13,80 +13,80 @@ let resource: PortsResource;
 let app: Application;
 
 beforeEach(() => {
-    app = initApp();
+	app = initApp();
 
-    app.unbind(Identifiers.ServiceProviderRepository);
-    app.bind(Identifiers.StandardCriteriaService).toConstantValue({});
-    app.bind(Identifiers.PaginationService).toConstantValue({});
-    app.bind(Identifiers.BlockHistoryService).toConstantValue({});
-    app.bind(Identifiers.TransactionHistoryService).toConstantValue({});
-    app.bind(Identifiers.ServiceProviderRepository).toConstantValue(Mocks.ServiceProviderRepository.instance);
+	app.unbind(Identifiers.ServiceProviderRepository);
+	app.bind(Identifiers.StandardCriteriaService).toConstantValue({});
+	app.bind(Identifiers.PaginationService).toConstantValue({});
+	app.bind(Identifiers.BlockHistoryService).toConstantValue({});
+	app.bind(Identifiers.TransactionHistoryService).toConstantValue({});
+	app.bind(Identifiers.ServiceProviderRepository).toConstantValue(Mocks.ServiceProviderRepository.instance);
 });
 
 beforeEach(() => {
-    resource = app.resolve<PortsResource>(PortsResource);
+	resource = app.resolve<PortsResource>(PortsResource);
 });
 
 describe("PortsResource", () => {
-    describe("raw", () => {
-        it("should return raw object", async () => {
-            expect(resource.raw({})).toEqual({});
-        });
-    });
+	describe("raw", () => {
+		it("should return raw object", async () => {
+			expect(resource.raw({})).toEqual({});
+		});
+	});
 
-    describe("transform", () => {
-        let coreApiServiceProvider;
+	describe("transform", () => {
+		let coreApiServiceProvider;
 
-        beforeEach(async () => {
-            coreApiServiceProvider = app.resolve<CoreApiServiceProvider>(CoreApiServiceProvider);
+		beforeEach(async () => {
+			coreApiServiceProvider = app.resolve<CoreApiServiceProvider>(CoreApiServiceProvider);
 
-            const pluginConfiguration = app.get<Providers.PluginConfiguration>(
-                Container.Identifiers.PluginConfiguration,
-            );
+			const pluginConfiguration = app.get<Providers.PluginConfiguration>(
+				Container.Identifiers.PluginConfiguration,
+			);
 
-            // @ts-ignore
-            defaults.enabled = true;
-            // @ts-ignore
-            defaults.port = 4003;
-            const instance: Providers.PluginConfiguration = pluginConfiguration.from("core-api", defaults);
+			// @ts-ignore
+			defaults.enabled = true;
+			// @ts-ignore
+			defaults.port = 4003;
+			const instance: Providers.PluginConfiguration = pluginConfiguration.from("core-api", defaults);
 
-            coreApiServiceProvider.setConfig(instance);
+			coreApiServiceProvider.setConfig(instance);
 
-            await coreApiServiceProvider.register();
-            coreApiServiceProvider.name = () => {
-                return "@arkecosystem/core-api";
-            };
+			await coreApiServiceProvider.register();
+			coreApiServiceProvider.name = () => {
+				return "@arkecosystem/core-api";
+			};
 
-            Mocks.ServiceProviderRepository.setServiceProviders([coreApiServiceProvider]);
-        });
+			Mocks.ServiceProviderRepository.setServiceProviders([coreApiServiceProvider]);
+		});
 
-        it("should return transformed object", async () => {
-            expect(resource.transform({})).toEqual({ "@arkecosystem/core-api": 4003 });
-        });
+		it("should return transformed object", async () => {
+			expect(resource.transform({})).toEqual({ "@arkecosystem/core-api": 4003 });
+		});
 
-        it("should return transformed object with server port", async () => {
-            // @ts-ignore
-            defaults.server.enabled = true;
-            // @ts-ignore
-            defaults.server.port = 4003;
+		it("should return transformed object with server port", async () => {
+			// @ts-ignore
+			defaults.server.enabled = true;
+			// @ts-ignore
+			defaults.server.port = 4003;
 
-            expect(resource.transform({})).toEqual({ "@arkecosystem/core-api": 4003 });
-        });
+			expect(resource.transform({})).toEqual({ "@arkecosystem/core-api": 4003 });
+		});
 
-        it("should not include port if disabled", async () => {
-            const pluginConfiguration = app.get<Providers.PluginConfiguration>(
-                Container.Identifiers.PluginConfiguration,
-            );
+		it("should not include port if disabled", async () => {
+			const pluginConfiguration = app.get<Providers.PluginConfiguration>(
+				Container.Identifiers.PluginConfiguration,
+			);
 
-            // @ts-ignore
-            defaults.enabled = false;
-            // @ts-ignore
-            defaults.port = 4003;
-            const instance: Providers.PluginConfiguration = pluginConfiguration.from("core-api", defaults);
+			// @ts-ignore
+			defaults.enabled = false;
+			// @ts-ignore
+			defaults.port = 4003;
+			const instance: Providers.PluginConfiguration = pluginConfiguration.from("core-api", defaults);
 
-            coreApiServiceProvider.setConfig(instance);
+			coreApiServiceProvider.setConfig(instance);
 
-            expect(resource.transform({})).toEqual({});
-        });
-    });
+			expect(resource.transform({})).toEqual({});
+		});
+	});
 });

@@ -5,30 +5,30 @@ import { ServiceProvider } from "@packages/core-webhooks";
 import { Sandbox } from "@packages/core-test-framework/src";
 
 const clear = () => {
-    ServiceProviderRepository.setServiceProviders([]);
+	ServiceProviderRepository.setServiceProviders([]);
 };
 
 describe("ServiceProviderRepository", () => {
-    describe("default values", () => {
-        it("allLoadedProviders should return empty array", async () => {
-            expect(ServiceProviderRepository.instance.allLoadedProviders()).toEqual([]);
-        });
-    });
+	describe("default values", () => {
+		it("allLoadedProviders should return empty array", async () => {
+			expect(ServiceProviderRepository.instance.allLoadedProviders()).toEqual([]);
+		});
+	});
 
-    describe("setRounds", () => {
-        let serviceProvider: ServiceProvider;
+	describe("setRounds", () => {
+		let serviceProvider: ServiceProvider;
 
-        beforeEach(() => {
-            clear();
+		beforeEach(() => {
+			clear();
 
-            let sandbox = new Sandbox();
-            serviceProvider = sandbox.app.resolve(ServiceProvider);
+			let sandbox = new Sandbox();
+			serviceProvider = sandbox.app.resolve(ServiceProvider);
 
-            ServiceProviderRepository.setServiceProviders([serviceProvider]);
-        });
+			ServiceProviderRepository.setServiceProviders([serviceProvider]);
+		});
 
-        it("allLoadedProviders should return mocked service providers", async () => {
-            expect(ServiceProviderRepository.instance.allLoadedProviders()).toEqual([serviceProvider]);
-        });
-    });
+		it("allLoadedProviders should return mocked service providers", async () => {
+			expect(ServiceProviderRepository.instance.allLoadedProviders()).toEqual([serviceProvider]);
+		});
+	});
 });

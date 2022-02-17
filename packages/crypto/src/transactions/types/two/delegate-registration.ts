@@ -1,5 +1,5 @@
 import { One } from "../index";
 
 export class DelegateRegistrationTransaction extends One.DelegateRegistrationTransaction {
-    public static version: number = 2;
+	public static version: number = 2;
 }

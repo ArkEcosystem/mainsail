@@ -9,17 +9,17 @@ let cli;
 let component;
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    // Bind from src instead of dist to collect coverage.
-    cli.app.rebind(Container.Identifiers.Confirm).to(Confirm).inSingletonScope();
-    component = cli.app.get(Container.Identifiers.Confirm);
+	// Bind from src instead of dist to collect coverage.
+	cli.app.rebind(Container.Identifiers.Confirm).to(Confirm).inSingletonScope();
+	component = cli.app.get(Container.Identifiers.Confirm);
 });
 
 describe("Confirm", () => {
-    it("should render the component", async () => {
-        prompts.inject([true]);
+	it("should render the component", async () => {
+		prompts.inject([true]);
 
-        await expect(component.render("Hello World")).resolves.toBeTrue();
-    });
+		await expect(component.render("Hello World")).resolves.toBeTrue();
+	});
 });

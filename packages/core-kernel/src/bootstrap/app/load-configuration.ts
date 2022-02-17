@@ -10,24 +10,24 @@ import { Bootstrapper } from "../interfaces";
  */
 @injectable()
 export class LoadConfiguration implements Bootstrapper {
-    /**
-     * The application instance.
-     *
-     * @private
-     * @type {Application}
-     * @memberof Local
-     */
-    @inject(Identifiers.Application)
-    private readonly app!: Application;
+	/**
+	 * The application instance.
+	 *
+	 * @private
+	 * @type {Application}
+	 * @memberof Local
+	 */
+	@inject(Identifiers.Application)
+	private readonly app!: Application;
 
-    /**
-     * @returns {Promise<void>}
-     * @memberof LoadConfiguration
-     */
-    public async bootstrap(): Promise<void> {
-        await this.app
-            .get<ConfigManager>(Identifiers.ConfigManager)
-            .driver(this.app.get<ConfigRepository>(Identifiers.ConfigRepository).get<string>("configLoader", "local"))
-            .loadConfiguration();
-    }
+	/**
+	 * @returns {Promise<void>}
+	 * @memberof LoadConfiguration
+	 */
+	public async bootstrap(): Promise<void> {
+		await this.app
+			.get<ConfigManager>(Identifiers.ConfigManager)
+			.driver(this.app.get<ConfigRepository>(Identifiers.ConfigRepository).get<string>("configLoader", "local"))
+			.loadConfiguration();
+	}
 }

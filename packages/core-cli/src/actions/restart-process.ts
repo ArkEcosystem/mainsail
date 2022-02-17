@@ -9,37 +9,37 @@ import { ProcessManager } from "../services";
  */
 @injectable()
 export class RestartProcess {
-    /**
-     * @private
-     * @type {Application}
-     * @memberof Command
-     */
-    @inject(Identifiers.Application)
-    private readonly app!: Application;
+	/**
+	 * @private
+	 * @type {Application}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.Application)
+	private readonly app!: Application;
 
-    /**
-     * @private
-     * @type {ProcessManager}
-     * @memberof Command
-     */
-    @inject(Identifiers.ProcessManager)
-    private readonly processManager!: ProcessManager;
+	/**
+	 * @private
+	 * @type {ProcessManager}
+	 * @memberof Command
+	 */
+	@inject(Identifiers.ProcessManager)
+	private readonly processManager!: ProcessManager;
 
-    /**
-     * @static
-     * @param {string} processName
-     * @memberof RestartProcess
-     */
-    public execute(processName: string): void {
-        let spinner;
-        try {
-            spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Restarting ${processName}`);
+	/**
+	 * @static
+	 * @param {string} processName
+	 * @memberof RestartProcess
+	 */
+	public execute(processName: string): void {
+		let spinner;
+		try {
+			spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Restarting ${processName}`);
 
-            this.processManager.restart(processName);
-        } catch (error) {
-            throw new Error(error.stderr ? `${error.message}: ${error.stderr}` : error.message);
-        } finally {
-            spinner.stop();
-        }
-    }
+			this.processManager.restart(processName);
+		} catch (error) {
+			throw new Error(error.stderr ? `${error.message}: ${error.stderr}` : error.message);
+		} finally {
+			spinner.stop();
+		}
+	}
 }

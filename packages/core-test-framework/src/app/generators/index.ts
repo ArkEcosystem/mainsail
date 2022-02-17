@@ -7,12 +7,12 @@ export const generateCoreConfig = (opts?: SandboxOptions): CoreConfigPaths => ne
 export const generateCryptoConfig = (opts?: SandboxOptions): CryptoConfigPaths => new CryptoGenerator(opts).generate();
 
 export const generateCryptoConfigRaw = (opts?: SandboxOptions) => {
-    const config: CryptoConfigPaths = generateCryptoConfig(opts);
+	const config: CryptoConfigPaths = generateCryptoConfig(opts);
 
-    return {
-        exceptions: require(config.exceptions),
-        genesisBlock: require(config.genesisBlock),
-        milestones: require(config.milestones),
-        network: require(config.network),
-    };
+	return {
+		exceptions: require(config.exceptions),
+		genesisBlock: require(config.genesisBlock),
+		milestones: require(config.milestones),
+		network: require(config.network),
+	};
 };

@@ -7,7 +7,7 @@ const entries = tg("../../../../packages/crypto/src/networks/**/*.json", { cwd: 
 
 const NETWORKS = {};
 entries.forEach((file) => {
-    NETWORKS[parse(file).name] = require(file);
+	NETWORKS[parse(file).name] = require(file);
 });
 
 const NETWORKS_LIST = [];

@@ -13,17 +13,17 @@ import { Stopped } from "./stopped";
 import { SyncingComplete } from "./syncing-complete";
 
 export const actions = {
-    blockchainReady: BlockchainReady,
-    checkLastBlockSynced: CheckLastBlockSynced,
-    checkLastDownloadedBlockSynced: CheckLastDownloadedBlockSynced,
-    checkLater: CheckLater,
-    downloadBlocks: DownloadBlocks,
-    downloadFinished: DownloadFinished,
-    downloadPaused: DownloadPaused,
-    exitApp: ExitApp,
-    init: Initialize, // todo: rename the action from 'init' to 'initialize'
-    rollbackDatabase: RollbackDatabase,
-    startForkRecovery: StartForkRecovery,
-    stopped: Stopped,
-    syncingComplete: SyncingComplete,
+	blockchainReady: BlockchainReady,
+	checkLastBlockSynced: CheckLastBlockSynced,
+	checkLastDownloadedBlockSynced: CheckLastDownloadedBlockSynced,
+	checkLater: CheckLater,
+	downloadBlocks: DownloadBlocks,
+	downloadFinished: DownloadFinished,
+	downloadPaused: DownloadPaused,
+	exitApp: ExitApp,
+	init: Initialize, // todo: rename the action from 'init' to 'initialize'
+	rollbackDatabase: RollbackDatabase,
+	startForkRecovery: StartForkRecovery,
+	stopped: Stopped,
+	syncingComplete: SyncingComplete,
 };

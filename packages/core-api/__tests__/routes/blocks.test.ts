@@ -13,99 +13,99 @@ let app;
 let server: Server;
 
 beforeAll(async () => {
-    app = initApp();
-    server = await initServer(app, serverDefaults);
-    // @ts-ignore
-    register(server.server);
+	app = initApp();
+	server = await initServer(app, serverDefaults);
+	// @ts-ignore
+	register(server.server);
 });
 
 afterAll(async () => {
-    await server.dispose();
+	await server.dispose();
 });
 
 describe("Blockchain", () => {
-    describe("Index", () => {
-        it("should be called", async () => {
-            const spyOnMethod = jest.spyOn(BlocksController.prototype, "index").mockResolvedValue(paginatedResult);
+	describe("Index", () => {
+		it("should be called", async () => {
+			const spyOnMethod = jest.spyOn(BlocksController.prototype, "index").mockResolvedValue(paginatedResult);
 
-            const injectOptions = {
-                method: "GET",
-                url: "/blocks",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/blocks",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("First", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(BlocksController.prototype, "first").mockResolvedValue({});
+	describe("First", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(BlocksController.prototype, "first").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/blocks/first",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/blocks/first",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Last", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(BlocksController.prototype, "last").mockResolvedValue({});
+	describe("Last", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(BlocksController.prototype, "last").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/blocks/last",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/blocks/last",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Show", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(BlocksController.prototype, "show").mockResolvedValue({});
+	describe("Show", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(BlocksController.prototype, "show").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/blocks/6130173a45d10bf450ca64d210d7f910cb3f673ba582fa919eed7808e1c9eebe",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/blocks/6130173a45d10bf450ca64d210d7f910cb3f673ba582fa919eed7808e1c9eebe",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Transactions", () => {
-        it("should be called", async () => {
-            const spyOnMethod = jest
-                .spyOn(BlocksController.prototype, "transactions")
-                .mockResolvedValue(paginatedResult);
+	describe("Transactions", () => {
+		it("should be called", async () => {
+			const spyOnMethod = jest
+				.spyOn(BlocksController.prototype, "transactions")
+				.mockResolvedValue(paginatedResult);
 
-            const injectOptions = {
-                method: "GET",
-                url: "/blocks/6130173a45d10bf450ca64d210d7f910cb3f673ba582fa919eed7808e1c9eebe/transactions",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/blocks/6130173a45d10bf450ca64d210d7f910cb3f673ba582fa919eed7808e1c9eebe/transactions",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 });

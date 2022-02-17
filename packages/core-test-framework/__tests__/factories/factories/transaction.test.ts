@@ -7,196 +7,196 @@ import passphrases from "@packages/core-test-framework/src/internal/passphrases.
 let factory: FactoryBuilder;
 
 beforeEach(() => {
-    factory = new FactoryBuilder();
+	factory = new FactoryBuilder();
 
-    Factories.registerTransactionFactory(factory);
+	Factories.registerTransactionFactory(factory);
 });
 
 describe("TransactionFactory", () => {
-    describe("Transfer", () => {
-        it("should create a builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
+	describe("Transfer", () => {
+		it("should create a builder", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+		});
 
-        it("should create a builder with options", () => {
-            let options = {
-                version: 2,
-                nonce: 1,
-                fee: 2,
-                timestamp: 1,
-                senderPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-                expiration: 2,
-                vendorField: "Dummy Field",
-            };
+		it("should create a builder with options", () => {
+			let options = {
+				version: 2,
+				nonce: 1,
+				fee: 2,
+				timestamp: 1,
+				senderPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
+				expiration: 2,
+				vendorField: "Dummy Field",
+			};
 
-            const transaction: Interfaces.ITransaction = factory
-                .get("Transfer")
-                .withOptions(options)
-                .withStates("vendorField")
-                .make();
+			const transaction: Interfaces.ITransaction = factory
+				.get("Transfer")
+				.withOptions(options)
+				.withStates("vendorField")
+				.make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
 
-            expect(transaction.data.vendorField).toBeDefined();
-        });
+			expect(transaction.data.vendorField).toBeDefined();
+		});
 
-        it("should create a builder with vendor field", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("vendorField").make();
+		it("should create a builder with vendor field", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("vendorField").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
 
-            expect(transaction.data.vendorField).toBeDefined();
-        });
+			expect(transaction.data.vendorField).toBeDefined();
+		});
 
-        it("should sign it with a single passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("sign").make();
+		it("should sign it with a single passphrase", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("sign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.verify()).toBeTrue();
+		});
 
-        it("should sign it with multiple passphrases", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("sign", "multiSign").make();
+		it("should sign it with multiple passphrases", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("sign", "multiSign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).not.toBeUndefined();
-            // todo: verify multi signatures
-            // expect(transaction.verify()).toBeTrue();
-        });
-    });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).not.toBeUndefined();
+			// todo: verify multi signatures
+			// expect(transaction.verify()).toBeTrue();
+		});
+	});
 
-    describe("DelegateRegistration", () => {
-        it("should create a signature builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").make();
+	describe("DelegateRegistration", () => {
+		it("should create a signature builder", () => {
+			const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+		});
 
-        it("should sign it with a single passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").withStates("sign").make();
+		it("should sign it with a single passphrase", () => {
+			const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").withStates("sign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
-    });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.verify()).toBeTrue();
+		});
+	});
 
-    describe("DelegateResignation", () => {
-        it("should create a signature builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").make();
+	describe("DelegateResignation", () => {
+		it("should create a signature builder", () => {
+			const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+		});
 
-        it("should sign it with a single passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").withStates("sign").make();
+		it("should sign it with a single passphrase", () => {
+			const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").withStates("sign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
-    });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.verify()).toBeTrue();
+		});
+	});
 
-    describe("Vote", () => {
-        it("should create a builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Vote").make();
+	describe("Vote", () => {
+		it("should create a builder", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Vote").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+		});
 
-        it("should sign it with a single passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign").make();
+		it("should sign it with a single passphrase", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.verify()).toBeTrue();
+		});
 
-        it("should sign it with multiple passphrases", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign", "multiSign").make();
+		it("should sign it with multiple passphrases", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign", "multiSign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).not.toBeUndefined();
-        });
-    });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).not.toBeUndefined();
+		});
+	});
 
-    describe("Unvote", () => {
-        it("should create a builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Unvote").make();
+	describe("Unvote", () => {
+		it("should create a builder", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Unvote").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+		});
 
-        it("should sign it with a single passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign").make();
+		it("should sign it with a single passphrase", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.verify()).toBeTrue();
+		});
 
-        it("should sign it with multiple passphrases", () => {
-            const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign", "multiSign").make();
+		it("should sign it with multiple passphrases", () => {
+			const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign", "multiSign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).not.toBeUndefined();
-        });
-    });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).not.toBeUndefined();
+		});
+	});
 
-    describe("MultiSignature", () => {
-        it("should create a builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("MultiSignature").make();
+	describe("MultiSignature", () => {
+		it("should create a builder", () => {
+			const transaction: Interfaces.ITransaction = factory.get("MultiSignature").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+		});
 
-        it("should sign it with multiple passphrases", () => {
-            const transaction: Interfaces.ITransaction = factory
-                .get("MultiSignature")
-                .withStates("multiSign", "sign")
-                .make();
+		it("should sign it with multiple passphrases", () => {
+			const transaction: Interfaces.ITransaction = factory
+				.get("MultiSignature")
+				.withStates("multiSign", "sign")
+				.make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).not.toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
-    });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).not.toBeUndefined();
+			expect(transaction.verify()).toBeTrue();
+		});
+	});
 
-    describe("MultiPayment", () => {
-        it("should create a builder", () => {
-            const transaction: Interfaces.ITransaction = factory.get("MultiPayment").make();
+	describe("MultiPayment", () => {
+		it("should create a builder", () => {
+			const transaction: Interfaces.ITransaction = factory.get("MultiPayment").make();
 
-            expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-        });
+			expect(transaction.data.signature).toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+		});
 
-        it("should sign it with a single passphrase", () => {
-            const transaction: Interfaces.ITransaction = factory.get("MultiPayment").withStates("sign").make();
+		it("should sign it with a single passphrase", () => {
+			const transaction: Interfaces.ITransaction = factory.get("MultiPayment").withStates("sign").make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).toBeUndefined();
-            expect(transaction.verify()).toBeTrue();
-        });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).toBeUndefined();
+			expect(transaction.verify()).toBeTrue();
+		});
 
-        it("should sign it with multiple passphrases", () => {
-            const transaction: Interfaces.ITransaction = factory
-                .get("MultiPayment")
-                .withStates("sign", "multiSign")
-                .make();
+		it("should sign it with multiple passphrases", () => {
+			const transaction: Interfaces.ITransaction = factory
+				.get("MultiPayment")
+				.withStates("sign", "multiSign")
+				.make();
 
-            expect(transaction.data.signature).not.toBeUndefined();
-            expect(transaction.data.signatures).not.toBeUndefined();
-        });
-    });
+			expect(transaction.data.signature).not.toBeUndefined();
+			expect(transaction.data.signatures).not.toBeUndefined();
+		});
+	});
 });

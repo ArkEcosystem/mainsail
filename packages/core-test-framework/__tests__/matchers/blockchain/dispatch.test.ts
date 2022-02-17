@@ -1,33 +1,33 @@
 import "@packages/core-test-framework/src/matchers/blockchain/dispatch";
 
 class Dispatcher {
-    public dispatch(event: string): void {}
+	public dispatch(event: string): void {}
 
-    public async transitionMethod(): Promise<void> {
-        this.dispatch("TEST");
-    }
+	public async transitionMethod(): Promise<void> {
+		this.dispatch("TEST");
+	}
 }
 
 describe("Dispatch", () => {
-    describe("toDispatch", () => {
-        it("should be successful on valid event", async () => {
-            const dispatcher = new Dispatcher();
+	describe("toDispatch", () => {
+		it("should be successful on valid event", async () => {
+			const dispatcher = new Dispatcher();
 
-            await expect(() => dispatcher.transitionMethod()).toDispatch(dispatcher, "TEST");
-        });
+			await expect(() => dispatcher.transitionMethod()).toDispatch(dispatcher, "TEST");
+		});
 
-        it("should not be successful on invalid event", async () => {
-            const dispatcher = new Dispatcher();
+		it("should not be successful on invalid event", async () => {
+			const dispatcher = new Dispatcher();
 
-            await expect(() => dispatcher.transitionMethod()).not.toDispatch(dispatcher, "INVALID");
-        });
+			await expect(() => dispatcher.transitionMethod()).not.toDispatch(dispatcher, "INVALID");
+		});
 
-        it("should not be successful if event is not dispatched", async () => {
-            const dispatcher = new Dispatcher();
+		it("should not be successful if event is not dispatched", async () => {
+			const dispatcher = new Dispatcher();
 
-            dispatcher.transitionMethod = jest.fn();
+			dispatcher.transitionMethod = jest.fn();
 
-            await expect(() => dispatcher.transitionMethod()).not.toDispatch(dispatcher, "TEST");
-        });
-    });
+			await expect(() => dispatcher.transitionMethod()).not.toDispatch(dispatcher, "TEST");
+		});
+	});
 });

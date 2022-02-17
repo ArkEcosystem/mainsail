@@ -2,10 +2,10 @@ import { Commands, Container } from "@packages/core-cli";
 
 @Container.injectable()
 export class CommandWithoutDefinition extends Commands.Command {
-    public signature: string = "config:cli";
-    public description: string = "Update the CLI configuration.";
+	public signature: string = "config:cli";
+	public description: string = "Update the CLI configuration.";
 
-    public async execute(): Promise<void> {
-        // Do nothing...
-    }
+	public async execute(): Promise<void> {
+		// Do nothing...
+	}
 }

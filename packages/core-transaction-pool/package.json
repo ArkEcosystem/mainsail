@@ -1,51 +1,51 @@
 {
-    "name": "@arkecosystem/core-transaction-pool",
-    "version": "3.1.1",
-    "description": "Transaction Pool Manager for ARK Core",
-    "license": "MIT",
-    "contributors": [
-        "Kristjan Košič <kristjan@ark.io>",
-        "Brian Faust <brian@ark.io>",
-        "Alex Barnsley <alex@ark.io>",
-        "Vasil Dimov <vd@FreeBSD.org>",
-        "Joshua Noack <joshua@ark.io>"
-    ],
-    "files": [
-        "dist"
-    ],
-    "main": "dist/index",
-    "types": "dist/index",
-    "scripts": {
-        "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -- -w",
-        "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-        "clean": "rimraf dist",
-        "compile": "node ../../node_modules/typescript/bin/tsc",
-        "prepublishOnly": "pnpm run build",
-        "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
-    },
-    "dependencies": {
-        "@arkecosystem/core-kernel": "workspace:*",
-        "@arkecosystem/core-transactions": "workspace:*",
-        "@arkecosystem/crypto": "workspace:*",
-        "better-sqlite3": "7.4.3",
-        "fs-extra": "8.1.0",
-        "joi": "17.4.2"
-    },
-    "devDependencies": {
-        "@types/better-sqlite3": "5.4.3",
-        "@types/fs-extra": "8.1.2"
-    },
-    "engines": {
-        "node": ">=10.x"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "arkecosystem": {
-        "core": {
-            "alias": "transactionPool"
-        }
-    }
+	"name": "@arkecosystem/core-transaction-pool",
+	"version": "3.1.1",
+	"description": "Transaction Pool Manager for ARK Core",
+	"license": "MIT",
+	"contributors": [
+		"Kristjan Košič <kristjan@ark.io>",
+		"Brian Faust <brian@ark.io>",
+		"Alex Barnsley <alex@ark.io>",
+		"Vasil Dimov <vd@FreeBSD.org>",
+		"Joshua Noack <joshua@ark.io>"
+	],
+	"files": [
+		"dist"
+	],
+	"main": "dist/index",
+	"types": "dist/index",
+	"scripts": {
+		"build": "pnpm run clean && pnpm run compile",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"clean": "rimraf dist",
+		"compile": "node ../../node_modules/typescript/bin/tsc",
+		"prepublishOnly": "pnpm run build",
+		"pretest": "bash ../../scripts/pre-test.sh",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/core-transactions": "workspace:*",
+		"@arkecosystem/crypto": "workspace:*",
+		"better-sqlite3": "7.4.3",
+		"fs-extra": "8.1.0",
+		"joi": "17.4.2"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "5.4.3",
+		"@types/fs-extra": "8.1.2"
+	},
+	"engines": {
+		"node": ">=10.x"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "transactionPool"
+		}
+	}
 }

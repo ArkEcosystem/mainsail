@@ -7,17 +7,17 @@ let cli;
 let component;
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    // Bind from src instead of dist to collect coverage.
-    cli.app.rebind(Container.Identifiers.Ask).to(Ask).inSingletonScope();
-    component = cli.app.get(Container.Identifiers.Ask);
+	// Bind from src instead of dist to collect coverage.
+	cli.app.rebind(Container.Identifiers.Ask).to(Ask).inSingletonScope();
+	component = cli.app.get(Container.Identifiers.Ask);
 });
 
 describe("Ask", () => {
-    it("should render the component", async () => {
-        prompts.inject(["john doe"]);
+	it("should render the component", async () => {
+		prompts.inject(["john doe"]);
 
-        await expect(component.render("Hello World")).resolves.toBe("john doe");
-    });
+		await expect(component.render("Hello World")).resolves.toBe("john doe");
+	});
 });

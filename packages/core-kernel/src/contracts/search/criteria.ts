@@ -16,15 +16,15 @@ export type OrContainsCriteria<T> = OrCriteria<ContainsCriteria<T>>;
 
 export type StandardCriteriaOf<T> = StandardCriteriaOfItem<T> | StandardCriteriaOfItem<T>[];
 export type StandardCriteriaOfItem<T> = T extends any[]
-    ? never
-    : T extends boolean
-    ? boolean | string
-    : T extends number
-    ? NumericCriteria<number | string>
-    : T extends BigInt | Utils.BigNumber
-    ? NumericCriteria<number | BigInt | Utils.BigNumber | string>
-    : T extends string
-    ? string
-    : T extends object
-    ? { [K in keyof T]?: StandardCriteriaOf<T[K]> } | { "*"?: unknown }
-    : never;
+	? never
+	: T extends boolean
+	? boolean | string
+	: T extends number
+	? NumericCriteria<number | string>
+	: T extends BigInt | Utils.BigNumber
+	? NumericCriteria<number | BigInt | Utils.BigNumber | string>
+	: T extends string
+	? string
+	: T extends object
+	? { [K in keyof T]?: StandardCriteriaOf<T[K]> } | { "*"?: unknown }
+	: never;

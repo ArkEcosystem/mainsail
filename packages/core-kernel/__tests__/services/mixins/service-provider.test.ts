@@ -10,12 +10,12 @@ let app: Application;
 beforeEach(() => (app = new Application(new Container())));
 
 describe("MixinServiceProvider", () => {
-    it(".register", async () => {
-        expect(app.isBound(Identifiers.MixinService)).toBeFalse();
+	it(".register", async () => {
+		expect(app.isBound(Identifiers.MixinService)).toBeFalse();
 
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.isBound(Identifiers.MixinService)).toBeTrue();
-        expect(app.get(Identifiers.MixinService)).toBeInstanceOf(MixinService);
-    });
+		expect(app.isBound(Identifiers.MixinService)).toBeTrue();
+		expect(app.get(Identifiers.MixinService)).toBeInstanceOf(MixinService);
+	});
 });

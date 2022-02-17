@@ -1,3 +1,3 @@
 export interface StateBuilder {
-    run(): Promise<void>;
+	run(): Promise<void>;
 }

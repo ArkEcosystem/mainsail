@@ -24,34 +24,34 @@ let database: SnapshotDatabaseService;
 let filesystem: Filesystem;
 
 class MockWorkerWrapper extends EventEmitter {
-    public constructor() {
-        super();
-    }
+	public constructor() {
+		super();
+	}
 
-    public async start() {
-        this.emit("count", 1);
-        this.emit("exit");
-    }
+	public async start() {
+		this.emit("count", 1);
+		this.emit("exit");
+	}
 
-    public async sync() {}
-    public async terminate() {}
+	public async sync() {}
+	public async terminate() {}
 }
 
 let mockWorkerWrapper;
 
 jest.mock("@packages/core-snapshots/src/workers/worker-wrapper", () => {
-    return {
-        WorkerWrapper: jest.fn().mockImplementation(() => {
-            return mockWorkerWrapper;
-        }),
-    };
+	return {
+		WorkerWrapper: jest.fn().mockImplementation(() => {
+			return mockWorkerWrapper;
+		}),
+	};
 });
 
 const configuration = {
-    chunkSize: 50000,
-    dispatchUpdateStep: 1000,
-    connection: {},
-    cryptoPackages: [],
+	chunkSize: 50000,
+	dispatchUpdateStep: 1000,
+	connection: {},
+	cryptoPackages: [],
 };
 
 let logger;
@@ -63,335 +63,335 @@ let progressDispatcher: Partial<ProgressDispatcher>;
 let eventDispatcher;
 
 beforeEach(() => {
-    mockWorkerWrapper = new MockWorkerWrapper();
-    mockWorkerWrapper.sync = jest.fn().mockResolvedValue({ numberOfTransactions: 1, height: 1 });
-    mockWorkerWrapper.terminate = jest.fn();
-    mockWorkerWrapper.removeListener = jest.fn();
+	mockWorkerWrapper = new MockWorkerWrapper();
+	mockWorkerWrapper.sync = jest.fn().mockResolvedValue({ numberOfTransactions: 1, height: 1 });
+	mockWorkerWrapper.terminate = jest.fn();
+	mockWorkerWrapper.removeListener = jest.fn();
 
-    logger = {
-        info: jest.fn(),
-        error: jest.fn(),
-        warning: jest.fn(),
-    };
+	logger = {
+		info: jest.fn(),
+		error: jest.fn(),
+		warning: jest.fn(),
+	};
 
-    connection = {
-        isConnected: true,
-    };
+	connection = {
+		isConnected: true,
+	};
 
-    eventDispatcher = {
-        dispatch: jest.fn(),
-    };
+	eventDispatcher = {
+		dispatch: jest.fn(),
+	};
 
-    const lastBlock = Assets.blocksBigNumber[0];
-    lastBlock.height = 100;
+	const lastBlock = Assets.blocksBigNumber[0];
+	lastBlock.height = 100;
 
-    blockRepository = {
-        fastCount: jest.fn().mockResolvedValue(1),
-        truncate: jest.fn(),
-        delete: jest.fn(),
-        findFirst: jest.fn().mockResolvedValue(Assets.blocksBigNumber[0] as any),
-        findLast: jest.fn().mockResolvedValue(lastBlock as any),
-        findByHeight: jest.fn().mockResolvedValue(lastBlock as any),
-        rollback: jest.fn(),
-        countInRange: jest.fn().mockResolvedValue(5),
-    };
+	blockRepository = {
+		fastCount: jest.fn().mockResolvedValue(1),
+		truncate: jest.fn(),
+		delete: jest.fn(),
+		findFirst: jest.fn().mockResolvedValue(Assets.blocksBigNumber[0] as any),
+		findLast: jest.fn().mockResolvedValue(lastBlock as any),
+		findByHeight: jest.fn().mockResolvedValue(lastBlock as any),
+		rollback: jest.fn(),
+		countInRange: jest.fn().mockResolvedValue(5),
+	};
 
-    transactionRepository = {
-        fastCount: jest.fn(),
-        delete: jest.fn(),
-        countInRange: jest.fn().mockResolvedValue(5),
-    };
+	transactionRepository = {
+		fastCount: jest.fn(),
+		delete: jest.fn(),
+		countInRange: jest.fn().mockResolvedValue(5),
+	};
 
-    roundRepository = {
-        fastCount: jest.fn(),
-        delete: jest.fn(),
-        countInRange: jest.fn().mockResolvedValue(5),
-    };
+	roundRepository = {
+		fastCount: jest.fn(),
+		delete: jest.fn(),
+		countInRange: jest.fn().mockResolvedValue(5),
+	};
 
-    progressDispatcher = {
-        start: jest.fn(),
-        end: jest.fn(),
-        update: jest.fn(),
-    };
+	progressDispatcher = {
+		start: jest.fn(),
+		end: jest.fn(),
+		update: jest.fn(),
+	};
 
-    sandbox = new Sandbox();
+	sandbox = new Sandbox();
 
-    sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
 
-    sandbox.app.bind(Container.Identifiers.DatabaseConnection).toConstantValue(connection);
+	sandbox.app.bind(Container.Identifiers.DatabaseConnection).toConstantValue(connection);
 
-    sandbox.app.bind(Container.Identifiers.ApplicationNetwork).toConstantValue("testnet");
+	sandbox.app.bind(Container.Identifiers.ApplicationNetwork).toConstantValue("testnet");
 
-    sandbox.app.bind(Container.Identifiers.FilesystemService).to(LocalFilesystem).inSingletonScope();
-    sandbox.app.bind(Identifiers.SnapshotFilesystem).to(Filesystem).inSingletonScope();
+	sandbox.app.bind(Container.Identifiers.FilesystemService).to(LocalFilesystem).inSingletonScope();
+	sandbox.app.bind(Identifiers.SnapshotFilesystem).to(Filesystem).inSingletonScope();
 
-    sandbox.app.bind(Identifiers.SnapshotBlockRepository).toConstantValue(blockRepository);
-    sandbox.app.bind(Identifiers.SnapshotTransactionRepository).toConstantValue(transactionRepository);
-    sandbox.app.bind(Identifiers.SnapshotRoundRepository).toConstantValue(roundRepository);
+	sandbox.app.bind(Identifiers.SnapshotBlockRepository).toConstantValue(blockRepository);
+	sandbox.app.bind(Identifiers.SnapshotTransactionRepository).toConstantValue(transactionRepository);
+	sandbox.app.bind(Identifiers.SnapshotRoundRepository).toConstantValue(roundRepository);
 
-    sandbox.app.bind(Identifiers.ProgressDispatcher).toConstantValue(progressDispatcher);
+	sandbox.app.bind(Identifiers.ProgressDispatcher).toConstantValue(progressDispatcher);
 
-    sandbox.app.bind(Identifiers.SnapshotVersion).toConstantValue("3.0.0-next.0");
+	sandbox.app.bind(Identifiers.SnapshotVersion).toConstantValue("3.0.0-next.0");
 
-    sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
+	sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
 
-    sandbox.app
-        .bind(Container.Identifiers.QueueFactory)
-        .toFactory((context: interfaces.Context) => async <K, T>(name?: string): Promise<Queue> =>
-            sandbox.app.resolve<Queue>(MemoryQueue).make(),
-        );
+	sandbox.app.bind(Container.Identifiers.QueueFactory).toFactory(
+		(context: interfaces.Context) =>
+			async <K, T>(name?: string): Promise<Queue> =>
+				sandbox.app.resolve<Queue>(MemoryQueue).make(),
+	);
 
-    sandbox.app.bind(Identifiers.SnapshotDatabaseService).to(SnapshotDatabaseService).inSingletonScope();
+	sandbox.app.bind(Identifiers.SnapshotDatabaseService).to(SnapshotDatabaseService).inSingletonScope();
 
-    sandbox.app.bind(Container.Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
-    sandbox.app
-        .get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration)
-        .from("@arkecosystem/core-snapshots", configuration);
+	sandbox.app.bind(Container.Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
+	sandbox.app
+		.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration)
+		.from("@arkecosystem/core-snapshots", configuration);
 
-    database = sandbox.app.get<SnapshotDatabaseService>(Identifiers.SnapshotDatabaseService);
-    filesystem = sandbox.app.get<Filesystem>(Identifiers.SnapshotFilesystem);
+	database = sandbox.app.get<SnapshotDatabaseService>(Identifiers.SnapshotDatabaseService);
+	filesystem = sandbox.app.get<Filesystem>(Identifiers.SnapshotFilesystem);
 });
 
 afterEach(() => {
-    setGracefulCleanup();
+	setGracefulCleanup();
 });
 
 describe("DatabaseService", () => {
-    describe("init", () => {
-        it("should be ok", async () => {
-            database.init("default", false, false);
-        });
-
-        it("should be ok with default parameters", async () => {
-            database.init();
-        });
-    });
-
-    describe("truncate", () => {
-        it("should call delete and clear method on transaction, block and round", async () => {
-            await expect(database.truncate()).toResolve();
-
-            expect(blockRepository.truncate).toHaveBeenCalled();
-        });
-    });
-
-    describe("getLastBlock", () => {
-        it("should return block", async () => {
-            await expect(database.getLastBlock()).toResolve();
-        });
-    });
+	describe("init", () => {
+		it("should be ok", async () => {
+			database.init("default", false, false);
+		});
+
+		it("should be ok with default parameters", async () => {
+			database.init();
+		});
+	});
+
+	describe("truncate", () => {
+		it("should call delete and clear method on transaction, block and round", async () => {
+			await expect(database.truncate()).toResolve();
+
+			expect(blockRepository.truncate).toHaveBeenCalled();
+		});
+	});
+
+	describe("getLastBlock", () => {
+		it("should return block", async () => {
+			await expect(database.getLastBlock()).toResolve();
+		});
+	});
 
-    describe("rollbackChain", () => {
-        it("should rollback chain to specific height", async () => {
-            const roundInfo = {
-                round: 1,
-                nextRound: 2,
-                maxDelegates: 51,
-                roundHeight: 1,
-            };
+	describe("rollbackChain", () => {
+		it("should rollback chain to specific height", async () => {
+			const roundInfo = {
+				round: 1,
+				nextRound: 2,
+				maxDelegates: 51,
+				roundHeight: 1,
+			};
 
-            await expect(database.rollback(roundInfo)).toResolve();
-        });
-    });
+			await expect(database.rollback(roundInfo)).toResolve();
+		});
+	});
 
-    describe("dump", () => {
-        it("should resolve", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+	describe("dump", () => {
+		it("should resolve", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            const dumpOptions = {
-                network: "testnet",
-                skipCompression: false,
-                codec: "default",
-            };
+			const dumpOptions = {
+				network: "testnet",
+				skipCompression: false,
+				codec: "default",
+			};
 
-            // await expect(database.dump(dumpOptions)).toResolve();
-            await database.dump(dumpOptions);
-        });
+			// await expect(database.dump(dumpOptions)).toResolve();
+			await database.dump(dumpOptions);
+		});
 
-        it("should throw error if last block is not found", async () => {
-            blockRepository.findLast = jest.fn().mockResolvedValue(undefined);
+		it("should throw error if last block is not found", async () => {
+			blockRepository.findLast = jest.fn().mockResolvedValue(undefined);
 
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            const dumpOptions = {
-                network: "testnet",
-                skipCompression: false,
-                codec: "default",
-            };
+			const dumpOptions = {
+				network: "testnet",
+				skipCompression: false,
+				codec: "default",
+			};
 
-            const promise = database.dump(dumpOptions);
+			const promise = database.dump(dumpOptions);
 
-            await expect(promise).rejects.toThrow();
-        });
+			await expect(promise).rejects.toThrow();
+		});
 
-        it("should throw error if last and first block are in same range", async () => {
-            blockRepository.findLast = jest.fn().mockResolvedValue(Assets.blocks[0]);
+		it("should throw error if last and first block are in same range", async () => {
+			blockRepository.findLast = jest.fn().mockResolvedValue(Assets.blocks[0]);
 
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
-            const spyOnDeleteSnapshot = jest.spyOn(filesystem, "deleteSnapshot");
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			const spyOnDeleteSnapshot = jest.spyOn(filesystem, "deleteSnapshot");
 
-            const dumpOptions = {
-                network: "testnet",
-                skipCompression: false,
-                codec: "default",
-            };
+			const dumpOptions = {
+				network: "testnet",
+				skipCompression: false,
+				codec: "default",
+			};
 
-            const promise = database.dump(dumpOptions);
+			const promise = database.dump(dumpOptions);
 
-            await expect(promise).rejects.toThrow();
-            expect(spyOnDeleteSnapshot).toHaveBeenCalled();
-        });
+			await expect(promise).rejects.toThrow();
+			expect(spyOnDeleteSnapshot).toHaveBeenCalled();
+		});
 
-        it("should throw error if error in worker", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should throw error if error in worker", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
-            const spyOnDeleteSnapshot = jest.spyOn(filesystem, "deleteSnapshot");
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			const spyOnDeleteSnapshot = jest.spyOn(filesystem, "deleteSnapshot");
 
-            const dumpOptions = {
-                network: "testnet",
-                skipCompression: false,
-                codec: "default",
-            };
+			const dumpOptions = {
+				network: "testnet",
+				skipCompression: false,
+				codec: "default",
+			};
 
-            mockWorkerWrapper.start = jest.fn().mockRejectedValue(new Error());
+			mockWorkerWrapper.start = jest.fn().mockRejectedValue(new Error());
 
-            const promise = database.dump(dumpOptions);
+			const promise = database.dump(dumpOptions);
 
-            await expect(promise).rejects.toThrow();
-            expect(spyOnDeleteSnapshot).toHaveBeenCalled();
-        });
-    });
+			await expect(promise).rejects.toThrow();
+			expect(spyOnDeleteSnapshot).toHaveBeenCalled();
+		});
+	});
 
-    describe("restore", () => {
-        it("should resolve", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+	describe("restore", () => {
+		it("should resolve", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            const promise = database.restore(Assets.metaData, { truncate: true });
+			const promise = database.restore(Assets.metaData, { truncate: true });
 
-            await expect(promise).toResolve();
-        });
+			await expect(promise).toResolve();
+		});
 
-        it("should resolve without truncate", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should resolve without truncate", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            const promise = database.restore(Assets.metaData, { truncate: false });
+			const promise = database.restore(Assets.metaData, { truncate: false });
 
-            await expect(promise).toResolve();
-        });
+			await expect(promise).toResolve();
+		});
 
-        it("should resolve with empty result", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should resolve with empty result", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            mockWorkerWrapper.sync = jest.fn();
+			mockWorkerWrapper.sync = jest.fn();
 
-            const promise = database.restore(Assets.metaData, { truncate: true });
+			const promise = database.restore(Assets.metaData, { truncate: true });
 
-            await expect(promise).toResolve();
-        });
+			await expect(promise).toResolve();
+		});
 
-        it("should throw error if error in worker", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should throw error if error in worker", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            mockWorkerWrapper.start = jest.fn().mockRejectedValue(new Error());
+			mockWorkerWrapper.start = jest.fn().mockRejectedValue(new Error());
 
-            const promise = database.restore(Assets.metaData, { truncate: true });
+			const promise = database.restore(Assets.metaData, { truncate: true });
 
-            await expect(promise).rejects.toThrow();
-        });
+			await expect(promise).rejects.toThrow();
+		});
 
-        it("should throw error if error on sync in blocks worker", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should throw error if error on sync in blocks worker", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            mockWorkerWrapper.sync = jest.fn().mockRejectedValueOnce(new Error("Blocks error"));
+			mockWorkerWrapper.sync = jest.fn().mockRejectedValueOnce(new Error("Blocks error"));
 
-            const promise = database.restore(Assets.metaData, { truncate: true });
+			const promise = database.restore(Assets.metaData, { truncate: true });
 
-            await expect(promise).rejects.toThrow("Blocks error");
-        });
+			await expect(promise).rejects.toThrow("Blocks error");
+		});
 
-        it("should throw error if error on sync in transactions worker", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should throw error if error on sync in transactions worker", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            mockWorkerWrapper.sync = jest
-                .fn()
-                .mockResolvedValueOnce({ numberOfTransactions: 1, height: 1 })
-                .mockRejectedValueOnce(new Error("Transactions error"));
+			mockWorkerWrapper.sync = jest
+				.fn()
+				.mockResolvedValueOnce({ numberOfTransactions: 1, height: 1 })
+				.mockRejectedValueOnce(new Error("Transactions error"));
 
-            const promise = database.restore(Assets.metaData, { truncate: true });
+			const promise = database.restore(Assets.metaData, { truncate: true });
 
-            await expect(promise).rejects.toThrow("Transactions error");
-        });
+			await expect(promise).rejects.toThrow("Transactions error");
+		});
 
-        it("should throw error if error on sync in rounds worker", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should throw error if error on sync in rounds worker", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            mockWorkerWrapper.sync = jest
-                .fn()
-                .mockResolvedValueOnce({ numberOfTransactions: 1, height: 1 })
-                .mockResolvedValueOnce({})
-                .mockRejectedValueOnce(new Error("Rounds error"));
+			mockWorkerWrapper.sync = jest
+				.fn()
+				.mockResolvedValueOnce({ numberOfTransactions: 1, height: 1 })
+				.mockResolvedValueOnce({})
+				.mockRejectedValueOnce(new Error("Rounds error"));
 
-            const promise = database.restore(Assets.metaData, { truncate: true });
+			const promise = database.restore(Assets.metaData, { truncate: true });
 
-            await expect(promise).rejects.toThrow("Rounds error");
-        });
-    });
+			await expect(promise).rejects.toThrow("Rounds error");
+		});
+	});
 
-    describe("verify", () => {
-        it("should resolve", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+	describe("verify", () => {
+		it("should resolve", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            const promise = database.verify(Assets.metaData);
+			const promise = database.verify(Assets.metaData);
 
-            await expect(promise).toResolve();
-        });
+			await expect(promise).toResolve();
+		});
 
-        it("should throw error if error in worker", async () => {
-            const dir: string = dirSync().name;
-            const subdir: string = `${dir}/sub`;
+		it("should throw error if error in worker", async () => {
+			const dir: string = dirSync().name;
+			const subdir: string = `${dir}/sub`;
 
-            filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
+			filesystem.getSnapshotPath = jest.fn().mockReturnValue(subdir);
 
-            mockWorkerWrapper.start = jest.fn().mockRejectedValue(new Error());
+			mockWorkerWrapper.start = jest.fn().mockRejectedValue(new Error());
 
-            const promise = database.verify(Assets.metaData);
+			const promise = database.verify(Assets.metaData);
 
-            await expect(promise).rejects.toThrow();
-        });
-    });
+			await expect(promise).rejects.toThrow();
+		});
+	});
 });

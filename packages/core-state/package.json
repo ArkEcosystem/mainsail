@@ -1,47 +1,47 @@
 {
-    "name": "@arkecosystem/core-state",
-    "version": "3.1.1",
-    "description": "State Management for ARK Core",
-    "license": "MIT",
-    "contributors": [
-        "Brian Faust <brian@ark.io>",
-        "Joshua Noack <joshua@ark.io>"
-    ],
-    "files": [
-        "dist"
-    ],
-    "main": "dist/index",
-    "types": "dist/index",
-    "scripts": {
-        "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -- -w",
-        "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-        "clean": "rimraf dist",
-        "compile": "node ../../node_modules/typescript/bin/tsc",
-        "prepublishOnly": "pnpm run build",
-        "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
-    },
-    "dependencies": {
-        "@arkecosystem/core-database": "workspace:*",
-        "@arkecosystem/core-kernel": "workspace:*",
-        "@arkecosystem/core-transactions": "workspace:*",
-        "@arkecosystem/crypto": "workspace:*",
-        "immutable": "4.0.0-rc.14",
-        "joi": "17.4.2"
-    },
-    "engines": {
-        "node": ">=10.x"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "arkecosystem": {
-        "core": {
-            "alias": "state"
-        }
-    },
-    "devDependencies": {
-        "delay": "4.4.1"
-    }
+	"name": "@arkecosystem/core-state",
+	"version": "3.1.1",
+	"description": "State Management for ARK Core",
+	"license": "MIT",
+	"contributors": [
+		"Brian Faust <brian@ark.io>",
+		"Joshua Noack <joshua@ark.io>"
+	],
+	"files": [
+		"dist"
+	],
+	"main": "dist/index",
+	"types": "dist/index",
+	"scripts": {
+		"build": "pnpm run clean && pnpm run compile",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"clean": "rimraf dist",
+		"compile": "node ../../node_modules/typescript/bin/tsc",
+		"prepublishOnly": "pnpm run build",
+		"pretest": "bash ../../scripts/pre-test.sh",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/core-database": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/core-transactions": "workspace:*",
+		"@arkecosystem/crypto": "workspace:*",
+		"immutable": "4.0.0-rc.14",
+		"joi": "17.4.2"
+	},
+	"engines": {
+		"node": ">=10.x"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "state"
+		}
+	},
+	"devDependencies": {
+		"delay": "4.4.1"
+	}
 }

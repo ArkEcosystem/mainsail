@@ -6,44 +6,44 @@ import * as schemas from "../schemas";
 import { Transaction } from "../transaction";
 
 export abstract class TransferTransaction extends Transaction {
-    public static typeGroup: number = TransactionTypeGroup.Core;
-    public static type: number = TransactionType.Transfer;
-    public static key = "transfer";
-    public static version: number = 1;
+	public static typeGroup: number = TransactionTypeGroup.Core;
+	public static type: number = TransactionType.Transfer;
+	public static key = "transfer";
+	public static version: number = 1;
 
-    protected static defaultStaticFee: BigNumber = BigNumber.make("10000000");
+	protected static defaultStaticFee: BigNumber = BigNumber.make("10000000");
 
-    public static getSchema(): schemas.TransactionSchema {
-        return schemas.transfer;
-    }
+	public static getSchema(): schemas.TransactionSchema {
+		return schemas.transfer;
+	}
 
-    public hasVendorField(): boolean {
-        return true;
-    }
+	public hasVendorField(): boolean {
+		return true;
+	}
 
-    public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
-        const { data } = this;
-        const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(33));
-        buff.writeBigUInt64LE(data.amount.toBigInt());
-        buff.writeUInt32LE(data.expiration || 0);
+	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+		const { data } = this;
+		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(33));
+		buff.writeBigUInt64LE(data.amount.toBigInt());
+		buff.writeUInt32LE(data.expiration || 0);
 
-        if (data.recipientId) {
-            const { addressBuffer, addressError } = Address.toBuffer(data.recipientId);
+		if (data.recipientId) {
+			const { addressBuffer, addressError } = Address.toBuffer(data.recipientId);
 
-            if (options) {
-                options.addressError = addressError;
-            }
+			if (options) {
+				options.addressError = addressError;
+			}
 
-            buff.writeBuffer(addressBuffer);
-        }
+			buff.writeBuffer(addressBuffer);
+		}
 
-        return buff;
-    }
+		return buff;
+	}
 
-    public deserialize(buf: ByteBuffer): void {
-        const { data } = this;
-        data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
-        data.expiration = buf.readUInt32LE();
-        data.recipientId = Address.fromBuffer(buf.readBuffer(21));
-    }
+	public deserialize(buf: ByteBuffer): void {
+		const { data } = this;
+		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
+		data.expiration = buf.readUInt32LE();
+		data.recipientId = Address.fromBuffer(buf.readBuffer(21));
+	}
 }

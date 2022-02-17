@@ -7,25 +7,25 @@ import { Utils } from "@packages/crypto";
 let factory: FactoryBuilder;
 
 beforeEach(() => {
-    factory = new FactoryBuilder();
+	factory = new FactoryBuilder();
 
-    Factories.registerRoundFactory(factory);
+	Factories.registerRoundFactory(factory);
 });
 
 describe("RoundFactory", () => {
-    it("should create a round with delegates", () => {
-        const entity: Wallets.Wallet[] = factory.get("Round").make();
+	it("should create a round with delegates", () => {
+		const entity: Wallets.Wallet[] = factory.get("Round").make();
 
-        expect(entity).toBeInstanceOf(Array);
-        expect(entity.length).toBeGreaterThan(0);
+		expect(entity).toBeInstanceOf(Array);
+		expect(entity.length).toBeGreaterThan(0);
 
-        entity.forEach((delegate) => {
-            expect(delegate).toBeInstanceOf(Wallets.Wallet);
-            expect(delegate.getAddress()).toBeString();
-            expect(delegate.getPublicKey()).toBeString();
-            expect(delegate.getBalance()).toBeInstanceOf(Utils.BigNumber);
-            expect(delegate.getNonce()).toBeInstanceOf(Utils.BigNumber);
-            expect(delegate.isDelegate()).toBeTrue();
-        });
-    });
+		entity.forEach((delegate) => {
+			expect(delegate).toBeInstanceOf(Wallets.Wallet);
+			expect(delegate.getAddress()).toBeString();
+			expect(delegate.getPublicKey()).toBeString();
+			expect(delegate.getBalance()).toBeInstanceOf(Utils.BigNumber);
+			expect(delegate.getNonce()).toBeInstanceOf(Utils.BigNumber);
+			expect(delegate.isDelegate()).toBeTrue();
+		});
+	});
 });

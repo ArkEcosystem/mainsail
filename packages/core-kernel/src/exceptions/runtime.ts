@@ -41,14 +41,14 @@ export class UnexpectedValueException extends RuntimeException {}
  * @extends {Exception}
  */
 export class NotImplemented extends RuntimeException {
-    /**
-     * @param {string} method
-     * @param {string} klass
-     * @memberof NotImplemented
-     */
-    public constructor(method: string, klass: string) {
-        super(`Method [${method}] is not implemented in [${klass}].`);
-    }
+	/**
+	 * @param {string} method
+	 * @param {string} klass
+	 * @memberof NotImplemented
+	 */
+	public constructor(method: string, klass: string) {
+		super(`Method [${method}] is not implemented in [${klass}].`);
+	}
 }
 
 /**

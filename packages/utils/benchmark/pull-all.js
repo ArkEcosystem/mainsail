@@ -1,8 +1,6 @@
-const {
-    pullAll
-} = require('../dist')
-const lodash = require('lodash/pullAll')
+const { pullAll } = require("../dist");
+const lodash = require("lodash/pullAll");
 
-exports['utils'] = () => pullAll(['a', 'b', 'c', 'a', 'b', 'c'], 'a', 'c');
+exports["utils"] = () => pullAll(["a", "b", "c", "a", "b", "c"], "a", "c");
 
-exports['lodash'] = () => lodash(['a', 'b', 'c', 'a', 'b', 'c'], 'a', 'c');
+exports["lodash"] = () => lodash(["a", "b", "c", "a", "b", "c"], "a", "c");

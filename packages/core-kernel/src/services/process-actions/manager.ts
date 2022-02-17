@@ -8,11 +8,11 @@ import { Pm2ProcessActionsService } from "./drivers/pm2";
  * @extends {InstanceManager<ProcessActionsService>}
  */
 export class ProcessActionsManager extends InstanceManager<ProcessActionsService> {
-    protected createPm2Driver(): ProcessActionsService {
-        return this.app.resolve(Pm2ProcessActionsService);
-    }
+	protected createPm2Driver(): ProcessActionsService {
+		return this.app.resolve(Pm2ProcessActionsService);
+	}
 
-    protected getDefaultDriver(): string {
-        return "pm2";
-    }
+	protected getDefaultDriver(): string {
+		return "pm2";
+	}
 }

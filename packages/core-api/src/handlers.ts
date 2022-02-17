@@ -11,13 +11,13 @@ import * as Votes from "./routes/votes";
 import * as Wallets from "./routes/wallets";
 
 export = {
-    async register(server: Hapi.Server): Promise<void> {
-        const handlers = [Blockchain, Blocks, Delegates, Node, Peers, Rounds, Transactions, Votes, Wallets];
+	async register(server: Hapi.Server): Promise<void> {
+		const handlers = [Blockchain, Blocks, Delegates, Node, Peers, Rounds, Transactions, Votes, Wallets];
 
-        for (const handler of handlers) {
-            handler.register(server);
-        }
-    },
-    name: "Public API",
-    version: "2.0.0",
+		for (const handler of handlers) {
+			handler.register(server);
+		}
+	},
+	name: "Public API",
+	version: "2.0.0",
 };

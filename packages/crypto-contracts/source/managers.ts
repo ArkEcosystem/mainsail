@@ -1,4 +1,4 @@
 export interface IMilestone {
-    index: number;
-    data: { [key: string]: any };
+	index: number;
+	data: { [key: string]: any };
 }

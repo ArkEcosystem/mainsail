@@ -9,27 +9,27 @@ import { TransferBuilder } from "../../../../../packages/crypto/src/transactions
 import { VoteBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/vote";
 
 describe("Builder Factory", () => {
-    it("should create DelegateRegistrationBuilder", () => {
-        expect(BuilderFactory.delegateRegistration()).toBeInstanceOf(DelegateRegistrationBuilder);
-    });
+	it("should create DelegateRegistrationBuilder", () => {
+		expect(BuilderFactory.delegateRegistration()).toBeInstanceOf(DelegateRegistrationBuilder);
+	});
 
-    it("should create DelegateResignationBuilder", () => {
-        expect(BuilderFactory.delegateResignation()).toBeInstanceOf(DelegateResignationBuilder);
-    });
+	it("should create DelegateResignationBuilder", () => {
+		expect(BuilderFactory.delegateResignation()).toBeInstanceOf(DelegateResignationBuilder);
+	});
 
-    it("should create MultiPaymentBuilder", () => {
-        expect(BuilderFactory.multiPayment()).toBeInstanceOf(MultiPaymentBuilder);
-    });
+	it("should create MultiPaymentBuilder", () => {
+		expect(BuilderFactory.multiPayment()).toBeInstanceOf(MultiPaymentBuilder);
+	});
 
-    it("should create MultiSignatureBuilder", () => {
-        expect(BuilderFactory.multiSignature()).toBeInstanceOf(MultiSignatureBuilder);
-    });
+	it("should create MultiSignatureBuilder", () => {
+		expect(BuilderFactory.multiSignature()).toBeInstanceOf(MultiSignatureBuilder);
+	});
 
-    it("should create TransferBuilder", () => {
-        expect(BuilderFactory.transfer()).toBeInstanceOf(TransferBuilder);
-    });
+	it("should create TransferBuilder", () => {
+		expect(BuilderFactory.transfer()).toBeInstanceOf(TransferBuilder);
+	});
 
-    it("should create VoteBuilder", () => {
-        expect(BuilderFactory.vote()).toBeInstanceOf(VoteBuilder);
-    });
+	it("should create VoteBuilder", () => {
+		expect(BuilderFactory.vote()).toBeInstanceOf(VoteBuilder);
+	});
 });

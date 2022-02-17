@@ -1,50 +1,50 @@
 {
-    "name": "@arkecosystem/core-blockchain",
-    "version": "3.1.1",
-    "description": "Blockchain Manager for ARK Core",
-    "license": "MIT",
-    "contributors": [
-        "François-Xavier Thoorens <fx@ark.io>",
-        "Kristjan Košič <kristjan@ark.io>",
-        "Brian Faust <brian@ark.io>"
-    ],
-    "files": [
-        "dist"
-    ],
-    "main": "dist/index",
-    "types": "dist/index",
-    "scripts": {
-        "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -- -w",
-        "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-        "clean": "rimraf dist",
-        "compile": "node ../../node_modules/typescript/bin/tsc",
-        "prepublishOnly": "pnpm run build",
-        "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
-    },
-    "dependencies": {
-        "@arkecosystem/core-database": "workspace:*",
-        "@arkecosystem/core-kernel": "workspace:*",
-        "@arkecosystem/core-state": "workspace:*",
-        "@arkecosystem/core-transactions": "workspace:*",
-        "@arkecosystem/crypto": "workspace:*",
-        "joi": "17.4.2",
-        "xstate": "4.23.4"
-    },
-    "devDependencies": {
-        "@types/async": "3.2.7",
-        "delay": "4.4.1"
-    },
-    "engines": {
-        "node": ">=10.x"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "arkecosystem": {
-        "core": {
-            "alias": "blockchain"
-        }
-    }
+	"name": "@arkecosystem/core-blockchain",
+	"version": "3.1.1",
+	"description": "Blockchain Manager for ARK Core",
+	"license": "MIT",
+	"contributors": [
+		"François-Xavier Thoorens <fx@ark.io>",
+		"Kristjan Košič <kristjan@ark.io>",
+		"Brian Faust <brian@ark.io>"
+	],
+	"files": [
+		"dist"
+	],
+	"main": "dist/index",
+	"types": "dist/index",
+	"scripts": {
+		"build": "pnpm run clean && pnpm run compile",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"clean": "rimraf dist",
+		"compile": "node ../../node_modules/typescript/bin/tsc",
+		"prepublishOnly": "pnpm run build",
+		"pretest": "bash ../../scripts/pre-test.sh",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/core-database": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/core-state": "workspace:*",
+		"@arkecosystem/core-transactions": "workspace:*",
+		"@arkecosystem/crypto": "workspace:*",
+		"joi": "17.4.2",
+		"xstate": "4.23.4"
+	},
+	"devDependencies": {
+		"@types/async": "3.2.7",
+		"delay": "4.4.1"
+	},
+	"engines": {
+		"node": ">=10.x"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "blockchain"
+		}
+	}
 }

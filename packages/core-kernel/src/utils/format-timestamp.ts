@@ -5,17 +5,17 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
 export const formatTimestamp = (
-    epochStamp: number,
+	epochStamp: number,
 ): {
-    epoch: number;
-    unix: number;
-    human: string;
+	epoch: number;
+	unix: number;
+	human: string;
 } => {
-    const timestamp: Dayjs = dayjs.utc(Managers.configManager.getMilestone().epoch).add(epochStamp, "second");
+	const timestamp: Dayjs = dayjs.utc(Managers.configManager.getMilestone().epoch).add(epochStamp, "second");
 
-    return {
-        epoch: epochStamp,
-        unix: timestamp.unix(),
-        human: timestamp.toISOString(),
-    };
+	return {
+		epoch: epochStamp,
+		unix: timestamp.unix(),
+		human: timestamp.toISOString(),
+	};
 };

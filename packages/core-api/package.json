@@ -1,64 +1,64 @@
 {
-    "name": "@arkecosystem/core-api",
-    "version": "3.1.1",
-    "description": "Public API for ARK Core",
-    "license": "MIT",
-    "contributors": [
-        "Kristjan Košič <kristjan@ark.io>",
-        "Brian Faust <brian@ark.io>"
-    ],
-    "files": [
-        "dist"
-    ],
-    "main": "dist/index",
-    "types": "dist/index",
-    "scripts": {
-        "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -- -w",
-        "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-        "clean": "rimraf dist",
-        "compile": "node ../../node_modules/typescript/bin/tsc",
-        "prepublishOnly": "pnpm run build",
-        "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
-        "test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
-    },
-    "dependencies": {
-        "@arkecosystem/core-database": "workspace:*",
-        "@arkecosystem/core-kernel": "workspace:*",
-        "@arkecosystem/core-transaction-pool": "workspace:*",
-        "@arkecosystem/core-transactions": "workspace:*",
-        "@arkecosystem/crypto": "workspace:*",
-        "@hapi/boom": "9.1.4",
-        "@hapi/hapi": "20.1.5",
-        "@hapi/hoek": "9.2.0",
-        "joi": "17.4.2",
-        "nanomatch": "1.2.13",
-        "node-cache": "5.1.2",
-        "rate-limiter-flexible": "1.3.2",
-        "semver": "6.3.0"
-    },
-    "devDependencies": {
-        "@arkecosystem/core-blockchain": "workspace:*",
-        "@arkecosystem/core-forger": "workspace:*",
-        "@arkecosystem/core-p2p": "workspace:*",
-        "@arkecosystem/core-state": "workspace:*",
-        "@arkecosystem/core-test-framework": "workspace:*",
-        "@types/hapi__boom": "7.4.1",
-        "@types/hapi__joi": "17.1.7",
-        "@types/ip": "1.1.0",
-        "@types/semver": "6.2.3",
-        "lodash.clonedeep": "4.5.0"
-    },
-    "engines": {
-        "node": ">=10.x"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "arkecosystem": {
-        "core": {
-            "alias": "api"
-        }
-    }
+	"name": "@arkecosystem/core-api",
+	"version": "3.1.1",
+	"description": "Public API for ARK Core",
+	"license": "MIT",
+	"contributors": [
+		"Kristjan Košič <kristjan@ark.io>",
+		"Brian Faust <brian@ark.io>"
+	],
+	"files": [
+		"dist"
+	],
+	"main": "dist/index",
+	"types": "dist/index",
+	"scripts": {
+		"build": "pnpm run clean && pnpm run compile",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"clean": "rimraf dist",
+		"compile": "node ../../node_modules/typescript/bin/tsc",
+		"prepublishOnly": "pnpm run build",
+		"pretest": "bash ../../scripts/pre-test.sh",
+		"test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
+		"test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
+	},
+	"dependencies": {
+		"@arkecosystem/core-database": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/core-transaction-pool": "workspace:*",
+		"@arkecosystem/core-transactions": "workspace:*",
+		"@arkecosystem/crypto": "workspace:*",
+		"@hapi/boom": "9.1.4",
+		"@hapi/hapi": "20.1.5",
+		"@hapi/hoek": "9.2.0",
+		"joi": "17.4.2",
+		"nanomatch": "1.2.13",
+		"node-cache": "5.1.2",
+		"rate-limiter-flexible": "1.3.2",
+		"semver": "6.3.0"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-blockchain": "workspace:*",
+		"@arkecosystem/core-forger": "workspace:*",
+		"@arkecosystem/core-p2p": "workspace:*",
+		"@arkecosystem/core-state": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"@types/hapi__boom": "7.4.1",
+		"@types/hapi__joi": "17.1.7",
+		"@types/ip": "1.1.0",
+		"@types/semver": "6.2.3",
+		"lodash.clonedeep": "4.5.0"
+	},
+	"engines": {
+		"node": ">=10.x"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "api"
+		}
+	}
 }

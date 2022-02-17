@@ -8,19 +8,19 @@ let cli;
 let component;
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    // Bind from src instead of dist to collect coverage.
-    cli.app.rebind(Container.Identifiers.AppHeader).to(AppHeader).inSingletonScope();
-    component = cli.app.get(Container.Identifiers.AppHeader);
+	// Bind from src instead of dist to collect coverage.
+	cli.app.rebind(Container.Identifiers.AppHeader).to(AppHeader).inSingletonScope();
+	component = cli.app.get(Container.Identifiers.AppHeader);
 });
 
 describe("AppHeader", () => {
-    it("should render the component", () => {
-        expect(component.render()).toBe(
-            `${red().bold(`${cli.pkg.description}`)} ${white().bold(
-                `[${cli.pkg.version} | ${process.version} | ${os.platform()}@${os.arch()}]`,
-            )}`,
-        );
-    });
+	it("should render the component", () => {
+		expect(component.render()).toBe(
+			`${red().bold(`${cli.pkg.description}`)} ${white().bold(
+				`[${cli.pkg.version} | ${process.version} | ${os.platform()}@${os.arch()}]`,
+			)}`,
+		);
+	});
 });

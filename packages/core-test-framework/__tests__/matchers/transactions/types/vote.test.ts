@@ -5,23 +5,23 @@ import { Interfaces } from "@packages/crypto";
 let factory: FactoryBuilder;
 
 beforeEach(() => {
-    factory = new FactoryBuilder();
+	factory = new FactoryBuilder();
 
-    Factories.registerTransactionFactory(factory);
+	Factories.registerTransactionFactory(factory);
 });
 
 describe("Vote", () => {
-    describe("toBeVoteType", () => {
-        it("should be vote type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("Vote").make();
+	describe("toBeVoteType", () => {
+		it("should be vote type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("Vote").make();
 
-            expect(transaction.data).toBeVoteType();
-        });
+			expect(transaction.data).toBeVoteType();
+		});
 
-        it("should not be vote type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
+		it("should not be vote type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
 
-            expect(transaction.data).not.toBeVoteType();
-        });
-    });
+			expect(transaction.data).not.toBeVoteType();
+		});
+	});
 });

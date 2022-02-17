@@ -8,48 +8,48 @@ import fsExtra from "fs-extra";
 import { sandboxOptions } from "./__fixtures__/assets";
 
 afterEach(() => {
-    jest.resetAllMocks();
+	jest.resetAllMocks();
 });
 
 describe("CoreGenerator", () => {
-    it("should generate core config paths", async () => {
-        const generator: CoreGenerator = new CoreGenerator();
+	it("should generate core config paths", async () => {
+		const generator: CoreGenerator = new CoreGenerator();
 
-        const result: CoreConfigPaths = generator.generate();
+		const result: CoreConfigPaths = generator.generate();
 
-        expect(result.root).toBeString();
-        expect(result.env).toBeString();
-        expect(result.app).toBeString();
-        expect(result.delegates).toBeString();
-        expect(result.peers).toBeString();
-    });
+		expect(result.root).toBeString();
+		expect(result.env).toBeString();
+		expect(result.app).toBeString();
+		expect(result.delegates).toBeString();
+		expect(result.peers).toBeString();
+	});
 
-    it("should generate core config paths with options", async () => {
-        const generator: CoreGenerator = new CoreGenerator(sandboxOptions);
+	it("should generate core config paths with options", async () => {
+		const generator: CoreGenerator = new CoreGenerator(sandboxOptions);
 
-        const result: CoreConfigPaths = generator.generate();
+		const result: CoreConfigPaths = generator.generate();
 
-        expect(result.root).toBeString();
-        expect(result.env).toBeString();
-        expect(result.app).toBeString();
-        expect(result.delegates).toBeString();
-        expect(result.peers).toBeString();
+		expect(result.root).toBeString();
+		expect(result.env).toBeString();
+		expect(result.app).toBeString();
+		expect(result.delegates).toBeString();
+		expect(result.peers).toBeString();
 
-        expect(fsExtra.readFileSync(result.env).toString()).toEqual("TEST=test\n");
-        expect(fsExtra.readJSONSync(result.app)).toEqual({});
-        expect(fsExtra.readJSONSync(result.delegates)).toEqual({});
-        expect(fsExtra.readJSONSync(result.peers)).toEqual({});
-    });
+		expect(fsExtra.readFileSync(result.env).toString()).toEqual("TEST=test\n");
+		expect(fsExtra.readJSONSync(result.app)).toEqual({});
+		expect(fsExtra.readJSONSync(result.delegates)).toEqual({});
+		expect(fsExtra.readJSONSync(result.peers)).toEqual({});
+	});
 
-    it("should throw error if destination already exist", async () => {
-        jest.spyOn(fsExtra, "existsSync").mockImplementation((path: PathLike): boolean => {
-            return true;
-        });
+	it("should throw error if destination already exist", async () => {
+		jest.spyOn(fsExtra, "existsSync").mockImplementation((path: PathLike): boolean => {
+			return true;
+		});
 
-        const generator: CoreGenerator = new CoreGenerator();
+		const generator: CoreGenerator = new CoreGenerator();
 
-        expect(() => {
-            generator.generate();
-        }).toThrowError();
-    });
+		expect(() => {
+			generator.generate();
+		}).toThrowError();
+	});
 });

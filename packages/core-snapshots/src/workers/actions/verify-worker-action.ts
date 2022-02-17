@@ -6,25 +6,25 @@ import { ReadProcessor } from "./read-processor";
 
 @Container.injectable()
 export class VerifyWorkerAction extends AbstractWorkerAction {
-    private readProcessor: ReadProcessor | undefined = undefined;
+	private readProcessor: ReadProcessor | undefined = undefined;
 
-    public async start(): Promise<void> {
-        const isBlock = this.table === "blocks";
-        const streamReader = this.getStreamReader();
-        const verify = this.getVerifyFunction();
+	public async start(): Promise<void> {
+		const isBlock = this.table === "blocks";
+		const streamReader = this.getStreamReader();
+		const verify = this.getVerifyFunction();
 
-        this.readProcessor = new ReadProcessor(isBlock, streamReader, async (entity: any, previousEntity: any) => {
-            if (isBlock) {
-                this.applyGenesisBlockFix(entity);
-            }
+		this.readProcessor = new ReadProcessor(isBlock, streamReader, async (entity: any, previousEntity: any) => {
+			if (isBlock) {
+				this.applyGenesisBlockFix(entity);
+			}
 
-            verify(entity, previousEntity);
-        });
+			verify(entity, previousEntity);
+		});
 
-        await this.readProcessor.start();
-    }
+		await this.readProcessor.start();
+	}
 
-    public sync(data: Worker.WorkerSyncData): void {
-        this.readProcessor!.sync(data);
-    }
+	public sync(data: Worker.WorkerSyncData): void {
+		this.readProcessor!.sync(data);
+	}
 }

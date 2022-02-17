@@ -5,23 +5,23 @@ import { Interfaces } from "@packages/crypto";
 let factory: FactoryBuilder;
 
 beforeEach(() => {
-    factory = new FactoryBuilder();
+	factory = new FactoryBuilder();
 
-    Factories.registerTransactionFactory(factory);
+	Factories.registerTransactionFactory(factory);
 });
 
 describe("Delegate Resignation", () => {
-    describe("toBeDelegateResignationType", () => {
-        it("should be delegate resignation type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").make();
+	describe("toBeDelegateResignationType", () => {
+		it("should be delegate resignation type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").make();
 
-            expect(transaction.data).toBeDelegateResignationType();
-        });
+			expect(transaction.data).toBeDelegateResignationType();
+		});
 
-        it("should not be delegate resignation type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
+		it("should not be delegate resignation type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
 
-            expect(transaction.data).not.toBeDelegateResignationType();
-        });
-    });
+			expect(transaction.data).not.toBeDelegateResignationType();
+		});
+	});
 });

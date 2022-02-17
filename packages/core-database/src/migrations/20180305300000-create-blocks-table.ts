@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateBlocksTable20180305300000 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`
+	public async up(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.query(`
             CREATE TABLE blocks (
                 "id" VARCHAR(64) PRIMARY KEY,
                 "version" SMALLINT NOT NULL,
@@ -19,9 +19,9 @@ export class CreateBlocksTable20180305300000 implements MigrationInterface {
                 "block_signature" VARCHAR(256) NOT NULL
             );
         `);
-    }
+	}
 
-    public async down(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.dropTable("blocks");
-    }
+	public async down(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.dropTable("blocks");
+	}
 }

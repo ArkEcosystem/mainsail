@@ -4,4 +4,4 @@ import { FunctionReturning } from "./internal";
 import { isArray } from "./is-array";
 
 export const filter = <T>(iterable: T | T[], iteratee: FunctionReturning): T | T[] =>
-    isArray(iterable) ? filterArray(iterable, iteratee) : filterObject(iterable, iteratee);
+	isArray(iterable) ? filterArray(iterable, iteratee) : filterObject(iterable, iteratee);

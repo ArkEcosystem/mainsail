@@ -1,11 +1,11 @@
 export const formatString = (...args: any[]): string => {
-    let output: string = args[0];
+	let output: string = args[0];
 
-    args.shift();
+	args.shift();
 
-    for (let i = 0; i < args.length; i++) {
-        output = output.replace(`{${i}}`, args[i]);
-    }
+	for (let i = 0; i < args.length; i++) {
+		output = output.replace(`{${i}}`, args[i]);
+	}
 
-    return output;
+	return output;
 };

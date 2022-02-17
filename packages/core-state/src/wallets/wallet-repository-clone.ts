@@ -7,166 +7,166 @@ import { WalletRepository } from "./wallet-repository";
 
 @Container.injectable()
 export class WalletRepositoryClone extends WalletRepository {
-    @Container.inject(Container.Identifiers.WalletRepository)
-    @Container.tagged("state", "blockchain")
-    private readonly blockchainWalletRepository!: Contracts.State.WalletRepository;
+	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.tagged("state", "blockchain")
+	private readonly blockchainWalletRepository!: Contracts.State.WalletRepository;
 
-    private readonly forgetIndexes: Record<string, Contracts.State.WalletIndex> = {};
+	private readonly forgetIndexes: Record<string, Contracts.State.WalletIndex> = {};
 
-    @Container.postConstruct()
-    public initialize(): void {
-        super.initialize();
+	@Container.postConstruct()
+	public initialize(): void {
+		super.initialize();
 
-        for (const { name, indexer, autoIndex } of this.indexerIndexes) {
-            this.forgetIndexes[name] = new WalletIndex(indexer, autoIndex);
-        }
-    }
+		for (const { name, indexer, autoIndex } of this.indexerIndexes) {
+			this.forgetIndexes[name] = new WalletIndex(indexer, autoIndex);
+		}
+	}
 
-    public createWallet(address: string): Contracts.State.Wallet {
-        return super.createWallet(address);
-    }
+	public createWallet(address: string): Contracts.State.Wallet {
+		return super.createWallet(address);
+	}
 
-    public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
-        return this.allByIndex(Contracts.State.WalletIndexes.Addresses);
-    }
+	public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
+		return this.allByIndex(Contracts.State.WalletIndexes.Addresses);
+	}
 
-    public allByPublicKey(): ReadonlyArray<Contracts.State.Wallet> {
-        return this.allByIndex(Contracts.State.WalletIndexes.PublicKeys);
-    }
+	public allByPublicKey(): ReadonlyArray<Contracts.State.Wallet> {
+		return this.allByIndex(Contracts.State.WalletIndexes.PublicKeys);
+	}
 
-    public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
-        return this.allByIndex(Contracts.State.WalletIndexes.Usernames);
-    }
+	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
+		return this.allByIndex(Contracts.State.WalletIndexes.Usernames);
+	}
 
-    public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
-        this.cloneAllByIndex(indexName);
-        return this.getIndex(indexName).values();
-    }
+	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
+		this.cloneAllByIndex(indexName);
+		return this.getIndex(indexName).values();
+	}
 
-    public findByAddress(address: string): Contracts.State.Wallet {
-        if (super.hasByIndex(Contracts.State.WalletIndexes.Addresses, address)) {
-            return super.findByIndex(Contracts.State.WalletIndexes.Addresses, address);
-        }
+	public findByAddress(address: string): Contracts.State.Wallet {
+		if (super.hasByIndex(Contracts.State.WalletIndexes.Addresses, address)) {
+			return super.findByIndex(Contracts.State.WalletIndexes.Addresses, address);
+		}
 
-        let wallet;
-        if (this.blockchainWalletRepository.hasByAddress(address)) {
-            const walletToClone = this.blockchainWalletRepository.findByAddress(address);
-            wallet = this.cloneWallet(this.blockchainWalletRepository, walletToClone);
-        } else {
-            wallet = this.createWallet(address);
-        }
+		let wallet;
+		if (this.blockchainWalletRepository.hasByAddress(address)) {
+			const walletToClone = this.blockchainWalletRepository.findByAddress(address);
+			wallet = this.cloneWallet(this.blockchainWalletRepository, walletToClone);
+		} else {
+			wallet = this.createWallet(address);
+		}
 
-        super.index(wallet);
+		super.index(wallet);
 
-        return wallet;
-    }
+		return wallet;
+	}
 
-    public findByPublicKey(publicKey: string): Contracts.State.Wallet {
-        if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
-            const wallet = this.findByAddress(Identities.Address.fromPublicKey(publicKey));
-            wallet.setPublicKey(publicKey);
-            super.index(wallet);
-        }
+	public findByPublicKey(publicKey: string): Contracts.State.Wallet {
+		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
+			const wallet = this.findByAddress(Identities.Address.fromPublicKey(publicKey));
+			wallet.setPublicKey(publicKey);
+			super.index(wallet);
+		}
 
-        return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
-    }
+		return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
+	}
 
-    public findByIndex(index: string, key: string): Contracts.State.Wallet {
-        if (!super.hasByIndex(index, key)) {
-            const walletToClone = this.blockchainWalletRepository.findByIndex(index, key);
-            this.cloneWallet(this.blockchainWalletRepository, walletToClone);
-        }
+	public findByIndex(index: string, key: string): Contracts.State.Wallet {
+		if (!super.hasByIndex(index, key)) {
+			const walletToClone = this.blockchainWalletRepository.findByIndex(index, key);
+			this.cloneWallet(this.blockchainWalletRepository, walletToClone);
+		}
 
-        return this.getIndex(index).get(key)!;
-    }
+		return this.getIndex(index).get(key)!;
+	}
 
-    public has(key: string): boolean {
-        for (const indexName of this.getIndexNames()) {
-            if (this.hasByIndex(indexName, key)) {
-                return true;
-            }
-        }
+	public has(key: string): boolean {
+		for (const indexName of this.getIndexNames()) {
+			if (this.hasByIndex(indexName, key)) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public hasByAddress(address: string): boolean {
-        return this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address);
-    }
+	public hasByAddress(address: string): boolean {
+		return this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address);
+	}
 
-    public hasByPublicKey(publicKey: string): boolean {
-        return this.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
-    }
+	public hasByPublicKey(publicKey: string): boolean {
+		return this.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
+	}
 
-    public hasByUsername(username: string): boolean {
-        return this.hasByIndex(Contracts.State.WalletIndexes.Usernames, username);
-    }
+	public hasByUsername(username: string): boolean {
+		return this.hasByIndex(Contracts.State.WalletIndexes.Usernames, username);
+	}
 
-    public hasByIndex(indexName: string, key: string): boolean {
-        return (
-            this.getIndex(indexName).has(key) ||
-            (this.blockchainWalletRepository.getIndex(indexName).has(key) && !this.getForgetIndex(indexName).has(key))
-        );
-    }
+	public hasByIndex(indexName: string, key: string): boolean {
+		return (
+			this.getIndex(indexName).has(key) ||
+			(this.blockchainWalletRepository.getIndex(indexName).has(key) && !this.getForgetIndex(indexName).has(key))
+		);
+	}
 
-    public getNonce(publicKey: string): Utils.BigNumber {
-        if (this.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey)) {
-            return this.findByPublicKey(publicKey).getNonce();
-        }
+	public getNonce(publicKey: string): Utils.BigNumber {
+		if (this.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey)) {
+			return this.findByPublicKey(publicKey).getNonce();
+		}
 
-        if (this.blockchainWalletRepository.hasByPublicKey(publicKey)) {
-            return this.blockchainWalletRepository.findByPublicKey(publicKey).getNonce();
-        }
+		if (this.blockchainWalletRepository.hasByPublicKey(publicKey)) {
+			return this.blockchainWalletRepository.findByPublicKey(publicKey).getNonce();
+		}
 
-        return Utils.BigNumber.ZERO;
-    }
+		return Utils.BigNumber.ZERO;
+	}
 
-    public forgetOnIndex(index: string, key: string): void {
-        if (this.getIndex(index).has(key) || this.blockchainWalletRepository.getIndex(index).has(key)) {
-            const wallet = this.findByIndex(index, key);
+	public forgetOnIndex(index: string, key: string): void {
+		if (this.getIndex(index).has(key) || this.blockchainWalletRepository.getIndex(index).has(key)) {
+			const wallet = this.findByIndex(index, key);
 
-            this.getIndex(index).forget(key);
+			this.getIndex(index).forget(key);
 
-            this.getForgetIndex(index).set(key, wallet);
-        }
-    }
+			this.getForgetIndex(index).set(key, wallet);
+		}
+	}
 
-    public reset(): void {
-        super.reset();
-        for (const walletIndex of Object.values(this.forgetIndexes)) {
-            walletIndex.clear();
-        }
-    }
+	public reset(): void {
+		super.reset();
+		for (const walletIndex of Object.values(this.forgetIndexes)) {
+			walletIndex.clear();
+		}
+	}
 
-    protected indexWallet(wallet: Contracts.State.Wallet): void {
-        const indexKeys = {};
-        for (const indexName of this.getIndexNames()) {
-            indexKeys[indexName] = this.getIndex(indexName).walletKeys(wallet);
-        }
+	protected indexWallet(wallet: Contracts.State.Wallet): void {
+		const indexKeys = {};
+		for (const indexName of this.getIndexNames()) {
+			indexKeys[indexName] = this.getIndex(indexName).walletKeys(wallet);
+		}
 
-        super.indexWallet(wallet);
+		super.indexWallet(wallet);
 
-        for (const indexName of this.getIndexNames()) {
-            const walletKeys = this.getIndex(indexName).walletKeys(wallet);
+		for (const indexName of this.getIndexNames()) {
+			const walletKeys = this.getIndex(indexName).walletKeys(wallet);
 
-            for (const key of indexKeys[indexName]) {
-                if (!walletKeys.includes(key)) {
-                    this.getForgetIndex(indexName).set(key, wallet);
-                }
-            }
-        }
-    }
+			for (const key of indexKeys[indexName]) {
+				if (!walletKeys.includes(key)) {
+					this.getForgetIndex(indexName).set(key, wallet);
+				}
+			}
+		}
+	}
 
-    private getForgetIndex(name: string): Contracts.State.WalletIndex {
-        if (!this.forgetIndexes[name]) {
-            throw new WalletIndexNotFoundError(name);
-        }
-        return this.forgetIndexes[name];
-    }
+	private getForgetIndex(name: string): Contracts.State.WalletIndex {
+		if (!this.forgetIndexes[name]) {
+			throw new WalletIndexNotFoundError(name);
+		}
+		return this.forgetIndexes[name];
+	}
 
-    private cloneAllByIndex(indexName: string) {
-        for (const wallet of this.blockchainWalletRepository.getIndex(indexName).values()) {
-            this.findByAddress(wallet.getAddress());
-        }
-    }
+	private cloneAllByIndex(indexName: string) {
+		for (const wallet of this.blockchainWalletRepository.getIndex(indexName).values()) {
+			this.findByAddress(wallet.getAddress());
+		}
+	}
 }

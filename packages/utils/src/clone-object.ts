@@ -1,12 +1,12 @@
 export const cloneObject = <T>(input: T): T => {
-    const keys: string[] = Object.keys(input);
-    const cloned = {};
+	const keys: string[] = Object.keys(input);
+	const cloned = {};
 
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
+	for (let i = 0; i < keys.length; i++) {
+		const key = keys[i];
 
-        cloned[key] = input[key];
-    }
+		cloned[key] = input[key];
+	}
 
-    return cloned as T;
+	return cloned as T;
 };

@@ -6,24 +6,24 @@ let cli;
 let component;
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    // Bind from src instead of dist to collect coverage.
-    cli.app.rebind(Container.Identifiers.TaskList).to(TaskList).inSingletonScope();
-    component = cli.app.get(Container.Identifiers.TaskList);
+	// Bind from src instead of dist to collect coverage.
+	cli.app.rebind(Container.Identifiers.TaskList).to(TaskList).inSingletonScope();
+	component = cli.app.get(Container.Identifiers.TaskList);
 });
 
 describe("TaskList", () => {
-    it("should render the component", async () => {
-        const fakeTask = jest.fn();
+	it("should render the component", async () => {
+		const fakeTask = jest.fn();
 
-        await component.render([
-            {
-                title: "description",
-                task: fakeTask,
-            },
-        ]);
+		await component.render([
+			{
+				title: "description",
+				task: fakeTask,
+			},
+		]);
 
-        expect(fakeTask).toHaveBeenCalled();
-    });
+		expect(fakeTask).toHaveBeenCalled();
+	});
 });

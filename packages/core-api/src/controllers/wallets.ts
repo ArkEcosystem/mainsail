@@ -11,192 +11,192 @@ import { Controller } from "./controller";
 
 @Container.injectable()
 export class WalletsController extends Controller {
-    @Container.inject(Container.Identifiers.PaginationService)
-    private readonly paginationService!: Services.Search.PaginationService;
+	@Container.inject(Container.Identifiers.PaginationService)
+	private readonly paginationService!: Services.Search.PaginationService;
 
-    @Container.inject(Identifiers.WalletSearchService)
-    private readonly walletSearchService!: WalletSearchService;
+	@Container.inject(Identifiers.WalletSearchService)
+	private readonly walletSearchService!: WalletSearchService;
 
-    @Container.inject(Container.Identifiers.TransactionHistoryService)
-    private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
+	@Container.inject(Container.Identifiers.TransactionHistoryService)
+	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
-    public index(request: Hapi.Request): Contracts.Search.ResultsPage<WalletResource> {
-        const pagination = this.getQueryPagination(request.query);
-        const sorting = request.query.orderBy as Contracts.Search.Sorting;
-        const criteria = this.getQueryCriteria(request.query, walletCriteriaSchemaObject) as WalletCriteria;
+	public index(request: Hapi.Request): Contracts.Search.ResultsPage<WalletResource> {
+		const pagination = this.getQueryPagination(request.query);
+		const sorting = request.query.orderBy as Contracts.Search.Sorting;
+		const criteria = this.getQueryCriteria(request.query, walletCriteriaSchemaObject) as WalletCriteria;
 
-        return this.walletSearchService.getWalletsPage(pagination, sorting, criteria);
-    }
+		return this.walletSearchService.getWalletsPage(pagination, sorting, criteria);
+	}
 
-    public top(request: Hapi.Request): Contracts.Search.ResultsPage<WalletResource> {
-        const pagination = this.getQueryPagination(request.query);
-        const sorting = request.query.orderBy as Contracts.Search.Sorting;
-        const criteria = this.getQueryCriteria(request.query, walletCriteriaSchemaObject) as WalletCriteria;
+	public top(request: Hapi.Request): Contracts.Search.ResultsPage<WalletResource> {
+		const pagination = this.getQueryPagination(request.query);
+		const sorting = request.query.orderBy as Contracts.Search.Sorting;
+		const criteria = this.getQueryCriteria(request.query, walletCriteriaSchemaObject) as WalletCriteria;
 
-        return this.walletSearchService.getWalletsPage(pagination, sorting, criteria);
-    }
+		return this.walletSearchService.getWalletsPage(pagination, sorting, criteria);
+	}
 
-    public show(request: Hapi.Request): { data: WalletResource } | Boom {
-        const walletId = request.params.id as string;
-        const walletResource = this.walletSearchService.getWallet(walletId);
+	public show(request: Hapi.Request): { data: WalletResource } | Boom {
+		const walletId = request.params.id as string;
+		const walletResource = this.walletSearchService.getWallet(walletId);
 
-        if (!walletResource) {
-            return notFound("Wallet not found");
-        }
+		if (!walletResource) {
+			return notFound("Wallet not found");
+		}
 
-        return { data: walletResource };
-    }
+		return { data: walletResource };
+	}
 
-    public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-        const walletId = request.params.id as string;
-        const walletResource = this.walletSearchService.getWallet(walletId);
+	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const walletId = request.params.id as string;
+		const walletResource = this.walletSearchService.getWallet(walletId);
 
-        if (!walletResource) {
-            return notFound("Wallet not found");
-        }
+		if (!walletResource) {
+			return notFound("Wallet not found");
+		}
 
-        const criteria: Contracts.Shared.TransactionCriteria = { ...request.query, address: walletResource.address };
-        const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
-        const pagination: Contracts.Search.Pagination = this.getListingPage(request);
-        const options: Contracts.Search.Options = this.getListingOptions();
+		const criteria: Contracts.Shared.TransactionCriteria = { ...request.query, address: walletResource.address };
+		const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
+		const pagination: Contracts.Search.Pagination = this.getListingPage(request);
+		const options: Contracts.Search.Options = this.getListingOptions();
 
-        if (request.query.transform) {
-            const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+		if (request.query.transform) {
+			const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
-        } else {
-            const transactionListResult = await this.transactionHistoryService.listByCriteria(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+			return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
+		} else {
+			const transactionListResult = await this.transactionHistoryService.listByCriteria(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionResource, false);
-        }
-    }
+			return this.toPagination(transactionListResult, TransactionResource, false);
+		}
+	}
 
-    public async transactionsSent(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-        const walletId = request.params.id as string;
-        const walletResource = this.walletSearchService.getWallet(walletId);
+	public async transactionsSent(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const walletId = request.params.id as string;
+		const walletResource = this.walletSearchService.getWallet(walletId);
 
-        if (!walletResource) {
-            return notFound("Wallet not found");
-        }
-        if (!walletResource.publicKey) {
-            return this.paginationService.getEmptyPage();
-        }
+		if (!walletResource) {
+			return notFound("Wallet not found");
+		}
+		if (!walletResource.publicKey) {
+			return this.paginationService.getEmptyPage();
+		}
 
-        const criteria: Contracts.Shared.TransactionCriteria = {
-            ...request.query,
-            senderPublicKey: walletResource.publicKey,
-        };
-        const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
-        const pagination: Contracts.Search.Pagination = this.getListingPage(request);
-        const options: Contracts.Search.Options = this.getListingOptions();
+		const criteria: Contracts.Shared.TransactionCriteria = {
+			...request.query,
+			senderPublicKey: walletResource.publicKey,
+		};
+		const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
+		const pagination: Contracts.Search.Pagination = this.getListingPage(request);
+		const options: Contracts.Search.Options = this.getListingOptions();
 
-        if (request.query.transform) {
-            const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+		if (request.query.transform) {
+			const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
-        } else {
-            const transactionListResult = await this.transactionHistoryService.listByCriteria(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+			return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
+		} else {
+			const transactionListResult = await this.transactionHistoryService.listByCriteria(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionResource, false);
-        }
-    }
+			return this.toPagination(transactionListResult, TransactionResource, false);
+		}
+	}
 
-    public async transactionsReceived(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-        const walletId = request.params.id as string;
-        const walletResource = this.walletSearchService.getWallet(walletId);
+	public async transactionsReceived(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const walletId = request.params.id as string;
+		const walletResource = this.walletSearchService.getWallet(walletId);
 
-        if (!walletResource) {
-            return notFound("Wallet not found");
-        }
+		if (!walletResource) {
+			return notFound("Wallet not found");
+		}
 
-        const criteria: Contracts.Shared.TransactionCriteria = {
-            ...request.query,
-            recipientId: walletResource.address,
-        };
-        const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
-        const pagination: Contracts.Search.Pagination = this.getListingPage(request);
-        const options: Contracts.Search.Options = this.getListingOptions();
+		const criteria: Contracts.Shared.TransactionCriteria = {
+			...request.query,
+			recipientId: walletResource.address,
+		};
+		const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
+		const pagination: Contracts.Search.Pagination = this.getListingPage(request);
+		const options: Contracts.Search.Options = this.getListingOptions();
 
-        if (request.query.transform) {
-            const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+		if (request.query.transform) {
+			const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
-        } else {
-            const transactionListResult = await this.transactionHistoryService.listByCriteria(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+			return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
+		} else {
+			const transactionListResult = await this.transactionHistoryService.listByCriteria(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionResource, false);
-        }
-    }
+			return this.toPagination(transactionListResult, TransactionResource, false);
+		}
+	}
 
-    public async votes(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-        const walletId = request.params.id as string;
-        const walletResource = this.walletSearchService.getWallet(walletId);
+	public async votes(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const walletId = request.params.id as string;
+		const walletResource = this.walletSearchService.getWallet(walletId);
 
-        if (!walletResource) {
-            return notFound("Wallet not found");
-        }
-        if (!walletResource.publicKey) {
-            return this.paginationService.getEmptyPage();
-        }
+		if (!walletResource) {
+			return notFound("Wallet not found");
+		}
+		if (!walletResource.publicKey) {
+			return this.paginationService.getEmptyPage();
+		}
 
-        const criteria: Contracts.Shared.TransactionCriteria = {
-            ...request.query,
-            typeGroup: Enums.TransactionTypeGroup.Core,
-            type: Enums.TransactionType.Vote,
-            senderPublicKey: walletResource.publicKey,
-        };
-        const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
-        const pagination: Contracts.Search.Pagination = this.getListingPage(request);
-        const options: Contracts.Search.Options = this.getListingOptions();
+		const criteria: Contracts.Shared.TransactionCriteria = {
+			...request.query,
+			typeGroup: Enums.TransactionTypeGroup.Core,
+			type: Enums.TransactionType.Vote,
+			senderPublicKey: walletResource.publicKey,
+		};
+		const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
+		const pagination: Contracts.Search.Pagination = this.getListingPage(request);
+		const options: Contracts.Search.Options = this.getListingOptions();
 
-        if (request.query.transform) {
-            const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+		if (request.query.transform) {
+			const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
-        } else {
-            const transactionListResult = await this.transactionHistoryService.listByCriteria(
-                criteria,
-                sorting,
-                pagination,
-                options,
-            );
+			return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
+		} else {
+			const transactionListResult = await this.transactionHistoryService.listByCriteria(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-            return this.toPagination(transactionListResult, TransactionResource, false);
-        }
-    }
+			return this.toPagination(transactionListResult, TransactionResource, false);
+		}
+	}
 }

@@ -8,21 +8,21 @@ let sandbox: Sandbox;
 let action: NextSlotProcessAction;
 
 const mockForgerService = {
-    getRemainingSlotTime: jest.fn().mockReturnValue(1000),
+	getRemainingSlotTime: jest.fn().mockReturnValue(1000),
 };
 
 beforeEach(() => {
-    sandbox = new Sandbox();
+	sandbox = new Sandbox();
 
-    sandbox.app.bind(Container.Identifiers.ForgerService).toConstantValue(mockForgerService);
+	sandbox.app.bind(Container.Identifiers.ForgerService).toConstantValue(mockForgerService);
 
-    action = sandbox.app.resolve(NextSlotProcessAction);
+	action = sandbox.app.resolve(NextSlotProcessAction);
 });
 
 describe("NextSlotProcessAction", () => {
-    it("should return remaining time", async () => {
-        await expect(action.handler()).resolves.toEqual({
-            remainingTime: 1000,
-        });
-    });
+	it("should return remaining time", async () => {
+		await expect(action.handler()).resolves.toEqual({
+			remainingTime: 1000,
+		});
+	});
 });

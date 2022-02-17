@@ -7,17 +7,17 @@ let cli;
 let component;
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    // Bind from src instead of dist to collect coverage.
-    cli.app.rebind(Container.Identifiers.AskPassword).to(AskPassword).inSingletonScope();
-    component = cli.app.get(Container.Identifiers.AskPassword);
+	// Bind from src instead of dist to collect coverage.
+	cli.app.rebind(Container.Identifiers.AskPassword).to(AskPassword).inSingletonScope();
+	component = cli.app.get(Container.Identifiers.AskPassword);
 });
 
 describe("AskPassword", () => {
-    it("should render the component", async () => {
-        prompts.inject(["password"]);
+	it("should render the component", async () => {
+		prompts.inject(["password"]);
 
-        await expect(component.render("Hello World")).resolves.toBe("password");
-    });
+		await expect(component.render("Hello World")).resolves.toBe("password");
+	});
 });

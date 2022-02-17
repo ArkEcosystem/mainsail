@@ -1,5 +1,5 @@
 module.exports = {
-    core: { plugins: [] },
-    relay: { plugins: [] },
-    forger: { plugins: [] },
+	core: { plugins: [] },
+	relay: { plugins: [] },
+	forger: { plugins: [] },
 };

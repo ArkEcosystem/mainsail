@@ -11,12 +11,7 @@ import { TransactionHandlerRegistry } from "@packages/core-transactions/src/hand
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@packages/crypto";
 import { configManager } from "@packages/crypto/src/managers";
 
-import {
-    buildMultiSignatureWallet,
-    buildRecipientWallet,
-    buildSenderWallet,
-    initApp,
-} from "../__support__/app";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -31,83 +26,83 @@ StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 const transactionHistoryService = {
-    streamByCriteria: jest.fn(),
+	streamByCriteria: jest.fn(),
 };
 
 beforeEach(() => {
-    transactionHistoryService.streamByCriteria.mockReset();
+	transactionHistoryService.streamByCriteria.mockReset();
 
-    const config = Generators.generateCryptoConfigRaw();
-    configManager.setConfig(config);
-    Managers.configManager.setConfig(config);
-    configManager.getMilestone().aip11 = false;
-    Managers.configManager.getMilestone().aip11 = false;
+	const config = Generators.generateCryptoConfigRaw();
+	configManager.setConfig(config);
+	Managers.configManager.setConfig(config);
+	configManager.getMilestone().aip11 = false;
+	Managers.configManager.getMilestone().aip11 = false;
 
-    app = initApp();
-    app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+	app = initApp();
+	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-    walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
-    factoryBuilder = new FactoryBuilder();
-    Factories.registerWalletFactory(factoryBuilder);
-    Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new FactoryBuilder();
+	Factories.registerWalletFactory(factoryBuilder);
+	Factories.registerTransactionFactory(factoryBuilder);
 
-    senderWallet = buildSenderWallet(factoryBuilder);
-    multiSignatureWallet = buildMultiSignatureWallet();
-    recipientWallet = buildRecipientWallet(factoryBuilder);
+	senderWallet = buildSenderWallet(factoryBuilder);
+	multiSignatureWallet = buildMultiSignatureWallet();
+	recipientWallet = buildRecipientWallet(factoryBuilder);
 
-    walletRepository.index(senderWallet);
-    walletRepository.index(multiSignatureWallet);
-    walletRepository.index(recipientWallet);
+	walletRepository.index(senderWallet);
+	walletRepository.index(multiSignatureWallet);
+	walletRepository.index(recipientWallet);
 });
 
 describe("DelegateRegistrationTransaction V1", () => {
-    let handler: TransactionHandler;
+	let handler: TransactionHandler;
 
-    beforeEach(async () => {
-        const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-            Identifiers.TransactionHandlerRegistry,
-        );
+	beforeEach(async () => {
+		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+			Identifiers.TransactionHandlerRegistry,
+		);
 
-        handler = transactionHandlerRegistry.getRegisteredHandlerByType(
-            Transactions.InternalTransactionType.from(
-                Enums.TransactionType.DelegateRegistration,
-                Enums.TransactionTypeGroup.Core,
-            ),
-            1,
-        );
-    });
+		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+			Transactions.InternalTransactionType.from(
+				Enums.TransactionType.DelegateRegistration,
+				Enums.TransactionTypeGroup.Core,
+			),
+			1,
+		);
+	});
 
-    describe("dependencies", () => {
-        it("should return empty array", async () => {
-            expect(handler.dependencies()).toEqual([]);
-        });
-    });
+	describe("dependencies", () => {
+		it("should return empty array", async () => {
+			expect(handler.dependencies()).toEqual([]);
+		});
+	});
 
-    describe("walletAttributes", () => {
-        it("should return array", async () => {
-            const attributes = handler.walletAttributes();
+	describe("walletAttributes", () => {
+		it("should return array", async () => {
+			const attributes = handler.walletAttributes();
 
-            expect(attributes).toBeArray();
-            expect(attributes.length).toBe(1);
-        });
-    });
+			expect(attributes).toBeArray();
+			expect(attributes.length).toBe(1);
+		});
+	});
 
-    describe("getConstructor", () => {
-        it("should return v1 constructor", async () => {
-            expect(handler.getConstructor()).toBe(Transactions.One.DelegateRegistrationTransaction);
-        });
-    });
+	describe("getConstructor", () => {
+		it("should return v1 constructor", async () => {
+			expect(handler.getConstructor()).toBe(Transactions.One.DelegateRegistrationTransaction);
+		});
+	});
 
-    describe("bootstrap", () => {
-        it("should resolve", async () => {
-            await expect(handler.bootstrap()).toResolve();
-        });
-    });
+	describe("bootstrap", () => {
+		it("should resolve", async () => {
+			await expect(handler.bootstrap()).toResolve();
+		});
+	});
 
-    describe("isActivated", () => {
-        it("should return true", async () => {
-            await expect(handler.isActivated()).resolves.toBeTrue();
-        });
-    });
+	describe("isActivated", () => {
+		it("should return true", async () => {
+			await expect(handler.isActivated()).resolves.toBeTrue();
+		});
+	});
 });

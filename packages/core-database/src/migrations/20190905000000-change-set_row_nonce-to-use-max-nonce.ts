@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class ChangeSetRowNonceToUseMaxNonce20190905000000 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`
+	public async up(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.query(`
             DROP TRIGGER transactions_set_nonce ON transactions;
 
             DROP FUNCTION set_row_nonce();
@@ -28,7 +28,7 @@ export class ChangeSetRowNonceToUseMaxNonce20190905000000 implements MigrationIn
             WHEN (NEW.version = 1)
             EXECUTE PROCEDURE set_row_nonce();
         `);
-    }
+	}
 
-    public async down(queryRunner: QueryRunner): Promise<any> {}
+	public async down(queryRunner: QueryRunner): Promise<any> {}
 }

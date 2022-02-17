@@ -11,197 +11,197 @@ import { Signer } from "../../signer";
 import { Verifier } from "../../verifier";
 
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
-    public data: ITransactionData;
+	public data: ITransactionData;
 
-    protected signWithSenderAsRecipient = false;
+	protected signWithSenderAsRecipient = false;
 
-    private disableVersionCheck = false;
+	private disableVersionCheck = false;
 
-    public constructor() {
-        this.data = {
-            id: undefined,
-            timestamp: Slots.getTime(),
-            typeGroup: TransactionTypeGroup.Test,
-            nonce: BigNumber.ZERO,
-            version: configManager.getMilestone().aip11 ? 0x02 : 0x01,
-        } as ITransactionData;
-    }
+	public constructor() {
+		this.data = {
+			id: undefined,
+			timestamp: Slots.getTime(),
+			typeGroup: TransactionTypeGroup.Test,
+			nonce: BigNumber.ZERO,
+			version: configManager.getMilestone().aip11 ? 0x02 : 0x01,
+		} as ITransactionData;
+	}
 
-    public build(data: Partial<ITransactionData> = {}): ITransaction {
-        return TransactionFactory.fromData({ ...this.data, ...data }, false, {
-            disableVersionCheck: this.disableVersionCheck,
-        });
-    }
+	public build(data: Partial<ITransactionData> = {}): ITransaction {
+		return TransactionFactory.fromData({ ...this.data, ...data }, false, {
+			disableVersionCheck: this.disableVersionCheck,
+		});
+	}
 
-    public version(version: number): TBuilder {
-        this.data.version = version;
-        this.disableVersionCheck = true;
-        return this.instance();
-    }
+	public version(version: number): TBuilder {
+		this.data.version = version;
+		this.disableVersionCheck = true;
+		return this.instance();
+	}
 
-    public typeGroup(typeGroup: number): TBuilder {
-        this.data.typeGroup = typeGroup;
+	public typeGroup(typeGroup: number): TBuilder {
+		this.data.typeGroup = typeGroup;
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public nonce(nonce: string): TBuilder {
-        if (nonce) {
-            this.data.nonce = BigNumber.make(nonce);
-        }
+	public nonce(nonce: string): TBuilder {
+		if (nonce) {
+			this.data.nonce = BigNumber.make(nonce);
+		}
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public network(network: number): TBuilder {
-        this.data.network = network;
+	public network(network: number): TBuilder {
+		this.data.network = network;
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public fee(fee: string): TBuilder {
-        if (fee) {
-            this.data.fee = BigNumber.make(fee);
-        }
+	public fee(fee: string): TBuilder {
+		if (fee) {
+			this.data.fee = BigNumber.make(fee);
+		}
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public amount(amount: string): TBuilder {
-        this.data.amount = BigNumber.make(amount);
+	public amount(amount: string): TBuilder {
+		this.data.amount = BigNumber.make(amount);
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public recipientId(recipientId: string): TBuilder {
-        this.data.recipientId = recipientId;
+	public recipientId(recipientId: string): TBuilder {
+		this.data.recipientId = recipientId;
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public senderPublicKey(publicKey: string): TBuilder {
-        this.data.senderPublicKey = publicKey;
+	public senderPublicKey(publicKey: string): TBuilder {
+		this.data.senderPublicKey = publicKey;
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public vendorField(vendorField: string): TBuilder {
-        const limit: number = maxVendorFieldLength();
+	public vendorField(vendorField: string): TBuilder {
+		const limit: number = maxVendorFieldLength();
 
-        if (vendorField) {
-            if (Buffer.from(vendorField).length > limit) {
-                throw new VendorFieldLengthExceededError(limit);
-            }
+		if (vendorField) {
+			if (Buffer.from(vendorField).length > limit) {
+				throw new VendorFieldLengthExceededError(limit);
+			}
 
-            this.data.vendorField = vendorField;
-        }
+			this.data.vendorField = vendorField;
+		}
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public timestamp(timestamp: number): TBuilder {
-        this.data.timestamp = timestamp;
+	public timestamp(timestamp: number): TBuilder {
+		this.data.timestamp = timestamp;
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    public sign(passphrase: string): TBuilder {
-        const keys: IKeyPair = Keys.fromPassphrase(passphrase);
-        return this.signWithKeyPair(keys);
-    }
+	public sign(passphrase: string): TBuilder {
+		const keys: IKeyPair = Keys.fromPassphrase(passphrase);
+		return this.signWithKeyPair(keys);
+	}
 
-    public signWithWif(wif: string, networkWif?: number): TBuilder {
-        const keys: IKeyPair = Keys.fromWIF(wif, {
-            wif: networkWif || configManager.get("network.wif"),
-        } as NetworkType);
+	public signWithWif(wif: string, networkWif?: number): TBuilder {
+		const keys: IKeyPair = Keys.fromWIF(wif, {
+			wif: networkWif || configManager.get("network.wif"),
+		} as NetworkType);
 
-        return this.signWithKeyPair(keys);
-    }
+		return this.signWithKeyPair(keys);
+	}
 
-    public multiSign(passphrase: string, index: number): TBuilder {
-        const keys: IKeyPair = Keys.fromPassphrase(passphrase);
-        return this.multiSignWithKeyPair(index, keys);
-    }
+	public multiSign(passphrase: string, index: number): TBuilder {
+		const keys: IKeyPair = Keys.fromPassphrase(passphrase);
+		return this.multiSignWithKeyPair(index, keys);
+	}
 
-    public multiSignWithWif(index: number, wif: string, networkWif?: number): TBuilder {
-        const keys = Keys.fromWIF(wif, {
-            wif: networkWif || configManager.get("network.wif"),
-        } as NetworkType);
+	public multiSignWithWif(index: number, wif: string, networkWif?: number): TBuilder {
+		const keys = Keys.fromWIF(wif, {
+			wif: networkWif || configManager.get("network.wif"),
+		} as NetworkType);
 
-        return this.multiSignWithKeyPair(index, keys);
-    }
+		return this.multiSignWithKeyPair(index, keys);
+	}
 
-    public verify(): boolean {
-        return Verifier.verifyHash(this.data, this.disableVersionCheck);
-    }
+	public verify(): boolean {
+		return Verifier.verifyHash(this.data, this.disableVersionCheck);
+	}
 
-    public getStruct(): ITransactionData {
-        if (!this.data.senderPublicKey || (!this.data.signature && !this.data.signatures)) {
-            throw new MissingTransactionSignatureError();
-        }
+	public getStruct(): ITransactionData {
+		if (!this.data.senderPublicKey || (!this.data.signature && !this.data.signatures)) {
+			throw new MissingTransactionSignatureError();
+		}
 
-        const struct: ITransactionData = {
-            id: Utils.getId(this.data).toString(),
-            signature: this.data.signature,
-            version: this.data.version,
-            type: this.data.type,
-            fee: this.data.fee,
-            senderPublicKey: this.data.senderPublicKey,
-            network: this.data.network,
-        } as ITransactionData;
+		const struct: ITransactionData = {
+			id: Utils.getId(this.data).toString(),
+			signature: this.data.signature,
+			version: this.data.version,
+			type: this.data.type,
+			fee: this.data.fee,
+			senderPublicKey: this.data.senderPublicKey,
+			network: this.data.network,
+		} as ITransactionData;
 
-        if (this.data.version === 1) {
-            struct.timestamp = this.data.timestamp;
-        } else {
-            struct.typeGroup = this.data.typeGroup;
-            struct.nonce = this.data.nonce;
-        }
+		if (this.data.version === 1) {
+			struct.timestamp = this.data.timestamp;
+		} else {
+			struct.typeGroup = this.data.typeGroup;
+			struct.nonce = this.data.nonce;
+		}
 
-        if (Array.isArray(this.data.signatures)) {
-            struct.signatures = this.data.signatures;
-        }
+		if (Array.isArray(this.data.signatures)) {
+			struct.signatures = this.data.signatures;
+		}
 
-        return struct;
-    }
+		return struct;
+	}
 
-    private signWithKeyPair(keys: IKeyPair): TBuilder {
-        this.data.senderPublicKey = keys.publicKey;
+	private signWithKeyPair(keys: IKeyPair): TBuilder {
+		this.data.senderPublicKey = keys.publicKey;
 
-        if (this.signWithSenderAsRecipient) {
-            this.data.recipientId = Address.fromPublicKey(keys.publicKey, this.data.network);
-        }
+		if (this.signWithSenderAsRecipient) {
+			this.data.recipientId = Address.fromPublicKey(keys.publicKey, this.data.network);
+		}
 
-        this.data.signature = Signer.sign(this.getSigningObject(), keys, {
-            disableVersionCheck: this.disableVersionCheck,
-        });
+		this.data.signature = Signer.sign(this.getSigningObject(), keys, {
+			disableVersionCheck: this.disableVersionCheck,
+		});
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    private multiSignWithKeyPair(index: number, keys: IKeyPair): TBuilder {
-        if (!this.data.signatures) {
-            this.data.signatures = [];
-        }
+	private multiSignWithKeyPair(index: number, keys: IKeyPair): TBuilder {
+		if (!this.data.signatures) {
+			this.data.signatures = [];
+		}
 
-        this.version(2);
-        Signer.multiSign(this.getSigningObject(), keys, index);
+		this.version(2);
+		Signer.multiSign(this.getSigningObject(), keys, index);
 
-        return this.instance();
-    }
+		return this.instance();
+	}
 
-    private getSigningObject(): ITransactionData {
-        const data: ITransactionData = {
-            ...this.data,
-        };
+	private getSigningObject(): ITransactionData {
+		const data: ITransactionData = {
+			...this.data,
+		};
 
-        for (const key of Object.keys(data)) {
-            if (["model", "network", "id"].includes(key)) {
-                delete data[key];
-            }
-        }
+		for (const key of Object.keys(data)) {
+			if (["model", "network", "id"].includes(key)) {
+				delete data[key];
+			}
+		}
 
-        return data;
-    }
+		return data;
+	}
 
-    protected abstract instance(): TBuilder;
+	protected abstract instance(): TBuilder;
 }

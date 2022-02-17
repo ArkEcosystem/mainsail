@@ -4,31 +4,31 @@ import { BlockProcessorResult } from "../../../../../packages/core-blockchain/sr
 import { Interfaces } from "@arkecosystem/crypto";
 
 describe("NonceOutOfOrderHandler", () => {
-    const container = new Container.Container();
+	const container = new Container.Container();
 
-    const blockchain = { resetLastDownloadedBlock: jest.fn() };
+	const blockchain = { resetLastDownloadedBlock: jest.fn() };
 
-    const application = { get: jest.fn() };
+	const application = { get: jest.fn() };
 
-    beforeAll(() => {
-        container.unbindAll();
-        container.bind(Container.Identifiers.Application).toConstantValue(application);
-        container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-    });
+	beforeAll(() => {
+		container.unbindAll();
+		container.bind(Container.Identifiers.Application).toConstantValue(application);
+		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+	});
 
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
+	beforeEach(() => {
+		jest.resetAllMocks();
+	});
 
-    describe("execute", () => {
-        it("should call blockchain.resetLastDownloadedBlock and return DiscardedButCanBeBroadcasted", async () => {
-            const nonceOutOfOrderHandler = container.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler);
+	describe("execute", () => {
+		it("should call blockchain.resetLastDownloadedBlock and return DiscardedButCanBeBroadcasted", async () => {
+			const nonceOutOfOrderHandler = container.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler);
 
-            const block = {};
-            const result = await nonceOutOfOrderHandler.execute(block as Interfaces.IBlock);
+			const block = {};
+			const result = await nonceOutOfOrderHandler.execute(block as Interfaces.IBlock);
 
-            expect(result).toBe(BlockProcessorResult.Rejected);
-            expect(blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);
-        });
-    });
+			expect(result).toBe(BlockProcessorResult.Rejected);
+			expect(blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);
+		});
+	});
 });

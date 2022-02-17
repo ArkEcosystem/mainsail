@@ -5,18 +5,18 @@ import passphrases from "@packages/core-test-framework/src/internal/passphrases.
 let address: string;
 
 beforeEach(() => {
-    address = Identities.Address.fromPassphrase(passphrases[0]);
+	address = Identities.Address.fromPassphrase(passphrases[0]);
 });
 
 describe("Address", () => {
-    describe("toBeAddress", () => {
-        it("should be valid address", async () => {
-            expect(address).toBeAddress();
-        });
+	describe("toBeAddress", () => {
+		it("should be valid address", async () => {
+			expect(address).toBeAddress();
+		});
 
-        it("should not be valid address", async () => {
-            address = "invalid_address";
-            expect(address).not.toBeAddress();
-        });
-    });
+		it("should not be valid address", async () => {
+			address = "invalid_address";
+			expect(address).not.toBeAddress();
+		});
+	});
 });

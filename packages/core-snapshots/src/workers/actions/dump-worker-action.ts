@@ -6,25 +6,25 @@ import { AbstractWorkerAction } from "./abstract-worker-action";
 
 @Container.injectable()
 export class DumpWorkerAction extends AbstractWorkerAction {
-    public async start(): Promise<void> {
-        const databaseStream = await this.getRepository().getReadStream(this.options!.start, this.options!.end);
-        const streamWriter = this.getStreamWriter(databaseStream);
+	public async start(): Promise<void> {
+		const databaseStream = await this.getRepository().getReadStream(this.options!.start, this.options!.end);
+		const streamWriter = this.getStreamWriter(databaseStream);
 
-        await streamWriter.open();
+		await streamWriter.open();
 
-        /* istanbul ignore next */
-        const interval = setInterval(() => {
-            parentPort?.postMessage({
-                action: "count",
-                data: streamWriter.count,
-            });
-        }, 100);
+		/* istanbul ignore next */
+		const interval = setInterval(() => {
+			parentPort?.postMessage({
+				action: "count",
+				data: streamWriter.count,
+			});
+		}, 100);
 
-        await streamWriter.write();
+		await streamWriter.write();
 
-        clearInterval(interval);
-    }
+		clearInterval(interval);
+	}
 
-    /* istanbul ignore next */
-    public sync(data: Worker.WorkerSyncData): void {}
+	/* istanbul ignore next */
+	public sync(data: Worker.WorkerSyncData): void {}
 }

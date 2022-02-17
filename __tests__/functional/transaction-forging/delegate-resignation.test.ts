@@ -15,162 +15,162 @@ beforeAll(async () => (app = await support.setUp()));
 afterAll(async () => await support.tearDown());
 
 describe("Transaction Forging - Delegate Resignation", () => {
-    describe("Signed with 1 Passphase", () => {
-        it("should broadcast, accept and forge it", async () => {
-            // Prepare a fresh wallet for the tests
-            const passphrase = generateMnemonic();
+	describe("Signed with 1 Passphase", () => {
+		it("should broadcast, accept and forge it", async () => {
+			// Prepare a fresh wallet for the tests
+			const passphrase = generateMnemonic();
 
-            // Initial Funds
-            const initialFunds = TransactionFactory.initialize(app)
-                .transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
-                .withPassphrase(genesisPassphrase)
-                .createOne();
+			// Initial Funds
+			const initialFunds = TransactionFactory.initialize(app)
+				.transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
+				.withPassphrase(genesisPassphrase)
+				.createOne();
 
-            await expect(initialFunds).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(initialFunds.id).toBeForged();
+			await expect(initialFunds).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(initialFunds.id).toBeForged();
 
-            // Register a delegate
-            const transactionsRegister = TransactionFactory.initialize(app)
-                .delegateRegistration()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Register a delegate
+			const transactionsRegister = TransactionFactory.initialize(app)
+				.delegateRegistration()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsRegister).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(transactionsRegister.id).toBeForged();
+			await expect(transactionsRegister).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(transactionsRegister.id).toBeForged();
 
-            // Resign a delegate
-            const transactionsResign = TransactionFactory.initialize(app)
-                .delegateResignation()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Resign a delegate
+			const transactionsResign = TransactionFactory.initialize(app)
+				.delegateResignation()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsResign).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(transactionsResign.id).toBeForged();
-        });
+			await expect(transactionsResign).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(transactionsResign.id).toBeForged();
+		});
 
-        it("should broadcast, reject and not forge it", async () => {
-            // Prepare a fresh wallet for the tests
-            const passphrase = generateMnemonic();
+		it("should broadcast, reject and not forge it", async () => {
+			// Prepare a fresh wallet for the tests
+			const passphrase = generateMnemonic();
 
-            // Initial Funds
-            const initialFunds = TransactionFactory.initialize(app)
-                .transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
-                .withPassphrase(genesisPassphrase)
-                .createOne();
+			// Initial Funds
+			const initialFunds = TransactionFactory.initialize(app)
+				.transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
+				.withPassphrase(genesisPassphrase)
+				.createOne();
 
-            await expect(initialFunds).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(initialFunds.id).toBeForged();
+			await expect(initialFunds).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(initialFunds.id).toBeForged();
 
-            // Resign a delegate
-            const transactionsResign = TransactionFactory.initialize(app)
-                .delegateResignation()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Resign a delegate
+			const transactionsResign = TransactionFactory.initialize(app)
+				.delegateResignation()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsResign).toBeRejected();
-            await snoozeForBlock(1);
-            await expect(transactionsResign.id).not.toBeForged();
-        });
+			await expect(transactionsResign).toBeRejected();
+			await snoozeForBlock(1);
+			await expect(transactionsResign.id).not.toBeForged();
+		});
 
-        it("should broadcast, reject and not forge it if the delegate already resigned", async () => {
-            // Prepare a fresh wallet for the tests
-            const passphrase = generateMnemonic();
+		it("should broadcast, reject and not forge it if the delegate already resigned", async () => {
+			// Prepare a fresh wallet for the tests
+			const passphrase = generateMnemonic();
 
-            // Initial Funds
-            const initialFunds = TransactionFactory.initialize(app)
-                .transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
-                .withPassphrase(genesisPassphrase)
-                .createOne();
+			// Initial Funds
+			const initialFunds = TransactionFactory.initialize(app)
+				.transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
+				.withPassphrase(genesisPassphrase)
+				.createOne();
 
-            await expect(initialFunds).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(initialFunds.id).toBeForged();
+			await expect(initialFunds).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(initialFunds.id).toBeForged();
 
-            // Register a delegate
-            const transactionsRegister = TransactionFactory.initialize(app)
-                .delegateRegistration()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Register a delegate
+			const transactionsRegister = TransactionFactory.initialize(app)
+				.delegateRegistration()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsRegister).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(transactionsRegister.id).toBeForged();
+			await expect(transactionsRegister).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(transactionsRegister.id).toBeForged();
 
-            // Resign a delegate
-            const transactionsResign1 = TransactionFactory.initialize(app)
-                .delegateResignation()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Resign a delegate
+			const transactionsResign1 = TransactionFactory.initialize(app)
+				.delegateResignation()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsResign1).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(transactionsResign1.id).toBeForged();
+			await expect(transactionsResign1).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(transactionsResign1.id).toBeForged();
 
-            // Resign a delegate
-            const transactionsResign2 = TransactionFactory.initialize(app)
-                .delegateResignation()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Resign a delegate
+			const transactionsResign2 = TransactionFactory.initialize(app)
+				.delegateResignation()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsResign2).toBeRejected();
-            await snoozeForBlock(1);
-            await expect(transactionsResign2.id).not.toBeForged();
-        });
+			await expect(transactionsResign2).toBeRejected();
+			await snoozeForBlock(1);
+			await expect(transactionsResign2.id).not.toBeForged();
+		});
 
-        it("should broadcast, reject and not forge it if not enough delegates", async () => {
-            // Prepare a fresh wallet for the tests
-            const passphrase = generateMnemonic();
+		it("should broadcast, reject and not forge it if not enough delegates", async () => {
+			// Prepare a fresh wallet for the tests
+			const passphrase = generateMnemonic();
 
-            // Initial Funds
-            const initialFunds = TransactionFactory.initialize(app)
-                .transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
-                .withPassphrase(genesisPassphrase)
-                .createOne();
+			// Initial Funds
+			const initialFunds = TransactionFactory.initialize(app)
+				.transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
+				.withPassphrase(genesisPassphrase)
+				.createOne();
 
-            await expect(initialFunds).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(initialFunds.id).toBeForged();
+			await expect(initialFunds).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(initialFunds.id).toBeForged();
 
-            // Register a delegate
-            const transactionsRegister = TransactionFactory.initialize(app)
-                .delegateRegistration()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Register a delegate
+			const transactionsRegister = TransactionFactory.initialize(app)
+				.delegateRegistration()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsRegister).toBeAccepted();
-            await snoozeForBlock(1);
-            await expect(transactionsRegister.id).toBeForged();
+			await expect(transactionsRegister).toBeAccepted();
+			await snoozeForBlock(1);
+			await expect(transactionsRegister.id).toBeForged();
 
-            const walletRepository = app.getTagged<Contracts.State.WalletRepository>(
-                Container.Identifiers.WalletRepository,
-                "state",
-                "blockchain",
-            );
+			const walletRepository = app.getTagged<Contracts.State.WalletRepository>(
+				Container.Identifiers.WalletRepository,
+				"state",
+				"blockchain",
+			);
 
-            const takenDelegates = walletRepository.allByUsername().slice(0, 50);
-            for (const delegate of takenDelegates) {
-                for (const indexName of walletRepository.getIndexNames()) {
-                    walletRepository.getIndex(indexName).forgetWallet(delegate);
-                }
-            }
+			const takenDelegates = walletRepository.allByUsername().slice(0, 50);
+			for (const delegate of takenDelegates) {
+				for (const indexName of walletRepository.getIndexNames()) {
+					walletRepository.getIndex(indexName).forgetWallet(delegate);
+				}
+			}
 
-            // Resign a delegate
-            const transactionsResign = TransactionFactory.initialize(app)
-                .delegateResignation()
-                .withPassphrase(passphrase)
-                .createOne();
+			// Resign a delegate
+			const transactionsResign = TransactionFactory.initialize(app)
+				.delegateResignation()
+				.withPassphrase(passphrase)
+				.createOne();
 
-            await expect(transactionsResign).toBeRejected();
-            await snoozeForBlock(1);
-            await expect(transactionsResign.id).not.toBeForged();
+			await expect(transactionsResign).toBeRejected();
+			await snoozeForBlock(1);
+			await expect(transactionsResign.id).not.toBeForged();
 
-            for (const delegate of takenDelegates) {
-                walletRepository.index(delegate);
-            }
-        });
-    });
+			for (const delegate of takenDelegates) {
+				walletRepository.index(delegate);
+			}
+		});
+	});
 });

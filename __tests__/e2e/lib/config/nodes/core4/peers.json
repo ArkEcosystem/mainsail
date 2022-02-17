@@ -1,4 +1,4 @@
 {
-    "list": [],
-    "sources": ["http://peerdiscovery:3000/"]
+	"list": [],
+	"sources": ["http://peerdiscovery:3000/"]
 }

@@ -10,48 +10,48 @@ beforeEach(() => container.snapshot());
 afterEach(() => container.restore());
 
 describe("Container", () => {
-    it("should be an inversify container", async () => {
-        expect(container).toBeInstanceOf(Container);
-    });
+	it("should be an inversify container", async () => {
+		expect(container).toBeInstanceOf(Container);
+	});
 
-    it("should bind a value to the IoC container", () => {
-        expect(container.isBound("key")).toBeFalse();
+	it("should bind a value to the IoC container", () => {
+		expect(container.isBound("key")).toBeFalse();
 
-        container.bind("key").toConstantValue("value");
+		container.bind("key").toConstantValue("value");
 
-        expect(container.isBound("key")).toBeTrue();
-    });
+		expect(container.isBound("key")).toBeTrue();
+	});
 
-    it("should rebind a value to the IoC container", () => {
-        expect(container.isBound("key")).toBeFalse();
+	it("should rebind a value to the IoC container", () => {
+		expect(container.isBound("key")).toBeFalse();
 
-        container.bind("key").toConstantValue("value");
+		container.bind("key").toConstantValue("value");
 
-        expect(container.get("key")).toBe("value");
-        expect(container.isBound("key")).toBeTrue();
+		expect(container.get("key")).toBe("value");
+		expect(container.isBound("key")).toBeTrue();
 
-        container.rebind("key").toConstantValue("value-new");
+		container.rebind("key").toConstantValue("value-new");
 
-        expect(container.get("key")).toBe("value-new");
-    });
+		expect(container.get("key")).toBe("value-new");
+	});
 
-    it("should unbind a value from the IoC container", () => {
-        container.bind("key").toConstantValue("value");
+	it("should unbind a value from the IoC container", () => {
+		container.bind("key").toConstantValue("value");
 
-        expect(container.isBound("key")).toBeTrue();
+		expect(container.isBound("key")).toBeTrue();
 
-        container.unbind("key");
+		container.unbind("key");
 
-        expect(container.isBound("key")).toBeFalse();
-    });
+		expect(container.isBound("key")).toBeFalse();
+	});
 
-    it("should get a value from the IoC container", () => {
-        container.bind("key").toConstantValue("value");
+	it("should get a value from the IoC container", () => {
+		container.bind("key").toConstantValue("value");
 
-        expect(container.get("key")).toBe("value");
-    });
+		expect(container.get("key")).toBe("value");
+	});
 
-    it("should resolve a value from the IoC container", () => {
-        expect(container.resolve(StubClass)).toBeInstanceOf(StubClass);
-    });
+	it("should resolve a value from the IoC container", () => {
+		expect(container.resolve(StubClass)).toBeInstanceOf(StubClass);
+	});
 });

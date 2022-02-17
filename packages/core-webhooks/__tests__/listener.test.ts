@@ -19,173 +19,173 @@ let listener: Listener;
 let webhook: Webhook;
 
 const logger = {
-    debug: jest.fn(),
-    error: jest.fn(),
+	debug: jest.fn(),
+	error: jest.fn(),
 };
 
 const mockEventDispatcher = {
-    dispatch: jest.fn(),
+	dispatch: jest.fn(),
 };
 
 let spyOnPost: jest.SpyInstance;
 
 const expectFinishedEventData = () => {
-    return expect.objectContaining({
-        executionTime: expect.toBeNumber(),
-        webhook: expect.toBeObject(),
-        payload: expect.anything(),
-    });
+	return expect.objectContaining({
+		executionTime: expect.toBeNumber(),
+		webhook: expect.toBeObject(),
+		payload: expect.anything(),
+	});
 };
 
 const expectFailedEventData = () => {
-    return expect.objectContaining({
-        executionTime: expect.toBeNumber(),
-        webhook: expect.toBeObject(),
-        payload: expect.anything(),
-        error: expect.toBeObject(),
-    });
+	return expect.objectContaining({
+		executionTime: expect.toBeNumber(),
+		webhook: expect.toBeObject(),
+		payload: expect.anything(),
+		error: expect.toBeObject(),
+	});
 };
 
 beforeEach(() => {
-    sandbox = new Sandbox();
-    sandbox.app.bind("path.cache").toConstantValue(dirSync().name);
+	sandbox = new Sandbox();
+	sandbox.app.bind("path.cache").toConstantValue(dirSync().name);
 
-    sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(mockEventDispatcher);
-    sandbox.app.bind<Database>(Identifiers.Database).to(Database).inSingletonScope();
+	sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(mockEventDispatcher);
+	sandbox.app.bind<Database>(Identifiers.Database).to(Database).inSingletonScope();
 
-    sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
 
-    database = sandbox.app.get<Database>(Identifiers.Database);
-    database.boot();
+	database = sandbox.app.get<Database>(Identifiers.Database);
+	database.boot();
 
-    listener = sandbox.app.resolve<Listener>(Listener);
+	listener = sandbox.app.resolve<Listener>(Listener);
 
-    webhook = Object.assign({}, dummyWebhook);
+	webhook = Object.assign({}, dummyWebhook);
 
-    spyOnPost = jest
-        .spyOn(Utils.http, "post")
-        .mockImplementation(async (url: string, opts?: HttpOptions | undefined) => {
-            return {
-                statusCode: 200,
-            } as HttpResponse;
-        });
+	spyOnPost = jest
+		.spyOn(Utils.http, "post")
+		.mockImplementation(async (url: string, opts?: HttpOptions | undefined) => {
+			return {
+				statusCode: 200,
+			} as HttpResponse;
+		});
 });
 
 afterEach(() => {
-    jest.clearAllMocks();
-    jest.resetAllMocks();
+	jest.clearAllMocks();
+	jest.resetAllMocks();
 });
 
 afterAll(() => setGracefulCleanup());
 
 describe("Listener", () => {
-    describe("broadcast", () => {
-        it("should broadcast to registered webhooks", async () => {
-            database.create(webhook);
+	describe("broadcast", () => {
+		it("should broadcast to registered webhooks", async () => {
+			database.create(webhook);
 
-            await listener.handle({ name: "event", data: "dummy_data" });
+			await listener.handle({ name: "event", data: "dummy_data" });
 
-            expect(spyOnPost).toHaveBeenCalled();
-            expect(logger.debug).toHaveBeenCalled();
+			expect(spyOnPost).toHaveBeenCalled();
+			expect(logger.debug).toHaveBeenCalled();
 
-            expect(mockEventDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(
-                WebhookEvent.Broadcasted,
-                expectFinishedEventData(),
-            );
-        });
+			expect(mockEventDispatcher.dispatch).toHaveBeenCalledTimes(1);
+			expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(
+				WebhookEvent.Broadcasted,
+				expectFinishedEventData(),
+			);
+		});
 
-        it("should log error if broadcast is not successful", async () => {
-            database.create(webhook);
+		it("should log error if broadcast is not successful", async () => {
+			database.create(webhook);
 
-            const spyOnPost = jest
-                .spyOn(Utils.http, "post")
-                .mockImplementation(async (url: string, opts?: HttpOptions | undefined) => {
-                    throw new Error();
-                });
+			const spyOnPost = jest
+				.spyOn(Utils.http, "post")
+				.mockImplementation(async (url: string, opts?: HttpOptions | undefined) => {
+					throw new Error();
+				});
 
-            await listener.handle({ name: "event", data: "dummy_data" });
+			await listener.handle({ name: "event", data: "dummy_data" });
 
-            expect(spyOnPost).toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalled();
+			expect(spyOnPost).toHaveBeenCalled();
+			expect(logger.error).toHaveBeenCalled();
 
-            expect(mockEventDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(WebhookEvent.Failed, expectFailedEventData());
-        });
-    });
+			expect(mockEventDispatcher.dispatch).toHaveBeenCalledTimes(1);
+			expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(WebhookEvent.Failed, expectFailedEventData());
+		});
+	});
 
-    describe("webhooks", () => {
-        it("should not broadcast if webhook is disabled", async () => {
-            webhook.enabled = false;
-            database.create(webhook);
+	describe("webhooks", () => {
+		it("should not broadcast if webhook is disabled", async () => {
+			webhook.enabled = false;
+			database.create(webhook);
 
-            await listener.handle({ name: "event", data: "dummy_data" });
+			await listener.handle({ name: "event", data: "dummy_data" });
 
-            expect(spyOnPost).toHaveBeenCalledTimes(0);
-        });
+			expect(spyOnPost).toHaveBeenCalledTimes(0);
+		});
 
-        it("should not broadcast if event is webhook event", async () => {
-            database.create(webhook);
+		it("should not broadcast if event is webhook event", async () => {
+			database.create(webhook);
 
-            await listener.handle({ name: WebhookEvent.Broadcasted, data: "dummy_data" });
+			await listener.handle({ name: WebhookEvent.Broadcasted, data: "dummy_data" });
 
-            expect(spyOnPost).toHaveBeenCalledTimes(0);
-        });
+			expect(spyOnPost).toHaveBeenCalledTimes(0);
+		});
 
-        it("should broadcast if webhook condition is satisfied", async () => {
-            webhook.conditions = [
-                {
-                    key: "test",
-                    value: 1,
-                    condition: "eq",
-                },
-            ];
-            database.create(webhook);
+		it("should broadcast if webhook condition is satisfied", async () => {
+			webhook.conditions = [
+				{
+					key: "test",
+					value: 1,
+					condition: "eq",
+				},
+			];
+			database.create(webhook);
 
-            await listener.handle({ name: "event", data: { test: 1 } });
+			await listener.handle({ name: "event", data: { test: 1 } });
 
-            expect(spyOnPost).toHaveBeenCalledTimes(1);
+			expect(spyOnPost).toHaveBeenCalledTimes(1);
 
-            expect(mockEventDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(
-                WebhookEvent.Broadcasted,
-                expectFinishedEventData(),
-            );
-        });
+			expect(mockEventDispatcher.dispatch).toHaveBeenCalledTimes(1);
+			expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(
+				WebhookEvent.Broadcasted,
+				expectFinishedEventData(),
+			);
+		});
 
-        it("should not broadcast if webhook condition is not satisfied", async () => {
-            webhook.conditions = [
-                {
-                    key: "test",
-                    value: 1,
-                    condition: "eq",
-                },
-            ];
-            database.create(webhook);
+		it("should not broadcast if webhook condition is not satisfied", async () => {
+			webhook.conditions = [
+				{
+					key: "test",
+					value: 1,
+					condition: "eq",
+				},
+			];
+			database.create(webhook);
 
-            await listener.handle({ name: "event", data: { test: 2 } });
+			await listener.handle({ name: "event", data: { test: 2 } });
 
-            expect(spyOnPost).toHaveBeenCalledTimes(0);
-        });
+			expect(spyOnPost).toHaveBeenCalledTimes(0);
+		});
 
-        it("should not broadcast if webhook condition throws error", async () => {
-            const spyOnEq = jest.spyOn(coditions, "eq").mockImplementation((actual, expected) => {
-                throw new Error();
-            });
+		it("should not broadcast if webhook condition throws error", async () => {
+			const spyOnEq = jest.spyOn(coditions, "eq").mockImplementation((actual, expected) => {
+				throw new Error();
+			});
 
-            webhook.conditions = [
-                {
-                    key: "test",
-                    value: 1,
-                    condition: "eq",
-                },
-            ];
-            database.create(webhook);
+			webhook.conditions = [
+				{
+					key: "test",
+					value: 1,
+					condition: "eq",
+				},
+			];
+			database.create(webhook);
 
-            await listener.handle({ name: "event", data: { test: 2 } });
+			await listener.handle({ name: "event", data: { test: 2 } });
 
-            expect(spyOnEq).toHaveBeenCalledTimes(1);
-            expect(spyOnPost).toHaveBeenCalledTimes(0);
-        });
-    });
+			expect(spyOnEq).toHaveBeenCalledTimes(1);
+			expect(spyOnPost).toHaveBeenCalledTimes(0);
+		});
+	});
 });

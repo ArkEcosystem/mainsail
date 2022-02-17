@@ -1,3 +1,3 @@
 export interface Action {
-    handle(): void;
+	handle(): void;
 }

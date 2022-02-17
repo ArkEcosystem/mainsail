@@ -8,13 +8,13 @@ import { injectable } from "../ioc";
  */
 @injectable()
 export class TaskList {
-    /**
-     * @static
-     * @param {{ title: string; task: any }[]} tasks
-     * @returns {Promise<void>}
-     * @memberof TaskList
-     */
-    public async render(tasks: { title: string; task: any }[]): Promise<void> {
-        return new Listr(tasks).run();
-    }
+	/**
+	 * @static
+	 * @param {{ title: string; task: any }[]} tasks
+	 * @returns {Promise<void>}
+	 * @memberof TaskList
+	 */
+	public async render(tasks: { title: string; task: any }[]): Promise<void> {
+		return new Listr(tasks).run();
+	}
 }

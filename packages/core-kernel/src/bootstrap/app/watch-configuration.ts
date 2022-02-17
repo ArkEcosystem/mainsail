@@ -10,21 +10,21 @@ import { Bootstrapper } from "../interfaces";
  */
 @injectable()
 export class WatchConfiguration implements Bootstrapper {
-    /**
-     * The application instance.
-     *
-     * @private
-     * @type {Application}
-     * @memberof WatchConfiguration
-     */
-    @inject(Identifiers.Application)
-    private readonly app!: Application;
+	/**
+	 * The application instance.
+	 *
+	 * @private
+	 * @type {Application}
+	 * @memberof WatchConfiguration
+	 */
+	@inject(Identifiers.Application)
+	private readonly app!: Application;
 
-    /**
-     * @returns {Promise<void>}
-     * @memberof WatchConfiguration
-     */
-    public async bootstrap(): Promise<void> {
-        await this.app.resolve<Watcher>(Watcher).boot();
-    }
+	/**
+	 * @returns {Promise<void>}
+	 * @memberof WatchConfiguration
+	 */
+	public async bootstrap(): Promise<void> {
+		await this.app.resolve<Watcher>(Watcher).boot();
+	}
 }

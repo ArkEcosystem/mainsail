@@ -6,15 +6,15 @@ import { BlockHandler } from "../contracts";
 
 @Container.injectable()
 export class NonceOutOfOrderHandler implements BlockHandler {
-    @Container.inject(Container.Identifiers.Application)
-    protected readonly app!: Contracts.Kernel.Application;
+	@Container.inject(Container.Identifiers.Application)
+	protected readonly app!: Contracts.Kernel.Application;
 
-    @Container.inject(Container.Identifiers.BlockchainService)
-    protected readonly blockchain!: Contracts.Blockchain.Blockchain;
+	@Container.inject(Container.Identifiers.BlockchainService)
+	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-    public async execute(block?: Interfaces.IBlock): Promise<BlockProcessorResult> {
-        this.blockchain.resetLastDownloadedBlock();
+	public async execute(block?: Interfaces.IBlock): Promise<BlockProcessorResult> {
+		this.blockchain.resetLastDownloadedBlock();
 
-        return BlockProcessorResult.Rejected;
-    }
+		return BlockProcessorResult.Rejected;
+	}
 }

@@ -13,31 +13,31 @@ let app;
 let server: Server;
 
 beforeAll(async () => {
-    app = initApp();
-    server = await initServer(app, serverDefaults);
-    // @ts-ignore
-    register(server.server);
+	app = initApp();
+	server = await initServer(app, serverDefaults);
+	// @ts-ignore
+	register(server.server);
 });
 
 afterAll(async () => {
-    await server.dispose();
+	await server.dispose();
 });
 
 describe("Rounds", () => {
-    describe("Delegates", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(RoundsController.prototype, "delegates").mockResolvedValue({});
+	describe("Delegates", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(RoundsController.prototype, "delegates").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/rounds/2/delegates",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/rounds/2/delegates",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 });

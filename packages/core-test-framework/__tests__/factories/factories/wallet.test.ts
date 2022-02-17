@@ -6,17 +6,17 @@ import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/fac
 let factory: FactoryBuilder;
 
 beforeEach(() => {
-    factory = new FactoryBuilder();
+	factory = new FactoryBuilder();
 
-    Factories.registerWalletFactory(factory);
+	Factories.registerWalletFactory(factory);
 });
 
 describe("WalletFactory", () => {
-    it("should make a wallet", () => {
-        const entity: Wallets.Wallet = factory.get("Wallet").make<Wallets.Wallet>();
+	it("should make a wallet", () => {
+		const entity: Wallets.Wallet = factory.get("Wallet").make<Wallets.Wallet>();
 
-        expect(entity).toBeInstanceOf(Wallets.Wallet);
-        expect(entity.getAddress()).toBeString();
-        expect(entity.getPublicKey()).toBeString();
-    });
+		expect(entity).toBeInstanceOf(Wallets.Wallet);
+		expect(entity.getAddress()).toBeString();
+		expect(entity.getPublicKey()).toBeString();
+	});
 });

@@ -10,41 +10,41 @@ let configPath;
 const config = { token: "token", network: "testnet" };
 
 jest.mock("env-paths", () => () => ({
-    config: configPath,
+	config: configPath,
 }));
 
 beforeAll(() => setGracefulCleanup());
 
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 
-    cmd = cli.app.resolve(DiscoverConfig);
+	cmd = cli.app.resolve(DiscoverConfig);
 
-    configPath = join(dirSync().name, "token-core");
+	configPath = join(dirSync().name, "token-core");
 });
 
 describe("DiscoverConfig", () => {
-    it("should return undefined if configuration can't be found", async () => {
-        await expect(cmd.discover()).resolves.toEqual(undefined);
-    });
+	it("should return undefined if configuration can't be found", async () => {
+		await expect(cmd.discover()).resolves.toEqual(undefined);
+	});
 
-    it("should return configuration if found on default config location", async () => {
-        ensureDirSync(join(configPath, "testnet"));
+	it("should return configuration if found on default config location", async () => {
+		ensureDirSync(join(configPath, "testnet"));
 
-        await writeJSON(join(configPath, "testnet", "config.json"), config);
+		await writeJSON(join(configPath, "testnet", "config.json"), config);
 
-        await expect(cmd.discover("token", "testnet")).resolves.toEqual(config);
-    });
+		await expect(cmd.discover("token", "testnet")).resolves.toEqual(config);
+	});
 
-    it("should return configuration if found on CORE_PATH_CONFIG location", async () => {
-        process.env.CORE_PATH_CONFIG = join(configPath, "testnet");
+	it("should return configuration if found on CORE_PATH_CONFIG location", async () => {
+		process.env.CORE_PATH_CONFIG = join(configPath, "testnet");
 
-        ensureDirSync(join(configPath, "testnet"));
+		ensureDirSync(join(configPath, "testnet"));
 
-        await writeJSON(join(configPath, "testnet", "config.json"), config);
+		await writeJSON(join(configPath, "testnet", "config.json"), config);
 
-        await expect(cmd.discover()).resolves.toEqual(config);
+		await expect(cmd.discover()).resolves.toEqual(config);
 
-        delete process.env.CORE_PATH_CONFIG;
-    });
+		delete process.env.CORE_PATH_CONFIG;
+	});
 });

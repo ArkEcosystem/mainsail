@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddBlocksAndTransactionsIndexes20200317000000 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`
+	public async up(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.query(`
             CREATE INDEX transactions_asset ON transactions USING GIN(asset);
             CREATE INDEX transactions_amount ON transactions(amount);
             CREATE INDEX transactions_fee ON transactions(fee);
@@ -34,10 +34,10 @@ export class AddBlocksAndTransactionsIndexes20200317000000 implements MigrationI
             CREATE INDEX blocks_total_fee ON blocks(total_fee);
             CREATE INDEX blocks_version ON blocks(version);
         `);
-    }
+	}
 
-    public async down(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.query(`
+	public async down(queryRunner: QueryRunner): Promise<any> {
+		await queryRunner.query(`
             DROP INDEX transactions_asset;
             DROP INDEX transactions_amount;
             DROP INDEX transactions_fee;
@@ -69,5 +69,5 @@ export class AddBlocksAndTransactionsIndexes20200317000000 implements MigrationI
             DROP INDEX blocks_total_fee;
             DROP INDEX blocks_version;
         `);
-    }
+	}
 }

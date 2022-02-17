@@ -41,13 +41,13 @@ export class ServiceNotFound extends ContainerException {}
  * @extends {KernelException}
  */
 export class InvalidBindingName extends ContainerException {
-    /**
-     * @param {string} name
-     * @memberof InvalidBindingName
-     */
-    public constructor(name: string) {
-        super(`The name [${name}] is reserved.`);
-    }
+	/**
+	 * @param {string} name
+	 * @memberof InvalidBindingName
+	 */
+	public constructor(name: string) {
+		super(`The name [${name}] is reserved.`);
+	}
 }
 
 /**
@@ -56,11 +56,11 @@ export class InvalidBindingName extends ContainerException {
  * @extends {RuntimeException}
  */
 export class DriverCannotBeResolved extends ContainerException {
-    /**
-     * @param {string} name
-     * @memberof DriverCannotBeResolved
-     */
-    public constructor(name: string) {
-        super(`Unable to resolve driver for [${name}].'`);
-    }
+	/**
+	 * @param {string} name
+	 * @memberof DriverCannotBeResolved
+	 */
+	public constructor(name: string) {
+		super(`Unable to resolve driver for [${name}].'`);
+	}
 }

@@ -10,14 +10,14 @@ let app: Application;
 beforeEach(() => (app = new Application(new Container())));
 
 describe("FilesystemServiceProvider", () => {
-    it(".register", async () => {
-        expect(app.isBound(Identifiers.FilesystemManager)).toBeFalse();
-        expect(app.isBound(Identifiers.FilesystemService)).toBeFalse();
+	it(".register", async () => {
+		expect(app.isBound(Identifiers.FilesystemManager)).toBeFalse();
+		expect(app.isBound(Identifiers.FilesystemService)).toBeFalse();
 
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.isBound(Identifiers.FilesystemManager)).toBeTrue();
-        expect(app.isBound(Identifiers.FilesystemService)).toBeTrue();
-        expect(app.get(Identifiers.FilesystemService)).toBeInstanceOf(LocalFilesystem);
-    });
+		expect(app.isBound(Identifiers.FilesystemManager)).toBeTrue();
+		expect(app.isBound(Identifiers.FilesystemService)).toBeTrue();
+		expect(app.get(Identifiers.FilesystemService)).toBeInstanceOf(LocalFilesystem);
+	});
 });

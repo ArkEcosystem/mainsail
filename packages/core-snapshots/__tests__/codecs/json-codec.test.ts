@@ -6,117 +6,117 @@ import { decamelize } from "xcase";
 import { Assets } from "../__fixtures__";
 
 const appendPrefix = (prefix: string, entity: any) => {
-    const itemToReturn = {};
+	const itemToReturn = {};
 
-    const item = entity;
+	const item = entity;
 
-    for (const key of Object.keys(item)) {
-        itemToReturn[prefix + decamelize(key)] = item[key];
-    }
+	for (const key of Object.keys(item)) {
+		itemToReturn[prefix + decamelize(key)] = item[key];
+	}
 
-    return itemToReturn;
+	return itemToReturn;
 };
 
 let codec;
 
 beforeEach(() => {
-    codec = new JSONCodec();
+	codec = new JSONCodec();
 });
 
 describe("Codec", () => {
-    describe("encodeBlock", () => {
-        it("should be ok", async () => {
-            const encoded = codec.encodeBlock(appendPrefix("Block_", Assets.blocks[1]));
+	describe("encodeBlock", () => {
+		it("should be ok", async () => {
+			const encoded = codec.encodeBlock(appendPrefix("Block_", Assets.blocks[1]));
 
-            expect(encoded).toBeDefined();
-        });
+			expect(encoded).toBeDefined();
+		});
 
-        it("should throw error", async () => {
-            expect(() => {
-                codec.encodeBlock(undefined);
-            }).toThrow();
-        });
-    });
+		it("should throw error", async () => {
+			expect(() => {
+				codec.encodeBlock(undefined);
+			}).toThrow();
+		});
+	});
 
-    describe("decodeBlock", () => {
-        it("should be ok", async () => {
-            const encoded = codec.encodeBlock(appendPrefix("Block_", Assets.blocks[1]));
+	describe("decodeBlock", () => {
+		it("should be ok", async () => {
+			const encoded = codec.encodeBlock(appendPrefix("Block_", Assets.blocks[1]));
 
-            expect(encoded).toBeDefined();
+			expect(encoded).toBeDefined();
 
-            const decoded = codec.decodeBlock(encoded);
+			const decoded = codec.decodeBlock(encoded);
 
-            expect(decoded).toBeDefined();
-        });
+			expect(decoded).toBeDefined();
+		});
 
-        it("should throw error", async () => {
-            expect(() => {
-                codec.decodeBlock(Buffer.from(""));
-            }).toThrow();
-        });
-    });
+		it("should throw error", async () => {
+			expect(() => {
+				codec.decodeBlock(Buffer.from(""));
+			}).toThrow();
+		});
+	});
 
-    describe("encodeTransaction", () => {
-        it("should be ok", async () => {
-            const encoded = codec.encodeTransaction(Assets.transactions[0]);
+	describe("encodeTransaction", () => {
+		it("should be ok", async () => {
+			const encoded = codec.encodeTransaction(Assets.transactions[0]);
 
-            expect(encoded).toBeDefined();
-        });
+			expect(encoded).toBeDefined();
+		});
 
-        it("should throw error", async () => {
-            expect(() => {
-                codec.encodeTransaction(undefined);
-            }).toThrow();
-        });
-    });
+		it("should throw error", async () => {
+			expect(() => {
+				codec.encodeTransaction(undefined);
+			}).toThrow();
+		});
+	});
 
-    describe("decodeTransaction", () => {
-        it("should be ok", async () => {
-            const encoded = codec.encodeTransaction(appendPrefix("Transaction_", Assets.transactions[0]));
+	describe("decodeTransaction", () => {
+		it("should be ok", async () => {
+			const encoded = codec.encodeTransaction(appendPrefix("Transaction_", Assets.transactions[0]));
 
-            expect(encoded).toBeDefined();
+			expect(encoded).toBeDefined();
 
-            const decoded = codec.decodeTransaction(encoded);
+			const decoded = codec.decodeTransaction(encoded);
 
-            expect(decoded).toBeDefined();
-        });
+			expect(decoded).toBeDefined();
+		});
 
-        it("should throw error", async () => {
-            expect(() => {
-                codec.decodeTransaction(Buffer.from(""));
-            }).toThrow();
-        });
-    });
+		it("should throw error", async () => {
+			expect(() => {
+				codec.decodeTransaction(Buffer.from(""));
+			}).toThrow();
+		});
+	});
 
-    describe("encodeRound", () => {
-        it("should be ok", async () => {
-            const encoded = codec.encodeRound(appendPrefix("Round_", Assets.rounds[0]));
+	describe("encodeRound", () => {
+		it("should be ok", async () => {
+			const encoded = codec.encodeRound(appendPrefix("Round_", Assets.rounds[0]));
 
-            expect(encoded).toBeDefined();
-        });
+			expect(encoded).toBeDefined();
+		});
 
-        it("should throw error", async () => {
-            expect(() => {
-                codec.encodeRound(undefined);
-            }).toThrow();
-        });
-    });
+		it("should throw error", async () => {
+			expect(() => {
+				codec.encodeRound(undefined);
+			}).toThrow();
+		});
+	});
 
-    describe("decodeRound", () => {
-        it("should be ok", async () => {
-            const encoded = codec.encodeRound(appendPrefix("Round_", Assets.rounds[0]));
+	describe("decodeRound", () => {
+		it("should be ok", async () => {
+			const encoded = codec.encodeRound(appendPrefix("Round_", Assets.rounds[0]));
 
-            expect(encoded).toBeDefined();
+			expect(encoded).toBeDefined();
 
-            const decoded = codec.decodeRound(encoded);
+			const decoded = codec.decodeRound(encoded);
 
-            expect(decoded).toBeDefined();
-        });
+			expect(decoded).toBeDefined();
+		});
 
-        it("should throw error", async () => {
-            expect(() => {
-                codec.decodeRound(Buffer.from(""));
-            }).toThrow();
-        });
-    });
+		it("should throw error", async () => {
+			expect(() => {
+				codec.decodeRound(Buffer.from(""));
+			}).toThrow();
+		});
+	});
 });

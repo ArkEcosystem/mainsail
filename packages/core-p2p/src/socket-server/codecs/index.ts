@@ -4,8 +4,8 @@ import * as Peer from "./peer";
 import * as Transactions from "./transactions";
 
 export const Codecs = {
-    ...Blocks,
-    ...Internal,
-    ...Peer,
-    ...Transactions,
+	...Blocks,
+	...Internal,
+	...Peer,
+	...Transactions,
 };

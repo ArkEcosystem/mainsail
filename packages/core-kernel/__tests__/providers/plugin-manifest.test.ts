@@ -11,29 +11,29 @@ let container: interfaces.Container;
 let pluginManifest: PluginManifest;
 
 beforeEach(() => {
-    container = new Container();
-    container.snapshot();
+	container = new Container();
+	container.snapshot();
 
-    app = new Application(container);
-    app.bind(Identifiers.ConfigRepository).to(ConfigRepository).inSingletonScope();
+	app = new Application(container);
+	app.bind(Identifiers.ConfigRepository).to(ConfigRepository).inSingletonScope();
 
-    pluginManifest = app.resolve<PluginManifest>(PluginManifest);
+	pluginManifest = app.resolve<PluginManifest>(PluginManifest);
 });
 
 afterEach(() => container.restore());
 
 describe("PluginManifest", () => {
-    it("should discover the manifest for the given plugin", () => {
-        pluginManifest.discover(resolve(__dirname, "../__stubs__/stub-plugin"));
+	it("should discover the manifest for the given plugin", () => {
+		pluginManifest.discover(resolve(__dirname, "../__stubs__/stub-plugin"));
 
-        expect(pluginManifest.has("name")).toBeTrue();
-        expect(pluginManifest.get("name")).toBe("stub-plugin");
-    });
+		expect(pluginManifest.has("name")).toBeTrue();
+		expect(pluginManifest.get("name")).toBe("stub-plugin");
+	});
 
-    it("should merge the given value", () => {
-        // @ts-ignore
-        pluginManifest.merge({ some: "value" });
+	it("should merge the given value", () => {
+		// @ts-ignore
+		pluginManifest.merge({ some: "value" });
 
-        expect(pluginManifest.get("some")).toEqual("value");
-    });
+		expect(pluginManifest.get("some")).toEqual("value");
+	});
 });

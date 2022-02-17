@@ -1,37 +1,37 @@
 {
-    "name": "@arkecosystem/core-transactions",
-    "version": "3.1.1",
-    "description": "Transaction Services for ARK Core",
-    "license": "MIT",
-    "contributors": [
-        "Joshua Noack <joshua@ark.io>"
-    ],
-    "files": [
-        "dist"
-    ],
-    "main": "dist/index",
-    "types": "dist/index",
-    "scripts": {
-        "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -- -w",
-        "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-        "clean": "rimraf dist",
-        "compile": "node ../../node_modules/typescript/bin/tsc",
-        "prepublishOnly": "pnpm run build",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
-    },
-    "dependencies": {
-        "@arkecosystem/core-database": "workspace:*",
-        "@arkecosystem/core-kernel": "workspace:*",
-        "@arkecosystem/crypto": "workspace:*"
-    },
-    "engines": {
-        "node": ">=10.x"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "devDependencies": {
-        "bytebuffer": "5.0.1"
-    }
+	"name": "@arkecosystem/core-transactions",
+	"version": "3.1.1",
+	"description": "Transaction Services for ARK Core",
+	"license": "MIT",
+	"contributors": [
+		"Joshua Noack <joshua@ark.io>"
+	],
+	"files": [
+		"dist"
+	],
+	"main": "dist/index",
+	"types": "dist/index",
+	"scripts": {
+		"build": "pnpm run clean && pnpm run compile",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"clean": "rimraf dist",
+		"compile": "node ../../node_modules/typescript/bin/tsc",
+		"prepublishOnly": "pnpm run build",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/core-database": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/crypto": "workspace:*"
+	},
+	"engines": {
+		"node": ">=10.x"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"devDependencies": {
+		"bytebuffer": "5.0.1"
+	}
 }

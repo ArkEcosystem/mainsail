@@ -1,3 +1,3 @@
 export interface IndexOptions {
-    scope: string;
+	scope: string;
 }

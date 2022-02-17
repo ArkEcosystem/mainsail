@@ -10,50 +10,50 @@ import Joi from "joi";
  */
 @Container.injectable()
 export class Command extends Commands.Command {
-    /**
-     * The console command signature.
-     *
-     * @type {string}
-     * @memberof Command
-     */
-    public signature: string = "snapshot:truncate";
+	/**
+	 * The console command signature.
+	 *
+	 * @type {string}
+	 * @memberof Command
+	 */
+	public signature: string = "snapshot:truncate";
 
-    /**
-     * The console command description.
-     *
-     * @type {string}
-     * @memberof Command
-     */
-    public description: string = "Truncate blockchain database.";
+	/**
+	 * The console command description.
+	 *
+	 * @type {string}
+	 * @memberof Command
+	 */
+	public description: string = "Truncate blockchain database.";
 
-    /**
-     * Configure the console command.
-     *
-     * @returns {void}
-     * @memberof Command
-     */
-    public configure(): void {
-        this.definition
-            .setFlag("token", "The name of the token.", Joi.string().default("ark"))
-            .setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)));
-    }
+	/**
+	 * Configure the console command.
+	 *
+	 * @returns {void}
+	 * @memberof Command
+	 */
+	public configure(): void {
+		this.definition
+			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
+			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)));
+	}
 
-    /**
-     * Execute the console command.
-     *
-     * @returns {Promise<void>}
-     * @memberof Command
-     */
-    public async execute(): Promise<void> {
-        const flags: Contracts.AnyObject = { ...this.getFlags() };
-        flags.processType = "snapshot";
+	/**
+	 * Execute the console command.
+	 *
+	 * @returns {Promise<void>}
+	 * @memberof Command
+	 */
+	public async execute(): Promise<void> {
+		const flags: Contracts.AnyObject = { ...this.getFlags() };
+		flags.processType = "snapshot";
 
-        const app = await Utils.buildApplication({
-            flags,
-        });
+		const app = await Utils.buildApplication({
+			flags,
+		});
 
-        await app.get<KernelContracts.Snapshot.SnapshotService>(KernelContainer.Identifiers.SnapshotService).truncate();
+		await app.get<KernelContracts.Snapshot.SnapshotService>(KernelContainer.Identifiers.SnapshotService).truncate();
 
-        await app.terminate();
-    }
+		await app.terminate();
+	}
 }

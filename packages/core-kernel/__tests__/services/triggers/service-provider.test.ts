@@ -9,12 +9,12 @@ let app: Application;
 beforeEach(() => (app = new Application(new Container())));
 
 describe("TriggersServiceProvider", () => {
-    it(".register", async () => {
-        expect(app.isBound(Identifiers.TriggerService)).toBeFalse();
+	it(".register", async () => {
+		expect(app.isBound(Identifiers.TriggerService)).toBeFalse();
 
-        await app.resolve<ServiceProvider>(ServiceProvider).register();
+		await app.resolve<ServiceProvider>(ServiceProvider).register();
 
-        expect(app.isBound(Identifiers.TriggerService)).toBeTrue();
-        expect(app.get(Identifiers.TriggerService)).toBeInstanceOf(Triggers);
-    });
+		expect(app.isBound(Identifiers.TriggerService)).toBeTrue();
+		expect(app.get(Identifiers.TriggerService)).toBeInstanceOf(Triggers);
+	});
 });

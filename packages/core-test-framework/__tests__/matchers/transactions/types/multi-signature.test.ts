@@ -5,23 +5,23 @@ import { Interfaces } from "@packages/crypto";
 let factory: FactoryBuilder;
 
 beforeEach(() => {
-    factory = new FactoryBuilder();
+	factory = new FactoryBuilder();
 
-    Factories.registerTransactionFactory(factory);
+	Factories.registerTransactionFactory(factory);
 });
 
 describe("Multi Signature", () => {
-    describe("toBeMultiSignatureType", () => {
-        it("should be multi signature type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("MultiSignature").make();
+	describe("toBeMultiSignatureType", () => {
+		it("should be multi signature type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("MultiSignature").make();
 
-            expect(transaction.data).toBeMultiSignatureType();
-        });
+			expect(transaction.data).toBeMultiSignatureType();
+		});
 
-        it("should not be multi signature type", async () => {
-            const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
+		it("should not be multi signature type", async () => {
+			const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
 
-            expect(transaction.data).not.toBeMultiSignatureType();
-        });
-    });
+			expect(transaction.data).not.toBeMultiSignatureType();
+		});
+	});
 });

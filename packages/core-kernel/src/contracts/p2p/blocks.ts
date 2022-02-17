@@ -1,4 +1,4 @@
 export type PostBlockResponse = {
-    status: boolean;
-    height: number;
+	status: boolean;
+	height: number;
 };
