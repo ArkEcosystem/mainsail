@@ -1,7 +1,7 @@
 import { Utils } from "@packages/core-cli";
 import { Container } from "@packages/core-kernel";
 import { Console, Sandbox } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/snapshot-dump";
+import { Command } from "@packages/core/source/commands/snapshot-dump";
 
 jest.mock("@packages/core-cli", () => {
 	const originalModule = jest.requireActual("@packages/core-cli");

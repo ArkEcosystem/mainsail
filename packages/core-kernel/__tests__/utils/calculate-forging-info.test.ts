@@ -3,10 +3,10 @@ import "jest-extended";
 import {
 	calculateForgingInfo,
 	getMilestonesWhichAffectActiveDelegateCount,
-} from "@packages/core-kernel/src/utils/calculate-forging-info";
+} from "@packages/core-kernel/source/utils/calculate-forging-info";
 import { Managers } from "@packages/crypto";
-import { configManager } from "@packages/crypto/src/managers";
-import { devnet } from "@packages/crypto/src/networks";
+import { configManager } from "@packages/crypto/source/managers";
+import { devnet } from "@packages/crypto/source/networks";
 
 afterEach(() => jest.clearAllMocks());
 

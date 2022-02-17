@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { BlockEvent, ScheduleEvent } from "@packages/core-kernel/src/enums/events";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
-import { BlockJob } from "@packages/core-kernel/src/services/schedule/block-job";
+import { BlockEvent, ScheduleEvent } from "@packages/core-kernel/source/enums/events";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
+import { BlockJob } from "@packages/core-kernel/source/services/schedule/block-job";
 import { Sandbox } from "@packages/core-test-framework";
 
 let sandbox: Sandbox;

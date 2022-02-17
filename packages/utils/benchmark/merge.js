@@ -1,4 +1,4 @@
-const { merge } = require("../dist");
+const { merge } = require("../distribution");
 const lodash = require("lodash/merge");
 
 var object = {

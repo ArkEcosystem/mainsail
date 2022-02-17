@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Console } from "@packages/core-test-framework";
 import Joi from "joi";
-import { InputValidator } from "@packages/core-cli/src/input";
+import { InputValidator } from "@packages/core-cli/source/input";
 
 let cli;
 let validator;

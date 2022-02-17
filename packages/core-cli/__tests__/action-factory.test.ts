@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { ActionFactory, Container } from "@packages/core-cli/src";
+import { ActionFactory, Container } from "@packages/core-cli/source";
 
 let cli;
 beforeEach(() => (cli = new Console()));

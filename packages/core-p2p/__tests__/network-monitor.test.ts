@@ -1,11 +1,11 @@
 import "jest-extended";
 
 import { Container, Enums, Utils } from "@packages/core-kernel";
-import { ChunkCache } from "@packages/core-p2p/src/chunk-cache";
-import { NetworkMonitor } from "@packages/core-p2p/src/network-monitor";
-import { NetworkState } from "@packages/core-p2p/src/network-state";
-import { Peer } from "@packages/core-p2p/src/peer";
-import { PeerVerificationResult } from "@packages/core-p2p/src/peer-verifier";
+import { ChunkCache } from "@packages/core-p2p/source/chunk-cache";
+import { NetworkMonitor } from "@packages/core-p2p/source/network-monitor";
+import { NetworkState } from "@packages/core-p2p/source/network-state";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { PeerVerificationResult } from "@packages/core-p2p/source/peer-verifier";
 import { Blocks } from "@packages/crypto";
 import delay from "delay";
 import { cloneDeep } from "lodash";
@@ -13,7 +13,7 @@ import path from "path";
 
 jest.mock("@packages/core-kernel", () => {
 	const originalModule = jest.requireActual("@packages/core-kernel");
-	const utilsModule = jest.requireActual("@packages/core-kernel/src/utils");
+	const utilsModule = jest.requireActual("@packages/core-kernel/source/utils");
 
 	return {
 		__esModule: true,

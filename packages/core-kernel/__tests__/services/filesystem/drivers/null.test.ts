@@ -1,4 +1,4 @@
-import { NullFilesystem } from "../../../../../../packages/core-kernel/src/services/filesystem/drivers/null";
+import { NullFilesystem } from "../../../../../../packages/core-kernel/source/services/filesystem/drivers/null";
 
 describe("NullFilesystem.make", () => {
 	it("should return instance itself", async () => {

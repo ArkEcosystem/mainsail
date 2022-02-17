@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/relay-share";
+import { Command } from "@packages/core/source/commands/relay-share";
 import ngrok from "ngrok";
 
 let cli;

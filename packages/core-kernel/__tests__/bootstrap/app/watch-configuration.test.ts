@@ -1,7 +1,7 @@
-import { Container, Identifiers } from "../../../../../packages/core-kernel/src/ioc";
+import { Container, Identifiers } from "../../../../../packages/core-kernel/source/ioc";
 
-import { WatchConfiguration } from "../../../../../packages/core-kernel/src/bootstrap/app/watch-configuration";
-import { Watcher } from "../../../../../packages/core-kernel/src/services/config/watcher";
+import { WatchConfiguration } from "../../../../../packages/core-kernel/source/bootstrap/app/watch-configuration";
+import { Watcher } from "../../../../../packages/core-kernel/source/services/config/watcher";
 
 const app = { resolve: jest.fn() };
 const watcher = { boot: jest.fn() };

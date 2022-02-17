@@ -1,4 +1,4 @@
-const { fill } = require("../dist");
+const { fill } = require("../distribution");
 const lodash = require("lodash/fill");
 
 exports["utils"] = () => fill([1, 2, 3], "a");

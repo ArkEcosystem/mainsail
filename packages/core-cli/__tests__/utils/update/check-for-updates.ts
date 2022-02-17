@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { checkForUpdates } from "@packages/core/src/common/update";
+import { checkForUpdates } from "@packages/core/source/common/update";
 import nock from "nock";
 
 import { versionLatest } from "../__fixtures__/latest-version";

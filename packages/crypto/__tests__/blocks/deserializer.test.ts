@@ -1,6 +1,6 @@
-import { Deserializer } from "../../../../packages/crypto/src/blocks/deserializer";
-import { Serializer } from "../../../../packages/crypto/src/blocks/serializer";
-import { configManager } from "../../../../packages/crypto/src/managers";
+import { Deserializer } from "../../../../packages/crypto/source/blocks/deserializer";
+import { Serializer } from "../../../../packages/crypto/source/blocks/serializer";
+import { configManager } from "../../../../packages/crypto/source/managers";
 import { dummyBlock2, dummyBlock3 } from "../fixtures/block";
 
 describe("block deserializer", () => {

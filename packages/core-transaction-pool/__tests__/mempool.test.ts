@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Identities, Interfaces } from "@arkecosystem/crypto";
 
-import { Mempool } from "../../../packages/core-transaction-pool/src/mempool";
+import { Mempool } from "../../../packages/core-transaction-pool/source/mempool";
 
 const createSenderMempool = jest.fn();
 const logger = { debug: jest.fn() };

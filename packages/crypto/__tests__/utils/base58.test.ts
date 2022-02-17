@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { HashAlgorithms } from "../../../../packages/crypto/src/crypto";
-import { Base58 } from "../../../../packages/crypto/src/utils/base58";
+import { HashAlgorithms } from "../../../../packages/crypto/source/crypto";
+import { Base58 } from "../../../../packages/crypto/source/utils/base58";
 
 const createPayload = () => {
 	const buffer: Buffer = HashAlgorithms.ripemd160(

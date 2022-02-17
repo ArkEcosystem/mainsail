@@ -1,4 +1,4 @@
-const { take } = require("../dist");
+const { take } = require("../distribution");
 const lodash = require("lodash/take");
 
 exports["utils"] = () => take([1, 2, 3], 2);

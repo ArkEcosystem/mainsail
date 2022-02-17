@@ -1,10 +1,10 @@
 import "jest-extended";
 
 import { Container } from "@packages/core-kernel";
-import * as Codecs from "@packages/core-snapshots/src/codecs";
-import { StreamReader, StreamWriter } from "@packages/core-snapshots/src/codecs";
-import { Identifiers } from "@packages/core-snapshots/src/ioc";
-import * as Actions from "@packages/core-snapshots/src/workers/actions";
+import * as Codecs from "@packages/core-snapshots/source/codecs";
+import { StreamReader, StreamWriter } from "@packages/core-snapshots/source/codecs";
+import { Identifiers } from "@packages/core-snapshots/source/ioc";
+import * as Actions from "@packages/core-snapshots/source/workers/actions";
 import { Sandbox } from "@packages/core-test-framework";
 import { Managers } from "@packages/crypto";
 import { Readable } from "stream";

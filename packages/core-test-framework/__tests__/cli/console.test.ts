@@ -2,7 +2,7 @@ import "jest-extended";
 
 import Joi from "joi";
 import { Commands, Container } from "@packages/core-cli";
-import { Console } from "@packages/core-test-framework/src";
+import { Console } from "@packages/core-test-framework/source";
 
 const spyOnGetFlag = jest.fn();
 const spyOnGetFlagToken = jest.fn();

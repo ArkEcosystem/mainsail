@@ -1,4 +1,4 @@
-import { ClassManager } from "../../../../packages/core-kernel/src/support/class-manager";
+import { ClassManager } from "../../../../packages/core-kernel/source/support/class-manager";
 
 class MyMemoryDriver {}
 class MyRemoteDriver {}

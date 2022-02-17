@@ -1,10 +1,10 @@
-import { Factories, Generators } from "@packages/core-test-framework/src";
-import { TransactionVersionError } from "@packages/crypto/src/errors";
-import { Keys } from "@packages/crypto/src/identities";
-import { Address } from "@packages/crypto/src/identities";
-import { configManager } from "@packages/crypto/src/managers";
-import { BuilderFactory, Signer } from "@packages/crypto/src/transactions";
-import { BigNumber } from "@packages/crypto/src/utils";
+import { Factories, Generators } from "@packages/core-test-framework/source";
+import { TransactionVersionError } from "@packages/crypto/source/errors";
+import { Keys } from "@packages/crypto/source/identities";
+import { Address } from "@packages/crypto/source/identities";
+import { configManager } from "@packages/crypto/source/managers";
+import { BuilderFactory, Signer } from "@packages/crypto/source/transactions";
+import { BigNumber } from "@packages/crypto/source/utils";
 
 let config;
 beforeAll(() => {

@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { ChunkCache } from "@packages/core-p2p/src/chunk-cache";
+import { ChunkCache } from "@packages/core-p2p/source/chunk-cache";
 import { Sandbox } from "@packages/core-test-framework";
 
 describe("EventListener", () => {

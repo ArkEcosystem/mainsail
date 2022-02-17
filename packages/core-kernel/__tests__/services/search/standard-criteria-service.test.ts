@@ -1,6 +1,10 @@
 import { Container, Contracts } from "@packages/core-kernel";
-import { InvalidCriteria, UnsupportedValue, UnexpectedError } from "@packages/core-kernel/src/services/search/errors";
-import { StandardCriteriaService } from "@packages/core-kernel/src/services/search/standard-criteria-service";
+import {
+	InvalidCriteria,
+	UnsupportedValue,
+	UnexpectedError,
+} from "@packages/core-kernel/source/services/search/errors";
+import { StandardCriteriaService } from "@packages/core-kernel/source/services/search/standard-criteria-service";
 import { Utils } from "@packages/crypto";
 
 const container = new Container.Container();

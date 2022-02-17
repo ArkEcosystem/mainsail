@@ -1,7 +1,7 @@
 import { Container } from "@packages/core-kernel";
-import { PluginConfiguration } from "@packages/core-kernel/src/providers";
-import { BlocksController } from "@packages/core-p2p/src/socket-server/controllers/blocks";
-import { TooManyTransactionsError } from "@packages/core-p2p/src/socket-server/errors";
+import { PluginConfiguration } from "@packages/core-kernel/source/providers";
+import { BlocksController } from "@packages/core-p2p/source/socket-server/controllers/blocks";
+import { TooManyTransactionsError } from "@packages/core-p2p/source/socket-server/errors";
 import { Sandbox } from "@packages/core-test-framework";
 import { Blocks, Identities, Managers, Networks, Transactions, Utils } from "@packages/crypto";
 import { cloneDeep } from "lodash";

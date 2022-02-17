@@ -1,4 +1,4 @@
-import { Application, Container } from "@packages/core-cli/src";
+import { Application, Container } from "@packages/core-cli/source";
 import envPaths from "env-paths";
 
 @Container.injectable()

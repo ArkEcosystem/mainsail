@@ -1,4 +1,4 @@
-const { mapValues } = require("../dist");
+const { mapValues } = require("../distribution");
 const lodash = require("lodash/mapValues");
 
 const users = {

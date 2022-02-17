@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { LocalFilesystem } from "@packages/core-kernel/src/services/filesystem/drivers/local";
+import { LocalFilesystem } from "@packages/core-kernel/source/services/filesystem/drivers/local";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
 
 let fs: LocalFilesystem;

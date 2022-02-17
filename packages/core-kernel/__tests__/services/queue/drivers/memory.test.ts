@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { sleep } from "@arkecosystem/utils";
 import { Container, Contracts, Enums } from "@packages/core-kernel";
-import { MemoryQueue } from "@packages/core-kernel/src/services/queue/drivers/memory";
+import { MemoryQueue } from "@packages/core-kernel/source/services/queue/drivers/memory";
 import { Sandbox } from "@packages/core-test-framework";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";

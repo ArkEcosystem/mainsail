@@ -1,5 +1,5 @@
-import { Crypto } from "@packages/core/src/exceptions";
-import { buildBIP38 } from "@packages/core/src/internal/crypto";
+import { Crypto } from "@packages/core/source/exceptions";
+import { buildBIP38 } from "@packages/core/source/internal/crypto";
 import { writeJSONSync } from "fs-extra";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";

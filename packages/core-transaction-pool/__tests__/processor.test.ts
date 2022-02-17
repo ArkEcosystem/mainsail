@@ -1,6 +1,6 @@
 import { Container, Contracts } from "@packages/core-kernel";
-import { TransactionFeeToLowError } from "@packages/core-transaction-pool/src/errors";
-import { Processor } from "@packages/core-transaction-pool/src/processor";
+import { TransactionFeeToLowError } from "@packages/core-transaction-pool/source/errors";
+import { Processor } from "@packages/core-transaction-pool/source/processor";
 import { Identities, Managers, Transactions } from "@packages/crypto";
 
 Managers.configManager.getMilestone().aip11 = true;

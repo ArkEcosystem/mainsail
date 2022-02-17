@@ -1,4 +1,4 @@
-import { getIp } from "@packages/core-api/src/utils/get-ip";
+import { getIp } from "@packages/core-api/source/utils/get-ip";
 
 const clientIp = "127.0.0.1";
 const proxyIp = "127.0.0.2";

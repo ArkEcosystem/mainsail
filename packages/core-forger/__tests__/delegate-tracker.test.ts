@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { DelegateTracker } from "@packages/core-forger/src/delegate-tracker";
-import { BIP39 } from "@packages/core-forger/src/methods/bip39";
+import { DelegateTracker } from "@packages/core-forger/source/delegate-tracker";
+import { BIP39 } from "@packages/core-forger/source/methods/bip39";
 import { Utils } from "@packages/core-kernel";
-import { Wallet } from "@packages/core-state/src/wallets";
+import { Wallet } from "@packages/core-state/source/wallets";
 import { Crypto, Managers } from "@packages/crypto";
 
 import { calculateActiveDelegates } from "./__utils__/calculate-active-delegates";

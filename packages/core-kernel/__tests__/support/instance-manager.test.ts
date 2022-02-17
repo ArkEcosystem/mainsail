@@ -1,4 +1,4 @@
-import { InstanceManager } from "../../../../packages/core-kernel/src/support/instance-manager";
+import { InstanceManager } from "../../../../packages/core-kernel/source/support/instance-manager";
 
 interface MyDriver {}
 class MyMemoryDriver implements MyDriver {}

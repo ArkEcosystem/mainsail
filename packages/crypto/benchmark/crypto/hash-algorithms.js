@@ -1,4 +1,4 @@
-const { Crypto, Transactions, Utils } = require("../../dist");
+const { Crypto, Transactions, Utils } = require("../../distribution");
 const createHash = require("create-hash");
 const hashWASM = require("hash-wasm");
 

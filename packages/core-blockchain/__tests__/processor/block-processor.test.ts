@@ -1,4 +1,4 @@
-import { BlockProcessor } from "@packages/core-blockchain/src/processor/block-processor";
+import { BlockProcessor } from "@packages/core-blockchain/source/processor/block-processor";
 import {
 	AcceptBlockHandler,
 	AlreadyForgedHandler,
@@ -8,9 +8,9 @@ import {
 	NonceOutOfOrderHandler,
 	UnchainedHandler,
 	VerificationFailedHandler,
-} from "@packages/core-blockchain/src/processor/handlers";
+} from "@packages/core-blockchain/source/processor/handlers";
 import { Container, Services } from "@packages/core-kernel";
-import { GetActiveDelegatesAction } from "@packages/core-state/src/actions";
+import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
 import { Sandbox } from "@packages/core-test-framework";
 import { Interfaces, Managers, Utils } from "@packages/crypto";
 

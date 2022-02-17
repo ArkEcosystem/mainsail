@@ -1,6 +1,6 @@
-import "@packages/core-test-framework/src/matchers/fields/address";
+import "@packages/core-test-framework/source/matchers/fields/address";
 import { Identities } from "@packages/crypto";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 
 let address: string;
 

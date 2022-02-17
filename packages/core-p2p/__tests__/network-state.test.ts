@@ -1,8 +1,8 @@
 import { Container, Utils as KernelUtils } from "@packages/core-kernel";
-import { NetworkStateStatus } from "@packages/core-p2p/src/enums";
-import { NetworkState } from "@packages/core-p2p/src/network-state";
-import { Peer } from "@packages/core-p2p/src/peer";
-import { PeerVerificationResult } from "@packages/core-p2p/src/peer-verifier";
+import { NetworkStateStatus } from "@packages/core-p2p/source/enums";
+import { NetworkState } from "@packages/core-p2p/source/network-state";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { PeerVerificationResult } from "@packages/core-p2p/source/peer-verifier";
 import { Blocks, Crypto, Utils } from "@packages/crypto";
 
 describe("NetworkState", () => {

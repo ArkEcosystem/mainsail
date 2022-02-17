@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Peer } from "@packages/core-p2p";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
 
 let factory: FactoryBuilder;
 

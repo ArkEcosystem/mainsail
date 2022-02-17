@@ -1,4 +1,4 @@
-const { pull } = require("../dist");
+const { pull } = require("../distribution");
 const lodash = require("lodash/pull");
 
 exports["utils"] = () => pull(["a", "b", "c", "a", "b", "c"], "a", "c");

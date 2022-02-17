@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Application, Container, Contracts, Services } from "@arkecosystem/core-kernel";
-import { ServiceProvider } from "@packages/core-transaction-pool/src";
+import { ServiceProvider } from "@packages/core-transaction-pool/source";
 import { fork } from "child_process";
 import { AnySchema } from "joi";
 
@@ -67,7 +67,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+				(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -98,7 +98,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-transaction-pool/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-transaction-pool/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -113,7 +113,7 @@ describe("ServiceProvider", () => {
 			it("should return true when process.env.CORE_TRANSACTION_POOL_DISABLED is undefined", async () => {
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -125,7 +125,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -139,7 +139,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -153,7 +153,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -165,7 +165,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -179,7 +179,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -191,7 +191,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -205,7 +205,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -217,7 +217,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-transaction-pool/src/defaults")).defaults,
+					(await import("@packages/core-transaction-pool/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -230,7 +230,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-transaction-pool/src/defaults")).defaults;
+				defaults = (await import("@packages/core-transaction-pool/source/defaults")).defaults;
 			});
 
 			it("enabled is required", async () => {

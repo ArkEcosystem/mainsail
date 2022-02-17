@@ -1,4 +1,4 @@
-const { cloneDeep } = require("../dist");
+const { cloneDeep } = require("../distribution");
 const lodash = require("lodash/cloneDeep");
 
 const objects = [

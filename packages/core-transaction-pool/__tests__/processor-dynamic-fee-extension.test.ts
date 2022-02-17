@@ -1,5 +1,5 @@
 import { Container } from "@packages/core-kernel";
-import { ProcessorDynamicFeeExtension } from "@packages/core-transaction-pool/src/processor-dynamic-fee-extension";
+import { ProcessorDynamicFeeExtension } from "@packages/core-transaction-pool/source/processor-dynamic-fee-extension";
 import { Identities, Managers, Transactions } from "@packages/crypto";
 
 Managers.configManager.getMilestone().aip11 = true;

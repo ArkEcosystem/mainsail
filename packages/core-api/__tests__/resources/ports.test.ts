@@ -1,10 +1,10 @@
 import "jest-extended";
 
-import { ServiceProvider as CoreApiServiceProvider } from "@packages/core-api/src";
-import { defaults } from "@packages/core-api/src/defaults";
-import { PortsResource } from "@packages/core-api/src/resources";
+import { ServiceProvider as CoreApiServiceProvider } from "@packages/core-api/source";
+import { defaults } from "@packages/core-api/source/defaults";
+import { PortsResource } from "@packages/core-api/source/resources";
 import { Application, Container, Providers } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
 import { Mocks } from "@packages/core-test-framework";
 
 import { initApp } from "../__support__";

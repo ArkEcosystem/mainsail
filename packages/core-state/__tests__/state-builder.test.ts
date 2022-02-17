@@ -1,9 +1,9 @@
 import "jest-extended";
 
 import { Enums, Utils } from "@packages/core-kernel";
-import { StateBuilder } from "@packages/core-state/src/state-builder";
-import { WalletRepository } from "@packages/core-state/src/wallets";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { StateBuilder } from "@packages/core-state/source/state-builder";
+import { WalletRepository } from "@packages/core-state/source/wallets";
+import { Sandbox } from "@packages/core-test-framework/source";
 import { Managers } from "@packages/crypto";
 
 import { setUp, setUpDefaults } from "./setup";

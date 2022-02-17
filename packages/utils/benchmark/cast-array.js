@@ -1,4 +1,4 @@
-const { castArray } = require("../dist");
+const { castArray } = require("../distribution");
 const lodash = require("lodash/castArray");
 
 exports["utils"] = () => castArray("abc");

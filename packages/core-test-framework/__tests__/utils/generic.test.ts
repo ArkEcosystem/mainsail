@@ -5,8 +5,8 @@ import { Generators, Sandbox } from "@packages/core-test-framework";
 import { Identities, Interfaces, Managers, Utils } from "@packages/crypto";
 import { Container } from "@packages/core-kernel";
 import { Mocks } from "@packages/core-test-framework";
-import { Block } from "@packages/core-database/src/models";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
+import { Block } from "@packages/core-database/source/models";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 import {
 	getLastHeight,
 	getSenderNonce,
@@ -14,7 +14,7 @@ import {
 	injectMilestone,
 	resetBlockchain,
 	snoozeForBlock,
-} from "@packages/core-test-framework/src/utils/generic";
+} from "@packages/core-test-framework/source/utils/generic";
 
 let sandbox: Sandbox;
 

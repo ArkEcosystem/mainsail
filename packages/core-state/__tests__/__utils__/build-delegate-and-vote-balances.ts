@@ -1,6 +1,6 @@
-import { Wallet, WalletRepository } from "@packages/core-state/src/wallets";
+import { Wallet, WalletRepository } from "@packages/core-state/source/wallets";
 import { Identities, Utils as CryptoUtils } from "@packages/crypto";
-import { SATOSHI } from "@packages/crypto/src/constants";
+import { SATOSHI } from "@packages/crypto/source/constants";
 
 export const buildDelegateAndVoteWallets = (numberDelegates: number, walletRepo: WalletRepository): Wallet[] => {
 	const delegates: Wallet[] = [];

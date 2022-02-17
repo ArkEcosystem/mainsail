@@ -1,4 +1,4 @@
-const { Blocks, Managers } = require("../../dist");
+const { Blocks, Managers } = require("../../distribution");
 
 const dataEmpty = require("../helpers").getJSONFixture("block/deserialized/no-transactions");
 const dataFull = require("../helpers").getJSONFixture("block/deserialized/transactions");

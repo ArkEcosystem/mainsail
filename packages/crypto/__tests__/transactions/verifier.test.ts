@@ -1,13 +1,13 @@
 import "jest-extended";
 
-import { Generators } from "@packages/core-test-framework/src";
-import { TransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
+import { Generators } from "@packages/core-test-framework/source";
+import { TransactionFactory } from "@packages/core-test-framework/source/utils/transaction-factory";
 import { Identities } from "@packages/crypto";
-import { Hash } from "@packages/crypto/src/crypto";
-import { Keys } from "@packages/crypto/src/identities";
-import { BuilderFactory, Utils as TransactionUtils, Verifier } from "@packages/crypto/src/transactions";
+import { Hash } from "@packages/crypto/source/crypto";
+import { Keys } from "@packages/crypto/source/identities";
+import { BuilderFactory, Utils as TransactionUtils, Verifier } from "@packages/crypto/source/transactions";
 
-import { configManager } from "../../../../packages/crypto/src/managers";
+import { configManager } from "../../../../packages/crypto/source/managers";
 import { createRandomTx } from "./__support__";
 
 beforeEach(() => {

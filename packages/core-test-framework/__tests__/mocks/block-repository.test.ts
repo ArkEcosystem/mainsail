@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { BlockRepository } from "@packages/core-test-framework/src/mocks";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { BlockRepository } from "@packages/core-test-framework/source/mocks";
 import { Identities } from "@packages/crypto";
 
 const delegateForgedBlock: BlockRepository.DelegateForgedBlock = {

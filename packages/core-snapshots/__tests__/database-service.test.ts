@@ -1,15 +1,15 @@
 import "jest-extended";
 
 import { Container, Providers } from "@packages/core-kernel";
-import { Queue } from "@packages/core-kernel/dist/contracts/kernel";
-import { interfaces } from "@packages/core-kernel/dist/ioc";
-import { MemoryQueue } from "@packages/core-kernel/dist/services/queue/drivers/memory";
-import { LocalFilesystem } from "@packages/core-kernel/src/services/filesystem/drivers/local";
-import { SnapshotDatabaseService } from "@packages/core-snapshots/src/database-service";
-import { Filesystem } from "@packages/core-snapshots/src/filesystem/filesystem";
-import { Identifiers } from "@packages/core-snapshots/src/ioc";
-import { ProgressDispatcher } from "@packages/core-snapshots/src/progress-dispatcher";
-import { BlockRepository, RoundRepository, TransactionRepository } from "@packages/core-snapshots/src/repositories";
+import { Queue } from "@packages/core-kernel/distribution/contracts/kernel";
+import { interfaces } from "@packages/core-kernel/distribution/ioc";
+import { MemoryQueue } from "@packages/core-kernel/distribution/services/queue/drivers/memory";
+import { LocalFilesystem } from "@packages/core-kernel/source/services/filesystem/drivers/local";
+import { SnapshotDatabaseService } from "@packages/core-snapshots/source/database-service";
+import { Filesystem } from "@packages/core-snapshots/source/filesystem/filesystem";
+import { Identifiers } from "@packages/core-snapshots/source/ioc";
+import { ProgressDispatcher } from "@packages/core-snapshots/source/progress-dispatcher";
+import { BlockRepository, RoundRepository, TransactionRepository } from "@packages/core-snapshots/source/repositories";
 import { Sandbox } from "@packages/core-test-framework";
 import { EventEmitter } from "events";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -39,7 +39,7 @@ class MockWorkerWrapper extends EventEmitter {
 
 let mockWorkerWrapper;
 
-jest.mock("@packages/core-snapshots/src/workers/worker-wrapper", () => {
+jest.mock("@packages/core-snapshots/source/workers/worker-wrapper", () => {
 	return {
 		WorkerWrapper: jest.fn().mockImplementation(() => {
 			return mockWorkerWrapper;

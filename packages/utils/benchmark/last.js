@@ -1,4 +1,4 @@
-const { last } = require("../dist");
+const { last } = require("../distribution");
 const lodash = require("lodash/last");
 
 exports["utils"] = () => last([1, 2, 3]);

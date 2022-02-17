@@ -1,4 +1,4 @@
-import { castFlagsToString } from "@packages/core-cli/src/utils/flags";
+import { castFlagsToString } from "@packages/core-cli/source/utils/flags";
 
 describe("castFlagsToString", () => {
 	it("should handle strings", () => {

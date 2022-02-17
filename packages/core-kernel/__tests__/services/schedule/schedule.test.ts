@@ -1,11 +1,11 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Container, Identifiers, interfaces } from "@packages/core-kernel/src/ioc";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
-import { BlockJob } from "@packages/core-kernel/src/services/schedule/block-job";
-import { CronJob } from "@packages/core-kernel/src/services/schedule/cron-job";
-import { Schedule } from "@packages/core-kernel/src/services/schedule/schedule";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container, Identifiers, interfaces } from "@packages/core-kernel/source/ioc";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
+import { BlockJob } from "@packages/core-kernel/source/services/schedule/block-job";
+import { CronJob } from "@packages/core-kernel/source/services/schedule/cron-job";
+import { Schedule } from "@packages/core-kernel/source/services/schedule/schedule";
 
 let app: Application;
 let container: interfaces.Container;

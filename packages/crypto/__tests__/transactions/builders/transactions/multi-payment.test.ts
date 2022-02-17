@@ -1,13 +1,13 @@
 import "jest-extended";
 
-import { Generators } from "@packages/core-test-framework/src";
-import { TransactionType } from "@packages/crypto/src/enums";
-import { MaximumPaymentCountExceededError } from "@packages/crypto/src/errors";
-import { configManager } from "@packages/crypto/src/managers";
-import { BuilderFactory } from "@packages/crypto/src/transactions";
-import { MultiPaymentBuilder } from "@packages/crypto/src/transactions/builders/transactions/multi-payment";
-import { Two } from "@packages/crypto/src/transactions/types";
-import { BigNumber } from "@packages/crypto/src/utils";
+import { Generators } from "@packages/core-test-framework/source";
+import { TransactionType } from "@packages/crypto/source/enums";
+import { MaximumPaymentCountExceededError } from "@packages/crypto/source/errors";
+import { configManager } from "@packages/crypto/source/managers";
+import { BuilderFactory } from "@packages/crypto/source/transactions";
+import { MultiPaymentBuilder } from "@packages/crypto/source/transactions/builders/transactions/multi-payment";
+import { Two } from "@packages/crypto/source/transactions/types";
+import { BigNumber } from "@packages/crypto/source/utils";
 
 let builder: MultiPaymentBuilder;
 

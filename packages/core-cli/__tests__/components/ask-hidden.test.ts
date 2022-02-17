@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { AskHidden } from "@packages/core-cli/src/components";
+import { AskHidden } from "@packages/core-cli/source/components";
 import prompts from "prompts";
 
 let cli;

@@ -1,11 +1,11 @@
 import "jest-extended";
 
-import { Contracts } from "@packages/core-kernel/src";
-import { Application } from "@packages/core-kernel/src/application";
-import { KernelEvent } from "@packages/core-kernel/src/enums/events";
-import { Container, Identifiers, interfaces } from "@packages/core-kernel/src/ioc";
-import { ServiceProvider, ServiceProviderRepository } from "@packages/core-kernel/src/providers";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
+import { Contracts } from "@packages/core-kernel/source";
+import { Application } from "@packages/core-kernel/source/application";
+import { KernelEvent } from "@packages/core-kernel/source/enums/events";
+import { Container, Identifiers, interfaces } from "@packages/core-kernel/source/ioc";
+import { ServiceProvider, ServiceProviderRepository } from "@packages/core-kernel/source/providers";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
 
 class StubListener implements Contracts.Kernel.EventListener {
 	public constructor(private readonly method?) {}

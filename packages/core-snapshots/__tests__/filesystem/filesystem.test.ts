@@ -1,9 +1,9 @@
 import "jest-extended";
 
 import { Container } from "@arkecosystem/core-kernel";
-import { LocalFilesystem } from "@packages/core-kernel/src/services/filesystem/drivers/local";
-import { Filesystem } from "@packages/core-snapshots/src/filesystem/filesystem";
-import { Identifiers } from "@packages/core-snapshots/src/ioc";
+import { LocalFilesystem } from "@packages/core-kernel/source/services/filesystem/drivers/local";
+import { Filesystem } from "@packages/core-snapshots/source/filesystem/filesystem";
+import { Identifiers } from "@packages/core-snapshots/source/ioc";
 import { Sandbox } from "@packages/core-test-framework";
 import { cloneDeep } from "lodash";
 import { dirSync, setGracefulCleanup } from "tmp";

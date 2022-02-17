@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import Joi from "joi";
-import { JoiValidator } from "@packages/core-kernel/src/services/validation/drivers/joi";
+import { JoiValidator } from "@packages/core-kernel/source/services/validation/drivers/joi";
 
 const schema = Joi.object({
 	username: Joi.string().alphanum().required(),

@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { StateStore } from "@packages/core-test-framework/src/mocks";
+import { StateStore } from "@packages/core-test-framework/source/mocks";
 import { Interfaces } from "@packages/crypto";
 
 let blockData: Partial<Interfaces.IBlockData> = {

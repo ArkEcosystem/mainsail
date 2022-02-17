@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { NonceOutOfOrderHandler } from "../../../../../packages/core-blockchain/src/processor/handlers/nonce-out-of-order-handler";
-import { BlockProcessorResult } from "../../../../../packages/core-blockchain/src/processor";
+import { NonceOutOfOrderHandler } from "../../../../../packages/core-blockchain/source/processor/handlers/nonce-out-of-order-handler";
+import { BlockProcessorResult } from "../../../../../packages/core-blockchain/source/processor";
 import { Interfaces } from "@arkecosystem/crypto";
 
 describe("NonceOutOfOrderHandler", () => {

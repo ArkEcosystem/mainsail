@@ -1,5 +1,5 @@
-import { QueueJob } from "@packages/core-kernel/src/contracts/kernel/queue";
-import { NullQueue } from "@packages/core-kernel/src/services/queue/drivers/null";
+import { QueueJob } from "@packages/core-kernel/source/contracts/kernel/queue";
+import { NullQueue } from "@packages/core-kernel/source/services/queue/drivers/null";
 
 class MyQueueJob implements QueueJob {
 	public async handle(): Promise<void> {}

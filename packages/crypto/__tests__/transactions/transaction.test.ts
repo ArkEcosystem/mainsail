@@ -1,12 +1,12 @@
 import "jest-extended";
 
-import { Address } from "../../../../packages/crypto/src/identities";
-import { configManager } from "../../../../packages/crypto/src/managers";
-import { devnet } from "../../../../packages/crypto/src/networks";
-import { TransactionFactory } from "../../../../packages/crypto/src/transactions";
-import { BuilderFactory } from "../../../../packages/crypto/src/transactions";
-import { Two } from "../../../../packages/crypto/src/transactions/types";
-import { BigNumber } from "../../../../packages/crypto/src/utils";
+import { Address } from "../../../../packages/crypto/source/identities";
+import { configManager } from "../../../../packages/crypto/source/managers";
+import { devnet } from "../../../../packages/crypto/source/networks";
+import { TransactionFactory } from "../../../../packages/crypto/source/transactions";
+import { BuilderFactory } from "../../../../packages/crypto/source/transactions";
+import { Two } from "../../../../packages/crypto/source/transactions/types";
+import { BigNumber } from "../../../../packages/crypto/source/utils";
 
 describe("Transaction", () => {
 	describe.skip("should deserialize correctly some tests transactions", () => {

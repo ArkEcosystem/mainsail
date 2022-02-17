@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { calculateBlockTime, isNewBlockTime } from "@packages/crypto/src/utils/block-time-calculator";
+import { calculateBlockTime, isNewBlockTime } from "@packages/crypto/source/utils/block-time-calculator";
 
-import { configManager } from "../../../../packages/crypto/src/managers/config";
+import { configManager } from "../../../../packages/crypto/source/managers/config";
 import milestones from "./fixtures/block-time-milestones.json";
 
 beforeEach(() => {

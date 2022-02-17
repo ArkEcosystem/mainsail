@@ -1,4 +1,4 @@
-const { isString } = require("../dist");
+const { isString } = require("../distribution");
 const lodash = require("lodash/isString");
 
 exports["utils"] = () => isString("abc");

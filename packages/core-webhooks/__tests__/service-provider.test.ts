@@ -1,11 +1,11 @@
 import "jest-extended";
 
-import { Identifiers, Server, ServiceProvider as CoreApiServiceProvider } from "@packages/core-api/src";
-import { defaults } from "@packages/core-api/src/defaults";
+import { Identifiers, Server, ServiceProvider as CoreApiServiceProvider } from "@packages/core-api/source";
+import { defaults } from "@packages/core-api/source/defaults";
 import { Application, Container, Providers } from "@packages/core-kernel";
-import { NullEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/null";
-import { ServiceProvider } from "@packages/core-webhooks/src";
-import { defaults as webhooksDefaults } from "@packages/core-webhooks/src/defaults";
+import { NullEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/null";
+import { ServiceProvider } from "@packages/core-webhooks/source";
+import { defaults as webhooksDefaults } from "@packages/core-webhooks/source/defaults";
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -157,7 +157,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-webhooks/src/defaults")).defaults,
+				(await import("@packages/core-webhooks/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -175,7 +175,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-webhooks/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-webhooks/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -192,7 +192,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-webhooks/src/defaults")).defaults,
+					(await import("@packages/core-webhooks/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -206,7 +206,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-webhooks/src/defaults")).defaults,
+					(await import("@packages/core-webhooks/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -220,7 +220,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-webhooks/src/defaults")).defaults,
+					(await import("@packages/core-webhooks/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -233,7 +233,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-webhooks/src/defaults")).defaults;
+				defaults = (await import("@packages/core-webhooks/source/defaults")).defaults;
 			});
 
 			it("enabled is required && is boolean", async () => {

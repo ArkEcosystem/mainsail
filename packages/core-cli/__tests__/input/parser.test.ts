@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { InputParser } from "@packages/core-cli/src/input";
+import { InputParser } from "@packages/core-cli/source/input";
 
 describe("InputParser", () => {
 	it("should parse the arguments and flags", () => {

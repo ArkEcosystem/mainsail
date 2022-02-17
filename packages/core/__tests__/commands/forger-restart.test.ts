@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/forger-restart";
+import { Command } from "@packages/core/source/commands/forger-restart";
 
 let cli;
 let processManager;

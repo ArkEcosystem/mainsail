@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Interfaces } from "@arkecosystem/crypto";
-import { BlockProcessorResult } from "@packages/core-blockchain/src/processor";
-import { RevertBlockHandler } from "@packages/core-blockchain/src/processor/handlers/revert-block-handler";
+import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
+import { RevertBlockHandler } from "@packages/core-blockchain/source/processor/handlers/revert-block-handler";
 
 describe("AcceptBlockHandler", () => {
 	const container = new Container.Container();

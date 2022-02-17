@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { factory } from "@packages/core-test-framework/src/factories/helpers";
+import { factory } from "@packages/core-test-framework/source/factories/helpers";
 
 describe("Helpers", () => {
 	it("should register all factories", async () => {

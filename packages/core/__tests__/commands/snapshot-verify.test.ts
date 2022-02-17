@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Utils } from "@packages/core-cli";
 import { Console, Sandbox } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/snapshot-verify";
+import { Command } from "@packages/core/source/commands/snapshot-verify";
 
 jest.mock("@packages/core-cli", () => {
 	const originalModule = jest.requireActual("@packages/core-cli");

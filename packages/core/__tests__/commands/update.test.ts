@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/update";
+import { Command } from "@packages/core/source/commands/update";
 import nock from "nock";
 import prompts from "prompts";
 

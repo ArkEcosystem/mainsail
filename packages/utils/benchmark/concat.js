@@ -1,4 +1,4 @@
-const { concat } = require("../dist");
+const { concat } = require("../distribution");
 const lodash = require("lodash/concat");
 
 exports["utils"] = () => concat([1], [2]);

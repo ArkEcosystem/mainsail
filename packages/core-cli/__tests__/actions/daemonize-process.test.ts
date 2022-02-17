@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { DaemonizeProcess } from "@packages/core-cli/src/actions";
+import { DaemonizeProcess } from "@packages/core-cli/source/actions";
 import os from "os";
 
 let cli;

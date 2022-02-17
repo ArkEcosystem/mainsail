@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/uninstall";
+import { Command } from "@packages/core/source/commands/uninstall";
 
 let cli;
 beforeEach(() => (cli = new Console()));

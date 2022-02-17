@@ -1,5 +1,5 @@
 import { Transactions } from "@packages/crypto";
-import { ITransaction } from "@packages/crypto/dist/interfaces";
+import { ITransaction } from "@packages/crypto/distribution/interfaces";
 
 export const makeVoteTransactions = (length: number, voteAssets: string[]): ITransaction[] => {
 	const txs: ITransaction[] = [];

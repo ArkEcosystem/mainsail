@@ -1,13 +1,13 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { PeersController } from "@packages/core-api/src/controllers/peers";
-import { register } from "@packages/core-api/src/routes/peers";
-import { Server } from "@packages/core-api/src/server";
+import { PeersController } from "@packages/core-api/source/controllers/peers";
+import { register } from "@packages/core-api/source/routes/peers";
+import { Server } from "@packages/core-api/source/server";
 
 import { initApp, initServer } from "../__support__";
 import { paginatedResult, serverDefaults } from "./__fixtures__";
 
 Container.decorate(Container.injectable(), PeersController);
-jest.mock("@packages/core-api/src/controllers/peers");
+jest.mock("@packages/core-api/source/controllers/peers");
 
 let app;
 let server: Server;

@@ -1,4 +1,4 @@
-import { SnakeNamingStrategy } from "../../../../packages/core-database/src/utils/snake-naming-strategy";
+import { SnakeNamingStrategy } from "../../../../packages/core-database/source/utils/snake-naming-strategy";
 
 describe("SnakeNamingStrategy.tableName", () => {
 	it("should convert class name to snake-case table name", () => {

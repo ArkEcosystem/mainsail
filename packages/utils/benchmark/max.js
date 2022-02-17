@@ -1,4 +1,4 @@
-const { max } = require("../dist");
+const { max } = require("../distribution");
 const lodash = require("lodash/max");
 
 exports["utils"] = () => max([4, 2, 8, 6]);

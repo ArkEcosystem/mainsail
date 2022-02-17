@@ -1,13 +1,13 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { NodeController } from "@packages/core-api/src/controllers/node";
-import { register } from "@packages/core-api/src/routes/node";
-import { Server } from "@packages/core-api/src/server";
+import { NodeController } from "@packages/core-api/source/controllers/node";
+import { register } from "@packages/core-api/source/routes/node";
+import { Server } from "@packages/core-api/source/server";
 
 import { initApp, initServer } from "../__support__";
 import { serverDefaults } from "./__fixtures__";
 
 Container.decorate(Container.injectable(), NodeController);
-jest.mock("@packages/core-api/src/controllers/node");
+jest.mock("@packages/core-api/source/controllers/node");
 
 let app;
 let server: Server;

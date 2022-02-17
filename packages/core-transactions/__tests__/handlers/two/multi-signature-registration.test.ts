@@ -1,14 +1,14 @@
 import "jest-extended";
 
 import { Application, Contracts, Exceptions, Services } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
 import { Wallets } from "@packages/core-state";
-import { StateStore } from "@packages/core-state/src/stores/state";
-import { Generators } from "@packages/core-test-framework/src";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { getWalletAttributeSet } from "@packages/core-test-framework/src/internal/wallet-attributes";
-import { Mempool } from "@packages/core-transaction-pool/src/mempool";
+import { StateStore } from "@packages/core-state/source/stores/state";
+import { Generators } from "@packages/core-test-framework/source";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
+import { Mempool } from "@packages/core-transaction-pool/source/mempool";
 import {
 	InsufficientBalanceError,
 	InvalidMultiSignatureError,
@@ -16,13 +16,13 @@ import {
 	MultiSignatureAlreadyRegisteredError,
 	// MultiSignatureKeyCountMismatchError,
 	// MultiSignatureMinimumKeysError,
-} from "@packages/core-transactions/src/errors";
-import { TransactionHandler } from "@packages/core-transactions/src/handlers";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
+} from "@packages/core-transactions/source/errors";
+import { TransactionHandler } from "@packages/core-transactions/source/handlers";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
 import { Crypto, Enums, Errors, Identities, Interfaces, Managers, Transactions, Utils } from "@packages/crypto";
-import { BuilderFactory } from "@packages/crypto/dist/transactions";
-import { IMultiSignatureAsset, IMultiSignatureLegacyAsset } from "@packages/crypto/src/interfaces";
-import { configManager } from "@packages/crypto/src/managers";
+import { BuilderFactory } from "@packages/crypto/distribution/transactions";
+import { IMultiSignatureAsset, IMultiSignatureLegacyAsset } from "@packages/crypto/source/interfaces";
+import { configManager } from "@packages/crypto/source/managers";
 
 import { buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 

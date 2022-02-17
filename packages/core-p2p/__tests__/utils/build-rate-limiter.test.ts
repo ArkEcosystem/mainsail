@@ -1,5 +1,5 @@
-import { buildRateLimiter } from "@packages/core-p2p/src/utils/build-rate-limiter";
-import { RateLimiter } from "@packages/core-p2p/src/rate-limiter";
+import { buildRateLimiter } from "@packages/core-p2p/source/utils/build-rate-limiter";
+import { RateLimiter } from "@packages/core-p2p/source/rate-limiter";
 
 describe("buildRateLimiter", () => {
 	it("should return instance of RateLimiter", () => {

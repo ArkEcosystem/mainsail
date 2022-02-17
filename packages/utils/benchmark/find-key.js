@@ -1,4 +1,4 @@
-const { findKey } = require("../dist");
+const { findKey } = require("../distribution");
 const lodash = require("lodash/findKey");
 
 const users = {

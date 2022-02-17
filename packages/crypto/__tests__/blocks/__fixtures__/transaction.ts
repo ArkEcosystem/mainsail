@@ -1,4 +1,4 @@
-import { BigNumber } from "../../../../../packages/crypto/src/utils";
+import { BigNumber } from "../../../../../packages/crypto/source/utils";
 
 export const transaction = {
 	version: 1,

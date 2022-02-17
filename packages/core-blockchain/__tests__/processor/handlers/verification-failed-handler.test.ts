@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { VerificationFailedHandler } from "../../../../../packages/core-blockchain/src/processor/handlers/verification-failed-handler";
-import { BlockProcessorResult } from "../../../../../packages/core-blockchain/src/processor";
+import { VerificationFailedHandler } from "../../../../../packages/core-blockchain/source/processor/handlers/verification-failed-handler";
+import { BlockProcessorResult } from "../../../../../packages/core-blockchain/source/processor";
 import { Interfaces } from "@arkecosystem/crypto";
 
 describe("VerificationFailedHandler", () => {

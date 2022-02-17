@@ -3,8 +3,8 @@ import "jest-extended";
 import { Container, Contracts, Services } from "@packages/core-kernel";
 import { Wallets } from "@packages/core-state";
 import { Managers, Utils } from "@arkecosystem/crypto";
-import { calculateApproval, calculateForgedTotal } from "@packages/core-kernel/src/utils/delegate-calculator";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { calculateApproval, calculateForgedTotal } from "@packages/core-kernel/source/utils/delegate-calculator";
+import { Sandbox } from "@packages/core-test-framework/source";
 
 let sandbox: Sandbox;
 

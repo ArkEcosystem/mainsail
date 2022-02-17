@@ -1,9 +1,9 @@
 import "jest-extended";
 
 import { Container, Contracts } from "@packages/core-kernel";
-import { SnapshotApplicationEvents } from "@packages/core-snapshots/src";
-import { Identifiers } from "@packages/core-snapshots/src/ioc";
-import { ProgressDispatcher } from "@packages/core-snapshots/src/progress-dispatcher";
+import { SnapshotApplicationEvents } from "@packages/core-snapshots/source";
+import { Identifiers } from "@packages/core-snapshots/source/ioc";
+import { ProgressDispatcher } from "@packages/core-snapshots/source/progress-dispatcher";
 import { Sandbox } from "@packages/core-test-framework";
 
 let sandbox: Sandbox;

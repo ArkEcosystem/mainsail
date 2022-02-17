@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { LoadCryptography } from "@packages/core-kernel/src/bootstrap/app";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { ConfigRepository } from "@packages/core-kernel/src/services/config";
+import { Application } from "@packages/core-kernel/source/application";
+import { LoadCryptography } from "@packages/core-kernel/source/bootstrap/app";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { ConfigRepository } from "@packages/core-kernel/source/services/config";
 
 let app: Application;
 let configRepository: ConfigRepository;

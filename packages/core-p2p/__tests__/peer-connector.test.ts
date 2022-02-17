@@ -1,9 +1,9 @@
 import "jest-extended";
 
 import { Container } from "@arkecosystem/core-kernel";
-import * as Nes from "@packages/core-p2p/src/hapi-nes";
-import { Peer } from "@packages/core-p2p/src/peer";
-import { PeerConnector } from "@packages/core-p2p/src/peer-connector";
+import * as Nes from "@packages/core-p2p/source/hapi-nes";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { PeerConnector } from "@packages/core-p2p/source/peer-connector";
 
 import { NesClient } from "./mocks/nes";
 

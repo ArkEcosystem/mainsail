@@ -1,4 +1,8 @@
-import { InvalidCriteria, UnexpectedError, UnsupportedValue } from "@packages/core-kernel/src/services/search/errors";
+import {
+	InvalidCriteria,
+	UnexpectedError,
+	UnsupportedValue,
+} from "@packages/core-kernel/source/services/search/errors";
 
 describe("InvalidCriteria", () => {
 	it("should create", () => {

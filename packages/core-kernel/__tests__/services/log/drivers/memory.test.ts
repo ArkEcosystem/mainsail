@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Logger } from "@packages/core-kernel/src/contracts/kernel/log";
-import { Container } from "@packages/core-kernel/src/ioc";
-import { MemoryLogger } from "@packages/core-kernel/src/services/log/drivers/memory";
+import { Application } from "@packages/core-kernel/source/application";
+import { Logger } from "@packages/core-kernel/source/contracts/kernel/log";
+import { Container } from "@packages/core-kernel/source/ioc";
+import { MemoryLogger } from "@packages/core-kernel/source/services/log/drivers/memory";
 import capcon from "capture-console";
 
 let logger: Logger;

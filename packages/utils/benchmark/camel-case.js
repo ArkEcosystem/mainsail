@@ -1,4 +1,4 @@
-const { camelCase } = require("../dist");
+const { camelCase } = require("../distribution");
 const lodash = require("lodash/camelCase");
 
 exports["utils"] = () => camelCase("Foo Bar");

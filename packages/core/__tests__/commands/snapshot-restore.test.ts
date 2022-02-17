@@ -1,5 +1,5 @@
 import { Console, Sandbox } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/snapshot-restore";
+import { Command } from "@packages/core/source/commands/snapshot-restore";
 import { Container } from "@arkecosystem/core-kernel";
 import { Utils } from "@arkecosystem/core-cli";
 

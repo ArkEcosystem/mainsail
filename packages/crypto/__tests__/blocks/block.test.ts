@@ -1,13 +1,13 @@
 import "jest-extended";
 
-import { BIP39 } from "@packages/core-forger/src/methods/bip39";
-import { TransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
+import { BIP39 } from "@packages/core-forger/source/methods/bip39";
+import { TransactionFactory } from "@packages/core-test-framework/source/utils/transaction-factory";
 import { Managers, Utils } from "@packages/crypto";
-import { Block, BlockFactory, Deserializer, Serializer } from "@packages/crypto/src/blocks";
-import { Slots } from "@packages/crypto/src/crypto";
-import { configManager } from "@packages/crypto/src/managers";
-import * as networks from "@packages/crypto/src/networks";
-import { NetworkName } from "@packages/crypto/src/types";
+import { Block, BlockFactory, Deserializer, Serializer } from "@packages/crypto/source/blocks";
+import { Slots } from "@packages/crypto/source/crypto";
+import { configManager } from "@packages/crypto/source/managers";
+import * as networks from "@packages/crypto/source/networks";
+import { NetworkName } from "@packages/crypto/source/types";
 import ByteBuffer from "bytebuffer";
 
 import { dummyBlock, dummyBlock2, dummyBlockSize } from "../fixtures/block";

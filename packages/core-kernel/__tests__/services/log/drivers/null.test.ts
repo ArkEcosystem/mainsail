@@ -1,4 +1,4 @@
-import { NullLogger } from "../../../../../../packages/core-kernel/src/services/log/drivers/null";
+import { NullLogger } from "../../../../../../packages/core-kernel/source/services/log/drivers/null";
 
 describe("NullLogger.make", () => {
 	it("should return instance itself", async () => {

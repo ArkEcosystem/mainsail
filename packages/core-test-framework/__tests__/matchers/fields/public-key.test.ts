@@ -1,6 +1,6 @@
-import "@packages/core-test-framework/src/matchers/fields/public-key";
+import "@packages/core-test-framework/source/matchers/fields/public-key";
 import { Identities } from "@packages/crypto";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 
 let publicKey: string;
 

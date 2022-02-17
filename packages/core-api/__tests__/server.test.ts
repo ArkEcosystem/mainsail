@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { preparePlugins } from "@packages/core-api/src/plugins";
-import { Server } from "@packages/core-api/src/server";
+import { preparePlugins } from "@packages/core-api/source/plugins";
+import { Server } from "@packages/core-api/source/server";
 import { Application, Container, Providers } from "@packages/core-kernel";
 
 import { initApp } from "./__support__";

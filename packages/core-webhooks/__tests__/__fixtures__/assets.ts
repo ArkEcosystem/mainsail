@@ -1,4 +1,4 @@
-import { Webhook } from "@packages/core-webhooks/src/interfaces";
+import { Webhook } from "@packages/core-webhooks/source/interfaces";
 
 export const dummyWebhook: Webhook = {
 	id: "id",

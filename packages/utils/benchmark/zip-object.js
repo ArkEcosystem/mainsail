@@ -1,4 +1,4 @@
-const { zipObject } = require("../dist");
+const { zipObject } = require("../distribution");
 const lodash = require("lodash/zipObject");
 
 exports["utils"] = () => zipObject(["a", "b"], [1, 2]);

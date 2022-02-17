@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { DelegateFactory } from "@packages/core-forger/src/delegate-factory";
-import { ServiceProvider } from "@packages/core-forger/src/service-provider";
+import { DelegateFactory } from "@packages/core-forger/source/delegate-factory";
+import { ServiceProvider } from "@packages/core-forger/source/service-provider";
 import { Application, Container, Providers } from "@packages/core-kernel";
-import { Pm2ProcessActionsService } from "@packages/core-kernel/src/services/process-actions/drivers/pm2";
+import { Pm2ProcessActionsService } from "@packages/core-kernel/source/services/process-actions/drivers/pm2";
 import { AnySchema } from "joi";
 
 describe("ServiceProvider", () => {
@@ -154,7 +154,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-forger/src/defaults")).defaults,
+				(await import("@packages/core-forger/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -174,7 +174,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-forger/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-forger/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -191,7 +191,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-forger/src/defaults")).defaults,
+					(await import("@packages/core-forger/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -203,7 +203,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-forger/src/defaults")).defaults,
+					(await import("@packages/core-forger/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -216,7 +216,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-forger/src/defaults")).defaults;
+				defaults = (await import("@packages/core-forger/source/defaults")).defaults;
 			});
 
 			it("hosts is required && must be array", async () => {

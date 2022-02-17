@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { JSONCodec } from "@packages/core-snapshots/src/codecs";
+import { JSONCodec } from "@packages/core-snapshots/source/codecs";
 import { decamelize } from "xcase";
 
 import { Assets } from "../__fixtures__";

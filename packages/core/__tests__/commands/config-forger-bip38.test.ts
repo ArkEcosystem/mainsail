@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/config-forger-bip38";
+import { Command } from "@packages/core/source/commands/config-forger-bip38";
 import { writeJSONSync } from "fs-extra";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";

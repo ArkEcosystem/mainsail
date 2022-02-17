@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { TransactionRepository } from "@packages/core-snapshots/src/repositories";
+import { TransactionRepository } from "@packages/core-snapshots/source/repositories";
 
 class MockQueryBuilder {
 	public where(...data) {

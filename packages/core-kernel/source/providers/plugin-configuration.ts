@@ -53,7 +53,7 @@ export class PluginConfiguration {
 	 */
 	public discover(name: string, packageId: string): this {
 		try {
-			this.items = require(`${packageId}/dist/defaults.js`).defaults;
+			this.items = require(`${packageId}/distribution/defaults.js`).defaults;
 		} catch {
 			// Failed to discover the defaults configuration file. This can be intentional.
 		}

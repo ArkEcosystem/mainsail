@@ -1,7 +1,7 @@
 import { Container, Services } from "@arkecosystem/core-kernel";
-import { BlockProcessorResult } from "@packages/core-blockchain/src/processor";
-import { UnchainedHandler } from "@packages/core-blockchain/src/processor/handlers/unchained-handler";
-import { GetActiveDelegatesAction } from "@packages/core-state/src/actions";
+import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
+import { UnchainedHandler } from "@packages/core-blockchain/source/processor/handlers/unchained-handler";
+import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
 import { Sandbox } from "@packages/core-test-framework";
 import { Interfaces } from "@packages/crypto";
 

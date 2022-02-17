@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/env-paths";
+import { Command } from "@packages/core/source/commands/env-paths";
 import envPaths, { Paths } from "env-paths";
 
 let cli;

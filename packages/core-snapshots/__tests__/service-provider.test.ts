@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Container } from "@packages/core-kernel";
-import { ServiceProvider } from "@packages/core-snapshots/src";
+import { ServiceProvider } from "@packages/core-snapshots/source";
 import { Sandbox } from "@packages/core-test-framework";
 import { AnySchema } from "joi";
 import * as typeorm from "typeorm";
@@ -73,7 +73,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-snapshots/src/defaults")).defaults,
+				(await import("@packages/core-snapshots/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -84,7 +84,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-snapshots/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-snapshots/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -100,7 +100,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-snapshots/src/defaults")).defaults;
+				defaults = (await import("@packages/core-snapshots/source/defaults")).defaults;
 			});
 
 			it("updateStep is required && is integer && >= 1 && <= 2000", async () => {

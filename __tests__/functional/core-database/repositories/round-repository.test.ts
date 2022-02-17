@@ -3,7 +3,7 @@ import { Utils } from "@arkecosystem/crypto";
 import { Connection, getCustomRepository } from "typeorm";
 
 import { clearCoreDatabase, getCoreDatabaseConnection } from "../__support__";
-import { RoundRepository } from "../../../../packages/core-database/src/repositories/round-repository";
+import { RoundRepository } from "../../../../packages/core-database/source/repositories/round-repository";
 
 class DelegateWalletMock {
 	public readonly publicKey: string;

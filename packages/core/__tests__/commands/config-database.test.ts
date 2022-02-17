@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/config-database";
+import { Command } from "@packages/core/source/commands/config-database";
 import envfile from "envfile";
 import fs from "fs-extra";
 import prompts from "prompts";

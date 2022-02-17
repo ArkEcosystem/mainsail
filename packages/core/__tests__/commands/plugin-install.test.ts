@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/plugin-install";
+import { Command } from "@packages/core/source/commands/plugin-install";
 import { Container } from "@packages/core-cli";
 
 let cli;

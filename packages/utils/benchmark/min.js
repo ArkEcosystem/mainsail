@@ -1,4 +1,4 @@
-const { min } = require("../dist");
+const { min } = require("../distribution");
 const lodash = require("lodash/min");
 
 exports["utils"] = () => min([4, 2, 8, 6]);

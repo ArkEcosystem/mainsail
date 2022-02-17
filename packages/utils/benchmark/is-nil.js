@@ -1,4 +1,4 @@
-const { isNil } = require("../dist");
+const { isNil } = require("../distribution");
 const lodash = require("lodash/isNil");
 
 exports["utils"] = () => isNil("abc");

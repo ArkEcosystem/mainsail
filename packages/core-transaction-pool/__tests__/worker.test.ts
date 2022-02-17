@@ -1,5 +1,5 @@
 import { Container } from "@packages/core-kernel";
-import { Worker } from "@packages/core-transaction-pool/src/worker";
+import { Worker } from "@packages/core-transaction-pool/source/worker";
 import { Identities, Managers, Transactions } from "@packages/crypto";
 
 const createWorkerSubprocess = jest.fn();

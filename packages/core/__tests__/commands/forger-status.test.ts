@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/forger-status";
+import { Command } from "@packages/core/source/commands/forger-status";
 
 let cli;
 let processManager;

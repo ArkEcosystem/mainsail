@@ -1,5 +1,5 @@
-import { BIP39 } from "@packages/core-forger/src/methods/bip39";
-import { TransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
+import { BIP39 } from "@packages/core-forger/source/methods/bip39";
+import { TransactionFactory } from "@packages/core-test-framework/source/utils/transaction-factory";
 import { Utils } from "@packages/crypto";
 
 export const dummy = {

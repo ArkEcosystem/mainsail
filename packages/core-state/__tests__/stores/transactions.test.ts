@@ -1,6 +1,6 @@
-import { TransactionStore } from "@packages/core-state/src/stores/transactions";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import { ITransaction } from "@packages/crypto/src/interfaces";
+import { TransactionStore } from "@packages/core-state/source/stores/transactions";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { ITransaction } from "@packages/crypto/source/interfaces";
 
 let factory: FactoryBuilder;
 

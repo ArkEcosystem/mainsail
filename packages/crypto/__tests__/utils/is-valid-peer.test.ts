@@ -2,7 +2,7 @@ import "jest-extended";
 
 import os from "os";
 
-import { isValidPeer } from "../../../../packages/crypto/src/utils/is-valid-peer";
+import { isValidPeer } from "../../../../packages/crypto/source/utils/is-valid-peer";
 
 describe("isValidPeer", () => {
 	it("should not be ok for 127.0.0.1", () => {

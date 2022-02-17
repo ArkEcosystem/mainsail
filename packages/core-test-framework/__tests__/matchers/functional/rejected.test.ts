@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/functional/rejected";
+import "@packages/core-test-framework/source/matchers/functional/rejected";
 import { Interfaces } from "@packages/crypto";
 import got from "got";
 

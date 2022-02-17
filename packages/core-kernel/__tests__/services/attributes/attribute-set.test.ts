@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { AttributeSet } from "@packages/core-kernel/src/services/attributes/attribute-set";
+import { AttributeSet } from "@packages/core-kernel/source/services/attributes/attribute-set";
 
 let set: AttributeSet;
 

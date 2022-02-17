@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { ServiceProviderRepository } from "@packages/core-test-framework/src/mocks";
+import { ServiceProviderRepository } from "@packages/core-test-framework/source/mocks";
 import { ServiceProvider } from "@packages/core-webhooks";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { Sandbox } from "@packages/core-test-framework/source";
 
 const clear = () => {
 	ServiceProviderRepository.setServiceProviders([]);

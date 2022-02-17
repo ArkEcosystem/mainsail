@@ -1,4 +1,4 @@
-const { minBy } = require("../dist");
+const { minBy } = require("../distribution");
 const lodash = require("lodash/minBy");
 
 const objects = [

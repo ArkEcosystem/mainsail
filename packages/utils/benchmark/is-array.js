@@ -1,4 +1,4 @@
-const { isArray } = require("../dist");
+const { isArray } = require("../distribution");
 const lodash = require("lodash/isArray");
 
 exports["utils"] = () => isArray("abc");

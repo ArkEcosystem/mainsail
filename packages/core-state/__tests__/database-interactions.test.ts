@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { DatabaseService } from "@packages/core-database";
 import { Container, Enums } from "@packages/core-kernel";
-import { DatabaseInteraction } from "@packages/core-state/src/database-interactions";
+import { DatabaseInteraction } from "@packages/core-state/source/database-interactions";
 
 const app = {
 	get: jest.fn(),

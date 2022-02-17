@@ -11,10 +11,10 @@
 		"Juan A. Martín <juan@ark.io>",
 		"Joshua Noack <joshua@ark.io>"
 	],
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"bench": "node benchmark/index.js",

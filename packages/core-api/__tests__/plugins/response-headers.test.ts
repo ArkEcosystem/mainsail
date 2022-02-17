@@ -1,4 +1,4 @@
-import { responseHeaders } from "@packages/core-api/src/plugins/response-headers";
+import { responseHeaders } from "@packages/core-api/source/plugins/response-headers";
 
 const getLastHeight = jest.fn();
 const app = { get: (id) => ({ getLastHeight }) };

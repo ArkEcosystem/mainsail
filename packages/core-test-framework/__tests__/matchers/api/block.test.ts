@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/api/block";
+import "@packages/core-test-framework/source/matchers/api/block";
 import { Utils } from "@packages/crypto";
 
 let block: any;

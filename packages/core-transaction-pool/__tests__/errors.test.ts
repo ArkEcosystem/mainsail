@@ -14,7 +14,7 @@ import {
 	TransactionFromWrongNetworkError,
 	TransactionHasExpiredError,
 	TransactionPoolFullError,
-} from "../../../packages/core-transaction-pool/src/errors";
+} from "../../../packages/core-transaction-pool/source/errors";
 
 Managers.configManager.getMilestone().aip11 = true;
 const transaction = Transactions.BuilderFactory.transfer()

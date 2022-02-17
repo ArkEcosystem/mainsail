@@ -1,11 +1,11 @@
 import "jest-extended";
 
-import { DelegateTracker } from "@packages/core-forger/src/delegate-tracker";
+import { DelegateTracker } from "@packages/core-forger/source/delegate-tracker";
 import { Container, Services } from "@packages/core-kernel";
-import { GetActiveDelegatesAction } from "@packages/core-state/src/actions";
-import { Wallet } from "@packages/core-state/src/wallets";
-import { Sandbox } from "@packages/core-test-framework/src";
-import { Managers } from "@packages/crypto/src";
+import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
+import { Wallet } from "@packages/core-state/source/wallets";
+import { Sandbox } from "@packages/core-test-framework/source";
+import { Managers } from "@packages/crypto/source";
 
 export const mockLastBlock = {
 	data: { height: 3, timestamp: 16 },

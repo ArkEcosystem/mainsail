@@ -33,8 +33,8 @@ export const versionLatest = {
 					email: "alex@ark.io",
 				},
 			],
-			main: "dist/index",
-			types: "dist/index",
+			main: "distribution/index",
+			types: "distribution/index",
 			bin: {
 				ark: "./bin/run",
 			},
@@ -44,7 +44,7 @@ export const versionLatest = {
 				"build:watch": "yarn clean && yarn copy && yarn compile -w",
 				clean: "del dist",
 				compile: "../../node_modules/typescript/bin/tsc",
-				copy: "cd ./src && cpy './config' '../dist/' --parents && cd ..",
+				copy: "cd ./source && cpy './config' '../distribution/' --parents && cd ..",
 				"debug:forger": "node --inspect-brk yarn ark forger:run",
 				"debug:relay": "node --inspect-brk yarn ark relay:run",
 				"debug:start": "node --inspect-brk yarn ark core:run",
@@ -133,10 +133,10 @@ export const versionLatest = {
 				access: "public",
 			},
 			oclif: {
-				commands: "./dist/commands",
+				commands: "./distribution/commands",
 				hooks: {
-					init: ["./dist/hooks/init/config", "./dist/hooks/init/update"],
-					command_not_found: ["./dist/hooks/command_not_found/suggest"],
+					init: ["./distribution/hooks/init/config", "./distribution/hooks/init/update"],
+					command_not_found: ["./distribution/hooks/command_not_found/suggest"],
 				},
 				bin: "ark",
 				topics: {
@@ -219,8 +219,8 @@ export const versionNext = {
 					email: "alex@ark.io",
 				},
 			],
-			main: "dist/index",
-			types: "dist/index",
+			main: "distribution/index",
+			types: "distribution/index",
 			bin: {
 				ark: "./bin/run",
 			},
@@ -230,7 +230,7 @@ export const versionNext = {
 				"build:watch": "yarn clean && yarn copy && yarn compile -w",
 				clean: "del dist",
 				compile: "../../node_modules/typescript/bin/tsc",
-				copy: "cd ./src && cpy './config' '../dist/' --parents && cd ..",
+				copy: "cd ./source && cpy './config' '../distribution/' --parents && cd ..",
 				"debug:forger": "node --inspect-brk yarn ark forger:run",
 				"debug:relay": "node --inspect-brk yarn ark relay:run",
 				"debug:start": "node --inspect-brk yarn ark core:run",
@@ -319,10 +319,10 @@ export const versionNext = {
 				access: "public",
 			},
 			oclif: {
-				commands: "./dist/commands",
+				commands: "./distribution/commands",
 				hooks: {
-					init: ["./dist/hooks/init/config", "./dist/hooks/init/update"],
-					command_not_found: ["./dist/hooks/command_not_found/suggest"],
+					init: ["./distribution/hooks/init/config", "./distribution/hooks/init/update"],
+					command_not_found: ["./distribution/hooks/command_not_found/suggest"],
 				},
 				bin: "ark",
 				topics: {

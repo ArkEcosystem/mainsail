@@ -4,7 +4,7 @@ import {
 	WalletIndexAlreadyRegisteredError,
 	WalletIndexNotFoundError,
 	WalletsError,
-} from "@packages/core-state/src/wallets/errors";
+} from "@packages/core-state/source/wallets/errors";
 
 describe("WalletErrors", () => {
 	it("should construct base wallet error", () => {

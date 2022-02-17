@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { Slots } from "@packages/crypto/src/crypto/slots";
-import { configManager } from "@packages/crypto/src/managers/config";
-import { devnet } from "@packages/crypto/src/networks";
+import { Slots } from "@packages/crypto/source/crypto/slots";
+import { configManager } from "@packages/crypto/source/managers/config";
+import { devnet } from "@packages/crypto/source/networks";
 
 afterEach(() => jest.clearAllMocks());
 

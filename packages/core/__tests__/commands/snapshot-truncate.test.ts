@@ -1,7 +1,7 @@
 import { Utils } from "@arkecosystem/core-cli";
 import { Container } from "@arkecosystem/core-kernel";
 import { Console, Sandbox } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/snapshot-truncate";
+import { Command } from "@packages/core/source/commands/snapshot-truncate";
 
 jest.mock("@packages/core-cli", () => {
 	const originalModule = jest.requireActual("@packages/core-cli");

@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/api/response";
+import "@packages/core-test-framework/source/matchers/api/response";
 
 let response: any;
 

@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { PeerRepository } from "@packages/core-test-framework/src/mocks";
+import { PeerRepository } from "@packages/core-test-framework/source/mocks";
 import { Contracts } from "@packages/core-kernel";
 
 let peer: Partial<Contracts.P2P.Peer> = {

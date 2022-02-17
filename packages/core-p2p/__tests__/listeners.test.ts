@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { DisconnectInvalidPeers, DisconnectPeer } from "@packages/core-p2p/src/listeners";
-import { Peer } from "@packages/core-p2p/src/peer";
+import { DisconnectInvalidPeers, DisconnectPeer } from "@packages/core-p2p/source/listeners";
+import { Peer } from "@packages/core-p2p/source/peer";
 
 describe("DisconnectInvalidPeers", () => {
 	let disconnectInvalidPeers: DisconnectInvalidPeers;

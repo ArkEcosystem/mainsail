@@ -1,4 +1,4 @@
-const { truncate } = require("../dist");
+const { truncate } = require("../distribution");
 const lodash = require("lodash/truncate");
 
 exports["utils"] = () =>

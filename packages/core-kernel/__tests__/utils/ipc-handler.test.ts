@@ -1,4 +1,4 @@
-import { IpcHandler } from "../../../../packages/core-kernel/src/utils/ipc-handler";
+import { IpcHandler } from "../../../../packages/core-kernel/source/utils/ipc-handler";
 
 type MyRpcInterface = {
 	myRpcActionMethod(a: number, b: number): void;

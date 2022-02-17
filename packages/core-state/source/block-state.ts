@@ -126,7 +126,7 @@ export class BlockState implements Contracts.State.BlockState {
 	}
 
 	public increaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: AppUtils.BigNumber) {
-		// ? packages/core-transactions/src/handlers/one/vote.ts:L120 blindly sets "vote" attribute
+		// ? packages/core-transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
 		// ? is it guaranteed that delegate wallet exists, so delegateWallet.getAttribute("delegate.voteBalance") is safe?
 		if (wallet.hasVoted()) {
 			const delegatePulicKey = wallet.getAttribute<string>("vote");

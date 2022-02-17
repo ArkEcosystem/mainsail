@@ -1,4 +1,4 @@
-import { BIP39 } from "@packages/core-forger/src/methods/bip39";
+import { BIP39 } from "@packages/core-forger/source/methods/bip39";
 import { Identities } from "@packages/crypto";
 
 import { dummy, optionsDefault, transactions } from "../__utils__/create-block-with-transactions";

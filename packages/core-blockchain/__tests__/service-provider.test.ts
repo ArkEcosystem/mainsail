@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { ServiceProvider } from "@packages/core-blockchain/src/service-provider";
+import { ServiceProvider } from "@packages/core-blockchain/source/service-provider";
 import { Application, Container, Providers } from "@packages/core-kernel";
-import { Services } from "@packages/core-kernel/dist";
+import { Services } from "@packages/core-kernel/distribution";
 import { AnySchema } from "joi";
 
 describe("ServiceProvider", () => {
@@ -81,7 +81,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-blockchain/src/defaults")).defaults,
+				(await import("@packages/core-blockchain/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -92,7 +92,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-blockchain/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-blockchain/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -108,7 +108,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-blockchain/src/defaults")).defaults;
+				defaults = (await import("@packages/core-blockchain/source/defaults")).defaults;
 			});
 
 			it("databaseRollback is required", async () => {

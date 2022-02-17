@@ -1,4 +1,4 @@
-const { orderBy } = require("../dist");
+const { orderBy } = require("../distribution");
 const lodash = require("lodash/orderBy");
 
 const users = [

@@ -7,10 +7,10 @@
 		"Brian Faust <brian@ark.io>",
 		"Joshua Noack <joshua@ark.io>"
 	],
-	"main": "dist/index",
-	"types": "dist/index",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"bench": "pnpm run build && node benchmark/index.js",

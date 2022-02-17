@@ -1,6 +1,6 @@
-import { Wallets } from "@packages/core-state/src";
-import { WalletIndex } from "@packages/core-state/src/wallets/wallet-index";
-import { Factory } from "@packages/core-test-framework/src/factories/factory";
+import { Wallets } from "@packages/core-state/source";
+import { WalletIndex } from "@packages/core-state/source/wallets/wallet-index";
+import { Factory } from "@packages/core-test-framework/source/factories/factory";
 
 import { setUp } from "../setup";
 

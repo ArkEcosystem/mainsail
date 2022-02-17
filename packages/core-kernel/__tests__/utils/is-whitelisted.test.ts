@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { isWhitelisted } from "@packages/core-kernel/src/utils/is-whitelisted";
+import { isWhitelisted } from "@packages/core-kernel/source/utils/is-whitelisted";
 
 describe("isWhitelisted", () => {
 	it("should allow everyone if there is whitelist", () => {

@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { Factories, Generators } from "@packages/core-test-framework/src";
-import { Message } from "@packages/crypto/src/crypto/message";
-import { configManager } from "@packages/crypto/src/managers";
+import { Factories, Generators } from "@packages/core-test-framework/source";
+import { Message } from "@packages/crypto/source/crypto/message";
+import { configManager } from "@packages/crypto/source/managers";
 
 let config;
 let identity;

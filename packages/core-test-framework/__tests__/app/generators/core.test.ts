@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { CoreConfigPaths } from "@packages/core-test-framework/src";
-import { CoreGenerator } from "@packages/core-test-framework/src/app/generators/core";
+import { CoreConfigPaths } from "@packages/core-test-framework/source";
+import { CoreGenerator } from "@packages/core-test-framework/source/app/generators/core";
 import { PathLike } from "fs";
 import fsExtra from "fs-extra";
 

@@ -1,4 +1,4 @@
-import { buildApplication, buildPeerFlags } from "@packages/core-cli/src/utils/builder";
+import { buildApplication, buildPeerFlags } from "@packages/core-cli/source/utils/builder";
 
 const app = {
 	bootstrap: jest.fn(),

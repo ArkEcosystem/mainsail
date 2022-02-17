@@ -1,12 +1,12 @@
 import "jest-extended";
 
 import { Container } from "@packages/core-kernel";
-import { JSONCodec, MessagePackCodec } from "@packages/core-snapshots/src/codecs";
-import * as Contracts from "@packages/core-snapshots/src/contracts";
-import * as Exceptions from "@packages/core-snapshots/src/exceptions";
-import { StreamReader, StreamWriter } from "@packages/core-snapshots/src/filesystem";
-import { Identifiers } from "@packages/core-snapshots/src/ioc";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { JSONCodec, MessagePackCodec } from "@packages/core-snapshots/source/codecs";
+import * as Contracts from "@packages/core-snapshots/source/contracts";
+import * as Exceptions from "@packages/core-snapshots/source/exceptions";
+import { StreamReader, StreamWriter } from "@packages/core-snapshots/source/filesystem";
+import { Identifiers } from "@packages/core-snapshots/source/ioc";
+import { Sandbox } from "@packages/core-test-framework/source";
 import pluralize from "pluralize";
 import { Readable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";

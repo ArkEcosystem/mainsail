@@ -1,4 +1,4 @@
-const { find } = require("../dist");
+const { find } = require("../distribution");
 const lodash = require("lodash/find");
 
 const users = [

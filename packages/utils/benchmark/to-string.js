@@ -1,4 +1,4 @@
-const { toString } = require("../dist");
+const { toString } = require("../distribution");
 const lodash = require("lodash/toString");
 
 exports["utils"] = () => toString([1, 2, 3]);

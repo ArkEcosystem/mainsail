@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { getLatestVersion, getRegistryChannel, installFromChannel } from "@packages/core/src/common/update";
+import { getLatestVersion, getRegistryChannel, installFromChannel } from "@packages/core/source/common/update";
 import nock from "nock";
 
 import execa from "../../__mocks__/execa";

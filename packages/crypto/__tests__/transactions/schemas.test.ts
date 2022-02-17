@@ -1,16 +1,16 @@
-import { Generators } from "@packages/core-test-framework/src";
+import { Generators } from "@packages/core-test-framework/source";
 
-import { ARKTOSHI } from "../../../../packages/crypto/src/constants";
-import { TransactionType, TransactionTypeGroup } from "../../../../packages/crypto/src/enums";
-import { PublicKey } from "../../../../packages/crypto/src/identities";
-import { Utils } from "../../../../packages/crypto/src/index";
-import { IMultiSignatureAsset } from "../../../../packages/crypto/src/interfaces";
-import { configManager } from "../../../../packages/crypto/src/managers";
-import { BuilderFactory } from "../../../../packages/crypto/src/transactions";
-import { TransactionTypeFactory } from "../../../../packages/crypto/src/transactions";
-import { schemas } from "../../../../packages/crypto/src/transactions/types";
-import { TransactionSchema } from "../../../../packages/crypto/src/transactions/types/schemas";
-import { validator as Ajv } from "../../../../packages/crypto/src/validation";
+import { ARKTOSHI } from "../../../../packages/crypto/source/constants";
+import { TransactionType, TransactionTypeGroup } from "../../../../packages/crypto/source/enums";
+import { PublicKey } from "../../../../packages/crypto/source/identities";
+import { Utils } from "../../../../packages/crypto/source/index";
+import { IMultiSignatureAsset } from "../../../../packages/crypto/source/interfaces";
+import { configManager } from "../../../../packages/crypto/source/managers";
+import { BuilderFactory } from "../../../../packages/crypto/source/transactions";
+import { TransactionTypeFactory } from "../../../../packages/crypto/source/transactions";
+import { schemas } from "../../../../packages/crypto/source/transactions/types";
+import { TransactionSchema } from "../../../../packages/crypto/source/transactions/types/schemas";
+import { validator as Ajv } from "../../../../packages/crypto/source/validation";
 
 let transaction;
 let transactionSchema: TransactionSchema;

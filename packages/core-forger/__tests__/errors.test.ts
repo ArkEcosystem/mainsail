@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { ForgerError, HostNoResponseError, RelayCommunicationError } from "@packages/core-forger/src/errors";
+import { ForgerError, HostNoResponseError, RelayCommunicationError } from "@packages/core-forger/source/errors";
 
 describe("Errors", () => {
 	it("should construct base ForgerError", () => {

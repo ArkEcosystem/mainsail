@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/core-status";
+import { Command } from "@packages/core/source/commands/core-status";
 
 let cli;
 let processManager;

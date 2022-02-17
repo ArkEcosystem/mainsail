@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { DiscoverCommands } from "@packages/core-cli/src/commands";
+import { DiscoverCommands } from "@packages/core-cli/source/commands";
 import { resolve } from "path";
 import { setGracefulCleanup } from "tmp";
 
@@ -17,7 +17,7 @@ beforeEach(() => {
 describe("DiscoverCommands", () => {
 	describe("#within", () => {
 		it("should discover commands within the given directory", () => {
-			const commandPath: string = resolve(__dirname, "../../../core/dist/commands");
+			const commandPath: string = resolve(__dirname, "../../../core/distribution/commands");
 
 			const commands = cmd.within(commandPath);
 
@@ -35,7 +35,7 @@ describe("DiscoverCommands", () => {
 		});
 
 		it.skip("should discover commands within the given packages", () => {
-			const commandPath: string = resolve(__dirname, "./dist");
+			const commandPath: string = resolve(__dirname, "./distribution");
 
 			const commands = cmd.from([commandPath]);
 

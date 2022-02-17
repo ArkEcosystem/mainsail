@@ -1,13 +1,13 @@
 import "jest-extended";
 
-import { Generators } from "@packages/core-test-framework/src";
-import { TransactionType } from "@packages/crypto/src/enums";
-import { configManager } from "@packages/crypto/src/managers";
-import { Utils } from "@packages/crypto/src/transactions";
-import { BuilderFactory } from "@packages/crypto/src/transactions/builders";
-import { DelegateRegistrationBuilder } from "@packages/crypto/src/transactions/builders/transactions/delegate-registration";
-import { Two } from "@packages/crypto/src/transactions/types";
-import { BigNumber } from "@packages/crypto/src/utils";
+import { Generators } from "@packages/core-test-framework/source";
+import { TransactionType } from "@packages/crypto/source/enums";
+import { configManager } from "@packages/crypto/source/managers";
+import { Utils } from "@packages/crypto/source/transactions";
+import { BuilderFactory } from "@packages/crypto/source/transactions/builders";
+import { DelegateRegistrationBuilder } from "@packages/crypto/source/transactions/builders/transactions/delegate-registration";
+import { Two } from "@packages/crypto/source/transactions/types";
+import { BigNumber } from "@packages/crypto/source/utils";
 
 let builder: DelegateRegistrationBuilder;
 

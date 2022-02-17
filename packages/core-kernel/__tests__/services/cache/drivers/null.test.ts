@@ -1,4 +1,4 @@
-import { NullCacheStore } from "../../../../../../packages/core-kernel/src/services/cache/drivers/null";
+import { NullCacheStore } from "../../../../../../packages/core-kernel/source/services/cache/drivers/null";
 
 describe("NullCacheStore.make", () => {
 	it("should return instance back", async () => {

@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { BlockchainController } from "@packages/core-api/src/controllers/blockchain";
+import { BlockchainController } from "@packages/core-api/source/controllers/blockchain";
 import { Application } from "@packages/core-kernel";
 import { Mocks } from "@packages/core-test-framework";
 import { Interfaces } from "@packages/crypto";

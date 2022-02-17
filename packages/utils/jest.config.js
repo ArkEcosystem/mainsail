@@ -9,7 +9,7 @@ module.exports = {
 	moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 	collectCoverage: false,
 	coverageDirectory: "<rootDir>/.coverage",
-	collectCoverageFrom: ["src/**/*.ts", "!**/node_modules/**", "!src/index.ts", "!src/immutable/index.ts"],
+	collectCoverageFrom: ["source/**/*.ts", "!**/node_modules/**", "!source/index.ts", "!source/immutable/index.ts"],
 	coverageReporters: ["json", "lcov", "text", "clover", "html"],
 	coverageThreshold: {
 		global: {

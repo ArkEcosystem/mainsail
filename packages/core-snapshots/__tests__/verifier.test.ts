@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Verifier } from "@packages/core-snapshots/src/verifier";
+import { Verifier } from "@packages/core-snapshots/source/verifier";
 import { Crypto, Transactions } from "@arkecosystem/crypto";
 
 import { Assets } from "./__fixtures__";

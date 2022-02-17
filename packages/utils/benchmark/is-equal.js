@@ -1,4 +1,4 @@
-const { isEqual } = require("../dist");
+const { isEqual } = require("../distribution");
 const lodash = require("lodash/isEqual");
 
 exports["utils"] = () => isEqual("abc", "abc");

@@ -1,4 +1,4 @@
-import { CheckLater } from "@packages/core-blockchain/src/state-machine/actions/check-later";
+import { CheckLater } from "@packages/core-blockchain/source/state-machine/actions/check-later";
 import { Container } from "@packages/core-kernel";
 
 describe("CheckLater", () => {

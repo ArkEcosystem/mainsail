@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Utils } from "@packages/core-kernel/src";
-import { TransactionValidator } from "@packages/core-state/src/transaction-validator";
+import { Utils } from "@packages/core-kernel/source";
+import { TransactionValidator } from "@packages/core-state/source/transaction-validator";
 import { AssertionError } from "assert";
 
 import { makeVoteTransactions } from "./__utils__/make-vote-transactions";

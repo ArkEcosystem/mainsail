@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/api/transaction";
+import "@packages/core-test-framework/source/matchers/api/transaction";
 
 let transaction: any;
 

@@ -5,15 +5,15 @@ import {
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 	UnkownTransactionError,
-} from "@packages/crypto/src/errors";
-import { ITransactionData } from "@packages/crypto/src/interfaces";
-import { configManager } from "@packages/crypto/src/managers";
+} from "@packages/crypto/source/errors";
+import { ITransactionData } from "@packages/crypto/source/interfaces";
+import { configManager } from "@packages/crypto/source/managers";
 import {
 	Serializer,
 	Transaction,
 	TransactionFactory,
 	Utils as TransactionUtils,
-} from "@packages/crypto/src/transactions";
+} from "@packages/crypto/source/transactions";
 
 import { transaction as transactionFixture } from "../fixtures/transaction";
 import { transaction as transactionDataFixture } from "../fixtures/transaction";

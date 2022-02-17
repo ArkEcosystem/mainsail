@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { AbortUnknownProcess } from "@packages/core-cli/src/actions";
+import { AbortUnknownProcess } from "@packages/core-cli/source/actions";
 
 const processName: string = "ark-core";
 

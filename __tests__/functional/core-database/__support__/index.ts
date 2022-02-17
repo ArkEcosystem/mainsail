@@ -3,8 +3,8 @@ import { Sandbox } from "@arkecosystem/core-test-framework";
 import { Interfaces, Transactions } from "@arkecosystem/crypto";
 import { Connection, createConnection } from "typeorm";
 
-import { Block } from "../../../../packages/core-database/src/models/block";
-import { SnakeNamingStrategy } from "../../../../packages/core-database/src/utils/snake-naming-strategy";
+import { Block } from "../../../../packages/core-database/source/models/block";
+import { SnakeNamingStrategy } from "../../../../packages/core-database/source/utils/snake-naming-strategy";
 
 export const getCoreDatabasePluginConfiguration = async (): Promise<Providers.PluginConfiguration> => {
 	const sandbox: Sandbox = new Sandbox();
@@ -34,8 +34,8 @@ export const getCoreDatabaseConnection = async (options = {}): Promise<Connectio
 	const connection = await createConnection({
 		...configuration.getRequired<any>("connection"),
 		namingStrategy: new SnakeNamingStrategy(),
-		migrations: [`${__dirname}/../../../../packages/core-database/src/migrations/*.ts`],
-		entities: [`${__dirname}/../../../../packages/core-database/src/models/*.ts`],
+		migrations: [`${__dirname}/../../../../packages/core-database/source/migrations/*.ts`],
+		entities: [`${__dirname}/../../../../packages/core-database/source/models/*.ts`],
 		migrationsRun: true,
 		...options,
 	});

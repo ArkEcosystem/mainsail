@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Application, Container, Contracts } from "@packages/core-kernel/src";
-import { MemoryPipeline } from "@packages/core-kernel/src/services/pipeline/drivers/memory";
+import { Application, Container, Contracts } from "@packages/core-kernel/source";
+import { MemoryPipeline } from "@packages/core-kernel/source/services/pipeline/drivers/memory";
 
 let app: Application;
 let pipeline: Contracts.Kernel.Pipeline;

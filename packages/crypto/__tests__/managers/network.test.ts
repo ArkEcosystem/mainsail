@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { NetworkManager } from "../../../../packages/crypto/src/managers/network";
-import * as networks from "../../../../packages/crypto/src/networks";
+import { NetworkManager } from "../../../../packages/crypto/source/managers/network";
+import * as networks from "../../../../packages/crypto/source/networks";
 
 describe("Network Manager", () => {
 	it("should be instantiated", () => {

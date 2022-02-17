@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { SuggestCommand } from "@packages/core-cli/src/plugins/suggest";
+import { SuggestCommand } from "@packages/core-cli/source/plugins/suggest";
 import { blue, red } from "kleur";
 import prompts from "prompts";
 

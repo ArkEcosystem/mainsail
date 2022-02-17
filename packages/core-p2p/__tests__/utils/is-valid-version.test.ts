@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { isValidVersion } from "@packages/core-p2p/src/utils/is-valid-version";
-import { Peer } from "@packages/core-p2p/src/peer";
+import { isValidVersion } from "@packages/core-p2p/source/utils/is-valid-version";
+import { Peer } from "@packages/core-p2p/source/peer";
 import { Managers } from "@arkecosystem/crypto";
 
 let peerMock: Peer;

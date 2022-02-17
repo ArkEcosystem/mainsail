@@ -13,7 +13,7 @@ import {
 	notBetween,
 	regexp,
 	truthy,
-} from "@packages/core-webhooks/src/conditions";
+} from "@packages/core-webhooks/source/conditions";
 
 // TODO: Add test for decimal comparison
 

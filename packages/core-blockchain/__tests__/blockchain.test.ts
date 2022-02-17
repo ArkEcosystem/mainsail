@@ -1,13 +1,13 @@
 import "jest-extended";
 
-import { ProcessBlocksJob } from "@packages/core-blockchain/src/process-blocks-job";
-import { Queue } from "@arkecosystem/core-kernel/dist/contracts/kernel";
-import { Identifiers, interfaces } from "@arkecosystem/core-kernel/dist/ioc";
-import { MemoryQueue } from "@arkecosystem/core-kernel/src/services/queue/drivers/memory";
-import { ProcessBlockAction } from "@packages/core-blockchain/src/actions";
-import { Blockchain } from "@packages/core-blockchain/src/blockchain";
+import { ProcessBlocksJob } from "@packages/core-blockchain/source/process-blocks-job";
+import { Queue } from "@arkecosystem/core-kernel/distribution/contracts/kernel";
+import { Identifiers, interfaces } from "@arkecosystem/core-kernel/distribution/ioc";
+import { MemoryQueue } from "@arkecosystem/core-kernel/source/services/queue/drivers/memory";
+import { ProcessBlockAction } from "@packages/core-blockchain/source/actions";
+import { Blockchain } from "@packages/core-blockchain/source/blockchain";
 import { Container, Enums, Services, Utils as AppUtils } from "@packages/core-kernel";
-import { GetActiveDelegatesAction } from "@packages/core-state/src/actions";
+import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
 import { Sandbox } from "@packages/core-test-framework";
 import { Crypto, Interfaces, Managers, Networks, Utils } from "@packages/crypto";
 import delay from "delay";

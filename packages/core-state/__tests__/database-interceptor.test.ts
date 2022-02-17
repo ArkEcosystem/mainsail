@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { DatabaseService } from "@packages/core-database";
 import { Container } from "@packages/core-kernel";
-import { DatabaseInterceptor } from "@packages/core-state/src/database-interceptor";
+import { DatabaseInterceptor } from "@packages/core-state/source/database-interceptor";
 
 const app = {
 	get: jest.fn(),

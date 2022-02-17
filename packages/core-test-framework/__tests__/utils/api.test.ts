@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Identifiers } from "@packages/core-api";
 import { Sandbox } from "@packages/core-test-framework";
-import { ApiHelpers } from "@packages/core-test-framework/src/utils/api";
+import { ApiHelpers } from "@packages/core-test-framework/source/utils/api";
 
 import {
 	blockResponse,

@@ -1,8 +1,8 @@
 import "jest-extended";
 
 import { Application, Container, Contracts } from "@packages/core-kernel";
-import { Peer } from "@packages/core-p2p/src/peer";
-import { PeerVerificationResult, PeerVerifier } from "@packages/core-p2p/src/peer-verifier";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { PeerVerificationResult, PeerVerifier } from "@packages/core-p2p/source/peer-verifier";
 import { Blocks } from "@packages/crypto";
 
 describe("PeerVerifier", () => {

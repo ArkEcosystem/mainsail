@@ -1,4 +1,4 @@
-const { keyBy } = require("../dist");
+const { keyBy } = require("../distribution");
 const lodash = require("lodash/keyBy");
 
 const array = [

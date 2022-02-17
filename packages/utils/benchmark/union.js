@@ -1,4 +1,4 @@
-const { union } = require("../dist");
+const { union } = require("../distribution");
 const lodash = require("lodash/union");
 
 exports["utils"] = () => union([2], [1, 2]);

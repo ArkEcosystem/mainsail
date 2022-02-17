@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { PluginManager } from "@packages/core-cli/src/services";
+import { PluginManager } from "@packages/core-cli/source/services";
 import fs from "fs-extra";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";
@@ -15,7 +15,7 @@ let gitUpdateCalled = false;
 const updateNPM = () => (npmUpdateCalled = true);
 const updateGIT = () => (gitUpdateCalled = true);
 
-jest.mock("@packages/core-cli/src/services/source-providers/npm", () => ({
+jest.mock("@packages/core-cli/source/services/source-providers/npm", () => ({
 	NPM: jest.fn().mockImplementation(() => ({
 		exists,
 		install,
@@ -23,7 +23,7 @@ jest.mock("@packages/core-cli/src/services/source-providers/npm", () => ({
 	})),
 }));
 
-jest.mock("@packages/core-cli/src/services/source-providers/git", () => ({
+jest.mock("@packages/core-cli/source/services/source-providers/git", () => ({
 	Git: jest.fn().mockImplementation(() => ({
 		exists,
 		install,
@@ -31,7 +31,7 @@ jest.mock("@packages/core-cli/src/services/source-providers/git", () => ({
 	})),
 }));
 
-jest.mock("@packages/core-cli/src/services/source-providers/file", () => ({
+jest.mock("@packages/core-cli/source/services/source-providers/file", () => ({
 	File: jest.fn().mockImplementation(() => ({
 		exists,
 		install,

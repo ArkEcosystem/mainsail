@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { ServiceProvider } from "@packages/core-kernel/src/services/events";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { ServiceProvider } from "@packages/core-kernel/source/services/events";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
 
 let app: Application;
 

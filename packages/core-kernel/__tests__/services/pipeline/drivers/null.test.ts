@@ -1,4 +1,4 @@
-import { NullPipeline } from "../../../../../../packages/core-kernel/src/services/pipeline/drivers/null";
+import { NullPipeline } from "../../../../../../packages/core-kernel/source/services/pipeline/drivers/null";
 
 describe("NullPipeline.pipe", () => {
 	it("should return new piped pipeline", () => {

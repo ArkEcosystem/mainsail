@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { blockchainMachine } from "@packages/core-blockchain/src/state-machine/machine";
-import { StateMachine } from "@packages/core-blockchain/src/state-machine/state-machine";
+import { blockchainMachine } from "@packages/core-blockchain/source/state-machine/machine";
+import { StateMachine } from "@packages/core-blockchain/source/state-machine/state-machine";
 import { Sandbox } from "@packages/core-test-framework";
 import delay from "delay";
 

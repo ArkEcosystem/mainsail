@@ -1,22 +1,26 @@
 import "jest-extended";
 
-import { walletFactory } from "@packages/core-state/src/wallets/wallet-factory";
+import { walletFactory } from "@packages/core-state/source/wallets/wallet-factory";
 import { Container, Providers, Services } from "@packages/core-kernel";
-import { DposPreviousRoundStateProvider } from "@packages/core-kernel/src/contracts/state";
-import { PluginConfiguration } from "@packages/core-kernel/src/providers";
-import { dposPreviousRoundStateProvider } from "@packages/core-state/src";
-import { BuildDelegateRankingAction } from "@packages/core-state/src/actions";
-import { BlockState } from "@packages/core-state/src/block-state";
-import { defaults } from "@packages/core-state/src/defaults";
-import { DposState } from "@packages/core-state/src/dpos/dpos";
-import { StateBuilder } from "@packages/core-state/src/state-builder";
-import { StateStore } from "@packages/core-state/src/stores/state";
-import { TransactionValidator } from "@packages/core-state/src/transaction-validator";
-import { WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "@packages/core-state/src/wallets";
-import { registerIndexers } from "@packages/core-state/src/wallets/indexers";
-import { Sandbox } from "@packages/core-test-framework/src";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import { Managers, Utils } from "@packages/crypto/src";
+import { DposPreviousRoundStateProvider } from "@packages/core-kernel/source/contracts/state";
+import { PluginConfiguration } from "@packages/core-kernel/source/providers";
+import { dposPreviousRoundStateProvider } from "@packages/core-state/source";
+import { BuildDelegateRankingAction } from "@packages/core-state/source/actions";
+import { BlockState } from "@packages/core-state/source/block-state";
+import { defaults } from "@packages/core-state/source/defaults";
+import { DposState } from "@packages/core-state/source/dpos/dpos";
+import { StateBuilder } from "@packages/core-state/source/state-builder";
+import { StateStore } from "@packages/core-state/source/stores/state";
+import { TransactionValidator } from "@packages/core-state/source/transaction-validator";
+import {
+	WalletRepository,
+	WalletRepositoryClone,
+	WalletRepositoryCopyOnWrite,
+} from "@packages/core-state/source/wallets";
+import { registerIndexers } from "@packages/core-state/source/wallets/indexers";
+import { Sandbox } from "@packages/core-test-framework/source";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Managers, Utils } from "@packages/crypto/source";
 
 export interface Spies {
 	applySpy: jest.SpyInstance;

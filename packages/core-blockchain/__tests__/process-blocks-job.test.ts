@@ -1,6 +1,6 @@
-import { ProcessBlockAction } from "@packages/core-blockchain/src/actions";
-import { ProcessBlocksJob } from "@packages/core-blockchain/src/process-blocks-job";
-import { BlockProcessorResult } from "@packages/core-blockchain/src/processor";
+import { ProcessBlockAction } from "@packages/core-blockchain/source/actions";
+import { ProcessBlocksJob } from "@packages/core-blockchain/source/process-blocks-job";
+import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
 import { Container, Services } from "@packages/core-kernel";
 import { Sandbox } from "@packages/core-test-framework";
 import { Crypto, Interfaces, Networks } from "@packages/crypto";

@@ -1,5 +1,5 @@
 import { Container } from "@packages/core-kernel";
-import { TransactionsController } from "@packages/core-p2p/src/socket-server/controllers/transactions";
+import { TransactionsController } from "@packages/core-p2p/source/socket-server/controllers/transactions";
 import { Sandbox } from "@packages/core-test-framework";
 import { Managers, Networks } from "@packages/crypto";
 

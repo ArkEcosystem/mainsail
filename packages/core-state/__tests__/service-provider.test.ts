@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Application, Container, Services } from "@packages/core-kernel";
-import { ServiceProvider } from "@packages/core-state/src";
+import { ServiceProvider } from "@packages/core-state/source";
 import { AnySchema } from "joi";
 
 let app: Application;
@@ -53,7 +53,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-state/src/defaults")).defaults,
+				(await import("@packages/core-state/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -66,7 +66,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-state/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-state/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -83,7 +83,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-state/src/defaults")).defaults,
+					(await import("@packages/core-state/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -96,7 +96,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-state/src/defaults")).defaults;
+				defaults = (await import("@packages/core-state/source/defaults")).defaults;
 			});
 
 			it("storage is required && is object", async () => {

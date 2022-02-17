@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { container } from "@packages/core-kernel/src/container";
-import { Container, injectable } from "@packages/core-kernel/src/ioc";
+import { container } from "@packages/core-kernel/source/container";
+import { Container, injectable } from "@packages/core-kernel/source/ioc";
 
 @injectable()
 class StubClass {}

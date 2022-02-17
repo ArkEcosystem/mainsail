@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { calculateRound, isNewRound } from "@packages/core-kernel/src/utils/round-calculator";
+import { calculateRound, isNewRound } from "@packages/core-kernel/source/utils/round-calculator";
 import { Errors, Managers } from "@packages/crypto";
-import { devnet } from "@packages/crypto/src/networks";
+import { devnet } from "@packages/crypto/source/networks";
 
 describe("Round Calculator", () => {
 	describe("calculateRound", () => {

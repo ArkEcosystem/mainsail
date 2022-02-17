@@ -1,4 +1,4 @@
-const { randomNumber } = require("../dist");
+const { randomNumber } = require("../distribution");
 const lodash = require("lodash/random");
 
 exports["utils"] = () => randomNumber(1, 10);

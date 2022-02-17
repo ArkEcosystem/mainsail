@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { RestartRunningProcessWithPrompt } from "@packages/core-cli/src/actions";
+import { RestartRunningProcessWithPrompt } from "@packages/core-cli/source/actions";
 import prompts from "prompts";
 
 const processName: string = "ark-core";

@@ -1,4 +1,4 @@
-import { checkDNS } from "@packages/core-p2p/src/utils/check-dns";
+import { checkDNS } from "@packages/core-p2p/source/utils/check-dns";
 
 const app = {
 	log: { error: jest.fn() },

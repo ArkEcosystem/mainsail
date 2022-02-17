@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { SATOSHI } from "../../../../packages/crypto/src/constants";
-import { BigNumber, formatSatoshi } from "../../../../packages/crypto/src/utils";
+import { SATOSHI } from "../../../../packages/crypto/source/constants";
+import { BigNumber, formatSatoshi } from "../../../../packages/crypto/source/utils";
 
 describe("Format Satoshi", () => {
 	it("should format satoshis", () => {

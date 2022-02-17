@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Application, Container } from "@packages/core-kernel/src";
-import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
+import { Application, Container } from "@packages/core-kernel/source";
+import { ServiceProvider } from "@packages/core-transactions/source/service-provider";
 
 let app: Application;
 

@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { WorkerWrapper } from "@packages/core-snapshots/src/workers/worker-wrapper";
+import { WorkerWrapper } from "@packages/core-snapshots/source/workers/worker-wrapper";
 import { EventEmitter } from "events";
 import { Worker } from "worker_threads";
 

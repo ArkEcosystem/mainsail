@@ -3,8 +3,8 @@ import "jest-extended";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Utils } from "@arkecosystem/crypto";
 import { Services } from "@packages/core-kernel";
-import { Wallet, WalletEvent } from "@packages/core-state/src/wallets";
-import { getWalletAttributeSet } from "@packages/core-test-framework/src/internal/wallet-attributes";
+import { Wallet, WalletEvent } from "@packages/core-state/source/wallets";
+import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
 
 import { Setup, setUp } from "../setup";
 

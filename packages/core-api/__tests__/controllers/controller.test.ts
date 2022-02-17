@@ -1,10 +1,10 @@
 import "jest-extended";
 
-import { Controller } from "@packages/core-api/src/controllers/controller";
-import { Resource } from "@packages/core-api/src/interfaces";
+import { Controller } from "@packages/core-api/source/controllers/controller";
+import { Resource } from "@packages/core-api/source/interfaces";
 import { Application, Container } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
 import Joi from "joi";
 
 import { initApp } from "../__support__";

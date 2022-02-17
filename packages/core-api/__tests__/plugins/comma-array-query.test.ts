@@ -1,4 +1,4 @@
-import { commaArrayQuery } from "@packages/core-api/src/plugins/comma-array-query";
+import { commaArrayQuery } from "@packages/core-api/source/plugins/comma-array-query";
 
 describe("commaArrayQuery.register", () => {
 	it("should register onRequest extension", () => {

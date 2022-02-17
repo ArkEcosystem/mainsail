@@ -1,4 +1,4 @@
-import { CheckLastDownloadedBlockSynced } from "@packages/core-blockchain/src/state-machine/actions/check-last-downloaded-block-synced";
+import { CheckLastDownloadedBlockSynced } from "@packages/core-blockchain/source/state-machine/actions/check-last-downloaded-block-synced";
 import { Container } from "@packages/core-kernel";
 
 describe("CheckLastDownloadedBlockSynced", () => {

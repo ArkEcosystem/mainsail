@@ -1,12 +1,12 @@
 import "jest-extended";
 
-import { Factories, Generators } from "@packages/core-test-framework/src";
-import { IBlock, ITransactionData } from "@packages/crypto/src/interfaces";
-import { configManager } from "@packages/crypto/src/managers";
-import { TransactionTypeFactory } from "@packages/crypto/src/transactions";
-import { TransactionSchema } from "@packages/crypto/src/transactions/types/schemas";
-import { BigNumber } from "@packages/crypto/src/utils";
-import { validator } from "@packages/crypto/src/validation";
+import { Factories, Generators } from "@packages/core-test-framework/source";
+import { IBlock, ITransactionData } from "@packages/crypto/source/interfaces";
+import { configManager } from "@packages/crypto/source/managers";
+import { TransactionTypeFactory } from "@packages/crypto/source/transactions";
+import { TransactionSchema } from "@packages/crypto/source/transactions/types/schemas";
+import { BigNumber } from "@packages/crypto/source/utils";
+import { validator } from "@packages/crypto/source/validation";
 import ajv from "ajv";
 
 describe("validator", () => {

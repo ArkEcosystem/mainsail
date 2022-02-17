@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Contracts } from "@packages/core-kernel/src";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
+import { Contracts } from "@packages/core-kernel/source";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
 
 class DummyClass implements Contracts.Kernel.EventListener {
 	public constructor(private readonly method?) {}

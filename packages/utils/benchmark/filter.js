@@ -1,4 +1,4 @@
-const { filter } = require("../dist");
+const { filter } = require("../distribution");
 const lodash = require("lodash/filter");
 
 const users = [

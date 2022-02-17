@@ -1,11 +1,11 @@
 import "jest-extended";
 
-import { Contracts } from "@packages/core-kernel/src";
-import { BlockState } from "@packages/core-state/src/block-state";
-import { StateStore } from "@packages/core-state/src/stores/state";
-import { Wallet } from "@packages/core-state/src/wallets";
-import { WalletRepository } from "@packages/core-state/src/wallets";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
+import { Contracts } from "@packages/core-kernel/source";
+import { BlockState } from "@packages/core-state/source/block-state";
+import { StateStore } from "@packages/core-state/source/stores/state";
+import { Wallet } from "@packages/core-state/source/wallets";
+import { WalletRepository } from "@packages/core-state/source/wallets";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
 import { Interfaces, Utils } from "@packages/crypto";
 
 import { makeChainedBlocks } from "./__utils__/make-chained-block";

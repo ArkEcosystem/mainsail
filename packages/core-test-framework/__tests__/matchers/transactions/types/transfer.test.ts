@@ -1,5 +1,5 @@
-import "@packages/core-test-framework/src/matchers/transactions/types/transfer";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
+import "@packages/core-test-framework/source/matchers/transactions/types/transfer";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
 import { Interfaces } from "@packages/crypto";
 
 let factory: FactoryBuilder;

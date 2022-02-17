@@ -1,10 +1,10 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { NotImplemented } from "@packages/core-kernel/src/exceptions/runtime";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { MemoryCacheStore } from "@packages/core-kernel/src/services/cache/drivers/memory";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
+import { Application } from "@packages/core-kernel/source/application";
+import { NotImplemented } from "@packages/core-kernel/source/exceptions/runtime";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { MemoryCacheStore } from "@packages/core-kernel/source/services/cache/drivers/memory";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
 
 const items: Record<string, number> = {
 	"1": 1,

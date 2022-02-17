@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Managers, Utils } from "@arkecosystem/crypto";
-import { calculate } from "@packages/core-kernel/src/utils/supply-calculator";
+import { calculate } from "@packages/core-kernel/source/utils/supply-calculator";
 
 const toString = (value) => Utils.BigNumber.make(value).toFixed();
 

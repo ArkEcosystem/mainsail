@@ -1,10 +1,10 @@
 import "jest-extended";
 
 import { Container } from "@packages/core-kernel";
-import { SnapshotDatabaseService } from "@packages/core-snapshots/src/database-service";
-import { Filesystem } from "@packages/core-snapshots/src/filesystem/filesystem";
-import { Identifiers } from "@packages/core-snapshots/src/ioc";
-import { SnapshotService } from "@packages/core-snapshots/src/snapshot-service";
+import { SnapshotDatabaseService } from "@packages/core-snapshots/source/database-service";
+import { Filesystem } from "@packages/core-snapshots/source/filesystem/filesystem";
+import { Identifiers } from "@packages/core-snapshots/source/ioc";
+import { SnapshotService } from "@packages/core-snapshots/source/snapshot-service";
 import { Sandbox } from "@packages/core-test-framework";
 
 import { Assets } from "./__fixtures__";

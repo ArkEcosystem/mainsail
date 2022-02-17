@@ -1,10 +1,10 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Container } from "@packages/core-kernel/src/ioc";
-import { Database } from "@packages/core-webhooks/src/database";
-import { Identifiers } from "@packages/core-webhooks/src/identifiers";
-import { Webhook } from "@packages/core-webhooks/src/interfaces";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container } from "@packages/core-kernel/source/ioc";
+import { Database } from "@packages/core-webhooks/source/database";
+import { Identifiers } from "@packages/core-webhooks/source/identifiers";
+import { Webhook } from "@packages/core-webhooks/source/interfaces";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 const dummyWebhook: Webhook = {

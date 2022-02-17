@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { NetworkMonitor } from "@packages/core-test-framework/src/mocks";
+import { NetworkMonitor } from "@packages/core-test-framework/source/mocks";
 
 const clear = () => {
 	NetworkMonitor.setNetworkHeight(0);

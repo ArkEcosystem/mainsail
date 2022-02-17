@@ -4,9 +4,9 @@ import { Connection } from "typeorm";
 import { getCustomRepository } from "typeorm";
 
 import { clearCoreDatabase, getCoreDatabaseConnection } from "../__support__";
-import { BlockRepository } from "../../../../packages/core-database/src/repositories/block-repository";
-import { TransactionRepository } from "../../../../packages/core-database/src/repositories/transaction-repository";
-import { BIP39 } from "../../../../packages/core-forger/src/methods/bip39";
+import { BlockRepository } from "../../../../packages/core-database/source/repositories/block-repository";
+import { TransactionRepository } from "../../../../packages/core-database/source/repositories/transaction-repository";
+import { BIP39 } from "../../../../packages/core-forger/source/methods/bip39";
 
 let connection: Connection | undefined;
 

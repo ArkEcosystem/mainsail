@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { ServiceProvider } from "@packages/core-kernel/src/services/mixins";
-import { MixinService } from "@packages/core-kernel/src/services/mixins/mixins";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { ServiceProvider } from "@packages/core-kernel/source/services/mixins";
+import { MixinService } from "@packages/core-kernel/source/services/mixins/mixins";
 
 let app: Application;
 

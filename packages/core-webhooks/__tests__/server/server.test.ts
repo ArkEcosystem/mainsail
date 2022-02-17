@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { Enums } from "@packages/core-kernel/src";
-import { Application } from "@packages/core-kernel/src/application";
-import { Server } from "@packages/core-webhooks/src/server";
+import { Enums } from "@packages/core-kernel/source";
+import { Application } from "@packages/core-kernel/source/application";
+import { Server } from "@packages/core-webhooks/source/server";
 import { setGracefulCleanup } from "tmp";
 import { initApp, initServer, request } from "./__support__";
 

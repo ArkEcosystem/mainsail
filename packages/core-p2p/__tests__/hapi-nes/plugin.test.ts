@@ -2,7 +2,7 @@ import "jest-extended";
 
 import * as Hapi from "@hapi/hapi";
 import * as Teamwork from "@hapi/teamwork";
-import { Client, plugin } from "@packages/core-p2p/src/hapi-nes";
+import { Client, plugin } from "@packages/core-p2p/source/hapi-nes";
 
 describe("register()", () => {
 	it("adds websocket support", async () => {

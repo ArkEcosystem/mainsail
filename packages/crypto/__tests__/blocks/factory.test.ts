@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { BlockFactory, Serializer } from "../../../../packages/crypto/src/blocks";
-import { IBlockData } from "../../../../packages/crypto/src/interfaces";
-import { configManager } from "../../../../packages/crypto/src/managers";
+import { BlockFactory, Serializer } from "../../../../packages/crypto/source/blocks";
+import { IBlockData } from "../../../../packages/crypto/source/interfaces";
+import { configManager } from "../../../../packages/crypto/source/managers";
 import { blockWithExceptions, dummyBlock } from "../fixtures/block";
 
 export const expectBlock = ({ data }: { data: IBlockData }) => {

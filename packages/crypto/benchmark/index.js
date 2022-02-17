@@ -1,5 +1,5 @@
 const { benchmarker } = require("@faustbrian/benchmarker");
-const { Managers } = require("../dist");
+const { Managers } = require("../distribution");
 
 Managers.configManager.setFromPreset("mainnet");
 

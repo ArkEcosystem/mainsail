@@ -1,4 +1,4 @@
-import { ProcessBlockAction } from "@packages/core-blockchain/src/actions/process-block";
+import { ProcessBlockAction } from "@packages/core-blockchain/source/actions/process-block";
 
 const blockProcessor = {
 	process: jest.fn(),

@@ -2,8 +2,8 @@ import "jest-extended";
 
 import { Container } from "@arkecosystem/core-kernel";
 
-import { PeerRepository } from "@packages/core-p2p/src/peer-repository";
-import { Peer } from "@packages/core-p2p/src/peer";
+import { PeerRepository } from "@packages/core-p2p/source/peer-repository";
+import { Peer } from "@packages/core-p2p/source/peer";
 
 describe("PeerRepository", () => {
 	let peerStorage: PeerRepository;

@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { defaults } from "@packages/core-database/src/defaults";
-import { ServiceProvider } from "@packages/core-database/src/service-provider";
+import { defaults } from "@packages/core-database/source/defaults";
+import { ServiceProvider } from "@packages/core-database/source/service-provider";
 import { Application, Container, Providers } from "@packages/core-kernel";
 import { AnySchema } from "joi";
 import { createConnection, getCustomRepository } from "typeorm";
@@ -113,7 +113,7 @@ describe("ServiceProvider.configSchema", () => {
 	it("should validate schema using defaults", async () => {
 		jest.resetModules();
 		const result = (serviceProvider.configSchema() as AnySchema).validate(
-			(await import("@packages/core-database/src/defaults")).defaults,
+			(await import("@packages/core-database/source/defaults")).defaults,
 		);
 
 		expect(result.error).toBeUndefined();
@@ -131,7 +131,7 @@ describe("ServiceProvider.configSchema", () => {
 
 	it("should allow configuration extension", async () => {
 		jest.resetModules();
-		const defaults = (await import("@packages/core-database/src/defaults")).defaults;
+		const defaults = (await import("@packages/core-database/source/defaults")).defaults;
 
 		// @ts-ignore
 		defaults.customField = "dummy";
@@ -148,7 +148,7 @@ describe("ServiceProvider.configSchema", () => {
 
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-database/src/defaults")).defaults,
+				(await import("@packages/core-database/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -162,7 +162,7 @@ describe("ServiceProvider.configSchema", () => {
 
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-database/src/defaults")).defaults,
+				(await import("@packages/core-database/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -176,7 +176,7 @@ describe("ServiceProvider.configSchema", () => {
 
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-database/src/defaults")).defaults,
+				(await import("@packages/core-database/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -190,7 +190,7 @@ describe("ServiceProvider.configSchema", () => {
 
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-database/src/defaults")).defaults,
+				(await import("@packages/core-database/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -204,7 +204,7 @@ describe("ServiceProvider.configSchema", () => {
 
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-database/src/defaults")).defaults,
+				(await import("@packages/core-database/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -217,7 +217,7 @@ describe("ServiceProvider.configSchema", () => {
 
 		beforeEach(async () => {
 			jest.resetModules();
-			defaults = (await import("@packages/core-database/src/defaults")).defaults;
+			defaults = (await import("@packages/core-database/source/defaults")).defaults;
 		});
 
 		it("connection is required", async () => {

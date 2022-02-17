@@ -1,6 +1,6 @@
 import { Blocks, Interfaces, Managers } from "@arkecosystem/crypto";
-import { assert } from "@packages/core-kernel/src/utils/assert";
-import { Generators } from "@packages/core-test-framework/src";
+import { assert } from "@packages/core-kernel/source/utils/assert";
+import { Generators } from "@packages/core-test-framework/source";
 
 let block: Interfaces.IBlock;
 beforeAll(() => {

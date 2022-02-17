@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { calculateTransactionExpiration } from "@packages/core-kernel/src/utils/expiration-calculator";
+import { calculateTransactionExpiration } from "@packages/core-kernel/source/utils/expiration-calculator";
 
 const context = {
 	blockTime: 8,

@@ -3,7 +3,7 @@ const { resolve } = require("path");
 const YAML = require("yaml");
 
 const workflow = {
-	name: "CI (Unit)",
+	name: "Unit",
 	on: {
 		push: {
 			branches: ["main", "develop"],

@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Console } from "@packages/core-test-framework";
-import { Environment } from "@packages/core-cli/src/services";
+import { Environment } from "@packages/core-cli/source/services";
 import envfile from "envfile";
 import fs from "fs-extra";
 

@@ -9,8 +9,8 @@ EventEmitter.prototype.constructor = Object.prototype.constructor;
 
 jest.setTimeout(1200000);
 
-import { StateBuilder } from "@arkecosystem/core-state/src/state-builder";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { StateBuilder } from "@arkecosystem/core-state/source/state-builder";
+import { Sandbox } from "@packages/core-test-framework/source";
 
 const sandbox: Sandbox = new Sandbox();
 

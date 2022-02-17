@@ -1,13 +1,13 @@
 import "jest-extended";
 
-import { Generators } from "@packages/core-test-framework/src";
-import { TransactionType } from "@packages/crypto/src/enums";
-import { TransactionVersionError } from "@packages/crypto/src/errors";
-import { configManager } from "@packages/crypto/src/managers";
-import { BuilderFactory } from "@packages/crypto/src/transactions";
-import { MultiSignatureBuilder } from "@packages/crypto/src/transactions/builders/transactions/multi-signature";
-import { Two } from "@packages/crypto/src/transactions/types";
-import * as Utils from "@packages/crypto/src/utils";
+import { Generators } from "@packages/core-test-framework/source";
+import { TransactionType } from "@packages/crypto/source/enums";
+import { TransactionVersionError } from "@packages/crypto/source/errors";
+import { configManager } from "@packages/crypto/source/managers";
+import { BuilderFactory } from "@packages/crypto/source/transactions";
+import { MultiSignatureBuilder } from "@packages/crypto/source/transactions/builders/transactions/multi-signature";
+import { Two } from "@packages/crypto/source/transactions/types";
+import * as Utils from "@packages/crypto/source/utils";
 
 let builder: MultiSignatureBuilder;
 

@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/relay-stop";
+import { Command } from "@packages/core/source/commands/relay-stop";
 
 let cli;
 let processManager;

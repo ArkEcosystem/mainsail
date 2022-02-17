@@ -1,5 +1,5 @@
-import { Server } from "@packages/core-api/src";
-import { preparePlugins } from "@packages/core-api/src/plugins";
+import { Server } from "@packages/core-api/source";
+import { preparePlugins } from "@packages/core-api/source/plugins";
 import { Application, Container, Providers } from "@packages/core-kernel";
 
 export const initServer = async (app: Application, defaults: any, customRoute?: any): Promise<Server> => {

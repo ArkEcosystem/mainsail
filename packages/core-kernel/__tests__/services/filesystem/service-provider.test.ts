@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { ServiceProvider } from "@packages/core-kernel/src/services/filesystem";
-import { LocalFilesystem } from "@packages/core-kernel/src/services/filesystem/drivers/local";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { ServiceProvider } from "@packages/core-kernel/source/services/filesystem";
+import { LocalFilesystem } from "@packages/core-kernel/source/services/filesystem/drivers/local";
 
 let app: Application;
 

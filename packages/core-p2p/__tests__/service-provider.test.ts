@@ -1,8 +1,8 @@
 import "jest-extended";
 
 import { Application, Container, Providers, Services } from "@packages/core-kernel";
-import { Peer } from "@packages/core-p2p/src/peer";
-import { ServiceProvider } from "@packages/core-p2p/src/service-provider";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { ServiceProvider } from "@packages/core-p2p/source/service-provider";
 import { AnySchema } from "joi";
 
 describe("ServiceProvider", () => {
@@ -157,7 +157,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-p2p/src/defaults")).defaults,
+				(await import("@packages/core-p2p/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -213,7 +213,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-p2p/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-p2p/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -230,7 +230,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -242,7 +242,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -258,7 +258,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -270,7 +270,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -284,7 +284,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -296,7 +296,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -310,7 +310,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -322,7 +322,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -336,7 +336,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -348,7 +348,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -362,7 +362,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -374,7 +374,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -388,7 +388,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -400,7 +400,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -414,7 +414,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -426,7 +426,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-p2p/src/defaults")).defaults,
+					(await import("@packages/core-p2p/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -439,7 +439,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-p2p/src/defaults")).defaults;
+				defaults = (await import("@packages/core-p2p/source/defaults")).defaults;
 			});
 
 			it("server is required && is object", async () => {

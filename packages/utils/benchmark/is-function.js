@@ -1,4 +1,4 @@
-const { isFunction } = require("../dist");
+const { isFunction } = require("../distribution");
 const lodash = require("lodash/isFunction");
 
 exports["utils"] = () => isFunction("abc");

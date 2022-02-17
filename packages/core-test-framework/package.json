@@ -8,9 +8,9 @@
 		"Erwann Gentric <erwann@ark.io>",
 		"Joshua Noack <joshua@ark.io>"
 	],
-	"main": "dist/index",
+	"main": "distribution/index.js",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",

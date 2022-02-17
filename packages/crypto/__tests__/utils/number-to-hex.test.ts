@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { numberToHex } from "../../../../packages/crypto/src/utils";
+import { numberToHex } from "../../../../packages/crypto/source/utils";
 
 describe("NumberToHex", () => {
 	it("should be ok", () => {

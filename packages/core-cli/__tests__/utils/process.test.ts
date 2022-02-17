@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Process } from "@packages/core-cli/src/utils";
+import { Process } from "@packages/core-cli/source/utils";
 import { fileSync, setGracefulCleanup } from "tmp";
 
 jest.mock("nodejs-tail");

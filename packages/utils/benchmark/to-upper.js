@@ -1,4 +1,4 @@
-const { toUpper } = require("../dist");
+const { toUpper } = require("../distribution");
 const lodash = require("lodash/toUpper");
 
 exports["native"] = () => "__FOO_BAR__".toUpperCase();

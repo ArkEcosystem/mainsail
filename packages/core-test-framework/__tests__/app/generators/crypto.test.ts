@@ -2,8 +2,8 @@ import "jest-extended";
 
 import fsExtra from "fs-extra";
 import { PathLike } from "fs";
-import { CryptoGenerator } from "@packages/core-test-framework/src/app/generators/crypto";
-import { CryptoConfigPaths, SandboxOptions } from "@packages/core-test-framework/src";
+import { CryptoGenerator } from "@packages/core-test-framework/source/app/generators/crypto";
+import { CryptoConfigPaths, SandboxOptions } from "@packages/core-test-framework/source";
 import { sandboxOptions } from "./__fixtures__/assets";
 
 afterEach(() => {

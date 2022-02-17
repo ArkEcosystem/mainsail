@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/blockchain/dispatch";
+import "@packages/core-test-framework/source/matchers/blockchain/dispatch";
 
 class Dispatcher {
 	public dispatch(event: string): void {}

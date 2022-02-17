@@ -9,14 +9,14 @@
 		"Brian Faust <brian@ark.io>",
 		"Alex Barnsley <alex@ark.io>"
 	],
-	"main": "dist/index",
-	"types": "dist/index",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"bin": {
 		"ark": "./bin/run"
 	},
 	"files": [
 		"/bin",
-		"/dist"
+		"/distribution"
 	],
 	"scripts": {
 		"ark": "node ./bin/run",

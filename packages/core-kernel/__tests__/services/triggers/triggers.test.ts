@@ -1,6 +1,6 @@
-import { InvalidArgumentException } from "@packages/core-kernel/src/exceptions/logic";
-import { Action, Triggers } from "@packages/core-kernel/src/services/triggers";
-import { ActionArguments } from "@packages/core-kernel/src/types";
+import { InvalidArgumentException } from "@packages/core-kernel/source/exceptions/logic";
+import { Action, Triggers } from "@packages/core-kernel/source/services/triggers";
+import { ActionArguments } from "@packages/core-kernel/source/types";
 
 class DummyAction extends Action {
 	public execute<T>(args: ActionArguments): T {

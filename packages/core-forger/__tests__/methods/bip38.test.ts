@@ -1,5 +1,5 @@
 import { Identities } from "@arkecosystem/crypto";
-import { BIP38 } from "@packages/core-forger/src/methods/bip38";
+import { BIP38 } from "@packages/core-forger/source/methods/bip38";
 
 import { dummy, expectedBlock, optionsDefault, transactions } from "../__utils__/create-block-with-transactions";
 

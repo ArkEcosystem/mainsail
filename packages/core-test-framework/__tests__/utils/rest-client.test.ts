@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { RestClient } from "@packages/core-test-framework/src/utils/rest-client";
+import { RestClient } from "@packages/core-test-framework/source/utils/rest-client";
 import { Utils } from "@packages/core-kernel";
 
 let spyOnGet: jest.SpyInstance;

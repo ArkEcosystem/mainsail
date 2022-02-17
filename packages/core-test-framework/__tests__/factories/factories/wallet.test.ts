@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Wallets } from "@packages/core-state";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
 
 let factory: FactoryBuilder;
 

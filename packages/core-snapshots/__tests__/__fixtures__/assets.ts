@@ -1,6 +1,6 @@
 import { Models } from "@arkecosystem/core-database";
 import { BigNumber } from "@arkecosystem/utils";
-import { Meta } from "@packages/core-snapshots/src/contracts";
+import { Meta } from "@packages/core-snapshots/source/contracts";
 
 export const metaData: Meta.MetaData = {
 	blocks: {

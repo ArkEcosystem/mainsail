@@ -2,7 +2,7 @@ import { Identifiers as ApiIdentifiers, Server } from "@packages/core-api";
 import { Application, Utils as AppUtils } from "@packages/core-kernel";
 import { Managers } from "@packages/crypto";
 import Hapi from "@hapi/hapi";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { Sandbox } from "@packages/core-test-framework/source";
 import { EventEmitter } from "events";
 
 import { EchoController } from "./echo-controller";

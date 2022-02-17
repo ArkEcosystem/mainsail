@@ -1,12 +1,12 @@
 import "jest-extended";
 
 import Hapi from "@hapi/hapi";
-import { NodeController } from "@packages/core-api/src/controllers/node";
+import { NodeController } from "@packages/core-api/source/controllers/node";
 import { Application, Container, Providers } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
 import { Mocks } from "@packages/core-test-framework";
-import { Generators } from "@packages/core-test-framework/src";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
+import { Generators } from "@packages/core-test-framework/source";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
 import { Interfaces, Managers } from "@packages/crypto";
 
 import { initApp, ItemResponse } from "../__support__";

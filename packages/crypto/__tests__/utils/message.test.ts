@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Message } from "../../../../packages/crypto/src/crypto";
+import { Message } from "../../../../packages/crypto/source/crypto";
 
 const fixture = {
 	data: {

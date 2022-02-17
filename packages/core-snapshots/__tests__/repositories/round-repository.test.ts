@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { RoundRepository } from "@packages/core-snapshots/src/repositories";
+import { RoundRepository } from "@packages/core-snapshots/source/repositories";
 
 class MockQueryBuilder {
 	public where(...data) {

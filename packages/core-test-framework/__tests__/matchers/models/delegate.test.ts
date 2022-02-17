@@ -1,6 +1,6 @@
-import "@packages/core-test-framework/src/matchers/models/delegate";
+import "@packages/core-test-framework/source/matchers/models/delegate";
 import { Identities } from "@packages/crypto";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 
 let delegate: any;
 

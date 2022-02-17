@@ -1,13 +1,13 @@
 import "jest-extended";
 
 import { sleep } from "@arkecosystem/utils";
-import { Application } from "@packages/core-kernel/src/application";
-import { BootServiceProviders } from "@packages/core-kernel/src/bootstrap/service-providers";
-import { BlockEvent, KernelEvent } from "@packages/core-kernel/src/enums/events";
-import { ServiceProviderCannotBeBooted } from "@packages/core-kernel/src/exceptions/plugins";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { ServiceProvider, ServiceProviderRepository } from "@packages/core-kernel/src/providers";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
+import { Application } from "@packages/core-kernel/source/application";
+import { BootServiceProviders } from "@packages/core-kernel/source/bootstrap/service-providers";
+import { BlockEvent, KernelEvent } from "@packages/core-kernel/source/enums/events";
+import { ServiceProviderCannotBeBooted } from "@packages/core-kernel/source/exceptions/plugins";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { ServiceProvider, ServiceProviderRepository } from "@packages/core-kernel/source/providers";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
 
 import {
 	DeferredBootServiceProvider,

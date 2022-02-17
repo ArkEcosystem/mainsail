@@ -1,4 +1,4 @@
-import { Lock } from "../../../../packages/core-kernel/src/utils/lock";
+import { Lock } from "../../../../packages/core-kernel/source/utils/lock";
 
 describe("Lock", () => {
 	it("should run exclusive executions in series", async () => {

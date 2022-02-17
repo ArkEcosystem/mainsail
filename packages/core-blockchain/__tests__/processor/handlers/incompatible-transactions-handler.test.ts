@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { IncompatibleTransactionsHandler } from "../../../../../packages/core-blockchain/src/processor/handlers/incompatible-transactions-handler";
-import { BlockProcessorResult } from "../../../../../packages/core-blockchain/src/processor";
+import { IncompatibleTransactionsHandler } from "../../../../../packages/core-blockchain/source/processor/handlers/incompatible-transactions-handler";
+import { BlockProcessorResult } from "../../../../../packages/core-blockchain/source/processor";
 import { Interfaces } from "@arkecosystem/crypto";
 
 describe("IncompatibleTransactionsHandler", () => {

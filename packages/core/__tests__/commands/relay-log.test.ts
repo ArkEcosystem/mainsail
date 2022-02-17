@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/relay-log";
+import { Command } from "@packages/core/source/commands/relay-log";
 import { fileSync, setGracefulCleanup } from "tmp";
 
 jest.mock("nodejs-tail");

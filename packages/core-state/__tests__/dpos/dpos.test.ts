@@ -1,11 +1,11 @@
 import "jest-extended";
 
-import { Utils } from "@packages/core-kernel/src";
-import { RoundInfo } from "@packages/core-kernel/src/contracts/shared";
-import { DposState } from "@packages/core-state/src/dpos/dpos";
-import { WalletRepository } from "@packages/core-state/src/wallets";
-import { Utils as CryptoUtils } from "@packages/crypto/src";
-import { SATOSHI } from "@packages/crypto/src/constants";
+import { Utils } from "@packages/core-kernel/source";
+import { RoundInfo } from "@packages/core-kernel/source/contracts/shared";
+import { DposState } from "@packages/core-state/source/dpos/dpos";
+import { WalletRepository } from "@packages/core-state/source/wallets";
+import { Utils as CryptoUtils } from "@packages/crypto/source";
+import { SATOSHI } from "@packages/crypto/source/constants";
 
 import { buildDelegateAndVoteWallets } from "../__utils__/build-delegate-and-vote-balances";
 import { setUp } from "../setup";

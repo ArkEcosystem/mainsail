@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-kernel";
 
-import { TransactionsRoute } from "@packages/core-p2p/src/socket-server/routes/transactions";
+import { TransactionsRoute } from "@packages/core-p2p/source/socket-server/routes/transactions";
 
 describe("BlocksRoute", () => {
 	let tranasctionsRoute: TransactionsRoute;

@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { JSONCodec } from "@packages/core-snapshots/src/codecs";
-import { StreamReader } from "@packages/core-snapshots/src/filesystem";
-import { ReadProcessor } from "@packages/core-snapshots/src/workers/actions/read-processor";
+import { JSONCodec } from "@packages/core-snapshots/source/codecs";
+import { StreamReader } from "@packages/core-snapshots/source/filesystem";
+import { ReadProcessor } from "@packages/core-snapshots/source/workers/actions/read-processor";
 import { EventEmitter } from "events";
 import { join } from "path";
 // @ts-ignore

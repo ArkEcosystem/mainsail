@@ -1,4 +1,4 @@
-import { Initialize } from "@packages/core-blockchain/src/state-machine/actions/initialize";
+import { Initialize } from "@packages/core-blockchain/source/state-machine/actions/initialize";
 import { Container } from "@packages/core-kernel";
 import { Managers } from "@packages/crypto";
 

@@ -3,7 +3,7 @@ import "jest-extended";
 import { Utils } from "@arkecosystem/core-kernel";
 import { Identifiers } from "@packages/core-api";
 import { Sandbox } from "@packages/core-test-framework";
-import { ApiHttpClient } from "@packages/core-test-framework/src/utils";
+import { ApiHttpClient } from "@packages/core-test-framework/source/utils";
 
 let sandbox: Sandbox;
 let apiClient: ApiHttpClient;

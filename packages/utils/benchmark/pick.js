@@ -1,4 +1,4 @@
-const { pick } = require("../dist");
+const { pick } = require("../distribution");
 const lodash = require("lodash/pick");
 
 exports["utils"] = () =>

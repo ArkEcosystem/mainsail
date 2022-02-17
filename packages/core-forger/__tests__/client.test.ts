@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Client } from "@packages/core-forger/src/client";
+import { Client } from "@packages/core-forger/source/client";
 import { Application, Container } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus, Nes, Codecs } from "@arkecosystem/core-p2p";
 

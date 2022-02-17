@@ -1,4 +1,4 @@
-import { StartForkRecovery } from "@packages/core-blockchain/src/state-machine/actions/start-fork-recovery";
+import { StartForkRecovery } from "@packages/core-blockchain/source/state-machine/actions/start-fork-recovery";
 import { Container } from "@packages/core-kernel";
 
 describe("StartForkRecovery", () => {

@@ -1,4 +1,4 @@
-const { stringify } = require("../dist");
+const { stringify } = require("../distribution");
 
 exports["native"] = () => JSON.stringify([1, 2, 3]);
 

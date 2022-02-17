@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/reinstall";
+import { Command } from "@packages/core/source/commands/reinstall";
 import prompts from "prompts";
 
 import execa from "../../__mocks__/execa";

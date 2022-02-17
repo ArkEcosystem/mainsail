@@ -1,7 +1,7 @@
-import { Address, PublicKey } from "@packages/crypto/src/identities";
-import { Keys } from "@packages/crypto/src/identities";
-import { ITransaction } from "@packages/crypto/src/interfaces";
-import { configManager } from "@packages/crypto/src/managers";
+import { Address, PublicKey } from "@packages/crypto/source/identities";
+import { Keys } from "@packages/crypto/source/identities";
+import { ITransaction } from "@packages/crypto/source/interfaces";
+import { configManager } from "@packages/crypto/source/managers";
 import {
 	Deserializer,
 	InternalTransactionType,
@@ -9,8 +9,8 @@ import {
 	Signer,
 	Transaction,
 	TransactionTypeFactory,
-} from "@packages/crypto/src/transactions";
-import { BigNumber, ByteBuffer } from "@packages/crypto/src/utils";
+} from "@packages/crypto/source/transactions";
+import { BigNumber, ByteBuffer } from "@packages/crypto/source/utils";
 
 configManager.getMilestone().aip11 = true;
 

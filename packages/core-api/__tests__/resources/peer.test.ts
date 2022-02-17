@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { PeerResource } from "@packages/core-api/src/resources";
+import { PeerResource } from "@packages/core-api/source/resources";
 
 let resource: PeerResource;
 

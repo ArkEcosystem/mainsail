@@ -1,18 +1,18 @@
 import "jest-extended";
 
-import { ForgeNewBlockAction, IsForgingAllowedAction } from "@packages/core-forger/src/actions";
+import { ForgeNewBlockAction, IsForgingAllowedAction } from "@packages/core-forger/source/actions";
+import { HostNoResponseError, RelayCommunicationError } from "@packages/core-forger/source/errors";
+import { ForgerService } from "@packages/core-forger/source/forger-service";
 import { Contracts } from "@packages/core-kernel";
-import { Sandbox } from "@packages/core-test-framework";
-import { Interfaces } from "@packages/crypto";
-import { Slots } from "@packages/crypto/dist/crypto";
-import { HostNoResponseError, RelayCommunicationError } from "@packages/core-forger/src/errors";
-import { ForgerService } from "@packages/core-forger/src/forger-service";
 import { Container, Enums, Services, Utils } from "@packages/core-kernel";
 import { NetworkStateStatus } from "@packages/core-p2p";
-import { GetActiveDelegatesAction } from "@packages/core-state/src/actions";
+import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
+import { Sandbox } from "@packages/core-test-framework";
+import { Interfaces } from "@packages/crypto";
 import { Crypto, Managers } from "@packages/crypto";
-import { Address } from "@packages/crypto/src/identities";
-import { BuilderFactory } from "@packages/crypto/src/transactions";
+import { Slots } from "@packages/crypto/distribution/crypto";
+import { Address } from "@packages/crypto/source/identities";
+import { BuilderFactory } from "@packages/crypto/source/transactions";
 
 import { calculateActiveDelegates } from "./__utils__/calculate-active-delegates";
 

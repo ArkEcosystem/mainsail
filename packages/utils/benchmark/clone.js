@@ -1,4 +1,4 @@
-const { clone } = require("../dist");
+const { clone } = require("../distribution");
 const lodash = require("lodash/clone");
 
 const objects = [

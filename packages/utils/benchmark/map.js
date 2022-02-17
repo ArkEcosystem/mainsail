@@ -1,4 +1,4 @@
-const { map } = require("../dist");
+const { map } = require("../distribution");
 const lodash = require("lodash/map");
 
 exports["native"] = () => [4, 8].map((n) => n * n);

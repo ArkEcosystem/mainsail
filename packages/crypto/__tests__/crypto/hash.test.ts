@@ -1,12 +1,12 @@
 import "jest-extended";
 
-import { Factories, Generators } from "@packages/core-test-framework/src";
-import { TransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
+import { Factories, Generators } from "@packages/core-test-framework/source";
+import { TransactionFactory } from "@packages/core-test-framework/source/utils/transaction-factory";
 
-import { Utils } from "../../../../packages/crypto/src";
-import { Hash } from "../../../../packages/crypto/src/crypto";
-import { configManager } from "../../../../packages/crypto/src/managers";
-import { Utils as TransactionUtils } from "../../../../packages/crypto/src/transactions";
+import { Utils } from "../../../../packages/crypto/source";
+import { Hash } from "../../../../packages/crypto/source/crypto";
+import { configManager } from "../../../../packages/crypto/source/managers";
+import { Utils as TransactionUtils } from "../../../../packages/crypto/source/transactions";
 
 const transaction = TransactionFactory.initialize()
 	.transfer("AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff", 1000)

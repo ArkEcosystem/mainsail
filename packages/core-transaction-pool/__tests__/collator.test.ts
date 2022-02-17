@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Managers } from "@arkecosystem/crypto";
 
-import { Collator } from "../../../packages/core-transaction-pool/src/collator";
+import { Collator } from "../../../packages/core-transaction-pool/source/collator";
 
 jest.mock("@arkecosystem/crypto");
 

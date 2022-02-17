@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { TaskList } from "@packages/core-cli/src/components";
+import { TaskList } from "@packages/core-cli/source/components";
 
 let cli;
 let component;

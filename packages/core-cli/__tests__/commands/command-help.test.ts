@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { CommandHelp } from "@packages/core-cli/src/commands";
+import { CommandHelp } from "@packages/core-cli/source/commands";
 import { setGracefulCleanup } from "tmp";
 
 import { Command } from "./__stubs__/command";

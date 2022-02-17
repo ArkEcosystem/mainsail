@@ -1,5 +1,5 @@
-import { NullEventDispatcher } from "../../../../../../packages/core-kernel/src/services/events/drivers/null";
-import { EventListener, EventName } from "../../../../../../packages/core-kernel/src/contracts/kernel/events";
+import { NullEventDispatcher } from "../../../../../../packages/core-kernel/source/services/events/drivers/null";
+import { EventListener, EventName } from "../../../../../../packages/core-kernel/source/contracts/kernel/events";
 
 class MyEventListener implements EventListener {
 	public handle(payload: { name: EventName; data: any }): void {}

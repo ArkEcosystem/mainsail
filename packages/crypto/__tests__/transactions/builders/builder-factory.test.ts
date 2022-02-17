@@ -1,12 +1,12 @@
 import "jest-extended";
 
-import { BuilderFactory } from "../../../../../packages/crypto/src/transactions";
-import { DelegateRegistrationBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/delegate-registration";
-import { DelegateResignationBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/delegate-resignation";
-import { MultiPaymentBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/multi-payment";
-import { MultiSignatureBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/multi-signature";
-import { TransferBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/transfer";
-import { VoteBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/vote";
+import { BuilderFactory } from "../../../../../packages/crypto/source/transactions";
+import { DelegateRegistrationBuilder } from "../../../../../packages/crypto/source/transactions/builders/transactions/delegate-registration";
+import { DelegateResignationBuilder } from "../../../../../packages/crypto/source/transactions/builders/transactions/delegate-resignation";
+import { MultiPaymentBuilder } from "../../../../../packages/crypto/source/transactions/builders/transactions/multi-payment";
+import { MultiSignatureBuilder } from "../../../../../packages/crypto/source/transactions/builders/transactions/multi-signature";
+import { TransferBuilder } from "../../../../../packages/crypto/source/transactions/builders/transactions/transfer";
+import { VoteBuilder } from "../../../../../packages/crypto/source/transactions/builders/transactions/vote";
 
 describe("Builder Factory", () => {
 	it("should create DelegateRegistrationBuilder", () => {

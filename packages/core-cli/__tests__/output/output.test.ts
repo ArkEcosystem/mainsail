@@ -2,7 +2,7 @@
 // public unmute() {
 
 import { Console } from "@packages/core-test-framework";
-import { Output } from "@packages/core-cli/src/output";
+import { Output } from "@packages/core-cli/source/output";
 
 let cli;
 let output;

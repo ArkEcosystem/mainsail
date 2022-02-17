@@ -1,4 +1,4 @@
-const { lowerCase } = require("../dist");
+const { lowerCase } = require("../distribution");
 const lodash = require("lodash/lowerCase");
 
 exports["utils"] = () => lowerCase("__FOO_BAR__");

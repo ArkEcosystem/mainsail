@@ -1,12 +1,12 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { NetworkCannotBeDetermined } from "@packages/core-kernel/src/exceptions/config";
-import { DirectoryCannotBeFound } from "@packages/core-kernel/src/exceptions/filesystem";
-import { Container, Identifiers, injectable, interfaces } from "@packages/core-kernel/src/ioc";
-import { ServiceProvider, ServiceProviderRepository } from "@packages/core-kernel/src/providers";
-import { ConfigRepository } from "@packages/core-kernel/src/services/config";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
+import { Application } from "@packages/core-kernel/source/application";
+import { NetworkCannotBeDetermined } from "@packages/core-kernel/source/exceptions/config";
+import { DirectoryCannotBeFound } from "@packages/core-kernel/source/exceptions/filesystem";
+import { Container, Identifiers, injectable, interfaces } from "@packages/core-kernel/source/ioc";
+import { ServiceProvider, ServiceProviderRepository } from "@packages/core-kernel/source/providers";
+import { ConfigRepository } from "@packages/core-kernel/source/services/config";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
 import { resolve } from "path";
 import { dirSync } from "tmp";
 

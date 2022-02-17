@@ -1,4 +1,4 @@
-import { NullValidator } from "../../../../../../packages/core-kernel/src/services/validation/drivers/null";
+import { NullValidator } from "../../../../../../packages/core-kernel/source/services/validation/drivers/null";
 
 describe("NullValidator.validate", () => {
 	it("should return undefined", () => {

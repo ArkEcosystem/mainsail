@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { FeeStatisticsResource } from "@packages/core-api/src/resources";
+import { FeeStatisticsResource } from "@packages/core-api/source/resources";
 
 // TODO: Use from support or add to node code
 type FeeStatistics = {

@@ -1,14 +1,14 @@
-import "@packages/core-test-framework/src/matchers";
+import "@packages/core-test-framework/source/matchers";
 
 import { Container, Contracts, Services } from "@arkecosystem/core-kernel";
 import { Identities, Interfaces, Managers } from "@arkecosystem/crypto";
-import secrets from "@packages/core-test-framework/src/internal/passphrases.json";
+import secrets from "@packages/core-test-framework/source/internal/passphrases.json";
 import {
 	getLastHeight,
 	injectMilestone,
 	snoozeForBlock,
 	TransactionFactory,
-} from "@packages/core-test-framework/src/utils";
+} from "@packages/core-test-framework/source/utils";
 
 import * as support from "./__support__";
 

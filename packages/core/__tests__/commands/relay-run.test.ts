@@ -1,4 +1,4 @@
-import { Command } from "@packages/core/src/commands/relay-run";
+import { Command } from "@packages/core/source/commands/relay-run";
 
 import { executeCommand } from "../__support__/app";
 

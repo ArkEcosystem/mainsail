@@ -1,4 +1,4 @@
-const { pluralize } = require("../dist");
+const { pluralize } = require("../distribution");
 const pluralizeFull = require("pluralize");
 
 exports["utils"] = () => pluralize("block");

@@ -1,4 +1,5 @@
 .coverage
 .ultra.cache.json
 dist
+distribution
 docs

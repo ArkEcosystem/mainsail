@@ -1,4 +1,4 @@
-const { partition } = require("../dist");
+const { partition } = require("../distribution");
 const lodash = require("lodash/partition");
 
 const users = [

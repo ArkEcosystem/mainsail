@@ -2,4 +2,5 @@
 *.d.ts
 bin
 dist
+distribution
 node_modules

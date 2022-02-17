@@ -1,6 +1,6 @@
 const { benchmarker } = require("@faustbrian/benchmarker");
 const { readdirSync } = require("fs");
-const { camelCase } = require("../dist");
+const { camelCase } = require("../distribution");
 
 benchmarker(
 	"utils",

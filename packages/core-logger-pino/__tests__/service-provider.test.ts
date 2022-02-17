@@ -1,12 +1,12 @@
 import "jest-extended";
 
 import { Application, Container, Providers, Services } from "@packages/core-kernel";
-import { ServiceProvider } from "@packages/core-logger-pino/src";
-import { defaults } from "@packages/core-logger-pino/src/defaults";
+import { ServiceProvider } from "@packages/core-logger-pino/source";
+import { defaults } from "@packages/core-logger-pino/source/defaults";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
-import { Identifiers, interfaces } from "@arkecosystem/core-kernel/dist/ioc";
-import { LogManager } from "@arkecosystem/core-kernel/dist/services/log";
+import { Identifiers, interfaces } from "@arkecosystem/core-kernel/distribution/ioc";
+import { LogManager } from "@arkecosystem/core-kernel/distribution/services/log";
 
 let app: Application;
 
@@ -75,7 +75,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (serviceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-logger-pino/src/defaults")).defaults,
+				(await import("@packages/core-logger-pino/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -88,7 +88,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-logger-pino/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-logger-pino/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -105,7 +105,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-logger-pino/src/defaults")).defaults,
+					(await import("@packages/core-logger-pino/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -119,7 +119,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (serviceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-logger-pino/src/defaults")).defaults,
+					(await import("@packages/core-logger-pino/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -132,7 +132,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-logger-pino/src/defaults")).defaults;
+				defaults = (await import("@packages/core-logger-pino/source/defaults")).defaults;
 			});
 
 			it("levels is required && is object", async () => {

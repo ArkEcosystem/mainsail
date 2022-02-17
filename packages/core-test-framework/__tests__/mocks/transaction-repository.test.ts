@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Utils } from "@arkecosystem/crypto";
 import { Models } from "@packages/core-database";
-import { TransactionRepository } from "@packages/core-test-framework/src/mocks";
+import { TransactionRepository } from "@packages/core-test-framework/source/mocks";
 
 const transaction: Partial<Models.Transaction> = {
 	id: "0c79fe9faf214de92847baa322a9e991a49f6f6f0bc774927098c7feae627d77",

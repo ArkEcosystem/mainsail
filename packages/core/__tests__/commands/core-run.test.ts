@@ -1,4 +1,4 @@
-import { Command } from "@packages/core/src/commands/core-run";
+import { Command } from "@packages/core/source/commands/core-run";
 import { writeJSONSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 

@@ -1,4 +1,4 @@
-const { groupBy } = require("../dist");
+const { groupBy } = require("../distribution");
 const lodash = require("lodash/groupBy");
 
 exports["utils"] = () => groupBy([6.1, 4.2, 6.3], Math.floor);

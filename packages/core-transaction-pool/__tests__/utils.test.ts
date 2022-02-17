@@ -1,4 +1,4 @@
-import { IteratorMany } from "../../../packages/core-transaction-pool/src/utils";
+import { IteratorMany } from "../../../packages/core-transaction-pool/source/utils";
 
 describe("IteratorMany", () => {
 	it("should choose next item based on comparator", () => {

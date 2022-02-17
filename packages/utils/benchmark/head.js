@@ -1,4 +1,4 @@
-const { head } = require("../dist");
+const { head } = require("../distribution");
 const lodash = require("lodash/head");
 
 exports["utils"] = () => head([1, 2, 3]);

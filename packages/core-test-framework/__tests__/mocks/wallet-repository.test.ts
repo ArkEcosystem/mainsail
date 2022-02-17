@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { WalletRepository } from "@packages/core-test-framework/src/mocks";
+import { WalletRepository } from "@packages/core-test-framework/source/mocks";
 import { Utils } from "@packages/crypto";
 
 const clear = () => {

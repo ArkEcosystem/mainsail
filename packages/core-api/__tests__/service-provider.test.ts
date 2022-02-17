@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Identifiers, Server, ServiceProvider as CoreApiServiceProvider } from "@packages/core-api/src";
-import { defaults } from "@packages/core-api/src/defaults";
+import { Identifiers, Server, ServiceProvider as CoreApiServiceProvider } from "@packages/core-api/source";
+import { defaults } from "@packages/core-api/source/defaults";
 import { Application, Container, Providers } from "@packages/core-kernel";
 import { AnySchema } from "joi";
 import path from "path";
@@ -173,7 +173,7 @@ describe("ServiceProvider", () => {
 		it("should validate schema using defaults", async () => {
 			jest.resetModules();
 			const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-				(await import("@packages/core-api/src/defaults")).defaults,
+				(await import("@packages/core-api/source/defaults")).defaults,
 			);
 
 			expect(result.error).toBeUndefined();
@@ -210,7 +210,7 @@ describe("ServiceProvider", () => {
 
 		it("should allow configuration extension", async () => {
 			jest.resetModules();
-			const defaults = (await import("@packages/core-api/src/defaults")).defaults;
+			const defaults = (await import("@packages/core-api/source/defaults")).defaults;
 
 			// @ts-ignore
 			defaults.customField = "dummy";
@@ -225,7 +225,7 @@ describe("ServiceProvider", () => {
 			it("should return true when process.env.CORE_API_DISABLED is undefined", async () => {
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -237,7 +237,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -251,7 +251,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -265,7 +265,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -277,7 +277,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -293,7 +293,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -303,7 +303,7 @@ describe("ServiceProvider", () => {
 			it("should return false if process.env.CORE_API_SSL is undefined", async () => {
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -316,7 +316,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				let result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -327,7 +327,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -339,7 +339,7 @@ describe("ServiceProvider", () => {
 			it("should return false if process.env.CORE_API_LOG is undefined", async () => {
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -351,7 +351,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -363,7 +363,7 @@ describe("ServiceProvider", () => {
 			it("should return false if process.env.CORE_API_CACHE is undefined", async () => {
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -375,7 +375,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -387,7 +387,7 @@ describe("ServiceProvider", () => {
 			it("should return true if process.env.CORE_API_RATE_LIMIT_DISABLED is undefined", async () => {
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -399,7 +399,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -413,7 +413,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -425,7 +425,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -439,7 +439,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -451,7 +451,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeDefined();
@@ -465,7 +465,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -479,7 +479,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -491,7 +491,7 @@ describe("ServiceProvider", () => {
 			it("should return false if process.env.CORE_API_TRUST_PROXY is undefined", async () => {
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -503,7 +503,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -515,7 +515,7 @@ describe("ServiceProvider", () => {
 			it("should return true if process.env.CORE_API_NO_ESTIMATED_TOTAL_COUNT is undefined", async () => {
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -527,7 +527,7 @@ describe("ServiceProvider", () => {
 
 				jest.resetModules();
 				const result = (coreApiServiceProvider.configSchema() as AnySchema).validate(
-					(await import("@packages/core-api/src/defaults")).defaults,
+					(await import("@packages/core-api/source/defaults")).defaults,
 				);
 
 				expect(result.error).toBeUndefined();
@@ -540,7 +540,7 @@ describe("ServiceProvider", () => {
 
 			beforeEach(async () => {
 				jest.resetModules();
-				defaults = (await import("@packages/core-api/src/defaults")).defaults;
+				defaults = (await import("@packages/core-api/source/defaults")).defaults;
 			});
 
 			it("server is required && is object", async () => {

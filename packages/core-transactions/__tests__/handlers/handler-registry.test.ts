@@ -1,18 +1,23 @@
 import "jest-extended";
 
 import { Services } from "@packages/core-kernel";
-import { Application } from "@packages/core-kernel/src/application";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
 import {
 	DeactivatedTransactionHandlerError,
 	InvalidTransactionTypeError,
-} from "@packages/core-transactions/src/errors";
-import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "@packages/core-transactions/src/handlers";
-import { TransactionHandlerProvider } from "@packages/core-transactions/src/handlers/handler-provider";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
+} from "@packages/core-transactions/source/errors";
+import {
+	One,
+	TransactionHandler,
+	TransactionHandlerConstructor,
+	Two,
+} from "@packages/core-transactions/source/handlers";
+import { TransactionHandlerProvider } from "@packages/core-transactions/source/handlers/handler-provider";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
+import { ServiceProvider } from "@packages/core-transactions/source/service-provider";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@packages/crypto";
-import { TransactionSchema } from "@packages/crypto/src/transactions/types/schemas";
+import { TransactionSchema } from "@packages/crypto/source/transactions/types/schemas";
 import ByteBuffer from "bytebuffer";
 
 let app: Application;

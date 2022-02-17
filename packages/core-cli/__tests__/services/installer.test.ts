@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Console } from "@packages/core-test-framework";
 // import path from "path";
-import { Installer } from "@packages/core-cli/src/services";
+import { Installer } from "@packages/core-cli/source/services";
 import { setGracefulCleanup } from "tmp";
 
 import execa from "../../__mocks__/execa";

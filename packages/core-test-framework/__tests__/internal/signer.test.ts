@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { Generators } from "@packages/core-test-framework/src";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { Signer } from "@packages/core-test-framework/src/internal/signer";
+import { Generators } from "@packages/core-test-framework/source";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { Signer } from "@packages/core-test-framework/source/internal/signer";
 import { Identities, Interfaces } from "@packages/crypto";
 
 let signer: Signer;

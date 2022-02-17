@@ -1,4 +1,4 @@
-const { keys } = require("../dist");
+const { keys } = require("../distribution");
 const lodash = require("lodash/keys");
 
 function Foo() {

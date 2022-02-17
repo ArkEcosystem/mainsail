@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { TransactionPoolQuery } from "@packages/core-test-framework/src/mocks";
+import { TransactionPoolQuery } from "@packages/core-test-framework/source/mocks";
 import { Interfaces } from "@packages/crypto";
 
 let tranasction: Partial<Interfaces.ITransaction> = {

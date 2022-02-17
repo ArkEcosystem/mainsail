@@ -1,4 +1,4 @@
-import { IpcSubprocess } from "../../../../packages/core-kernel/src/utils/ipc-subprocess";
+import { IpcSubprocess } from "../../../../packages/core-kernel/source/utils/ipc-subprocess";
 
 type MyRpcInterface = {
 	myRpcActionMethod(a: number, b: number): void;

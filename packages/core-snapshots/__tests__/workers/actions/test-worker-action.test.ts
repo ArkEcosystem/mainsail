@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { TestWorkerAction } from "@packages/core-snapshots/src/workers/actions";
+import { TestWorkerAction } from "@packages/core-snapshots/source/workers/actions";
 
 const testWorkerAction = new TestWorkerAction();
 

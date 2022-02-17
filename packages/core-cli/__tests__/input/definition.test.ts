@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import Joi from "joi";
-import { InputDefinition } from "@packages/core-cli/src/input";
+import { InputDefinition } from "@packages/core-cli/source/input";
 
 describe("InputDefinition", () => {
 	it("should get all arguments", () => {

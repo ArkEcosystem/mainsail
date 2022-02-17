@@ -1,4 +1,4 @@
-import { log } from "@packages/core-api/src/plugins/log";
+import { log } from "@packages/core-api/source/plugins/log";
 
 const logger = {
 	debug: jest.fn(),

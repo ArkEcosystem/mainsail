@@ -1,4 +1,4 @@
-import { DownloadBlocks } from "@packages/core-blockchain/src/state-machine/actions/download-blocks";
+import { DownloadBlocks } from "@packages/core-blockchain/source/state-machine/actions/download-blocks";
 import { Container, Utils } from "@packages/core-kernel";
 import delay from "delay";
 

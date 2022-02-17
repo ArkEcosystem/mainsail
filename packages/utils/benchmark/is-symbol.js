@@ -1,4 +1,4 @@
-const { isSymbol } = require("../dist");
+const { isSymbol } = require("../distribution");
 const lodash = require("lodash/isSymbol");
 
 exports["utils"] = () => isSymbol("abc");

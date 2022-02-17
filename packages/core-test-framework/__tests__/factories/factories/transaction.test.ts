@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import { Interfaces, Identities } from "@packages/crypto/src";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Interfaces, Identities } from "@packages/crypto/source";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 
 let factory: FactoryBuilder;
 

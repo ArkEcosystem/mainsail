@@ -1,4 +1,4 @@
-const { has } = require("../dist");
+const { has } = require("../distribution");
 const lodash = require("lodash/has");
 
 var object = {

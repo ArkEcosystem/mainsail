@@ -1,4 +1,4 @@
-const { reject } = require("../dist");
+const { reject } = require("../distribution");
 const lodash = require("lodash/reject");
 
 const users = [

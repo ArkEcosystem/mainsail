@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import * as Contracts from "@packages/core-snapshots/src/contracts";
+import * as Contracts from "@packages/core-snapshots/source/contracts";
 import { Managers } from "@packages/crypto";
 import { resolve } from "path";
 import { Worker } from "worker_threads";
@@ -69,7 +69,7 @@ let spyOnExit;
 let spyOnError;
 let spyOnMessage;
 
-const workerPath = resolve("dist/workers/worker.js");
+const workerPath = resolve("distribution/workers/worker.js");
 
 beforeEach(() => {
 	spyOnExit = jest.spyOn(eventListener, "onExit");

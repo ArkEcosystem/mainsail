@@ -2,13 +2,13 @@ import "jest-extended";
 
 import { Factories, Generators } from "@packages/core-test-framework";
 import { Utils } from "@packages/crypto";
-import { TransactionType } from "@packages/crypto/src/enums";
-import { Keys, WIF } from "@packages/crypto/src/identities";
-import { configManager } from "@packages/crypto/src/managers";
-import { devnet } from "@packages/crypto/src/networks";
-import { BuilderFactory } from "@packages/crypto/src/transactions";
-import { TransferBuilder } from "@packages/crypto/src/transactions/builders/transactions/transfer";
-import { Two } from "@packages/crypto/src/transactions/types";
+import { TransactionType } from "@packages/crypto/source/enums";
+import { Keys, WIF } from "@packages/crypto/source/identities";
+import { configManager } from "@packages/crypto/source/managers";
+import { devnet } from "@packages/crypto/source/networks";
+import { BuilderFactory } from "@packages/crypto/source/transactions";
+import { TransferBuilder } from "@packages/crypto/source/transactions/builders/transactions/transfer";
+import { Two } from "@packages/crypto/source/transactions/types";
 
 let builder: TransferBuilder;
 let identity;

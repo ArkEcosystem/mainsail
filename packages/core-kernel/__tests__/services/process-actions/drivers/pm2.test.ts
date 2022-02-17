@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { ProcessAction } from "@packages/core-kernel/src/contracts/kernel";
-import { Pm2ProcessActionsService } from "@packages/core-kernel/src/services/process-actions/drivers/pm2";
+import { ProcessAction } from "@packages/core-kernel/source/contracts/kernel";
+import { Pm2ProcessActionsService } from "@packages/core-kernel/source/services/process-actions/drivers/pm2";
 import pmx from "@pm2/io";
 
 let pm2: Pm2ProcessActionsService;

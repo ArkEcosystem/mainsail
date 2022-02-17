@@ -1,9 +1,9 @@
-import { Application } from "@packages/core-kernel/src";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
-import { Database } from "@packages/core-webhooks/src/database";
-import { Identifiers as WebhookIdentifiers } from "@packages/core-webhooks/src/identifiers";
-import { Server } from "@packages/core-webhooks/src/server";
+import { Application } from "@packages/core-kernel/source";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
+import { Database } from "@packages/core-webhooks/source/database";
+import { Identifiers as WebhookIdentifiers } from "@packages/core-webhooks/source/identifiers";
+import { Server } from "@packages/core-webhooks/source/server";
 import { dirSync } from "tmp";
 
 export const initApp = (): Application => {

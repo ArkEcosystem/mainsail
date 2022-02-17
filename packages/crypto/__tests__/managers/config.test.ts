@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { configManager } from "../../../../packages/crypto/src/managers";
-import { devnet, mainnet } from "../../../../packages/crypto/src/networks";
+import { configManager } from "../../../../packages/crypto/source/managers";
+import { devnet, mainnet } from "../../../../packages/crypto/source/networks";
 
 beforeEach(() => configManager.setConfig(devnet));
 

@@ -1,4 +1,4 @@
-import { DelegateFactory } from "@packages/core-forger/src/delegate-factory";
+import { DelegateFactory } from "@packages/core-forger/source/delegate-factory";
 import { Identities } from "@packages/crypto";
 
 const passphrase38: string = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";

@@ -1,4 +1,4 @@
-const { toLower } = require("../dist");
+const { toLower } = require("../distribution");
 const lodash = require("lodash/toLower");
 
 exports["native"] = () => "__FOO_BAR__".toLowerCase();

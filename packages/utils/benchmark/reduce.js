@@ -1,4 +1,4 @@
-const { reduce } = require("../dist");
+const { reduce } = require("../distribution");
 const lodash = require("lodash/reduce");
 
 exports["native"] = () => [1, 2].reduce((sum, n) => sum + n, 0);

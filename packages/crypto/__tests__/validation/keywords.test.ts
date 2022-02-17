@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Managers, Utils, Validation } from "../../../../packages/crypto";
-import { TransactionType } from "../../../../packages/crypto/src/enums";
+import { TransactionType } from "../../../../packages/crypto/source/enums";
 
 const ajv = Validation.validator.getInstance();
 

@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Commands, Services } from "@packages/core-cli";
-import { CommandLineInterface } from "@packages/core/src/cli";
+import { CommandLineInterface } from "@packages/core/source/cli";
 import envPaths from "env-paths";
 import prompts from "prompts";
 
@@ -14,7 +14,7 @@ afterEach(() => jest.clearAllMocks());
 describe("CLI", () => {
 	it("should run successfully using valid commands", async () => {
 		const cli = new CommandLineInterface(["help"]);
-		await expect(cli.execute("dist")).toResolve();
+		await expect(cli.execute("distribution")).toResolve();
 	});
 
 	it("should fail when the dirname isn't properly configured", async () => {
@@ -30,7 +30,7 @@ describe("CLI", () => {
 
 		const cli = new CommandLineInterface(["hello"]);
 		prompts.inject([false]);
-		await cli.execute("dist");
+		await cli.execute("distribution");
 
 		expect(spyOnCheck).toBeCalled();
 		expect(message).toContain(`is not a ark command.`);
@@ -39,13 +39,13 @@ describe("CLI", () => {
 
 	it("should set exitCode = 2 when the command doesn't have a valid signature", async () => {
 		const cli = new CommandLineInterface(["--nope"]);
-		await cli.execute("dist");
+		await cli.execute("distribution");
 		expect(process.exitCode).toEqual(2);
 	});
 
 	it("should not set exitCode when a valid command appears with the help flag", async () => {
 		const cli = new CommandLineInterface(["update", "--help"]);
-		await expect(cli.execute("dist")).toResolve();
+		await expect(cli.execute("distribution")).toResolve();
 		expect(process.exitCode).toEqual(undefined);
 	});
 
@@ -54,7 +54,7 @@ describe("CLI", () => {
 		const mockExit = jest.spyOn(process, "exit").mockImplementation(() => {});
 		const cli = new CommandLineInterface(["hello"]);
 		prompts.inject([true]);
-		await expect(cli.execute("dist")).toResolve();
+		await expect(cli.execute("distribution")).toResolve();
 		expect(mockExit).not.toHaveBeenCalled();
 	});
 
@@ -76,7 +76,7 @@ describe("CLI", () => {
 			const network = "testnet";
 
 			const cli = new CommandLineInterface(["help", `--token=${token}`, `--network=${network}`]);
-			await expect(cli.execute("dist")).toResolve();
+			await expect(cli.execute("distribution")).toResolve();
 
 			expect(spyOnList).toHaveBeenCalledWith(token, network);
 
@@ -88,7 +88,7 @@ describe("CLI", () => {
 			process.env.CORE_PATH_CONFIG = __dirname;
 
 			const cli = new CommandLineInterface(["help"]);
-			await expect(cli.execute("dist")).toResolve();
+			await expect(cli.execute("distribution")).toResolve();
 
 			expect(spyOnList).toHaveBeenCalledWith("dummyToken", "testnet");
 
@@ -103,7 +103,7 @@ describe("CLI", () => {
 				.mockResolvedValueOnce("testnet");
 
 			const cli = new CommandLineInterface(["help"]);
-			await expect(cli.execute("dist")).toResolve();
+			await expect(cli.execute("distribution")).toResolve();
 
 			expect(spyOnList).toHaveBeenCalledWith("ark", "testnet");
 			expect(spyOnDiscoverNetwork).toHaveBeenCalledWith(envPaths("ark", { suffix: "core" }).config);
@@ -115,7 +115,7 @@ describe("CLI", () => {
 			const token = "dummy";
 
 			const cli = new CommandLineInterface(["help", `--token=${token}`]);
-			await expect(cli.execute("dist")).toResolve();
+			await expect(cli.execute("distribution")).toResolve();
 
 			expect(spyOnList).not.toHaveBeenCalled();
 		});

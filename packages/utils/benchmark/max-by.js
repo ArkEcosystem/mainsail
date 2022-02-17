@@ -1,4 +1,4 @@
-const { maxBy } = require("../dist");
+const { maxBy } = require("../distribution");
 const lodash = require("lodash/maxBy");
 
 const objects = [

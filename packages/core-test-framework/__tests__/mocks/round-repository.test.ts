@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { RoundRepository } from "@packages/core-test-framework/src/mocks";
+import { RoundRepository } from "@packages/core-test-framework/source/mocks";
 import { Identities, Utils } from "@packages/crypto";
 import { Models } from "@packages/core-database";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 
 const round: Models.Round = {
 	publicKey: Identities.PublicKey.fromPassphrase(passphrases[1]),

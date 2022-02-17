@@ -1,7 +1,7 @@
 {
 	"name": "stub-plugin",
 	"version": "1.0.0",
-	"main": "dist/index",
+	"main": "distribution/index.js",
 	"arkecosystem": {
 		"core": {
 			"required": true,

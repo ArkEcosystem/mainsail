@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { formatTimestamp } from "@packages/core-kernel/src/utils/format-timestamp";
+import { formatTimestamp } from "@packages/core-kernel/source/utils/format-timestamp";
 
 describe("Format Timestamp", () => {
 	it("should compute the correct epoch value", () => {

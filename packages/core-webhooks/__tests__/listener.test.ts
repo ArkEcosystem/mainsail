@@ -1,14 +1,14 @@
 import "jest-extended";
 
 import { Container, Utils } from "@packages/core-kernel";
-import { HttpOptions, HttpResponse } from "@packages/core-kernel/src/utils";
+import { HttpOptions, HttpResponse } from "@packages/core-kernel/source/utils";
 import { Sandbox } from "@packages/core-test-framework";
-import * as coditions from "@packages/core-webhooks/src/conditions";
-import { Database } from "@packages/core-webhooks/src/database";
-import { WebhookEvent } from "@packages/core-webhooks/src/events";
-import { Identifiers } from "@packages/core-webhooks/src/identifiers";
-import { Webhook } from "@packages/core-webhooks/src/interfaces";
-import { Listener } from "@packages/core-webhooks/src/listener";
+import * as coditions from "@packages/core-webhooks/source/conditions";
+import { Database } from "@packages/core-webhooks/source/database";
+import { WebhookEvent } from "@packages/core-webhooks/source/events";
+import { Identifiers } from "@packages/core-webhooks/source/identifiers";
+import { Webhook } from "@packages/core-webhooks/source/interfaces";
+import { Listener } from "@packages/core-webhooks/source/listener";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { dummyWebhook } from "./__fixtures__/assets";

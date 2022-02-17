@@ -1,10 +1,10 @@
 import "jest-extended";
 
 import { Application } from "@packages/core-kernel";
-import { getBlockTimeLookup } from "@packages/core-kernel/src/utils/get-blocktime-lookup";
+import { getBlockTimeLookup } from "@packages/core-kernel/source/utils/get-blocktime-lookup";
 import { Managers } from "@packages/crypto";
-import { configManager } from "@packages/crypto/src/managers";
-import { devnet } from "@packages/crypto/src/networks";
+import { configManager } from "@packages/crypto/source/managers";
+import { devnet } from "@packages/crypto/source/networks";
 
 afterEach(() => jest.clearAllMocks());
 

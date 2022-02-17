@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { WIF } from "../../../../packages/crypto/src/identities/wif";
+import { WIF } from "../../../../packages/crypto/source/identities/wif";
 import { data, passphrase } from "./fixture.json";
 
 describe("Identities - WIF", () => {

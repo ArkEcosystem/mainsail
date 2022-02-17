@@ -1,4 +1,4 @@
-const { Blocks } = require("../../dist");
+const { Blocks } = require("../../distribution");
 
 const data = require("../helpers").getJSONFixture("block/deserialized/transactions");
 

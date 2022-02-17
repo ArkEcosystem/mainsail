@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { TransactionPoolProcessor } from "@packages/core-test-framework/src/mocks";
+import { TransactionPoolProcessor } from "@packages/core-test-framework/source/mocks";
 
 let processorState = {
 	accept: ["f0880e972206698bf48e43325ec03045a3b2ab215b8f716a51742a909b718177"],

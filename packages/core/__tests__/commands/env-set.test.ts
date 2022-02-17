@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/env-set";
+import { Command } from "@packages/core/source/commands/env-set";
 import envfile from "envfile";
 import { ensureFileSync, removeSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";

@@ -1,8 +1,8 @@
 import { Container } from "@packages/core-kernel";
-import { MissingCommonBlockError } from "@packages/core-p2p/src/errors";
-import { Peer } from "@packages/core-p2p/src/peer";
-import { PeerController } from "@packages/core-p2p/src/socket-server/controllers/peer";
-import { getPeerConfig } from "@packages/core-p2p/src/socket-server/utils/get-peer-config";
+import { MissingCommonBlockError } from "@packages/core-p2p/source/errors";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { PeerController } from "@packages/core-p2p/source/socket-server/controllers/peer";
+import { getPeerConfig } from "@packages/core-p2p/source/socket-server/utils/get-peer-config";
 import { Sandbox } from "@packages/core-test-framework";
 import { Crypto, Managers } from "@packages/crypto";
 

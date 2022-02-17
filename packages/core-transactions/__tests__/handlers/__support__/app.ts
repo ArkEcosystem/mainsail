@@ -1,36 +1,36 @@
 import { Application, Container, Contracts, Providers, Services } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
-import { NullEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/null";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
+import { NullEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/null";
 import { Wallets } from "@packages/core-state";
-import { StateStore } from "@packages/core-state/src/stores/state";
+import { StateStore } from "@packages/core-state/source/stores/state";
 import {
 	addressesIndexer,
 	publicKeysIndexer,
 	usernamesIndexer,
-} from "@packages/core-state/src/wallets/indexers/indexers";
+} from "@packages/core-state/source/wallets/indexers/indexers";
 import { Mocks } from "@packages/core-test-framework";
-import { FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { getWalletAttributeSet } from "@packages/core-test-framework/src/internal/wallet-attributes";
-import { Collator } from "@packages/core-transaction-pool/src";
+import { FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
+import { Collator } from "@packages/core-transaction-pool/source";
 import {
 	ApplyTransactionAction,
 	RevertTransactionAction,
 	ThrowIfCannotEnterPoolAction,
 	VerifyTransactionAction,
-} from "@packages/core-transaction-pool/src/actions";
-import { DynamicFeeMatcher } from "@packages/core-transaction-pool/src/dynamic-fee-matcher";
-import { ExpirationService } from "@packages/core-transaction-pool/src/expiration-service";
-import { Mempool } from "@packages/core-transaction-pool/src/mempool";
-import { Query } from "@packages/core-transaction-pool/src/query";
-import { SenderMempool } from "@packages/core-transaction-pool/src/sender-mempool";
-import { SenderState } from "@packages/core-transaction-pool/src/sender-state";
-import { One, Two } from "@packages/core-transactions/src/handlers";
-import { TransactionHandlerProvider } from "@packages/core-transactions/src/handlers/handler-provider";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
+} from "@packages/core-transaction-pool/source/actions";
+import { DynamicFeeMatcher } from "@packages/core-transaction-pool/source/dynamic-fee-matcher";
+import { ExpirationService } from "@packages/core-transaction-pool/source/expiration-service";
+import { Mempool } from "@packages/core-transaction-pool/source/mempool";
+import { Query } from "@packages/core-transaction-pool/source/query";
+import { SenderMempool } from "@packages/core-transaction-pool/source/sender-mempool";
+import { SenderState } from "@packages/core-transaction-pool/source/sender-state";
+import { One, Two } from "@packages/core-transactions/source/handlers";
+import { TransactionHandlerProvider } from "@packages/core-transactions/source/handlers/handler-provider";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
+import { ServiceProvider } from "@packages/core-transactions/source/service-provider";
 import { Identities, Utils } from "@packages/crypto";
-import { IMultiSignatureAsset } from "@packages/crypto/src/interfaces";
+import { IMultiSignatureAsset } from "@packages/crypto/source/interfaces";
 
 const logger = {
 	notice: jest.fn(),

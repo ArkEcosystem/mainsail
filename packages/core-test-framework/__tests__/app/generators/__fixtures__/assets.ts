@@ -1,4 +1,4 @@
-import { SandboxOptions } from "@packages/core-test-framework/src/app/contracts";
+import { SandboxOptions } from "@packages/core-test-framework/source/app/contracts";
 
 export const sandboxOptions: SandboxOptions = {
 	core: {

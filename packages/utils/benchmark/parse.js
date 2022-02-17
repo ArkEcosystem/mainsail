@@ -1,4 +1,4 @@
-const { parse } = require("../dist");
+const { parse } = require("../distribution");
 
 const json = JSON.stringify(
 	new Array(1000).fill({

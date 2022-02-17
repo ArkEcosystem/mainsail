@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/api/peer";
+import "@packages/core-test-framework/source/matchers/api/peer";
 
 let peer: any;
 

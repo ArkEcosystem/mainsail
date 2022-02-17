@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Title } from "@packages/core-cli/src/components";
+import { Title } from "@packages/core-cli/source/components";
 import { yellow } from "kleur";
 
 let cli;

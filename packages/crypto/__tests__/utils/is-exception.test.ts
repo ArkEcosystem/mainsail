@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { configManager } from "../../../../packages/crypto/src/managers";
-import { isException } from "../../../../packages/crypto/src/utils";
-import { IBlockData } from "../../../../packages/crypto/src/interfaces";
+import { configManager } from "../../../../packages/crypto/source/managers";
+import { isException } from "../../../../packages/crypto/source/utils";
+import { IBlockData } from "../../../../packages/crypto/source/interfaces";
 
 describe("IsException", () => {
 	let spyConfigGet;

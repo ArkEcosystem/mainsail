@@ -1,20 +1,20 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { RegisterServiceProviders } from "@packages/core-kernel/src/bootstrap/service-providers";
+import { Application } from "@packages/core-kernel/source/application";
+import { RegisterServiceProviders } from "@packages/core-kernel/source/bootstrap/service-providers";
 import {
 	InvalidPluginConfiguration,
 	ServiceProviderCannotBeRegistered,
-} from "@packages/core-kernel/src/exceptions/plugins";
-import { Container, Identifiers, interfaces } from "@packages/core-kernel/src/ioc";
+} from "@packages/core-kernel/source/exceptions/plugins";
+import { Container, Identifiers, interfaces } from "@packages/core-kernel/source/ioc";
 import {
 	PluginConfiguration,
 	PluginManifest,
 	ServiceProvider,
 	ServiceProviderRepository,
-} from "@packages/core-kernel/src/providers";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
-import { ServiceProvider as ValidationServiceProvider } from "@packages/core-kernel/src/services/validation";
+} from "@packages/core-kernel/source/providers";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
+import { ServiceProvider as ValidationServiceProvider } from "@packages/core-kernel/source/services/validation";
 
 import {
 	InvalidConfigurationServiceProvider,

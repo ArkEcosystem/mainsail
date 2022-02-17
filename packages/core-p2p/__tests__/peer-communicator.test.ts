@@ -1,24 +1,24 @@
 import "jest-extended";
 
 import { Container, Utils as KernelUtils } from "@arkecosystem/core-kernel";
-import { constants } from "@packages/core-p2p/src/constants";
+import { constants } from "@packages/core-p2p/source/constants";
 import {
 	PeerPingTimeoutError,
 	PeerStatusResponseError,
 	PeerVerificationFailedError,
-} from "@packages/core-p2p/src/errors";
-import { Peer } from "@packages/core-p2p/src/peer";
-import { PeerCommunicator } from "@packages/core-p2p/src/peer-communicator";
-import { PeerVerificationResult } from "@packages/core-p2p/src/peer-verifier";
-import { replySchemas } from "@packages/core-p2p/src/schemas";
+} from "@packages/core-p2p/source/errors";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { PeerCommunicator } from "@packages/core-p2p/source/peer-communicator";
+import { PeerVerificationResult } from "@packages/core-p2p/source/peer-verifier";
+import { replySchemas } from "@packages/core-p2p/source/schemas";
 import { Blocks, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import delay from "delay";
 
-jest.mock("@packages/core-p2p/src/socket-server/utils/get-codec", () => ({
+jest.mock("@packages/core-p2p/source/socket-server/utils/get-codec", () => ({
 	getCodec: () => ({ request: { serialize: (obj) => obj }, response: { deserialize: (obj) => obj } }),
 }));
 
-jest.mock("@packages/core-p2p/src/socket-server/utils/get-codec", () => ({
+jest.mock("@packages/core-p2p/source/socket-server/utils/get-codec", () => ({
 	getCodec: () => ({ request: { serialize: (obj) => obj }, response: { deserialize: (obj) => obj } }),
 }));
 

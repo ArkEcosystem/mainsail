@@ -5,7 +5,7 @@ import {
 	isIPv6Address,
 	isValidAddress,
 	normalizeAddress,
-} from "@packages/core-kernel/src/utils/ip-address";
+} from "@packages/core-kernel/source/utils/ip-address";
 
 describe("isValidAddress", () => {
 	it("should return true for valid IPv6 address", () => {

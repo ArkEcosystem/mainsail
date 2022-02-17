@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/functional/unconfirmed";
+import "@packages/core-test-framework/source/matchers/functional/unconfirmed";
 
 import { Interfaces } from "@arkecosystem/crypto";
 import got from "got";

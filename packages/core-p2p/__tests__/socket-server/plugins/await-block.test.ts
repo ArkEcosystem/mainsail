@@ -1,6 +1,6 @@
 import { Server } from "@hapi/hapi";
 import { Container } from "@packages/core-kernel";
-import { AwaitBlockPlugin } from "@packages/core-p2p/src/socket-server/plugins/await-block";
+import { AwaitBlockPlugin } from "@packages/core-p2p/source/socket-server/plugins/await-block";
 import Joi from "joi";
 
 afterEach(() => {

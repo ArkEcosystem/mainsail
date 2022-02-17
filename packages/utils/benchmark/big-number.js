@@ -1,4 +1,4 @@
-const { BigNumber } = require("../dist");
+const { BigNumber } = require("../distribution");
 const BigNumberJS = require("bignumber.js");
 const BigJS = require("bignumber.js");
 const BigNumber2 = require("big-number");

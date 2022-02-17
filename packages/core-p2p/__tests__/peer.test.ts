@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Peer } from "@packages/core-p2p/src/peer";
-import { PeerVerificationResult } from "@packages/core-p2p/src/peer-verifier";
+import { Peer } from "@packages/core-p2p/source/peer";
+import { PeerVerificationResult } from "@packages/core-p2p/source/peer-verifier";
 import dayjs from "dayjs";
 import { Contracts } from "@arkecosystem/core-kernel";
 

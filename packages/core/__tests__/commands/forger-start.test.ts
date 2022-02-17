@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/forger-start";
+import { Command } from "@packages/core/source/commands/forger-start";
 import { writeJSONSync } from "fs-extra";
 import os from "os";
 import { resolve } from "path";

@@ -1,4 +1,4 @@
-import { Worker } from "@packages/core-snapshots/src/contracts";
+import { Worker } from "@packages/core-snapshots/source/contracts";
 import { Readable } from "stream";
 import WorkerThreads from "worker_threads";
 import { decamelize } from "xcase";

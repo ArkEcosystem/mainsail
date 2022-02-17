@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Identifiers } from "@packages/core-api";
 import { Sandbox } from "@packages/core-test-framework";
-import { ApiInjectClient } from "@packages/core-test-framework/src/utils";
+import { ApiInjectClient } from "@packages/core-test-framework/source/utils";
 
 let sandbox: Sandbox;
 let apiClient: ApiInjectClient;

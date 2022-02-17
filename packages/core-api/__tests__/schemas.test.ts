@@ -4,7 +4,7 @@ import {
 	createSortingSchema,
 	nonNegativeBigNumber,
 	positiveBigNumber,
-} from "@packages/core-api/src/schemas";
+} from "@packages/core-api/source/schemas";
 import { Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 

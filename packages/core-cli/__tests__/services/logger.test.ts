@@ -1,6 +1,6 @@
 import { Container } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Logger } from "@packages/core-cli/src/services";
+import { Logger } from "@packages/core-cli/source/services";
 
 let cli;
 let logger;

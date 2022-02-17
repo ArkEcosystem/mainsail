@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Console } from "@packages/core-test-framework";
 import Joi from "joi";
-import { Input, InputDefinition } from "@packages/core-cli/src/input";
+import { Input, InputDefinition } from "@packages/core-cli/source/input";
 
 let cli;
 beforeEach(() => (cli = new Console()));

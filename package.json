@@ -18,7 +18,7 @@
 		"lint": "./node_modules/eslint/bin/eslint.js packages --ext .ts --fix",
 		"lint:tests": "./node_modules/eslint/bin/eslint.js __tests__ --ext .ts --fix",
 		"madge:circular": "node ./scripts/circular.js",
-		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/src",
+		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/source",
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./__tests__/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
 		"rebuild": "ultra -r rebuild",
 		"setup": "pnpm install && pnpm run build",

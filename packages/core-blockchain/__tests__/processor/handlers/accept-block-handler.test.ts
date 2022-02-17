@@ -1,5 +1,5 @@
-import { BlockProcessorResult } from "@packages/core-blockchain/src/processor";
-import { AcceptBlockHandler } from "@packages/core-blockchain/src/processor/handlers/accept-block-handler";
+import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
+import { AcceptBlockHandler } from "@packages/core-blockchain/source/processor/handlers/accept-block-handler";
 import { Container } from "@packages/core-kernel";
 import { Interfaces } from "@packages/crypto";
 

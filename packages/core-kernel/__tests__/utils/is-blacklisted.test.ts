@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { isBlacklisted } from "@packages/core-kernel/src/utils/is-blacklisted";
+import { isBlacklisted } from "@packages/core-kernel/source/utils/is-blacklisted";
 
 describe("isBlacklisted", () => {
 	it("should allow everyone if there is no blacklist", () => {

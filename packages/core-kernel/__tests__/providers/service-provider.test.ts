@@ -1,10 +1,10 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Container, interfaces } from "@packages/core-kernel/src/ioc";
-import { PluginConfiguration } from "@packages/core-kernel/src/providers/plugin-configuration";
-import { PluginManifest } from "@packages/core-kernel/src/providers/plugin-manifest";
-import { ServiceProvider } from "@packages/core-kernel/src/providers/service-provider";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container, interfaces } from "@packages/core-kernel/source/ioc";
+import { PluginConfiguration } from "@packages/core-kernel/source/providers/plugin-configuration";
+import { PluginManifest } from "@packages/core-kernel/source/providers/plugin-manifest";
+import { ServiceProvider } from "@packages/core-kernel/source/providers/service-provider";
 import { resolve } from "path";
 
 let app: Application;

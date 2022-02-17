@@ -1,4 +1,4 @@
-const { unset } = require("../dist");
+const { unset } = require("../distribution");
 const lodash = require("lodash/unset");
 
 var object = {

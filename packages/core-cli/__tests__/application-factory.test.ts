@@ -1,4 +1,4 @@
-import { Application, ApplicationFactory, Container, Utils } from "@packages/core-cli/src";
+import { Application, ApplicationFactory, Container, Utils } from "@packages/core-cli/source";
 
 describe("ApplicationFactory", () => {
 	it("should create an application instance with the given container", () => {

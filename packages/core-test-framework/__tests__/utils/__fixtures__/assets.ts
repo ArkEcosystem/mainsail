@@ -1,4 +1,4 @@
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 
 export const paginationResponseMeta = {
 	count: 100,

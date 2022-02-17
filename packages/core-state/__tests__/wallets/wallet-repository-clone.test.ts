@@ -9,9 +9,12 @@ import {
 	Wallet,
 	WalletRepository,
 	WalletRepositoryClone,
-} from "@packages/core-state/src/wallets";
-import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "@packages/core-state/src/wallets/errors";
-import { walletFactory } from "@packages/core-state/src/wallets/wallet-factory";
+} from "@packages/core-state/source/wallets";
+import {
+	WalletIndexAlreadyRegisteredError,
+	WalletIndexNotFoundError,
+} from "@packages/core-state/source/wallets/errors";
+import { walletFactory } from "@packages/core-state/source/wallets/wallet-factory";
 import { Sandbox } from "@packages/core-test-framework";
 
 let sandbox: Sandbox;

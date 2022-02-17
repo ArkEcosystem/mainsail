@@ -1,7 +1,7 @@
 import "jest-extended";
 
 import { Utils } from "@packages/core-kernel";
-import { BlockRepository } from "@packages/core-snapshots/src/repositories";
+import { BlockRepository } from "@packages/core-snapshots/source/repositories";
 
 import { Assets } from "../__fixtures__";
 

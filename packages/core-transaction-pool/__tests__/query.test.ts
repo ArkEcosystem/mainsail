@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Enums, Identities, Managers, Transactions } from "@arkecosystem/crypto";
 
-import { Query, QueryIterable } from "../../../packages/core-transaction-pool/src/query";
+import { Query, QueryIterable } from "../../../packages/core-transaction-pool/source/query";
 
 const mempool = {
 	getSenderMempools: jest.fn(),

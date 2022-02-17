@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { ConfigRepository } from "@packages/core-kernel/src/services/config/repository";
+import { ConfigRepository } from "@packages/core-kernel/source/services/config/repository";
 
 let configRepository: ConfigRepository;
 beforeEach(() => (configRepository = new ConfigRepository()));

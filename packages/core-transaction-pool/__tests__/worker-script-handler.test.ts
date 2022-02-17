@@ -1,5 +1,5 @@
 import { Generators } from "@packages/core-test-framework";
-import { WorkerScriptHandler } from "@packages/core-transaction-pool/src/worker-script-handler";
+import { WorkerScriptHandler } from "@packages/core-transaction-pool/source/worker-script-handler";
 import { Identities, Managers, Transactions } from "@packages/crypto";
 
 describe("WorkerScriptHandler.setConfig", () => {

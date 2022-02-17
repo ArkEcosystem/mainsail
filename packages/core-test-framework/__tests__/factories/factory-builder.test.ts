@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { FactoryBuilder } from "@packages/core-test-framework/src/factories/factory-builder";
+import { FactoryBuilder } from "@packages/core-test-framework/source/factories/factory-builder";
 
 let factory: FactoryBuilder;
 

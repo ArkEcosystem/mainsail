@@ -3,8 +3,8 @@ import "jest-extended";
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";
 import * as Teamwork from "@hapi/teamwork";
-import { Client, plugin } from "@packages/core-p2p/src/hapi-nes";
-import { stringifyNesMessage } from "@packages/core-p2p/src/hapi-nes/utils";
+import { Client, plugin } from "@packages/core-p2p/source/hapi-nes";
+import { stringifyNesMessage } from "@packages/core-p2p/source/hapi-nes/utils";
 
 jest.setTimeout(60000);
 

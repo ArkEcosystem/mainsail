@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import * as constants from "@packages/crypto/src/constants";
+import * as constants from "@packages/crypto/source/constants";
 
 describe("Constants", () => {
 	it("satoshi is valid", () => {

@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { Container } from "@packages/core-kernel/src";
-import { StateStore } from "@packages/core-state/src/stores/state";
-import { FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import { IBlock, IBlockData, ITransactionData } from "@packages/crypto/dist/interfaces";
+import { Container } from "@packages/core-kernel/source";
+import { StateStore } from "@packages/core-state/source/stores/state";
+import { FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { IBlock, IBlockData, ITransactionData } from "@packages/crypto/distribution/interfaces";
 import delay from "delay";
 
 import { makeChainedBlocks } from "../__utils__/make-chained-block";

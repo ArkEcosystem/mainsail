@@ -1,5 +1,5 @@
 import { Container, Enums } from "@packages/core-kernel";
-import { RoundState } from "@packages/core-state/src/round-state";
+import { RoundState } from "@packages/core-state/source/round-state";
 import { Sandbox } from "@packages/core-test-framework";
 import { Blocks, Identities, Utils } from "@packages/crypto";
 

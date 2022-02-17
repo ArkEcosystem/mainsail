@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { MixinService } from "@packages/core-kernel/src/services/mixins/mixins";
-import { Constructor } from "@packages/core-kernel/src/types/container";
+import { MixinService } from "@packages/core-kernel/source/services/mixins/mixins";
+import { Constructor } from "@packages/core-kernel/source/types/container";
 
 class User {
 	name: string;

@@ -1,18 +1,18 @@
 import "jest-extended";
 
 import { Application, Contracts, Exceptions } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
 import { Wallets } from "@packages/core-state";
-import { StateStore } from "@packages/core-state/src/stores/state";
-import { Generators } from "@packages/core-test-framework/src";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { InsufficientBalanceError } from "@packages/core-transactions/src/errors";
-import { TransactionHandler } from "@packages/core-transactions/src/handlers";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
+import { StateStore } from "@packages/core-state/source/stores/state";
+import { Generators } from "@packages/core-test-framework/source";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { InsufficientBalanceError } from "@packages/core-transactions/source/errors";
+import { TransactionHandler } from "@packages/core-transactions/source/handlers";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@packages/crypto";
-import { BuilderFactory } from "@packages/crypto/dist/transactions";
-import { configManager } from "@packages/crypto/src/managers";
+import { BuilderFactory } from "@packages/crypto/distribution/transactions";
+import { configManager } from "@packages/crypto/source/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -161,7 +161,7 @@ describe("MultiPaymentTransaction", () => {
 	describe("apply", () => {
 		it("should be ok", async () => {
 			const senderBalance = senderWallet.getBalance();
-			const totalPaymentsAmount = multiPaymentTransaction.data.asset!.payments!.reduce(
+			const totalPaymentsAmount = multiPaymentTransaction.data.asset.payments.reduce(
 				(prev, curr) => prev.plus(curr.amount),
 				Utils.BigNumber.ZERO,
 			);
@@ -172,7 +172,7 @@ describe("MultiPaymentTransaction", () => {
 				Utils.BigNumber.make(senderBalance).minus(totalPaymentsAmount).minus(multiPaymentTransaction.data.fee),
 			);
 
-			for (const { recipientId, amount } of multiPaymentTransaction.data.asset!.payments!) {
+			for (const { recipientId, amount } of multiPaymentTransaction.data.asset.payments) {
 				const paymentRecipientWallet = walletRepository.findByAddress(recipientId);
 				expect(paymentRecipientWallet.getBalance()).toEqual(amount);
 			}
@@ -206,11 +206,11 @@ describe("MultiPaymentTransaction", () => {
 			const senderBalance = senderWallet.getBalance();
 			senderWallet.setNonce(Utils.BigNumber.make(1));
 
-			for (const { recipientId, amount } of multiPaymentTransaction.data.asset!.payments!) {
+			for (const { recipientId, amount } of multiPaymentTransaction.data.asset.payments) {
 				const paymentRecipientWallet = walletRepository.findByAddress(recipientId);
 				paymentRecipientWallet.setBalance(amount);
 			}
-			const totalPaymentsAmount = multiPaymentTransaction.data.asset!.payments!.reduce(
+			const totalPaymentsAmount = multiPaymentTransaction.data.asset.payments.reduce(
 				(prev, curr) => prev.plus(curr.amount),
 				Utils.BigNumber.ZERO,
 			);

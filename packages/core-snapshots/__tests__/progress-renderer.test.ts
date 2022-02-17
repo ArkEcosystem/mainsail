@@ -1,10 +1,10 @@
 import "jest-extended";
 
 import { Container } from "@packages/core-kernel";
-import { MemoryEventDispatcher } from "@packages/core-kernel/src/services/events/drivers/memory";
+import { MemoryEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/memory";
 import { SnapshotApplicationEvents } from "@packages/core-snapshots";
-import { ProgressRenderer } from "@packages/core-snapshots/src/progress-renderer";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { ProgressRenderer } from "@packages/core-snapshots/source/progress-renderer";
+import { Sandbox } from "@packages/core-test-framework/source";
 
 let sandbox: Sandbox;
 let eventDispatcher: MemoryEventDispatcher;

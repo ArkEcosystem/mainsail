@@ -1,4 +1,4 @@
-const { some } = require("../dist");
+const { some } = require("../distribution");
 const lodash = require("lodash/some");
 
 exports["native"] = () => [null, 0, "yes", false].some(Boolean);

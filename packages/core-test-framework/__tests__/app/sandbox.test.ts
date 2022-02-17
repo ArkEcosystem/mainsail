@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { Container } from "@packages/core-kernel";
 import { ServiceProvider as CoreStateServiceProvider } from "@packages/core-state";
-import { CoreOptions, CryptoOptions, Sandbox } from "@packages/core-test-framework/src/app";
+import { CoreOptions, CryptoOptions, Sandbox } from "@packages/core-test-framework/source/app";
 import { resolve } from "path";
 
 describe("Sandbox", () => {

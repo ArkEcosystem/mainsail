@@ -1,5 +1,5 @@
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/core-log";
+import { Command } from "@packages/core/source/commands/core-log";
 
 let cli;
 beforeEach(() => (cli = new Console()));

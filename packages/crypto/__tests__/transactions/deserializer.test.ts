@@ -1,21 +1,21 @@
 import "jest-extended";
 
-import { Generators } from "@packages/core-test-framework/src";
-import { Enums, Errors, Utils } from "@packages/crypto/src";
-import { Hash } from "@packages/crypto/src/crypto";
+import { Generators } from "@packages/core-test-framework/source";
+import { Enums, Errors, Utils } from "@packages/crypto/source";
+import { Hash } from "@packages/crypto/source/crypto";
 import {
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 	TransactionVersionError,
 	UnkownTransactionError,
-} from "@packages/crypto/src/errors";
-import { Address, Keys } from "@packages/crypto/src/identities";
-import { IKeyPair, ITransaction, ITransactionData } from "@packages/crypto/src/interfaces";
-import { configManager } from "@packages/crypto/src/managers";
-import { TransactionFactory, Utils as TransactionUtils, Verifier } from "@packages/crypto/src/transactions";
-import { BuilderFactory } from "@packages/crypto/src/transactions/builders";
-import { Deserializer } from "@packages/crypto/src/transactions/deserializer";
-import { Serializer } from "@packages/crypto/src/transactions/serializer";
+} from "@packages/crypto/source/errors";
+import { Address, Keys } from "@packages/crypto/source/identities";
+import { IKeyPair, ITransaction, ITransactionData } from "@packages/crypto/source/interfaces";
+import { configManager } from "@packages/crypto/source/managers";
+import { TransactionFactory, Utils as TransactionUtils, Verifier } from "@packages/crypto/source/transactions";
+import { BuilderFactory } from "@packages/crypto/source/transactions/builders";
+import { Deserializer } from "@packages/crypto/source/transactions/deserializer";
+import { Serializer } from "@packages/crypto/source/transactions/serializer";
 import ByteBuffer from "bytebuffer";
 
 import { legacyMultiSignatureRegistration } from "./__fixtures__/transaction";

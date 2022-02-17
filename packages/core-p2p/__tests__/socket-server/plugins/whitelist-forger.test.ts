@@ -1,9 +1,9 @@
 import { Server } from "@hapi/hapi";
 import Joi from "joi";
 import { Container } from "@packages/core-kernel";
-import { defaults } from "@packages/core-p2p/src/defaults";
-import { PeerProcessor } from "@packages/core-p2p/src/peer-processor";
-import { WhitelistForgerPlugin } from "@packages/core-p2p/src/socket-server/plugins/whitelist-forger";
+import { defaults } from "@packages/core-p2p/source/defaults";
+import { PeerProcessor } from "@packages/core-p2p/source/peer-processor";
+import { WhitelistForgerPlugin } from "@packages/core-p2p/source/socket-server/plugins/whitelist-forger";
 
 describe("WhitelistForgerPlugin", () => {
 	let whitelistForgerPlugin: WhitelistForgerPlugin;

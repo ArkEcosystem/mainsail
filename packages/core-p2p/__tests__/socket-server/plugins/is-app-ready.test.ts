@@ -1,7 +1,7 @@
 import { Server } from "@hapi/hapi";
 import { Container } from "@packages/core-kernel";
-import { protocol } from "@packages/core-p2p/src/hapi-nes/utils";
-import { IsAppReadyPlugin } from "@packages/core-p2p/src/socket-server/plugins/is-app-ready";
+import { protocol } from "@packages/core-p2p/source/hapi-nes/utils";
+import { IsAppReadyPlugin } from "@packages/core-p2p/source/socket-server/plugins/is-app-ready";
 import Joi from "joi";
 
 afterEach(() => {

@@ -1,4 +1,4 @@
-name: Unit Testing
+name: Unit
 on:
     push:
         branches:
@@ -17,7 +17,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core
+            group: ${{ github.head_ref }}-unit-core
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -42,7 +42,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-api
+            group: ${{ github.head_ref }}-unit-core-api
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-blockchain
+            group: ${{ github.head_ref }}-unit-core-blockchain
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -92,7 +92,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-cli
+            group: ${{ github.head_ref }}-unit-core-cli
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -117,7 +117,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-database
+            group: ${{ github.head_ref }}-unit-core-database
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -142,7 +142,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-forger
+            group: ${{ github.head_ref }}-unit-core-forger
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -167,7 +167,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-kernel
+            group: ${{ github.head_ref }}-unit-core-kernel
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -192,7 +192,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-logger-pino
+            group: ${{ github.head_ref }}-unit-core-logger-pino
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -217,7 +217,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-p2p
+            group: ${{ github.head_ref }}-unit-core-p2p
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -242,7 +242,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-snapshots
+            group: ${{ github.head_ref }}-unit-core-snapshots
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -267,7 +267,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-state
+            group: ${{ github.head_ref }}-unit-core-state
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -292,7 +292,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-test
+            group: ${{ github.head_ref }}-unit-core-test
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -317,7 +317,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-test-framework
+            group: ${{ github.head_ref }}-unit-core-test-framework
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -342,7 +342,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-transaction-pool
+            group: ${{ github.head_ref }}-unit-core-transaction-pool
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -367,7 +367,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-transactions
+            group: ${{ github.head_ref }}-unit-core-transactions
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -392,7 +392,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-core-webhooks
+            group: ${{ github.head_ref }}-unit-core-webhooks
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -417,7 +417,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto
+            group: ${{ github.head_ref }}-unit-crypto
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -442,7 +442,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto-address-base58
+            group: ${{ github.head_ref }}-unit-crypto-address-base58
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -467,7 +467,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto-address-bech32
+            group: ${{ github.head_ref }}-unit-crypto-address-bech32
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -492,7 +492,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto-address-bech32m
+            group: ${{ github.head_ref }}-unit-crypto-address-bech32m
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -517,7 +517,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto-address-keccak256
+            group: ${{ github.head_ref }}-unit-crypto-address-keccak256
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -542,7 +542,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto-identities
+            group: ${{ github.head_ref }}-unit-crypto-identities
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -567,7 +567,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto-key-pair-schnorr
+            group: ${{ github.head_ref }}-unit-crypto-key-pair-schnorr
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -592,7 +592,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-crypto-key-pair-secp256k1
+            group: ${{ github.head_ref }}-unit-crypto-key-pair-secp256k1
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -617,7 +617,7 @@ jobs:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-test-utils
+            group: ${{ github.head_ref }}-unit-utils
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2

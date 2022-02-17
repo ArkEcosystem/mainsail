@@ -1,6 +1,6 @@
 import { Validation } from "@arkecosystem/crypto";
-import { SocketErrors } from "@packages/core-p2p/src/enums";
-import { validate } from "@packages/core-p2p/src/socket-server/utils/validate";
+import { SocketErrors } from "@packages/core-p2p/source/enums";
+import { validate } from "@packages/core-p2p/source/socket-server/utils/validate";
 
 describe("validate", () => {
 	it("should validate using crypto validate()", () => {

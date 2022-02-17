@@ -1,4 +1,4 @@
-const { assign } = require("../dist");
+const { assign } = require("../distribution");
 const lodash = require("lodash/assign");
 
 function Foo() {

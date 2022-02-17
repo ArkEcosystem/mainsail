@@ -1,23 +1,23 @@
 import "jest-extended";
 
 import { Utils } from "@packages/crypto";
-import { Generators } from "@packages/core-test-framework/src";
-import { TransactionFactory as TestTransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
+import { Generators } from "@packages/core-test-framework/source";
+import { TransactionFactory as TestTransactionFactory } from "@packages/core-test-framework/source/utils/transaction-factory";
 
 import {
 	InvalidTransactionBytesError,
 	TransactionTypeError,
 	TransactionVersionError,
-} from "../../../../packages/crypto/src/errors";
-import { Keys } from "../../../../packages/crypto/src/identities";
-import { ITransaction, ITransactionData } from "../../../../packages/crypto/src/interfaces";
-import { configManager } from "../../../../packages/crypto/src/managers";
+} from "../../../../packages/crypto/source/errors";
+import { Keys } from "../../../../packages/crypto/source/identities";
+import { ITransaction, ITransactionData } from "../../../../packages/crypto/source/interfaces";
+import { configManager } from "../../../../packages/crypto/source/managers";
 import {
 	BuilderFactory,
 	Transaction,
 	TransactionFactory,
 	Utils as TransactionUtils,
-} from "../../../../packages/crypto/src/transactions";
+} from "../../../../packages/crypto/source/transactions";
 import { transaction as transactionDataFixture } from "../fixtures/transaction";
 
 let transactionData: ITransactionData;

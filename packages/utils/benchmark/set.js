@@ -1,4 +1,4 @@
-const { set } = require("../dist");
+const { set } = require("../distribution");
 const lodash = require("lodash/set");
 
 var object = {

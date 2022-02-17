@@ -1,5 +1,5 @@
-import { Container } from "@packages/core-kernel/src/ioc";
-import { decorateInjectable } from "@packages/core-kernel/src/ioc/decorator";
+import { Container } from "@packages/core-kernel/source/ioc";
+import { decorateInjectable } from "@packages/core-kernel/source/ioc/decorator";
 
 class ThirdPartyClass {}
 const container = new Container();

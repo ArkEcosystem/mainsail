@@ -1,6 +1,12 @@
 module.exports = {
 	collectCoverage: true,
-	collectCoverageFrom: ["src/**/*.ts", "!src/contracts.ts", "!src/errors.ts", "!src/index.ts", "!**/node_modules/**"],
+	collectCoverageFrom: [
+		"source/**/*.ts",
+		"!source/contracts.ts",
+		"!source/errors.ts",
+		"!source/index.ts",
+		"!**/node_modules/**",
+	],
 	coverageDirectory: "<rootDir>/.coverage",
 	coverageReporters: ["json", "lcov", "text", "clover", "html"],
 	moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],

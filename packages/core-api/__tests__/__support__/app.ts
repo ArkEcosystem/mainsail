@@ -1,17 +1,17 @@
 import { Application, Container, Contracts, Providers, Services } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
 import { Wallets } from "@packages/core-state";
 import {
 	addressesIndexer,
 	publicKeysIndexer,
 	usernamesIndexer,
-} from "@packages/core-state/src/wallets/indexers/indexers";
+} from "@packages/core-state/source/wallets/indexers/indexers";
 import { Mocks } from "@packages/core-test-framework";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { One, Two } from "@packages/core-transactions/src/handlers";
-import { TransactionHandlerProvider } from "@packages/core-transactions/src/handlers/handler-provider";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { One, Two } from "@packages/core-transactions/source/handlers";
+import { TransactionHandlerProvider } from "@packages/core-transactions/source/handlers/handler-provider";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
+import { ServiceProvider } from "@packages/core-transactions/source/service-provider";
 import { Identities, Utils } from "@packages/crypto";
 
 export type PaginatedResponse = {

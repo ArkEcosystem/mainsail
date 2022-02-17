@@ -1,4 +1,4 @@
-const { isNumber, pickBy } = require("../dist");
+const { isNumber, pickBy } = require("../distribution");
 const lodash = require("lodash/pickBy");
 
 exports["utils"] = () =>

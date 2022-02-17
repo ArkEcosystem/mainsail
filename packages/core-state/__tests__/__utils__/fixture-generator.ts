@@ -1,7 +1,7 @@
 import { Services } from "@packages/core-kernel";
-import { Wallet } from "@packages/core-state/src/wallets";
+import { Wallet } from "@packages/core-state/source/wallets";
 import { Identities } from "@packages/crypto";
-import { Utils } from "@packages/crypto/src";
+import { Utils } from "@packages/crypto/source";
 
 import compact from "./compact";
 import unique from "./unique";

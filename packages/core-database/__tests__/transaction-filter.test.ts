@@ -1,4 +1,4 @@
-import { TransactionFilter } from "@packages/core-database/src/transaction-filter";
+import { TransactionFilter } from "@packages/core-database/source/transaction-filter";
 import { Container } from "@packages/core-kernel";
 import { Enums, Utils } from "@packages/crypto";
 

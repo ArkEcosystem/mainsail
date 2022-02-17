@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { Application } from "@packages/core-kernel/src/application";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { PluginConfiguration } from "@packages/core-kernel/src/providers/plugin-configuration";
-import { ConfigRepository } from "@packages/core-kernel/src/services/config";
+import { Application } from "@packages/core-kernel/source/application";
+import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
+import { PluginConfiguration } from "@packages/core-kernel/source/providers/plugin-configuration";
+import { ConfigRepository } from "@packages/core-kernel/source/services/config";
 import { resolve } from "path";
 
 let app: Application;

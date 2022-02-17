@@ -1,4 +1,4 @@
-import "@packages/core-test-framework/src/matchers/functional/vote-balance";
+import "@packages/core-test-framework/source/matchers/functional/vote-balance";
 
 import got from "got";
 
