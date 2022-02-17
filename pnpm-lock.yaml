@@ -916,19 +916,6 @@ importers:
       '@arkecosystem/core-test': link:../core-test
       uvu: 0.5.3
 
-  packages/crypto-keypair-secp256k1:
-    specifiers:
-      '@arkecosystem/core-test': workspace:*
-      '@arkecosystem/crypto-contracts': workspace:*
-      bcrypto: 5.4.0
-      uvu: ^0.5.3
-    dependencies:
-      '@arkecosystem/crypto-contracts': link:../crypto-contracts
-      bcrypto: 5.4.0
-    devDependencies:
-      '@arkecosystem/core-test': link:../core-test
-      uvu: 0.5.3
-
   packages/crypto-networks:
     specifiers:
       '@types/tmp': ^0.2.0
