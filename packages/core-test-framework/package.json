@@ -15,7 +15,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "rimraf dist",
+		"clean": "del dist",
 		"test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
 		"test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
 	},

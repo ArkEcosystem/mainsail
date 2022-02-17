@@ -12,7 +12,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "rimraf dist"
+		"clean": "del dist"
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",

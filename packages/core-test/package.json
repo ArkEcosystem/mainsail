@@ -14,7 +14,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "rimraf dist",
+		"clean": "del dist",
 		"test": "uvu -r tsm src .test.ts"
 	},
 	"dependencies": {
