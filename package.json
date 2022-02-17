@@ -7,7 +7,6 @@
 		"plugins/*"
 	],
 	"scripts": {
-		"bench": "node benchmark/index.js",
 		"build": "ultra -r build",
 		"clean": "ultra -r clean",
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
@@ -52,7 +51,6 @@
 	"devDependencies": {
 		"@babel/core": "7.15.5",
 		"@babel/preset-env": "7.15.4",
-		"@faustbrian/benchmarker": "0.1.2",
 		"@noble/hashes": "^1.0.0",
 		"@oclif/dev-cli": "1.26.0",
 		"@types/babel__core": "7.1.16",
