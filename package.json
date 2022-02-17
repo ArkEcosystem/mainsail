@@ -52,8 +52,6 @@
 	"devDependencies": {
 		"@babel/core": "7.15.5",
 		"@babel/preset-env": "7.15.4",
-		"@commitlint/cli": "11.0.0",
-		"@commitlint/config-conventional": "11.0.0",
 		"@faustbrian/benchmarker": "0.1.2",
 		"@noble/hashes": "^1.0.0",
 		"@oclif/dev-cli": "1.26.0",
