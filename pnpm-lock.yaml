@@ -818,6 +818,14 @@ importers:
     dependencies:
       ajv: 6.12.6
 
+  packages/crypto-signatures-ecdsa:
+    specifiers:
+      '@arkecosystem/crypto-contracts': workspace:*
+      bcrypto: 5.4.0
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      bcrypto: 5.4.0
+
   packages/utils:
     specifiers:
       '@babel/core': ^7.11.6

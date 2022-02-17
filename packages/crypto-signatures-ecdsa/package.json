@@ -1,7 +1,7 @@
 {
-    "name": "@arkecosystem/crypto-contracts",
+    "name": "@arkecosystem/crypto-signatures-ecdsa",
     "version": "3.1.1",
-    "description": "Implementation Contracts for Cryptography",
+    "description": "Elliptic Curve Cryptography (ECDSA)",
     "license": "MIT",
     "contributors": [],
     "files": [
@@ -15,6 +15,7 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "ajv": "6.12.6"
+        "@arkecosystem/crypto-contracts": "workspace:*",
+        "bcrypto": "5.4.0"
     }
 }

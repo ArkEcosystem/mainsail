@@ -1,7 +1,5 @@
-import { IKeyPair } from "./identities";
-
 export interface Signatory {
-    signSchnorr(hash: Buffer, keys: IKeyPair): string;
+    sign(hash: Buffer, privateKey: Buffer): string;
 
-    verifySchnorr(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): boolean;
+    verify(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): boolean;
 }
