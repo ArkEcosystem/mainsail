@@ -1,7 +1,7 @@
 {
     "name": "@arkecosystem/crypto-address-bech32",
     "version": "3.1.1",
-    "description": "bech32 Derivation",
+    "description": "bech32 Address Derivation",
     "license": "MIT",
     "contributors": [],
     "files": [

@@ -56,7 +56,7 @@ describe("AddressFactory", ({ assert, it }) => {
         );
     });
 
-    it("should validate bech32 addresses", () => {
+    it("should validate addresses", () => {
         const factory = new AddressFactory(
             {
                 prefix: "mod",

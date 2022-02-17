@@ -12,11 +12,11 @@ describe("AddressFactory", ({ assert, it }) => {
         assert.is(
             new AddressFactory(
                 {
-                    prefix: "mod",
+                    pubKeyHash: 23,
                 },
                 new Schnorr(),
             ).fromMnemonic(mnemonic),
-            "mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur",
+            "AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8",
         );
     });
 
@@ -24,11 +24,11 @@ describe("AddressFactory", ({ assert, it }) => {
         assert.is(
             new AddressFactory(
                 {
-                    prefix: "mod",
+                    pubKeyHash: 23,
                 },
                 new Secp25k61(),
             ).fromMnemonic(mnemonic),
-            "mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
+            "AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
         );
     });
 
@@ -36,11 +36,11 @@ describe("AddressFactory", ({ assert, it }) => {
         assert.is(
             new AddressFactory(
                 {
-                    prefix: "mod",
+                    pubKeyHash: 23,
                 },
                 new Schnorr(),
             ).fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-            "mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur",
+            "AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8",
         );
     });
 
@@ -48,24 +48,24 @@ describe("AddressFactory", ({ assert, it }) => {
         assert.is(
             new AddressFactory(
                 {
-                    prefix: "mod",
+                    pubKeyHash: 23,
                 },
                 new Secp25k61(),
             ).fromPublicKey("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-            "mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
+            "AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
         );
     });
 
     it("should validate addresses", () => {
         const factory = new AddressFactory(
             {
-                prefix: "mod",
+                pubKeyHash: 23,
             },
             new Secp25k61(),
         );
 
-        assert.true(factory.validate("mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
-        assert.true(factory.validate("mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur"));
+        assert.true(factory.validate("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu"));
+        assert.true(factory.validate("AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8"));
         assert.false(factory.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
     });
 });

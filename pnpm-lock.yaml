@@ -812,6 +812,25 @@ importers:
       rollup-plugin-terser: 7.0.0_rollup@2.18.0
       util: 0.12.4
 
+  packages/crypto-address-base58:
+    specifiers:
+      '@arkecosystem/core-test': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-keypair-schnorr': workspace:^3.1.1
+      '@arkecosystem/crypto-keypair-secp256k1': workspace:^3.1.1
+      bcrypto: 5.4.0
+      bstring: 0.3.9
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      bcrypto: 5.4.0
+      bstring: 0.3.9
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      '@arkecosystem/crypto-keypair-schnorr': link:../crypto-keypair-schnorr
+      '@arkecosystem/crypto-keypair-secp256k1': link:../crypto-keypair-secp256k1
+      uvu: 0.5.3
+
   packages/crypto-address-bech32:
     specifiers:
       '@arkecosystem/core-test': workspace:*

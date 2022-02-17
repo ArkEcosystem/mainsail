@@ -1,7 +1,7 @@
 {
-    "name": "@arkecosystem/crypto-address-bech32m",
+    "name": "@arkecosystem/crypto-address-base58",
     "version": "3.1.1",
-    "description": "bech32 Address Derivation",
+    "description": "base58 Address Derivation",
     "license": "MIT",
     "contributors": [],
     "files": [
@@ -17,7 +17,8 @@
     },
     "dependencies": {
         "@arkecosystem/crypto-contracts": "workspace:*",
-        "@scure/base": "^1.0.0"
+        "bcrypto": "5.4.0",
+        "bstring": "0.3.9"
     },
     "devDependencies": {
         "@arkecosystem/core-test": "workspace:*",
