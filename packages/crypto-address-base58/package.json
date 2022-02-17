@@ -1,6 +1,6 @@
 {
 	"name": "@arkecosystem/crypto-address-base58",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "base58 Address Derivation",
 	"license": "MIT",
 	"contributors": [],
