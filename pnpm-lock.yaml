@@ -812,6 +812,23 @@ importers:
       rollup-plugin-terser: 7.0.0_rollup@2.18.0
       util: 0.12.4
 
+  packages/crypto-address-bech32:
+    specifiers:
+      '@arkecosystem/core-test': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-keypair-schnorr': workspace:^3.1.1
+      '@arkecosystem/crypto-keypair-secp256k1': workspace:^3.1.1
+      '@scure/base': ^1.0.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@scure/base': 1.0.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      '@arkecosystem/crypto-keypair-schnorr': link:../crypto-keypair-schnorr
+      '@arkecosystem/crypto-keypair-secp256k1': link:../crypto-keypair-secp256k1
+      uvu: 0.5.3
+
   packages/crypto-contracts:
     specifiers:
       ajv: 6.12.6
@@ -3311,6 +3328,10 @@ packages:
     dependencies:
       any-observable: 0.3.0
       rxjs: 6.6.7
+    dev: false
+
+  /@scure/base/1.0.0:
+    resolution: {integrity: sha512-gIVaYhUsy+9s58m/ETjSJVKHhKTBMmcRb9cEV5/5dwvfDlfORjKrFsDeDHWRrm6RjcPvCLZFwGJjAjLj1gg4HA==}
     dev: false
 
   /@sideway/address/4.1.3:
