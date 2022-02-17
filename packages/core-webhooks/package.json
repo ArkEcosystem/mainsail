@@ -1,38 +1,36 @@
 {
-	"name": "@arkecosystem/core-webhooks",
-	"version": "3.1.1",
-	"description": "Webhooks for ARK Core",
-	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>"
-	],
-	"main": "distribution/index.js",
-	"files": [
-		"/distribution"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
-	},
-	"dependencies": {
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
-		"@hapi/boom": "9.0.0",
-		"@hapi/hapi": "20.1.5",
-		"fs-extra": "8.1.0",
-		"joi": "17.4.2",
-		"lowdb": "1.0.0",
-		"uuid": "8.3.2"
-	},
-	"devDependencies": {
-		"@types/fs-extra": "8.1.2",
-		"@types/hapi__boom": "7.4.1",
-		"@types/hapi__joi": "17.1.7",
-		"@types/uuid": "8.3.1"
-	},
-	"engines": {
-		"node": ">=16.x"
-	}
+    "name": "@arkecosystem/core-webhooks",
+    "version": "3.1.1",
+    "description": "Webhooks for ARK Core",
+    "license": "MIT",
+    "contributors": [],
+    "main": "distribution/index.js",
+    "files": [
+        "/distribution"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "del dist",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
+    },
+    "dependencies": {
+        "@arkecosystem/core-kernel": "workspace:*",
+        "@arkecosystem/crypto": "workspace:*",
+        "@hapi/boom": "9.0.0",
+        "@hapi/hapi": "20.1.5",
+        "fs-extra": "8.1.0",
+        "joi": "17.4.2",
+        "lowdb": "1.0.0",
+        "uuid": "8.3.2"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "8.1.2",
+        "@types/hapi__boom": "7.4.1",
+        "@types/hapi__joi": "17.1.7",
+        "@types/uuid": "8.3.1"
+    },
+    "engines": {
+        "node": ">=16.x"
+    }
 }

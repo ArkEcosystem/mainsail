@@ -1,40 +1,37 @@
 {
-	"name": "@arkecosystem/core-state",
-	"version": "3.1.1",
-	"description": "State Management for ARK Core",
-	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>",
-		"Joshua Noack <joshua@ark.io>"
-	],
-	"main": "distribution/index.js",
-	"types": "distribution/index.d.ts",
-	"files": [
-		"/distribution"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
-	},
-	"dependencies": {
-		"@arkecosystem/core-database": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
-		"immutable": "4.0.0-rc.14",
-		"joi": "17.4.2"
-	},
-	"devDependencies": {
-		"delay": "4.4.1"
-	},
-	"engines": {
-		"node": ">=16.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"alias": "state"
-		}
-	}
+    "name": "@arkecosystem/core-state",
+    "version": "3.1.1",
+    "description": "State Management for ARK Core",
+    "license": "MIT",
+    "contributors": [],
+    "main": "distribution/index.js",
+    "types": "distribution/index.d.ts",
+    "files": [
+        "/distribution"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "del dist",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
+    },
+    "dependencies": {
+        "@arkecosystem/core-database": "workspace:*",
+        "@arkecosystem/core-kernel": "workspace:*",
+        "@arkecosystem/core-transactions": "workspace:*",
+        "@arkecosystem/crypto": "workspace:*",
+        "immutable": "4.0.0-rc.14",
+        "joi": "17.4.2"
+    },
+    "devDependencies": {
+        "delay": "4.4.1"
+    },
+    "engines": {
+        "node": ">=16.x"
+    },
+    "arkecosystem": {
+        "core": {
+            "alias": "state"
+        }
+    }
 }

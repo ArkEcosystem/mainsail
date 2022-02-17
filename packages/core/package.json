@@ -3,12 +3,7 @@
 	"version": "3.1.1",
 	"description": "Core of the ARK Blockchain",
 	"license": "MIT",
-	"contributors": [
-		"François-Xavier Thoorens <fx@ark.io>",
-		"Kristjan Košič <kristjan@ark.io>",
-		"Brian Faust <brian@ark.io>",
-		"Alex Barnsley <alex@ark.io>"
-	],
+	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"bin": {

@@ -3,11 +3,7 @@
 	"version": "3.1.1",
 	"description": "Blockchain Manager for ARK Core",
 	"license": "MIT",
-	"contributors": [
-		"François-Xavier Thoorens <fx@ark.io>",
-		"Kristjan Košič <kristjan@ark.io>",
-		"Brian Faust <brian@ark.io>"
-	],
+	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [

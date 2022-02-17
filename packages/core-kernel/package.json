@@ -1,54 +1,52 @@
 {
-	"name": "@arkecosystem/core-kernel",
-	"version": "3.1.1",
-	"description": "Kernel of ARK Core",
-	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>"
-	],
-	"main": "distribution/index.js",
-	"types": "distribution/index.d.ts",
-	"files": [
-		"/distribution"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
-	},
-	"dependencies": {
-		"@arkecosystem/crypto": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
-		"@pm2/io": "4.3.5",
-		"chalk": "4.1.2",
-		"cron": "1.8.2",
-		"dayjs": "1.10.7",
-		"deepmerge": "4.2.2",
-		"env-paths": "2.2.0",
-		"fs-extra": "8.1.0",
-		"functional-red-black-tree": "1.0.1",
-		"glob": "7.1.7",
-		"import-fresh": "3.3.0",
-		"inversify": "5.1.1",
-		"ipaddr.js": "2.0.1",
-		"joi": "17.4.2",
-		"log-process-errors": "5.1.2",
-		"nanomatch": "1.2.13",
-		"nsfw": "2.1.2",
-		"reflect-metadata": "0.1.13",
-		"semver": "6.3.0",
-		"type-fest": "0.21.3"
-	},
-	"devDependencies": {
-		"@types/cron": "1.7.3",
-		"@types/fs-extra": "8.1.2",
-		"@types/functional-red-black-tree": "1.0.1",
-		"@types/got": "9.6.12",
-		"@types/log-process-errors": "4.1.0",
-		"@types/semver": "6.2.3"
-	},
-	"engines": {
-		"node": ">=16.x"
-	}
+    "name": "@arkecosystem/core-kernel",
+    "version": "3.1.1",
+    "description": "Kernel of ARK Core",
+    "license": "MIT",
+    "contributors": [],
+    "main": "distribution/index.js",
+    "types": "distribution/index.d.ts",
+    "files": [
+        "/distribution"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "del dist",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
+    },
+    "dependencies": {
+        "@arkecosystem/crypto": "workspace:*",
+        "@arkecosystem/utils": "workspace:*",
+        "@pm2/io": "4.3.5",
+        "chalk": "4.1.2",
+        "cron": "1.8.2",
+        "dayjs": "1.10.7",
+        "deepmerge": "4.2.2",
+        "env-paths": "2.2.0",
+        "fs-extra": "8.1.0",
+        "functional-red-black-tree": "1.0.1",
+        "glob": "7.1.7",
+        "import-fresh": "3.3.0",
+        "inversify": "5.1.1",
+        "ipaddr.js": "2.0.1",
+        "joi": "17.4.2",
+        "log-process-errors": "5.1.2",
+        "nanomatch": "1.2.13",
+        "nsfw": "2.1.2",
+        "reflect-metadata": "0.1.13",
+        "semver": "6.3.0",
+        "type-fest": "0.21.3"
+    },
+    "devDependencies": {
+        "@types/cron": "1.7.3",
+        "@types/fs-extra": "8.1.2",
+        "@types/functional-red-black-tree": "1.0.1",
+        "@types/got": "9.6.12",
+        "@types/log-process-errors": "4.1.0",
+        "@types/semver": "6.2.3"
+    },
+    "engines": {
+        "node": ">=16.x"
+    }
 }

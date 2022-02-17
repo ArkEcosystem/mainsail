@@ -1,64 +1,59 @@
 {
-	"name": "@arkecosystem/core-p2p",
-	"version": "3.1.1",
-	"description": "P2P API for ARK Core",
-	"license": "MIT",
-	"contributors": [
-		"François-Xavier Thoorens <fx@ark.io>",
-		"Kristjan Košič <kristjan@ark.io>",
-		"Brian Faust <brian@ark.io>",
-		"Alex Barnsley <alex@ark.io>"
-	],
-	"main": "distribution/index.js",
-	"types": "distribution/index.d.ts",
-	"files": [
-		"/distribution"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:proto": "pnpm run pbjs && pnpm run pbts",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
-		"pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
-	},
-	"dependencies": {
-		"@arkecosystem/core-database": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
-		"@hapi/boom": "9.0.0",
-		"@hapi/bounce": "2.0.0",
-		"@hapi/hapi": "20.1.5",
-		"@hapi/hoek": "9.2.0",
-		"@hapi/sntp": "4.0.0",
-		"@hapi/teamwork": "5.1.0",
-		"dayjs": "1.10.7",
-		"delay": "4.4.1",
-		"ip": "1.1.5",
-		"ipaddr.js": "2.0.1",
-		"joi": "17.4.2",
-		"pluralize": "8.0.0",
-		"pretty-ms": "7.0.1",
-		"protobufjs": "6.10.2",
-		"rate-limiter-flexible": "1.3.2",
-		"semver": "6.3.0",
-		"ws": "7.5.5"
-	},
-	"devDependencies": {
-		"@types/better-sqlite3": "5.4.3",
-		"@types/fs-extra": "8.1.2",
-		"@types/hapi__sntp": "3.1.2",
-		"@types/ip": "1.1.0",
-		"@types/semver": "6.2.3"
-	},
-	"engines": {
-		"node": ">=16.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"alias": "p2p"
-		}
-	}
+    "name": "@arkecosystem/core-p2p",
+    "version": "3.1.1",
+    "description": "P2P API for ARK Core",
+    "license": "MIT",
+    "contributors": [],
+    "main": "distribution/index.js",
+    "types": "distribution/index.d.ts",
+    "files": [
+        "/distribution"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:proto": "pnpm run pbjs && pnpm run pbts",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "del dist",
+        "pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
+        "pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
+    },
+    "dependencies": {
+        "@arkecosystem/core-database": "workspace:*",
+        "@arkecosystem/core-kernel": "workspace:*",
+        "@arkecosystem/core-state": "workspace:*",
+        "@arkecosystem/crypto": "workspace:*",
+        "@hapi/boom": "9.0.0",
+        "@hapi/bounce": "2.0.0",
+        "@hapi/hapi": "20.1.5",
+        "@hapi/hoek": "9.2.0",
+        "@hapi/sntp": "4.0.0",
+        "@hapi/teamwork": "5.1.0",
+        "dayjs": "1.10.7",
+        "delay": "4.4.1",
+        "ip": "1.1.5",
+        "ipaddr.js": "2.0.1",
+        "joi": "17.4.2",
+        "pluralize": "8.0.0",
+        "pretty-ms": "7.0.1",
+        "protobufjs": "6.10.2",
+        "rate-limiter-flexible": "1.3.2",
+        "semver": "6.3.0",
+        "ws": "7.5.5"
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": "5.4.3",
+        "@types/fs-extra": "8.1.2",
+        "@types/hapi__sntp": "3.1.2",
+        "@types/ip": "1.1.0",
+        "@types/semver": "6.2.3"
+    },
+    "engines": {
+        "node": ">=16.x"
+    },
+    "arkecosystem": {
+        "core": {
+            "alias": "p2p"
+        }
+    }
 }

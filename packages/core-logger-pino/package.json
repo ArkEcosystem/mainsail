@@ -1,41 +1,39 @@
 {
-	"name": "@arkecosystem/core-logger-pino",
-	"version": "3.1.1",
-	"description": "Webhooks for ARK Core",
-	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>"
-	],
-	"main": "distribution/index.js",
-	"files": [
-		"/distribution"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
-	},
-	"dependencies": {
-		"@arkecosystem/core-kernel": "workspace:*",
-		"chalk": "4.1.2",
-		"joi": "17.4.2",
-		"pino": "6.13.2",
-		"pino-pretty": "4.8.0",
-		"pump": "3.0.0",
-		"pumpify": "2.0.1",
-		"readable-stream": "3.6.0",
-		"rotating-file-stream": "2.1.5",
-		"split2": "3.2.2"
-	},
-	"devDependencies": {
-		"@arkecosystem/utils": "1.3.1",
-		"@types/pino": "6.3.11",
-		"@types/pump": "1.1.1",
-		"@types/readable-stream": "2.3.11",
-		"@types/split2": "2.1.6"
-	},
-	"engines": {
-		"node": ">=16.x"
-	}
+    "name": "@arkecosystem/core-logger-pino",
+    "version": "3.1.1",
+    "description": "Webhooks for ARK Core",
+    "license": "MIT",
+    "contributors": [],
+    "main": "distribution/index.js",
+    "files": [
+        "/distribution"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "del dist",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
+    },
+    "dependencies": {
+        "@arkecosystem/core-kernel": "workspace:*",
+        "chalk": "4.1.2",
+        "joi": "17.4.2",
+        "pino": "6.13.2",
+        "pino-pretty": "4.8.0",
+        "pump": "3.0.0",
+        "pumpify": "2.0.1",
+        "readable-stream": "3.6.0",
+        "rotating-file-stream": "2.1.5",
+        "split2": "3.2.2"
+    },
+    "devDependencies": {
+        "@arkecosystem/utils": "1.3.1",
+        "@types/pino": "6.3.11",
+        "@types/pump": "1.1.1",
+        "@types/readable-stream": "2.3.11",
+        "@types/split2": "2.1.6"
+    },
+    "engines": {
+        "node": ">=16.x"
+    }
 }

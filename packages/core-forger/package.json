@@ -1,42 +1,38 @@
 {
-	"name": "@arkecosystem/core-forger",
-	"version": "3.1.1",
-	"description": "Forger for ARK Core",
-	"license": "MIT",
-	"contributors": [
-		"François-Xavier Thoorens <fx@ark.io>",
-		"Kristjan Košič <kristjan@ark.io>",
-		"Brian Faust <brian@ark.io>"
-	],
-	"main": "distribution/index.js",
-	"files": [
-		"/distribution"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
-	},
-	"dependencies": {
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-p2p": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
-		"joi": "17.4.2",
-		"node-forge": "1.2.1",
-		"wif": "2.0.6"
-	},
-	"devDependencies": {
-		"@types/node-forge": "0.10.4",
-		"@types/wif": "2.0.2"
-	},
-	"engines": {
-		"node": ">=16.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"alias": "forger"
-		}
-	}
+    "name": "@arkecosystem/core-forger",
+    "version": "3.1.1",
+    "description": "Forger for ARK Core",
+    "license": "MIT",
+    "contributors": [],
+    "main": "distribution/index.js",
+    "files": [
+        "/distribution"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "del dist",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
+    },
+    "dependencies": {
+        "@arkecosystem/core-kernel": "workspace:*",
+        "@arkecosystem/core-p2p": "workspace:*",
+        "@arkecosystem/core-transactions": "workspace:*",
+        "@arkecosystem/crypto": "workspace:*",
+        "joi": "17.4.2",
+        "node-forge": "1.2.1",
+        "wif": "2.0.6"
+    },
+    "devDependencies": {
+        "@types/node-forge": "0.10.4",
+        "@types/wif": "2.0.2"
+    },
+    "engines": {
+        "node": ">=16.x"
+    },
+    "arkecosystem": {
+        "core": {
+            "alias": "forger"
+        }
+    }
 }

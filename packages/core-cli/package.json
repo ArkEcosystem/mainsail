@@ -3,9 +3,7 @@
 	"version": "3.1.1",
 	"description": "Core of the ARK Blockchain",
 	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>"
-	],
+	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
