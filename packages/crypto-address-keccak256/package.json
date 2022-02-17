@@ -1,28 +1,28 @@
 {
-	"name": "@arkecosystem/crypto-address-keccak256",
-	"version": "3.1.1",
-	"description": "keccak256 Address Derivation",
-	"license": "MIT",
-	"contributors": [],
-	"main": "distribution/index.js",
-	"types": "distribution/index.d.ts",
-	"files": [
-		"distribution"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "rimraf dist",
-		"test": "uvu -r tsm source .test.ts"
-	},
-	"dependencies": {
-		"@arkecosystem/crypto-contracts": "workspace:*",
-		"ethers": "^5.5.4"
-	},
-	"devDependencies": {
-		"@arkecosystem/core-test": "workspace:*",
-		"@arkecosystem/crypto-keypair-schnorr": "workspace:^3.1.1",
-		"@arkecosystem/crypto-keypair-secp256k1": "workspace:^3.1.1",
-		"uvu": "^0.5.3"
-	}
+    "name": "@arkecosystem/crypto-address-keccak256",
+    "version": "3.1.1",
+    "description": "keccak256 Address Derivation",
+    "license": "MIT",
+    "contributors": [],
+    "main": "distribution/index.js",
+    "types": "distribution/index.d.ts",
+    "files": [
+        "distribution"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "rimraf dist",
+        "test": "uvu -r tsm source .test.ts"
+    },
+    "dependencies": {
+        "@arkecosystem/crypto-contracts": "workspace:*",
+        "ethers": "^5.5.4"
+    },
+    "devDependencies": {
+        "@arkecosystem/core-test": "workspace:*",
+        "@arkecosystem/crypto-key-pair-schnorr": "workspace:^3.1.1",
+        "@arkecosystem/crypto-key-pair-secp256k1": "workspace:^3.1.1",
+        "uvu": "^0.5.3"
+    }
 }

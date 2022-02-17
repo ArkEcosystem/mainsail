@@ -1,7 +1,7 @@
 {
-    "name": "@arkecosystem/crypto-address-base58",
+    "name": "@arkecosystem/crypto-key-pair-secp256k1",
     "version": "3.1.1",
-    "description": "base58 Address Derivation",
+    "description": "secp256k1 Key Derivation",
     "license": "MIT",
     "contributors": [],
     "main": "distribution/index.js",
@@ -17,13 +17,10 @@
     },
     "dependencies": {
         "@arkecosystem/crypto-contracts": "workspace:*",
-        "bcrypto": "5.4.0",
-        "bstring": "0.3.9"
+        "bcrypto": "5.4.0"
     },
     "devDependencies": {
-        "@arkecosystem/core-test": "workspace:*",
-        "@arkecosystem/crypto-key-pair-schnorr": "workspace:^3.1.1",
-        "@arkecosystem/crypto-key-pair-secp256k1": "workspace:^3.1.1",
+        "@arkecosystem/core-test": "workspace:^3.1.1",
         "uvu": "^0.5.3"
     }
 }

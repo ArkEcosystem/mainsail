@@ -813,8 +813,8 @@ importers:
     specifiers:
       '@arkecosystem/core-test': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-keypair-schnorr': workspace:^3.1.1
-      '@arkecosystem/crypto-keypair-secp256k1': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-secp256k1': workspace:^3.1.1
       bcrypto: 5.4.0
       bstring: 0.3.9
       uvu: ^0.5.3
@@ -824,16 +824,16 @@ importers:
       bstring: 0.3.9
     devDependencies:
       '@arkecosystem/core-test': link:../core-test
-      '@arkecosystem/crypto-keypair-schnorr': link:../crypto-keypair-schnorr
-      '@arkecosystem/crypto-keypair-secp256k1': link:../crypto-keypair-secp256k1
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
+      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
       uvu: 0.5.3
 
   packages/crypto-address-bech32:
     specifiers:
       '@arkecosystem/core-test': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-keypair-schnorr': workspace:^3.1.1
-      '@arkecosystem/crypto-keypair-secp256k1': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-secp256k1': workspace:^3.1.1
       '@scure/base': ^1.0.0
       uvu: ^0.5.3
     dependencies:
@@ -841,16 +841,16 @@ importers:
       '@scure/base': 1.0.0
     devDependencies:
       '@arkecosystem/core-test': link:../core-test
-      '@arkecosystem/crypto-keypair-schnorr': link:../crypto-keypair-schnorr
-      '@arkecosystem/crypto-keypair-secp256k1': link:../crypto-keypair-secp256k1
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
+      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
       uvu: 0.5.3
 
   packages/crypto-address-bech32m:
     specifiers:
       '@arkecosystem/core-test': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-keypair-schnorr': workspace:^3.1.1
-      '@arkecosystem/crypto-keypair-secp256k1': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-secp256k1': workspace:^3.1.1
       '@scure/base': ^1.0.0
       uvu: ^0.5.3
     dependencies:
@@ -858,16 +858,16 @@ importers:
       '@scure/base': 1.0.0
     devDependencies:
       '@arkecosystem/core-test': link:../core-test
-      '@arkecosystem/crypto-keypair-schnorr': link:../crypto-keypair-schnorr
-      '@arkecosystem/crypto-keypair-secp256k1': link:../crypto-keypair-secp256k1
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
+      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
       uvu: 0.5.3
 
   packages/crypto-address-keccak256:
     specifiers:
       '@arkecosystem/core-test': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-keypair-schnorr': workspace:^3.1.1
-      '@arkecosystem/crypto-keypair-secp256k1': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:^3.1.1
+      '@arkecosystem/crypto-key-pair-secp256k1': workspace:^3.1.1
       ethers: ^5.5.4
       uvu: ^0.5.3
     dependencies:
@@ -875,8 +875,8 @@ importers:
       ethers: 5.5.4
     devDependencies:
       '@arkecosystem/core-test': link:../core-test
-      '@arkecosystem/crypto-keypair-schnorr': link:../crypto-keypair-schnorr
-      '@arkecosystem/crypto-keypair-secp256k1': link:../crypto-keypair-secp256k1
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
+      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
       uvu: 0.5.3
 
   packages/crypto-contracts:
@@ -885,7 +885,7 @@ importers:
     dependencies:
       ajv: 6.12.6
 
-  packages/crypto-keypair-schnorr:
+  packages/crypto-key-pair-schnorr:
     specifiers:
       '@arkecosystem/core-test': workspace:^3.1.1
       '@arkecosystem/crypto-contracts': workspace:*
@@ -898,7 +898,7 @@ importers:
       '@arkecosystem/core-test': link:../core-test
       uvu: 0.5.3
 
-  packages/crypto-keypair-secp256k1:
+  packages/crypto-key-pair-secp256k1:
     specifiers:
       '@arkecosystem/core-test': workspace:^3.1.1
       '@arkecosystem/crypto-contracts': workspace:*
