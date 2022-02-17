@@ -30,7 +30,7 @@ export class AddressFactory implements Contract {
     public validate(address: string): boolean {
         try {
             return this.#decodeCheck(address)[0] === this.#network.pubKeyHash;
-        } catch (err) {
+        } catch {
             return false;
         }
     }
