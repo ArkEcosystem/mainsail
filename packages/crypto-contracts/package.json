@@ -1,0 +1,20 @@
+{
+    "name": "@arkecosystem/crypto-contracts",
+    "version": "3.1.1",
+    "description": "Implementation Contracts for Cryptography",
+    "license": "MIT",
+    "contributors": [],
+    "files": [
+        "dist"
+    ],
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "rimraf dist"
+    },
+    "dependencies": {
+        "ajv": "6.12.6"
+    }
+}
