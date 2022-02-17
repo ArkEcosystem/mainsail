@@ -6,20 +6,20 @@
 	"contributors": [
 		"Brian Faust <brian@ark.io>"
 	],
+	"main": "dist/index.js",
+	"umd:main": "dist/index.umd.js",
+	"jsdelivr": "dist/index.bundled.min.js",
+	"unpkg": "dist/index.bundled.min.js",
+	"module": "dist/index.esm.js",
+	"browser": "dist/index.bundled.js",
+	"types": "dist/index.d.ts",
 	"files": [
 		"dist"
 	],
-	"main": "dist/index.js",
-	"umd:main": "dist/index.umd.js",
-	"browser": "dist/index.bundled.js",
-	"module": "dist/index.esm.js",
-	"unpkg": "dist/index.bundled.min.js",
-	"jsdelivr": "dist/index.bundled.min.js",
-	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "yarn clean && tsc",
-		"build:watch": "yarn clean && yarn compile -w",
 		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"build:watch": "yarn clean && yarn compile -w",
 		"clean": "rimraf dist",
 		"compile": "node ../../node_modules/typescript/bin/tsc",
 		"test": "uvu -r tsm src .test.ts"

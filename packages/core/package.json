@@ -9,36 +9,36 @@
 		"Brian Faust <brian@ark.io>",
 		"Alex Barnsley <alex@ark.io>"
 	],
-	"files": [
-		"/bin",
-		"/dist"
-	],
 	"main": "dist/index",
 	"types": "dist/index",
 	"bin": {
 		"ark": "./bin/run"
 	},
+	"files": [
+		"/bin",
+		"/dist"
+	],
 	"scripts": {
 		"ark": "node ./bin/run",
 		"build": "pnpm run clean && pnpm run compile",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"clean": "rimraf dist",
 		"compile": "node ../../node_modules/typescript/bin/tsc",
-		"debug:forger": "node --inspect-brk ./bin/run forger:run",
-		"debug:relay": "node --inspect-brk ./bin/run relay:run",
-		"debug:core": "node --inspect-brk ./bin/run core:run",
 		"core:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark core:run",
 		"core:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark core:run",
 		"core:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --env=test",
-		"relay:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark relay:run",
-		"relay:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark relay:run",
-		"relay:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark relay:run -- --env=test",
+		"debug:core": "node --inspect-brk ./bin/run core:run",
+		"debug:forger": "node --inspect-brk ./bin/run forger:run",
+		"debug:relay": "node --inspect-brk ./bin/run relay:run",
 		"forger:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark forger:run",
 		"forger:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark forger:run",
 		"forger:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark forger:run -- --env=test",
 		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test",
 		"prepublishOnly": "pnpm run build",
+		"relay:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark relay:run",
+		"relay:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark relay:run",
+		"relay:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark relay:run -- --env=test",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
@@ -60,9 +60,9 @@
 		"argon2": "0.28.2",
 		"bip39": "3.0.4",
 		"boxen": "4.2.0",
+		"cross-env": "7.0.3",
 		"dayjs": "1.10.7",
 		"env-paths": "2.2.1",
-		"cross-env": "7.0.3",
 		"envfile": "5.2.0",
 		"execa": "3.4.0",
 		"fs-extra": "8.1.0",

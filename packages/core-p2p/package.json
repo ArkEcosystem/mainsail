@@ -9,20 +9,20 @@
 		"Brian Faust <brian@ark.io>",
 		"Alex Barnsley <alex@ark.io>"
 	],
+	"main": "dist/index",
+	"types": "dist/index",
 	"files": [
 		"dist"
 	],
-	"main": "dist/index",
-	"types": "dist/index",
 	"scripts": {
 		"build": "pnpm run clean && pnpm run compile",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-		"pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
-		"pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
 		"build:proto": "pnpm run pbjs && pnpm run pbts",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"clean": "rimraf dist",
 		"compile": "node ../../node_modules/typescript/bin/tsc",
+		"pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
+		"pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
 		"prepublishOnly": "pnpm run build",
 		"pretest": "bash ../../scripts/pre-test.sh",
 		"test": "cross-env CORE_ENV=test jest --forceExit"

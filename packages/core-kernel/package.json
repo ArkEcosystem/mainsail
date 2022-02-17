@@ -1,24 +1,24 @@
 {
 	"name": "@arkecosystem/core-kernel",
-	"description": "Kernel of ARK Core",
 	"version": "3.1.1",
+	"description": "Kernel of ARK Core",
+	"license": "MIT",
 	"contributors": [
 		"Brian Faust <brian@ark.io>"
 	],
-	"license": "MIT",
 	"main": "dist/index",
 	"types": "dist/index",
 	"files": [
 		"dist"
 	],
 	"scripts": {
+		"build": "pnpm run clean && pnpm run compile",
+		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"clean": "rimraf dist",
+		"compile": "node ../../node_modules/typescript/bin/tsc",
 		"prepublishOnly": "pnpm run build",
 		"pretest": "pnpm run lint && pnpm run build",
-		"compile": "node ../../node_modules/typescript/bin/tsc",
-		"build": "pnpm run clean && pnpm run compile",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
-		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-		"clean": "rimraf dist",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
@@ -52,10 +52,10 @@
 		"@types/log-process-errors": "4.1.0",
 		"@types/semver": "6.2.3"
 	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"engines": {
 		"node": ">=10.x"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

@@ -4,11 +4,11 @@
 	"description": "Schnorr Key Derivation",
 	"license": "MIT",
 	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
 		"distribution"
 	],
-	"main": "distribution/index.js",
-	"types": "distribution/index.d.ts",
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",

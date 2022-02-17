@@ -6,14 +6,14 @@
 	"contributors": [
 		"Brian Faust <brian@ark.io>"
 	],
+	"main": "dist/index",
 	"files": [
 		"dist"
 	],
-	"main": "dist/index",
 	"scripts": {
 		"build": "pnpm run clean && pnpm run compile",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"clean": "rimraf dist",
 		"compile": "node ../../node_modules/typescript/bin/tsc",
 		"prepublishOnly": "pnpm run build",
@@ -32,17 +32,17 @@
 		"rotating-file-stream": "2.1.5",
 		"split2": "3.2.2"
 	},
-	"engines": {
-		"node": ">=10.x"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"devDependencies": {
 		"@arkecosystem/utils": "1.3.1",
 		"@types/pino": "6.3.11",
 		"@types/pump": "1.1.1",
 		"@types/readable-stream": "2.3.11",
 		"@types/split2": "2.1.6"
+	},
+	"engines": {
+		"node": ">=10.x"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

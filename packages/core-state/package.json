@@ -7,15 +7,15 @@
 		"Brian Faust <brian@ark.io>",
 		"Joshua Noack <joshua@ark.io>"
 	],
+	"main": "dist/index",
+	"types": "dist/index",
 	"files": [
 		"dist"
 	],
-	"main": "dist/index",
-	"types": "dist/index",
 	"scripts": {
 		"build": "pnpm run clean && pnpm run compile",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"clean": "rimraf dist",
 		"compile": "node ../../node_modules/typescript/bin/tsc",
 		"prepublishOnly": "pnpm run build",
@@ -30,6 +30,9 @@
 		"immutable": "4.0.0-rc.14",
 		"joi": "17.4.2"
 	},
+	"devDependencies": {
+		"delay": "4.4.1"
+	},
 	"engines": {
 		"node": ">=10.x"
 	},
@@ -40,8 +43,5 @@
 		"core": {
 			"alias": "state"
 		}
-	},
-	"devDependencies": {
-		"delay": "4.4.1"
 	}
 }

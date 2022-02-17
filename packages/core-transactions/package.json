@@ -6,15 +6,15 @@
 	"contributors": [
 		"Joshua Noack <joshua@ark.io>"
 	],
+	"main": "dist/index",
+	"types": "dist/index",
 	"files": [
 		"dist"
 	],
-	"main": "dist/index",
-	"types": "dist/index",
 	"scripts": {
 		"build": "pnpm run clean && pnpm run compile",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
+		"build:watch": "pnpm run clean && pnpm run compile -- -w",
 		"clean": "rimraf dist",
 		"compile": "node ../../node_modules/typescript/bin/tsc",
 		"prepublishOnly": "pnpm run build",
@@ -25,13 +25,13 @@
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/crypto": "workspace:*"
 	},
+	"devDependencies": {
+		"bytebuffer": "5.0.1"
+	},
 	"engines": {
 		"node": ">=10.x"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"devDependencies": {
-		"bytebuffer": "5.0.1"
 	}
 }
