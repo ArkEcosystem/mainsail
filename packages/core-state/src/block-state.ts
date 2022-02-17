@@ -86,19 +86,6 @@ export class BlockState implements Contracts.State.BlockState {
     public async applyTransaction(transaction: Interfaces.ITransaction): Promise<void> {
         const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-        let lockWallet: Contracts.State.Wallet | undefined;
-        let lockTransaction: Interfaces.ITransactionData | undefined;
-        if (
-            transaction.type === Enums.TransactionType.HtlcClaim &&
-            transaction.typeGroup === Enums.TransactionTypeGroup.Core
-        ) {
-            AppUtils.assert.defined<Interfaces.IHtlcClaimAsset>(transaction.data.asset?.claim);
-
-            const lockId = transaction.data.asset.claim.lockTransactionId;
-            lockWallet = this.walletRepository.findByIndex(Contracts.State.WalletIndexes.Locks, lockId);
-            lockTransaction = lockWallet.getAttribute("htlc.locks", {})[lockId];
-        }
-
         await transactionHandler.apply(transaction);
 
         AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -113,7 +100,7 @@ export class BlockState implements Contracts.State.BlockState {
         }
 
         // @ts-ignore - Apply vote balance updates
-        this.applyVoteBalances(sender, recipient, transaction.data, lockWallet, lockTransaction);
+        this.applyVoteBalances(sender, recipient, transaction.data);
     }
 
     public async revertTransaction(transaction: Interfaces.ITransaction): Promise<void> {
@@ -134,21 +121,8 @@ export class BlockState implements Contracts.State.BlockState {
 
         await transactionHandler.revert(transaction);
 
-        let lockWallet: Contracts.State.Wallet | undefined;
-        let lockTransaction: Interfaces.ITransactionData | undefined;
-        if (
-            transaction.type === Enums.TransactionType.HtlcClaim &&
-            transaction.typeGroup === Enums.TransactionTypeGroup.Core
-        ) {
-            AppUtils.assert.defined<Interfaces.IHtlcClaimAsset>(transaction.data.asset?.claim);
-
-            const lockId = transaction.data.asset.claim.lockTransactionId;
-            lockWallet = this.walletRepository.findByIndex(Contracts.State.WalletIndexes.Locks, lockId);
-            lockTransaction = lockWallet.getAttribute("htlc.locks", {})[lockId];
-        }
-
         // @ts-ignore - Revert vote balance updates
-        this.revertVoteBalances(sender, recipient, data, lockWallet, lockTransaction);
+        this.revertVoteBalances(sender, recipient, data);
     }
 
     public increaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: AppUtils.BigNumber) {
@@ -178,20 +152,16 @@ export class BlockState implements Contracts.State.BlockState {
         sender: Contracts.State.Wallet,
         recipient: Contracts.State.Wallet,
         transaction: Interfaces.ITransactionData,
-        lockWallet: Contracts.State.Wallet,
-        lockTransaction: Interfaces.ITransactionData,
     ): void {
-        return this.updateVoteBalances(sender, recipient, transaction, lockWallet, lockTransaction, false);
+        return this.updateVoteBalances(sender, recipient, transaction, false);
     }
 
     private revertVoteBalances(
         sender: Contracts.State.Wallet,
         recipient: Contracts.State.Wallet,
         transaction: Interfaces.ITransactionData,
-        lockWallet: Contracts.State.Wallet,
-        lockTransaction: Interfaces.ITransactionData,
     ): void {
-        return this.updateVoteBalances(sender, recipient, transaction, lockWallet, lockTransaction, true);
+        return this.updateVoteBalances(sender, recipient, transaction, true);
     }
 
     private applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Interfaces.IBlockData) {
@@ -233,8 +203,6 @@ export class BlockState implements Contracts.State.BlockState {
         sender: Contracts.State.Wallet,
         recipient: Contracts.State.Wallet,
         transaction: Interfaces.ITransactionData,
-        lockWallet: Contracts.State.Wallet,
-        lockTransaction: Interfaces.ITransactionData,
         revert: boolean,
     ): void {
         if (
@@ -244,8 +212,7 @@ export class BlockState implements Contracts.State.BlockState {
             AppUtils.assert.defined<Interfaces.ITransactionAsset>(transaction.asset?.votes);
 
             const senderDelegatedAmount = sender
-                .getAttribute("htlc.lockedBalance", Utils.BigNumber.ZERO)
-                .plus(sender.getBalance())
+                .getBalance()
                 // balance already includes reverted fee when updateVoteBalances is called
                 .minus(revert ? transaction.fee : Utils.BigNumber.ZERO);
 
@@ -295,47 +262,11 @@ export class BlockState implements Contracts.State.BlockState {
                     "delegate.voteBalance",
                     Utils.BigNumber.ZERO,
                 );
-                let newVoteBalance: Utils.BigNumber;
 
-                if (
-                    transaction.type === Enums.TransactionType.HtlcLock &&
-                    transaction.typeGroup === Enums.TransactionTypeGroup.Core
-                ) {
-                    // HTLC Lock keeps the locked amount as the sender's delegate vote balance
-                    newVoteBalance = revert ? voteBalance.plus(transaction.fee) : voteBalance.minus(transaction.fee);
-                } else if (
-                    transaction.type === Enums.TransactionType.HtlcClaim &&
-                    transaction.typeGroup === Enums.TransactionTypeGroup.Core
-                ) {
-                    // HTLC Claim transfers the locked amount to the lock recipient's (= claim sender) delegate vote balance
-                    newVoteBalance = revert
-                        ? voteBalance.plus(transaction.fee).minus(lockTransaction.amount)
-                        : voteBalance.minus(transaction.fee).plus(lockTransaction.amount);
-                } else {
-                    // General case : sender delegate vote balance reduced by amount + fees (or increased if revert)
-                    newVoteBalance = revert ? voteBalance.plus(total) : voteBalance.minus(total);
-                }
-                delegate.setAttribute("delegate.voteBalance", newVoteBalance);
-            }
-
-            if (
-                transaction.type === Enums.TransactionType.HtlcClaim &&
-                transaction.typeGroup === Enums.TransactionTypeGroup.Core &&
-                lockWallet.hasAttribute("vote")
-            ) {
-                // HTLC Claim transfers the locked amount to the lock recipient's (= claim sender) delegate vote balance
-                const lockWalletDelegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
-                    lockWallet.getAttribute("vote"),
-                );
-                const lockWalletDelegateVoteBalance: Utils.BigNumber = lockWalletDelegate.getAttribute(
+                // General case : sender delegate vote balance reduced by amount + fees (or increased if revert)
+                delegate.setAttribute(
                     "delegate.voteBalance",
-                    Utils.BigNumber.ZERO,
-                );
-                lockWalletDelegate.setAttribute(
-                    "delegate.voteBalance",
-                    revert
-                        ? lockWalletDelegateVoteBalance.plus(lockTransaction.amount)
-                        : lockWalletDelegateVoteBalance.minus(lockTransaction.amount),
+                    revert ? voteBalance.plus(total) : voteBalance.minus(total),
                 );
             }
 
@@ -364,12 +295,7 @@ export class BlockState implements Contracts.State.BlockState {
             }
 
             // Update vote balance of recipient's delegate
-            if (
-                recipient &&
-                recipient.hasVoted() &&
-                (transaction.type !== Enums.TransactionType.HtlcLock ||
-                    transaction.typeGroup !== Enums.TransactionTypeGroup.Core)
-            ) {
+            if (recipient && recipient.hasVoted() && transaction.typeGroup !== Enums.TransactionTypeGroup.Core) {
                 const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
                     recipient.getAttribute("vote"),
                 );

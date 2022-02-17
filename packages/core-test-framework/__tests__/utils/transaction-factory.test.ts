@@ -6,7 +6,7 @@ import { Generators } from "@packages/core-test-framework/src";
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
 import { TransactionFactory } from "@packages/core-test-framework/src/utils/transaction-factory";
 
-import { htlcClaimAsset, htlcLockAsset, htlcRefundAsset, passphrasePairsAsset } from "./__fixtures__/assets";
+import { passphrasePairsAsset } from "./__fixtures__/assets";
 
 let sandbox: Sandbox;
 let transactionFactory: TransactionFactory;
@@ -94,40 +94,6 @@ describe("TransactionFactory", () => {
 
         it("should return transaction factory - with default parameters", async () => {
             const entity = transactionFactory.multiSignature();
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("htlcLock", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.htlcLock(
-                htlcLockAsset,
-                Identities.Address.fromPassphrase(passphrases[0]),
-                5,
-            );
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-
-        it("should return transaction factory - with default parameters", async () => {
-            const entity = transactionFactory.htlcLock(htlcLockAsset);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("htlcClaim", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.htlcClaim(htlcClaimAsset);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
-    describe("htlcRefund", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.htlcRefund(htlcRefundAsset);
 
             expect(entity).toBeInstanceOf(TransactionFactory);
         });
@@ -253,7 +219,7 @@ describe("TransactionFactory", () => {
 
     describe("withVendorField", () => {
         it("should return transaction factory", async () => {
-            const entity = transactionFactory.htlcLock(htlcLockAsset).withVendorField("Test VendorField");
+            const entity = transactionFactory.transfer().withVendorField("Test VendorField");
 
             expect(entity).toBeInstanceOf(TransactionFactory);
         });

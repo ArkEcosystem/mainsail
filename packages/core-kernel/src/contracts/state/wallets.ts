@@ -203,16 +203,3 @@ export interface SearchContext<T = any> {
     entries: ReadonlyArray<T>;
     defaultOrder: string[];
 }
-
-export interface UnwrappedHtlcLock {
-    lockId: string;
-    senderPublicKey: string;
-    amount: Utils.BigNumber;
-    recipientId: string;
-    secretHash: string;
-    timestamp: number;
-    expirationType: number;
-    expirationValue: number;
-    isExpired: boolean;
-    vendorField: string;
-}

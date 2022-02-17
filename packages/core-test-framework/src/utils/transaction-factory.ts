@@ -112,33 +112,6 @@ export class TransactionFactory {
         return this;
     }
 
-    public htlcLock(
-        lockAsset: Interfaces.IHtlcLockAsset,
-        recipientId?: string,
-        amount: number = 2 * 1e8,
-    ): TransactionFactory {
-        const builder = Transactions.BuilderFactory.htlcLock()
-            .htlcLockAsset(lockAsset)
-            .amount(Utils.BigNumber.make(amount).toFixed())
-            .recipientId(recipientId || Identities.Address.fromPassphrase(defaultPassphrase));
-
-        this.builder = builder;
-
-        return this;
-    }
-
-    public htlcClaim(claimAsset: Interfaces.IHtlcClaimAsset): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.htlcClaim().htlcClaimAsset(claimAsset);
-
-        return this;
-    }
-
-    public htlcRefund(refundAsset: Interfaces.IHtlcRefundAsset): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.htlcRefund().htlcRefundAsset(refundAsset);
-
-        return this;
-    }
-
     public multiPayment(payments: Array<{ recipientId: string; amount: string }>): TransactionFactory {
         const builder = Transactions.BuilderFactory.multiPayment();
 
@@ -339,14 +312,11 @@ export class TransactionFactory {
             const isDevelop: boolean = !["mainnet", "devnet"].includes(Managers.configManager.get("network.name"));
 
             const aip11: boolean = Managers.configManager.getMilestone().aip11;
-            const htlcEnabled: boolean = Managers.configManager.getMilestone().htlcEnabled;
 
             if (this.builder.data.version === 1 && aip11) {
                 Managers.configManager.getMilestone().aip11 = false;
-                Managers.configManager.getMilestone().htlcEnabled = false;
             } /* istanbul ignore else */ else if (isDevelop) {
                 Managers.configManager.getMilestone().aip11 = true;
-                Managers.configManager.getMilestone().htlcEnabled = htlcEnabled;
             }
 
             let sign = true;
@@ -368,7 +338,6 @@ export class TransactionFactory {
             /* istanbul ignore else */
             if (isDevelop) {
                 Managers.configManager.getMilestone().aip11 = true;
-                Managers.configManager.getMilestone().htlcEnabled = true;
             }
 
             transactions.push(transaction);

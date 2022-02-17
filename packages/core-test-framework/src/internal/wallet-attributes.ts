@@ -14,9 +14,6 @@ export function getWalletAttributeSet(): Services.Attributes.AttributeSet {
     attributes.set("delegate.username");
     attributes.set("delegate.voteBalance");
     attributes.set("delegate");
-    attributes.set("htlc.lockedBalance");
-    attributes.set("htlc.locks");
-    attributes.set("htlc");
     attributes.set("multiSignature");
     attributes.set("multiSignature.legacy");
     attributes.set("vote");

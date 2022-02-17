@@ -3,7 +3,6 @@ import { Identifiers } from "@packages/core-kernel/src/ioc";
 import { Wallets } from "@packages/core-state";
 import {
     addressesIndexer,
-    locksIndexer,
     publicKeysIndexer,
     usernamesIndexer,
 } from "@packages/core-state/src/wallets/indexers/indexers";
@@ -12,8 +11,8 @@ import passphrases from "@packages/core-test-framework/src/internal/passphrases.
 import { One, Two } from "@packages/core-transactions/src/handlers";
 import { TransactionHandlerProvider } from "@packages/core-transactions/src/handlers/handler-provider";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
-import { Identities, Utils } from "@packages/crypto";
 import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
+import { Identities, Utils } from "@packages/crypto";
 
 export type PaginatedResponse = {
     totalCount: number;
@@ -84,9 +83,6 @@ export const initApp = (): Application => {
     app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcLockTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcClaimTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcRefundTransactionHandler);
 
     app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
     app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
@@ -113,12 +109,6 @@ export const initApp = (): Application => {
     app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
         name: Contracts.State.WalletIndexes.Usernames,
         indexer: usernamesIndexer,
-        autoIndex: true,
-    });
-
-    app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-        name: Contracts.State.WalletIndexes.Locks,
-        indexer: locksIndexer,
         autoIndex: true,
     });
 

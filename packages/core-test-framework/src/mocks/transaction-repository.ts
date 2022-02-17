@@ -48,26 +48,6 @@ class TransactionRepositoryMock implements Partial<Repositories.TransactionRepos
         });
     }
 
-    public async findByHtlcLocks(lockIds: string[]): Promise<Models.Transaction[]> {
-        return mockTransactions as Models.Transaction[];
-    }
-
-    public async getOpenHtlcLocks(): Promise<Array<Models.Transaction & { open: boolean }>> {
-        return mockTransactions as any;
-    }
-
-    public async getClaimedHtlcLockBalances(): Promise<{ claimedBalance: string; recipientId: string }[]> {
-        return mockTransactions.map((x) => {
-            return { recipientId: x.recipientId!.toString(), claimedBalance: x.amount!.toString() };
-        });
-    }
-
-    public async getRefundedHtlcLockBalances(): Promise<{ refundedBalance: string; senderPublicKey: string }[]> {
-        return mockTransactions.map((x) => {
-            return { senderPublicKey: x.senderPublicKey!.toString(), refundedBalance: x.amount!.toString() };
-        });
-    }
-
     public async getFeeStatistics(txTypes: Array<{ type: number, typeGroup: number }>, days: number, minFee?: number): Promise<FeeStatistics[]> {
         return mockFeeStatistics;
     }

@@ -468,9 +468,6 @@ describe("API 2.0 - Transactions", () => {
                     MultiSignature: 4,
                     MultiPayment: 6,
                     DelegateResignation: 7,
-                    HtlcLock: 8,
-                    HtlcClaim: 9,
-                    HtlcRefund: 10,
                 },
             });
         });
@@ -615,9 +612,6 @@ describe("API 2.0 - Transactions", () => {
                 "1": {
                     delegateRegistration: "2500000000",
                     delegateResignation: "2500000000",
-                    htlcClaim: "0",
-                    htlcLock: "10000000",
-                    htlcRefund: "0",
                     multiPayment: "10000000",
                     multiSignature: "500000000",
                     transfer: "10000000",

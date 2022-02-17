@@ -4,5 +4,4 @@ export const Identifiers = {
 
     WalletSearchService: Symbol.for("API<WalletSearchService>"),
     DelegateSearchService: Symbol.for("API<DelegateSearchService>"),
-    LockSearchService: Symbol.for("API<LockSearchService>"),
 };

@@ -232,21 +232,6 @@ export class StandardCriteriaService {
         const criteriaKeys = Object.keys(criteriaItem);
 
         if (criteriaKeys.length === 1 && criteriaKeys[0] === "*") {
-            // Wildcard criteria that checks if any property matches
-            //
-            // Example:
-            // {
-            //   attributes: {
-            //     htlc: {
-            //       locks: {
-            //         ["*"]: {
-            //           secretHash: "03da05c1c1d4f9c6bda13695b2f29fbc65d9589edc070fc61fe97974be3e59c1"
-            //         }
-            //       }
-            //     }
-            //   }
-            // }
-
             try {
                 return Object.values(value).some((v) => {
                     return this.testStandardCriterias(v, criteriaItem["*"]);

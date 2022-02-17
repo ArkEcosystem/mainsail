@@ -9,10 +9,7 @@ export const getExpectedVoteBalances = (
     for (const wallet of walletRepository.allByAddress()) {
         if (wallet.hasAttribute("vote")) {
             const publicKey = wallet.getAttribute("vote");
-            const voteBalance = wallet
-                .getAttribute("htlc.lockedBalance", Utils.BigNumber.ZERO)
-                .plus(wallet.getBalance())
-                .plus(expectedVoteBalances[publicKey] ?? Utils.BigNumber.ZERO);
+            const voteBalance = wallet.getBalance().plus(expectedVoteBalances[publicKey] ?? Utils.BigNumber.ZERO);
 
             if (voteBalance.isZero()) {
                 delete expectedVoteBalances[publicKey];

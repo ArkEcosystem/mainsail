@@ -41,9 +41,6 @@ export const buildDelegateAndVoteWallets = (numberDelegates: number, walletRepo:
         voter.setBalance(totalBalance.div(2));
         voter.setPublicKey(`v${delegateKey}`);
         voter.setAttribute("vote", delegateKey);
-        // TODO: is this correct?
-        // that buildVoteBalances should only be triggered if there is a htlc lockedBalance?
-        voter.setAttribute("htlc.lockedBalance", totalBalance.div(2));
 
         // @ts-ignore
         voter.events = undefined;

@@ -1,11 +1,8 @@
-import { Enums, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { createHash } from "crypto";
+import { Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder";
 import { FactoryFunctionOptions } from "../types";
-
-const randomHash = (): string => createHash("sha256").update(Math.random().toString(36).substring(8)).digest("hex");
 
 const sign = ({ entity, options }: FactoryFunctionOptions) => entity.sign(options.passphrase || secrets[0]);
 
@@ -137,53 +134,6 @@ export const registerMultiSignatureFactory = (factory: FactoryBuilder): void => 
     factory.get("MultiSignature").state("multiSign", multiSign);
 };
 
-export const registerHtlcLockFactory = (factory: FactoryBuilder): void => {
-    factory.set("HtlcLock", ({ options }) =>
-        applyModifiers(
-            Transactions.BuilderFactory.htlcLock().htlcLockAsset({
-                secretHash: options.secretHash || randomHash(),
-                expiration: options.expiration || {
-                    type: Enums.HtlcLockExpirationType.EpochTimestamp,
-                    value: Math.floor(Date.now() / 1000),
-                },
-            }),
-            options,
-        ),
-    );
-
-    factory.get("HtlcLock").state("sign", sign);
-    factory.get("HtlcLock").state("multiSign", multiSign);
-};
-
-export const registerHtlcClaimFactory = (factory: FactoryBuilder): void => {
-    factory.set("HtlcClaim", ({ options }) =>
-        applyModifiers(
-            Transactions.BuilderFactory.htlcClaim().htlcClaimAsset({
-                lockTransactionId: options.lockTransactionId || randomHash(),
-                unlockSecret: options.unlockSecret || Math.random().toString(36).substring(8),
-            }),
-            options,
-        ),
-    );
-
-    factory.get("HtlcClaim").state("sign", sign);
-    factory.get("HtlcClaim").state("multiSign", multiSign);
-};
-
-export const registerHtlcRefundFactory = (factory: FactoryBuilder): void => {
-    factory.set("HtlcRefund", ({ options }) =>
-        applyModifiers(
-            Transactions.BuilderFactory.htlcRefund().htlcRefundAsset({
-                lockTransactionId: options.lockTransactionId || randomHash(),
-            }),
-            options,
-        ),
-    );
-
-    factory.get("HtlcRefund").state("sign", sign);
-    factory.get("HtlcRefund").state("multiSign", multiSign);
-};
-
 export const registerMultiPaymentFactory = (factory: FactoryBuilder): void => {
     factory.set("MultiPayment", ({ options }) =>
         applyModifiers(
@@ -211,12 +161,6 @@ export const registerTransactionFactory = (factory: FactoryBuilder): void => {
     registerUnvoteFactory(factory);
 
     registerMultiSignatureFactory(factory);
-
-    registerHtlcLockFactory(factory);
-
-    registerHtlcClaimFactory(factory);
-
-    registerHtlcRefundFactory(factory);
 
     registerMultiPaymentFactory(factory);
 };

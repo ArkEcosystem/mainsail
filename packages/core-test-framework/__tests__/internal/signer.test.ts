@@ -4,7 +4,6 @@ import { Generators } from "@packages/core-test-framework/src";
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
 import { Signer } from "@packages/core-test-framework/src/internal/signer";
 import { Identities, Interfaces } from "@packages/crypto";
-import { HtlcLockExpirationType } from "@packages/crypto/src/enums";
 
 let signer: Signer;
 const config = Generators.generateCryptoConfigRaw();
@@ -174,113 +173,5 @@ describe("Signer", () => {
 
         expect(entity.signature).toBeDefined();
         expect(entity.asset?.payments).toBeArray();
-    });
-
-    it("should make htlc lock", async () => {
-        const options = {
-            htlcLockFee: "5",
-            lock: {
-                secretHash: "dummy hash",
-                expiration: {
-                    type: HtlcLockExpirationType.EpochTimestamp,
-                    value: 5,
-                },
-            },
-            amount: "100",
-            recipient: Identities.Address.fromPassphrase(passphrases[0]),
-            passphrase: passphrases[0],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeHtlcLock(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.asset?.lock?.secretHash).toBeString();
-        expect(entity.asset?.lock?.expiration).toBeDefined();
-    });
-
-    it("should make htlc lock with second signature", async () => {
-        const options = {
-            htlcLockFee: "5",
-            lock: {
-                secretHash: "dummy hash",
-                expiration: {
-                    type: HtlcLockExpirationType.EpochTimestamp,
-                    value: 5,
-                },
-            },
-            amount: "100",
-            recipient: Identities.Address.fromPassphrase(passphrases[0]),
-            passphrase: passphrases[0],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeHtlcLock(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.asset?.lock?.secretHash).toBeString();
-        expect(entity.asset?.lock?.expiration).toBeDefined();
-    });
-
-    it("should make htlc claim", async () => {
-        const options = {
-            htlcClaimFee: "5",
-            claim: {
-                lockTransactionId: "12345",
-                unlockSecret: "dummy unlock secret",
-            },
-            passphrase: passphrases[0],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeHtlcClaim(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.asset?.claim?.lockTransactionId).toBeString();
-        expect(entity.asset?.claim?.unlockSecret).toBeString();
-    });
-
-    it("should make htlc claim with second signature", async () => {
-        const options = {
-            htlcClaimFee: "5",
-            claim: {
-                lockTransactionId: "12345",
-                unlockSecret: "dummy unlock secret",
-            },
-            passphrase: passphrases[0],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeHtlcClaim(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.asset?.claim?.lockTransactionId).toBeString();
-        expect(entity.asset?.claim?.unlockSecret).toBeString();
-    });
-
-    it("should make htlc refound", async () => {
-        const options = {
-            htlcRefundFee: "5",
-            refund: {
-                lockTransactionId: "12345",
-            },
-            passphrase: passphrases[0],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeHtlcRefund(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.asset?.refund?.lockTransactionId).toBeString();
-    });
-
-    it("should make htlc refound with second signature", async () => {
-        const options = {
-            htlcRefundFee: "5",
-            refund: {
-                lockTransactionId: "12345",
-            },
-            passphrase: passphrases[0],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeHtlcRefund(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.asset?.refund?.lockTransactionId).toBeString();
     });
 });

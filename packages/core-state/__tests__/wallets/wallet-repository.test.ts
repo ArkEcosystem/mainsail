@@ -6,7 +6,6 @@ import { Container, Contracts } from "@packages/core-kernel/src";
 import { Wallet, WalletRepository } from "@packages/core-state/src/wallets";
 import {
     addressesIndexer,
-    locksIndexer,
     publicKeysIndexer,
     resignationsIndexer,
     usernamesIndexer,
@@ -52,7 +51,6 @@ describe("Wallet Repository", () => {
         expect(walletRepo.getIndex("publicKeys").indexer).toEqual(publicKeysIndexer);
         expect(walletRepo.getIndex("usernames").indexer).toEqual(usernamesIndexer);
         expect(walletRepo.getIndex("resignations").indexer).toEqual(resignationsIndexer);
-        expect(walletRepo.getIndex("locks").indexer).toEqual(locksIndexer);
         expect(() => walletRepo.getIndex("iDontExist")).toThrow();
     });
 

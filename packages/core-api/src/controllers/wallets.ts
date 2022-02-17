@@ -5,15 +5,8 @@ import Hapi from "@hapi/hapi";
 
 import { Identifiers } from "../identifiers";
 import { TransactionResource, TransactionWithBlockResource } from "../resources";
-import {
-    LockCriteria,
-    lockCriteriaSchemaObject,
-    LockResource,
-    WalletCriteria,
-    walletCriteriaSchemaObject,
-    WalletResource,
-} from "../resources-new";
-import { LockSearchService, WalletSearchService } from "../services";
+import { WalletCriteria, walletCriteriaSchemaObject, WalletResource } from "../resources-new";
+import { WalletSearchService } from "../services";
 import { Controller } from "./controller";
 
 @Container.injectable()
@@ -23,9 +16,6 @@ export class WalletsController extends Controller {
 
     @Container.inject(Identifiers.WalletSearchService)
     private readonly walletSearchService!: WalletSearchService;
-
-    @Container.inject(Identifiers.LockSearchService)
-    private readonly lockSearchService!: LockSearchService;
 
     @Container.inject(Container.Identifiers.TransactionHistoryService)
     private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
@@ -55,21 +45,6 @@ export class WalletsController extends Controller {
         }
 
         return { data: walletResource };
-    }
-
-    public locks(request: Hapi.Request): Contracts.Search.ResultsPage<LockResource> | Boom {
-        const walletId = request.params.id as string;
-        const walletResource = this.walletSearchService.getWallet(walletId);
-
-        if (!walletResource) {
-            return notFound("Wallet not found");
-        }
-
-        const pagination = this.getQueryPagination(request.query);
-        const sorting = request.query.orderBy as Contracts.Search.Sorting;
-        const criteria = this.getQueryCriteria(request.query, lockCriteriaSchemaObject) as LockCriteria;
-
-        return this.lockSearchService.getWalletLocksPage(pagination, sorting, walletResource.address, criteria);
     }
 
     public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {

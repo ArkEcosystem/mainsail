@@ -59,13 +59,11 @@ export const setUp = async (): Promise<Application> => {
             });
 
             Managers.configManager.getMilestone().aip11 = false;
-            Managers.configManager.getMilestone().htlcEnabled = false;
 
             await app.boot();
 
             Managers.configManager.getMilestone().aip11 = true;
             Managers.configManager.getMilestone().aip37 = true;
-            Managers.configManager.getMilestone().htlcEnabled = true;
 
             await AppUtils.sleep(1000);
         });

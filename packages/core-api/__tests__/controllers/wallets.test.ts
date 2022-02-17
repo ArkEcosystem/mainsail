@@ -1,9 +1,9 @@
-import { LockSearchService, Resources, WalletSearchService } from "@packages/core-api";
-import { WalletsController } from "@packages/core-api/src/controllers/wallets";
-import { Identifiers } from "@packages/core-api/src/identifiers";
 import { Application, Container, Contracts, Providers, Services } from "@arkecosystem/core-kernel";
 import { Enums, Utils } from "@arkecosystem/crypto";
 import { Boom } from "@hapi/boom";
+import { Resources, WalletSearchService } from "@packages/core-api";
+import { WalletsController } from "@packages/core-api/src/controllers/wallets";
+import { Identifiers } from "@packages/core-api/src/identifiers";
 
 const jestfn = <T extends (...args: unknown[]) => unknown>(
     implementation?: (...args: Parameters<T>) => ReturnType<T>,
@@ -24,10 +24,6 @@ const walletSearchService = {
     getWalletsPage: jestfn<WalletSearchService["getWalletsPage"]>(),
 };
 
-const lockSearchService = {
-    getWalletLocksPage: jestfn<LockSearchService["getWalletLocksPage"]>(),
-};
-
 const transactionHistoryService = {
     listByCriteria: jestfn<Contracts.Shared.TransactionHistoryService["listByCriteria"]>(),
     listByCriteriaJoinBlock: jestfn<Contracts.Shared.TransactionHistoryService["listByCriteriaJoinBlock"]>(),
@@ -41,7 +37,6 @@ const container = new Container.Container();
 container.bind(Container.Identifiers.Application).toConstantValue(app);
 container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(apiConfiguration);
 container.bind(Identifiers.WalletSearchService).toConstantValue(walletSearchService);
-container.bind(Identifiers.LockSearchService).toConstantValue(lockSearchService);
 container.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 container.bind(Container.Identifiers.PaginationService).toConstantValue(paginationService);
 
@@ -62,23 +57,6 @@ const walletResource2Cold: Resources.WalletResource = {
     balance: Utils.BigNumber.make("1000"),
     nonce: Utils.BigNumber.make("0"),
     attributes: {},
-};
-
-const wallet1LockResource1: Resources.LockResource = {
-    lockId: "700bef5e3c2fcbbac83472b7320a635cf02fddb14e12d83f911f05faea8e540c",
-    senderPublicKey: "03c6e98f9aff65c517c824c9b21b6e1bc053a19f81d95d4f76426b1f5e651e64db",
-    isExpired: false,
-    amount: Utils.BigNumber.make("1000"),
-    secretHash: "9929b94c6caf437576b458334b10605b4471086bda5dfdac6e3108043e349324",
-    recipientId: "AXm433vapiwt83xfh8x9ciNxYkVd76pbNe",
-    timestamp: {
-        epoch: 108158400,
-        unix: 1598259600,
-        human: "2020-08-24T09:00:00.000Z",
-    },
-    expirationType: Enums.HtlcLockExpirationType.EpochTimestamp,
-    expirationValue: 108158500,
-    vendorField: "ArkPool payments",
 };
 
 describe("WalletsController", () => {
@@ -162,57 +140,6 @@ describe("WalletsController", () => {
 
             const walletsController = container.resolve(WalletsController);
             const result = walletsController.show({
-                params: {
-                    id: "non-existing-wallet-id",
-                },
-            });
-
-            expect(walletSearchService.getWallet).toBeCalledWith("non-existing-wallet-id");
-            expect(result).toBeInstanceOf(Boom);
-        });
-    });
-
-    describe("Locks", () => {
-        it("should get wallet id from pathname and criteria from query and return locks page from LockSearchService", () => {
-            walletSearchService.getWallet.mockReturnValueOnce(walletResource1);
-
-            const locksPage: Contracts.Search.ResultsPage<Resources.LockResource> = {
-                results: [wallet1LockResource1],
-                totalCount: 1,
-                meta: { totalCountIsEstimate: false },
-            };
-            lockSearchService.getWalletLocksPage.mockReturnValueOnce(locksPage);
-
-            const walletsController = container.resolve(WalletsController);
-            const result = walletsController.locks({
-                params: {
-                    id: walletResource1.publicKey,
-                },
-                query: {
-                    page: 1,
-                    limit: 100,
-                    orderBy: ["timestamp.unix:desc"],
-                    isExpired: false,
-                },
-            });
-
-            expect(walletSearchService.getWallet).toBeCalledWith(walletResource1.publicKey);
-
-            expect(lockSearchService.getWalletLocksPage).toBeCalledWith(
-                { limit: 100, offset: 0 },
-                ["timestamp.unix:desc"],
-                walletResource1.address,
-                { isExpired: false },
-            );
-
-            expect(result).toBe(locksPage);
-        });
-
-        it("should return 404 when wallet wasn't found", () => {
-            walletSearchService.getWallet.mockReturnValueOnce(undefined);
-
-            const walletsController = container.resolve(WalletsController);
-            const result = walletsController.locks({
                 params: {
                     id: "non-existing-wallet-id",
                 },

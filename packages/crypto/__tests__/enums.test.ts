@@ -23,14 +23,5 @@ describe("Constants", () => {
 
         expect(TransactionType.DelegateResignation).toBeDefined();
         expect(TransactionType.DelegateResignation).toBe(7);
-
-        expect(TransactionType.HtlcLock).toBeDefined();
-        expect(TransactionType.HtlcLock).toBe(8);
-
-        expect(TransactionType.HtlcClaim).toBeDefined();
-        expect(TransactionType.HtlcClaim).toBe(9);
-
-        expect(TransactionType.HtlcRefund).toBeDefined();
-        expect(TransactionType.HtlcRefund).toBe(10);
     });
 });

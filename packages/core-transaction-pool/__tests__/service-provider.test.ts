@@ -91,9 +91,6 @@ describe("ServiceProvider", () => {
             expect(result.value.dynamicFees.addonBytes.multiSignature).toBeNumber();
             expect(result.value.dynamicFees.addonBytes.multiPayment).toBeNumber();
             expect(result.value.dynamicFees.addonBytes.delegateResignation).toBeNumber();
-            expect(result.value.dynamicFees.addonBytes.htlcLock).toBeNumber();
-            expect(result.value.dynamicFees.addonBytes.htlcClaim).toBeNumber();
-            expect(result.value.dynamicFees.addonBytes.htlcRefund).toBeNumber();
 
             expect(result.value.workerPool.workerCount).toBeNumber();
             expect(result.value.workerPool.cryptoPackages).toBeArray();

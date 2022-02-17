@@ -98,13 +98,11 @@ export const setUp = async (): Promise<Application> => {
             });
 
             Managers.configManager.getMilestone().aip11 = false;
-            Managers.configManager.getMilestone().htlcEnabled = false;
 
             await app.boot();
             registerEchoApi(app);
 
             Managers.configManager.getMilestone().aip11 = true;
-            Managers.configManager.getMilestone().htlcEnabled = true;
 
             await AppUtils.sleep(1000); // give some more time for api server to be up
         });

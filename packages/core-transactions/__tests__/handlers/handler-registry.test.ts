@@ -137,9 +137,6 @@ beforeEach(() => {
     app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcLockTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcClaimTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcRefundTransactionHandler);
 
     app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
     app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
@@ -226,27 +223,6 @@ describe("Registry", () => {
                 transactionHandlerRegistry.getRegisteredHandlerByType(
                     Transactions.InternalTransactionType.from(
                         Enums.TransactionType.DelegateRegistration,
-                        Enums.TransactionTypeGroup.Core,
-                    ),
-                    2,
-                ),
-                transactionHandlerRegistry.getRegisteredHandlerByType(
-                    Transactions.InternalTransactionType.from(
-                        Enums.TransactionType.HtlcLock,
-                        Enums.TransactionTypeGroup.Core,
-                    ),
-                    2,
-                ),
-                transactionHandlerRegistry.getRegisteredHandlerByType(
-                    Transactions.InternalTransactionType.from(
-                        Enums.TransactionType.HtlcClaim,
-                        Enums.TransactionTypeGroup.Core,
-                    ),
-                    2,
-                ),
-                transactionHandlerRegistry.getRegisteredHandlerByType(
-                    Transactions.InternalTransactionType.from(
-                        Enums.TransactionType.HtlcRefund,
                         Enums.TransactionTypeGroup.Core,
                     ),
                     2,

@@ -42,8 +42,7 @@ export class DposState implements Contracts.State.DposState {
 
                 const voteBalance: Utils.BigNumber = delegate.getAttribute("delegate.voteBalance");
 
-                const lockedBalance = voter.getAttribute("htlc.lockedBalance", Utils.BigNumber.ZERO);
-                delegate.setAttribute("delegate.voteBalance", voteBalance.plus(voter.getBalance()).plus(lockedBalance));
+                delegate.setAttribute("delegate.voteBalance", voteBalance.plus(voter.getBalance()));
             }
         }
     }

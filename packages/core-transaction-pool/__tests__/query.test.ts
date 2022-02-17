@@ -183,7 +183,7 @@ describe("QueryIterable.has", () => {
 
     it("should return false when there are no matching transactions", () => {
         const queryIterable = new QueryIterable([sender1Transaction100, sender1Transaction200]);
-        const result = queryIterable.whereType(Enums.TransactionType.HtlcClaim).has();
+        const result = queryIterable.whereType(Enums.TransactionType.Vote).has();
 
         expect(result).toBe(false);
     });
@@ -204,7 +204,7 @@ describe("QueryIterable.first", () => {
 
     it("should throw where there are no matching transactions", () => {
         const queryIterable = new QueryIterable([sender1Transaction100, sender1Transaction200]);
-        const check = () => queryIterable.whereType(Enums.TransactionType.HtlcClaim).first();
+        const check = () => queryIterable.whereType(Enums.TransactionType.Vote).first();
 
         expect(check).toThrow();
     });

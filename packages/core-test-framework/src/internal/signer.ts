@@ -82,41 +82,6 @@ export class Signer {
         return transaction.getStruct();
     }
 
-    public makeHtlcLock(opts: Record<string, any>): any {
-        const transaction = Transactions.BuilderFactory.htlcLock()
-            .fee(this.toSatoshi(opts.htlcLockFee))
-            .htlcLockAsset(opts.lock)
-            .nonce(this.nonce.toString())
-            .amount(opts.amount)
-            .recipientId(opts.recipient)
-            .sign(opts.passphrase);
-
-        this.incrementNonce();
-        return transaction.getStruct();
-    }
-
-    public makeHtlcClaim(opts: Record<string, any>): any {
-        const transaction = Transactions.BuilderFactory.htlcClaim()
-            .fee(this.toSatoshi(opts.htlcClaimFee))
-            .htlcClaimAsset(opts.claim)
-            .nonce(this.nonce.toString())
-            .sign(opts.passphrase);
-
-        this.incrementNonce();
-        return transaction.getStruct();
-    }
-
-    public makeHtlcRefund(opts: Record<string, any>): any {
-        const transaction = Transactions.BuilderFactory.htlcRefund()
-            .fee(this.toSatoshi(opts.htlcRefundFee))
-            .htlcRefundAsset(opts.refund)
-            .nonce(this.nonce.toString())
-            .sign(opts.passphrase);
-
-        this.incrementNonce();
-        return transaction.getStruct();
-    }
-
     private incrementNonce(): void {
         this.nonce = this.nonce.plus(1);
     }

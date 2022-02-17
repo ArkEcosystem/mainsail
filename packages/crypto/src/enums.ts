@@ -5,9 +5,6 @@ export enum TransactionType {
     MultiSignature = 4,
     MultiPayment = 6,
     DelegateResignation = 7,
-    HtlcLock = 8,
-    HtlcClaim = 9,
-    HtlcRefund = 10,
 }
 
 export enum TransactionTypeGroup {
@@ -16,9 +13,4 @@ export enum TransactionTypeGroup {
 
     // Everything above is available to anyone
     Reserved = 1000,
-}
-
-export enum HtlcLockExpirationType {
-    EpochTimestamp = 1,
-    BlockHeight = 2,
 }

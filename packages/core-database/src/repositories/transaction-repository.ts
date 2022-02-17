@@ -1,7 +1,7 @@
 import { Utils } from "@arkecosystem/core-kernel";
 import { Crypto, Enums } from "@arkecosystem/crypto";
 import dayjs from "dayjs";
-import { Brackets, EntityRepository, In } from "typeorm";
+import { EntityRepository, In } from "typeorm";
 
 import { Block } from "../models/block";
 import { Transaction } from "../models/transaction";
@@ -17,9 +17,7 @@ type FeeStatistics = {
 };
 @EntityRepository(Transaction)
 export class TransactionRepository extends AbstractRepository<Transaction> {
-    public async findByBlockIds(
-        blockIds: string[],
-    ): Promise<
+    public async findByBlockIds(blockIds: string[]): Promise<
         Array<{
             id: string;
             blockId: string;
@@ -59,7 +57,7 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
     }
 
     public async getFeeStatistics(
-        txTypes: Array<{ type: number, typeGroup: number }>,
+        txTypes: Array<{ type: number; typeGroup: number }>,
         days?: number,
         minFee?: number,
     ): Promise<FeeStatistics[]> {
@@ -86,37 +84,41 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
         for (const feeStatsByType of txTypes) {
             // we don't use directly this.createQueryBuilder() because it forces to have FROM transactions
             // instead of just the FROM (...) subquery
-            const feeStatsForType: FeeStatistics = await this.manager.connection.createQueryBuilder()
+            const feeStatsForType: FeeStatistics = await this.manager.connection
+                .createQueryBuilder()
                 .select(['subquery.type_group AS "typeGroup"', "subquery.type"])
                 .addSelect("COALESCE(AVG(subquery.fee), 0)::int8", "avg")
                 .addSelect("COALESCE(MIN(subquery.fee), 0)::int8", "min")
                 .addSelect("COALESCE(MAX(subquery.fee), 0)::int8", "max")
                 .addSelect("COALESCE(SUM(subquery.fee), 0)::int8", "sum")
                 .from(
-                    qb => qb
-                        .subQuery()
-                        .select()
-                        .from("transactions", "txs")
-                        .where(
-                            "txs.type = :type and txs.type_group = :typeGroup",
-                            { type: feeStatsByType.type, typeGroup: feeStatsByType.typeGroup }
-                        )
-                        .orderBy("txs.block_height", "DESC")
-                        .addOrderBy("txs.sequence", "DESC")
-                        .limit(20),
-                    "subquery"
+                    (qb) =>
+                        qb
+                            .subQuery()
+                            .select()
+                            .from("transactions", "txs")
+                            .where("txs.type = :type and txs.type_group = :typeGroup", {
+                                type: feeStatsByType.type,
+                                typeGroup: feeStatsByType.typeGroup,
+                            })
+                            .orderBy("txs.block_height", "DESC")
+                            .addOrderBy("txs.sequence", "DESC")
+                            .limit(20),
+                    "subquery",
                 )
                 .groupBy("subquery.type_group")
                 .addGroupBy("subquery.type")
                 .getRawOne();
-            feeStatistics.push(feeStatsForType ?? {
-                type: feeStatsByType.type,
-                typeGroup: feeStatsByType.typeGroup,
-                avg: 0,
-                min: 0,
-                max: 0,
-                sum: 0,
-            });
+            feeStatistics.push(
+                feeStatsForType ?? {
+                    type: feeStatsByType.type,
+                    typeGroup: feeStatsByType.typeGroup,
+                    avg: 0,
+                    min: 0,
+                    max: 0,
+                    sum: 0,
+                },
+            );
         }
 
         return feeStatistics;
@@ -182,89 +184,5 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
                 },
             );
         }) as any;
-    }
-
-    public async findByHtlcLocks(lockIds: string[]): Promise<Transaction[]> {
-        return this.createQueryBuilder()
-            .select()
-            .where(
-                new Brackets((qb) => {
-                    qb.where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-                        .andWhere(`type = ${Enums.TransactionType.HtlcClaim}`)
-                        .andWhere("asset->'claim'->>'lockTransactionId' IN (:...lockIds)", { lockIds });
-                }),
-            )
-            .orWhere(
-                new Brackets((qb) => {
-                    qb.where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-                        .andWhere(`type = ${Enums.TransactionType.HtlcRefund}`)
-                        .andWhere("asset->'refund'->>'lockTransactionId' IN (:...lockIds)", { lockIds });
-                }),
-            )
-            .getMany();
-    }
-
-    public async getOpenHtlcLocks(): Promise<Array<Transaction>> {
-        return this.createQueryBuilder()
-            .select()
-            .where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-            .andWhere(`type = ${Enums.TransactionType.HtlcLock}`)
-            .andWhere((qb) => {
-                const claimedIdsSubQuery = qb
-                    .subQuery()
-                    .select("asset->'claim'->>'lockTransactionId'")
-                    .from(Transaction, "t")
-                    .where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-                    .andWhere(`type = ${Enums.TransactionType.HtlcClaim}`);
-                return `id NOT IN ${claimedIdsSubQuery.getQuery()}`;
-            })
-            .andWhere((qb) => {
-                const refundedIdsSubQuery = qb
-                    .subQuery()
-                    .select("asset->'refund'->>'lockTransactionId'")
-                    .from(Transaction, "t")
-                    .where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-                    .andWhere(`type = ${Enums.TransactionType.HtlcRefund}`);
-                return `id NOT IN ${refundedIdsSubQuery.getQuery()}`;
-            })
-            .getMany();
-    }
-
-    public async getClaimedHtlcLockBalances(): Promise<{ recipientId: string; claimedBalance: string }[]> {
-        return this.createQueryBuilder()
-            .select(`recipient_id AS "recipientId"`)
-            .addSelect("SUM(amount)", "claimedBalance")
-            .where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-            .andWhere(`type = ${Enums.TransactionType.HtlcLock}`)
-            .andWhere((qb) => {
-                const claimedLockIdsSubQuery = qb
-                    .subQuery()
-                    .select("asset->'claim'->>'lockTransactionId'")
-                    .from(Transaction, "t")
-                    .where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-                    .andWhere(`type = ${Enums.TransactionType.HtlcClaim}`);
-                return `id IN ${claimedLockIdsSubQuery.getQuery()}`;
-            })
-            .groupBy("recipient_id")
-            .getRawMany();
-    }
-
-    public async getRefundedHtlcLockBalances(): Promise<{ senderPublicKey: string; refundedBalance: string }[]> {
-        return this.createQueryBuilder()
-            .select(`sender_public_key AS "senderPublicKey"`)
-            .addSelect("SUM(amount)", "refundedBalance")
-            .where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-            .andWhere(`type = ${Enums.TransactionType.HtlcLock}`)
-            .andWhere((qb) => {
-                const refundedLockIdsSubQuery = qb
-                    .subQuery()
-                    .select("asset->'refund'->>'lockTransactionId'")
-                    .from(Transaction, "t")
-                    .where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-                    .andWhere(`type = ${Enums.TransactionType.HtlcRefund}`);
-                return `id IN ${refundedLockIdsSubQuery.getQuery()}`;
-            })
-            .groupBy("sender_public_key")
-            .getRawMany();
     }
 }

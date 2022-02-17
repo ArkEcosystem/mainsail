@@ -5,7 +5,6 @@ import { Wallets } from "@packages/core-state";
 import { StateStore } from "@packages/core-state/src/stores/state";
 import {
     addressesIndexer,
-    locksIndexer,
     publicKeysIndexer,
     usernamesIndexer,
 } from "@packages/core-state/src/wallets/indexers/indexers";
@@ -29,9 +28,9 @@ import { SenderState } from "@packages/core-transaction-pool/src/sender-state";
 import { One, Two } from "@packages/core-transactions/src/handlers";
 import { TransactionHandlerProvider } from "@packages/core-transactions/src/handlers/handler-provider";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
+import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
 import { Identities, Utils } from "@packages/crypto";
 import { IMultiSignatureAsset } from "@packages/crypto/src/interfaces";
-import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
 
 const logger = {
     notice: jest.fn(),
@@ -64,12 +63,6 @@ export const initApp = (): Application => {
     app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
         name: Contracts.State.WalletIndexes.Usernames,
         indexer: usernamesIndexer,
-        autoIndex: true,
-    });
-
-    app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-        name: Contracts.State.WalletIndexes.Locks,
-        indexer: locksIndexer,
         autoIndex: true,
     });
 
@@ -129,9 +122,6 @@ export const initApp = (): Application => {
     app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcLockTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcClaimTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcRefundTransactionHandler);
 
     app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
     app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();

@@ -53,22 +53,6 @@ describe("TransactionRepository", () => {
             await expect(TransactionRepository.instance.findReceivedTransactions()).resolves.toEqual([]);
         });
 
-        it("findByHtlcLocks should return empty search result", async () => {
-            await expect(TransactionRepository.instance.findByHtlcLocks(["dummy_id"])).resolves.toEqual([]);
-        });
-
-        it("getOpenHtlcLocks should return empty search result", async () => {
-            await expect(TransactionRepository.instance.getOpenHtlcLocks()).resolves.toEqual([]);
-        });
-
-        it("getClaimedHtlcLockBalances should return empty search result", async () => {
-            await expect(TransactionRepository.instance.getClaimedHtlcLockBalances()).resolves.toEqual([]);
-        });
-
-        it("getRefundedHtlcLockBalances should return empty search result", async () => {
-            await expect(TransactionRepository.instance.getRefundedHtlcLockBalances()).resolves.toEqual([]);
-        });
-
         it("getFeeStatistics should return empty search result", async () => {
             await expect(TransactionRepository.instance.getFeeStatistics([], 1)).resolves.toEqual([]);
         });
@@ -110,32 +94,6 @@ describe("TransactionRepository", () => {
                 {
                     recipientId: transaction.recipientId,
                     amount: transaction.amount!.toString(),
-                },
-            ]);
-        });
-
-        it("findByHtlcLocks should return mocked transactions", async () => {
-            await expect(TransactionRepository.instance.findByHtlcLocks(["dummy_id"])).resolves.toEqual([transaction]);
-        });
-
-        it("getOpenHtlcLocks should return empty search result", async () => {
-            await expect(TransactionRepository.instance.getOpenHtlcLocks()).resolves.toEqual([transaction]);
-        });
-
-        it("getClaimedHtlcLockBalances should return empty search result", async () => {
-            await expect(TransactionRepository.instance.getClaimedHtlcLockBalances()).resolves.toEqual([
-                {
-                    recipientId: transaction.recipientId,
-                    claimedBalance: transaction.amount!.toString(),
-                },
-            ]);
-        });
-
-        it("getRefundedHtlcLockBalances should return empty search result", async () => {
-            await expect(TransactionRepository.instance.getRefundedHtlcLockBalances()).resolves.toEqual([
-                {
-                    senderPublicKey: transaction.senderPublicKey,
-                    refundedBalance: transaction.amount!.toString(),
                 },
             ]);
         });

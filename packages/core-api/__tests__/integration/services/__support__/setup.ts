@@ -36,7 +36,6 @@ export const setUp = async (): Promise<Application> => {
     walletAttributes.set("delegate.resigned");
     walletAttributes.set("delegate.voteBalance");
     walletAttributes.set("delegate");
-    walletAttributes.set("htlc.locks");
 
     return app;
 };

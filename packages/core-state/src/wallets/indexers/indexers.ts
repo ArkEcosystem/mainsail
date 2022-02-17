@@ -23,13 +23,3 @@ export const resignationsIndexer = (index: Contracts.State.WalletIndex, wallet: 
         index.set(wallet.getAttribute("delegate.username"), wallet);
     }
 };
-
-export const locksIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.Wallet) => {
-    if (wallet.hasAttribute("htlc.locks")) {
-        const locks: object = wallet.getAttribute("htlc.locks");
-
-        for (const lockId of Object.keys(locks)) {
-            index.set(lockId, wallet);
-        }
-    }
-};

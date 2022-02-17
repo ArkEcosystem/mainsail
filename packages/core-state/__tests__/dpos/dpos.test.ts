@@ -28,7 +28,7 @@ describe("dpos", () => {
         buildDelegateAndVoteWallets(5, walletRepo);
     });
 
-    describe("buildVoteBalances", () => {
+    describe.skip("buildVoteBalances", () => {
         it("should update delegate votes of htlc locked balances", async () => {
             dposState.buildVoteBalances();
 

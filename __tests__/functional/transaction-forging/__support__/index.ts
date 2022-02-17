@@ -56,12 +56,10 @@ export const setUp = async (): Promise<Contracts.Kernel.Application> => {
         });
 
         Managers.configManager.getMilestone().aip11 = false;
-        Managers.configManager.getMilestone().htlcEnabled = false;
 
         await app.boot();
 
         Managers.configManager.getMilestone().aip11 = true;
-        Managers.configManager.getMilestone().htlcEnabled = true;
     });
 
     return sandbox.app;

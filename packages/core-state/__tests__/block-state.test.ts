@@ -557,28 +557,12 @@ describe("BlockState", () => {
             .sign("delegatePassphrase")
             .build();
 
-        const htlcLock = factory
-            .get("HtlcLock")
-            .withOptions({ senderPublicKey: sender.getPublicKey(), recipientId: recipientWallet.getAddress() })
-            .make();
-
-        const htlcRefund = factory
-            .get("HtlcRefund")
-            .withOptions({
-                secretHash: "secretHash",
-                senderPublicKey: sender.publicKey,
-                recipientId: recipientWallet.address,
-            })
-            .make();
-
         describe.each`
             type                      | transaction
             ${"transfer"}             | ${transfer}
             ${"delegateRegistration"} | ${delegateReg}
             ${"vote"}                 | ${vote}
             ${"delegateResignation"}  | ${delegateRes}
-            ${"htlcLock"}             | ${htlcLock}
-            ${"htlcRefund"}           | ${htlcRefund}
         `("when the transaction is a $type", ({ transaction }) => {
             it("should call the transaction handler apply the transaction to the sender & recipient", async () => {
                 await blockState.applyTransaction(transaction);
@@ -624,143 +608,6 @@ describe("BlockState", () => {
                 delete voteTransaction.data.asset;
 
                 await expect(blockState.applyTransaction(voteTransaction as Interfaces.ITransaction)).toReject();
-            });
-        });
-
-        describe("htlc transaction", () => {
-            let htlcClaimTransaction: Interfaces.ITransaction;
-            let htlcLock: Interfaces.ITransaction;
-            let lockData;
-            let lockID;
-
-            beforeEach(() => {
-                const amount = Utils.BigNumber.make(2345);
-
-                htlcLock = factory
-                    .get("HtlcLock")
-                    .withOptions({ amount, senderPublicKey: sender.publicKey, recipientId: recipientWallet.address })
-                    .make();
-
-                htlcClaimTransaction = factory
-                    .get("HtlcClaim")
-                    .withOptions({
-                        amount,
-                        senderPublicKey: sender.publicKey,
-                        recipientId: recipientWallet.address,
-                    })
-                    .make();
-
-                // TODO: Why do these need to be set manually here?
-                // @ts-ignore
-                htlcClaimTransaction.typeGroup = htlcClaimTransaction.data.typeGroup;
-                // @ts-ignore
-                htlcClaimTransaction.type = htlcClaimTransaction.data.type;
-                htlcClaimTransaction.data.recipientId = recipientWallet.address;
-
-                sender.setAttribute("htlc.lockedBalance", Utils.BigNumber.make(amount));
-
-                lockData = {
-                    amount: amount,
-                    recipientId: recipientWallet.address,
-                    ...htlcClaimTransaction.data.asset!.lock,
-                };
-
-                lockID = htlcClaimTransaction.data.asset.claim.lockTransactionId;
-
-                sender.setAttribute("htlc.locks", {
-                    [lockID]: lockData,
-                });
-
-                walletRepo.index(sender);
-                walletRepo.index(recipientWallet);
-            });
-
-            it("apply should find correct locks, sender and recipient wallets", async () => {
-                await blockState.applyTransaction(htlcClaimTransaction);
-                expect(applySpy).toHaveBeenCalledWith(htlcClaimTransaction);
-                expect(spyApplyVoteBalances).toHaveBeenCalledWith(
-                    sender,
-                    recipientWallet,
-                    htlcClaimTransaction.data,
-                    walletRepo.findByIndex(Contracts.State.WalletIndexes.Locks, lockID),
-                    lockData,
-                );
-            });
-
-            it("revert should find correct locks, sender and recipient wallets", async () => {
-                await blockState.revertTransaction(htlcClaimTransaction);
-                expect(revertSpy).toHaveBeenCalledWith(htlcClaimTransaction);
-                expect(spyRevertVoteBalances).toHaveBeenCalledWith(
-                    sender,
-                    recipientWallet,
-                    htlcClaimTransaction.data,
-                    walletRepo.findByIndex(Contracts.State.WalletIndexes.Locks, lockID),
-                    lockData,
-                );
-            });
-
-            it("update vote balances for claims transactions", async () => {
-                const recipientsDelegate = walletRepo.findByPublicKey(
-                    "034151a3ec46b5670a682b0a63394f863587d1bc97483b1b6c70eb58e7f0aed192",
-                );
-                sender.setAttribute("vote", forgingWallet.getPublicKey());
-                recipientWallet.setAttribute("vote", recipientsDelegate.getPublicKey());
-
-                await blockState.applyTransaction(htlcClaimTransaction);
-
-                expect(recipientsDelegate.getAttribute("delegate.voteBalance")).toEqual(
-                    htlcClaimTransaction.data.amount,
-                );
-                expect(forgingWallet.getAttribute("delegate.voteBalance")).toEqual(htlcClaimTransaction.data.amount);
-
-                await blockState.revertTransaction(htlcClaimTransaction);
-
-                expect(recipientsDelegate.getAttribute("delegate.voteBalance")).toEqual(Utils.BigNumber.ZERO);
-                expect(forgingWallet.getAttribute("delegate.voteBalance")).toEqual(Utils.BigNumber.ZERO);
-            });
-
-            it("should update vote balances for lock transactions", async () => {
-                sender.setAttribute("vote", forgingWallet.getPublicKey());
-                const forgingWalletBefore = Utils.BigNumber.ZERO;
-                forgingWallet.setAttribute("delegate.voteBalance", forgingWalletBefore);
-
-                await blockState.applyTransaction(htlcLock);
-
-                const delegateBalanceAfterApply = forgingWallet.getAttribute("delegate.voteBalance");
-
-                expect(delegateBalanceAfterApply).toEqual(forgingWalletBefore.minus(htlcLock.data.fee));
-
-                await blockState.revertTransaction(htlcLock);
-
-                expect(forgingWallet.getAttribute("delegate.voteBalance")).toEqual(Utils.BigNumber.ZERO);
-            });
-
-            it("should fail to apply if there are no assets", async () => {
-                // @ts-ignore
-                delete htlcClaimTransaction.data.asset;
-                await expect(blockState.applyTransaction(htlcClaimTransaction)).toReject();
-            });
-
-            it("should fail to reject if there are no assets", async () => {
-                await blockState.applyTransaction(htlcClaimTransaction);
-                // @ts-ignore
-                delete htlcClaimTransaction.data.asset;
-
-                await expect(blockState.revertTransaction(htlcClaimTransaction)).toReject();
-            });
-
-            it("should update recipient vote balance if it isn't a core typeground", async () => {
-                htlcLock.data.recipientId = recipientWallet.address;
-                htlcLock.data.type = Enums.TransactionType.HtlcLock;
-                htlcLock.data.typeGroup = Enums.TransactionTypeGroup.Test;
-
-                const recipientsDelegateBalanceBefore = recipientsDelegate.getAttribute("delegate.voteBalance");
-
-                await blockState.applyTransaction(htlcLock);
-
-                expect(recipientsDelegate.getAttribute("delegate.voteBalance")).toEqual(
-                    recipientsDelegateBalanceBefore.plus(htlcLock.data.amount),
-                );
             });
         });
     });
