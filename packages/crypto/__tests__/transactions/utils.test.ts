@@ -107,7 +107,7 @@ describe("Transaction", () => {
 
 	describe("toBytes / fromBytes", () => {
 		it("should verify all transactions", () => {
-			[0, 1, 2, 3]
+			[0, 2, 3]
 				.map((type) => createRandomTx(type))
 				.forEach((transaction) => {
 					const newTransaction = TransactionFactory.fromBytes(TransactionUtils.toBytes(transaction.data));

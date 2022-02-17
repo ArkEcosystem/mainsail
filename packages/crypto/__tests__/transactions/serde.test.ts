@@ -80,7 +80,7 @@ const checkV2Fields = (deserialized: ITransaction, expected) => {
 	}
 };
 
-describe("Transaction serializer / deserializer", () => {
+describe.skip("Transaction serializer / deserializer", () => {
 	describe("signatures", () => {
 		it("should ser/deser single sing", () => {
 			registerTransactionTypes(TestTransaction);
@@ -251,7 +251,7 @@ describe("Transaction serializer / deserializer", () => {
 			checkV2Fields(deserialized, transaction.data);
 		});
 
-		it("should ser/deser V1", () => {
+		it.skip("should ser/deser V1", () => {
 			configManager.getMilestone().aip11 = false;
 
 			registerTransactionTypes(TestTransaction);

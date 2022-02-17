@@ -45,7 +45,7 @@ describe("Wallet Repository", () => {
 	});
 
 	it("should be able to look up indexers", () => {
-		const expected = ["addresses", "publicKeys", "usernames", "resignations", "locks"];
+		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
 		expect(walletRepo.getIndexNames()).toEqual(expected);
 		expect(walletRepo.getIndex("addresses").indexer).toEqual(addressesIndexer);
 		expect(walletRepo.getIndex("publicKeys").indexer).toEqual(publicKeysIndexer);

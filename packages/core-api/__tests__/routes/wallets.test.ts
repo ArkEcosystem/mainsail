@@ -75,23 +75,6 @@ describe("Blockchain", () => {
 		});
 	});
 
-	describe("Locks", () => {
-		it("should be called", async () => {
-			// @ts-ignore
-			const spyOnMethod = jest.spyOn(WalletsController.prototype, "locks").mockResolvedValue(paginatedResult);
-
-			const injectOptions = {
-				method: "GET",
-				url: "/wallets/027716e659220085e41389efc7cf6a05f7f7c659cf3db9126caabce6cda9156582/locks",
-			};
-
-			const result = await server.inject(injectOptions);
-
-			expect(result.statusCode).toEqual(200);
-			expect(spyOnMethod).toHaveBeenCalled();
-		});
-	});
-
 	describe("Transactions", () => {
 		it("should be called", async () => {
 			// @ts-ignore

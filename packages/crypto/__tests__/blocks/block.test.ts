@@ -736,7 +736,7 @@ describe("Block", () => {
 		});
 	});
 
-	it("should reorder correctly transactions in deserialization", () => {
+	it.skip("should reorder correctly transactions in deserialization", () => {
 		configManager.setFromPreset("mainnet");
 
 		const issue = {

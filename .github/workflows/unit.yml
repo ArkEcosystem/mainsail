@@ -358,7 +358,7 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: pnpm run test packages/__tests__/unit/
+              run: cd packages/core-p2p && pnpm run test
 
     core-snapshots:
         runs-on: ubuntu-latest

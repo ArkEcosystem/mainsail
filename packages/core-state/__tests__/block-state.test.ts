@@ -6,7 +6,7 @@ import { StateStore } from "@packages/core-state/src/stores/state";
 import { Wallet } from "@packages/core-state/src/wallets";
 import { WalletRepository } from "@packages/core-state/src/wallets";
 import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import { Enums, Interfaces, Utils } from "@packages/crypto";
+import { Interfaces, Utils } from "@packages/crypto";
 
 import { makeChainedBlocks } from "./__utils__/make-chained-block";
 import { makeVoteTransactions } from "./__utils__/make-vote-transactions";
@@ -33,7 +33,6 @@ let spyInitGenesisForgerWallet: jest.SpyInstance;
 let spyApplyBlockToForger: jest.SpyInstance;
 let spyDecreaseWalletDelegateVoteBalance: jest.SpyInstance;
 let spyApplyVoteBalances: jest.SpyInstance;
-let spyRevertVoteBalances: jest.SpyInstance;
 let spyRevertBlockFromForger: jest.SpyInstance;
 
 const forgetWallet = (wallet: Wallet) => {
@@ -64,7 +63,6 @@ beforeEach(() => {
 	spyInitGenesisForgerWallet = jest.spyOn(blockState as any, "initGenesisForgerWallet");
 	spyApplyBlockToForger = jest.spyOn(blockState as any, "applyBlockToForger");
 	spyApplyVoteBalances = jest.spyOn(blockState as any, "applyVoteBalances");
-	spyRevertVoteBalances = jest.spyOn(blockState as any, "revertVoteBalances");
 	spyRevertBlockFromForger = jest.spyOn(blockState as any, "revertBlockFromForger");
 
 	forgingWallet = walletRepo.findByPublicKey(blocks[0].data.generatorPublicKey);

@@ -14,8 +14,8 @@ import {
 	InvalidMultiSignatureError,
 	LegacyMultiSignatureRegistrationError,
 	MultiSignatureAlreadyRegisteredError,
-	MultiSignatureKeyCountMismatchError,
-	MultiSignatureMinimumKeysError,
+	// MultiSignatureKeyCountMismatchError,
+	// MultiSignatureMinimumKeysError,
 } from "@packages/core-transactions/src/errors";
 import { TransactionHandler } from "@packages/core-transactions/src/handlers";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
@@ -24,7 +24,7 @@ import { BuilderFactory } from "@packages/crypto/dist/transactions";
 import { IMultiSignatureAsset, IMultiSignatureLegacyAsset } from "@packages/crypto/src/interfaces";
 import { configManager } from "@packages/crypto/src/managers";
 
-import { buildRecipientWallet, buildSecondSignatureWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -131,7 +131,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
 				yield multiSignatureTransaction.data;
 			});
-			recipientWallet.setAttribute("multiSignature", multiSignatureTransaction.data.asset!.multiSignature);
+			recipientWallet.setAttribute("multiSignature", multiSignatureTransaction.data.asset.multiSignature);
 			await expect(handler.bootstrap()).rejects.toThrow(MultiSignatureAlreadyRegisteredError);
 		});
 
@@ -163,7 +163,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 		});
 
 		it("should throw if the wallet already has multisignatures", async () => {
-			recipientWallet.setAttribute("multiSignature", multiSignatureTransaction.data.asset!.multiSignature);
+			recipientWallet.setAttribute("multiSignature", multiSignatureTransaction.data.asset.multiSignature);
 
 			await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).rejects.toThrow(
 				MultiSignatureAlreadyRegisteredError,
@@ -194,7 +194,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 
 			multiSignatureTransaction.data.version = 1;
 			multiSignatureTransaction.data.timestamp = 1000;
-			multiSignatureTransaction.data.asset!.legacyAsset = legacyAssset;
+			multiSignatureTransaction.data.asset.legacyAsset = legacyAssset;
 
 			Managers.configManager.getMilestone().aip11 = false;
 
@@ -207,7 +207,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 
 		// TODO: check value 02 thwors DuplicateParticipantInMultiSignatureError, 03 throws nodeError
 		it("should throw if failure to verify signatures in asset", async () => {
-			multiSignatureTransaction.data.signatures![0] = multiSignatureTransaction.data.signatures![0].replace(
+			multiSignatureTransaction.data.signatures[0] = multiSignatureTransaction.data.signatures[0].replace(
 				"00",
 				"02",
 			);
@@ -267,7 +267,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 				.build();
 
 			const multiSigWallet = walletRepository.findByPublicKey(
-				Identities.PublicKey.fromMultiSignatureAsset(multiSignatureTransaction.data.asset!.multiSignature!),
+				Identities.PublicKey.fromMultiSignatureAsset(multiSignatureTransaction.data.asset.multiSignature),
 			);
 
 			await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, participantWallet)).toResolve();
@@ -387,7 +387,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 
 			expect(senderWallet.hasAttribute("multiSignature")).toBeFalse();
 			expect(recipientWallet.getAttribute("multiSignature")).toEqual(
-				multiSignatureTransaction.data.asset!.multiSignature,
+				multiSignatureTransaction.data.asset.multiSignature,
 			);
 		});
 	});

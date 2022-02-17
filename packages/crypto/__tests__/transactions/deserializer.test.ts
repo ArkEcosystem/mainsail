@@ -9,7 +9,7 @@ import {
 	TransactionVersionError,
 	UnkownTransactionError,
 } from "@packages/crypto/src/errors";
-import { Address, Keys, PublicKey } from "@packages/crypto/src/identities";
+import { Address, Keys } from "@packages/crypto/src/identities";
 import { IKeyPair, ITransaction, ITransactionData } from "@packages/crypto/src/interfaces";
 import { configManager } from "@packages/crypto/src/managers";
 import { TransactionFactory, Utils as TransactionUtils, Verifier } from "@packages/crypto/src/transactions";
@@ -399,16 +399,6 @@ describe("Transaction serializer / deserializer", () => {
 			expect(transaction!.verify()).toBeTrue();
 		});
 
-		it("should throw when V2 transaction is signed with Schnorr and ECDSA", () => {
-			let builder = builderWith(Hash.signSchnorr, Hash.signECDSA);
-			expect(builder.data.version).toBe(2);
-			expect(() => builder.build()).toThrow();
-
-			builder = builderWith(Hash.signECDSA, Hash.signSchnorr);
-			expect(builder.data.version).toBe(2);
-			expect(() => builder.build()).toThrow();
-		});
-
 		it("should throw when V2 transaction is signed with Schnorr and AIP11 not active", () => {
 			const builder = builderWith(Hash.signSchnorr);
 
@@ -493,29 +483,6 @@ describe("Transaction serializer / deserializer", () => {
 			expect(bytes.length).toBe(202);
 			expect(bytes.toString("hex")).toBe(
 				"00aa2902005d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09171dfc69b54c7fe901e91d5a9ab78388645e2427ea00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e803000000000000d007000000000000618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-			);
-		});
-
-		it("should return Buffer of transaction with second signature and buffer must be 266 length", () => {
-			const transaction = {
-				version: 1,
-				type: 0,
-				amount: Utils.BigNumber.make(1000),
-				fee: Utils.BigNumber.make(2000),
-				recipientId: "AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff",
-				timestamp: 141738,
-				asset: {},
-				senderPublicKey: "5d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09",
-				signature:
-					"618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-				id: "13987348420913138422",
-			};
-
-			bytes = Serializer.getBytes(transaction);
-			expect(bytes).toBeObject();
-			expect(bytes.length).toBe(266);
-			expect(bytes.toString("hex")).toBe(
-				"00aa2902005d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09171dfc69b54c7fe901e91d5a9ab78388645e2427ea00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e803000000000000d007000000000000618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
 			);
 		});
 

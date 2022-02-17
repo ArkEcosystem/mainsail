@@ -9,7 +9,7 @@ import { Two } from "../../../../packages/crypto/src/transactions/types";
 import { BigNumber } from "../../../../packages/crypto/src/utils";
 
 describe("Transaction", () => {
-	describe("should deserialize correctly some tests transactions", () => {
+	describe.skip("should deserialize correctly some tests transactions", () => {
 		describe("mainnet", () => {
 			beforeEach(() => {
 				configManager.setFromPreset("mainnet");

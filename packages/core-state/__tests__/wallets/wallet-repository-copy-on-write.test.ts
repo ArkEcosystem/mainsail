@@ -34,7 +34,7 @@ describe("Wallet Repository Copy On Write", () => {
 	});
 
 	it("should be able to look up indexers", () => {
-		const expected = ["addresses", "publicKeys", "usernames", "resignations", "locks"];
+		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
 		expect(walletRepoCopyOnWrite.getIndexNames()).toEqual(expected);
 		expect(walletRepoCopyOnWrite.getIndex("addresses").indexer).toEqual(addressesIndexer);
 		expect(walletRepoCopyOnWrite.getIndex("publicKeys").indexer).toEqual(publicKeysIndexer);
