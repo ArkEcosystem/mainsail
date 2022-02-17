@@ -1,26 +1,26 @@
 {
-    "name": "@arkecosystem/crypto-key-pair-secp256k1",
-    "version": "3.1.1",
-    "description": "secp256k1 Key Derivation",
-    "license": "MIT",
-    "contributors": [],
-    "main": "distribution/index.js",
-    "types": "distribution/index.d.ts",
-    "files": [
-        "distribution"
-    ],
-    "scripts": {
-        "build": "pnpm run clean && tsc",
-        "build:watch": "pnpm run clean && tsc -w",
-        "clean": "rimraf dist",
-        "test": "uvu -r tsm source .test.ts"
-    },
-    "dependencies": {
-        "@arkecosystem/crypto-contracts": "workspace:*",
-        "bcrypto": "5.4.0"
-    },
-    "devDependencies": {
-        "@arkecosystem/core-test": "workspace:^3.1.1",
-        "uvu": "^0.5.3"
-    }
+	"name": "@arkecosystem/crypto-key-pair-secp256k1",
+	"version": "3.1.1",
+	"description": "secp256k1 Key Derivation",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "rimraf dist",
+		"test": "uvu -r tsm source .test.ts"
+	},
+	"dependencies": {
+		"@arkecosystem/crypto-contracts": "workspace:*",
+		"bcrypto": "5.4.0"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-test": "workspace:^3.1.1",
+		"uvu": "^0.5.3"
+	}
 }

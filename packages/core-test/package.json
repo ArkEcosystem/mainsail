@@ -7,18 +7,13 @@
 		"Brian Faust <brian@ark.io>"
 	],
 	"main": "dist/index.js",
-	"umd:main": "dist/index.umd.js",
-	"jsdelivr": "dist/index.bundled.min.js",
-	"unpkg": "dist/index.bundled.min.js",
-	"module": "dist/index.esm.js",
-	"browser": "dist/index.bundled.js",
 	"types": "dist/index.d.ts",
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "yarn clean && tsc",
-		"build:watch": "yarn clean && yarn compile -w",
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "rimraf dist",
 		"test": "uvu -r tsm src .test.ts"
 	},
@@ -35,5 +30,8 @@
 	"devDependencies": {
 		"@types/node": "^17.0.8",
 		"@types/sinon": "^10.0.6"
+	},
+	"engines": {
+		"node": ">=16.x"
 	}
 }
