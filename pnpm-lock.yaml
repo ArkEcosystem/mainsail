@@ -602,6 +602,7 @@ importers:
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/crypto': workspace:*
+      '@hapi/hapi': 20.1.5
       '@types/got': 9.6.12
       bip39: 3.0.4
       bs58: 4.0.1
@@ -640,6 +641,7 @@ importers:
       tmp: 0.2.1
       xstate: 4.23.4
     devDependencies:
+      '@hapi/hapi': 20.1.5
       '@types/got': 9.6.12
       joi: 17.4.2
 
@@ -2265,6 +2267,7 @@ packages:
     deprecated: This version has been deprecated and is no longer supported or maintained
     dependencies:
       '@hapi/hoek': 9.2.1
+    dev: false
 
   /@hapi/boom/9.1.4:
     resolution: {integrity: sha512-Ls1oH8jaN1vNsqcaHVYJrKmgMcKsC1wcp8bujvXrHaAqD2iDYq3HoOwsxwo09Cuda5R5nC0o0IxlrlTuvPuzSw==}
@@ -2274,8 +2277,8 @@ packages:
   /@hapi/bounce/2.0.0:
     resolution: {integrity: sha512-JesW92uyzOOyuzJKjoLHM1ThiOvHPOLDHw01YV8yh5nCso7sDwJho1h0Ad2N+E62bZyz46TG3xhAi/78Gsct6A==}
     dependencies:
-      '@hapi/boom': 9.0.0
-      '@hapi/hoek': 9.2.0
+      '@hapi/boom': 9.1.4
+      '@hapi/hoek': 9.2.1
 
   /@hapi/bourne/2.0.0:
     resolution: {integrity: sha512-WEezM1FWztfbzqIUbsDzFRVMxSoLy3HugVcux6KDDtTqzPsLE8NDRHfXvev66aH1i2oOKKar3/XDjbvh/OUBdg==}

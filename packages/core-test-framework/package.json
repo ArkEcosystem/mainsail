@@ -19,7 +19,9 @@
         "clean": "rimraf dist",
         "compile": "node ../../node_modules/typescript/bin/tsc",
         "prepublishOnly": "pnpm run build",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
+        "pretest": "bash ../../scripts/pre-test.sh",
+        "test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
+        "test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
     },
     "dependencies": {
         "@arkecosystem/core": "workspace:*",
@@ -46,6 +48,7 @@
         "xstate": "4.23.4"
     },
     "devDependencies": {
+        "@hapi/hapi": "20.1.5",
         "@types/got": "9.6.12",
         "joi": "17.4.2"
     },
