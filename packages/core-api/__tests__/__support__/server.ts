@@ -22,7 +22,7 @@ export const initServer = async (app: Application, defaults: any, customRoute?: 
 
     app.bind(Container.Identifiers.PluginConfiguration)
         .toConstantValue(pluginConfigurationInstance)
-        .when(Container.Selectors.anyAncestorOrTargetTaggedFirst("plugin", "@arkecosystem/core-api"));
+        .when(Container.Selectors.anyAncestorOrTargetTaggedFirst("plugin", "core-api"));
 
     await server.initialize("Test", serverConfig);
     await server.register(preparePlugins(defaults.plugins));

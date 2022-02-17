@@ -12,7 +12,7 @@ export const getHeaders = (app: Contracts.Kernel.Application) => {
                 .getTagged<Providers.PluginConfiguration>(
                     Container.Identifiers.PluginConfiguration,
                     "plugin",
-                    "@arkecosystem/core-p2p",
+                    "core-p2p",
                 )
                 .get<number>("port"),
         ),

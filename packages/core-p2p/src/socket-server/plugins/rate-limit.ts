@@ -13,7 +13,7 @@ export class RateLimitPlugin {
     protected readonly app!: Contracts.Kernel.Application;
 
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-p2p")
+    @Container.tagged("plugin", "core-p2p")
     private readonly configuration!: Providers.PluginConfiguration;
 
     private rateLimiter!: RateLimiter;

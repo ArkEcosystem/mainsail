@@ -13,7 +13,7 @@ export const transactionsSchemas = {
                         .getTagged<Providers.PluginConfiguration>(
                             Container.Identifiers.PluginConfiguration,
                             "plugin",
-                            "@arkecosystem/core-transaction-pool",
+                            "core-transaction-pool",
                         )
                         .getOptional<number>("maxTransactionsPerRequest", 40),
                 ),

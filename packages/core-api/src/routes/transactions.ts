@@ -48,7 +48,7 @@ export const register = (server: Hapi.Server): void => {
                                     .getTagged<Providers.PluginConfiguration>(
                                         Container.Identifiers.PluginConfiguration,
                                         "plugin",
-                                        "@arkecosystem/core-transaction-pool",
+                                        "core-transaction-pool",
                                     )
                                     .get<number>("maxTransactionsPerRequest"),
                             },

@@ -11,7 +11,7 @@ export class Controller {
     protected readonly app!: Contracts.Kernel.Application;
 
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-api")
+    @Container.tagged("plugin", "core-api")
     protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
     protected getQueryPagination(query: Hapi.RequestQuery): Contracts.Search.Pagination {

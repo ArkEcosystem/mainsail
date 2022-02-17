@@ -5,7 +5,7 @@ import { ensureFileSync } from "fs-extra";
 @Container.injectable()
 export class Storage implements Contracts.TransactionPool.Storage {
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-transaction-pool")
+    @Container.tagged("plugin", "core-transaction-pool")
     private readonly configuration!: Providers.PluginConfiguration;
 
     private database!: BetterSqlite3.Database;

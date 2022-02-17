@@ -9,7 +9,7 @@ export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcas
     private readonly logger!: Contracts.Kernel.Logger;
 
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-p2p")
+    @Container.tagged("plugin", "core-p2p")
     private readonly configuration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.PeerRepository)

@@ -22,7 +22,7 @@ export class Server {
      * @memberof Server
      */
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-api")
+    @Container.tagged("plugin", "core-api")
     private readonly configuration!: Providers.PluginConfiguration;
 
     /**

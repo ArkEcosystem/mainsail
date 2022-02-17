@@ -11,7 +11,7 @@ export class StateStore implements Contracts.State.StateStore {
     private readonly app!: Contracts.Kernel.Application;
 
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-state")
+    @Container.tagged("plugin", "core-state")
     private readonly configuration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.LogService)

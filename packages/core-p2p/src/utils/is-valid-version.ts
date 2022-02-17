@@ -23,7 +23,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
         const configuration = app.getTagged<Providers.PluginConfiguration>(
             Container.Identifiers.PluginConfiguration,
             "plugin",
-            "@arkecosystem/core-p2p",
+            "core-p2p",
         );
         minimumVersions = configuration.getOptional<string[]>("minimumVersions", []);
     }

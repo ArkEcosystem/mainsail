@@ -6,7 +6,7 @@ import { TransactionAlreadyInPoolError, TransactionPoolFullError } from "./error
 @Container.injectable()
 export class Service implements Contracts.TransactionPool.Service {
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-transaction-pool")
+    @Container.tagged("plugin", "core-transaction-pool")
     private readonly configuration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.StateStore)

@@ -88,7 +88,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
         const configuration = monitor.app.getTagged<Providers.PluginConfiguration>(
             Container.Identifiers.PluginConfiguration,
             "plugin",
-            "@arkecosystem/core-p2p",
+            "core-p2p",
         );
         const minimumNetworkReach = configuration.getOptional<number>("minimumNetworkReach", 20);
 

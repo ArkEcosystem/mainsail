@@ -10,7 +10,7 @@ import { Controller } from "./controller";
 @Container.injectable()
 export class NodeController extends Controller {
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-transaction-pool")
+    @Container.tagged("plugin", "core-transaction-pool")
     private readonly transactionPoolConfiguration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.TransactionHandlerRegistry)

@@ -15,11 +15,11 @@ export class SnapshotDatabaseService implements Database.DatabaseService {
     private readonly app!: Contracts.Kernel.Application;
 
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-snapshots")
+    @Container.tagged("plugin", "core-snapshots")
     private readonly configuration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-database")
+    @Container.tagged("plugin", "core-database")
     private readonly coreDatabaseConfiguration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.LogService)

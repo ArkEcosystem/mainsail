@@ -5,7 +5,7 @@ import { WalletEvent } from "./wallet-event";
 @Container.injectable()
 export class WalletSyncService implements Contracts.Kernel.EventListener {
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-state")
+    @Container.tagged("plugin", "core-state")
     private readonly configuration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.Application)

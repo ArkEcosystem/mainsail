@@ -11,7 +11,7 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
     private readonly createWorker!: Contracts.TransactionPool.WorkerFactory;
 
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-transaction-pool")
+    @Container.tagged("plugin", "core-transaction-pool")
     private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
     private workers: Contracts.TransactionPool.Worker[] = [];
