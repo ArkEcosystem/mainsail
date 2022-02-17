@@ -17,5 +17,9 @@
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
 		"bcrypto": "5.4.0"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-test": "workspace:^0.0.1",
+		"uvu": "^0.5.3"
 	}
 }

@@ -981,29 +981,57 @@ importers:
       util: 0.12.4
       uuid: 8.3.2
 
+  packages/crypto-signature-bls12-381:
+    specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@noble/bls12-381': ^1.2.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@noble/bls12-381': 1.2.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
+
   packages/crypto-signature-ecdsa:
     specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
 
   packages/crypto-signature-schnorr:
     specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
 
   packages/crypto-signature-schnorr-legacy:
     specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
 
   packages/utils:
     specifiers:
@@ -3050,6 +3078,10 @@ packages:
       call-me-maybe: 1.0.1
       glob-to-regexp: 0.3.0
     dev: true
+
+  /@noble/bls12-381/1.2.0:
+    resolution: {integrity: sha512-4wulV2SGeu4UxlXkNT0K88sG5g23tzmLMGFZgHSMkwz2Cd2zx2YFJNTEghdLioNdludTZQ5iQpMkQxrtyuS0mw==}
+    dev: false
 
   /@noble/hashes/1.0.0:
     resolution: {integrity: sha512-DZVbtY62kc3kkBtMHqwCOfXrT/hnoORy5BJ4+HU1IR59X0KWAOqsfzQPcUl/lQLlG7qXbe/fZ3r/emxtAl+sqg==}

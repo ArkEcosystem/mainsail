@@ -2,11 +2,11 @@ import { Signatory as Contract } from "@arkecosystem/crypto-contracts";
 import { secp256k1 } from "bcrypto";
 
 export class Signatory implements Contract {
-	public sign(hash: Buffer, privateKey: Buffer): string {
+	public async sign(hash: Buffer, privateKey: Buffer): Promise<string> {
 		return secp256k1.signatureExport(secp256k1.sign(hash, privateKey)).toString("hex");
 	}
 
-	public verify(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): boolean {
+	public async verify(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): Promise<boolean> {
 		const bufferSignature = signature instanceof Buffer ? signature : Buffer.from(signature, "hex");
 		const signatureRS = secp256k1.signatureImport(bufferSignature);
 

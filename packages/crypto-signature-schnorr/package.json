@@ -12,10 +12,15 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist"
+		"clean": "del dist",
+		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
 		"bcrypto": "5.4.0"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-test": "workspace:^0.0.1",
+		"uvu": "^0.5.3"
 	}
 }

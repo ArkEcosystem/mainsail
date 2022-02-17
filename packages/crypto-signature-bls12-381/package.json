@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-signature-ecdsa",
+	"name": "@arkecosystem/crypto-signature-bls12-381",
 	"version": "0.0.1",
-	"description": "Elliptic Curve Cryptography (ECDSA)",
+	"description": "BLS12-381 Signatures",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -17,7 +17,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"bcrypto": "5.4.0"
+		"@noble/bls12-381": "^1.2.0"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test": "workspace:^0.0.1",

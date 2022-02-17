@@ -635,6 +635,81 @@ jobs:
               run: pnpm run build
             - name: Test
               run: cd packages/crypto-key-pair-secp256k1 && pnpm run test
+    crypto-signature-bls12-381:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-crypto-signature-bls12-381
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/crypto-signature-bls12-381 && pnpm run test
+    crypto-signature-ecdsa:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-crypto-signature-ecdsa
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/crypto-signature-ecdsa && pnpm run test
+    crypto-signature-schnorr:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-crypto-signature-schnorr
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/crypto-signature-schnorr && pnpm run test
     utils:
         runs-on: ubuntu-latest
         strategy:
