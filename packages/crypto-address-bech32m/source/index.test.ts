@@ -16,7 +16,7 @@ describe("AddressFactory", ({ assert, it }) => {
                 },
                 new Schnorr(),
             ).fromMnemonic(mnemonic),
-            "mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur",
+            "mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0sj0q2ep",
         );
     });
 
@@ -28,7 +28,7 @@ describe("AddressFactory", ({ assert, it }) => {
                 },
                 new Secp25k61(),
             ).fromMnemonic(mnemonic),
-            "mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
+            "mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7a6xmtw",
         );
     });
 
@@ -40,7 +40,7 @@ describe("AddressFactory", ({ assert, it }) => {
                 },
                 new Schnorr(),
             ).fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-            "mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur",
+            "mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0sj0q2ep",
         );
     });
 
@@ -52,7 +52,7 @@ describe("AddressFactory", ({ assert, it }) => {
                 },
                 new Secp25k61(),
             ).fromPublicKey("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-            "mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
+            "mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7a6xmtw",
         );
     });
 
@@ -64,8 +64,8 @@ describe("AddressFactory", ({ assert, it }) => {
             new Secp25k61(),
         );
 
-        assert.true(factory.validate("mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
-        assert.true(factory.validate("mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur"));
+        assert.true(factory.validate("mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7a6xmtw"));
+        assert.true(factory.validate("mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0sj0q2ep"));
         assert.false(factory.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
     });
 });
