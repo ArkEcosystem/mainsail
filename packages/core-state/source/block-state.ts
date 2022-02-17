@@ -295,7 +295,7 @@ export class BlockState implements Contracts.State.BlockState {
 			}
 
 			// Update vote balance of recipient's delegate
-			if (recipient && recipient.hasVoted() && transaction.typeGroup !== Enums.TransactionTypeGroup.Core) {
+			if (recipient && recipient.hasVoted()) {
 				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
 					recipient.getAttribute("vote"),
 				);
