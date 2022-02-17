@@ -61,11 +61,10 @@ describe("LoadServiceProviders", () => {
     it("should bootstrap if plugins path doesn't exist", async () => {
         jest.spyOn(app, "dataPath").mockReturnValue("/invalid/path");
 
-
         configRepository.merge({
             app: { plugins: [] },
         });
 
         await app.resolve<LoadServiceProviders>(LoadServiceProviders).bootstrap();
-    })
+    });
 });
