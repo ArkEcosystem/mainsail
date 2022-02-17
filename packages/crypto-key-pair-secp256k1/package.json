@@ -20,7 +20,7 @@
 		"bcrypto": "5.4.0"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test": "workspace:^3.1.1",
+		"@arkecosystem/core-test": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }
