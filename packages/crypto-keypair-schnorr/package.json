@@ -1,7 +1,7 @@
 {
-    "name": "@arkecosystem/crypto-keypair-secp256k1",
+    "name": "@arkecosystem/crypto-keypair-schnorr",
     "version": "3.1.1",
-    "description": "secp256k1 Key Derivation",
+    "description": "Schnorr Key Derivation",
     "license": "MIT",
     "contributors": [],
     "files": [

@@ -818,6 +818,19 @@ importers:
     dependencies:
       ajv: 6.12.6
 
+  packages/crypto-keypair-schnorr:
+    specifiers:
+      '@arkecosystem/core-test': workspace:^3.1.1
+      '@arkecosystem/crypto-contracts': workspace:*
+      bcrypto: 5.4.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
+
   packages/crypto-keypair-secp256k1:
     specifiers:
       '@arkecosystem/core-test': workspace:^3.1.1
@@ -839,7 +852,7 @@ importers:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
 
-  packages/crypto-signature-schnorr-legacy:
+  packages/crypto-signature-schnorr:
     specifiers:
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
@@ -847,7 +860,7 @@ importers:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
 
-  packages/crypto-signatures-schnorr:
+  packages/crypto-signature-schnorr-legacy:
     specifiers:
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
