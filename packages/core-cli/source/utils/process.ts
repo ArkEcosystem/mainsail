@@ -11,48 +11,20 @@ import { ProcessDescription } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 import { ProcessManager } from "../services";
 
-/**
- * @export
- * @class Process
- */
 @injectable()
 export class Process {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof ComponentFactory
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {ProcessManager}
-	 * @memberof Command
-	 */
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	/**
-	 * @private
-	 * @type {string}
-	 * @memberof Process
-	 */
 	private processName!: string;
 
-	/**
-	 * @param {string} token
-	 * @param {string} suffix
-	 * @memberof Process
-	 */
 	public initialize(token: string, suffix: string): void {
 		this.processName = `${token}-${suffix}`;
 	}
 
-	/**
-	 * @param {boolean} daemon
-	 * @memberof Process
-	 */
 	public stop(daemon: boolean): void {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
 		this.app.get<AbortUnknownProcess>(Identifiers.AbortUnknownProcess).execute(this.processName);
@@ -67,9 +39,6 @@ export class Process {
 		spinner.succeed();
 	}
 
-	/**
-	 * @memberof Process
-	 */
 	public restart(): void {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
 		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.processName);
@@ -83,9 +52,6 @@ export class Process {
 		spinner.succeed();
 	}
 
-	/**
-	 * @memberof Process
-	 */
 	public status(): void {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
 
@@ -108,12 +74,6 @@ export class Process {
 			});
 	}
 
-	/**
-	 * @param {boolean} showErrors
-	 * @param {number} lines
-	 * @returns {Promise<void>}
-	 * @memberof Process
-	 */
 	public async log(showErrors: boolean, lines: number): Promise<void> {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
 

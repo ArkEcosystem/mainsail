@@ -8,17 +8,8 @@ interface ChunkData {
 
 @Container.injectable()
 export class ChunkCache implements Contracts.P2P.ChunkCache {
-	/**
-	 * If downloading some chunk fails but nevertheless we manage to download higher chunks,
-	 * then they are stored here for later retrieval.
-	 */
 	private downloadedChunksCache: ChunkData[] = [];
 
-	/**
-	 * Maximum number of entries to keep in `downloadedChunksCache`.
-	 * At 400 blocks per chunk, 100 chunks would amount to 40k blocks.
-	 * Chunks are removed by First in first out method.
-	 */
 	private downloadedChunksCacheMax: number = 100;
 
 	public has(key: string): boolean {

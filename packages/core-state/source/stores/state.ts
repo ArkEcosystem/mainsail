@@ -46,18 +46,12 @@ export class StateStore implements Contracts.State.StateStore {
 		this.blockchain = blockchain;
 	}
 
-	/**
-	 * Get the genesis block.
-	 */
 	public getGenesisBlock(): Interfaces.IBlock {
 		Utils.assert.defined<Interfaces.IBlock>(this.genesisBlock);
 
 		return this.genesisBlock;
 	}
 
-	/**
-	 * Sets the genesis block.
-	 */
 	public setGenesisBlock(block: Interfaces.IBlock): void {
 		this.genesisBlock = block;
 	}
@@ -142,10 +136,6 @@ export class StateStore implements Contracts.State.StateStore {
 		this.restoredDatabaseIntegrity = restoredDatabaseIntegrity;
 	}
 
-	/**
-	 * Resets the state.
-	 * @todo: remove the need for this method.
-	 */
 	public reset(blockchainMachine): void {
 		this.blockchain = blockchainMachine.initialState;
 	}
@@ -161,9 +151,6 @@ export class StateStore implements Contracts.State.StateStore {
 		}, timeout);
 	}
 
-	/**
-	 * Clear check later timeout.
-	 */
 	public clearWakeUpTimeout(): void {
 		if (this.wakeUpTimeout) {
 			clearTimeout(this.wakeUpTimeout);
@@ -175,16 +162,10 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.configuration.getRequired<number>("storage.maxLastBlocks");
 	}
 
-	/**
-	 * Get the last block height.
-	 */
 	public getLastHeight(): number {
 		return this.getLastBlock().data.height;
 	}
 
-	/**
-	 * Get the last block.
-	 */
 	public getLastBlock(): Interfaces.IBlock {
 		const lastBlock: Interfaces.IBlock | undefined = this.lastBlocks.last();
 
@@ -193,9 +174,6 @@ export class StateStore implements Contracts.State.StateStore {
 		return lastBlock;
 	}
 
-	/**
-	 * Sets the last block.
-	 */
 	public setLastBlock(block: Interfaces.IBlock): void {
 		// Only keep blocks which are below the new block height (i.e. rollback)
 		if (this.lastBlocks.last() && this.lastBlocks.last<Interfaces.IBlock>().data.height !== block.data.height - 1) {
@@ -223,23 +201,14 @@ export class StateStore implements Contracts.State.StateStore {
 		this.p2pUpdateCounter = 0;
 	}
 
-	/**
-	 * Get the last blocks.
-	 */
 	public getLastBlocks(): Interfaces.IBlock[] {
 		return this.lastBlocks.valueSeq().reverse().toArray();
 	}
 
-	/**
-	 * Get the last blocks data.
-	 */
 	public getLastBlocksData(headersOnly?: boolean): Seq<number, Interfaces.IBlockData> {
 		return this.mapToBlockData(this.lastBlocks.valueSeq().reverse(), headersOnly);
 	}
 
-	/**
-	 * Get the last block ids.
-	 */
 	public getLastBlockIds(): string[] {
 		return this.lastBlocks
 			.valueSeq()
@@ -252,11 +221,6 @@ export class StateStore implements Contracts.State.StateStore {
 			.toArray();
 	}
 
-	/**
-	 * Get last blocks in the given height range in ascending order.
-	 * @param {Number} start
-	 * @param {Number} end
-	 */
 	public getLastBlocksByHeight(start: number, end?: number, headersOnly?: boolean): Interfaces.IBlockData[] {
 		const tail: number | undefined = end || start;
 
@@ -269,9 +233,6 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.mapToBlockData(blocks, headersOnly).toArray() as Interfaces.IBlockData[];
 	}
 
-	/**
-	 * Get common blocks for the given IDs.
-	 */
 	public getCommonBlocks(ids: string[]): Interfaces.IBlockData[] {
 		const idsHash = {};
 
@@ -288,9 +249,6 @@ export class StateStore implements Contracts.State.StateStore {
 			.toArray() as Interfaces.IBlockData[];
 	}
 
-	/**
-	 * Cache the ids of the given transactions.
-	 */
 	public cacheTransactions(transactions: Interfaces.ITransactionData[]): {
 		added: Interfaces.ITransactionData[];
 		notAdded: Interfaces.ITransactionData[];
@@ -326,23 +284,14 @@ export class StateStore implements Contracts.State.StateStore {
 		return { added, notAdded };
 	}
 
-	/**
-	 * Drop all cached transaction ids.
-	 */
 	public clearCachedTransactionIds(): void {
 		this.cachedTransactionIds = this.cachedTransactionIds.clear();
 	}
 
-	/**
-	 * Get cached transaction ids.
-	 */
 	public getCachedTransactionIds(): string[] {
 		return this.cachedTransactionIds.toArray();
 	}
 
-	/**
-	 * Ping a block.
-	 */
 	public pingBlock(incomingBlock: Interfaces.IBlockData): boolean {
 		if (!this.blockPing) {
 			return false;
@@ -358,9 +307,6 @@ export class StateStore implements Contracts.State.StateStore {
 		return false;
 	}
 
-	/**
-	 * Push ping block.
-	 */
 	public pushPingBlock(block: Interfaces.IBlockData, fromForger = false): void {
 		if (this.blockPing) {
 			this.logger.info(

@@ -41,23 +41,14 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 	private blocks: Interfaces.IBlockData[] = [];
 
-	/**
-	 * Get blocks.
-	 */
 	public getBlocks(): Interfaces.IBlockData[] {
 		return this.blocks;
 	}
 
-	/**
-	 * Set blocks.
-	 */
 	public setBlocks(blocks: Interfaces.IBlockData[]): void {
 		this.blocks = blocks;
 	}
 
-	/**
-	 * Process the given blocks.
-	 */
 	public async handle(): Promise<void> {
 		if (!this.blocks.length) {
 			return;

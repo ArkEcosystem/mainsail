@@ -1,3 +1,7 @@
+import { readJSONSync } from "fs-extra";
+import glob from "glob";
+import { join } from "path";
+
 import { Application } from "../../contracts/kernel";
 import { Identifiers, inject, injectable } from "../../ioc";
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../../providers";
@@ -5,9 +9,6 @@ import { ConfigRepository } from "../../services/config";
 import { JsonObject } from "../../types";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
-import { join } from "path";
-import { readJSONSync } from "fs-extra";
-import glob from "glob";
 
 interface PluginEntry {
 	package: string;
@@ -20,43 +21,17 @@ interface Plugin {
 	version: string;
 }
 
-/**
- * @export
- * @class LoadServiceProviders
- * @implements {Bootstrapper}
- */
 @injectable()
 export class LoadServiceProviders implements Bootstrapper {
-	/**
-	 * The application instance.
-	 *
-	 * @private
-	 * @type {Application}
-	 * @memberof Local
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {ConfigRepository}
-	 * @memberof RegisterBasePaths
-	 */
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
-	/**
-	 * @private
-	 * @type {ServiceProviderRepository}
-	 * @memberof RegisterBasePaths
-	 */
 	@inject(Identifiers.ServiceProviderRepository)
 	private readonly serviceProviderRepository!: ServiceProviderRepository;
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof RegisterProviders
-	 */
 	public async bootstrap(): Promise<void> {
 		const plugins: PluginEntry[] | undefined = this.configRepository.get<PluginEntry[]>("app.plugins");
 
@@ -82,16 +57,6 @@ export class LoadServiceProviders implements Bootstrapper {
 		}
 	}
 
-	/**
-	 * Discover the configuration for the package of the given service provider.
-	 *
-	 * @private
-	 * @param {ServiceProvider} serviceProvider
-	 * @param {JsonObject} options
-	 * @param packageId
-	 * @returns {PluginConfiguration}
-	 * @memberof LoadServiceProviders
-	 */
 	private discoverConfiguration(
 		serviceProvider: ServiceProvider,
 		options: JsonObject,
@@ -120,7 +85,7 @@ export class LoadServiceProviders implements Bootstrapper {
 			.sync("{*/*/package.json,*/package.json}", { cwd: path })
 			.map((packagePath) => join(path, packagePath).slice(0, -"/package.json".length));
 
-		for (let packagePath of packagePaths) {
+		for (const packagePath of packagePaths) {
 			const packageJson = readJSONSync(join(packagePath, "package.json"));
 
 			plugins.push({

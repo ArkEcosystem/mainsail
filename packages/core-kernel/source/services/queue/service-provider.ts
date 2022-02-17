@@ -4,12 +4,6 @@ import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { QueueManager } from "./manager";
 
 export class ServiceProvider extends BaseServiceProvider {
-	/**
-	 * Register the service provider.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async register(): Promise<void> {
 		this.app.bind<QueueManager>(Identifiers.QueueManager).to(QueueManager).inSingletonScope();
 

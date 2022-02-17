@@ -24,9 +24,6 @@ interface Assert {
 	transaction(value: unknown): asserts value is Transactions.Transaction;
 }
 
-/**
- * Type assertions have to be declared with an explicit type.
- */
 export const assert: Assert = {
 	array: <T>(value: unknown): asserts value is Array<T> => {
 		return assertType(Array.isArray(value), "array");

@@ -11,49 +11,19 @@ import { whitelist } from "./plugins/whitelist";
 import * as schema from "./schema";
 import * as utils from "./utils";
 
-/**
- * @export
- * @class Server
- */
 @Container.injectable()
 export class Server {
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Application}
-	 * @memberof Server
-	 */
 	@Container.inject(Container.Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Application}
-	 * @memberof Server
-	 */
 	@Container.inject(Identifiers.Database)
 	private readonly database!: Database;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Application}
-	 * @memberof Server
-	 */
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	/**
-	 * @private
-	 * @type {HapiServer}
-	 * @memberof Server
-	 */
 	private server: HapiServer;
 
-	/**
-	 * @param {string} name
-	 * @param {Types.JsonObject} optionsServer
-	 * @returns {Promise<void>}
-	 * @memberof Server
-	 */
 	public async register(optionsServer: Types.JsonObject): Promise<void> {
 		this.server = new HapiServer(this.getServerOptions(optionsServer));
 		this.server.app.database = this.database;
@@ -72,10 +42,6 @@ export class Server {
 		await this.registerRoutes();
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof Server
-	 */
 	public async boot(): Promise<void> {
 		try {
 			await this.server.start();
@@ -86,10 +52,6 @@ export class Server {
 		}
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof Server
-	 */
 	public async dispose(): Promise<void> {
 		try {
 			await this.server.stop();
@@ -100,21 +62,10 @@ export class Server {
 		}
 	}
 
-	/**
-	 * @param {(string | ServerInjectOptions)} options
-	 * @returns {Promise<void>}
-	 * @memberof Server
-	 */
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
 		return this.server.inject(options);
 	}
 
-	/**
-	 * @private
-	 * @param {Record<string, any>} options
-	 * @returns {object}
-	 * @memberof Server
-	 */
 	private getServerOptions(options: Record<string, any>): object {
 		options = {
 			...options.http,
@@ -147,12 +98,6 @@ export class Server {
 		};
 	}
 
-	/**
-	 * @private
-	 * @param {Types.JsonObject} config
-	 * @returns {Promise<void>}
-	 * @memberof Server
-	 */
 	private async registerPlugins(config: Types.JsonObject): Promise<void> {
 		await this.server.register({
 			plugin: whitelist,
@@ -162,11 +107,6 @@ export class Server {
 		});
 	}
 
-	/**
-	 * @private
-	 * @returns {void}
-	 * @memberof Server
-	 */
 	private registerRoutes(): void {
 		this.server.route({
 			method: "GET",

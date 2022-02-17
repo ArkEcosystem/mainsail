@@ -2,50 +2,17 @@ import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * @private
-	 * @type {Environment}
-	 * @memberof Command
-	 */
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public signature: string = "config:database";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public description: string = "Update the Database configuration.";
 
-	/**
-	 * @private
-	 * @type {string[]}
-	 * @memberof Command
-	 */
 	private readonly validFlags: string[] = ["host", "port", "database", "username", "password"];
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -57,12 +24,6 @@ export class Command extends Commands.Command {
 			.setFlag("password", "The password of the database user.", Joi.string());
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		const envFile = this.app.getCorePath("config", ".env");
 
@@ -119,12 +80,6 @@ export class Command extends Commands.Command {
 		this.environment.updateVariables(envFile, this.confirm(response));
 	}
 
-	/**
-	 * @private
-	 * @param {Contracts.AnyObject} flags
-	 * @returns {Contracts.AnyObject}
-	 * @memberof Command
-	 */
 	private confirm(flags: Contracts.AnyObject): Contracts.AnyObject {
 		const variables: Contracts.AnyObject = {};
 

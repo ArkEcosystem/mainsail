@@ -63,66 +63,22 @@ export interface Wallet {
 
 	getData(): WalletData;
 
-	/**
-	 * @returns {Record<string, any>}
-	 * @memberof Wallet
-	 */
 	getAttributes(): Record<string, any>;
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} [defaultValue]
-	 * @returns {T}
-	 * @memberof Wallet
-	 */
 	getAttribute<T = any>(key: string, defaultValue?: T): T;
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} value
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	setAttribute<T = any>(key: string, value: T): boolean;
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	forgetAttribute(key: string): boolean;
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	hasAttribute(key: string): boolean;
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	isDelegate(): boolean;
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	hasVoted(): boolean;
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	hasMultiSignature(): boolean;
 
-	/**
-	 * @returns {Wallet}
-	 * @memberof Wallet
-	 */
 	clone(): Wallet;
 }
 

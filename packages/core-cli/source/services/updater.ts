@@ -13,70 +13,27 @@ import * as Contracts from "../contracts";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
-/**
- * @export
- * @class Updater
- */
 @injectable()
 export class Updater implements Contracts.Updater {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {Config}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.Config)
 	private readonly config!: Config;
 
-	/**
-	 * @private
-	 * @type {PackageJson}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.Package)
 	private readonly pkg!: PackageJson;
 
-	/**
-	 * @private
-	 * @type {Installer}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.Installer)
 	private readonly installer!: Installer;
 
-	/**
-	 * @private
-	 * @type {ProcessManager}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	/**
-	 * @private
-	 * @type {*}
-	 * @memberof Updater
-	 */
 	private updateCheckInterval: any = ONE_DAY;
 
-	/**
-	 * @private
-	 * @type {(string | undefined)}
-	 * @memberof Updater
-	 */
 	private latestVersion: string | undefined;
 
-	/**
-	 * @returns {Promise<boolean>}
-	 * @memberof Updater
-	 */
 	public async check(): Promise<boolean> {
 		this.latestVersion = this.config.get("latestVersion");
 
@@ -103,12 +60,6 @@ export class Updater implements Contracts.Updater {
 		return true;
 	}
 
-	/**
-	 * @param {boolean} [updateProcessManager=false]
-	 * @param {boolean} [force=false]
-	 * @returns {Promise<boolean>}
-	 * @memberof Updater
-	 */
 	public async update(updateProcessManager: boolean = false, force: boolean = false): Promise<boolean> {
 		if (this.latestVersion === undefined) {
 			return false;
@@ -143,11 +94,6 @@ export class Updater implements Contracts.Updater {
 		return true;
 	}
 
-	/**
-	 * @private
-	 * @returns {(Promise<string | undefined>)}
-	 * @memberof Updater
-	 */
 	public async getLatestVersion(): Promise<string | undefined> {
 		try {
 			const latest: string | undefined = await latestVersion(this.packageName, {

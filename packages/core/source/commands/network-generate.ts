@@ -94,38 +94,15 @@ interface Options {
 	force: boolean;
 }
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public signature: string = "network:generate";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public description: string = "Generates a new network configuration.";
 
-	/**
-	 * Indicates whether the command requires a network to be present.
-	 *
-	 * @type {boolean}
-	 * @memberof Command
-	 */
 	public requiresNetwork: boolean = false;
 
 	/*eslint-disable */
@@ -328,12 +305,6 @@ export class Command extends Commands.Command {
 	];
 	/*eslint-enable */
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		for (const flag of this.flagSettings) {
 			const flagSchema: Joi.Schema = flag.schema;
@@ -348,12 +319,6 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = this.getFlags();
 

@@ -22,18 +22,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.registerActions();
 	}
 
-	/**
-	 * @returns {Promise<boolean>}
-	 * @memberof ServiceProvider
-	 */
 	public async bootWhen(): Promise<boolean> {
 		return !process.env.DISABLE_P2P_SERVER;
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async boot(): Promise<void> {
 		this.app.get<EventListener>(Container.Identifiers.PeerEventListener).initialize();
 

@@ -2,43 +2,15 @@ import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
 import { Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * @private
-	 * @type {Contracts.Updater}
-	 * @memberof Command
-	 */
 	@Container.inject(Container.Identifiers.Updater)
 	private readonly updater!: Contracts.Updater;
 
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public signature: string = "update";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public description: string = "Update the Core installation.";
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -50,12 +22,6 @@ export class Command extends Commands.Command {
 			.setFlag("restartForger", "Restart the Forger process.", Joi.boolean());
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		const hasNewVersion: boolean = await this.updater.check();
 
@@ -90,11 +56,6 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	/**
-	 * @private
-	 * @returns {boolean}
-	 * @memberof Command
-	 */
 	private hasRestartFlag(): boolean {
 		return Utils.hasSomeProperty(this.getFlags(), ["restart", "restartCore", "restartRelay", "restartForger"]);
 	}

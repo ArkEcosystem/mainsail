@@ -11,29 +11,14 @@ import split from "split2";
 import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
 
-/**
- * @export
- * @class PinoLogger
- * @implements {Contracts.Kernel.Logger}
- */
 @Container.injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Application}
-	 * @memberof PinoLogger
-	 */
 	@Container.inject(Container.Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@Container.inject(Container.Identifiers.ConfigFlags)
 	private readonly configFlags!: { processType: string };
 
-	/**
-	 * @private
-	 * @type {Record<string, Chalk>}
-	 * @memberof PinoLogger
-	 */
 	private readonly levelStyles: Record<string, Chalk> = {
 		emergency: chalk.bgRed,
 		alert: chalk.red,
@@ -45,39 +30,14 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		debug: chalk.magenta,
 	};
 
-	/**
-	 * @private
-	 * @type {PassThrough}
-	 * @memberof PinoLogger
-	 */
 	private stream!: PassThrough;
 
-	/**
-	 * @private
-	 * @type {Writable}
-	 * @memberof PinoLogger
-	 */
 	private combinedFileStream?: Writable;
 
-	/**
-	 * @private
-	 * @type {pino.Logger}
-	 * @memberof PinoLogger
-	 */
 	private logger!: pino.Logger;
 
-	/**
-	 * @private
-	 * @type {boolean}
-	 * @memberof PinoLogger
-	 */
 	private silentConsole: boolean = false;
 
-	/**
-	 * @param {*} options
-	 * @returns {Promise<Contracts.Kernel.Logger>}
-	 * @memberof PinoLogger
-	 */
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.stream = new PassThrough();
 		this.logger = pino(
@@ -138,74 +98,38 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public emergency(message: any): void {
 		this.log("emergency", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public alert(message: any): void {
 		this.log("alert", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public critical(message: any): void {
 		this.log("critical", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public error(message: any): void {
 		this.log("error", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public warning(message: any): void {
 		this.log("warning", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public notice(message: any): void {
 		this.log("notice", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public info(message: any): void {
 		this.log("info", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof PinoLogger
-	 */
 	public debug(message: any): void {
 		this.log("debug", message);
 	}
 
-	/**
-	 * @param {boolean} suppress
-	 * @memberof PinoLogger
-	 */
 	public suppressConsoleOutput(suppress: boolean): void {
 		this.silentConsole = suppress;
 	}
@@ -226,12 +150,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		}
 	}
 
-	/**
-	 * @param {string} level
-	 * @param {*} message
-	 * @returns {boolean}
-	 * @memberof Logger
-	 */
 	private log(level: string, message: any): void {
 		if (this.silentConsole) {
 			return;
@@ -248,13 +166,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		this.logger[level](message);
 	}
 
-	/**
-	 * @private
-	 * @param {string} level
-	 * @param {PrettyOptions} [prettyOptions]
-	 * @returns {Transform}
-	 * @memberof PinoLogger
-	 */
 	private createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
 		const pinoPretty = PinoPretty({
 			...{
@@ -287,12 +198,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		});
 	}
 
-	/**
-	 * @private
-	 * @param {{ interval: string }} options
-	 * @returns {Writable}
-	 * @memberof PinoLogger
-	 */
 	private getFileStream(options: { interval: string }): Writable {
 		return createStream(
 			(time: number | Date, index?: number): string => {
@@ -324,12 +229,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		);
 	}
 
-	/**
-	 * @private
-	 * @param {string} level
-	 * @returns {boolean}
-	 * @memberof PinoLogger
-	 */
 	private isValidLevel(level: string): boolean {
 		return ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"].includes(level);
 	}

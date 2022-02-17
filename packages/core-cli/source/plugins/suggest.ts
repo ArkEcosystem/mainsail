@@ -6,26 +6,11 @@ import { JsonObject } from "type-fest";
 import { Application } from "../application";
 import { Identifiers, inject, injectable } from "../ioc";
 
-/**
- * @export
- * @class SuggestCommand
- */
 @injectable()
 export class SuggestCommand {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof ComponentFactory
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @static
-	 * @param {JsonObject} context
-	 * @returns {(Promise<string | undefined>)}
-	 * @memberof SuggestCommand
-	 */
 	public async execute(context: JsonObject): Promise<string | undefined> {
 		const signature: string = context.signature as string;
 

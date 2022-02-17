@@ -11,51 +11,21 @@ import { Bootstrapper } from "../interfaces";
 import { ChangeServiceProviderState } from "./listeners";
 
 // todo: review the implementation
-/**
- * @export
- * @class RegisterProviders
- * @implements {Bootstrapper}
- */
+
 @injectable()
 export class BootServiceProviders implements Bootstrapper {
-	/**
-	 * The application instance.
-	 *
-	 * @private
-	 * @type {Application}
-	 * @memberof Local
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {ServiceProviderRepository}
-	 * @memberof BootServiceProviders
-	 */
 	@inject(Identifiers.ServiceProviderRepository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.EventDispatcher}
-	 * @memberof BootServiceProviders
-	 */
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Logger}
-	 * @memberof BootServiceProviders
-	 */
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof RegisterProviders
-	 */
 	public async bootstrap(): Promise<void> {
 		for (const [name, serviceProvider] of this.serviceProviders.all()) {
 			const serviceProviderName: string | undefined = serviceProvider.name();

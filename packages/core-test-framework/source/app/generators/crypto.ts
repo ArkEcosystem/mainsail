@@ -9,17 +9,8 @@ import { CryptoConfigPaths, Wallet } from "../contracts";
 import { Generator } from "./generator";
 
 export class CryptoGenerator extends Generator {
-	/**
-	 * @private
-	 * @type {string}
-	 * @memberof CoreGenerator
-	 */
 	private destination!: string;
 
-	/**
-	 * @returns {CoreConfigPaths}
-	 * @memberof CoreGenerator
-	 */
 	public generate(): CryptoConfigPaths {
 		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.flags.network}`);
 
@@ -337,10 +328,6 @@ export class CryptoGenerator extends Generator {
 		return byteBuffer.toBuffer();
 	}
 
-	/**
-	 * @private
-	 * @memberof CryptoGenerator
-	 */
 	private writeExceptions(): void {
 		const filePath: string = resolve(this.destination, "exceptions.json");
 
@@ -351,11 +338,6 @@ export class CryptoGenerator extends Generator {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {Types.JsonObject} genesisBlock
-	 * @memberof CryptoGenerator
-	 */
 	private writeGenesisBlock(genesisBlock: Types.JsonObject): void {
 		const filePath: string = resolve(this.destination, "genesisBlock.json");
 
@@ -366,11 +348,6 @@ export class CryptoGenerator extends Generator {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {Types.JsonObject} genesisBlock
-	 * @memberof CryptoGenerator
-	 */
 	private writeMilestones(genesisBlock: Types.JsonObject): void {
 		const filePath: string = resolve(this.destination, "milestones.json");
 
@@ -392,11 +369,6 @@ export class CryptoGenerator extends Generator {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {string} payloadHash
-	 * @memberof CryptoGenerator
-	 */
 	private writeNetwork(payloadHash: string): void {
 		const filePath: string = resolve(this.destination, "network.json");
 

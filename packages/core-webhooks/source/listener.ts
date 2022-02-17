@@ -7,40 +7,17 @@ import { WebhookEvent } from "./events";
 import { Identifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 
-/**
- * @export
- * @class Listener
- */
 @Container.injectable()
 export class Listener {
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Application}
-	 * @memberof Listener
-	 */
 	@Container.inject(Container.Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.EventDispatcher}
-	 * @memberof Listener
-	 */
 	@Container.inject(Container.Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Logger}
-	 * @memberof Listener
-	 */
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	/**
-	 * @param {string} event
-	 * @memberof Listener
-	 */
 	public async handle({ name, data }): Promise<void> {
 		// Skip own events to prevent cycling
 		if (name.toString().includes("webhooks")) {
@@ -58,12 +35,6 @@ export class Listener {
 		await Promise.all(promises);
 	}
 
-	/**
-	 * @param {Webhook} webhook
-	 * @param {number} timeout
-	 * @returns {Promise<void>}
-	 * @memberof Broadcaster
-	 */
 	public async broadcast(webhook: Webhook, payload: object, timeout: number = 1500): Promise<void> {
 		const start = performance.now();
 
@@ -109,13 +80,6 @@ export class Listener {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {string} event
-	 * @param {object} payload
-	 * @returns {Webhook[]}
-	 * @memberof Listener
-	 */
 	private getWebhooks(event: string, payload: object): Webhook[] {
 		return this.app
 			.get<Database>(Identifiers.Database)

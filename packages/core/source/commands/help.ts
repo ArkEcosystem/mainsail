@@ -2,43 +2,14 @@ import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
 import boxen from "boxen";
 import { blue, cyan } from "kleur";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public signature: string = "help";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public description: string = "Displays detailed information on all commands available via CLI.";
 
-	/**
-	 * Indicates whether the command requires a network to be present.
-	 *
-	 * @type {boolean}
-	 * @memberof Command
-	 */
 	public requiresNetwork: boolean = false;
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		const commands: Contracts.CommandList = this.app.get(Container.Identifiers.Commands);
 

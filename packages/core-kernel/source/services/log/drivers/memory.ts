@@ -13,11 +13,6 @@ dayjs.extend(utc);
 
 @injectable()
 export class MemoryLogger implements Logger {
-	/**
-	 * @private
-	 * @type {Record<string, Chalk>}
-	 * @memberof MemoryLogger
-	 */
 	private readonly levelStyles: Record<string, Chalk> = {
 		emergency: chalk.bgRed,
 		alert: chalk.red,
@@ -29,116 +24,52 @@ export class MemoryLogger implements Logger {
 		debug: chalk.magenta,
 	};
 
-	/**
-	 * @private
-	 * @type {boolean}
-	 * @memberof MemoryLogger
-	 */
 	private silentConsole: boolean = false;
 
-	/**
-	 * @private
-	 * @type {Dayjs}
-	 * @memberof MemoryLogger
-	 */
 	private lastTimestamp: Dayjs = dayjs().utc();
 
-	/**
-	 * @param {*} [options]
-	 * @returns {Promise<Logger>}
-	 * @memberof MemoryLogger
-	 */
 	public async make(options?: any): Promise<Logger> {
 		return this;
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public emergency(message: any): void {
 		this.log("emergency", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public alert(message: any): void {
 		this.log("alert", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public critical(message: any): void {
 		this.log("critical", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public error(message: any): void {
 		this.log("error", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public warning(message: any): void {
 		this.log("warning", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public notice(message: any): void {
 		this.log("notice", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public info(message: any): void {
 		this.log("info", message);
 	}
 
-	/**
-	 * @param {*} message
-	 * @memberof MemoryLogger
-	 */
 	public debug(message: any): void {
 		this.log("debug", message);
 	}
 
-	/**
-	 * @param {boolean} suppress
-	 * @memberof MemoryLogger
-	 */
 	public suppressConsoleOutput(suppress: boolean): void {
 		this.silentConsole = suppress;
 	}
 
-	/**
-	 * Dispose logger.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof MemoryLogger
-	 */
 	public async dispose(): Promise<void> {}
 
-	/**
-	 * @private
-	 * @param {*} level
-	 * @param {*} message
-	 * @returns {void}
-	 * @memberof MemoryLogger
-	 */
 	private log(level: any, message: any): void {
 		if (this.silentConsole) {
 			return;
@@ -160,11 +91,6 @@ export class MemoryLogger implements Logger {
 		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);
 	}
 
-	/**
-	 * @private
-	 * @returns {string}
-	 * @memberof MemoryLogger
-	 */
 	private getTimestampDiff(): string {
 		const diff: number = dayjs().diff(this.lastTimestamp);
 

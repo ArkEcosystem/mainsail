@@ -7,59 +7,22 @@ import { Delegate } from "../interfaces";
 import { Method } from "./method";
 
 export class BIP38 extends Method implements Delegate {
-	/**
-	 * @type {Interfaces.IKeyPair}
-	 * @memberof BIP38
-	 */
 	public keys: Interfaces.IKeyPair | undefined;
 
-	/**
-	 * @type {string}
-	 * @memberof BIP38
-	 */
 	public publicKey: string;
 
-	/**
-	 * @type {string}
-	 * @memberof BIP38
-	 */
 	public address: string;
 
-	/**
-	 * @type {string}
-	 * @memberof BIP38
-	 */
 	public otpSecret: string;
 
-	/**
-	 * @type {(string | undefined)}
-	 * @memberof BIP38
-	 */
 	public otp: string | undefined;
 
-	/**
-	 * @type {(string | undefined)}
-	 * @memberof BIP38
-	 */
 	public encryptedKeys: string | undefined;
 
-	/**
-	 * @type {number}
-	 * @memberof BIP38
-	 */
 	private readonly keySize: number = 32;
 
-	/**
-	 * @type {number}
-	 * @memberof BIP38
-	 */
 	private readonly iterations: number = 5000;
 
-	/**
-	 * @param {string} bip38
-	 * @param {string} password
-	 * @memberof BIP38
-	 */
 	public constructor(bip38: string, password: string) {
 		super();
 
@@ -71,12 +34,6 @@ export class BIP38 extends Method implements Delegate {
 		this.encryptKeysWithOtp();
 	}
 
-	/**
-	 * @param {Interfaces.ITransactionData[]} transactions
-	 * @param {Record<string, any>} options
-	 * @returns {Interfaces.IBlock}
-	 * @memberof BIP38
-	 */
 	public forge(transactions: Interfaces.ITransactionData[], options: Record<string, any>): Interfaces.IBlock {
 		this.decryptKeysWithOtp();
 
@@ -89,10 +46,6 @@ export class BIP38 extends Method implements Delegate {
 		return block;
 	}
 
-	/**
-	 * @private
-	 * @memberof BIP38
-	 */
 	private encryptKeysWithOtp(): void {
 		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
 
@@ -103,10 +56,6 @@ export class BIP38 extends Method implements Delegate {
 		this.encryptedKeys = this.encryptDataWithOtp(wifKey, this.otp);
 	}
 
-	/**
-	 * @private
-	 * @memberof BIP38
-	 */
 	private decryptKeysWithOtp(): void {
 		AppUtils.assert.defined<string>(this.encryptedKeys);
 		AppUtils.assert.defined<string>(this.otp);
@@ -118,13 +67,6 @@ export class BIP38 extends Method implements Delegate {
 		this.encryptedKeys = undefined;
 	}
 
-	/**
-	 * @private
-	 * @param {string} passphrase
-	 * @param {string} password
-	 * @returns {Interfaces.IKeyPair}
-	 * @memberof BIP38
-	 */
 	private decryptPassphrase(passphrase: string, password: string): Interfaces.IKeyPair {
 		const decryptedWif: Interfaces.IDecryptResult = Crypto.bip38.decrypt(passphrase, password);
 		const wifKey: string = wif.encode(
@@ -136,13 +78,6 @@ export class BIP38 extends Method implements Delegate {
 		return Identities.Keys.fromWIF(wifKey);
 	}
 
-	/**
-	 * @private
-	 * @param {string} content
-	 * @param {string} password
-	 * @returns {string}
-	 * @memberof BIP38
-	 */
 	private encryptDataWithOtp(content: string, password: string): string {
 		AppUtils.assert.defined<string>(this.otpSecret);
 
@@ -157,13 +92,6 @@ export class BIP38 extends Method implements Delegate {
 		return forge.util.encode64(cipher.output.getBytes());
 	}
 
-	/**
-	 * @private
-	 * @param {string} cipherText
-	 * @param {string} password
-	 * @returns {string}
-	 * @memberof BIP38
-	 */
 	private decryptDataWithOtp(cipherText: string, password: string): string {
 		AppUtils.assert.defined<string>(this.otpSecret);
 

@@ -3,67 +3,29 @@ import { Managers, Utils as CryptoUtils } from "@arkecosystem/crypto";
 
 import { Delegate } from "./interfaces";
 
-/**
- * @export
- * @class DelegateTracker
- */
 @Container.injectable()
 export class DelegateTracker {
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Application}
-	 * @memberof ForgerService
-	 */
 	@Container.inject(Container.Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Logger}
-	 * @memberof DelegateTracker
-	 */
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	/**
-	 * @private
-	 * @type {Contracts.Blockchain.Blockchain}
-	 * @memberof DelegateTracker
-	 */
 	@Container.inject(Container.Identifiers.BlockchainService)
 	private readonly blockchainService!: Contracts.Blockchain.Blockchain;
 
-	/**
-	 * @private
-	 * @type {Contracts.State.WalletRepository}
-	 * @memberof DelegateTracker
-	 */
 	@Container.inject(Container.Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	/**
-	 * @private
-	 * @type {Delegate[]}
-	 * @memberof DelegateTracker
-	 */
 	private delegates: Delegate[] = [];
 
-	/**
-	 * @param {Delegate[]} delegates
-	 * @returns {this}
-	 * @memberof DelegateTracker
-	 */
 	public initialize(delegates: Delegate[]): this {
 		this.delegates = delegates;
 
 		return this;
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof DelegateTracker
-	 */
 	public async handle(): Promise<void> {
 		// Arrange...
 		const { height, timestamp } = this.blockchainService.getLastBlock().data;
@@ -71,9 +33,9 @@ export class DelegateTracker {
 		const blockTime: number = CryptoUtils.calculateBlockTime(height);
 		const round: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(height);
 
-		const activeDelegates = (await this.app
+		const activeDelegates: any = await this.app
 			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-			.call("getActiveDelegates", { roundInfo: round })) as Contracts.State.Wallet[];
+			.call("getActiveDelegates", { roundInfo: round });
 
 		const activeDelegatesPublicKeys: (string | undefined)[] = activeDelegates.map(
 			(delegate: Contracts.State.Wallet) => delegate.getPublicKey(),
@@ -142,12 +104,6 @@ export class DelegateTracker {
 		this.logger.debug(`Round ${round.round} will end in ${Utils.prettyTime(secondsToNextRound * 1000)}.`);
 	}
 
-	/**
-	 * @private
-	 * @param {string} publicKey
-	 * @returns {string}
-	 * @memberof DelegateTracker
-	 */
 	private getUsername(publicKey: string): string {
 		return this.walletRepository.findByPublicKey(publicKey).getAttribute("delegate.username");
 	}

@@ -14,35 +14,15 @@ import {
 import { generateCoreConfig, generateCryptoConfig } from "./generators";
 
 export class Sandbox {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof Sandbox
-	 */
 	public readonly app: Application;
 
-	/**
-	 * @private
-	 * @type {Container.interfaces.Container}
-	 * @memberof Sandbox
-	 */
 	private readonly container: Container.interfaces.Container;
 
-	/**
-	 * @private
-	 * @type {ConfigPaths}
-	 * @memberof Sandbox
-	 */
 	private paths!: {
 		core: CoreConfigPaths;
 		crypto: CryptoConfigPaths;
 	};
 
-	/**
-	 * @private
-	 * @type {ConfigPaths}
-	 * @memberof Sandbox
-	 */
 	private readonly options: SandboxOptions = {
 		core: {},
 		crypto: {
@@ -65,11 +45,6 @@ export class Sandbox {
 		},
 	};
 
-	/**
-	 * Creates an instance of Sandbox.
-	 *
-	 * @memberof Sandbox
-	 */
 	public constructor() {
 		setGracefulCleanup();
 
@@ -78,35 +53,18 @@ export class Sandbox {
 		this.app = new Application(this.container);
 	}
 
-	/**
-	 * @param {CoreOptions} options
-	 * @returns {this}
-	 * @memberof Sandbox
-	 */
 	public withCoreOptions(options: CoreOptions): this {
 		this.options.core = { ...this.options.core, ...options };
 
 		return this;
 	}
 
-	/**
-	 * @param {CryptoOptions} options
-	 * @returns {this}
-	 * @memberof Sandbox
-	 */
 	public withCryptoOptions(options: CryptoOptions): this {
 		this.options.crypto = { ...this.options.crypto, ...options };
 
 		return this;
 	}
 
-	/**
-	 * Boot the sandbox environment.
-	 *
-	 * @param {SandboxCallback} [callback]
-	 * @returns {Promise<import { app: Application; container: Container.interfaces.Container }>}
-	 * @memberof Sandbox
-	 */
 	public async boot(callback?: SandboxCallback): Promise<void> {
 		// Generate Configurations
 		this.paths = {
@@ -149,13 +107,6 @@ export class Sandbox {
 		}
 	}
 
-	/**
-	 * Boot the sandbox environment.
-	 *
-	 * @param {SandboxCallback} [callback]
-	 * @returns {Promise<void>}
-	 * @memberof Sandbox
-	 */
 	public async dispose(callback?: SandboxCallback): Promise<void> {
 		try {
 			await this.app.terminate();
@@ -171,20 +122,10 @@ export class Sandbox {
 		}
 	}
 
-	/**
-	 * Take a snapshot of the container.
-	 *
-	 * @memberof Sandbox
-	 */
 	public snapshot(): void {
 		this.container.snapshot();
 	}
 
-	/**
-	 * Restore the snapshot of the container.
-	 *
-	 * @memberof Sandbox
-	 */
 	public restore(): void {
 		try {
 			this.container.restore();
@@ -193,11 +134,6 @@ export class Sandbox {
 		}
 	}
 
-	/**
-	 * @param {{ name: string; path: string; klass: Types.Class }} { name, path, klass }
-	 * @returns {this}
-	 * @memberof Sandbox
-	 */
 	public registerServiceProvider({
 		name,
 		path,

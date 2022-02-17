@@ -7,38 +7,16 @@ import { RelayHost } from "./interfaces";
 
 const MAX_PAYLOAD_CLIENT = 20 * 1024 * 1024; // allow large value of max payload communicating with relay
 
-/**
- * @export
- * @class Client
- */
 @Container.injectable()
 export class Client {
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Logger}
-	 * @memberof Client
-	 */
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	/**
-	 * @type {RelayHost[]}
-	 * @memberof Client
-	 */
 	public hosts: RelayHost[] = [];
 
-	/**
-	 * @private
-	 * @type {RelayHost}
-	 * @memberof Client
-	 */
 	// @ts-ignore
 	private host: RelayHost;
 
-	/**
-	 * @param {RelayHost[]} hosts
-	 * @memberof Client
-	 */
 	public register(hosts: RelayHost[]) {
 		this.hosts = hosts.map((host: RelayHost) => {
 			const url = `ws://${Utils.IpAddress.normalizeAddress(host.hostname)}:${host.port}`;
@@ -58,9 +36,6 @@ export class Client {
 		this.host = this.hosts[0];
 	}
 
-	/**
-	 * @memberof Client
-	 */
 	public dispose(): void {
 		for (const host of this.hosts) {
 			const socket: Nes.Client | undefined = host.socket;
@@ -71,11 +46,6 @@ export class Client {
 		}
 	}
 
-	/**
-	 * @param {Interfaces.IBlock} block
-	 * @returns {Promise<void>}
-	 * @memberof Client
-	 */
 	public async broadcastBlock(block: Interfaces.IBlock): Promise<void> {
 		this.logger.debug(
 			`Broadcasting block ${block.data.height.toLocaleString()} (${block.data.id}) with ${
@@ -95,10 +65,6 @@ export class Client {
 		}
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof Client
-	 */
 	public async syncWithNetwork(): Promise<void> {
 		await this.selectHost();
 
@@ -111,10 +77,6 @@ export class Client {
 		}
 	}
 
-	/**
-	 * @returns {Promise<Contracts.P2P.CurrentRound>}
-	 * @memberof Client
-	 */
 	public async getRound(): Promise<Contracts.P2P.CurrentRound> {
 		await this.selectHost();
 
@@ -131,20 +93,10 @@ export class Client {
 		}
 	}
 
-	/**
-	 * @returns {Promise<Contracts.P2P.ForgingTransactions>}
-	 * @memberof Client
-	 */
 	public async getTransactions(): Promise<Contracts.P2P.ForgingTransactions> {
 		return this.emit<Contracts.P2P.ForgingTransactions>("p2p.internal.getUnconfirmedTransactions");
 	}
 
-	/**
-	 * @param {string} event
-	 * @param {({ error: string } | { activeDelegates: string[] } | Interfaces.IBlockData | Interfaces.ITransactionData)} body
-	 * @returns {Promise<void>}
-	 * @memberof Client
-	 */
 	public async emitEvent(
 		event: string,
 		body: { error: string } | { activeDelegates: string[] } | Interfaces.IBlockData | Interfaces.ITransactionData,
@@ -171,10 +123,6 @@ export class Client {
 		}
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof Client
-	 */
 	public async selectHost(): Promise<void> {
 		for (let i = 0; i < 10; i++) {
 			for (const host of this.hosts) {
@@ -196,15 +144,6 @@ export class Client {
 		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join());
 	}
 
-	/**
-	 * @private
-	 * @template T
-	 * @param {string} event
-	 * @param {Record<string, any>} [payload={}]
-	 * @param {number} [timeout=4000]
-	 * @returns {Promise<T>}
-	 * @memberof Client
-	 */
 	private async emit<T = object>(event: string, payload: Record<string, any> = {}, timeout = 4000): Promise<T> {
 		try {
 			Utils.assert.defined<Nes.Client>(this.host.socket);

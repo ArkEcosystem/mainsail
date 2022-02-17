@@ -24,10 +24,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 		const previousBlock = this.state.getLastBlock();
 		const forgerWallet = this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
-		/**
-		 * TODO: side-effect of findByPublicKey is that it creates a wallet if one isn't found - is that correct?
-		 * If so, this code can be deleted.
-		 */
+
 		// if (!forgerWallet) {
 		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
 		//     this.app.terminate(msg);
@@ -56,10 +53,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 	public async revertBlock(block: Interfaces.IBlock): Promise<void> {
 		const forgerWallet = this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
-		/**
-		 * TODO: side-effect of findByPublicKey is that it creates a wallet if one isn't found - is that correct?
-		 * If so, this code can be deleted.
-		 */
+
 		// if (!forgerWallet) {
 		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
 		//     this.app.terminate(msg);
@@ -188,17 +182,6 @@ export class BlockState implements Contracts.State.BlockState {
 		forgerWallet.decreaseBalance(balanceDecrease);
 	}
 
-	/**
-	 * Updates the vote balances of the respective delegates of sender and recipient.
-	 * If the transaction is not a vote...
-	 *    1. fee + amount is removed from the sender's delegate vote balance
-	 *    2. amount is added to the recipient's delegate vote balance
-	 *
-	 * in case of a vote...
-	 *    1. the full sender balance is added to the sender's delegate vote balance
-	 *
-	 * If revert is set to true, the operations are reversed (plus -> minus, minus -> plus).
-	 */
 	private updateVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,

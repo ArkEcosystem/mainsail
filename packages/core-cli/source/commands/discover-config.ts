@@ -9,18 +9,8 @@ interface Config {
 	network: string;
 }
 
-/**
- * @export
- * @class DiscoverConfig
- */
 @injectable()
 export class DiscoverConfig {
-	/**
-	 * @returns {Promise<string>}
-	 * @memberof DiscoverConfig
-	 * @param token
-	 * @param network
-	 */
 	public async discover(token: string = "", network: string = ""): Promise<Config | undefined> {
 		try {
 			return await readJSON(join(process.env.CORE_PATH_CONFIG!, "config.json"));

@@ -1,7 +1,3 @@
-/**
- * These service providers don't rely on any configuration and are
- * necessary to be available early on during the application lifecycle.
- */
 export * from "./register-base-service-providers";
 
 // Foundation

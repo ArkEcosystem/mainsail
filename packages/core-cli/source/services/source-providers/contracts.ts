@@ -1,7 +1,3 @@
-/**
- * @export
- * @interface Source
- */
 export interface Source {
 	exists(value: string, version?: string): Promise<boolean>;
 

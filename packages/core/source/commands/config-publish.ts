@@ -4,51 +4,17 @@ import Joi from "joi";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import { resolve } from "path";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * @private
-	 * @type {Environment}
-	 * @memberof Command
-	 */
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public signature: string = "config:publish";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
 	public description: string = "Publish the configuration.";
 
-	/**
-	 * Indicates whether the command requires a network to be present.
-	 *
-	 * @type {boolean}
-	 * @memberof Command
-	 */
 	public requiresNetwork: boolean = false;
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -56,12 +22,6 @@ export class Command extends Commands.Command {
 			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		if (this.hasFlag("network")) {
 			return this.performPublishment(this.getFlags());
@@ -92,12 +52,6 @@ export class Command extends Commands.Command {
 		await this.performPublishment({ ...response, ...this.getFlags() });
 	}
 
-	/**
-	 * @private
-	 * @param {Contracts.AnyObject} flags
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	private async performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app
 			.rebind(Container.Identifiers.ApplicationPaths)

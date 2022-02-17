@@ -1,7 +1,3 @@
-/**
- * @export
- * @interface Webhook
- */
 export interface Webhook {
 	id?: string;
 	token?: string;

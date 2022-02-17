@@ -165,9 +165,6 @@ export class BlockProcessor {
 		return false;
 	}
 
-	/**
-	 * Check if a block contains incompatible transactions and should thus be rejected.
-	 */
 	private blockContainsIncompatibleTransactions(block: Interfaces.IBlock): boolean {
 		for (let i = 1; i < block.transactions.length; i++) {
 			if (block.transactions[i].data.version !== block.transactions[0].data.version) {
@@ -178,9 +175,6 @@ export class BlockProcessor {
 		return false;
 	}
 
-	/**
-	 * For a given sender, v2 transactions must have strictly increasing nonce without gaps.
-	 */
 	private blockContainsOutOfOrderNonce(block: Interfaces.IBlock): boolean {
 		const nonceBySender = {};
 
@@ -223,9 +217,9 @@ export class BlockProcessor {
 		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.data.height);
 
 		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(block.data.height);
-		const delegates: Contracts.State.Wallet[] = (await this.triggers.call("getActiveDelegates", {
+		const delegates: Contracts.State.Wallet[] = await this.triggers.call("getActiveDelegates", {
 			roundInfo,
-		})) as Contracts.State.Wallet[];
+		});
 
 		const forgingInfo: Contracts.Shared.ForgingInfo = AppUtils.forgingInfoCalculator.calculateForgingInfo(
 			block.data.timestamp,

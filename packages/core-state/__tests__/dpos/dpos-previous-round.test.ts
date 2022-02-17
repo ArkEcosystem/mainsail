@@ -82,12 +82,6 @@ describe("dposPreviousRound", () => {
 				},
 			});
 
-			/**
-			 * @FIXME
-			 * Why do we need to rebind them?
-			 * Modifications to dposState and blockState should be in the container
-			 * because they are the same objects as in the container while being modified.
-			 */
 			initialEnv.sandbox.app.rebind(Container.Identifiers.DposState).toConstantValue(dposState);
 			initialEnv.sandbox.app.rebind(Container.Identifiers.BlockState).toConstantValue(blockState);
 			initialEnv.sandbox.app.rebind(Container.Identifiers.StateStore).toConstantValue(stateStore);
@@ -125,12 +119,6 @@ describe("dposPreviousRound", () => {
 			const spySetDelegatesRound = jest.spyOn(dposState, "setDelegatesRound");
 			const spyRevertBlock = jest.spyOn(blockState, "revertBlock");
 
-			/**
-			 * @FIXME
-			 * Why do we need to rebind them?
-			 * Modifications to dposState and blockState should be in the container
-			 * because they are the same objects as in the container while being modified.
-			 */
 			initialEnv.sandbox.app.rebind(Container.Identifiers.DposState).toConstantValue(dposState);
 			initialEnv.sandbox.app.rebind(Container.Identifiers.BlockState).toConstantValue(blockState);
 

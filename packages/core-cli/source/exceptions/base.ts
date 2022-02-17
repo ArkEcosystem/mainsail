@@ -1,16 +1,4 @@
-/**
- * @export
- * @class Exception
- * @extends {Error}
- */
 export class Exception extends Error {
-	/**
-	 * Creates an instance of Exception.
-	 *
-	 * @param {string} message
-	 * @param {string} [code]
-	 * @memberof Exception
-	 */
 	public constructor(message: string, code?: string) {
 		super(message);
 

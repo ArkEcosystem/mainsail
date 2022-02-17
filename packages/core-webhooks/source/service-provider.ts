@@ -6,16 +6,7 @@ import { Identifiers } from "./identifiers";
 import { Listener } from "./listener";
 import { Server } from "./server";
 
-/**
- * @export
- * @class ServiceProvider
- * @extends {Providers.ServiceProvider}
- */
 export class ServiceProvider extends Providers.ServiceProvider {
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async register(): Promise<void> {
 		// Setup Database...
 		this.app.bind<Database>(Identifiers.Database).to(Database).inSingletonScope();
@@ -31,26 +22,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.startListeners();
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async boot(): Promise<void> {
 		await this.app.get<any>(Identifiers.Server).boot();
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async dispose(): Promise<void> {
 		await this.app.get<any>(Identifiers.Server).dispose();
 	}
 
-	/**
-	 * @returns {Promise<boolean>}
-	 * @memberof ServiceProvider
-	 */
 	public async bootWhen(): Promise<boolean> {
 		return this.config().get("enabled") === true;
 	}
@@ -71,10 +50,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	/**
-	 * @private
-	 * @memberof ServiceProvider
-	 */
 	private startListeners(): void {
 		this.app
 			.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService)

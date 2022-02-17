@@ -1,20 +1,7 @@
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Blocks, Crypto, Interfaces, Utils } from "@arkecosystem/crypto";
 
-/**
- * @export
- * @abstract
- * @class Method
- */
 export abstract class Method {
-	/**
-	 * @protected
-	 * @param {Interfaces.IKeyPair} keys
-	 * @param {Interfaces.ITransactionData[]} transactions
-	 * @param {Record<string, any>} options
-	 * @returns {Interfaces.IBlock}
-	 * @memberof Method
-	 */
 	protected createBlock(
 		keys: Interfaces.IKeyPair,
 		transactions: Interfaces.ITransactionData[],

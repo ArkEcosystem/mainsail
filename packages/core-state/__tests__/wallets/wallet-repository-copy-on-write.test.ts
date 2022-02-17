@@ -85,11 +85,6 @@ describe("Wallet Repository Copy On Write", () => {
 		expect(walletRepoCopyOnWrite.findByPublicKey(publicKey).getPublicKey()).toBeDefined();
 		expect(walletRepoCopyOnWrite.findByPublicKey(publicKey)).toEqual(wallet);
 
-		/**
-		 * TODO: check this is desired behaviour?
-		 * TempWalletRepository calls index inside findByPublicKey (unlike WalletRepository).
-		 * This has the effect that these are now defined without needing to index
-		 */
 		expect(walletRepoCopyOnWrite.findByAddress(address).getPublicKey()).toBeDefined();
 		expect(walletRepoCopyOnWrite.findByAddress(address)).toEqual(wallet);
 	});
@@ -101,21 +96,10 @@ describe("Wallet Repository Copy On Write", () => {
 		const wallet = walletRepoCopyOnWrite.createWallet(address);
 		walletRepoCopyOnWrite.index(wallet);
 
-		/**
-		 * TODO: check this is desired behaviour
-		 * has, hasByAddress and hasByIndex all behave differently because of the problem of inheritance.
-		 * I've added has and hasByIndex to TempWalletRepo to fix this (i.e. these should all return false, not just one of them), but in general this architecture needs revisiting.
-		 */
 		expect(walletRepoCopyOnWrite.has(address)).toBeFalse();
 		expect(walletRepoCopyOnWrite.hasByAddress(address)).toBeFalse();
 		expect(walletRepoCopyOnWrite.hasByIndex("addresses", address)).toBeFalse();
-		/**
-		 *  For example, because allByAddress is *not* overwritten in TempWalletRepo, this falls back to the WalletRepo base class which returns the wallet, despite hasByAddress being false.
-		 *
-		 * We can add all these different methods to TempWalletRepository to make the class behave more sensibly. However, if these methods aren't intended to ever really be called on the temporary version of the wallet repository it makes sense to use a shared base interface, rather than using inheritance.
-		 *
-		 * IMO inheritance should be used very sparingly, as it is often difficult to reason about, and calling methods have side effects the calling code may not expect.
-		 */
+
 		expect(walletRepoCopyOnWrite.allByAddress()).toEqual([wallet]);
 
 		walletRepo.index(wallet);
@@ -136,10 +120,6 @@ describe("Wallet Repository Copy On Write", () => {
 		expect(walletRepoCopyOnWrite.has("hello")).toBeFalse();
 		expect(walletRepoCopyOnWrite.hasByAddress("iDontExist")).toBeFalse();
 
-		/**
-		 * TODO: check this is desired behaviour
-		 * WalletRepo throws here, TempWalletRepo does not.
-		 */
 		expect(() => walletRepoCopyOnWrite.findByIndex("addresses", "iAlsoDontExist")).not.toThrow();
 	});
 

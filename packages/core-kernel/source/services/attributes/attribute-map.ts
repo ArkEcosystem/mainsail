@@ -5,36 +5,14 @@ import { assert } from "../../utils";
 import { AttributeSet } from "./attribute-set";
 
 export class AttributeMap {
-	/**
-	 * @private
-	 * @type {object}
-	 * @memberof AttributeMap
-	 */
 	private attributes: object = {};
 
-	/**
-	 * Creates an instance of AttributeMap.
-	 *
-	 * @param {AttributeSet} knownAttributes
-	 * @memberof AttributeMap
-	 */
 	public constructor(private readonly knownAttributes: AttributeSet) {}
 
-	/**
-	 * @returns {object}
-	 * @memberof AttributeMap
-	 */
 	public all(): object {
 		return this.attributes;
 	}
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} [defaultValue]
-	 * @returns {(T | undefined)}
-	 * @memberof AttributeMap
-	 */
 	public get<T>(key: string, defaultValue?: T): T {
 		this.assertKnown(key);
 
@@ -45,13 +23,6 @@ export class AttributeMap {
 		return value;
 	}
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} value
-	 * @returns {boolean}
-	 * @memberof AttributeMap
-	 */
 	public set<T>(key: string, value: T): boolean {
 		this.assertKnown(key);
 
@@ -60,11 +31,6 @@ export class AttributeMap {
 		return this.has(key);
 	}
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof AttributeMap
-	 */
 	public forget(key: string): boolean {
 		this.assertKnown(key);
 
@@ -73,42 +39,24 @@ export class AttributeMap {
 		return !this.has(key);
 	}
 
-	/**
-	 * @returns {boolean}
-	 * @memberof AttributeMap
-	 */
 	public flush(): boolean {
 		this.attributes = {};
 
 		return Object.keys(this.attributes).length === 0;
 	}
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof AttributeMap
-	 */
 	public has(key: string): boolean {
 		this.assertKnown(key);
 
 		return has(this.attributes, key);
 	}
 
-	/**
-	 * @returns {AttributeMap}
-	 * @memberof AttributeMap
-	 */
 	public clone(): AttributeMap {
 		const cloned = new AttributeMap(this.knownAttributes);
 		cloned.attributes = cloneDeep(this.attributes);
 		return cloned;
 	}
 
-	/**
-	 * @private
-	 * @param {string} key
-	 * @memberof AttributeMap
-	 */
 	private assertKnown(key: string): void {
 		strictEqual(this.knownAttributes.has(key), true, `Unknown attribute: ${key}`);
 	}

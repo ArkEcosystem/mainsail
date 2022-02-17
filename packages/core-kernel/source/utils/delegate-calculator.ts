@@ -19,13 +19,6 @@ export const calculateApproval = (delegate: Wallet, height: number = 1): number 
 	return toDecimal(voteBalance, totalSupply);
 };
 
-/**
- * todo: review the implementation
- *
- * review the implementation - currently it is coupled to the container because wallet is coupled to the container
- * a better approach would be to pass in a delegate object rather then letting the function make assumptions about
- * from where the data is coming that needs to be processed.
- */
 export const calculateForgedTotal = (wallet: Wallet): string => {
 	const delegate: WalletDelegateAttributes = wallet.getAttribute("delegate");
 	const forgedFees: BigNumber = BigNumber.make(delegate.forgedFees);

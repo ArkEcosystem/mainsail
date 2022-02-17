@@ -9,21 +9,7 @@ export interface Repository {
 }
 
 export interface Resource {
-	/**
-	 * Return the raw representation of the resource.
-	 *
-	 * @param {*} resource
-	 * @returns {object}
-	 * @memberof Resource
-	 */
 	raw(resource): object;
 
-	/**
-	 * Return the transformed representation of the resource.
-	 *
-	 * @param {*} resource
-	 * @returns {object}
-	 * @memberof Resource
-	 */
 	transform(resource): object;
 }

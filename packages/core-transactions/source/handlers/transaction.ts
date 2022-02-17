@@ -151,23 +151,10 @@ export abstract class TransactionHandler {
 		sender.decreaseNonce();
 	}
 
-	/**
-	 * Database Service
-	 */
 	public emitEvents(transaction: Interfaces.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
 
-	/**
-	 * Transaction Pool logic
-	 */
 	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {}
 
-	/**
-	 * @param {Contracts.State.Wallet} wallet
-	 * @param {Interfaces.ITransactionData} transaction
-	 * @param {Interfaces.IMultiSignatureAsset} [multiSignature]
-	 * @returns {boolean}
-	 * @memberof TransactionHandler
-	 */
 	public verifySignatures(
 		wallet: Contracts.State.Wallet,
 		transaction: Interfaces.ITransactionData,
@@ -231,13 +218,6 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	/**
-	 * Verify that the transaction's nonce is the wallet nonce plus one, so that the
-	 * transaction can be applied to the wallet. Throw an exception if it is not.
-	 *
-	 * @param {Interfaces.ITransaction} transaction
-	 * @memberof Wallet
-	 */
 	protected verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Interfaces.ITransaction): void {
 		const version: number = transaction.data.version || 1;
 		const nonce: AppUtils.BigNumber = transaction.data.nonce || AppUtils.BigNumber.ZERO;
@@ -247,14 +227,6 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	/**
-	 * Verify that the transaction's nonce is the same as the wallet nonce, so that the
-	 * transaction can be reverted from the wallet. Throw an exception if it is not.
-	 *
-	 * @param wallet
-	 * @param {Interfaces.ITransaction} transaction
-	 * @memberof Wallet
-	 */
 	protected verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Interfaces.ITransaction): void {
 		const version: number = transaction.data.version || 1;
 		const nonce: AppUtils.BigNumber = transaction.data.nonce || AppUtils.BigNumber.ZERO;
@@ -271,10 +243,6 @@ export abstract class TransactionHandler {
 	public abstract walletAttributes(): ReadonlyArray<string>;
 
 	public abstract isActivated(): Promise<boolean>;
-
-	/**
-	 * Wallet logic
-	 */
 
 	public abstract bootstrap(): Promise<void>;
 

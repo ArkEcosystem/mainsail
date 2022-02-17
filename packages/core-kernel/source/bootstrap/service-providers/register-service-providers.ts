@@ -16,35 +16,15 @@ import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
 
 // todo: review the implementation
-/**
- * @export
- * @class RegisterServiceProviders
- * @implements {Bootstrapper}
- */
+
 @injectable()
 export class RegisterServiceProviders implements Bootstrapper {
-	/**
-	 * The application instance.
-	 *
-	 * @private
-	 * @type {Application}
-	 * @memberof Local
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {Contracts.Kernel.Logger}
-	 * @memberof Local
-	 */
 	@inject(Identifiers.LogService)
 	private readonly logger!: Kernel.Logger;
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof RegisterProviders
-	 */
 	public async bootstrap(): Promise<void> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProviderRepository,
@@ -78,12 +58,6 @@ export class RegisterServiceProviders implements Bootstrapper {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {ServiceProvider} serviceProvider
-	 * @returns {Promise<void>}
-	 * @memberof RegisterServiceProviders
-	 */
 	private async validateConfiguration(serviceProvider: ServiceProvider): Promise<void> {
 		const configSchema: object = serviceProvider.configSchema();
 
@@ -110,12 +84,6 @@ export class RegisterServiceProviders implements Bootstrapper {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {ServiceProvider} serviceProvider
-	 * @returns {Promise<boolean>}
-	 * @memberof RegisterProviders
-	 */
 	private async satisfiesDependencies(serviceProvider: ServiceProvider): Promise<boolean> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProviderRepository,

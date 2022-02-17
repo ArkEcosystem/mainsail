@@ -86,9 +86,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		});
 	}
 
-	/**
-	 * Determine if the blockchain is stopped.
-	 */
 	public isStopped(): boolean {
 		return this.stopped;
 	}
@@ -101,19 +98,10 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.queue;
 	}
 
-	/**
-	 * Dispatch an event to transition the state machine.
-	 * @param  {String} event
-	 * @return {void}
-	 */
 	public dispatch(event: string): void {
 		return this.stateMachine.transition(event);
 	}
 
-	/**
-	 * Start the blockchain and wait for it to be ready.
-	 * @return {void}
-	 */
 	public async boot(skipStartedCheck = false): Promise<boolean> {
 		this.logger.info("Starting Blockchain Manager");
 
@@ -156,27 +144,17 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		}
 	}
 
-	/**
-	 * Set wakeup timeout to check the network for new blocks.
-	 */
 	public setWakeUp(): void {
 		this.stateStore.setWakeUpTimeout(() => {
 			this.dispatch("WAKEUP");
 		}, 60000);
 	}
 
-	/**
-	 * Reset the wakeup timeout.
-	 */
 	public resetWakeUp(): void {
 		this.stateStore.clearWakeUpTimeout();
 		this.setWakeUp();
 	}
 
-	/**
-	 * Clear and stop the queue.
-	 * @return {void}
-	 */
 	public clearAndStopQueue(): void {
 		this.stateStore.setLastDownloadedBlock(this.getLastBlock().data);
 
@@ -184,17 +162,10 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.clearQueue();
 	}
 
-	/**
-	 * Clear the queue.
-	 * @return {void}
-	 */
 	public clearQueue(): void {
 		this.queue.clear();
 	}
 
-	/**
-	 * Push a block to the process queue.
-	 */
 	public async handleIncomingBlock(block: Interfaces.IBlockData, fromForger = false): Promise<void> {
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.height);
 
@@ -229,9 +200,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		}
 	}
 
-	/**
-	 * Enqueue blocks in process queue and set last downloaded block to last item in list.
-	 */
 	public enqueueBlocks(blocks: Interfaces.IBlockData[]): void {
 		if (blocks.length === 0) {
 			return;
@@ -280,11 +248,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		__createQueueJob(currentBlocksChunk);
 	}
 
-	/**
-	 * Remove N number of blocks.
-	 * @param  {Number} nblocks
-	 * @return {void}
-	 */
 	public async removeBlocks(nblocks: number): Promise<void> {
 		try {
 			this.clearAndStopQueue();
@@ -381,38 +344,22 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		}
 	}
 
-	/**
-	 * Remove the top blocks from database.
-	 * NOTE: Only used when trying to restore database integrity.
-	 * @param  {Number} count
-	 * @return {void}
-	 */
 	public async removeTopBlocks(count: number): Promise<void> {
 		this.logger.info(`Removing top ${Utils.pluralize("block", count, true)}`);
 
 		await this.blockRepository.deleteTopBlocks(count);
 	}
 
-	/**
-	 * Reset the last downloaded block to last chained block.
-	 */
 	public resetLastDownloadedBlock(): void {
 		this.stateStore.setLastDownloadedBlock(this.getLastBlock().data);
 	}
 
-	/**
-	 * Called by forger to wake up and sync with the network.
-	 * It clears the wakeUpTimeout if set.
-	 */
 	public forceWakeup(): void {
 		this.stateStore.clearWakeUpTimeout();
 
 		this.dispatch("WAKEUP");
 	}
 
-	/**
-	 * Fork the chain at the given block.
-	 */
 	public forkBlock(block: Interfaces.IBlock, numberOfBlockToRollback?: number): void {
 		this.stateStore.setForkedBlock(block);
 
@@ -426,9 +373,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.dispatch("FORK");
 	}
 
-	/**
-	 * Determine if the blockchain is synced.
-	 */
 	public isSynced(block?: Interfaces.IBlockData): boolean {
 		if (!this.peerRepository.hasPeers()) {
 			return true;
@@ -441,51 +385,30 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		);
 	}
 
-	/**
-	 * Get the last block of the blockchain.
-	 */
 	public getLastBlock(): Interfaces.IBlock {
 		return this.stateStore.getLastBlock();
 	}
 
-	/**
-	 * Get the last height of the blockchain.
-	 */
 	public getLastHeight(): number {
 		return this.getLastBlock().data.height;
 	}
 
-	/**
-	 * Get the last downloaded block of the blockchain.
-	 */
 	public getLastDownloadedBlock(): Interfaces.IBlockData {
 		return this.stateStore.getLastDownloadedBlock() || this.getLastBlock().data;
 	}
 
-	/**
-	 * Get the block ping.
-	 */
 	public getBlockPing(): Contracts.State.BlockPing | undefined {
 		return this.stateStore.getBlockPing();
 	}
 
-	/**
-	 * Ping a block.
-	 */
 	public pingBlock(incomingBlock: Interfaces.IBlockData): boolean {
 		return this.stateStore.pingBlock(incomingBlock);
 	}
 
-	/**
-	 * Push ping block.
-	 */
 	public pushPingBlock(block: Interfaces.IBlockData, fromForger = false): void {
 		this.stateStore.pushPingBlock(block, fromForger);
 	}
 
-	/**
-	 * Check if the blockchain should roll back due to missing blocks.
-	 */
 	public async checkMissingBlocks(): Promise<void> {
 		this.missedBlocks++;
 		if (

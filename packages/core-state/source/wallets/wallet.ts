@@ -102,32 +102,14 @@ export class Wallet implements Contracts.State.Wallet {
 		};
 	}
 
-	/**
-	 * @returns {Record<string, any>}
-	 * @memberof Wallet
-	 */
 	public getAttributes(): Record<string, any> {
 		return this.attributes.all();
 	}
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} [defaultValue]
-	 * @returns {T}
-	 * @memberof Wallet
-	 */
 	public getAttribute<T>(key: string, defaultValue?: T): T {
 		return this.attributes.get<T>(key, defaultValue);
 	}
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} value
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public setAttribute<T = any>(key: string, value: T): boolean {
 		const wasSet = this.attributes.set<T>(key, value);
 
@@ -141,11 +123,6 @@ export class Wallet implements Contracts.State.Wallet {
 		return wasSet;
 	}
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public forgetAttribute(key: string): boolean {
 		const na = Symbol();
 		const previousValue = this.attributes.get(key, na);
@@ -161,43 +138,22 @@ export class Wallet implements Contracts.State.Wallet {
 		return wasSet;
 	}
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public hasAttribute(key: string): boolean {
 		return this.attributes.has(key);
 	}
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public isDelegate(): boolean {
 		return this.hasAttribute("delegate");
 	}
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public hasVoted(): boolean {
 		return this.hasAttribute("vote");
 	}
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public hasMultiSignature(): boolean {
 		return this.hasAttribute("multiSignature");
 	}
 
-	/**
-	 * @returns {Contracts.State.Wallet}
-	 * @memberof Wallet
-	 */
 	public clone(): Contracts.State.Wallet {
 		const cloned = new Wallet(this.address, this.attributes.clone());
 		cloned.publicKey = this.publicKey;

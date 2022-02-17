@@ -9,11 +9,6 @@ import { decorateInjectable, Identifiers, inject, injectable } from "../../../io
 
 decorateInjectable(EventEmitter);
 
-/**
- * @export
- * @class MemoryQueue
- * @implements {Queue}
- */
 @injectable()
 export class MemoryQueue extends EventEmitter implements Queue {
 	@inject(Identifiers.EventDispatcherService)
@@ -22,18 +17,8 @@ export class MemoryQueue extends EventEmitter implements Queue {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Logger;
 
-	/**
-	 * @private
-	 * @type {(QueueJob[])}
-	 * @memberof MemoryQueue
-	 */
 	private jobs: QueueJob[] = [];
 
-	/**
-	 * @private
-	 * @type {boolean}
-	 * @memberof MemoryQueue
-	 */
 	private running: boolean = false;
 	private started: boolean = false;
 
@@ -44,35 +29,16 @@ export class MemoryQueue extends EventEmitter implements Queue {
 		this.setMaxListeners(0);
 	}
 
-	/**
-	 * Create a new instance of the queue.
-	 *
-	 * @param {Application} app
-	 * @returns {Queue}
-	 * @memberof CacheStore
-	 */
 	public async make(): Promise<Queue> {
 		return this;
 	}
 
-	/**
-	 * Start the queue.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async start(): Promise<void> {
 		this.started = true;
 
 		this.processJobs();
 	}
 
-	/**
-	 * Stop the queue.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async stop(): Promise<void> {
 		this.started = false;
 
@@ -83,84 +49,36 @@ export class MemoryQueue extends EventEmitter implements Queue {
 		return promise;
 	}
 
-	/**
-	 * Pause the queue.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async pause(): Promise<void> {
 		this.started = false;
 
 		await this.waitUntilProcessed();
 	}
 
-	/**
-	 * Resume the queue.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async resume(): Promise<void> {
 		await this.start();
 	}
 
-	/**
-	 * Clear the queue.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async clear(): Promise<void> {
 		this.jobs = [];
 	}
 
-	/**
-	 * Push a new job onto the queue.
-	 *
-	 * @template T
-	 * @param {QueueJob} job
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async push(job: QueueJob): Promise<void> {
 		this.jobs.push(job);
 
 		this.processJobs();
 	}
 
-	/**
-	 * Push a new job onto the queue after a delay.
-	 *
-	 * @template T
-	 * @param {number} delay
-	 * @param {QueueJob} job
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async later(delay: number, job: QueueJob): Promise<void> {
 		setTimeout(() => this.push(job), delay);
 	}
 
-	/**
-	 * Push an array of jobs onto the queue.
-	 *
-	 * @param {QueueJob[]} jobs
-	 * @returns {Promise<void>}
-	 * @memberof MemoryQueue
-	 */
 	public async bulk(jobs: QueueJob[]): Promise<void> {
 		for (const job of jobs) {
 			this.jobs.push(job);
 		}
 	}
 
-	/**
-	 * Get the size of the queue.
-	 *
-	 * @returns {number}
-	 * @memberof MemoryQueue
-	 */
 	public size(): number {
 		return this.jobs.length;
 	}

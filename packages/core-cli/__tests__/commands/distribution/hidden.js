@@ -21,44 +21,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_cli_1 = require("@packages/core-cli");
 const boxen_1 = __importDefault(require("boxen"));
 const kleur_1 = require("kleur");
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
+
 let Command = class Command extends core_cli_1.Commands.Command {
 	constructor() {
 		super(...arguments);
-		/**
-		 * The console command signature.
-		 *
-		 * @type {string}
-		 * @memberof Command
-		 */
+
 		this.signature = "help";
-		/**
-		 * The console command description.
-		 *
-		 * @type {string}
-		 * @memberof Command
-		 */
+
 		this.description = "Displays detailed information on all commands available via CLI.";
-		/**
-		 * Indicates whether the command requires a network to be present.
-		 *
-		 * @type {boolean}
-		 * @memberof Command
-		 */
+
 		this.requiresNetwork = false;
 
 		this.isHidden = true;
 	}
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
+
 	async execute() {
 		const commands = this.app.get(core_cli_1.Container.Identifiers.Commands);
 		// figure out the longest signature

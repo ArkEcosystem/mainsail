@@ -5,28 +5,11 @@ import { Identifiers, inject, injectable } from "../../ioc";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
 
-/**
- * @export
- * @class RegisterBaseBindings
- * @implements {Bootstrapper}
- */
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {
-	/**
-	 * The application instance.
-	 *
-	 * @private
-	 * @type {Application}
-	 * @memberof Local
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @param {Kernel.Application} app
-	 * @returns {Promise<void>}
-	 * @memberof RegisterBaseBindings
-	 */
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
 		const { version } = require(resolve(__dirname, "../../../package.json"));

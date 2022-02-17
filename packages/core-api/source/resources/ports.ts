@@ -4,32 +4,13 @@ import { Resource } from "../interfaces";
 
 @Container.injectable()
 export class PortsResource implements Resource {
-	/**
-	 * @protected
-	 * @type {Providers.ServiceProviderRepository}
-	 * @memberof PortsResource
-	 */
 	@Container.inject(Container.Identifiers.ServiceProviderRepository)
 	protected readonly serviceProviderRepository!: Providers.ServiceProviderRepository;
 
-	/**
-	 * Return the raw representation of the resource.
-	 *
-	 * @param {*} resource
-	 * @returns {object}
-	 * @memberof Resource
-	 */
 	public raw(resource): object {
 		return resource;
 	}
 
-	/**
-	 * Return the transformed representation of the resource.
-	 *
-	 * @param {*} resource
-	 * @returns {object}
-	 * @memberof Resource
-	 */
 	public transform(resource): object {
 		const result = {};
 		const keys = ["@arkecosystem/core-p2p", "@arkecosystem/core-api", "@arkecosystem/core-webhooks"];

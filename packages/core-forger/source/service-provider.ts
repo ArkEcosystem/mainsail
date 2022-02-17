@@ -8,16 +8,7 @@ import { ForgerService } from "./forger-service";
 import { Delegate } from "./interfaces";
 import { CurrentDelegateProcessAction, LastForgedBlockRemoteAction, NextSlotProcessAction } from "./process-actions";
 
-/**
- * @export
- * @class ServiceProvider
- * @extends {Providers.ServiceProvider}
- */
 export class ServiceProvider extends Providers.ServiceProvider {
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async register(): Promise<void> {
 		this.app.bind<ForgerService>(Container.Identifiers.ForgerService).to(ForgerService).inSingletonScope();
 
@@ -26,10 +17,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.registerProcessActions();
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async boot(): Promise<void> {
 		const delegates: Delegate[] = this.makeDelegates();
 
@@ -45,18 +32,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// this.config().set("app.flags.password", undefined);
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof ServiceProvider
-	 */
 	public async dispose(): Promise<void> {
 		await this.app.get<ForgerService>(Container.Identifiers.ForgerService).dispose();
 	}
 
-	/**
-	 * @returns {Promise<boolean>}
-	 * @memberof ServiceProvider
-	 */
 	public async bootWhen(): Promise<boolean> {
 		const { secrets, bip38 }: { secrets: string[]; bip38: string } = this.app.config("delegates")!;
 
@@ -111,10 +90,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.register(this.app.resolve(LastForgedBlockRemoteAction));
 	}
 
-	/**
-	 * @private
-	 * @memberof ServiceProvider
-	 */
 	private startTracker(delegates: Delegate[]): void {
 		if (!Array.isArray(delegates) || !delegates.length) {
 			return;
@@ -130,11 +105,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 	}
 
-	/**
-	 * @private
-	 * @returns {Delegate[]}
-	 * @memberof ServiceProvider
-	 */
 	private makeDelegates(): Delegate[] {
 		const delegates: Set<Delegate> = new Set<Delegate>();
 

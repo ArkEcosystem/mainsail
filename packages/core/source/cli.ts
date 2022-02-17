@@ -5,39 +5,12 @@ import { platform } from "os";
 import { join, resolve } from "path";
 import { PackageJson } from "type-fest";
 
-/**
- * @export
- * @class CommandLineInterface
- */
 @Container.injectable()
 export class CommandLineInterface {
-	/**
-	 * @private
-	 * @type {Contracts.Application}
-	 * @memberof CommandLineInterface
-	 */
 	private app!: Contracts.Application;
 
-	/**
-	 * @param {string[]} argv
-	 * @memberof CommandLineInterface
-	 */
 	public constructor(private readonly argv: string[]) {}
 
-	/**
-	 * @remarks
-	 * There are 3 steps to how the CLI is bootstrapped with a single piece of duplication.
-	 *
-	 * 1. We load the package.json file into memory so that the updater can do its job.
-	 * 2. We parse the arguments to figure out what command was supposed to be executed.
-	 * 3. We parse and validate all arguments if we found a matching command.
-	 *
-	 * We parse arguments twice because because before we find a matching command we do not
-	 * care about their validity and we also don't know what the input definition looks like.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof CommandLineInterface
-	 */
 	public async execute(dirname = __dirname): Promise<void> {
 		// Set NODE_PATHS. Only required for plugins that uses @arkecosystem as peer dependencies.
 		this.setNodePath();
@@ -73,7 +46,7 @@ export class CommandLineInterface {
 			commandSignature = await this.app.resolve(Plugins.SuggestCommand).execute({
 				signature: commandSignature,
 				signatures: Object.keys(commands),
-				bin: Object.keys(pkg.bin!)[0],
+				bin: Object.keys(pkg.bin)[0],
 			});
 
 			if (commandSignature) {
