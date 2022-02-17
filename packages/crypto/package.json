@@ -25,7 +25,7 @@
 		"bench": "node benchmark/index.js",
 		"build": "pnpm run clean && tsc",
 		"build:rollup": "pnpm run clean && tsc && rollup -c",
-		"build:watch": "pnpm run clean && tsc -- -w",
+		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "rimraf dist",
 		"prepublishOnly": "pnpm run build:rollup",
 		"test": "cross-env CORE_ENV=test jest --forceExit"

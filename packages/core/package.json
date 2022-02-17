@@ -21,7 +21,7 @@
 	"scripts": {
 		"ark": "node ./bin/run",
 		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
+		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "rimraf dist",
 		"core:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark core:run",
 		"core:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark core:run",

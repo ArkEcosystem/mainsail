@@ -17,7 +17,7 @@
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
+		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "rimraf dist",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
