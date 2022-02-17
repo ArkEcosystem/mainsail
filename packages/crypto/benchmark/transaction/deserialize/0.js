@@ -1,9 +1,7 @@
-const {
-    deserialize
-} = require('./methods')
+const { deserialize } = require("./methods");
 
-const data = require('../../helpers').getFixture('transaction/serialized/0.txt');
+const data = require("../../helpers").getFixture("transaction/serialized/0.txt");
 
-exports['core'] = () => {
-    return deserialize(data);
+exports["core"] = () => {
+	return deserialize(data);
 };

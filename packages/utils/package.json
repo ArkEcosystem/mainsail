@@ -74,6 +74,6 @@
 		"typescript-language-server": "^0.4.0"
 	},
 	"engines": {
-		"node": ">=10.x"
+		"node": ">=16.x"
 	}
 }

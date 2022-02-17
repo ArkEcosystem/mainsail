@@ -20,11 +20,9 @@
 	],
 	"scripts": {
 		"ark": "node ./bin/run",
-		"build": "pnpm run clean && pnpm run compile",
-		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -- -w",
 		"clean": "rimraf dist",
-		"compile": "node ../../node_modules/typescript/bin/tsc",
 		"core:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark core:run",
 		"core:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark core:run",
 		"core:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --env=test",
@@ -35,7 +33,6 @@
 		"forger:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark forger:run",
 		"forger:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark forger:run -- --env=test",
 		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test",
-		"prepublishOnly": "pnpm run build",
 		"relay:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark relay:run",
 		"relay:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark relay:run",
 		"relay:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark relay:run -- --env=test",
@@ -79,9 +76,6 @@
 		"pm2": "^4.5.0"
 	},
 	"engines": {
-		"node": ">=10.x"
-	},
-	"publishConfig": {
-		"access": "public"
+		"node": ">=16.x"
 	}
 }

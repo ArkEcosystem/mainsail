@@ -12,12 +12,9 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "pnpm run clean && pnpm run compile",
-		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-		"build:watch": "pnpm run clean && pnpm run compile -- -w",
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -- -w",
 		"clean": "rimraf dist",
-		"compile": "node ../../node_modules/typescript/bin/tsc",
-		"prepublishOnly": "pnpm run build",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
@@ -29,9 +26,6 @@
 		"bytebuffer": "5.0.1"
 	},
 	"engines": {
-		"node": ">=10.x"
-	},
-	"publishConfig": {
-		"access": "public"
+		"node": ">=16.x"
 	}
 }

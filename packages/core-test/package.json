@@ -18,10 +18,8 @@
 	],
 	"scripts": {
 		"build": "yarn clean && tsc",
-		"build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
 		"build:watch": "yarn clean && yarn compile -w",
 		"clean": "rimraf dist",
-		"compile": "node ../../node_modules/typescript/bin/tsc",
 		"test": "uvu -r tsm src .test.ts"
 	},
 	"dependencies": {
@@ -37,8 +35,5 @@
 	"devDependencies": {
 		"@types/node": "^17.0.8",
 		"@types/sinon": "^10.0.6"
-	},
-	"publishConfig": {
-		"access": "public"
 	}
 }
