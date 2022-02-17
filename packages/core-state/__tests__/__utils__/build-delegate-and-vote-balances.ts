@@ -38,7 +38,7 @@ export const buildDelegateAndVoteWallets = (numberDelegates: number, walletRepo:
 		const totalBalance = CryptoUtils.BigNumber.make(i + 1)
 			.times(1000)
 			.times(SATOSHI);
-		voter.setBalance(totalBalance.div(2));
+		voter.setBalance(totalBalance);
 		voter.setPublicKey(`v${delegateKey}`);
 		voter.setAttribute("vote", delegateKey);
 
