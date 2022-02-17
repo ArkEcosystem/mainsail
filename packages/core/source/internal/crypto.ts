@@ -24,7 +24,7 @@ export const buildBIP38 = async (flags, config?: string): Promise<Record<string,
 	}
 
 	// @todo: update to follow new config convention
-	const configDelegates = join(config!, "delegates.json");
+	const configDelegates = join(config, "delegates.json");
 
 	if (!existsSync(configDelegates)) {
 		throw new MissingConfigFile(configDelegates);
@@ -47,14 +47,14 @@ export const buildBIP38 = async (flags, config?: string): Promise<Record<string,
 
 		const response = await prompts([
 			{
-				type: "password",
-				name: "password",
 				message: "Please enter your BIP38 password",
+				name: "password",
+				type: "password",
 			},
 			{
-				type: "confirm",
-				name: "confirm",
 				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
 			},
 		]);
 

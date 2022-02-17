@@ -25,8 +25,8 @@ export class RoundRepository extends Repository<Round> {
 	public async save(delegates: readonly Contracts.State.Wallet[]): Promise<never> {
 		const round: { publicKey: string; balance: Utils.BigNumber; round: number }[] = delegates.map(
 			(delegate: Contracts.State.Wallet) => ({
-				publicKey: delegate.getPublicKey()!,
 				balance: delegate.getAttribute("delegate.voteBalance"),
+				publicKey: delegate.getPublicKey()!,
 				round: delegate.getAttribute("delegate.round"),
 			}),
 		);

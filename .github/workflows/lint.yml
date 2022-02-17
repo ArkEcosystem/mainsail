@@ -40,6 +40,9 @@ jobs:
             - name: Sort
               run: pnpm run sort
 
+            - name: Lint
+              run: bash scripts/lint.sh
+
             - name: Prettier
               run: pnpm run prettier
 

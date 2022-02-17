@@ -4,14 +4,16 @@ import cloneDeep from "lodash.clonedeep";
 
 const defaultblockTimestampLookup = (height: number): number => {
 	/* istanbul ignore next */
-	if (height === 1) return 0;
+	if (height === 1) {
+		return 0;
+	}
 	/* istanbul ignore next */
 	throw new Error(`Attempted to lookup block with height ${height}, but no lookup implementation was provided`);
 };
 
 export const snoozeForBlock = async (
-	sleep: number = 0,
-	height: number = 1,
+	sleep = 0,
+	height = 1,
 	blockTimestampLookupByHeight = defaultblockTimestampLookup,
 ): Promise<void> => {
 	const blockTime: number = Managers.configManager.getMilestone(height).blocktime * 1000;
@@ -30,11 +32,10 @@ export const injectMilestone = (index: number, milestone: Record<string, any>): 
 export const getLastHeight = (app: Contracts.Kernel.Application): number =>
 	app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore).getLastHeight();
 
-export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): Utils.BigNumber => {
-	return app
+export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): Utils.BigNumber =>
+	app
 		.getTagged<Contracts.State.WalletRepository>(Container.Identifiers.WalletRepository, "state", "blockchain")
 		.getNonce(senderPublicKey);
-};
 
 export const resetBlockchain = async (app: Contracts.Kernel.Application) => {
 	// Resets everything so that it can be used in beforeAll to start clean a test suite

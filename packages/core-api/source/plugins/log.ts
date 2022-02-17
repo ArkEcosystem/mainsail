@@ -5,8 +5,6 @@ import { getIp } from "../utils";
 
 export const log = {
 	name: "log",
-	version: "1.0.0",
-
 	register(
 		server: Hapi.Server,
 		options: {
@@ -30,4 +28,6 @@ export const log = {
 			return h.continue;
 		});
 	},
+
+	version: "1.0.0",
 };

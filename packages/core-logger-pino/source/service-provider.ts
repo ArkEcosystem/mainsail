@@ -22,12 +22,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): object {
 		return Joi.object({
+			fileRotator: Joi.object({
+				interval: Joi.string().required(),
+			}).required(),
 			levels: Joi.object({
 				console: Joi.string().required(),
 				file: Joi.string().required(),
-			}).required(),
-			fileRotator: Joi.object({
-				interval: Joi.string().required(),
 			}).required(),
 		}).unknown(true);
 	}

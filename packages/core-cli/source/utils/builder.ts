@@ -11,6 +11,7 @@ export const buildApplication = async (context?: AnyObject): Promise<Contracts.K
 			plugins: context.plugins,
 		});
 
+		// eslint-disable-next-line @typescript-eslint/await-thenable
 		await app.boot();
 	}
 
@@ -19,10 +20,10 @@ export const buildApplication = async (context?: AnyObject): Promise<Contracts.K
 
 export const buildPeerFlags = (flags: AnyObject) => {
 	const config = {
-		networkStart: flags.networkStart,
 		disableDiscovery: flags.disableDiscovery,
-		skipDiscovery: flags.skipDiscovery,
 		ignoreMinimumNetworkReach: flags.ignoreMinimumNetworkReach,
+		networkStart: flags.networkStart,
+		skipDiscovery: flags.skipDiscovery,
 	};
 
 	if (flags.launchMode === "seed") {

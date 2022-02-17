@@ -201,7 +201,7 @@ export class BlockProcessor {
 				this.logger.warning(
 					`Block { height: ${block.data.height.toLocaleString()}, id: ${block.data.id} } ` +
 						`not accepted: invalid nonce order for sender ${sender}: ` +
-						`preceding nonce: ${nonceBySender[sender].toFixed()}, ` +
+						`preceding nonce: ${nonceBySender[sender].toFixed(0)}, ` +
 						`transaction ${data.id} has nonce ${nonce.toFixed()}.`,
 				);
 				return true;

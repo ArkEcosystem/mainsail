@@ -29,8 +29,8 @@ export class DaemonizeProcess {
 			spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Starting ${processName}`);
 
 			const flagsProcess: Record<string, boolean | number | string> = {
+				"kill-timeout": 30_000,
 				"max-restarts": 5,
-				"kill-timeout": 30000,
 			};
 
 			if (flags.daemon !== true) {
@@ -44,13 +44,12 @@ export class DaemonizeProcess {
 			this.processManager.start(
 				{
 					...options,
-					...{
-						env: {
-							NODE_ENV: "production",
-							CORE_ENV: flags.env,
-						},
-						node_args: potato ? { max_old_space_size: 500 } : undefined,
+
+					env: {
+						CORE_ENV: flags.env,
+						NODE_ENV: "production",
 					},
+					node_args: potato ? { max_old_space_size: 500 } : undefined,
 				},
 				flagsProcess,
 			);

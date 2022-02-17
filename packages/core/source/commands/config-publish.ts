@@ -1,19 +1,19 @@
+import { resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { Networks } from "@arkecosystem/crypto";
-import Joi from "joi";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
-import { resolve } from "path";
+import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-	public signature: string = "config:publish";
+	public signature = "config:publish";
 
-	public description: string = "Publish the configuration.";
+	public description = "Publish the configuration.";
 
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
 	public configure(): void {
 		this.definition
@@ -29,15 +29,15 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				type: "select",
-				name: "network",
-				message: "Please select which network you want to operate on",
 				choices: Object.keys(Networks).map((network) => ({ title: network, value: network })),
+				message: "Please select which network you want to operate on",
+				name: "network",
+				type: "select",
 			},
 			{
-				type: "confirm",
-				name: "confirm",
 				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
 			},
 		]);
 
@@ -62,7 +62,6 @@ export class Command extends Commands.Command {
 
 		await this.components.taskList([
 			{
-				title: "Prepare directories",
 				task: () => {
 					if (flags.reset) {
 						removeSync(configDest);
@@ -78,9 +77,9 @@ export class Command extends Commands.Command {
 
 					ensureDirSync(configDest);
 				},
+				title: "Prepare directories",
 			},
 			{
-				title: "Publish environment",
 				task: () => {
 					if (!existsSync(`${configSrc}/.env`)) {
 						this.components.fatal(`Couldn't find the environment file at ${configSrc}/.env.`);
@@ -88,8 +87,9 @@ export class Command extends Commands.Command {
 
 					copySync(`${configSrc}/.env`, `${configDest}/.env`);
 				},
+				title: "Publish environment",
 			},
-			{ title: "Publish configuration", task: () => copySync(configSrc, configDest) },
+			{ task: () => copySync(configSrc, configDest), title: "Publish configuration" },
 		]);
 	}
 }

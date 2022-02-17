@@ -17,14 +17,14 @@ export class Environment {
 		if (process.env.CORE_PATH_CONFIG) {
 			paths = {
 				...paths,
-				...{ config: resolve(process.env.CORE_PATH_CONFIG) },
+				config: resolve(process.env.CORE_PATH_CONFIG),
 			};
 		}
 
 		if (process.env.CORE_PATH_DATA) {
 			paths = {
 				...paths,
-				...{ data: resolve(process.env.CORE_PATH_DATA) },
+				data: resolve(process.env.CORE_PATH_DATA),
 			};
 		}
 

@@ -14,7 +14,7 @@ export class CommandHelp {
 	protected readonly pkg!: PackageJson;
 
 	public render(command): string {
-		let helpMessage: string = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
+		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
 
 ${blue().bold("Description")}
 ${command.description}`;
@@ -46,8 +46,8 @@ ${flags}`;
 		const { options, descriptions, longestProperty } = this.buildProperties(args);
 
 		const output: string[] = [];
-		for (let i = 0; i < options.length; i++) {
-			output.push(`${options[i].padEnd(longestProperty, " ")}    ${descriptions[i]}`);
+		for (const [i, option] of options.entries()) {
+			output.push(`${option.padEnd(longestProperty, " ")}    ${descriptions[i]}`);
 		}
 
 		return output.join("\n");
@@ -63,8 +63,8 @@ ${flags}`;
 		const { options, descriptions, longestProperty } = this.buildProperties(flags);
 
 		const output: string[] = [];
-		for (let i = 0; i < options.length; i++) {
-			output.push(`--${options[i].padEnd(longestProperty, " ")}    ${descriptions[i]}`);
+		for (const [i, option] of options.entries()) {
+			output.push(`--${option.padEnd(longestProperty, " ")}    ${descriptions[i]}`);
 		}
 
 		return output.join("\n");
@@ -80,9 +80,9 @@ ${flags}`;
 		}
 
 		return {
-			options,
 			descriptions,
 			longestProperty: options.reduce((a, b) => (a.length > b.length ? a : b)).length,
+			options,
 		};
 	}
 }

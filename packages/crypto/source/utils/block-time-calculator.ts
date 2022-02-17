@@ -1,7 +1,9 @@
 import { configManager } from "../managers/config";
 
 export const isNewBlockTime = (height: number): boolean => {
-	if (height === 1) return true;
+	if (height === 1) {
+		return true;
+	}
 
 	const milestones = configManager.get("milestones");
 
@@ -23,7 +25,9 @@ export const isNewBlockTime = (height: number): boolean => {
 		}
 	}
 
-	if (!milestone) return false;
+	if (!milestone) {
+		return false;
+	}
 
 	return height - milestone.height === 0;
 };
@@ -33,10 +37,8 @@ export const calculateBlockTime = (height: number): number => {
 
 	for (let i = milestones.length - 1; i >= 0; i--) {
 		const milestone = milestones[i];
-		if (milestone.height <= height) {
-			if (milestone.blocktime) {
-				return milestone.blocktime;
-			}
+		if (milestone.height <= height && milestone.blocktime) {
+			return milestone.blocktime;
 		}
 	}
 

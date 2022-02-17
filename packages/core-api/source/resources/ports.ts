@@ -13,13 +13,13 @@ export class PortsResource implements Resource {
 
 	public transform(resource): object {
 		const result = {};
-		const keys = ["@arkecosystem/core-p2p", "@arkecosystem/core-api", "@arkecosystem/core-webhooks"];
+		const keys = new Set(["@arkecosystem/core-p2p", "@arkecosystem/core-api", "@arkecosystem/core-webhooks"]);
 
 		for (const serviceProvider of this.serviceProviderRepository.allLoadedProviders()) {
 			const name: string = serviceProvider.name()!;
 			const options: Record<string, any> = serviceProvider.config().all();
 
-			if (keys.includes(name) && options.enabled) {
+			if (keys.has(name) && options.enabled) {
 				if (options.server && options.server.enabled) {
 					result[name] = +options.server.port;
 

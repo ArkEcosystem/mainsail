@@ -14,6 +14,6 @@ export class LastForgedBlockRemoteAction implements Contracts.Kernel.ProcessActi
 
 		Utils.assert.defined(lastForgedBlock);
 
-		return lastForgedBlock!.data;
+		return lastForgedBlock.data;
 	}
 }

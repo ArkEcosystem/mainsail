@@ -4,6 +4,7 @@ import Boom from "@hapi/boom";
 import Bounce from "@hapi/bounce";
 import Hoek from "@hapi/hoek";
 import Teamwork from "@hapi/teamwork";
+
 import { parseNesMessage, protocol, stringifyNesMessage } from "./utils";
 
 const internals = {
@@ -88,7 +89,7 @@ export class Socket {
 					string = string.replace(`"${token}"`, options.replace[token]);
 				});
 			}
-		} catch (err) {
+		} catch (error) {
 			this.server.log(["nes", "serialization", "error"], message.type);
 
 			/* istanbul ignore else */
@@ -97,11 +98,11 @@ export class Socket {
 			}
 
 			/* istanbul ignore next */
-			return Promise.reject(err);
+			return Promise.reject(error);
 		}
 
 		const team = new Teamwork.Team();
-		this._packets.push({ message: string, type: message.type, team });
+		this._packets.push({ message: string, team, type: message.type });
 		this._flush();
 		return team.work;
 	}
@@ -109,8 +110,7 @@ export class Socket {
 	// private even though it does not start with _ ; adapted from the original code
 	private caseInsensitiveKey(object, key) {
 		const keys = Object.keys(object);
-		for (let i = 0; i < keys.length; ++i) {
-			const current = keys[i];
+		for (const current of keys) {
 			if (key === current.toLowerCase()) {
 				return object[current];
 			}
@@ -143,15 +143,13 @@ export class Socket {
 		}
 
 		let error;
-		for (let i = 0; i < messages.length; ++i) {
-			const message = messages[i];
-
+		for (const message of messages) {
 			const team = new Teamwork.Team();
 			this._ws.send(message, (err) => team.attend(err));
 			try {
 				await team.work;
-			} catch (err) {
-				error = err;
+			} catch (error_) {
+				error = error_;
 				break;
 			}
 
@@ -195,7 +193,7 @@ export class Socket {
 				return this.terminate();
 			}
 			request = parseNesMessage(message);
-		} catch (err) {
+		} catch {
 			return this.terminate();
 		}
 
@@ -207,9 +205,9 @@ export class Socket {
 			const lifecycleResponse = await this._lifecycle(request);
 			response = lifecycleResponse.response;
 			options = lifecycleResponse.options;
-		} catch (err) {
-			Bounce.rethrow(err, "system");
-			error = err;
+		} catch (error_) {
+			Bounce.rethrow(error_, "system");
+			error = error_;
 		}
 
 		try {
@@ -218,8 +216,8 @@ export class Socket {
 			} else if (response) {
 				await this._send(response, options);
 			}
-		} catch (err) {
-			Bounce.rethrow(err, "system");
+		} catch (error_) {
+			Bounce.rethrow(error_, "system");
 			this.terminate();
 		}
 
@@ -289,10 +287,10 @@ export class Socket {
 		}
 
 		const response = {
-			type: "hello",
-			id: request.id,
 			heartbeat: this._listener._settings.heartbeat,
+			id: request.id,
 			socket: this.id,
+			type: "hello",
 		};
 
 		return { response };
@@ -329,19 +327,19 @@ export class Socket {
 		}
 
 		const shot = {
-			method,
-			url: path,
-			payload: request.payload,
-			headers: { ...request.headers, "content-type": "application/octet-stream" },
+			allowInternals: true,
 			auth: null,
-			validate: false,
+			headers: { ...request.headers, "content-type": "application/octet-stream" },
+			method,
+			payload: request.payload,
 			plugins: {
 				nes: {
 					socket: this,
 				},
 			},
 			remoteAddress: this.info.remoteAddress,
-			allowInternals: true,
+			url: path,
+			validate: false,
 		};
 
 		const res = await this.server.inject(shot);
@@ -350,14 +348,14 @@ export class Socket {
 		}
 
 		const response = {
-			type: "request",
-			id: request.id,
-			statusCode: res.statusCode,
-			payload: res.result,
 			headers: this._filterHeaders(res.headers),
+			id: request.id,
+			payload: res.result,
+			statusCode: res.statusCode,
+			type: "request",
 		};
 
-		return { response, options: {} };
+		return { options: {}, response };
 	}
 
 	private _filterHeaders(headers) {
@@ -372,9 +370,8 @@ export class Socket {
 
 		const filtered = {};
 		const fields = Object.keys(headers);
-		for (let i = 0; i < fields.length; ++i) {
-			const field = fields[i];
-			if (filter.indexOf(field.toLowerCase()) !== -1) {
+		for (const field of fields) {
+			if (filter.includes(field.toLowerCase())) {
 				filtered[field] = headers[field];
 			}
 		}

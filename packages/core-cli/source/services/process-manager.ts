@@ -37,7 +37,7 @@ export class ProcessManager {
 	}
 
 	public start(opts: Record<string, any>, flags: Record<string, any>): ExecaSyncReturnValue {
-		let command: string = `pm2 start ${opts.script}`;
+		let command = `pm2 start ${opts.script}`;
 
 		if (opts.node_args) {
 			command += ` --node-args="${castFlagsToString(opts.node_args)}"`;
@@ -55,7 +55,7 @@ export class ProcessManager {
 	}
 
 	public stop(id: ProcessIdentifier, flags: Record<string, any> = {}): ExecaSyncReturnValue {
-		let command: string = `pm2 stop ${id}`;
+		let command = `pm2 stop ${id}`;
 
 		if (Object.keys(flags).length > 0) {
 			command += ` ${castFlagsToString(flags)}`;
@@ -65,7 +65,7 @@ export class ProcessManager {
 	}
 
 	public restart(id: ProcessIdentifier, flags: Record<string, any> = { "update-env": true }): ExecaSyncReturnValue {
-		let command: string = `pm2 restart ${id}`;
+		let command = `pm2 restart ${id}`;
 
 		if (Object.keys(flags).length > 0) {
 			command += ` ${castFlagsToString(flags)}`;

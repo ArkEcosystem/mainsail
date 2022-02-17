@@ -5,9 +5,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "snapshot:truncate";
+	public signature = "snapshot:truncate";
 
-	public description: string = "Truncate blockchain database.";
+	public description = "Truncate blockchain database.";
 
 	public configure(): void {
 		this.definition

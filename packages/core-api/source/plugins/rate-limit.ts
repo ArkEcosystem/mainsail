@@ -26,7 +26,6 @@ const isListed = (ip: string, patterns: string[]): boolean => {
 
 export = {
 	name: "rate-limit",
-	version: "1.0.0",
 	once: true,
 	async register(
 		server: Hapi.Server,
@@ -44,20 +43,15 @@ export = {
 		}
 
 		const rateLimiter = new RLWrapperBlackAndWhite({
-			limiter: new RateLimiterMemory({ points: options.points, duration: options.duration }),
-			whiteList: options.whitelist || ["*"],
 			blackList: options.blacklist || [],
-			isWhite: (ip: string) => {
-				return isListed(ip, options.whitelist);
-			},
-			isBlack: (ip: string) => {
-				return isListed(ip, options.blacklist);
-			},
+			isBlack: (ip: string) => isListed(ip, options.blacklist),
+			isWhite: (ip: string) => isListed(ip, options.whitelist),
+			limiter: new RateLimiterMemory({ duration: options.duration, points: options.points }),
 			runActionAnyway: false,
+			whiteList: options.whitelist || ["*"],
 		});
 
 		server.ext({
-			type: "onPostAuth",
 			async method(request, h) {
 				try {
 					const rateLimitRes: RateLimiterRes = await rateLimiter.consume(
@@ -69,14 +63,14 @@ export = {
 						remaining: rateLimitRes.remainingPoints,
 						reset: Date.now() + rateLimitRes.msBeforeNext,
 					} as RateLimitPluginData;
-				} catch (rateLimitRes) {
-					if (rateLimitRes instanceof Error) {
-						return Boom.internal(rateLimitRes.message);
+				} catch (error) {
+					if (error instanceof Error) {
+						return Boom.internal(error.message);
 					}
 
 					request.plugins["rate-limit"] = {
-						remaining: rateLimitRes.remainingPoints,
-						reset: Date.now() + rateLimitRes.msBeforeNext,
+						remaining: error.remainingPoints,
+						reset: Date.now() + error.msBeforeNext,
 					} as RateLimitPluginData;
 
 					return Boom.tooManyRequests();
@@ -84,10 +78,10 @@ export = {
 
 				return h.continue;
 			},
+			type: "onPostAuth",
 		});
 
 		server.ext({
-			type: "onPreResponse",
 			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				if (request.plugins["rate-limit"]) {
 					const data = request.plugins["rate-limit"] as RateLimitPluginData;
@@ -106,6 +100,8 @@ export = {
 
 				return h.continue;
 			},
+			type: "onPreResponse",
 		});
 	},
+	version: "1.0.0",
 };

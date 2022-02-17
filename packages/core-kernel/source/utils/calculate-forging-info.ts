@@ -1,4 +1,5 @@
 import { Crypto, Managers } from "@arkecosystem/crypto";
+
 import { ForgingInfo } from "../contracts/shared";
 
 export interface MilestoneSearchResult {
@@ -10,9 +11,9 @@ export interface MilestoneSearchResult {
 export const getMilestonesWhichAffectActiveDelegateCount = (): Array<MilestoneSearchResult> => {
 	const milestones: Array<MilestoneSearchResult> = [
 		{
+			data: Managers.configManager.getMilestone(1).activeDelegates,
 			found: true,
 			height: 1,
-			data: Managers.configManager.getMilestone(1).activeDelegates,
 		},
 	];
 
@@ -36,7 +37,7 @@ export const calculateForgingInfo = (
 	const [currentForger, nextForger] = findIndex(height, slotInfo.slotNumber, getTimeStampForBlock);
 	const canForge = slotInfo.forgingStatus;
 
-	return { currentForger, nextForger, blockTimestamp: slotInfo.startTime, canForge };
+	return { blockTimestamp: slotInfo.startTime, canForge, currentForger, nextForger };
 };
 
 const findIndex = (

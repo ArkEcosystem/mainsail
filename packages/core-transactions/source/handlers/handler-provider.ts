@@ -12,7 +12,7 @@ export class TransactionHandlerProvider {
 	@Container.inject(Container.Identifiers.TransactionHandlerConstructors)
 	private readonly handlerConstructors!: TransactionHandlerConstructor[];
 
-	private registered: boolean = false;
+	private registered = false;
 
 	public isRegistrationRequired(): boolean {
 		return this.registered === false;
@@ -65,7 +65,9 @@ export class TransactionHandlerProvider {
 		version: number,
 	) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {
-			if (otherHandlerConstructor === handlerConstructor) continue;
+			if (otherHandlerConstructor === handlerConstructor) {
+				continue;
+			}
 
 			const otherHandler = new otherHandlerConstructor();
 			const otherTransactionConstructor = otherHandler.getConstructor();
@@ -90,8 +92,9 @@ export class TransactionHandlerProvider {
 		handlerConstructor: TransactionHandlerConstructor,
 		dependency: TransactionHandlerConstructor,
 	) {
-		return this.handlerConstructors.some((otherHandlerConstructor) => {
-			return otherHandlerConstructor !== handlerConstructor && otherHandlerConstructor === dependency;
-		});
+		return this.handlerConstructors.some(
+			(otherHandlerConstructor) =>
+				otherHandlerConstructor !== handlerConstructor && otherHandlerConstructor === dependency,
+		);
 	}
 }

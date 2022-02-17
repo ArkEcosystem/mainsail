@@ -43,7 +43,9 @@ export const assert = {
 	matchesObject: (value: unknown, schema: ZodRawShape): void => uvu.not.throws(() => z.object(schema).parse(value)),
 	not: {
 		...uvu.not,
+		containKey: (value: object, key: string): void => assert.false(Object.keys(value).includes(key)),
 		defined: (value: unknown): void => uvu.ok(value === undefined, "Expected value not to be defined."),
+		empty: (value: unknown[]): void => uvu.ok(Object.keys(value).length > 0),
 		equal: (a: any, b: any): void => {
 			if (a instanceof BigNumber) {
 				a = a.toString();
@@ -55,8 +57,6 @@ export const assert = {
 
 			uvu.not.equal(a, b);
 		},
-		containKey: (value: object, key: string): void => assert.false(Object.keys(value).includes(key)),
-		empty: (value: unknown[]): void => uvu.ok(Object.keys(value).length > 0),
 		matchesObject: (value: unknown, schema: ZodRawShape): void => uvu.throws(() => z.object(schema).parse(value)),
 		undefined: (value: unknown): void => uvu.ok(value !== undefined, "Expected value not to be undefined."),
 	},

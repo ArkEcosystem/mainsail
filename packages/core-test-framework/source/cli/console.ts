@@ -4,8 +4,8 @@ export class Console {
 	public app: Application;
 
 	public pkg = {
-		name: "@arkecosystem/core",
 		description: "Core of the ARK Blockchain",
+		name: "@arkecosystem/core",
 		version: "3.0.0-next.0",
 	};
 
@@ -55,13 +55,13 @@ export class Console {
 
 	private reset(): void {
 		this.args = [];
-		this.flags = this.useDefaultFlags ? { token: "ark", network: "testnet" } : {};
+		this.flags = this.useDefaultFlags ? { network: "testnet", token: "ark" } : {};
 	}
 
 	private createApplication(): Application {
 		const app = ApplicationFactory.make(new Container.Container(), this.pkg);
 
-		this.flags = this.useDefaultFlags ? { token: "ark", network: "testnet" } : {};
+		this.flags = this.useDefaultFlags ? { network: "testnet", token: "ark" } : {};
 
 		return app;
 	}

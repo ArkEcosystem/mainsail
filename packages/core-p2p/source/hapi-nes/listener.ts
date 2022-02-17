@@ -7,8 +7,8 @@ import { Socket } from "./socket";
 
 const internals = {
 	counter: {
-		min: 10000,
-		max: 99999,
+		max: 99_999,
+		min: 10_000,
 	},
 };
 
@@ -35,12 +35,12 @@ export class Listener {
 		// WebSocket listener
 
 		const options: any = {
-			server: this._server.listener,
 			maxPayload: settings.maxPayload,
 			perMessageDeflate: false,
+			server: this._server.listener,
 		};
 		if (settings.origin) {
-			options.verifyClient = (info) => settings.origin.indexOf(info.origin) >= 0;
+			options.verifyClient = (info) => settings.origin.includes(info.origin);
 		}
 
 		this._wss = new Ws.Server(options);

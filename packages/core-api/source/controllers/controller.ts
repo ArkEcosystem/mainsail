@@ -16,8 +16,8 @@ export class Controller {
 
 	protected getQueryPagination(query: Hapi.RequestQuery): Contracts.Search.Pagination {
 		const pagination = {
-			offset: (query.page - 1) * query.limit || 0,
 			limit: query.limit,
+			offset: (query.page - 1) * query.limit || 0,
 		};
 
 		if (query.offset) {
@@ -40,8 +40,8 @@ export class Controller {
 
 	protected getListingPage(request: Hapi.Request): Contracts.Search.Pagination {
 		const pagination = {
-			offset: (request.query.page - 1) * request.query.limit || 0,
 			limit: request.query.limit || 100,
+			offset: (request.query.page - 1) * request.query.limit || 0,
 		};
 
 		if (request.query.offset) {
@@ -59,8 +59,8 @@ export class Controller {
 		const orderBy = Array.isArray(request.query.orderBy) ? request.query.orderBy : request.query.orderBy.split(",");
 
 		return orderBy.map((s: string) => ({
-			property: s.split(":")[0],
 			direction: s.split(":")[1] === "desc" ? "desc" : "asc",
+			property: s.split(":")[0],
 		}));
 	}
 

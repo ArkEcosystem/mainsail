@@ -36,10 +36,10 @@ export class Server {
 		this.server = new HapiServer({ address, port });
 		this.server.app = this.app;
 		await this.server.register({
-			plugin: hapiNesPlugin,
 			options: {
-				maxPayload: 20971520, // 20 MB TODO to adjust
+				maxPayload: 20_971_520, // 20 MB TODO to adjust
 			},
+			plugin: hapiNesPlugin,
 		});
 
 		this.app.resolve(InternalRoute).register(this.server);

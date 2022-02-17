@@ -4,7 +4,6 @@ import aes from "browserify-aes";
 import xor from "buffer-xor/inplace";
 import crypto from "crypto";
 
-import { HashAlgorithms } from "../crypto";
 import {
 	Bip38CompressionError,
 	Bip38LengthError,
@@ -15,17 +14,18 @@ import {
 import { Keys } from "../identities";
 import { IDecryptResult } from "../interfaces";
 import { Base58 } from "../utils/base58";
+import { HashAlgorithms } from ".";
 
 const SCRYPT_PARAMS = {
-	N: 16384, // specified by BIP38
-	r: 8,
+	N: 16_384,
 	p: 8,
+	// specified by BIP38
+	r: 8,
 };
 const NULL = Buffer.alloc(0);
 
-const getPublicKey = (buff: Buffer, compressed: boolean): Buffer => {
-	return Buffer.from(Keys.fromPrivateKey(buff, compressed).publicKey, "hex");
-};
+const getPublicKey = (buff: Buffer, compressed: boolean): Buffer =>
+	Buffer.from(Keys.fromPrivateKey(buff, compressed).publicKey, "hex");
 
 const getAddressPrivate = (privateKey: Buffer, compressed: boolean): string => {
 	const publicKey = getPublicKey(privateKey, compressed);
@@ -149,8 +149,8 @@ const decryptECMult = (buff: Buffer, passphrase: string): IDecryptResult => {
 	const publicKey = getPublicKey(passFactor, true);
 	const seedBPass = crypto.scryptSync(publicKey, Buffer.concat([addressHash, ownerEntropy]), 64, {
 		N: 1024,
-		r: 1,
 		p: 1,
+		r: 1,
 	});
 	const derivedHalf1 = seedBPass.slice(0, 32);
 	const derivedHalf2 = seedBPass.slice(32, 64);
@@ -173,8 +173,8 @@ const decryptECMult = (buff: Buffer, passphrase: string): IDecryptResult => {
 	const privateKey = secp256k1.privateKeyTweakMul(HashAlgorithms.hash256(seedB), passFactor);
 
 	return {
-		privateKey,
 		compressed,
+		privateKey,
 	};
 };
 
@@ -223,15 +223,12 @@ const decryptRaw = (buff: Buffer, passphrase: string): IDecryptResult => {
 	assert.deepEqual(salt, checksum);
 
 	return {
-		privateKey,
 		compressed,
+		privateKey,
 	};
 };
 
-export const encrypt = (privateKey: Buffer, compressed: boolean, passphrase: string): string => {
-	return Base58.encodeCheck(encryptRaw(privateKey, compressed, passphrase));
-};
+export const encrypt = (privateKey: Buffer, compressed: boolean, passphrase: string): string =>
+	Base58.encodeCheck(encryptRaw(privateKey, compressed, passphrase));
 
-export const decrypt = (bip38: string, passphrase): IDecryptResult => {
-	return decryptRaw(Base58.decodeCheck(bip38), passphrase);
-};
+export const decrypt = (bip38: string, passphrase): IDecryptResult => decryptRaw(Base58.decodeCheck(bip38), passphrase);

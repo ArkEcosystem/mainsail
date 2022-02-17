@@ -7,14 +7,11 @@ const name = "hapi-ajv";
 // todo: review implementation - still needed?
 export const hapiAjv = {
 	name,
-	version: "1.0.0",
 	register: async (server: Hapi.Server, options: any): Promise<void> => {
-		const createErrorResponse = (request, h, errors) => {
-			return Boom.badData(errors.map((error) => error.message).join(","));
-		};
+		const createErrorResponse = (request, h, errors) =>
+			Boom.badData(errors.map((error) => error.message).join(","));
 
 		server.ext({
-			type: "onPreHandler",
 			method: (request, h) => {
 				const config = request.route.settings.plugins[name] || {};
 
@@ -36,6 +33,8 @@ export const hapiAjv = {
 
 				return h.continue;
 			},
+			type: "onPreHandler",
 		});
 	},
+	version: "1.0.0",
 };

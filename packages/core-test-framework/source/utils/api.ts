@@ -18,13 +18,13 @@ export class ApiHelpers {
 
 		// Injecting the request into Hapi server
 		const injectOptions = {
-			method,
-			url: ["GET", "DELETE"].includes(method) ? `${url}?${getParams}` : url,
 			headers: {
 				...headers,
 				"Content-Type": "application/json",
 			},
+			method,
 			payload: ["GET", "DELETE"].includes(method) ? {} : params,
+			url: ["GET", "DELETE"].includes(method) ? `${url}?${getParams}` : url,
 		};
 
 		const response = await this.app.get<Server>(Identifiers.HTTP).inject(injectOptions);
@@ -167,10 +167,10 @@ export class ApiHelpers {
 	}
 
 	// todo: fix the use of the factory
-	public async createTransfer(passphrase?: string, nonce: number = 0): Promise<Interfaces.ITransactionData> {
+	public async createTransfer(passphrase?: string, nonce = 0): Promise<Interfaces.ITransactionData> {
 		const transaction = TransactionFactory.initialize()
 			.withVersion(2)
-			.transfer("AZFEPTWnn2Sn8wDZgCRF8ohwKkrmk2AZi1", 100000000, "test")
+			.transfer("AZFEPTWnn2Sn8wDZgCRF8ohwKkrmk2AZi1", 100_000_000, "test")
 			.withPassphrase(passphrase || secrets[0])
 			.withNonce(Utils.BigNumber.make(nonce))
 			.createOne();

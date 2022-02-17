@@ -22,6 +22,6 @@ const decodeCheck = (address: string): Buffer => {
 };
 
 export const Base58 = {
-	encodeCheck: moize(encodeCheck),
 	decodeCheck: moize(decodeCheck),
+	encodeCheck: moize(encodeCheck),
 };

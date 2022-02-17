@@ -25,8 +25,8 @@ export class PluginManager implements Contracts.PluginManager {
 			const packageJson = readJSONSync(join(packagePath, "package.json"));
 
 			plugins.push({
-				path: packagePath,
 				name: packageJson.name,
+				path: packagePath,
 				version: packageJson.version,
 			});
 		}

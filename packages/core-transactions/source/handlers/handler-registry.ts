@@ -26,7 +26,7 @@ export class TransactionHandlerRegistry {
 
 	public getRegisteredHandlerByType(
 		internalType: Transactions.InternalTransactionType,
-		version: number = 1,
+		version = 1,
 	): TransactionHandler {
 		for (const handler of this.handlers) {
 			const transactionConstructor = handler.getConstructor();
@@ -45,9 +45,9 @@ export class TransactionHandlerRegistry {
 	}
 
 	public async getActivatedHandlers(): Promise<TransactionHandler[]> {
-		const promises = this.handlers.map(async (handler): Promise<[TransactionHandler, boolean]> => {
-			return [handler, await handler.isActivated()];
-		});
+		const promises = this.handlers.map(
+			async (handler): Promise<[TransactionHandler, boolean]> => [handler, await handler.isActivated()],
+		);
 		const results = await Promise.all(promises);
 		const activated = results.filter(([_, activated]) => activated);
 		return activated.map(([handler, _]) => handler);
@@ -55,7 +55,7 @@ export class TransactionHandlerRegistry {
 
 	public async getActivatedHandlerByType(
 		internalType: Transactions.InternalTransactionType,
-		version: number = 1,
+		version = 1,
 	): Promise<TransactionHandler> {
 		const handler = this.getRegisteredHandlerByType(internalType, version);
 		if (await handler.isActivated()) {

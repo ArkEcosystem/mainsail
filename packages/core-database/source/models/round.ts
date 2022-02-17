@@ -8,25 +8,25 @@ import { transformBigInt } from "../utils/transform";
 })
 export class Round {
 	@Column({
-		primary: true,
-		type: "varchar",
 		length: 66,
 		nullable: false,
+		primary: true,
+		type: "varchar",
 	})
 	public publicKey!: string;
 
 	@Column({
-		primary: true,
-		type: "bigint",
-		transformer: transformBigInt,
 		nullable: false,
+		primary: true,
+		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public round!: Utils.BigNumber;
 
 	@Column({
-		type: "bigint",
-		transformer: transformBigInt,
 		nullable: false,
+		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public balance!: Utils.BigNumber;
 }

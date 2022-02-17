@@ -27,9 +27,9 @@ class TransactionPoolProcessorMock implements Partial<Contracts.TransactionPool.
 		return {
 			accept,
 			broadcast,
-			invalid,
-			excess,
 			errors,
+			excess,
+			invalid,
 		};
 	}
 }

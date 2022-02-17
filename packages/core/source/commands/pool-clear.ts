@@ -1,13 +1,13 @@
 import { Commands, Container } from "@arkecosystem/core-cli";
 import { Networks } from "@arkecosystem/crypto";
-import Joi from "joi";
 import { removeSync } from "fs-extra";
+import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "pool:clear";
+	public signature = "pool:clear";
 
-	public description: string = "Clear the transaction pool.";
+	public description = "Clear the transaction pool.";
 
 	public configure(): void {
 		this.definition
@@ -32,8 +32,8 @@ export class Command extends Commands.Command {
 			) {
 				this.removeFiles();
 			}
-		} catch (err) {
-			this.components.fatal(err.message);
+		} catch (error) {
+			this.components.fatal(error.message);
 		}
 	}
 

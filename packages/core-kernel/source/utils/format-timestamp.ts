@@ -15,7 +15,7 @@ export const formatTimestamp = (
 
 	return {
 		epoch: epochStamp,
-		unix: timestamp.unix(),
 		human: timestamp.toISOString(),
+		unix: timestamp.unix(),
 	};
 };

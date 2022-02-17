@@ -108,19 +108,19 @@ export class Slots {
 
 		return {
 			blockTime,
-			startTime,
 			endTime,
-			slotNumber,
 			forgingStatus,
+			slotNumber,
+			startTime,
 		};
 	}
 
 	public static getMilestonesWhichAffectBlockTimes(): Array<MilestoneSearchResult> {
 		const milestones: Array<MilestoneSearchResult> = [
 			{
+				data: configManager.getMilestone(1).blocktime,
 				found: true,
 				height: 1,
-				data: configManager.getMilestone(1).blocktime,
 			},
 		];
 

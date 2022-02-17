@@ -23,12 +23,12 @@ const nextTick = function (callback) {
 // NesError types
 
 const errorTypes = {
-	TIMEOUT: "timeout",
 	DISCONNECT: "disconnect",
-	SERVER: "server",
 	PROTOCOL: "protocol",
-	WS: "ws",
+	SERVER: "server",
+	TIMEOUT: "timeout",
 	USER: "user",
+	WS: "ws",
 };
 
 const NesError = function (err, type) {
@@ -41,8 +41,8 @@ const NesError = function (err, type) {
 
 	try {
 		throw err; // ensure stack trace for IE11
-	} catch (withStack) {
-		return withStack;
+	} catch (error) {
+		return error;
 	}
 };
 
@@ -142,15 +142,21 @@ export class Client {
 		if (options.reconnect !== false) {
 			// Defaults to true
 			this._reconnection = {
-				// Options: reconnect, delay, maxDelay
-				wait: 0,
-				delay: options.delay || 1000, // 1 second
-				maxDelay: options.maxDelay || 5000, // 5 seconds
-				retries: options.retries || Infinity, // Unlimited
+				delay: options.delay || 1000,
+
+				// 1 second
+				maxDelay: options.maxDelay || 5000,
+
+				// 5 seconds
+				retries: options.retries || Infinity,
+
+				// Unlimited
 				settings: {
 					auth: options.auth,
 					timeout: options.timeout,
 				},
+				// Options: reconnect, delay, maxDelay
+				wait: 0,
 			};
 		} else {
 			this._reconnection = null;
@@ -183,11 +189,11 @@ export class Client {
 		}
 
 		const request = {
-			type: "request",
+			headers: options.headers,
 			method: "POST",
 			path: options.path,
-			headers: options.headers,
 			payload: options.payload,
+			type: "request",
 		};
 
 		return this._send(request, true);
@@ -228,8 +234,8 @@ export class Client {
 				explanation: errorCodes[event.code] || "Unknown",
 				reason: event.reason,
 				wasClean: event.wasClean,
-				willReconnect: this._willReconnect(),
 				wasRequested,
+				willReconnect: this._willReconnect(),
 			};
 
 			this.onDisconnect(log.willReconnect, log);
@@ -259,7 +265,7 @@ export class Client {
 
 		const timeout = options.timeout ? setTimeout(timeoutHandler, options.timeout) : null;
 
-		ws.onopen = () => {
+		ws.addEventListener("open", () => {
 			if (timeout) {
 				clearTimeout(timeout);
 			}
@@ -270,12 +276,12 @@ export class Client {
 					this.onConnect();
 					finalize(undefined);
 				})
-				.catch((err) => {
-					this._disconnect(() => nextTick(finalize)(err), true); // Stop reconnection when the hello message returns error
+				.catch((error) => {
+					this._disconnect(() => nextTick(finalize)(error), true); // Stop reconnection when the hello message returns error
 				});
-		};
+		});
 
-		ws.onerror = (event) => {
+		ws.addEventListener("error", (event) => {
 			/* istanbul ignore next */
 			if (timeout) {
 				clearTimeout(timeout);
@@ -288,13 +294,11 @@ export class Client {
 			this._cleanup();
 			const error = NesError("Socket error", errorTypes.WS);
 			return finalize(error);
-		};
+		});
 
-		ws.onclose = reconnect;
+		ws.addEventListener("close", reconnect);
 
-		ws.onmessage = (message) => {
-			return this._onMessage(message);
-		};
+		ws.onmessage = (message) => this._onMessage(message);
 
 		ws.on("ping", () => this._disconnect(() => {}, true, true));
 		ws.on("pong", () => this._disconnect(() => {}, true, true));
@@ -337,7 +341,7 @@ export class Client {
 
 			ws.onopen = null;
 			ws.onclose = null;
-			ws.onerror = ignore;
+			ws.addEventListener("error", ignore);
 			ws.onmessage = null;
 		}
 
@@ -353,8 +357,7 @@ export class Client {
 		const requests = this._requests;
 		this._requests = {};
 		const ids = Object.keys(requests);
-		for (let i = 0; i < ids.length; ++i) {
-			const id = ids[i];
+		for (const id of ids) {
 			const request = requests[id];
 			clearTimeout(request.timeout);
 			request.reject(error);
@@ -405,8 +408,8 @@ export class Client {
 		let encoded;
 		try {
 			encoded = stringifyNesMessage(request);
-		} catch (err) {
-			return Promise.reject(err);
+		} catch (error) {
+			return Promise.reject(error);
 		}
 
 		// Ignore errors
@@ -415,16 +418,16 @@ export class Client {
 			try {
 				this._ws.send(encoded);
 				return Promise.resolve();
-			} catch (err) {
-				return Promise.reject(NesError(err, errorTypes.WS));
+			} catch (error) {
+				return Promise.reject(NesError(error, errorTypes.WS));
 			}
 		}
 
 		// Track errors
 
 		const record: { resolve: any; reject: any; timeout: any } = {
-			resolve: null,
 			reject: null,
+			resolve: null,
 			timeout: null,
 		};
 
@@ -446,10 +449,10 @@ export class Client {
 
 		try {
 			this._ws.send(encoded);
-		} catch (err) {
+		} catch (error) {
 			clearTimeout(this._requests[request.id].timeout);
 			delete this._requests[request.id];
-			return Promise.reject(NesError(err, errorTypes.WS));
+			return Promise.reject(NesError(error, errorTypes.WS));
 		}
 
 		return promise;
@@ -477,8 +480,8 @@ export class Client {
 				return this.onError(NesError("Received message is not a Buffer", errorTypes.PROTOCOL));
 			}
 			update = parseNesMessage(message.data);
-		} catch (err) {
-			return this.onError(NesError(err, errorTypes.PROTOCOL));
+		} catch (error_) {
+			return this.onError(NesError(error_, errorTypes.PROTOCOL));
 		}
 
 		// Recreate error
@@ -530,7 +533,7 @@ export class Client {
 		// Response
 
 		if (update.type === "request") {
-			return next(error, { payload: update.payload, statusCode: update.statusCode, headers: update.headers });
+			return next(error, { headers: update.headers, payload: update.payload, statusCode: update.statusCode });
 		}
 
 		// Authentication

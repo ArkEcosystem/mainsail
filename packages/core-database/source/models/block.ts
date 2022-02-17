@@ -10,9 +10,9 @@ import { transformBigInt } from "../utils/transform";
 @Index(["generatorPublicKey"])
 export class Block implements Contracts.Database.BlockModel {
 	@Column({
+		length: 64,
 		primary: true,
 		type: "varchar",
-		length: 64,
 	})
 	public id!: string;
 
@@ -22,78 +22,78 @@ export class Block implements Contracts.Database.BlockModel {
 	public version!: number;
 
 	@Column({
-		type: "integer",
 		nullable: false,
+		type: "integer",
 		unique: true,
 	})
 	public timestamp!: number;
 
 	@Column({
+		default: undefined,
+		length: 64,
 		type: "varchar",
 		unique: true,
-		length: 64,
-		default: undefined,
 	})
 	public previousBlock!: string;
 
 	@Column({
-		type: "integer",
 		nullable: false,
+		type: "integer",
 		unique: true,
 	})
 	public height!: number;
 
 	@Column({
-		type: "integer",
 		nullable: false,
+		type: "integer",
 	})
 	public numberOfTransactions!: number;
 
 	@Column({
-		type: "bigint",
 		nullable: false,
 		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public totalAmount!: Utils.BigNumber;
 
 	@Column({
-		type: "bigint",
 		nullable: false,
 		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public totalFee!: Utils.BigNumber;
 
 	@Column({
-		type: "bigint",
 		nullable: false,
 		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public reward!: Utils.BigNumber;
 
 	@Column({
-		type: "integer",
 		nullable: false,
+		type: "integer",
 	})
 	public payloadLength!: number;
 
 	@Column({
-		type: "varchar",
 		length: 64,
 		nullable: false,
+		type: "varchar",
 	})
 	public payloadHash!: string;
 
 	@Column({
-		type: "varchar",
 		length: 66,
 		nullable: false,
+		type: "varchar",
 	})
 	public generatorPublicKey!: string;
 
 	@Column({
-		type: "varchar",
 		length: 256,
 		nullable: false,
+		type: "varchar",
 	})
 	public blockSignature!: string;
 }

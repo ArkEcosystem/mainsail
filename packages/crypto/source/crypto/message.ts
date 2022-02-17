@@ -10,9 +10,9 @@ export class Message {
 		const keys: IKeyPair = Keys.fromPassphrase(passphrase);
 
 		return {
+			message,
 			publicKey: keys.publicKey,
 			signature: Hash.signECDSA(this.createHash(message), keys),
-			message,
 		};
 	}
 
@@ -24,9 +24,9 @@ export class Message {
 		const keys: IKeyPair = Keys.fromWIF(wif, network);
 
 		return {
+			message,
 			publicKey: keys.publicKey,
 			signature: Hash.signECDSA(this.createHash(message), keys),
-			message,
 		};
 	}
 

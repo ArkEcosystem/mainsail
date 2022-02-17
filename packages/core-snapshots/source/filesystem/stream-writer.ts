@@ -8,7 +8,7 @@ import { TransformEncoder } from "./transform-encoder";
 import { removeListeners } from "./utils";
 
 export class StreamWriter {
-	public count: number = 0;
+	public count = 0;
 
 	private writeStream?: Writable;
 
@@ -31,20 +31,19 @@ export class StreamWriter {
 			const eventListenerPairs = [] as StreamContracts.EventListenerPair[];
 
 			const onOpen = () => {
-				removeListeners(this.writeStream!, eventListenerPairs);
+				removeListeners(this.writeStream, eventListenerPairs);
 				resolve();
 			};
 
 			/* istanbul ignore next */
 			const onError = (err) => {
-				removeListeners(this.writeStream!, eventListenerPairs);
+				removeListeners(this.writeStream, eventListenerPairs);
 
 				this.destroyStreams();
 				reject(err);
 			};
 
-			eventListenerPairs.push({ event: "open", listener: onOpen });
-			eventListenerPairs.push({ event: "error", listener: onError });
+			eventListenerPairs.push({ event: "open", listener: onOpen }, { event: "error", listener: onError });
 
 			this.writeStream.once("open", onOpen);
 			this.writeStream.once("error", onError);
@@ -82,6 +81,6 @@ export class StreamWriter {
 
 	private destroyStreams(): void {
 		this.dbStream.destroy();
-		this.writeStream!.destroy();
+		this.writeStream.destroy();
 	}
 }

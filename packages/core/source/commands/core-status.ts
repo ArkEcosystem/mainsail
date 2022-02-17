@@ -3,9 +3,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "core:status";
+	public signature = "core:status";
 
-	public description: string = "Display the status of the Core process.";
+	public description = "Display the status of the Core process.";
 
 	public configure(): void {
 		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));

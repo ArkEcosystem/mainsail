@@ -50,7 +50,7 @@ export class PluginConfiguration {
 
 	public get<T>(key: string, defaultValue?: T): T | undefined {
 		if (typeof defaultValue !== "undefined") {
-			throw new Error(`DEPRECATED get(${key}, ${defaultValue}), use getOptional instead`);
+			throw new TypeError(`DEPRECATED get(${key}, ${defaultValue}), use getOptional instead`);
 		}
 
 		return get(this.items, key);
@@ -61,7 +61,7 @@ export class PluginConfiguration {
 			throw new Error(`Missing required ${key} configuration value`);
 		}
 
-		return get(this.items, key) as T;
+		return get(this.items, key);
 	}
 
 	public getOptional<T>(key: string, defaultValue: T): T {
@@ -69,7 +69,7 @@ export class PluginConfiguration {
 			return defaultValue;
 		}
 
-		return get(this.items, key) as T;
+		return get(this.items, key);
 	}
 
 	public set<T>(key: string, value: T): boolean {

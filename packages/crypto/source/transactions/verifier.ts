@@ -29,13 +29,13 @@ export class Verifier {
 		const { signatures }: ITransactionData = transaction;
 
 		const hash: Buffer = Utils.toHash(transaction, {
-			excludeSignature: true,
 			excludeMultiSignature: true,
+			excludeSignature: true,
 		});
 
 		const publicKeyIndexes: { [index: number]: boolean } = {};
-		let verified: boolean = false;
-		let verifiedSignatures: number = 0;
+		let verified = false;
+		let verifiedSignatures = 0;
 
 		if (signatures) {
 			for (let i = 0; i < signatures.length; i++) {

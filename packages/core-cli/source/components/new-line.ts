@@ -6,7 +6,7 @@ export class NewLine {
 	@inject(Identifiers.Logger)
 	private readonly logger!: Logger;
 
-	public render(count: number = 1): void {
+	public render(count = 1): void {
 		this.logger.log("\n".repeat(count));
 	}
 }

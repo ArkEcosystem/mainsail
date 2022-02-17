@@ -1,6 +1,5 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
-import { Crypto, Identities, Managers } from "@arkecosystem/crypto";
-import { Networks } from "@arkecosystem/crypto";
+import { Crypto, Identities, Managers, Networks } from "@arkecosystem/crypto";
 import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
@@ -8,11 +7,11 @@ import wif from "wif";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "config:forger:bip38";
+	public signature = "config:forger:bip38";
 
-	public description: string = "Configure the forging delegate (BIP38).";
+	public description = "Configure the forging delegate (BIP38).";
 
-	public isHidden: boolean = true;
+	public isHidden = true;
 
 	public configure(): void {
 		this.definition
@@ -30,18 +29,18 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				type: "password",
-				name: "bip39",
 				message: "Please enter your delegate plain text passphrase. Referred to as BIP39.",
+				name: "bip39",
+				type: "password",
 				validate: /* istanbul ignore next */ (value) =>
 					!validateMnemonic(value) && !this.getFlag("skipValidation")
 						? "Failed to verify the given passphrase as BIP39 compliant."
 						: true,
 			},
 			{
-				type: "password",
-				name: "password",
 				message: "Please enter your custom password that encrypts the BIP39. Referred to as BIP38.",
+				name: "password",
+				type: "password",
 				validate: /* istanbul ignore next */ (value) =>
 					typeof value !== "string" ? "The BIP38 password has to be a string." : true,
 			},
@@ -49,9 +48,9 @@ export class Command extends Commands.Command {
 
 		await this.components.prompt([
 			{
-				type: "password",
-				name: "passwordConfirmation",
 				message: "Confirm custom password that encrypts the BIP39. Referred to as BIP38.",
+				name: "passwordConfirmation",
+				type: "password",
 				validate: /* istanbul ignore next */ (value) =>
 					value !== response.password ? "Confirm password does not match BIP38 password." : true,
 			},
@@ -73,28 +72,27 @@ export class Command extends Commands.Command {
 
 		await this.components.taskList([
 			{
-				title: "Validating passphrase is BIP39 compliant.",
 				task: () => {
 					if (!validateMnemonic(flags.bip39) && !flags.skipValidation) {
 						throw new Error(`Failed to verify the given passphrase as BIP39 compliant.`);
 					}
 				},
+				title: "Validating passphrase is BIP39 compliant.",
 			},
 			{
-				title: "Prepare crypto.",
 				task: () => {
 					Managers.configManager.setFromPreset(flags.network);
 				},
+				title: "Prepare crypto.",
 			},
 			{
-				title: "Loading private key.",
 				task: () => {
 					// @ts-ignore
 					decodedWIF = wif.decode(Identities.WIF.fromPassphrase(flags.bip39));
 				},
+				title: "Loading private key.",
 			},
 			{
-				title: "Encrypting BIP39 passphrase.",
 				task: () => {
 					const delegatesConfig = this.app.getCorePath("config", "delegates.json");
 
@@ -108,6 +106,7 @@ export class Command extends Commands.Command {
 
 					writeJSONSync(delegatesConfig, delegates);
 				},
+				title: "Encrypting BIP39 passphrase.",
 			},
 		]);
 	}

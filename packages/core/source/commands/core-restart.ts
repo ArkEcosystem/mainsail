@@ -3,9 +3,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "core:restart";
+	public signature = "core:restart";
 
-	public description: string = "Restart the Core process.";
+	public description = "Restart the Core process.";
 
 	public configure(): void {
 		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));

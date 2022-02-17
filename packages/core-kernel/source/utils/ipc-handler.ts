@@ -30,9 +30,9 @@ export class IpcHandler<T> {
 				try {
 					// @ts-ignore
 					const result = await this.handler[method](...message.args);
-					process.send!({ id: message.id, result });
+					process.send({ id: message.id, result });
 				} catch (error) {
-					process.send!({ id: message.id, error: error.message });
+					process.send({ error: error.message, id: message.id });
 				}
 			}
 		});

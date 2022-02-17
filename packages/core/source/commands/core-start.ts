@@ -7,9 +7,9 @@ import { buildBIP38 } from "../internal/crypto";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "core:start";
+	public signature = "core:start";
 
-	public description: string = "Start the Core process.";
+	public description = "Start the Core process.";
 
 	public configure(): void {
 		this.definition
@@ -38,9 +38,9 @@ export class Command extends Commands.Command {
 
 		await this.actions.daemonizeProcess(
 			{
+				args: `core:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 				name: `${flags.token}-core`,
 				script: resolve(__dirname, "../../bin/run"),
-				args: `core:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 			},
 			flags,
 		);

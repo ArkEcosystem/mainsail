@@ -3,9 +3,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "forger:log";
+	public signature = "forger:log";
 
-	public description: string = "Display the Forger process log.";
+	public description = "Display the Forger process log.";
 
 	public configure(): void {
 		this.definition

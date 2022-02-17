@@ -8,11 +8,11 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
-	public signature: string = "top";
+	public signature = "top";
 
-	public description: string = "List all Core daemons.";
+	public description = "List all Core daemons.";
 
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
 	public configure(): void {
 		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));

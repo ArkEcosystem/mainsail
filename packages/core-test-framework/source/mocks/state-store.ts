@@ -2,7 +2,7 @@ import { Stores } from "@arkecosystem/core-state";
 import { Interfaces } from "@arkecosystem/crypto";
 
 let mockBlock: Partial<Interfaces.IBlock> | undefined;
-let lastHeight: number = 0;
+let lastHeight = 0;
 
 export const setBlock = (block: Partial<Interfaces.IBlock> | undefined) => {
 	mockBlock = block;

@@ -11,17 +11,16 @@ type CachedResponse = {
 const generateCacheKey = (request: Hapi.Request): string =>
 	Crypto.HashAlgorithms.sha256(
 		JSON.stringify({
-			pathname: request.url.pathname,
+			method: request.method,
 			params: request.params || {},
+			pathname: request.url.pathname,
 			payload: request.payload || {},
 			query: request.query,
-			method: request.method,
 		}),
 	).toString("hex");
 
 export = {
 	name: "node-cache",
-	version: "1.0.0",
 	once: true,
 	async register(
 		server: Hapi.Server,
@@ -31,13 +30,12 @@ export = {
 			return;
 		}
 
-		const cache: NodeCache = new NodeCache({ stdTTL: options.stdTTL, checkperiod: options.checkperiod });
+		const cache: NodeCache = new NodeCache({ checkperiod: options.checkperiod, stdTTL: options.stdTTL });
 
 		// const lastModified = cached ? new Date(cached.stored) : new Date();
 		// return h.response(arg).header("Last-modified", lastModified.toUTCString());
 
 		server.ext({
-			type: "onPreHandler",
 			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				const cacheKey: string = generateCacheKey(request);
 				const cachedResponse: CachedResponse | undefined = cache.get(cacheKey);
@@ -54,10 +52,10 @@ export = {
 					return h.continue;
 				}
 			},
+			type: "onPreHandler",
 		});
 
 		server.ext({
-			type: "onPreResponse",
 			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				const cacheKey: string = generateCacheKey(request);
 
@@ -93,6 +91,8 @@ export = {
 
 				return h.continue;
 			},
+			type: "onPreResponse",
 		});
 	},
+	version: "1.0.0",
 };

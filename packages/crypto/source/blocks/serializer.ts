@@ -9,7 +9,7 @@ import { Block } from "./block";
 
 export class Serializer {
 	public static size(block: IBlock): number {
-		let size = this.headerSize(block.data) + block.data.blockSignature!.length / 2;
+		let size = this.headerSize(block.data) + block.data.blockSignature.length / 2;
 
 		for (const transaction of block.transactions) {
 			size += 4 /* tx length */ + transaction.serialized.length;
@@ -28,8 +28,8 @@ export class Serializer {
 			.append(serializedHeader)
 			.skip(transactions.length * 4);
 
-		for (let i = 0; i < transactions.length; i++) {
-			const serialized: Buffer = Utils.toBytes(transactions[i]);
+		for (const [i, transaction] of transactions.entries()) {
+			const serialized: Buffer = Utils.toBytes(transaction);
 			buff.writeUint32(serialized.length, serializedHeader.length + i * 4);
 			buff.append(serialized);
 		}

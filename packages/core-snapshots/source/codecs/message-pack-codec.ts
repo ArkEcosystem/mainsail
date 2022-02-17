@@ -24,16 +24,16 @@ export class MessagePackCodec implements Codec {
 			const blockCamelized = camelizeKeys(MessagePackCodec.removePrefix(block, "Block_"));
 
 			return Blocks.Serializer.serialize(blockCamelized, true);
-		} catch (err) {
-			throw new CodecException.BlockEncodeException(block.Block_id, err.message);
+		} catch (error) {
+			throw new CodecException.BlockEncodeException(block.Block_id, error.message);
 		}
 	}
 
 	public decodeBlock(buffer: Buffer): Models.Block {
 		try {
 			return Blocks.Deserializer.deserialize(buffer, false).data as Models.Block;
-		} catch (err) {
-			throw new CodecException.BlockDecodeException(undefined, err.message);
+		} catch (error) {
+			throw new CodecException.BlockDecodeException(undefined, error.message);
 		}
 	}
 
@@ -47,8 +47,8 @@ export class MessagePackCodec implements Codec {
 				transaction.Transaction_timestamp,
 				transaction.Transaction_serialized,
 			]);
-		} catch (err) {
-			throw new CodecException.TransactionEncodeException(transaction.Transaction_id, err.message);
+		} catch (error) {
+			throw new CodecException.TransactionEncodeException(transaction.Transaction_id, error.message);
 		}
 	}
 
@@ -65,27 +65,40 @@ export class MessagePackCodec implements Codec {
 
 			/* istanbul ignore next */
 			return {
-				id: id,
-				version: transaction.data.version!,
-				blockId: blockId,
-				blockHeight: blockHeight,
-				sequence: sequence,
-				timestamp: timestamp,
-				senderPublicKey: transaction.data.senderPublicKey!,
-				// @ts-ignore
-				recipientId: transaction.data.recipientId,
-				type: transaction.data.type,
-				vendorField: transaction.data.vendorField,
 				amount: transaction.data.amount,
+				blockHeight: blockHeight,
+				blockId: blockId,
+
 				fee: transaction.data.fee,
-				serialized: serialized,
-				typeGroup: transaction.data.typeGroup || 1,
+
+				id: id,
+
 				nonce: Utils.BigNumber.make(transaction.data.nonce || 0),
+
 				// @ts-ignore
 				asset: transaction.data.asset,
+
+				// @ts-ignore
+				recipientId: transaction.data.recipientId,
+
+				senderPublicKey: transaction.data.senderPublicKey,
+
+				sequence: sequence,
+
+				serialized: serialized,
+
+				version: transaction.data.version,
+
+				timestamp: timestamp,
+
+				type: transaction.data.type,
+
+				typeGroup: transaction.data.typeGroup || 1,
+
+				vendorField: transaction.data.vendorField,
 			};
-		} catch (err) {
-			throw new CodecException.TransactionDecodeException(transactionId as unknown as string, err.message);
+		} catch (error) {
+			throw new CodecException.TransactionDecodeException(transactionId as unknown as string, error.message);
 		}
 	}
 
@@ -94,8 +107,8 @@ export class MessagePackCodec implements Codec {
 			const roundCamelized = camelizeKeys(MessagePackCodec.removePrefix(round, "Round_"));
 
 			return encode([roundCamelized.publicKey, roundCamelized.balance, roundCamelized.round]);
-		} catch (err) {
-			throw new CodecException.RoundEncodeException(round.Round_round, err.message);
+		} catch (error) {
+			throw new CodecException.RoundEncodeException(round.Round_round, error.message);
 		}
 	}
 
@@ -104,12 +117,12 @@ export class MessagePackCodec implements Codec {
 			const [publicKey, balance, round] = decode(buffer);
 
 			return {
-				publicKey,
 				balance,
+				publicKey,
 				round,
 			};
-		} catch (err) {
-			throw new CodecException.RoundDecodeException(undefined, err.message);
+		} catch (error) {
+			throw new CodecException.RoundDecodeException(undefined, error.message);
 		}
 	}
 }

@@ -16,9 +16,9 @@ export class RestartRunningProcessWithPrompt {
 		if (this.processManager.isOnline(processName)) {
 			const { confirm } = await this.app.resolve(Prompt).render([
 				{
-					type: "confirm",
-					name: "confirm",
 					message: `Would you like to restart the ${processName} process?`,
+					name: "confirm",
+					type: "confirm",
 				},
 			]);
 

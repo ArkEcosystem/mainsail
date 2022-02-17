@@ -7,9 +7,9 @@ import { buildBIP38 } from "../internal/crypto";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "forger:start";
+	public signature = "forger:start";
 
-	public description: string = "Start the Forger process.";
+	public description = "Start the Forger process.";
 
 	public configure(): void {
 		this.definition
@@ -36,9 +36,9 @@ export class Command extends Commands.Command {
 
 		await this.actions.daemonizeProcess(
 			{
+				args: `forger:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 				name: `${flags.token}-forger`,
 				script: resolve(__dirname, "../../bin/run"),
-				args: `forger:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 			},
 			flags,
 		);

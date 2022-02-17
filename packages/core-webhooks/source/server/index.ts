@@ -8,8 +8,8 @@ import { Database } from "../database";
 import { Identifiers } from "../identifiers";
 import { Webhook } from "../interfaces";
 import { whitelist } from "./plugins/whitelist";
-import * as schema from "./schema";
-import * as utils from "./utils";
+import { destroy, show, store, update } from "./schema";
+import { respondWithResource } from "./utils";
 
 @Container.injectable()
 export class Server {
@@ -29,12 +29,12 @@ export class Server {
 		this.server.app.database = this.database;
 
 		this.server.ext({
-			type: "onPreHandler",
 			async method(request, h) {
 				request.headers["content-type"] = "application/json";
 
 				return h.continue;
 			},
+			type: "onPreHandler",
 		});
 
 		await this.registerPlugins(optionsServer);
@@ -77,20 +77,18 @@ export class Server {
 		delete options.whitelist;
 
 		return {
-			...{
-				router: {
-					stripTrailingSlash: true,
-				},
-				routes: {
-					payload: {
-						async failAction(request, h, err) {
-							return badData(err.message);
-						},
+			router: {
+				stripTrailingSlash: true,
+			},
+			routes: {
+				payload: {
+					async failAction(request, h, err) {
+						return badData(err.message);
 					},
-					validate: {
-						async failAction(request, h, err) {
-							return badData(err.message);
-						},
+				},
+				validate: {
+					async failAction(request, h, err) {
+						return badData(err.message);
 					},
 				},
 			},
@@ -100,67 +98,63 @@ export class Server {
 
 	private async registerPlugins(config: Types.JsonObject): Promise<void> {
 		await this.server.register({
-			plugin: whitelist,
 			options: {
 				whitelist: config.whitelist,
 			},
+			plugin: whitelist,
 		});
 	}
 
 	private registerRoutes(): void {
 		this.server.route({
-			method: "GET",
-			path: "/",
 			handler() {
 				return { data: "Hello World!" };
 			},
+			method: "GET",
+			path: "/",
 		});
 
 		this.server.route({
+			handler: (request) => ({
+				data: request.server.app.database.all().map((webhook) => {
+					webhook = { ...webhook };
+					delete webhook.token;
+					return webhook;
+				}),
+			}),
 			method: "GET",
 			path: "/api/webhooks",
-			handler: (request) => {
-				return {
-					data: request.server.app.database.all().map((webhook) => {
-						webhook = { ...webhook };
-						delete webhook.token;
-						return webhook;
-					}),
-				};
-			},
 		});
 
 		this.server.route({
-			method: "POST",
-			path: "/api/webhooks",
 			handler(request: any, h) {
 				const token: string = randomBytes(32).toString("hex");
 
 				return h
 					.response(
-						utils.respondWithResource({
+						respondWithResource({
 							...request.server.app.database.create({
 								...request.payload,
-								...{ token: token.substring(0, 32) },
+								token: token.substring(0, 32),
 							}),
-							...{ token },
+							token,
 						}),
 					)
 					.code(201);
 			},
+			method: "POST",
 			options: {
 				plugins: {
 					pagination: {
 						enabled: false,
 					},
 				},
-				validate: schema.store,
+				validate: store,
 			},
+			path: "/api/webhooks",
 		});
 
 		this.server.route({
-			method: "GET",
-			path: "/api/webhooks/{id}",
 			async handler(request) {
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -176,16 +170,16 @@ export class Server {
 
 				delete webhook.token;
 
-				return utils.respondWithResource(webhook);
+				return respondWithResource(webhook);
 			},
+			method: "GET",
 			options: {
-				validate: schema.show,
+				validate: show,
 			},
+			path: "/api/webhooks/{id}",
 		});
 
 		this.server.route({
-			method: "PUT",
-			path: "/api/webhooks/{id}",
 			handler: (request, h) => {
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -195,14 +189,14 @@ export class Server {
 
 				return h.response(undefined).code(204);
 			},
+			method: "PUT",
 			options: {
-				validate: schema.update,
+				validate: update,
 			},
+			path: "/api/webhooks/{id}",
 		});
 
 		this.server.route({
-			method: "DELETE",
-			path: "/api/webhooks/{id}",
 			handler: (request, h) => {
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -212,9 +206,11 @@ export class Server {
 
 				return h.response(undefined).code(204);
 			},
+			method: "DELETE",
 			options: {
-				validate: schema.destroy,
+				validate: destroy,
 			},
+			path: "/api/webhooks/{id}",
 		});
 	}
 }

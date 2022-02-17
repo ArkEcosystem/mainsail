@@ -28,10 +28,10 @@ export class Wallet implements Contracts.State.Wallet {
 		this.publicKey = publicKey;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: "publicKey",
-			value: publicKey,
 			previousValue,
+			publicKey: this.publicKey,
+			value: publicKey,
 			wallet: this,
 		});
 	}
@@ -46,10 +46,10 @@ export class Wallet implements Contracts.State.Wallet {
 		this.balance = balance;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: "balance",
-			value: balance,
 			previousValue,
+			publicKey: this.publicKey,
+			value: balance,
 			wallet: this,
 		});
 	}
@@ -64,10 +64,10 @@ export class Wallet implements Contracts.State.Wallet {
 		this.nonce = nonce;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: "nonce",
-			value: nonce,
 			previousValue,
+			publicKey: this.publicKey,
+			value: nonce,
 			wallet: this,
 		});
 	}
@@ -95,10 +95,10 @@ export class Wallet implements Contracts.State.Wallet {
 	public getData(): Contracts.State.WalletData {
 		return {
 			address: this.address,
-			publicKey: this.publicKey,
+			attributes: this.attributes,
 			balance: this.balance,
 			nonce: this.nonce,
-			attributes: this.attributes,
+			publicKey: this.publicKey,
 		};
 	}
 
@@ -114,8 +114,8 @@ export class Wallet implements Contracts.State.Wallet {
 		const wasSet = this.attributes.set<T>(key, value);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: key,
+			publicKey: this.publicKey,
 			value,
 			wallet: this,
 		});
@@ -129,9 +129,9 @@ export class Wallet implements Contracts.State.Wallet {
 		const wasSet = this.attributes.forget(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key,
 			previousValue: previousValue === na ? undefined : previousValue,
+			publicKey: this.publicKey,
 			wallet: this,
 		});
 

@@ -5,9 +5,9 @@ import { resolve } from "path";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "relay:start";
+	public signature = "relay:start";
 
-	public description: string = "Start the Relay process.";
+	public description = "Start the Relay process.";
 
 	public configure(): void {
 		this.definition
@@ -29,9 +29,9 @@ export class Command extends Commands.Command {
 
 		await this.actions.daemonizeProcess(
 			{
+				args: `relay:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 				name: `${flags.token}-relay`,
 				script: resolve(__dirname, "../../bin/run"),
-				args: `relay:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 			},
 			flags,
 		);

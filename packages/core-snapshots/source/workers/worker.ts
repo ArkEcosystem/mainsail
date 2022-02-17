@@ -5,12 +5,11 @@ import { Readable } from "stream";
 import { Connection, createConnection, getCustomRepository } from "typeorm";
 import { parentPort, workerData } from "worker_threads";
 
-import * as Codecs from "../codecs";
-import { StreamReader, StreamWriter } from "../codecs";
+import { JSONCodec, MessagePackCodec, StreamReader, StreamWriter } from "../codecs";
 import { Repository, Worker } from "../contracts";
 import { Identifiers } from "../ioc";
-import * as Repositories from "../repositories";
-import * as Actions from "./actions";
+import { BlockRepository, RoundRepository, TransactionRepository } from "../repositories";
+import { DumpWorkerAction, RestoreWorkerAction, TestWorkerAction, VerifyWorkerAction } from "./actions";
 import { Application } from "./application";
 
 let app: Application;
@@ -18,13 +17,12 @@ let action: Worker.WorkerAction;
 const _workerData: Worker.WorkerData = workerData;
 
 /* istanbul ignore next */
-const connect = async (options: any): Promise<Connection> => {
-	return createConnection({
+const connect = async (options: any): Promise<Connection> =>
+	createConnection({
 		...options.connection,
-		namingStrategy: new Utils.SnakeNamingStrategy(),
 		entities: [Models.Block, Models.Transaction, Models.Round],
+		namingStrategy: new Utils.SnakeNamingStrategy(),
 	});
-};
 
 export const init = async (): Promise<void> => {
 	Managers.configManager.setConfig(_workerData.networkConfig);
@@ -48,12 +46,12 @@ export const init = async (): Promise<void> => {
 	/* istanbul ignore next */
 	app.bind(Identifiers.SnapshotRepositoryFactory).toFactory<Repository>(() => (table: string) => {
 		if (table === "blocks") {
-			return getCustomRepository(Repositories.BlockRepository);
+			return getCustomRepository(BlockRepository);
 		}
 		if (table === "transactions") {
-			return getCustomRepository(Repositories.TransactionRepository);
+			return getCustomRepository(TransactionRepository);
 		}
-		return getCustomRepository(Repositories.RoundRepository);
+		return getCustomRepository(RoundRepository);
 	});
 
 	/* istanbul ignore next */
@@ -69,33 +67,33 @@ export const init = async (): Promise<void> => {
 	);
 
 	app.bind(Identifiers.SnapshotCodec)
-		.to(Codecs.MessagePackCodec)
+		.to(MessagePackCodec)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("codec", "default"));
 
 	app.bind(Identifiers.SnapshotCodec)
-		.to(Codecs.JSONCodec)
+		.to(JSONCodec)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("codec", "json"));
 
 	app.bind(Identifiers.SnapshotAction)
-		.to(Actions.DumpWorkerAction)
+		.to(DumpWorkerAction)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("action", "dump"));
 
 	app.bind(Identifiers.SnapshotAction)
-		.to(Actions.RestoreWorkerAction)
+		.to(RestoreWorkerAction)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("action", "restore"));
 
 	app.bind(Identifiers.SnapshotAction)
-		.to(Actions.VerifyWorkerAction)
+		.to(VerifyWorkerAction)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("action", "verify"));
 
 	// For testing purposes only
 	app.bind(Identifiers.SnapshotAction)
-		.to(Actions.TestWorkerAction)
+		.to(TestWorkerAction)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("action", "test"));
 
@@ -131,7 +129,7 @@ parentPort?.on("message", async (data: { action: string; data: Worker.WorkerSync
 
 /* istanbul ignore next */
 const handleException = (err: any) => {
-	parentPort!.postMessage({
+	parentPort.postMessage({
 		action: "exception",
 		data: err,
 	});

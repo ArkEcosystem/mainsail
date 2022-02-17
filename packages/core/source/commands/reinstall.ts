@@ -9,11 +9,11 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
-	public signature: string = "reinstall";
+	public signature = "reinstall";
 
-	public description: string = "Reinstall the Core installation";
+	public description = "Reinstall the Core installation";
 
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
 	public configure(): void {
 		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean());

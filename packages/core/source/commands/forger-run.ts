@@ -6,9 +6,9 @@ import { buildBIP38 } from "../internal/crypto";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "forger:run";
+	public signature = "forger:run";
 
-	public description: string = "Run the Forger process in foreground. Exiting the process will stop it from running.";
+	public description = "Run the Forger process in foreground. Exiting the process will stop it from running.";
 
 	public configure(): void {
 		this.definition

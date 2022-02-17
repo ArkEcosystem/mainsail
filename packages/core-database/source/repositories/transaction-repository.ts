@@ -25,11 +25,11 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 		}>
 	> {
 		return this.find({
+			order: { sequence: "ASC" },
 			select: ["id", "blockId", "serialized"],
 			where: {
 				blockId: In(blockIds),
 			},
-			order: { sequence: "ASC" },
 		});
 	}
 
@@ -111,12 +111,12 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 				.getRawOne();
 			feeStatistics.push(
 				feeStatsForType ?? {
+					avg: 0,
+					max: 0,
+					min: 0,
+					sum: 0,
 					type: feeStatsByType.type,
 					typeGroup: feeStatsByType.typeGroup,
-					avg: 0,
-					min: 0,
-					max: 0,
-					sum: 0,
 				},
 			);
 		}
@@ -171,8 +171,8 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 			.take(limit)
 			.getRawMany();
 
-		return transactions.map((transaction) => {
-			return this.rawToEntity(
+		return transactions.map((transaction) =>
+			this.rawToEntity(
 				transaction,
 				// @ts-ignore
 				(entity: any, key: string, value: number | string) => {
@@ -182,7 +182,7 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 						entity[key] = value;
 					}
 				},
-			);
-		}) as any;
+			),
+		) as any;
 	}
 }

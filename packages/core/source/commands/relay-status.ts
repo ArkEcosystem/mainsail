@@ -3,9 +3,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "relay:status";
+	public signature = "relay:status";
 
-	public description: string = "Display the Relay process status.";
+	public description = "Display the Relay process status.";
 
 	public configure(): void {
 		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));

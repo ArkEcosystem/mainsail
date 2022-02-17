@@ -7,8 +7,8 @@ export const register = (server: Hapi.Server): void => {
 	server.bind(controller);
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.index(request),
 		method: "GET",
 		path: "/blockchain",
-		handler: (request: Hapi.Request) => controller.index(request),
 	});
 };

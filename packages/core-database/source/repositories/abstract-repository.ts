@@ -70,13 +70,13 @@ export abstract class AbstractRepository<TEntity extends ObjectLiteral> extends 
 
 					await queryRunner.commitTransaction();
 
-					return { results, totalCount, meta: { totalCountIsEstimate: false } };
+					return { meta: { totalCountIsEstimate: false }, results, totalCount };
 				} else {
 					let totalCountEstimated = 0;
 					const [resultsSql, resultsParameters] = resultsQueryBuilder.getQueryAndParameters();
 					const resultsExplainedRows = await queryRunner.query(`EXPLAIN ${resultsSql}`, resultsParameters);
 					for (const resultsExplainedRow of resultsExplainedRows) {
-						const match = resultsExplainedRow["QUERY PLAN"].match(/rows=([0-9]+)/);
+						const match = resultsExplainedRow["QUERY PLAN"].match(/rows=(\d+)/);
 						if (match) {
 							totalCountEstimated = parseFloat(match[1]);
 						}
@@ -86,7 +86,7 @@ export abstract class AbstractRepository<TEntity extends ObjectLiteral> extends 
 
 					await queryRunner.commitTransaction();
 
-					return { results, totalCount, meta: { totalCountIsEstimate: true } };
+					return { meta: { totalCountIsEstimate: true }, results, totalCount };
 				}
 			} catch (error) {
 				await queryRunner.rollbackTransaction();

@@ -2,7 +2,7 @@ import { Blockchain } from "@arkecosystem/core-blockchain";
 import { Interfaces } from "@arkecosystem/crypto";
 
 let mockBlock: Partial<Interfaces.IBlock> | undefined;
-let mockIsSynced: boolean = true;
+let mockIsSynced = true;
 
 export const setBlock = (block: Partial<Interfaces.IBlock> | undefined) => {
 	mockBlock = block;

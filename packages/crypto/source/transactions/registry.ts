@@ -37,7 +37,7 @@ class TransactionRegistry {
 		const { typeGroup, type } = constructor;
 
 		if (typeof type === "undefined" || typeof typeGroup === "undefined") {
-			throw new Error();
+			throw new TypeError();
 		}
 
 		const internalType: InternalTransactionType = InternalTransactionType.from(type, typeGroup);
@@ -46,9 +46,9 @@ class TransactionRegistry {
 				const first = [...registeredConstructors.values()][0];
 				if (
 					first.key === constructor.key &&
-					InternalTransactionType.from(first.type!, first.typeGroup) !== internalType
+					InternalTransactionType.from(first.type, first.typeGroup) !== internalType
 				) {
-					throw new TransactionKeyAlreadyRegisteredError(first.key!);
+					throw new TransactionKeyAlreadyRegisteredError(first.key);
 				}
 
 				for (const registeredConstructor of registeredConstructors.values()) {
@@ -73,7 +73,7 @@ class TransactionRegistry {
 		const { typeGroup, type, version } = constructor;
 
 		if (typeof type === "undefined" || typeof typeGroup === "undefined") {
-			throw new Error();
+			throw new TypeError();
 		}
 
 		const internalType: InternalTransactionType = InternalTransactionType.from(type, typeGroup);

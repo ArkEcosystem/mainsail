@@ -1,14 +1,14 @@
 import { Commands, Container } from "@arkecosystem/core-cli";
 import { Networks } from "@arkecosystem/crypto";
-import Joi from "joi";
 import { parseFileSync } from "envfile";
 import { existsSync } from "fs-extra";
+import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "env:list";
+	public signature = "env:list";
 
-	public description: string = "List all environment variables.";
+	public description = "List all environment variables.";
 
 	public configure(): void {
 		this.definition

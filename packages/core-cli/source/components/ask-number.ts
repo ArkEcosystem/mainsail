@@ -9,11 +9,9 @@ export class AskNumber {
 
 	public async render(message: string, opts: object = {}): Promise<number> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
-			...{
-				type: "number",
-				name: "value",
-				message,
-			},
+			message,
+			name: "value",
+			type: "number",
 			...opts,
 		});
 

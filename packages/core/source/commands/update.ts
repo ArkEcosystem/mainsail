@@ -7,9 +7,9 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Updater)
 	private readonly updater!: Contracts.Updater;
 
-	public signature: string = "update";
+	public signature = "update";
 
-	public description: string = "Update the Core installation.";
+	public description = "Update the Core installation.";
 
 	public configure(): void {
 		this.definition
@@ -30,20 +30,20 @@ export class Command extends Commands.Command {
 
 			if (this.hasRestartFlag()) {
 				if (this.hasFlag("restart")) {
-					await this.actions.restartRunningProcess(`${this.getFlag("token")}-core`);
-					await this.actions.restartRunningProcess(`${this.getFlag("token")}-relay`);
-					await this.actions.restartRunningProcess(`${this.getFlag("token")}-forger`);
+					this.actions.restartRunningProcess(`${this.getFlag("token")}-core`);
+					this.actions.restartRunningProcess(`${this.getFlag("token")}-relay`);
+					this.actions.restartRunningProcess(`${this.getFlag("token")}-forger`);
 				} else {
 					if (this.hasFlag("restartCore")) {
-						await this.actions.restartRunningProcess(`${this.getFlag("token")}-core`);
+						this.actions.restartRunningProcess(`${this.getFlag("token")}-core`);
 					}
 
 					if (this.hasFlag("restartRelay")) {
-						await this.actions.restartRunningProcess(`${this.getFlag("token")}-relay`);
+						this.actions.restartRunningProcess(`${this.getFlag("token")}-relay`);
 					}
 
 					if (this.hasFlag("restartForger")) {
-						await this.actions.restartRunningProcess(`${this.getFlag("token")}-forger`);
+						this.actions.restartRunningProcess(`${this.getFlag("token")}-forger`);
 					}
 				}
 			} else if (!this.getFlag("force")) {

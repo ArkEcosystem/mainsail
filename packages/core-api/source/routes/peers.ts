@@ -2,36 +2,35 @@ import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 import { PeersController } from "../controllers/peers";
-import * as Schemas from "../schemas";
+import { pagination } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(PeersController);
 	server.bind(controller);
 
 	server.route({
-		method: "GET",
-		path: "/peers",
 		handler: (request: Hapi.Request) => controller.index(request),
+		method: "GET",
 		options: {
-			validate: {
-				query: Joi.object({
-					ip: Joi.string().ip({ version: ["ipv4", "ipV6"] }),
-					version: Joi.string(),
-					orderBy: server.app.schemas.orderBy,
-				}).concat(Schemas.pagination),
-			},
 			plugins: {
 				pagination: {
 					enabled: true,
 				},
 			},
+			validate: {
+				query: Joi.object({
+					ip: Joi.string().ip({ version: ["ipv4", "ipV6"] }),
+					orderBy: server.app.schemas.orderBy,
+					version: Joi.string(),
+				}).concat(pagination),
+			},
 		},
+		path: "/peers",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/peers/{ip}",
 		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
 		options: {
 			validate: {
 				params: Joi.object({
@@ -39,5 +38,6 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/peers/{ip}",
 	});
 };

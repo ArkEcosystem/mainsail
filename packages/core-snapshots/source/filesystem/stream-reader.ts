@@ -8,7 +8,7 @@ import { Stream as StreamExceptions } from "../exceptions";
 import { removeListeners } from "./utils";
 
 export class StreamReader {
-	public count: number = 0;
+	public count = 0;
 
 	private isEnd = false;
 	private readStream?: Readable;
@@ -38,19 +38,18 @@ export class StreamReader {
 			const eventListenerPairs = [] as StreamContracts.EventListenerPair[];
 
 			const onOpen = () => {
-				removeListeners(this.readStream!, eventListenerPairs);
+				removeListeners(this.readStream, eventListenerPairs);
 				resolve();
 			};
 
 			const onError = (err) => {
-				removeListeners(this.readStream!, eventListenerPairs);
+				removeListeners(this.readStream, eventListenerPairs);
 
 				this.destroyStreams();
 				reject(err);
 			};
 
-			eventListenerPairs.push({ event: "open", listener: onOpen });
-			eventListenerPairs.push({ event: "error", listener: onError });
+			eventListenerPairs.push({ event: "open", listener: onOpen }, { event: "error", listener: onError });
 
 			this.readStream.on("open", onOpen);
 			this.readStream.on("error", onError);
@@ -66,13 +65,13 @@ export class StreamReader {
 		let lengthChunk: ByteBuffer;
 		try {
 			lengthChunk = await this.read(4);
-		} catch (err) {
-			if (err instanceof StreamExceptions.EndOfFile) {
+		} catch (error) {
+			if (error instanceof StreamExceptions.EndOfFile) {
 				this.isEnd = true;
 				return null;
 			}
 
-			throw err;
+			throw error;
 		}
 
 		const length = lengthChunk.readUint32();
@@ -111,34 +110,36 @@ export class StreamReader {
 			const eventListenerPairs = [] as StreamContracts.EventListenerPair[];
 
 			const onReadable = () => {
-				removeListeners(this.stream!, eventListenerPairs);
+				removeListeners(this.stream, eventListenerPairs);
 				resolve();
 			};
 
 			/* istanbul ignore next */
 			const onError = () => {
-				removeListeners(this.stream!, eventListenerPairs);
+				removeListeners(this.stream, eventListenerPairs);
 
 				this.destroyStreams();
 				reject(new Error("Error on stream"));
 			};
 
 			const onEnd = () => {
-				removeListeners(this.stream!, eventListenerPairs);
+				removeListeners(this.stream, eventListenerPairs);
 
 				this.destroyStreams();
 				reject(new StreamExceptions.EndOfFile(this.path));
 			};
 
-			eventListenerPairs.push({ event: "readable", listener: onReadable });
-			eventListenerPairs.push({ event: "error", listener: onError });
-			eventListenerPairs.push({ event: "end", listener: onEnd });
+			eventListenerPairs.push(
+				{ event: "readable", listener: onReadable },
+				{ event: "error", listener: onError },
+				{ event: "end", listener: onEnd },
+			);
 
-			this.stream!.once("readable", onReadable);
+			this.stream.once("readable", onReadable);
 
-			this.stream!.once("error", onError);
+			this.stream.once("error", onError);
 
-			this.stream!.once("end", onEnd);
+			this.stream.once("end", onEnd);
 		});
 	}
 

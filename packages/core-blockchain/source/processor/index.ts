@@ -1,1 +1,1 @@
-export * from "../processor/block-processor";
+export * from "./block-processor";

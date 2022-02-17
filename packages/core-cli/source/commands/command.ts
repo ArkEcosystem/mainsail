@@ -41,9 +41,9 @@ export abstract class Command {
 
 	public description: string | undefined;
 
-	public isHidden: boolean = false;
+	public isHidden = false;
 
-	public requiresNetwork: boolean = true;
+	public requiresNetwork = true;
 
 	protected definition: InputDefinition = new InputDefinition();
 

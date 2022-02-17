@@ -2,13 +2,6 @@ import { Container, Contracts } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 export const responseHeaders = {
-	name: "response-headers",
-	version: "1.0.0",
-
-	register(server: Hapi.Server): void {
-		server.ext("onPreResponse", this.getOnPreResponseHandler(server.app.app));
-	},
-
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
 		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
 			const blockHeight = app
@@ -22,4 +15,11 @@ export const responseHeaders = {
 			return h.continue;
 		};
 	},
+	name: "response-headers",
+
+	register(server: Hapi.Server): void {
+		server.ext("onPreResponse", this.getOnPreResponseHandler(server.app.app));
+	},
+
+	version: "1.0.0",
 };

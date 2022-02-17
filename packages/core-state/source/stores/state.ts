@@ -20,14 +20,14 @@ export class StateStore implements Contracts.State.StateStore {
 	private blockchain: any = {};
 	private genesisBlock?: Interfaces.IBlock;
 	private lastDownloadedBlock?: Interfaces.IBlockData;
-	private lastStoredBlockHeight: number = 1;
+	private lastStoredBlockHeight = 1;
 	private blockPing?: Contracts.State.BlockPing;
 	private started = false;
 	private forkedBlock?: Interfaces.IBlock;
 	private wakeUpTimeout?: NodeJS.Timeout;
-	private noBlockCounter: number = 0;
-	private p2pUpdateCounter: number = 0;
-	private numberOfBlocksToRollback: number = 0;
+	private noBlockCounter = 0;
+	private p2pUpdateCounter = 0;
+	private numberOfBlocksToRollback = 0;
 	private networkStart = false;
 	private restoredDatabaseIntegrity = false;
 
@@ -299,7 +299,7 @@ export class StateStore implements Contracts.State.StateStore {
 
 		if (this.blockPing.block.height === incomingBlock.height && this.blockPing.block.id === incomingBlock.id) {
 			this.blockPing.count++;
-			this.blockPing.last = new Date().getTime();
+			this.blockPing.last = Date.now();
 
 			return true;
 		}
@@ -317,11 +317,11 @@ export class StateStore implements Contracts.State.StateStore {
 		}
 
 		this.blockPing = {
-			count: fromForger ? 0 : 1,
-			first: new Date().getTime(),
-			last: new Date().getTime(),
-			fromForger: fromForger,
 			block,
+			count: fromForger ? 0 : 1,
+			first: Date.now(),
+			fromForger: fromForger,
+			last: Date.now(),
 		};
 	}
 

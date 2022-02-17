@@ -17,7 +17,7 @@ export class Input {
 
 	public flags: InputValues = {};
 
-	public interactive: boolean = true;
+	public interactive = true;
 
 	private definition!: InputDefinition;
 
@@ -38,8 +38,8 @@ export class Input {
 		const keys: string[] = Object.keys(this.definition.getArguments());
 		const values: string[] = [...this.rawArgs].slice(1);
 
-		for (let i = 0; i < keys.length; i++) {
-			this.args[keys[i]] = values[i];
+		for (const [i, key] of keys.entries()) {
+			this.args[key] = values[i];
 		}
 
 		this.flags = this.rawFlags;

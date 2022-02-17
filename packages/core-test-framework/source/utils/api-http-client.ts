@@ -45,7 +45,7 @@ export class ApiHttpClient {
 
 	private getResponse(response: Utils.HttpResponse): ApiResponse {
 		if (typeof response.statusCode === "undefined") {
-			throw new Error(`Invalid response status ${response.statusCode}`);
+			throw new TypeError(`Invalid response status ${response.statusCode}`);
 		}
 
 		if (response.headers.length % 2 !== 0) {
@@ -59,9 +59,9 @@ export class ApiHttpClient {
 		}
 
 		return {
-			status: response.statusCode,
-			headers: responseHeaders,
 			body: response.data,
+			headers: responseHeaders,
+			status: response.statusCode,
 		};
 	}
 }

@@ -7,35 +7,34 @@ import { whitelist } from "./whitelist";
 
 export const preparePlugins = (config) => [
 	{
-		plugin: whitelist,
 		options: {
-			whitelist: config.whitelist,
 			trustProxy: config.trustProxy,
+			whitelist: config.whitelist,
 		},
+		plugin: whitelist,
 	},
 	{ plugin: hapiAjv },
 	{
-		plugin: log,
 		options: {
 			...config.log,
 			trustProxy: config.trustProxy,
 		},
+		plugin: log,
 	},
 	{ plugin: commaArrayQuery },
 	{ plugin: dotSeparatedQuery },
 	{
-		plugin: require("./cache"),
 		options: config.cache,
+		plugin: require("./cache"),
 	},
 	{
-		plugin: require("./rate-limit"),
 		options: {
 			...config.rateLimit,
 			trustProxy: config.trustProxy,
 		},
+		plugin: require("./rate-limit"),
 	},
 	{
-		plugin: require("./pagination"),
 		options: {
 			query: {
 				limit: {
@@ -43,6 +42,7 @@ export const preparePlugins = (config) => [
 				},
 			},
 		},
+		plugin: require("./pagination"),
 	},
 	{ plugin: responseHeaders },
 ];

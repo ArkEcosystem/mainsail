@@ -26,10 +26,10 @@ export class ConfigManager {
 
 	public setConfig(config: NetworkConfig): void {
 		this.config = {
-			network: config.network,
 			exceptions: config.exceptions,
-			milestones: config.milestones,
 			genesisBlock: config.genesisBlock,
+			milestones: config.milestones,
+			network: config.network,
 		};
 
 		this.validateMilestones();
@@ -120,17 +120,17 @@ export class ConfigManager {
 				milestone.height > previousMilestone
 			) {
 				return {
+					data: milestone[key],
 					found: true,
 					height: milestone.height,
-					data: milestone[key],
 				};
 			}
 		}
 
 		return {
+			data: null,
 			found: false,
 			height: previousMilestone,
-			data: null,
 		};
 	}
 
@@ -145,8 +145,8 @@ export class ConfigManager {
 
 		this.milestones = this.config.milestones.sort((a, b) => a.height - b.height);
 		this.milestone = {
-			index: 0,
 			data: this.milestones[0],
+			index: 0,
 		};
 
 		let lastMerged = 0;

@@ -3,9 +3,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "forger:restart";
+	public signature = "forger:restart";
 
-	public description: string = "Restart the Forger process.";
+	public description = "Restart the Forger process.";
 
 	public configure(): void {
 		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));

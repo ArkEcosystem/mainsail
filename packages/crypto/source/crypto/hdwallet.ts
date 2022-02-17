@@ -25,9 +25,9 @@ export class HDWallet {
 		}
 
 		return {
-			publicKey: node.publicKey.toString("hex"),
-			privateKey: node.privateKey.toString("hex"),
 			compressed: true,
+			privateKey: node.privateKey.toString("hex"),
+			publicKey: node.publicKey.toString("hex"),
 		};
 	}
 

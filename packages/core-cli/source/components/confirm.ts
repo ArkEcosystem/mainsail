@@ -9,11 +9,9 @@ export class Confirm {
 
 	public async render(message: string, opts: object = {}): Promise<boolean> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
-			...{
-				type: "confirm",
-				name: "value",
-				message,
-			},
+			message,
+			name: "value",
+			type: "confirm",
 			...opts,
 		});
 

@@ -1,111 +1,53 @@
 import { Machine } from "xstate";
 
 export const blockchainMachine: any = Machine({
-	key: "blockchain",
 	initial: "uninitialised",
+	key: "blockchain",
 	states: {
-		uninitialised: {
-			on: {
-				START: "init",
-				STOP: "stopped",
-			},
+		exit: {
+			onEntry: ["exitApp"],
 		},
-		init: {
-			onEntry: ["init"],
+		fork: {
 			on: {
-				NETWORKSTART: "idle",
-				STARTED: "syncWithNetwork",
-				ROLLBACK: "rollback",
 				FAILURE: "exit",
 				STOP: "stopped",
+				SUCCESS: "syncWithNetwork",
 			},
-		},
-		syncWithNetwork: {
-			initial: "syncing",
-			states: {
-				syncing: {
-					onEntry: ["checkLastDownloadedBlockSynced"],
-					on: {
-						SYNCED: "downloadFinished",
-						NOTSYNCED: "downloadBlocks",
-						PAUSED: "downloadPaused",
-						NETWORKHALTED: "end",
-					},
-				},
-				idle: {
-					on: {
-						DOWNLOADED: "downloadBlocks",
-					},
-				},
-				downloadBlocks: {
-					onEntry: ["downloadBlocks"],
-					on: {
-						DOWNLOADED: "syncing",
-						NOBLOCK: "syncing",
-						PROCESSFINISHED: "downloadFinished",
-					},
-				},
-				downloadFinished: {
-					onEntry: ["downloadFinished"],
-					on: {
-						PROCESSFINISHED: "processFinished",
-					},
-				},
-				downloadPaused: {
-					onEntry: ["downloadPaused"],
-					on: {
-						PROCESSFINISHED: "processFinished",
-					},
-				},
-				processFinished: {
-					onEntry: ["checkLastBlockSynced"],
-					on: {
-						SYNCED: "end",
-						NOTSYNCED: "downloadBlocks",
-					},
-				},
-				end: {
-					onEntry: ["syncingComplete"],
-				},
-			},
-			on: {
-				TEST: "idle",
-				SYNCFINISHED: "idle",
-				FORK: "fork",
-				STOP: "stopped",
-			},
+			onEntry: ["startForkRecovery"],
 		},
 		idle: {
-			onEntry: ["checkLater", "blockchainReady"],
 			on: {
-				WAKEUP: "syncWithNetwork",
+				FORK: "fork",
 				NEWBLOCK: "newBlock",
 				STOP: "stopped",
-				FORK: "fork",
+				WAKEUP: "syncWithNetwork",
 			},
+			onEntry: ["checkLater", "blockchainReady"],
+		},
+		init: {
+			on: {
+				FAILURE: "exit",
+				NETWORKSTART: "idle",
+				ROLLBACK: "rollback",
+				STARTED: "syncWithNetwork",
+				STOP: "stopped",
+			},
+			onEntry: ["init"],
 		},
 		newBlock: {
 			on: {
-				PROCESSFINISHED: "idle",
 				FORK: "fork",
-				STOP: "stopped",
-			},
-		},
-		fork: {
-			onEntry: ["startForkRecovery"],
-			on: {
-				SUCCESS: "syncWithNetwork",
-				FAILURE: "exit",
+				PROCESSFINISHED: "idle",
 				STOP: "stopped",
 			},
 		},
 		rollback: {
-			onEntry: ["rollbackDatabase"],
 			on: {
-				SUCCESS: "init",
 				FAILURE: "exit",
 				STOP: "stopped",
+				SUCCESS: "init",
 			},
+			onEntry: ["rollbackDatabase"],
 		},
 		/**
 		 * This state should be used for stopping the blockchain on purpose, not as
@@ -115,8 +57,68 @@ export const blockchainMachine: any = Machine({
 		stopped: {
 			onEntry: ["stopped"],
 		},
-		exit: {
-			onEntry: ["exitApp"],
+
+		syncWithNetwork: {
+			initial: "syncing",
+			on: {
+				SYNCFINISHED: "idle",
+				FORK: "fork",
+				TEST: "idle",
+				STOP: "stopped",
+			},
+			states: {
+				idle: {
+					on: {
+						DOWNLOADED: "downloadBlocks",
+					},
+				},
+				downloadBlocks: {
+					on: {
+						DOWNLOADED: "syncing",
+						NOBLOCK: "syncing",
+						PROCESSFINISHED: "downloadFinished",
+					},
+					onEntry: ["downloadBlocks"],
+				},
+				syncing: {
+					onEntry: ["checkLastDownloadedBlockSynced"],
+					on: {
+						SYNCED: "downloadFinished",
+						NOTSYNCED: "downloadBlocks",
+						PAUSED: "downloadPaused",
+						NETWORKHALTED: "end",
+					},
+				},
+				downloadFinished: {
+					on: {
+						PROCESSFINISHED: "processFinished",
+					},
+					onEntry: ["downloadFinished"],
+				},
+				downloadPaused: {
+					on: {
+						PROCESSFINISHED: "processFinished",
+					},
+					onEntry: ["downloadPaused"],
+				},
+				end: {
+					onEntry: ["syncingComplete"],
+				},
+				processFinished: {
+					on: {
+						SYNCED: "end",
+						NOTSYNCED: "downloadBlocks",
+					},
+					onEntry: ["checkLastBlockSynced"],
+				},
+			},
+		},
+
+		uninitialised: {
+			on: {
+				START: "init",
+				STOP: "stopped",
+			},
 		},
 	},
 });

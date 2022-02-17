@@ -14,9 +14,10 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 	switch (expression.op) {
 		case "and": {
 			const optimized = expression.expressions.map(optimizeExpression);
-			const flattened = optimized.reduce((acc, e) => {
-				return e.op === "and" ? [...acc, ...e.expressions] : [...acc, e];
-			}, [] as Expression<TEntity>[]);
+			const flattened = optimized.reduce(
+				(acc, e) => (e.op === "and" ? [...acc, ...e.expressions] : [...acc, e]),
+				[] as Expression<TEntity>[],
+			);
 
 			if (flattened.every((e) => e.op === "true")) {
 				return { op: "true" };
@@ -26,14 +27,15 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 			}
 
 			const expressions = flattened.filter((e) => e.op !== "true");
-			return expressions.length === 1 ? expressions[0] : { op: "and", expressions };
+			return expressions.length === 1 ? expressions[0] : { expressions, op: "and" };
 		}
 
 		case "or": {
 			const optimized = expression.expressions.map(optimizeExpression);
-			const flattened = optimized.reduce((acc, e) => {
-				return e.op === "or" ? [...acc, ...e.expressions] : [...acc, e];
-			}, [] as Expression<TEntity>[]);
+			const flattened = optimized.reduce(
+				(acc, e) => (e.op === "or" ? [...acc, ...e.expressions] : [...acc, e]),
+				[] as Expression<TEntity>[],
+			);
 
 			if (flattened.every((e) => e.op === "false")) {
 				return { op: "false" };
@@ -43,7 +45,7 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 			}
 
 			const expressions = flattened.filter((e) => e.op !== "false");
-			return expressions.length === 1 ? expressions[0] : { op: "or", expressions };
+			return expressions.length === 1 ? expressions[0] : { expressions, op: "or" };
 		}
 
 		default:
@@ -77,9 +79,8 @@ export const everyOrCriteria = <TCriteria>(
 	return predicate(criteria);
 };
 
-export const hasOrCriteria = <TCriteria>(criteria: OrCriteria<TCriteria>): boolean => {
-	return someOrCriteria(criteria, () => true);
-};
+export const hasOrCriteria = <TCriteria>(criteria: OrCriteria<TCriteria>): boolean =>
+	someOrCriteria(criteria, () => true);
 
 export const handleAndCriteria = async <TEntity, TCriteria>(
 	criteria: TCriteria,
@@ -89,7 +90,7 @@ export const handleAndCriteria = async <TEntity, TCriteria>(
 		.filter((key) => typeof criteria[key] !== "undefined")
 		.map((key) => cb(key as keyof TCriteria));
 	const expressions = await Promise.all(promises);
-	return { op: "and", expressions };
+	return { expressions, op: "and" };
 };
 
 export const handleOrCriteria = async <TEntity, TCriteria>(
@@ -99,10 +100,10 @@ export const handleOrCriteria = async <TEntity, TCriteria>(
 	if (Array.isArray(criteria)) {
 		const promises = criteria.map((c) => cb(c));
 		const expressions = await Promise.all(promises);
-		return { op: "or", expressions };
+		return { expressions, op: "or" };
 	} else {
 		const expression = await cb(criteria);
-		return { op: "or", expressions: [expression] };
+		return { expressions: [expression], op: "or" };
 	}
 };
 
@@ -117,7 +118,7 @@ export const handleNumericCriteria = async <TEntity, TProperty extends keyof TEn
 > => {
 	if (typeof criteria === "object") {
 		if ("from" in criteria && "to" in criteria) {
-			return { op: "between", property, from: criteria.from, to: criteria.to };
+			return { from: criteria.from, op: "between", property, to: criteria.to };
 		}
 		if ("from" in criteria) {
 			return { op: "greaterThanEqual", property, value: criteria.from };

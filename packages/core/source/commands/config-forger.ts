@@ -7,9 +7,9 @@ import { Command as BIP39Command } from "./config-forger-bip39";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "config:forger";
+	public signature = "config:forger";
 
-	public description: string = "Configure the forging delegate.";
+	public description = "Configure the forging delegate.";
 
 	public configure(): void {
 		this.definition
@@ -21,7 +21,7 @@ export class Command extends Commands.Command {
 			.setFlag(
 				"method",
 				"The configuration method to use (BIP38 or BIP39).",
-				Joi.string().valid(...["bip38", "bip39"]),
+				Joi.string().valid("bip38", "bip39"),
 			)
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
@@ -37,13 +37,13 @@ export class Command extends Commands.Command {
 
 		let response = await this.components.prompt([
 			{
-				type: "select",
-				name: "method",
-				message: "Please select how you wish to store your delegate passphrase?",
 				choices: [
 					{ title: "Encrypted BIP38 (Recommended)", value: "bip38" },
 					{ title: "Plain BIP39", value: "bip39" },
 				],
+				message: "Please select how you wish to store your delegate passphrase?",
+				name: "method",
+				type: "select",
 			},
 		]);
 

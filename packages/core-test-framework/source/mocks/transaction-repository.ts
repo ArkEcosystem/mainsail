@@ -43,9 +43,7 @@ class TransactionRepositoryMock implements Partial<Repositories.TransactionRepos
 	}
 
 	public async findReceivedTransactions(): Promise<{ recipientId: string; amount: string }[]> {
-		return mockTransactions.map((x) => {
-			return { recipientId: x.recipientId!.toString(), amount: x.amount!.toString() };
-		});
+		return mockTransactions.map((x) => ({ amount: x.amount.toString(), recipientId: x.recipientId.toString() }));
 	}
 
 	public async getFeeStatistics(

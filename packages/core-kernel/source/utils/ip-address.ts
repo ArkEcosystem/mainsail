@@ -1,8 +1,6 @@
 import ipaddr from "ipaddr.js";
 
-export const isValidAddress = (ip: string) => {
-	return ipaddr.isValid(cleanAddress(ip));
-};
+export const isValidAddress = (ip: string) => ipaddr.isValid(cleanAddress(ip));
 
 export const isIPv6Address = (ip: string) => {
 	try {
@@ -22,6 +20,4 @@ export const normalizeAddress = (ip: string) => {
 	return ip;
 };
 
-export const cleanAddress = (ip: string) => {
-	return ip.replace("[", "").replace("]", "");
-};
+export const cleanAddress = (ip: string) => ip.replace("[", "").replace("]", "");

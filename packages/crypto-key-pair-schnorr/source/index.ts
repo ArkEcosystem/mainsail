@@ -1,6 +1,5 @@
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/crypto-contracts";
-import { schnorr } from "bcrypto";
-import { SHA256 } from "bcrypto";
+import { schnorr, SHA256 } from "bcrypto";
 
 export class KeyPairFactory implements Contract {
 	public fromMnemonic(mnemonic: string): IKeyPair {
@@ -11,9 +10,9 @@ export class KeyPairFactory implements Contract {
 		privateKey = privateKey instanceof Buffer ? privateKey : Buffer.from(privateKey, "hex");
 
 		return {
-			publicKey: schnorr.publicKeyCreate(privateKey).toString("hex"),
-			privateKey: privateKey.toString("hex"),
 			compressed: true,
+			privateKey: privateKey.toString("hex"),
+			publicKey: schnorr.publicKeyCreate(privateKey).toString("hex"),
 		};
 	}
 }

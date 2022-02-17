@@ -8,33 +8,32 @@ export const register = (server: Hapi.Server): void => {
 	server.bind(controller);
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.status(request),
 		method: "GET",
 		path: "/node/status",
-		handler: (request: Hapi.Request) => controller.status(request),
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.syncing(request),
 		method: "GET",
 		path: "/node/syncing",
-		handler: (request: Hapi.Request) => controller.syncing(request),
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.configuration(request),
 		method: "GET",
 		path: "/node/configuration",
-		handler: (request: Hapi.Request) => controller.configuration(request),
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.configurationCrypto(request),
 		method: "GET",
 		path: "/node/configuration/crypto",
-		handler: (request: Hapi.Request) => controller.configurationCrypto(request),
 	});
 
 	server.route({
-		method: "GET",
-		path: "/node/fees",
 		handler: (request: Hapi.Request) => controller.fees(request),
+		method: "GET",
 		options: {
 			validate: {
 				query: Joi.object({
@@ -42,5 +41,6 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/node/fees",
 	});
 };

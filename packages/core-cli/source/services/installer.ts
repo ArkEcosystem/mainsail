@@ -1,11 +1,11 @@
 import { sync } from "execa";
-import * as semver from "semver";
+import { rcompare, satisfies } from "semver";
 
 import { injectable } from "../ioc";
 
 @injectable()
 export class Installer {
-	public install(pkg: string, tag: string = "latest"): void {
+	public install(pkg: string, tag = "latest"): void {
 		this.installPeerDependencies(pkg, tag);
 
 		const { stdout, stderr, exitCode } = sync(`yarn global add ${pkg}@${tag} --force`, { shell: true });
@@ -17,7 +17,7 @@ export class Installer {
 		console.log(stdout);
 	}
 
-	public installPeerDependencies(pkg: string, tag: string = "latest"): void {
+	public installPeerDependencies(pkg: string, tag = "latest"): void {
 		const { stdout, stderr, exitCode } = sync(`yarn info ${pkg}@${tag} peerDependencies --json`, { shell: true });
 
 		if (exitCode !== 0) {
@@ -39,8 +39,8 @@ export class Installer {
 		}
 
 		const versions = (JSON.parse(stdout).data as string[])
-			.filter((v) => semver.satisfies(v, range))
-			.sort((a, b) => semver.rcompare(a, b));
+			.filter((v) => satisfies(v, range))
+			.sort((a, b) => rcompare(a, b));
 
 		if (versions.length === 0) {
 			throw new Error(`No ${pkg} version to satisfy ${range}`);

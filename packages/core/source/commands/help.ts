@@ -4,11 +4,11 @@ import { blue, cyan } from "kleur";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "help";
+	public signature = "help";
 
-	public description: string = "Displays detailed information on all commands available via CLI.";
+	public description = "Displays detailed information on all commands available via CLI.";
 
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
 	public async execute(): Promise<void> {
 		const commands: Contracts.CommandList = this.app.get(Container.Identifiers.Commands);
@@ -59,8 +59,8 @@ ${blue().bold("Arguments")}
 ${blue().bold("Available Commands")}
 ${commandsAsString.join("\n")}`,
 				{
-					padding: 1,
 					borderStyle: boxen.BorderStyle.Classic,
+					padding: 1,
 				},
 			),
 		);

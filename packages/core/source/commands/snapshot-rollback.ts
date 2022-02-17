@@ -8,9 +8,9 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
-	public signature: string = "snapshot:rollback";
+	public signature = "snapshot:rollback";
 
-	public description: string = "Rollback chain to specified height.";
+	public description = "Rollback chain to specified height.";
 
 	public configure(): void {
 		this.definition

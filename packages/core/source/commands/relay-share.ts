@@ -4,11 +4,11 @@ import ngrok from "ngrok";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "relay:share";
+	public signature = "relay:share";
 
-	public description: string = "Share the Relay via ngrok.";
+	public description = "Share the Relay via ngrok.";
 
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
 	public configure(): void {
 		this.definition
@@ -22,12 +22,12 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		const url: string = await ngrok.connect({
-			proto: this.getFlag("proto"),
 			addr: this.getFlag("addr"),
 			auth: this.getFlag("auth"),
-			subdomain: this.getFlag("subdomain"),
 			authtoken: this.getFlag("authtoken"),
+			proto: this.getFlag("proto"),
 			region: this.getFlag("region"),
+			subdomain: this.getFlag("subdomain"),
 		});
 
 		this.components.info(`Public access to your API: ${url}`);

@@ -4,9 +4,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "env:paths";
+	public signature = "env:paths";
 
-	public description: string = "Get all of the environment paths.";
+	public description = "Get all of the environment paths.";
 
 	public configure(): void {
 		this.definition

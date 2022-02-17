@@ -2,7 +2,7 @@ import { describe } from "@arkecosystem/core-test";
 
 import { KeyPairFactory } from "./index";
 
-const mnemonic: string =
+const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
 describe("KeyPairFactory", ({ assert, it }) => {

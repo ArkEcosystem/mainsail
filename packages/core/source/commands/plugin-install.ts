@@ -7,9 +7,9 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.PluginManager)
 	private readonly pluginManager!: Contracts.PluginManager;
 
-	public signature: string = "plugin:install";
+	public signature = "plugin:install";
 
-	public description: string = "Installs a package, and any packages that it depends on.";
+	public description = "Installs a package, and any packages that it depends on.";
 
 	public configure(): void {
 		this.definition

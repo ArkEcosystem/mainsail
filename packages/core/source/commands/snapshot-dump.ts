@@ -6,9 +6,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "snapshot:dump";
+	public signature = "snapshot:dump";
 
-	public description: string = "Create a full snapshot of the database.";
+	public description = "Create a full snapshot of the database.";
 
 	public configure(): void {
 		this.definition

@@ -6,9 +6,9 @@ import { buildBIP38 } from "../internal/crypto";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "core:run";
+	public signature = "core:run";
 
-	public description: string = "Run the Core process in foreground. Exiting the process will stop it from running.";
+	public description = "Run the Core process in foreground. Exiting the process will stop it from running.";
 
 	public configure(): void {
 		this.definition
@@ -33,11 +33,11 @@ export class Command extends Commands.Command {
 		await Utils.buildApplication({
 			flags,
 			plugins: {
-				"@arkecosystem/core-p2p": Utils.buildPeerFlags(flags),
 				"@arkecosystem/core-blockchain": {
 					networkStart: flags.networkStart,
 				},
 				"@arkecosystem/core-forger": await buildBIP38(flags, this.app.getCorePath("config")),
+				"@arkecosystem/core-p2p": Utils.buildPeerFlags(flags),
 			},
 		});
 

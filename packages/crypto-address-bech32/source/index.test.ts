@@ -4,7 +4,7 @@ import { KeyPairFactory as Secp25k61 } from "@arkecosystem/crypto-key-pair-secp2
 
 import { AddressFactory } from "./index";
 
-const mnemonic: string =
+const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
 describe("AddressFactory", ({ assert, it }) => {

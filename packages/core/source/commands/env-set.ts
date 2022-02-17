@@ -7,9 +7,9 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-	public signature: string = "env:set";
+	public signature = "env:set";
 
-	public description: string = "Set the value of an environment variable.";
+	public description = "Set the value of an environment variable.";
 
 	public configure(): void {
 		this.definition

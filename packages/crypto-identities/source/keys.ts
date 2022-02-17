@@ -15,9 +15,9 @@ export class Keys {
 		privateKey = privateKey instanceof Buffer ? privateKey : Buffer.from(privateKey, "hex");
 
 		return {
-			publicKey: secp256k1.publicKeyCreate(privateKey, compressed).toString("hex"),
-			privateKey: privateKey.toString("hex"),
 			compressed,
+			privateKey: privateKey.toString("hex"),
+			publicKey: secp256k1.publicKeyCreate(privateKey, compressed).toString("hex"),
 		};
 	}
 
@@ -29,9 +29,9 @@ export class Keys {
 		}
 
 		return {
-			publicKey: secp256k1.publicKeyCreate(privateKey, compressed).toString("hex"),
-			privateKey: privateKey.toString("hex"),
 			compressed,
+			privateKey: privateKey.toString("hex"),
+			publicKey: secp256k1.publicKeyCreate(privateKey, compressed).toString("hex"),
 		};
 	}
 }

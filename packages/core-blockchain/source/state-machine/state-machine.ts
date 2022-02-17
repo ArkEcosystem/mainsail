@@ -38,7 +38,9 @@ export class StateMachine {
 			let action: Action;
 			try {
 				action = this.app.resolve(actions[actionKey]);
-			} catch {}
+			} catch {
+				//
+			}
 
 			// @ts-ignore
 			if (action) {

@@ -9,7 +9,7 @@ import { AbstractRepository } from "./abstract-repository";
 export class BlockRepository extends AbstractRepository<Models.Block> {
 	public async getReadStream(start: number, end: number): Promise<Readable> {
 		return this.createQueryBuilder()
-			.where("height >= :start AND height <= :end", { start, end })
+			.where("height >= :start AND height <= :end", { end, start })
 			.orderBy("height", "ASC")
 			.stream();
 	}
@@ -19,7 +19,7 @@ export class BlockRepository extends AbstractRepository<Models.Block> {
 	}
 
 	public async countInRange(start: number, end: number): Promise<number> {
-		return this.fastCount({ where: "height >= :start AND height <= :end", parameters: { start, end } });
+		return this.fastCount({ parameters: { end, start }, where: "height >= :start AND height <= :end" });
 	}
 
 	public async rollback(roundInfo: Contracts.Shared.RoundInfo): Promise<void> {
@@ -55,10 +55,10 @@ export class BlockRepository extends AbstractRepository<Models.Block> {
 
 	public async findLast(): Promise<Models.Block | undefined> {
 		const topBlocks = await this.find({
-			take: 1,
 			order: {
 				height: "DESC",
 			},
+			take: 1,
 		});
 
 		return topBlocks[0];
@@ -66,10 +66,10 @@ export class BlockRepository extends AbstractRepository<Models.Block> {
 
 	public async findFirst(): Promise<Models.Block | undefined> {
 		const topBlocks = await this.find({
-			take: 1,
 			order: {
 				height: "ASC",
 			},
+			take: 1,
 		});
 
 		return topBlocks[0];

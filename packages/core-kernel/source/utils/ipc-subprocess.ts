@@ -44,15 +44,15 @@ export class IpcSubprocess<T> {
 
 	// @ts-ignore
 	public sendAction<K extends Actions<T>>(method: K, ...args: Parameters<T[K]>): void {
-		this.subprocess.send({ method, args });
+		this.subprocess.send({ args, method });
 	}
 
 	// @ts-ignore
 	public sendRequest<K extends Requests<T>>(method: K, ...args: Parameters<T[K]>): Promise<ReturnType<T[K]>> {
 		return new Promise((resolve, reject) => {
 			const id = this.lastId++;
-			this.callbacks.set(id, { resolve, reject });
-			this.subprocess.send({ id, method, args });
+			this.callbacks.set(id, { reject, resolve });
+			this.subprocess.send({ args, id, method });
 		});
 	}
 

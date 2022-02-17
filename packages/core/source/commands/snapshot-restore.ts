@@ -6,9 +6,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "snapshot:restore";
+	public signature = "snapshot:restore";
 
-	public description: string = "Import data from specified snapshot.";
+	public description = "Import data from specified snapshot.";
 
 	public configure(): void {
 		this.definition

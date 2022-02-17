@@ -3,9 +3,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "relay:stop";
+	public signature = "relay:stop";
 
-	public description: string = "Stop the Relay process.";
+	public description = "Stop the Relay process.";
 
 	public configure(): void {
 		this.definition

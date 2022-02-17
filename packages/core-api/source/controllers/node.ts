@@ -35,9 +35,9 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				synced: this.blockchain.isSynced(),
-				now: lastBlock ? lastBlock.data.height : 0,
 				blocksCount: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
+				now: lastBlock ? lastBlock.data.height : 0,
+				synced: this.blockchain.isSynced(),
 				timestamp: Crypto.Slots.getTime(),
 			},
 		};
@@ -49,10 +49,10 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				syncing: !this.blockchain.isSynced(),
 				blocks: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
 				height: lastBlock ? lastBlock.data.height : 0,
 				id: lastBlock?.data?.id,
+				syncing: !this.blockchain.isSynced(),
 			},
 		};
 	}
@@ -66,29 +66,29 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
+				constants: Managers.configManager.getMilestone(this.blockchain.getLastHeight()),
 				core: {
 					version: this.app.version(),
 				},
-				nethash: network.nethash,
-				slip44: network.slip44,
-				wif: network.wif,
-				token: network.client.token,
-				symbol: network.client.symbol,
 				explorer: network.client.explorer,
-				version: network.pubKeyHash,
+				nethash: network.nethash,
 				ports: super.toResource(this.configRepository, PortsResource),
-				constants: Managers.configManager.getMilestone(this.blockchain.getLastHeight()),
+				slip44: network.slip44,
+				symbol: network.client.symbol,
+				token: network.client.token,
 				transactionPool: {
 					dynamicFees: dynamicFees.enabled ? dynamicFees : { enabled: false },
-					maxTransactionsInPool:
-						this.transactionPoolConfiguration.getRequired<number>("maxTransactionsInPool"),
-					maxTransactionsPerSender:
-						this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerSender"),
-					maxTransactionsPerRequest:
-						this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerRequest"),
 					maxTransactionAge: this.transactionPoolConfiguration.getRequired<number>("maxTransactionAge"),
 					maxTransactionBytes: this.transactionPoolConfiguration.getRequired<number>("maxTransactionBytes"),
+					maxTransactionsInPool:
+						this.transactionPoolConfiguration.getRequired<number>("maxTransactionsInPool"),
+					maxTransactionsPerRequest:
+						this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerRequest"),
+					maxTransactionsPerSender:
+						this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerSender"),
 				},
+				version: network.pubKeyHash,
+				wif: network.wif,
 			},
 		};
 	}
@@ -107,7 +107,7 @@ export class NodeController extends Controller {
 		for (const handler of handlers) {
 			handlersKey[`${handler.getConstructor().type}-${handler.getConstructor().typeGroup}`] =
 				handler.getConstructor().key;
-			txsTypes.push({ type: handler.getConstructor().type!, typeGroup: handler.getConstructor().typeGroup! });
+			txsTypes.push({ type: handler.getConstructor().type, typeGroup: handler.getConstructor().typeGroup });
 		}
 
 		const results = await this.transactionRepository.getFeeStatistics(txsTypes, request.query.days);
@@ -128,6 +128,6 @@ export class NodeController extends Controller {
 			};
 		}
 
-		return { meta: { days: request.query.days }, data: groupedByTypeGroup };
+		return { data: groupedByTypeGroup, meta: { days: request.query.days } };
 	}
 }

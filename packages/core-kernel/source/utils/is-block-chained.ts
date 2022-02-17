@@ -23,7 +23,7 @@ const getBlockChainedDetails = (
 
 	const isChained: boolean = followsPrevious && isPlusOne && isAfterPreviousSlot;
 
-	return { followsPrevious, isPlusOne, previousSlot, nextSlot, isAfterPreviousSlot, isChained };
+	return { followsPrevious, isAfterPreviousSlot, isChained, isPlusOne, nextSlot, previousSlot };
 };
 
 export const isBlockChained = (

@@ -8,7 +8,6 @@ import { BigNumber, isGenesisTransaction } from "../utils";
 
 const maxBytes = (ajv: Ajv) => {
 	ajv.addKeyword("maxBytes", {
-		type: "string",
 		compile(schema, parentSchema) {
 			return (data) => {
 				if ((parentSchema as any).type !== "string") {
@@ -20,9 +19,10 @@ const maxBytes = (ajv: Ajv) => {
 		},
 		errors: false,
 		metaSchema: {
-			type: "integer",
 			minimum: 0,
+			type: "integer",
 		},
+		type: "string",
 	});
 };
 
@@ -35,12 +35,12 @@ const transactionType = (ajv: Ajv) => {
 				if (
 					data === TransactionType.MultiPayment &&
 					parentObject &&
-					(!parentObject.typeGroup || parentObject.typeGroup === 1)
+					(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
+					parentObject.asset &&
+					parentObject.asset.payments
 				) {
-					if (parentObject.asset && parentObject.asset.payments) {
-						const limit: number = configManager.getMilestone().multiPaymentLimit || 256;
-						return parentObject.asset.payments.length <= limit;
-					}
+					const limit: number = configManager.getMilestone().multiPaymentLimit || 256;
+					return parentObject.asset.payments.length <= limit;
 				}
 
 				return data === schema;
@@ -48,8 +48,8 @@ const transactionType = (ajv: Ajv) => {
 		},
 		errors: false,
 		metaSchema: {
-			type: "integer",
 			minimum: 0,
+			type: "integer",
 		},
 	});
 };
@@ -57,9 +57,7 @@ const transactionType = (ajv: Ajv) => {
 const network = (ajv: Ajv) => {
 	ajv.addKeyword("network", {
 		compile(schema) {
-			return (data) => {
-				return schema && data === configManager.get("network.pubKeyHash");
-			};
+			return (data) => schema && data === configManager.get("network.pubKeyHash");
 		},
 		errors: false,
 		metaSchema: {
@@ -93,14 +91,12 @@ const bignumber = (ajv: Ajv) => {
 					parentObject[property] = bignum;
 				}
 
-				let bypassGenesis: boolean = false;
-				if (schema.bypassGenesis) {
-					if (parentObject.id) {
-						if (schema.block) {
-							bypassGenesis = parentObject.height === 1;
-						} else {
-							bypassGenesis = isGenesisTransaction(parentObject.id);
-						}
+				let bypassGenesis = false;
+				if (schema.bypassGenesis && parentObject.id) {
+					if (schema.block) {
+						bypassGenesis = parentObject.height === 1;
+					} else {
+						bypassGenesis = isGenesisTransaction(parentObject.id);
 					}
 				}
 
@@ -116,17 +112,17 @@ const bignumber = (ajv: Ajv) => {
 			};
 		},
 		errors: false,
-		modifying: true,
 		metaSchema: {
-			type: "object",
-			properties: {
-				minimum: { type: "integer" },
-				maximum: { type: "integer" },
-				bypassGenesis: { type: "boolean" },
-				block: { type: "boolean" },
-			},
 			additionalItems: false,
+			properties: {
+				block: { type: "boolean" },
+				bypassGenesis: { type: "boolean" },
+				maximum: { type: "integer" },
+				minimum: { type: "integer" },
+			},
+			type: "object",
 		},
+		modifying: true,
 	});
 };
 
@@ -134,10 +130,13 @@ const blockId = (ajv: Ajv) => {
 	ajv.addKeyword("blockId", {
 		compile(schema) {
 			return (data, dataPath, parentObject: any) => {
-				if (parentObject && parentObject.height === 1 && schema.allowNullWhenGenesis) {
-					if (!data || Number(data) === 0) {
-						return true;
-					}
+				if (
+					parentObject &&
+					parentObject.height === 1 &&
+					schema.allowNullWhenGenesis &&
+					(!data || Number(data) === 0)
+				) {
+					return true;
 				}
 
 				if (typeof data !== "string") {
@@ -146,8 +145,8 @@ const blockId = (ajv: Ajv) => {
 
 				// Partial SHA256 block id (old/legacy), before the switch to full SHA256.
 				// 8 byte integer either decimal without leading zeros or hex with leading zeros.
-				const isPartial = /^[0-9]{1,20}$/.test(data) || /^[0-9a-f]{16}$/i.test(data);
-				const isFullSha256 = /^[0-9a-f]{64}$/i.test(data);
+				const isPartial = /^\d{1,20}$/.test(data) || /^[\da-f]{16}$/i.test(data);
+				const isFullSha256 = /^[\da-f]{64}$/i.test(data);
 
 				if (parentObject && parentObject.height) {
 					const height = schema.isPreviousBlock ? parentObject.height - 1 : parentObject.height;
@@ -160,12 +159,12 @@ const blockId = (ajv: Ajv) => {
 		},
 		errors: false,
 		metaSchema: {
-			type: "object",
+			additionalItems: false,
 			properties: {
 				allowNullWhenGenesis: { type: "boolean" },
 				isPreviousBlock: { type: "boolean" },
 			},
-			additionalItems: false,
+			type: "object",
 		},
 	});
 };

@@ -7,9 +7,9 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-	public signature: string = "config:database";
+	public signature = "config:database";
 
-	public description: string = "Update the Database configuration.";
+	public description = "Update the Database configuration.";
 
 	private readonly validFlags: string[] = ["host", "port", "database", "username", "password"];
 
@@ -35,41 +35,41 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				type: "text",
-				name: "host",
-				message: "What host do you want to use?",
 				initial: "localhost",
+				message: "What host do you want to use?",
+				name: "host",
+				type: "text",
 			},
 			{
-				type: "text",
-				name: "port",
-				message: "What port do you want to use?",
 				initial: 5432,
+				message: "What port do you want to use?",
+				name: "port",
+				type: "text",
 				validate: /* istanbul ignore next */ (value) =>
-					value < 1 || value > 65535 ? `The port must be in the range of 1-65535.` : true,
+					value < 1 || value > 65_535 ? `The port must be in the range of 1-65535.` : true,
 			},
 			{
-				type: "text",
-				name: "database",
-				message: "What database do you want to use?",
 				initial: `${this.getFlag("token")}_${this.getFlag("network")}`,
-			},
-			{
+				message: "What database do you want to use?",
+				name: "database",
 				type: "text",
-				name: "username",
-				message: "What username do you want to use?",
+			},
+			{
 				initial: this.getFlag("token"),
+				message: "What username do you want to use?",
+				name: "username",
+				type: "text",
 			},
 			{
-				type: "password",
-				name: "password",
-				message: "What password do you want to use?",
 				initial: "password",
+				message: "What password do you want to use?",
+				name: "password",
+				type: "password",
 			},
 			{
-				type: "confirm",
-				name: "confirm",
 				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
 			},
 		]);
 

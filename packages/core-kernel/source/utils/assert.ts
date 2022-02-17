@@ -25,40 +25,19 @@ interface Assert {
 }
 
 export const assert: Assert = {
-	array: <T>(value: unknown): asserts value is Array<T> => {
-		return assertType(Array.isArray(value), "array");
-	},
-	bigint: (value: unknown): asserts value is bigint => {
-		return assertType(typeof value === "bigint", "bigint");
-	},
-	block: (value: unknown): asserts value is Blocks.Block => {
-		return assertType(value instanceof Blocks.Block, "Crypto.Blocks.Block");
-	},
-	boolean: (value: unknown): asserts value is boolean => {
-		return assertType(typeof value === "boolean", "boolean");
-	},
-	buffer: (value: unknown): asserts value is Buffer => {
-		return assertType(value instanceof Buffer, "buffer");
-	},
-	defined: <T>(value: unknown): asserts value is NonNullable<T> => {
-		return assertType(value !== undefined && value !== null, "non-null and non-undefined");
-	},
-	number: (value: unknown): asserts value is number => {
-		return assertType(typeof value === "number", "number");
-	},
-	object: (value: unknown): asserts value is Record<string, any> => {
-		return assertType(typeof value === "object", "object");
-	},
-	string: (value: unknown): asserts value is string => {
-		return assertType(typeof value === "string", "string");
-	},
-	symbol: (value: unknown): asserts value is symbol => {
-		return assertType(typeof value === "symbol", "symbol");
-	},
-	transaction: (value: unknown): asserts value is Transactions.Transaction => {
-		return assertType(value instanceof Transactions.Transaction, "Crypto.Transactions.Transaction");
-	},
-	undefined: (value: unknown): asserts value is undefined => {
-		return assertType(typeof value === "undefined", "undefined");
-	},
+	array: <T>(value: unknown): asserts value is Array<T> => assertType(Array.isArray(value), "array"),
+	bigint: (value: unknown): asserts value is bigint => assertType(typeof value === "bigint", "bigint"),
+	block: (value: unknown): asserts value is Blocks.Block =>
+		assertType(value instanceof Blocks.Block, "Crypto.Blocks.Block"),
+	boolean: (value: unknown): asserts value is boolean => assertType(typeof value === "boolean", "boolean"),
+	buffer: (value: unknown): asserts value is Buffer => assertType(value instanceof Buffer, "buffer"),
+	defined: <T>(value: unknown): asserts value is NonNullable<T> =>
+		assertType(value !== undefined && value !== null, "non-null and non-undefined"),
+	number: (value: unknown): asserts value is number => assertType(typeof value === "number", "number"),
+	object: (value: unknown): asserts value is Record<string, any> => assertType(typeof value === "object", "object"),
+	string: (value: unknown): asserts value is string => assertType(typeof value === "string", "string"),
+	symbol: (value: unknown): asserts value is symbol => assertType(typeof value === "symbol", "symbol"),
+	transaction: (value: unknown): asserts value is Transactions.Transaction =>
+		assertType(value instanceof Transactions.Transaction, "Crypto.Transactions.Transaction"),
+	undefined: (value: unknown): asserts value is undefined => assertType(typeof value === "undefined", "undefined"),
 };

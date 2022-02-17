@@ -65,20 +65,20 @@ export class PeersController extends Controller {
 					break;
 				}
 				default: {
-					results = results.sort((a, b) => a.latency! - b.latency!);
+					results = results.sort((a, b) => a.latency - b.latency);
 					break;
 				}
 			}
 		} else {
-			results = results.sort((a, b) => a.latency! - b.latency!);
+			results = results.sort((a, b) => a.latency - b.latency);
 		}
 
 		results = results.slice(offset, offset + limit);
 
 		const resultsPage = {
+			meta: { totalCountIsEstimate: false },
 			results,
 			totalCount,
-			meta: { totalCountIsEstimate: false },
 		};
 
 		return super.toPagination(resultsPage, PeerResource);

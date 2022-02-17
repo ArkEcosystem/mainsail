@@ -15,8 +15,8 @@ export class CurrentDelegateProcessAction implements Contracts.Kernel.ProcessAct
 		Utils.assert.defined(round);
 
 		return {
-			username: round!.currentForger.delegate.username,
-			rank: round!.currentForger.delegate.rank,
+			rank: round.currentForger.delegate.rank,
+			username: round.currentForger.delegate.username,
 		};
 	}
 }

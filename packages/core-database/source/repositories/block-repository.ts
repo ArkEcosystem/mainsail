@@ -15,10 +15,10 @@ export class BlockRepository extends AbstractRepository<Block> {
 
 	public async findRecent(limit: number): Promise<{ id: string }[]> {
 		return this.find({
-			select: ["id"],
 			order: {
 				timestamp: "DESC",
 			},
+			select: ["id"],
 			take: limit,
 		});
 	}
@@ -46,7 +46,7 @@ export class BlockRepository extends AbstractRepository<Block> {
 
 	public async findByHeightRange(start: number, end: number): Promise<Block[]> {
 		return this.createQueryBuilder()
-			.where("height BETWEEN :start AND :end", { start, end })
+			.where("height BETWEEN :start AND :end", { end, start })
 			.orderBy("height")
 			.getMany();
 	}
@@ -56,8 +56,8 @@ export class BlockRepository extends AbstractRepository<Block> {
 		end: number,
 	): Promise<Contracts.Shared.DownloadBlock[]> {
 		const blocks = await this.findByHeightRangeWithTransactionsRaw(start, end);
-		return blocks.map((block) => {
-			return this.rawToEntity(
+		return blocks.map((block) =>
+			this.rawToEntity(
 				block,
 				// @ts-ignore
 				(entity: Block & { transactions: string[] }, _, value: Buffer[] | undefined) => {
@@ -67,14 +67,14 @@ export class BlockRepository extends AbstractRepository<Block> {
 						entity.transactions = [];
 					}
 				},
-			);
-		}) as Contracts.Shared.DownloadBlock[];
+			),
+		) as Contracts.Shared.DownloadBlock[];
 	}
 
 	public async findByHeightRangeWithTransactions(start: number, end: number): Promise<Interfaces.IBlockData[]> {
 		const blocks = await this.findByHeightRangeWithTransactionsRaw(start, end);
-		return blocks.map((block) => {
-			return this.rawToEntity(
+		return blocks.map((block) =>
+			this.rawToEntity(
 				block,
 				// @ts-ignore
 				(entity: Block & { transactions: Interfaces.ITransactionData[] }, _, value: Buffer[] | undefined) => {
@@ -86,8 +86,8 @@ export class BlockRepository extends AbstractRepository<Block> {
 						entity.transactions = [];
 					}
 				},
-			);
-		});
+			),
+		);
 	}
 
 	public async getStatistics(): Promise<{
@@ -167,13 +167,11 @@ export class BlockRepository extends AbstractRepository<Block> {
 						.map((tx) =>
 							Object.assign(new Transaction(), {
 								...tx.data,
-								timestamp: tx.timestamp,
 								serialized: tx.serialized,
+								timestamp: tx.timestamp,
 							}),
 						)
-						.sort((a: Transaction, b: Transaction) => {
-							return a.sequence - b.sequence;
-						});
+						.sort((a: Transaction, b: Transaction) => a.sequence - b.sequence);
 
 					transactionEntities.push(...transactions);
 				}
@@ -187,9 +185,9 @@ export class BlockRepository extends AbstractRepository<Block> {
 	}
 
 	public async deleteBlocks(blocks: Interfaces.IBlockData[]): Promise<void> {
-		const continuousChunk = blocks.every((block, i, arr) => {
-			return i === 0 ? true : block.height - arr[i - 1].height === 1;
-		});
+		const continuousChunk = blocks.every((block, i, arr) =>
+			i === 0 ? true : block.height - arr[i - 1].height === 1,
+		);
 
 		if (!continuousChunk) {
 			throw new Error("Blocks chunk to delete isn't continuous");
@@ -303,7 +301,7 @@ export class BlockRepository extends AbstractRepository<Block> {
                     BETWEEN :start AND :end
                 ORDER BY height ASC
             `,
-			{ start, end },
+			{ end, start },
 			{},
 		);
 

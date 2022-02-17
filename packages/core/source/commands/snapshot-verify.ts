@@ -6,9 +6,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "snapshot:verify";
+	public signature = "snapshot:verify";
 
-	public description: string = "Check validity of specified snapshot.";
+	public description = "Check validity of specified snapshot.";
 
 	public configure(): void {
 		this.definition

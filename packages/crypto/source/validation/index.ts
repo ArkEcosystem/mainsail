@@ -71,20 +71,18 @@ export class Validator {
 
 			const error = ajv.errors ? ajv.errorsText() : undefined;
 
-			return { value: data, error, errors: ajv.errors || undefined };
+			return { error, errors: ajv.errors || undefined, value: data };
 		} catch (error) {
-			return { value: undefined, error: error.stack, errors: [] };
+			return { error: error.stack, errors: [], value: undefined };
 		}
 	}
 
 	private instantiateAjv(options: Record<string, any>) {
 		const ajv = new Ajv({
-			...{
-				$data: true,
-				schemas,
-				removeAdditional: true,
-				extendRefs: true,
-			},
+			$data: true,
+			extendRefs: true,
+			removeAdditional: true,
+			schemas,
 			...options,
 		});
 		ajvKeywords(ajv);
@@ -127,9 +125,9 @@ export class Validator {
 		ajv.removeSchema("transactions");
 		ajv.addSchema({
 			$id: "transactions",
-			type: "array",
 			additionalItems: false,
 			items: { anyOf: [...this.transactionSchemas.keys()].map((schema) => ({ $ref: `${schema}Signed` })) },
+			type: "array",
 		});
 		ajv.addSchema(schemas.block);
 	}

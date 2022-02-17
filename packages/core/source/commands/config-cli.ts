@@ -6,20 +6,16 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Installer)
 	private readonly installer!: Services.Installer;
 
-	public signature: string = "config:cli";
+	public signature = "config:cli";
 
-	public description: string = "Update the CLI configuration.";
+	public description = "Update the CLI configuration.";
 
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag(
-				"channel",
-				"The NPM registry channel that should be used.",
-				Joi.string().valid(...["next", "latest"]),
-			);
+			.setFlag("channel", "The NPM registry channel that should be used.", Joi.string().valid("next", "latest"));
 	}
 
 	public async execute(): Promise<void> {
@@ -41,7 +37,7 @@ export class Command extends Commands.Command {
 
 			spinner.start();
 
-			this.installer.install(this.pkg.name!, newChannel);
+			this.installer.install(this.pkg.name, newChannel);
 
 			spinner.succeed();
 

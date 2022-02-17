@@ -50,16 +50,16 @@ export class JSONCodec implements Codec {
 			const blockStringified = JSONCodec.stringify(camelizeKeys(JSONCodec.removePrefix(block, "Block_")));
 
 			return Buffer.from(blockStringified);
-		} catch (err) {
-			throw new CodecException.BlockEncodeException(block.Block_id, err.message);
+		} catch (error) {
+			throw new CodecException.BlockEncodeException(block.Block_id, error.message);
 		}
 	}
 
 	public decodeBlock(buffer: Buffer): Models.Block {
 		try {
 			return JSON.parse(buffer.toString());
-		} catch (err) {
-			throw new CodecException.BlockDecodeException(undefined, err.message);
+		} catch (error) {
+			throw new CodecException.BlockDecodeException(undefined, error.message);
 		}
 	}
 
@@ -71,8 +71,8 @@ export class JSONCodec implements Codec {
 			tmp = JSONCodec.stringify(tmp);
 
 			return Buffer.from(tmp);
-		} catch (err) {
-			throw new CodecException.TransactionEncodeException(transaction.Transaction_id, err.message);
+		} catch (error) {
+			throw new CodecException.TransactionEncodeException(transaction.Transaction_id, error.message);
 		}
 	}
 
@@ -89,24 +89,24 @@ export class JSONCodec implements Codec {
 			tmp.serialized = Buffer.from(serialized);
 
 			return tmp;
-		} catch (err) {
-			throw new CodecException.TransactionDecodeException(undefined, err.message);
+		} catch (error) {
+			throw new CodecException.TransactionDecodeException(undefined, error.message);
 		}
 	}
 
 	public encodeRound(round: any): Buffer {
 		try {
 			return Buffer.from(JSONCodec.stringify(camelizeKeys(JSONCodec.removePrefix(round, "Round_"))));
-		} catch (err) {
-			throw new CodecException.RoundEncodeException(round.Round_round, err.message);
+		} catch (error) {
+			throw new CodecException.RoundEncodeException(round.Round_round, error.message);
 		}
 	}
 
 	public decodeRound(buffer: Buffer): Models.Round {
 		try {
 			return JSON.parse(buffer.toString());
-		} catch (err) {
-			throw new CodecException.RoundDecodeException(undefined, err.message);
+		} catch (error) {
+			throw new CodecException.RoundDecodeException(undefined, error.message);
 		}
 	}
 }

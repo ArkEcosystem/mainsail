@@ -15,54 +15,54 @@ import { transformBigInt, transformVendorField } from "../utils/transform";
 @Index(["timestamp"])
 export class Transaction implements Contracts.Database.TransactionModel {
 	@Column({
+		length: 64,
 		primary: true,
 		type: "varchar",
-		length: 64,
 	})
 	public id!: string;
 
 	@Column({
-		type: "smallint",
 		nullable: false,
+		type: "smallint",
 	})
 	public version!: number;
 
 	@Column({
-		type: "varchar",
 		length: 64,
 		nullable: false,
+		type: "varchar",
 	})
 	public blockId!: string;
 
 	@Column({
-		type: "integer",
 		nullable: false,
+		type: "integer",
 	})
 	public blockHeight!: number;
 
 	@Column({
-		type: "smallint",
 		nullable: false,
+		type: "smallint",
 	})
 	public sequence!: number;
 
 	@Column({
-		type: "integer",
 		nullable: false,
+		type: "integer",
 	})
 	public timestamp!: number;
 
 	@Column({
-		type: "bigint",
-		transformer: transformBigInt,
 		default: undefined,
+		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public nonce!: Utils.BigNumber;
 
 	@Column({
-		type: "varchar",
 		length: 66,
 		nullable: false,
+		type: "varchar",
 	})
 	public senderPublicKey!: string;
 
@@ -72,42 +72,42 @@ export class Transaction implements Contracts.Database.TransactionModel {
 	public recipientId!: string;
 
 	@Column({
-		type: "smallint",
 		nullable: false,
+		type: "smallint",
 	})
 	public type!: number;
 
 	@Column({
-		type: "integer",
-		nullable: false,
 		default: 1,
+		nullable: false,
+		type: "integer",
 	})
 	public typeGroup!: number;
 
 	@Column({
-		type: "bytea",
 		default: undefined,
 		transformer: transformVendorField,
+		type: "bytea",
 	})
 	public vendorField: string | undefined;
 
 	@Column({
-		type: "bigint",
-		transformer: transformBigInt,
 		nullable: false,
+		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public amount!: Utils.BigNumber;
 
 	@Column({
-		type: "bigint",
-		transformer: transformBigInt,
 		nullable: false,
+		transformer: transformBigInt,
+		type: "bigint",
 	})
 	public fee!: Utils.BigNumber;
 
 	@Column({
-		type: "bytea",
 		nullable: false,
+		type: "bytea",
 	})
 	public serialized!: Buffer;
 

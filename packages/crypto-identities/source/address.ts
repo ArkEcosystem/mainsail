@@ -58,7 +58,7 @@ export class Address {
 	public static validate(address: string, options: { pubKeyHash: number }): boolean {
 		try {
 			return Base58.decodeCheck(address)[0] === options.pubKeyHash;
-		} catch (err) {
+		} catch {
 			return false;
 		}
 	}

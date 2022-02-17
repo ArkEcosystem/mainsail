@@ -9,39 +9,44 @@ import { Listener } from "./listener";
 const internals: any = {
 	defaults: {
 		headers: null,
-		payload: {
-			maxChunkChars: false,
-		},
 		heartbeat: {
-			interval: 15000, // 15 seconds
+			interval: 15_000, // 15 seconds
 			timeout: 5000, // 5 seconds
 		},
 		maxConnections: false,
+		payload: {
+			maxChunkChars: false,
+		},
 	},
 };
 
 internals.schema = Joi.object({
-	onConnection: Joi.function(), // async function (socket) {}
-	onDisconnection: Joi.function(), // function (socket) {}
-	onMessage: Joi.function(), // async function (socket, message) { return data; }    // Or throw errors
+	// async function (socket, message) { return data; }    // Or throw errors
 	headers: Joi.array().items(Joi.string().lowercase()).min(1).allow("*", null),
-	payload: {
-		maxChunkChars: Joi.number().integer().min(1).allow(false),
-	},
+
 	heartbeat: Joi.object({
 		interval: Joi.number().integer().min(1).required(),
 		timeout: Joi.number().integer().min(1).less(Joi.ref("interval")).required(),
 	}).allow(false),
+
 	maxConnections: Joi.number().integer().min(1).allow(false),
-	origin: Joi.array().items(Joi.string()).single().min(1),
+
 	maxPayload: Joi.number().integer().min(1),
+
+	onConnection: Joi.function(),
+
+	// async function (socket) {}
+	onDisconnection: Joi.function(),
+	// function (socket) {}
+	onMessage: Joi.function(),
+	origin: Joi.array().items(Joi.string()).single().min(1),
+	payload: {
+		maxChunkChars: Joi.number().integer().min(1).allow(false),
+	},
 });
 
 const plugin = {
 	pkg: require("../../package.json"),
-	requirements: {
-		hapi: ">=19.0.0",
-	},
 	register: function (server, options) {
 		const settings: any = Hoek.applyToDefaults(internals.defaults, options);
 
@@ -72,6 +77,9 @@ const plugin = {
 		// Decorate server and request
 
 		server.decorate("request", "socket", internals.socket, { apply: true });
+	},
+	requirements: {
+		hapi: ">=19.0.0",
 	},
 };
 

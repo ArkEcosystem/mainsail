@@ -10,22 +10,22 @@ const mapTypeIntToString = {
 const mapTypeStringToInt = {
 	hello: 0,
 	ping: 1,
-	update: 2,
 	request: 3,
 	undefined: 9,
+	update: 2,
 };
 
 const HEADER_BYTE_LENGTH = 14;
 
 const OFFSETS = {
-	VERSION: 0,
-	TYPE: 1,
-	ID: 2,
-	STATUS_CODE: 6,
-	PATH_LENGTH: 8,
-	SOCKET_LENGTH: 9,
 	HEARTBEAT_INTERVAL: 10,
 	HEARTBEAT_TIMEOUT: 12,
+	ID: 2,
+	PATH_LENGTH: 8,
+	SOCKET_LENGTH: 9,
+	STATUS_CODE: 6,
+	TYPE: 1,
+	VERSION: 0,
 };
 
 const MAX_PATH_LENGTH = 100;
@@ -83,14 +83,14 @@ export const parseNesMessage = (buf: Buffer): NesMessage => {
 	const payload = buf.slice(HEADER_BYTE_LENGTH + pathLength + socketLength);
 
 	return {
-		version,
-		type,
+		heartbeat,
 		id,
-		statusCode,
 		path,
 		payload,
 		socket,
-		heartbeat,
+		statusCode,
+		type,
+		version,
 	};
 };
 

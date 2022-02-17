@@ -1,4 +1,5 @@
 import { Errors, Managers } from "@arkecosystem/crypto";
+
 import { RoundInfo } from "../contracts/shared";
 import { getMilestonesWhichAffectActiveDelegateCount } from "./calculate-forging-info";
 
@@ -25,10 +26,10 @@ export const isNewRound = (height: number): boolean => {
 
 export const calculateRound = (height: number): RoundInfo => {
 	const result: RoundInfo = {
+		maxDelegates: 0,
+		nextRound: 0,
 		round: 1,
 		roundHeight: 1,
-		nextRound: 0,
-		maxDelegates: 0,
 	};
 
 	let nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(1, "activeDelegates");

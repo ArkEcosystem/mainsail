@@ -1,10 +1,10 @@
+import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { Blocks, Crypto, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import { generateMnemonic } from "bip39";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
-import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -99,11 +99,11 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
-	public signature: string = "network:generate";
+	public signature = "network:generate";
 
-	public description: string = "Generates a new network configuration.";
+	public description = "Generates a new network configuration.";
 
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
 	/*eslint-disable */
 	private flagSettings: Flag[] = [
@@ -326,10 +326,10 @@ export class Command extends Commands.Command {
 			.filter((flag) => flag.promptType)
 			.find((flag) => flags[flag.name] === undefined);
 
-		const defaults = this.flagSettings.reduce<any>((acc: any, flag: Flag) => {
-			acc[flag.name] = flag.default;
+		const defaults = this.flagSettings.reduce<any>((accumulator: any, flag: Flag) => {
+			accumulator[flag.name] = flag.default;
 
-			return acc;
+			return accumulator;
 		}, {});
 
 		let options = {
@@ -347,16 +347,16 @@ export class Command extends Commands.Command {
 				.map(
 					(flag) =>
 						({
-							type: flag.promptType,
-							name: flag.name,
-							message: flag.description,
 							initial: flags[flag.name] ? `${flags[flag.name]}` : flag.default || "undefined",
+							message: flag.description,
+							name: flag.name,
+							type: flag.promptType,
 						} as prompts.PromptObject<string>),
 				)
 				.concat({
-					type: "confirm",
-					name: "confirm",
 					message: "Can you confirm?",
+					name: "confirm",
+					type: "confirm",
 				} as prompts.PromptObject<string>),
 		);
 
@@ -379,7 +379,7 @@ export class Command extends Commands.Command {
 				continue;
 			}
 
-			if (["confirm", "date"].includes(flag.promptType!)) {
+			if (["confirm", "date"].includes(flag.promptType)) {
 				continue;
 			}
 
@@ -393,8 +393,8 @@ export class Command extends Commands.Command {
 		const paths = envPaths(flags.token, { suffix: "core" });
 		const configPath = flags.configPath ? flags.configPath : paths.config;
 
-		const coreConfigDest = join(configPath, flags.network);
-		const cryptoConfigDest = join(coreConfigDest, "crypto");
+		const coreConfigDestination = join(configPath, flags.network);
+		const cryptoConfigDestination = join(coreConfigDestination, "crypto");
 
 		const delegates: any[] = this.generateCoreDelegates(flags.delegates, flags.pubKeyHash);
 
@@ -402,49 +402,52 @@ export class Command extends Commands.Command {
 
 		await this.components.taskList([
 			{
-				title: `Prepare directories.`,
 				task: async () => {
 					if (!flags.overwriteConfig) {
-						if (existsSync(coreConfigDest)) {
-							throw new Error(`${coreConfigDest} already exists.`);
+						if (existsSync(coreConfigDestination)) {
+							throw new Error(`${coreConfigDestination} already exists.`);
 						}
 
-						if (existsSync(cryptoConfigDest)) {
-							throw new Error(`${cryptoConfigDest} already exists.`);
+						if (existsSync(cryptoConfigDestination)) {
+							throw new Error(`${cryptoConfigDestination} already exists.`);
 						}
 					}
 
-					ensureDirSync(coreConfigDest);
-					ensureDirSync(cryptoConfigDest);
+					ensureDirSync(coreConfigDestination);
+					ensureDirSync(cryptoConfigDestination);
 				},
+				title: `Prepare directories.`,
 			},
 			{
-				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
 				task: async () => {
-					writeJSONSync(resolve(coreConfigDest, "genesis-wallet.json"), genesisWallet, { spaces: 4 });
+					writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, { spaces: 4 });
 				},
+				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
 			},
 			{
-				title: "Generate crypto network configuration.",
 				task: async () => {
 					const genesisBlock = this.generateCryptoGenesisBlock(genesisWallet, delegates, flags);
 
 					writeJSONSync(
-						resolve(cryptoConfigDest, "network.json"),
+						resolve(cryptoConfigDestination, "network.json"),
 						this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
 						{ spaces: 4 },
 					);
 
-					writeJSONSync(resolve(cryptoConfigDest, "milestones.json"), this.generateCryptoMilestones(flags), {
-						spaces: 4,
-					});
+					writeJSONSync(
+						resolve(cryptoConfigDestination, "milestones.json"),
+						this.generateCryptoMilestones(flags),
+						{
+							spaces: 4,
+						},
+					);
 
-					writeJSONSync(resolve(cryptoConfigDest, "genesisBlock.json"), genesisBlock, { spaces: 4 });
+					writeJSONSync(resolve(cryptoConfigDestination, "genesisBlock.json"), genesisBlock, { spaces: 4 });
 
-					writeJSONSync(resolve(cryptoConfigDest, "exceptions.json"), {});
+					writeJSONSync(resolve(cryptoConfigDestination, "exceptions.json"), {});
 
 					writeFileSync(
-						resolve(cryptoConfigDest, "index.ts"),
+						resolve(cryptoConfigDestination, "index.ts"),
 						[
 							'import exceptions from "./exceptions.json";',
 							'import genesisBlock from "./genesisBlock.json";',
@@ -456,46 +459,49 @@ export class Command extends Commands.Command {
 						].join("\n"),
 					);
 				},
+				title: "Generate crypto network configuration.",
 			},
 			{
-				title: "Generate Core network configuration.",
 				task: async () => {
-					writeJSONSync(resolve(coreConfigDest, "peers.json"), this.generatePeers(flags), { spaces: 4 });
+					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), {
+						spaces: 4,
+					});
 
 					writeJSONSync(
-						resolve(coreConfigDest, "delegates.json"),
+						resolve(coreConfigDestination, "delegates.json"),
 						{ secrets: delegates.map((d) => d.passphrase) },
 						{ spaces: 4 },
 					);
 
-					writeFileSync(resolve(coreConfigDest, ".env"), this.generateEnvironmentVariables(flags));
+					writeFileSync(resolve(coreConfigDestination, ".env"), this.generateEnvironmentVariables(flags));
 
-					writeJSONSync(resolve(coreConfigDest, "app.json"), this.generateApp(flags), { spaces: 4 });
+					writeJSONSync(resolve(coreConfigDestination, "app.json"), this.generateApp(flags), { spaces: 4 });
 				},
+				title: "Generate Core network configuration.",
 			},
 		]);
 
-		this.logger.info(`Configuration generated on location: ${coreConfigDest}`);
+		this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
 	}
 
 	private generateCryptoNetwork(nethash: string, options: Options) {
 		return {
-			name: options.network,
-			messagePrefix: `${options.network} message:\n`,
-			bip32: {
-				public: 70617039,
-				private: 70615956,
-			},
-			pubKeyHash: options.pubKeyHash,
-			nethash,
-			wif: options.wif,
-			slip44: 1,
 			aip20: 0,
-			client: {
-				token: options.token,
-				symbol: options.symbol,
-				explorer: options.explorer,
+			bip32: {
+				private: 70_615_956,
+				public: 70_617_039,
 			},
+			client: {
+				explorer: options.explorer,
+				symbol: options.symbol,
+				token: options.token,
+			},
+			messagePrefix: `${options.network} message:\n`,
+			name: options.network,
+			nethash,
+			pubKeyHash: options.pubKeyHash,
+			slip44: 1,
+			wif: options.wif,
 		};
 	}
 
@@ -504,30 +510,30 @@ export class Command extends Commands.Command {
 
 		return [
 			{
-				height: 1,
-				reward: "0",
 				activeDelegates: options.delegates,
-				blocktime: options.blocktime,
+				aip11: true,
 				block: {
-					version: 0,
 					idFullSha256: true,
-					maxTransactions: options.maxTxPerBlock,
 					maxPayload: options.maxBlockPayload,
+					maxTransactions: options.maxTxPerBlock,
+					version: 0,
 				},
+				blocktime: options.blocktime,
 				epoch: epoch.toISOString(),
 				fees: {
 					staticFees: {
-						transfer: options.feeStaticTransfer,
 						delegateRegistration: options.feeStaticDelegateRegistration,
-						vote: options.feeStaticVote,
-						multiSignature: options.feeStaticMultiSignature,
-						multiPayment: options.feeStaticMultiPayment,
 						delegateResignation: options.feeStaticDelegateResignation,
+						multiPayment: options.feeStaticMultiPayment,
+						multiSignature: options.feeStaticMultiSignature,
+						transfer: options.feeStaticTransfer,
+						vote: options.feeStaticVote,
 					},
 				},
-				vendorFieldLength: options.vendorFieldLength,
+				height: 1,
 				multiPaymentLimit: 256,
-				aip11: true,
+				reward: "0",
+				vendorFieldLength: options.vendorFieldLength,
 			},
 			{
 				height: options.rewardHeight,
@@ -604,7 +610,7 @@ export class Command extends Commands.Command {
 
 				return {
 					ip,
-					port: Number.isNaN(parseInt(port)) ? options.coreP2PPort : parseInt(port),
+					port: Number.isNaN(Number.parseInt(port)) ? options.coreP2PPort : Number.parseInt(port),
 				};
 			});
 
@@ -613,10 +619,10 @@ export class Command extends Commands.Command {
 
 	private generateApp(options: Options): any {
 		const dynamicFees: DynamicFees = {
-			enabled: undefined,
-			minFeePool: undefined,
-			minFeeBroadcast: undefined,
 			addonBytes: {},
+			enabled: undefined,
+			minFeeBroadcast: undefined,
+			minFeePool: undefined,
 		};
 
 		let includeDynamicFees = false;
@@ -658,7 +664,7 @@ export class Command extends Commands.Command {
 			includeDynamicFees = true;
 		}
 
-		if (!Object.keys(dynamicFees.addonBytes).length) {
+		if (Object.keys(dynamicFees.addonBytes).length === 0) {
 			// @ts-ignore
 			delete dynamicFees.addonBytes;
 		}
@@ -680,9 +686,9 @@ export class Command extends Commands.Command {
 
 	private generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Wallet[] {
 		const wallets: Wallet[] = [];
-		for (let i = 0; i < activeDelegates; i++) {
+		for (let index = 0; index < activeDelegates; index++) {
 			const delegateWallet: Wallet = this.createWallet(pubKeyHash);
-			delegateWallet.username = `genesis_${i + 1}`;
+			delegateWallet.username = `genesis_${index + 1}`;
 
 			wallets.push(delegateWallet);
 		}
@@ -697,8 +703,8 @@ export class Command extends Commands.Command {
 
 		return {
 			address: Identities.Address.fromPublicKey(keys.publicKey, pubKeyHash),
-			passphrase,
 			keys,
+			passphrase,
 			username: undefined,
 		};
 	}
@@ -708,13 +714,13 @@ export class Command extends Commands.Command {
 		recipient: Wallet,
 		amount: string,
 		pubKeyHash: number,
-		nonce: number = 1,
+		nonce = 1,
 	): any {
 		return this.formatGenesisTransaction(
 			Transactions.BuilderFactory.transfer()
 				.network(pubKeyHash)
 				.version(2)
-				.nonce(nonce.toFixed())
+				.nonce(nonce.toFixed(0))
 				.recipientId(recipient.address)
 				.amount(amount)
 				.sign(sender.passphrase).data,
@@ -742,7 +748,7 @@ export class Command extends Commands.Command {
 					.network(pubKeyHash)
 					.version(2)
 					.nonce("1") // delegate registration tx is always the first one from sender
-					.usernameAsset(sender.username!)
+					.usernameAsset(sender.username)
 					.fee(`${25 * 1e8}`)
 					.sign(sender.passphrase).data,
 				sender,
@@ -803,21 +809,30 @@ export class Command extends Commands.Command {
 		const payloadHash: Buffer = Crypto.HashAlgorithms.sha256(Buffer.concat(allBytes));
 
 		const block: any = {
-			version: 0,
-			totalAmount: totalAmount.toString(),
-			totalFee: totalFee.toString(),
-			reward: "0",
-			payloadHash: payloadHash.toString("hex"),
-			timestamp,
-			numberOfTransactions: transactions.length,
-			payloadLength,
-			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+			blockSignature: undefined,
+
 			// @ts-ignore
 			generatorPublicKey: keys.publicKey.toString("hex"),
-			transactions,
+
 			height: 1,
+
 			id: undefined,
-			blockSignature: undefined,
+
+			numberOfTransactions: transactions.length,
+
+			payloadHash: payloadHash.toString("hex"),
+
+			payloadLength,
+
+			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+
+			reward: "0",
+
+			timestamp,
+			totalAmount: totalAmount.toString(),
+			totalFee: totalFee.toString(),
+			transactions,
+			version: 0,
 		};
 
 		block.id = Blocks.Block.getId(block);

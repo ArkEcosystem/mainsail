@@ -6,9 +6,9 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "env:get";
+	public signature = "env:get";
 
-	public description: string = "Get the value of an environment variable.";
+	public description = "Get the value of an environment variable.";
 
 	public configure(): void {
 		this.definition

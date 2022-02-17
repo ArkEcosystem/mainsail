@@ -28,8 +28,8 @@ export class Signer {
 		index = index === -1 ? transaction.signatures.length : index;
 
 		const hash: Buffer = Utils.toHash(transaction, {
-			excludeSignature: true,
 			excludeMultiSignature: true,
+			excludeSignature: true,
 		});
 
 		const signature: string = Hash.signSchnorr(hash, keys);

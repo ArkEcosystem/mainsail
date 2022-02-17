@@ -49,7 +49,7 @@ export class Config {
 	public load(): any {
 		try {
 			this.store = readJsonSync(this.file);
-		} catch (error) {
+		} catch {
 			this.restoreDefaults();
 
 			this.load();
@@ -72,7 +72,7 @@ export class Config {
 		}
 
 		if (!this.has("channel")) {
-			this.set("channel", this.getRegistryChannel(this.app.get<PackageJson>(Identifiers.Package).version!));
+			this.set("channel", this.getRegistryChannel(this.app.get<PackageJson>(Identifiers.Package).version));
 		}
 
 		if (!this.has("plugins")) {

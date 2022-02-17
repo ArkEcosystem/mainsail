@@ -5,7 +5,7 @@ import { WorkerData, WorkerSyncData } from "../contracts/worker";
 
 export class WorkerWrapper extends EventEmitter {
 	private worker: Worker;
-	private isDone: boolean = false;
+	private isDone = false;
 
 	public constructor(data: WorkerData) {
 		super();
@@ -16,27 +16,39 @@ export class WorkerWrapper extends EventEmitter {
 		});
 
 		this.worker.on("error", (err) => {
-			this.emit("*", { name: "error", data: err });
+			this.emit("*", { data: err, name: "error" });
 		});
 
 		this.worker.on("exit", (statusCode) => {
 			this.isDone = true;
 			this.emit("exit", statusCode);
-			this.emit("*", { name: "exit", data: statusCode });
+			this.emit("*", { data: statusCode, name: "exit" });
 		});
 	}
 
 	public start(): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			this.once("*", (data) => {
-				if (data.name === "started") {
-					resolve();
-				} else if (data.name === "exit") {
-					resolve();
-				} else if (data.name === "exception" || data.name === "error") {
-					reject(data.data);
-				} else {
-					reject();
+				switch (data.name) {
+					case "started": {
+						resolve();
+
+						break;
+					}
+					case "exit": {
+						resolve();
+
+						break;
+					}
+					case "exception":
+					case "error": {
+						reject(data.data);
+
+						break;
+					}
+					default: {
+						reject();
+					}
 				}
 			});
 
@@ -52,14 +64,26 @@ export class WorkerWrapper extends EventEmitter {
 			}
 
 			this.once("*", (data) => {
-				if (data.name === "synchronized") {
-					resolve(data.data);
-				} else if (data.name === "exit") {
-					resolve();
-				} else if (data.name === "exception" || data.name === "error") {
-					reject(data.data);
-				} else {
-					reject();
+				switch (data.name) {
+					case "synchronized": {
+						resolve(data.data);
+
+						break;
+					}
+					case "exit": {
+						resolve();
+
+						break;
+					}
+					case "exception":
+					case "error": {
+						reject(data.data);
+
+						break;
+					}
+					default: {
+						reject();
+					}
 				}
 			});
 
@@ -79,7 +103,7 @@ export class WorkerWrapper extends EventEmitter {
 		this.emit(data.action, data.data);
 		/* istanbul ignore next */
 		if (data.action !== "count" && data.action !== "log") {
-			this.emit("*", { name: data.action, data: data.data });
+			this.emit("*", { data: data.data, name: data.action });
 		}
 	}
 }

@@ -9,6 +9,6 @@ export class Box {
 	private readonly logger!: Logger;
 
 	public render(message: string): void {
-		this.logger.log(boxen(message, { margin: 1, padding: 1, borderStyle: boxen.BorderStyle.Classic }));
+		this.logger.log(boxen(message, { borderStyle: boxen.BorderStyle.Classic, margin: 1, padding: 1 }));
 	}
 }

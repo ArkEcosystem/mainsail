@@ -1,3 +1,4 @@
+import { Managers } from "..";
 import { Hash, HashAlgorithms, Slots } from "../crypto";
 import { BlockSchemaError } from "../errors";
 import { IBlock, IBlockData, IBlockJson, IBlockVerification, ITransaction, ITransactionData } from "../interfaces";
@@ -5,7 +6,6 @@ import { configManager } from "../managers/config";
 import { BigNumber, isException } from "../utils";
 import { validator } from "../validation";
 import { Serializer } from "./serializer";
-import { Managers } from "..";
 
 export class Block implements IBlock {
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
@@ -68,7 +68,7 @@ export class Block implements IBlock {
 		for (const err of result.errors) {
 			let fatal = false;
 
-			const match = err.dataPath.match(/\.transactions\[([0-9]+)\]/);
+			const match = err.dataPath.match(/\.transactions\[(\d+)]/);
 			if (match === null) {
 				if (!isException(data)) {
 					fatal = true;
@@ -160,18 +160,16 @@ export class Block implements IBlock {
 	public verify(): IBlockVerification {
 		const block: IBlockData = this.data;
 		const result: IBlockVerification = {
-			verified: false,
 			containsMultiSignatures: false,
 			errors: [],
+			verified: false,
 		};
 
 		try {
 			const constants = configManager.getMilestone(block.height);
 
-			if (block.height !== 1) {
-				if (!block.previousBlock) {
-					result.errors.push("Invalid previous block");
-				}
+			if (block.height !== 1 && !block.previousBlock) {
+				result.errors.push("Invalid previous block");
 			}
 
 			if (!block.reward.isEqualTo(constants.reward)) {
@@ -212,10 +210,8 @@ export class Block implements IBlock {
 				result.errors.push("Invalid number of transactions");
 			}
 
-			if (this.transactions.length > constants.block.maxTransactions) {
-				if (block.height > 1) {
-					result.errors.push("Transactions length is too high");
-				}
+			if (this.transactions.length > constants.block.maxTransactions && block.height > 1) {
+				result.errors.push("Transactions length is too high");
 			}
 
 			// Checking if transactions of the block adds up to block values.
@@ -252,7 +248,7 @@ export class Block implements IBlock {
 					const now: number = block.timestamp;
 					if (transaction.data.timestamp > now + 3600 + constants.blocktime) {
 						result.errors.push(`Encountered future transaction: ${transaction.data.id}`);
-					} else if (now - transaction.data.timestamp > 21600) {
+					} else if (now - transaction.data.timestamp > 21_600) {
 						result.errors.push(`Encountered expired transaction: ${transaction.data.id}`);
 					}
 				}

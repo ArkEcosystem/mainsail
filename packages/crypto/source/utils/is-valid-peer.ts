@@ -2,7 +2,7 @@ import * as ipAdd from "ipaddr.js";
 import os from "os";
 
 // todo: review the implementation of all methods
-export const isLocalHost = (ip: string, includeNetworkInterfaces: boolean = true): boolean => {
+export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolean => {
 	try {
 		const parsed = ipAdd.parse(ip);
 		if (parsed.range() === "loopback" || ip.startsWith("0") || ["127.0.0.1", "::ffff:127.0.0.1"].includes(ip)) {
@@ -18,7 +18,7 @@ export const isLocalHost = (ip: string, includeNetworkInterfaces: boolean = true
 		}
 
 		return false;
-	} catch (error) {
+	} catch {
 		return false;
 	}
 };
@@ -26,14 +26,14 @@ export const isLocalHost = (ip: string, includeNetworkInterfaces: boolean = true
 const sanitizeRemoteAddress = (ip: string): string | undefined => {
 	try {
 		return ipAdd.process(ip).toString();
-	} catch (error) {
+	} catch {
 		return undefined;
 	}
 };
 
 export const isValidPeer = (
 	peer: { ip: string; status?: string | number },
-	includeNetworkInterfaces: boolean = true,
+	includeNetworkInterfaces = true,
 ): boolean => {
 	const sanitizedAddress: string | undefined = sanitizeRemoteAddress(peer.ip);
 

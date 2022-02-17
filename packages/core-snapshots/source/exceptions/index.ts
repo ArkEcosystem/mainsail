@@ -1,5 +1,3 @@
-import * as Codec from "./codec";
-import * as Stream from "./stream";
-import * as Verifier from "./verifier";
-
-export { Codec, Stream, Verifier };
+export * as Codec from "./codec";
+export * as Stream from "./stream";
+export * as Verifier from "./verifier";

@@ -9,7 +9,7 @@ import { Block } from "./block";
 export class Deserializer {
 	public static deserialize(
 		serialized: Buffer,
-		headerOnly: boolean = false,
+		headerOnly = false,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): { data: IBlockData; transactions: ITransaction[] } {
 		const block = {} as IBlockData;
@@ -86,7 +86,7 @@ export class Deserializer {
 	private static deserializeTransactions(
 		block: IBlockData,
 		buf: ByteBuffer,
-		deserializeTransactionsUnchecked: boolean = false,
+		deserializeTransactionsUnchecked = false,
 	): ITransaction[] {
 		const transactionLengths: number[] = [];
 

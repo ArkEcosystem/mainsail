@@ -25,7 +25,7 @@ export class ApiInjectClient {
 		const url = this.getUrl(path, params);
 		const payload = JSON.stringify(body);
 		const headers = { "Content-Type": "application/json" };
-		const request = { method: "POST", url, payload, headers };
+		const request = { headers, method: "POST", payload, url };
 		const response = await this.server.inject(request);
 
 		return this.getResponse(response);
@@ -48,9 +48,9 @@ export class ApiInjectClient {
 		const responseBody = JSON.parse(JSON.stringify(response.result));
 
 		return {
-			status: response.statusCode,
-			headers: responseHeaders,
 			body: responseBody,
+			headers: responseHeaders,
+			status: response.statusCode,
 		};
 	}
 }

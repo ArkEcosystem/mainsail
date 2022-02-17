@@ -1,5 +1,5 @@
-import { ITransactionData } from "../interfaces";
 import { BigNumber } from "../utils";
+import { ITransactionData } from "./";
 import { ITransaction, ITransactionJson } from "./transactions";
 
 export interface IBlockVerification {

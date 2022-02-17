@@ -1,20 +1,19 @@
 import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";
-import * as semver from "semver";
+import { lte } from "semver";
 import { PackageJson } from "type-fest";
 
 import { Application } from "../application";
 import { Confirm, Spinner, Warning } from "../components";
-import { Config } from "../contracts";
+import { Config, Updater as Contracts_Updater } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 import { Installer } from "./installer";
 import { ProcessManager } from "./process-manager";
-import * as Contracts from "../contracts";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
 @injectable()
-export class Updater implements Contracts.Updater {
+export class Updater implements Contracts_Updater {
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
@@ -60,7 +59,7 @@ export class Updater implements Contracts.Updater {
 		return true;
 	}
 
-	public async update(updateProcessManager: boolean = false, force: boolean = false): Promise<boolean> {
+	public async update(updateProcessManager = false, force = false): Promise<boolean> {
 		if (this.latestVersion === undefined) {
 			return false;
 		}
@@ -100,7 +99,7 @@ export class Updater implements Contracts.Updater {
 				version: this.packageChannel,
 			});
 
-			if (semver.lte(latest, this.packageVersion)) {
+			if (lte(latest, this.packageVersion)) {
 				return undefined;
 			}
 
@@ -115,11 +114,11 @@ export class Updater implements Contracts.Updater {
 	}
 
 	private get packageName(): string {
-		return this.pkg.name!;
+		return this.pkg.name;
 	}
 
 	private get packageVersion(): string {
-		return this.pkg.version!;
+		return this.pkg.version;
 	}
 
 	private get packageChannel(): string {

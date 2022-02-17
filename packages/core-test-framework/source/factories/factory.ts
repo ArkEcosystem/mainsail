@@ -13,9 +13,9 @@ export class Factory {
 		attributes: object;
 		options: FactoryFunctionOptions;
 	} = {
-		states: new Set<string>(["default"]),
 		attributes: {},
 		options: {},
+		states: new Set<string>(["default"]),
 	};
 
 	public state(state: string, fn: FactoryFunction): boolean {
@@ -56,7 +56,7 @@ export class Factory {
 		return this;
 	}
 
-	public make<T>(resetModifiers: boolean = true): T {
+	public make<T>(resetModifiers = true): T {
 		const states: string[] = [...this.modifiers.states.values()];
 		const initialState: string | undefined = states.shift();
 

@@ -27,20 +27,20 @@ export class Sandbox {
 		core: {},
 		crypto: {
 			flags: {
+				blocktime: 8,
+				delegates: 51,
+				explorer: "http://uexplorer.ark.io",
+				maxBlockPayload: 2_097_152,
+				distribute: true,
+				maxTxPerBlock: 150,
 				network: "unitnet",
 				premine: "15300000000000000",
-				delegates: 51,
-				blocktime: 8,
-				maxTxPerBlock: 150,
-				maxBlockPayload: 2097152,
-				rewardHeight: 75600,
-				rewardAmount: 200000000,
 				pubKeyHash: 23,
-				wif: 186,
-				token: "UARK",
+				rewardAmount: 200_000_000,
+				rewardHeight: 75_600,
 				symbol: "UѦ",
-				explorer: "http://uexplorer.ark.io",
-				distribute: true,
+				token: "UARK",
+				wif: 186,
 			},
 		},
 	};
@@ -110,7 +110,7 @@ export class Sandbox {
 	public async dispose(callback?: SandboxCallback): Promise<void> {
 		try {
 			await this.app.terminate();
-		} catch (error) {
+		} catch {
 			// We encountered a unexpected error.
 		}
 

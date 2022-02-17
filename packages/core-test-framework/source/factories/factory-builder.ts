@@ -9,7 +9,7 @@ export class FactoryBuilder {
 	public get(factory: string): Factory {
 		strictEqual(this.factories.has(factory), true, `The [${factory}] factory is unknown.`);
 
-		return this.factories.get(factory) as Factory;
+		return this.factories.get(factory);
 	}
 
 	public set(factory: string, fn: FactoryFunction): boolean {

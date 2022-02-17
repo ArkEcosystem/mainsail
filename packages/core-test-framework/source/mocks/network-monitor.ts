@@ -1,6 +1,6 @@
 import { NetworkMonitor } from "@arkecosystem/core-p2p";
 
-let mockNetworkHeight: number = 0;
+let mockNetworkHeight = 0;
 
 export const setNetworkHeight = (networkHeight: number) => {
 	mockNetworkHeight = networkHeight;

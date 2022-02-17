@@ -6,11 +6,11 @@ import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {
-	public signature: string = "config:forger:bip39";
+	public signature = "config:forger:bip39";
 
-	public description: string = "Configure the forging delegate (BIP39).";
+	public description = "Configure the forging delegate (BIP39).";
 
-	public isHidden: boolean = true;
+	public isHidden = true;
 
 	public configure(): void {
 		this.definition
@@ -27,18 +27,18 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				type: "password",
-				name: "bip39",
 				message: "Please enter your delegate plain text passphrase. Referred to as BIP39.",
+				name: "bip39",
+				type: "password",
 				validate: /* istanbul ignore next */ (value) =>
 					!validateMnemonic(value) && !this.getFlag("skipValidation")
 						? `Failed to verify the given passphrase as BIP39 compliant.`
 						: true,
 			},
 			{
-				type: "confirm",
-				name: "confirm",
 				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
 			},
 		]);
 
@@ -50,15 +50,14 @@ export class Command extends Commands.Command {
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
 		await this.components.taskList([
 			{
-				title: "Validating passphrase is BIP39 compliant.",
 				task: () => {
 					if (!flags.bip39 || (!validateMnemonic(flags.bip39) && !flags.skipValidation)) {
 						throw new Error(`Failed to verify the given passphrase as BIP39 compliant.`);
 					}
 				},
+				title: "Validating passphrase is BIP39 compliant.",
 			},
 			{
-				title: "Writing BIP39 passphrase to configuration.",
 				task: () => {
 					const delegatesConfig = this.app.getCorePath("config", "delegates.json");
 
@@ -68,6 +67,7 @@ export class Command extends Commands.Command {
 
 					writeJSONSync(delegatesConfig, delegates);
 				},
+				title: "Writing BIP39 passphrase to configuration.",
 			},
 		]);
 	}
