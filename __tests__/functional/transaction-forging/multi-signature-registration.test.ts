@@ -12,7 +12,7 @@ import {
 
 import * as support from "./__support__";
 
-const { passphrase, secondPassphrase } = support.passphrases;
+const { passphrase } = support.passphrases;
 
 let app: Contracts.Kernel.Application;
 let networkConfig: Interfaces.NetworkConfig;
@@ -50,47 +50,6 @@ describe("Transaction Forging - Multi Signature Registration", () => {
             .multiSignature(participants, 3)
             .withPassphrase(passphrase)
             .withPassphraseList(passphrases)
-            .createOne();
-
-        await expect(multiSignature).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(multiSignature.id).toBeForged();
-    });
-
-    it("should broadcast, accept and forge it [Signed with 2 Passphrases]", async () => {
-        const passphrase = secrets[2];
-        // Make a fresh wallet for the second signature tests
-        const initialFunds = TransactionFactory.initialize(app)
-            .transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
-            .withPassphrase(secrets[0])
-            .createOne();
-
-        await expect(initialFunds).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(initialFunds.id).toBeForged();
-
-        // Register a second passphrase
-        const secondSignature = TransactionFactory.initialize(app)
-            .secondSignature(secondPassphrase)
-            .withPassphrase(passphrase)
-            .createOne();
-
-        await expect(secondSignature).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(secondSignature.id).toBeForged();
-
-        // Register a multi signature wallet with defaults
-        const passphrases = [passphrase, secrets[3], secrets[4]];
-        const participants = [
-            Identities.PublicKey.fromPassphrase(passphrases[0]),
-            Identities.PublicKey.fromPassphrase(passphrases[1]),
-            Identities.PublicKey.fromPassphrase(passphrases[2]),
-        ];
-
-        const multiSignature = TransactionFactory.initialize(app)
-            .multiSignature(participants, 3)
-            .withPassphraseList(passphrases)
-            .withPassphrasePair({ passphrase, secondPassphrase })
             .createOne();
 
         await expect(multiSignature).toBeAccepted();

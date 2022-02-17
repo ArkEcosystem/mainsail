@@ -20,7 +20,6 @@ export const defaults = {
         minFeeBroadcast: 3000,
         addonBytes: {
             transfer: 100,
-            secondSignature: 250,
             delegateRegistration: 400000,
             vote: 100,
             multiSignature: 500,

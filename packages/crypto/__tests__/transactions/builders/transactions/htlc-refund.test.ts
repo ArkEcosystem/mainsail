@@ -48,15 +48,5 @@ describe("Htlc refund Transaction", () => {
             expect(actual.build().verified).toBeTrue();
             expect(actual.verify()).toBeTrue();
         });
-
-        it("should be valid with a second signature", () => {
-            const actual = builder
-                .htlcRefundAsset(htlcRefundAsset)
-                .sign("dummy passphrase")
-                .secondSign("dummy passphrase");
-
-            expect(actual.build().verified).toBeTrue();
-            expect(actual.verify()).toBeTrue();
-        });
     });
 });

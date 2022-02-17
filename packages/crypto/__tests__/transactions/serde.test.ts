@@ -140,7 +140,6 @@ describe("Transaction serializer / deserializer", () => {
             };
 
             Signer.sign(transaction.data, Keys.fromPassphrase("sender passphrase"));
-            Signer.secondSign(transaction.data, Keys.fromPassphrase("second passphrase"));
 
             const serialized = Serializer.serialize(transaction);
             expect(serialized.toString("hex")).toEqual(

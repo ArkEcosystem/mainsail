@@ -8,7 +8,6 @@ const defaultPassphrase: string = secrets[0];
 
 interface IPassphrasePair {
     passphrase: string;
-    secondPassphrase: string;
 }
 
 // todo: replace this by the use of real factories
@@ -22,7 +21,6 @@ export class TransactionFactory {
     private fee: Utils.BigNumber | undefined;
     private timestamp: number | undefined;
     private passphrase: string = defaultPassphrase;
-    private secondPassphrase: string | undefined;
     private passphraseList: string[] | undefined;
     private passphrasePairs: IPassphrasePair[] | undefined;
     private version: number | undefined;
@@ -50,14 +48,6 @@ export class TransactionFactory {
         }
 
         this.builder = builder;
-
-        return this;
-    }
-
-    public secondSignature(secondPassphrase?: string): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.secondSignature().signatureAsset(
-            secondPassphrase || defaultPassphrase,
-        );
 
         return this;
     }
@@ -227,12 +217,6 @@ export class TransactionFactory {
         return this;
     }
 
-    public withSecondPassphrase(secondPassphrase: string): TransactionFactory {
-        this.secondPassphrase = secondPassphrase;
-
-        return this;
-    }
-
     public withPassphraseList(passphrases: string[]): TransactionFactory {
         this.passphraseList = passphrases;
 
@@ -241,7 +225,6 @@ export class TransactionFactory {
 
     public withPassphrasePair(passphrases: IPassphrasePair): TransactionFactory {
         this.passphrase = passphrases.passphrase;
-        this.secondPassphrase = passphrases.secondPassphrase;
 
         return this;
     }
@@ -280,7 +263,6 @@ export class TransactionFactory {
             return this.passphrasePairs.map(
                 (passphrasePair: IPassphrasePair) =>
                     this.withPassphrase(passphrasePair.passphrase)
-                        .withSecondPassphrase(passphrasePair.secondPassphrase)
                         .sign<T>(quantity, method)[0],
             );
         }
@@ -379,10 +361,6 @@ export class TransactionFactory {
 
             if (sign) {
                 this.builder.sign(this.passphrase);
-
-                if (this.secondPassphrase) {
-                    this.builder.secondSign(this.secondPassphrase);
-                }
             }
 
             const transaction = this.builder[method]();

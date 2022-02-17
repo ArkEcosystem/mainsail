@@ -77,17 +77,5 @@ describe("Htlc lock Transaction", () => {
             expect(actual.build().verified).toBeTrue();
             expect(actual.verify()).toBeTrue();
         });
-
-        it("should be valid with a second signature", () => {
-            const actual = builder
-                .recipientId(address)
-                .htlcLockAsset(htlcLockAsset)
-                .amount("1")
-                .sign("dummy passphrase")
-                .secondSign("dummy passphrase");
-
-            expect(actual.build().verified).toBeTrue();
-            expect(actual.verify()).toBeTrue();
-        });
     });
 });

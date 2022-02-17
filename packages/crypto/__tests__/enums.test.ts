@@ -9,9 +9,6 @@ describe("Constants", () => {
         expect(TransactionType.Transfer).toBeDefined();
         expect(TransactionType.Transfer).toBe(0);
 
-        expect(TransactionType.SecondSignature).toBeDefined();
-        expect(TransactionType.SecondSignature).toBe(1);
-
         expect(TransactionType.DelegateRegistration).toBeDefined();
         expect(TransactionType.DelegateRegistration).toBe(2);
 

@@ -12,7 +12,7 @@ import {
 
 import * as support from "./__support__";
 
-const { passphrase, secondPassphrase } = support.passphrases;
+const { passphrase } = support.passphrases;
 
 let app: Contracts.Kernel.Application;
 let networkConfig: Interfaces.NetworkConfig;
@@ -36,38 +36,6 @@ describe("Transaction Forging - Transfer", () => {
         await expect(transaction).toBeAccepted();
         await snoozeForBlock(1);
         await expect(transaction.id).toBeForged();
-    });
-
-    it("should broadcast, accept and forge it [Signed with 2 Passphrases]", async () => {
-        // Funds to register a second passphrase
-        const initialFunds = TransactionFactory.initialize(app)
-            .transfer(Identities.Address.fromPassphrase(passphrase), 50 * 1e8)
-            .withPassphrase(secrets[0])
-            .createOne();
-
-        await expect(initialFunds).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(initialFunds.id).toBeForged();
-
-        // Register a second passphrase
-        const secondSignature = TransactionFactory.initialize(app)
-            .secondSignature(secondPassphrase)
-            .withPassphrase(passphrase)
-            .createOne();
-
-        await expect(secondSignature).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(secondSignature.id).toBeForged();
-
-        // Submit a transfer with 2 passprhases
-        const transfer = TransactionFactory.initialize(app)
-            .transfer(Identities.Address.fromPassphrase(passphrase))
-            .withPassphrasePair(support.passphrases)
-            .createOne();
-
-        await expect(transfer).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(transfer.id).toBeForged();
     });
 
     it("should broadcast, accept and forge it [3-of-3 multisig]", async () => {

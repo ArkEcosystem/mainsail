@@ -26,7 +26,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeTransfer(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.vendorField).toBeDefined();
     });
 
@@ -36,14 +35,12 @@ describe("Signer", () => {
             recipient: Identities.Address.fromPassphrase(passphrases[2]),
             amount: "100",
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
             vendorField: "dummy",
         };
 
         const entity: Interfaces.ITransactionData = signer.makeTransfer(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.vendorField).toBeDefined();
     });
 
@@ -57,7 +54,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeDelegate(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.delegate?.username).toBeString();
     });
 
@@ -66,29 +62,12 @@ describe("Signer", () => {
             delegateFee: "5",
             username: "dummy",
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeDelegate(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.delegate?.username).toBeString();
-    });
-
-    it("should make second signature", async () => {
-        const options = {
-            signatureFee: "5",
-            username: "dummy",
-            passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeSecondSignature(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
-        expect(entity.asset?.signature?.publicKey).toBeString();
     });
 
     it("should make vote", async () => {
@@ -101,7 +80,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeVote(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.votes).toBeArray();
     });
 
@@ -110,13 +88,11 @@ describe("Signer", () => {
             voteFee: "5",
             delegate: Identities.PublicKey.fromPassphrase(passphrases[3]),
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeVote(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.votes).toBeArray();
     });
 
@@ -133,7 +109,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeMultiSignatureRegistration(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.signatures).toBeArray();
         expect(entity.asset?.multiSignature?.min).toBeNumber();
         expect(entity.asset?.multiSignature?.publicKeys).toBeArray();
@@ -147,13 +122,11 @@ describe("Signer", () => {
             )},${Identities.PublicKey.fromPassphrase(passphrases[2])}`,
             passphrases: `${passphrases[0]},${passphrases[1]},${passphrases[2]}`,
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeMultiSignatureRegistration(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.signatures).toBeArray();
         expect(entity.asset?.multiSignature?.min).toBeNumber();
         expect(entity.asset?.multiSignature?.publicKeys).toBeArray();
@@ -178,7 +151,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeMultipayment(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.payments).toBeArray();
     });
 
@@ -196,13 +168,11 @@ describe("Signer", () => {
                 },
             ],
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeMultipayment(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.payments).toBeArray();
     });
 
@@ -224,7 +194,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcLock(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.lock?.secretHash).toBeString();
         expect(entity.asset?.lock?.expiration).toBeDefined();
     });
@@ -242,13 +211,11 @@ describe("Signer", () => {
             amount: "100",
             recipient: Identities.Address.fromPassphrase(passphrases[0]),
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeHtlcLock(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.lock?.secretHash).toBeString();
         expect(entity.asset?.lock?.expiration).toBeDefined();
     });
@@ -266,7 +233,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcClaim(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.claim?.lockTransactionId).toBeString();
         expect(entity.asset?.claim?.unlockSecret).toBeString();
     });
@@ -279,13 +245,11 @@ describe("Signer", () => {
                 unlockSecret: "dummy unlock secret",
             },
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeHtlcClaim(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.claim?.lockTransactionId).toBeString();
         expect(entity.asset?.claim?.unlockSecret).toBeString();
     });
@@ -302,7 +266,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcRefund(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.refund?.lockTransactionId).toBeString();
     });
 
@@ -313,13 +276,11 @@ describe("Signer", () => {
                 lockTransactionId: "12345",
             },
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeHtlcRefund(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.refund?.lockTransactionId).toBeString();
     });
 });

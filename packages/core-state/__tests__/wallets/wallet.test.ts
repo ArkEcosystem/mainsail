@@ -147,15 +147,6 @@ describe("Models - Wallet", () => {
         expect(wallet.hasVoted()).toBe(true);
     });
 
-    it("should return whether the wallet has a second signature", () => {
-        const address = "Abcde";
-        const wallet = new Wallet(address, attributeMap);
-
-        expect(wallet.hasSecondSignature()).toBe(false);
-        wallet.setAttribute("secondPublicKey", {});
-        expect(wallet.hasSecondSignature()).toBe(true);
-    });
-
     it("should return whether the wallet has multisignature", () => {
         const address = "Abcde";
         const wallet = new Wallet(address, attributeMap);

@@ -23,7 +23,6 @@ describe("Valid", () => {
             const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
 
             expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.secondSignature).toBeUndefined();
             expect(transaction.data).not.toBeValidTransaction();
         });
     });

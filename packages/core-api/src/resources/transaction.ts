@@ -49,7 +49,6 @@ export class TransactionResource implements Resource {
             senderPublicKey: resource.senderPublicKey,
             recipient: resource.recipientId || sender,
             signature: resource.signature,
-            signSignature: resource.signSignature || resource.secondSignature,
             signatures: resource.signatures,
             vendorField: resource.vendorField,
             asset: resource.asset,

@@ -103,8 +103,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
     sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("vote");
 
-    sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("secondPublicKey");
-
     sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate.resigned");
 
     sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate.rank");

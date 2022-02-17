@@ -148,10 +148,8 @@ export const htlcRefundAsset = {
 export const passphrasePairsAsset = [
     {
         passphrase: passphrases[0],
-        secondPassphrase: passphrases[1],
     },
     {
         passphrase: passphrases[3],
-        secondPassphrase: passphrases[4],
     },
 ];

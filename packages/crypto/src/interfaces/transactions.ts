@@ -67,8 +67,6 @@ export interface ITransactionData {
 
     id?: string;
     signature?: string;
-    secondSignature?: string;
-    signSignature?: string;
     signatures?: string[];
 
     blockId?: string;
@@ -98,8 +96,6 @@ export interface ITransactionJson {
 
     id?: string;
     signature?: string;
-    secondSignature?: string;
-    signSignature?: string;
     signatures?: string[];
 
     blockId?: string;
@@ -172,7 +168,6 @@ export interface ISerializeOptions {
     acceptLegacyVersion?: boolean;
     disableVersionCheck?: boolean;
     excludeSignature?: boolean;
-    excludeSecondSignature?: boolean;
     excludeMultiSignature?: boolean;
 
     // WORKAROUND: A handful of mainnet transactions have an invalid

@@ -27,7 +27,6 @@ export class FixtureGenerator {
                 forgedRewards: Utils.BigNumber.ZERO,
                 forgedFees: Utils.BigNumber.ZERO,
             });
-            wallet.setAttribute("secondPublicKey", `secondPublicKey-${address}`);
             wallet.setAttribute("vote", `vote-${address}`);
             return wallet;
         });

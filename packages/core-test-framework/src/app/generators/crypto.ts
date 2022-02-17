@@ -108,7 +108,6 @@ export class CryptoGenerator extends Generator {
                 fees: {
                     staticFees: {
                         transfer: 10000000,
-                        secondSignature: 500000000,
                         delegateRegistration: 2500000000,
                         vote: 100000000,
                         multiSignature: 500000000,

@@ -463,7 +463,6 @@ describe("API 2.0 - Transactions", () => {
             expect(response.data.data).toEqual({
                 1: {
                     Transfer: 0,
-                    SecondSignature: 1,
                     DelegateRegistration: 2,
                     Vote: 3,
                     MultiSignature: 4,
@@ -621,7 +620,6 @@ describe("API 2.0 - Transactions", () => {
                     htlcRefund: "0",
                     multiPayment: "10000000",
                     multiSignature: "500000000",
-                    secondSignature: "500000000",
                     transfer: "10000000",
                     vote: "100000000",
                 },

@@ -14,14 +14,12 @@ import { configManager } from "@packages/crypto/src/managers";
 import {
     buildMultiSignatureWallet,
     buildRecipientWallet,
-    buildSecondSignatureWallet,
     buildSenderWallet,
     initApp,
 } from "../__support__/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
-let secondSignatureWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
@@ -55,12 +53,10 @@ beforeEach(() => {
     Factories.registerTransactionFactory(factoryBuilder);
 
     senderWallet = buildSenderWallet(factoryBuilder);
-    secondSignatureWallet = buildSecondSignatureWallet(factoryBuilder);
     multiSignatureWallet = buildMultiSignatureWallet();
     recipientWallet = buildRecipientWallet(factoryBuilder);
 
     walletRepository.index(senderWallet);
-    walletRepository.index(secondSignatureWallet);
     walletRepository.index(multiSignatureWallet);
     walletRepository.index(recipientWallet);
 });

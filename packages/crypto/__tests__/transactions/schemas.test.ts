@@ -211,64 +211,6 @@ describe("Transfer Transaction", () => {
     });
 });
 
-describe("Second Signature Transaction", () => {
-    beforeAll(() => {
-        transactionSchema = TransactionTypeFactory.get(TransactionType.SecondSignature).getSchema();
-    });
-
-    beforeEach(() => {
-        transaction = BuilderFactory.secondSignature();
-    });
-
-    it("should be valid", () => {
-        transaction.signatureAsset("second passphrase").sign("passphrase");
-
-        const { error } = Ajv.validate(transactionSchema.$id, transaction.getStruct());
-        expect(error).toBeUndefined();
-    });
-
-    it("should be valid with correct data", () => {
-        transaction.signatureAsset("second passphrase").fee("100000000").sign("passphrase");
-
-        const { error } = Ajv.validate(transactionSchema.$id, transaction.getStruct());
-        expect(error).toBeUndefined();
-    });
-
-    it("should be invalid due to no transaction as object", () => {
-        const { error } = Ajv.validate(transactionSchema.$id, "test");
-        expect(error).not.toBeUndefined();
-    });
-
-    it("should be invalid due to non-zero amount", () => {
-        transaction.signatureAsset("second passphrase").amount("1000000000").sign("passphrase");
-
-        const { error } = Ajv.validate(transactionSchema.$id, transaction.getStruct());
-        expect(error).not.toBeUndefined();
-    });
-
-    it("should be invalid due to zero fee", () => {
-        transaction.signatureAsset("second passphrase").fee("0").sign("passphrase");
-
-        const { error } = Ajv.validate(transactionSchema.$id, transaction.getStruct());
-        expect(error).not.toBeUndefined();
-    });
-
-    it("should be invalid due to second signature", () => {
-        transaction.signatureAsset("second passphrase").fee("1").sign("passphrase").secondSign("second passphrase");
-
-        const { error } = Ajv.validate(transactionSchema.$id, transaction.getStruct());
-        expect(error).not.toBeUndefined();
-    });
-
-    it("should be invalid due to wrong transaction type", () => {
-        transaction = BuilderFactory.delegateRegistration();
-        transaction.usernameAsset("delegate_name").sign("passphrase");
-
-        const { error } = Ajv.validate(transactionSchema.$id, transaction.getStruct());
-        expect(error).not.toBeUndefined();
-    });
-});
-
 describe("Delegate Registration Transaction", () => {
     beforeAll(() => {
         transactionSchema = TransactionTypeFactory.get(TransactionType.DelegateRegistration).getSchema();

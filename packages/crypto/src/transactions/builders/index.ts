@@ -5,7 +5,6 @@ import { HtlcLockBuilder } from "./transactions/htlc-lock";
 import { HtlcRefundBuilder } from "./transactions/htlc-refund";
 import { MultiPaymentBuilder } from "./transactions/multi-payment";
 import { MultiSignatureBuilder } from "./transactions/multi-signature";
-import { SecondSignatureBuilder } from "./transactions/second-signature";
 import { TransferBuilder } from "./transactions/transfer";
 import { VoteBuilder } from "./transactions/vote";
 
@@ -14,10 +13,6 @@ export * from "./transactions/transaction";
 export class BuilderFactory {
     public static transfer(): TransferBuilder {
         return new TransferBuilder();
-    }
-
-    public static secondSignature(): SecondSignatureBuilder {
-        return new SecondSignatureBuilder();
     }
 
     public static delegateRegistration(): DelegateRegistrationBuilder {

@@ -31,7 +31,7 @@ describe("Delegate Registration Transaction", () => {
         });
 
         it("should be valid with a second signature", () => {
-            const actual = builder.usernameAsset("homer").sign("dummy passphrase").secondSign("dummy passphrase");
+            const actual = builder.usernameAsset("homer").sign("dummy passphrase");
 
             expect(actual.build().verified).toBeTrue();
             expect(actual.verify()).toBeTrue();
@@ -91,10 +91,6 @@ describe("Delegate Registration Transaction", () => {
 
             it("returns the signature", () => {
                 expect(builder.getStruct().signature).toBe(builder.data.signature);
-            });
-
-            it("returns the second signature", () => {
-                expect(builder.getStruct().secondSignature).toBe(builder.data.secondSignature);
             });
 
             it("returns the timestamp", () => {

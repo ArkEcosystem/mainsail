@@ -112,7 +112,6 @@ const transactionDataWithBlockDataTransformed = {
     recipient: "AJjv7WztjJNYHrLAeveG5NgHWp6699ZJwD",
     sender: "D8791H5uhZcg1tJmpryVUFanvLth52AmrJ",
     senderPublicKey: "02275d8577a0ec2b75fc8683282d53c5db76ebc54514a80c2854e419b793ea259a",
-    signSignature: undefined,
     signature:
         "304402203aa292e7aedcd62bb5a79c2521b666b8e1886b57923d98f51911b0461cfdb5db0220539657d5c1dcb78c2c86376da87cc0db428e03c53da3f4f64ebe7115998f00b6",
     signatures: undefined,
@@ -170,34 +169,6 @@ describe("TransactionResource", () => {
 
             delete tmpTransactionDataWithBlockData.data.recipientId;
             tmpTransactionDataWithBlockDataTransformed.recipient = "D8791H5uhZcg1tJmpryVUFanvLth52AmrJ";
-
-            expect(resource.transform(tmpTransactionDataWithBlockData)).toEqual(
-                tmpTransactionDataWithBlockDataTransformed,
-            );
-        });
-
-        it("should return transformed with signSignature", async () => {
-            const tmpTransactionDataWithBlockData = cloneDeep(transactionDataWithBlockData);
-            const tmpTransactionDataWithBlockDataTransformed = cloneDeep(transactionDataWithBlockDataTransformed);
-
-            // @ts-ignore
-            tmpTransactionDataWithBlockData.data.signSignature = "dummy_signature";
-            // @ts-ignore
-            tmpTransactionDataWithBlockDataTransformed.signSignature = "dummy_signature";
-
-            expect(resource.transform(tmpTransactionDataWithBlockData)).toEqual(
-                tmpTransactionDataWithBlockDataTransformed,
-            );
-        });
-
-        it("should return transformed with secondSignature", async () => {
-            const tmpTransactionDataWithBlockData = cloneDeep(transactionDataWithBlockData);
-            const tmpTransactionDataWithBlockDataTransformed = cloneDeep(transactionDataWithBlockDataTransformed);
-
-            // @ts-ignore
-            tmpTransactionDataWithBlockData.data.secondSignature = "dummy_signature";
-            // @ts-ignore
-            tmpTransactionDataWithBlockDataTransformed.signSignature = "dummy_signature";
 
             expect(resource.transform(tmpTransactionDataWithBlockData)).toEqual(
                 tmpTransactionDataWithBlockDataTransformed,

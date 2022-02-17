@@ -19,9 +19,6 @@ class TransactionRegistry {
         this.registerTransactionType(One.TransferTransaction);
         this.registerTransactionType(Two.TransferTransaction);
 
-        this.registerTransactionType(One.SecondSignatureRegistrationTransaction);
-        this.registerTransactionType(Two.SecondSignatureRegistrationTransaction);
-
         this.registerTransactionType(One.DelegateRegistrationTransaction);
         this.registerTransactionType(Two.DelegateRegistrationTransaction);
 

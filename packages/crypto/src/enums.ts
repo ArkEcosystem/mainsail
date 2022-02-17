@@ -1,6 +1,5 @@
 export enum TransactionType {
     Transfer = 0,
-    SecondSignature = 1,
     DelegateRegistration = 2,
     Vote = 3,
     MultiSignature = 4,

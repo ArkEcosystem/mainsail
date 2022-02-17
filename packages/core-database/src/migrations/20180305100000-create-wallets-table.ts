@@ -6,7 +6,6 @@ export class CreateWalletsTable20180305100000 implements MigrationInterface {
             CREATE TABLE wallets (
                 "address" VARCHAR(36) PRIMARY KEY NOT NULL,
                 "public_key" VARCHAR(66) UNIQUE NOT NULL,
-                "second_public_key" VARCHAR(66) UNIQUE,
                 "vote" VARCHAR(66),
                 "username" VARCHAR(64) UNIQUE,
                 "balance" BIGINT NOT NULL,

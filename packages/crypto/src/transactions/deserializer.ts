@@ -12,7 +12,6 @@ import { TransactionTypeFactory } from "./types";
 // Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
 export class Deserializer {
     public static applyV1Compatibility(transaction: ITransactionData): void {
-        transaction.secondSignature = transaction.secondSignature || transaction.signSignature;
         transaction.typeGroup = TransactionTypeGroup.Core;
 
         if (transaction.type === TransactionType.Vote && transaction.senderPublicKey) {
@@ -132,12 +131,6 @@ export class Deserializer {
             return marker === 255;
         };
 
-        // Second Signature
-        if (buf.getRemainderLength() && !beginningMultiSignature()) {
-            const secondSignatureLength: number = currentSignatureLength();
-            transaction.secondSignature = buf.readBuffer(secondSignatureLength).toString("hex");
-        }
-
         // Multi Signatures
         if (buf.getRemainderLength() && beginningMultiSignature()) {
             buf.jump(1);
@@ -159,10 +152,6 @@ export class Deserializer {
 
         if (canReadNonMultiSignature()) {
             transaction.signature = buf.readBuffer(64).toString("hex");
-        }
-
-        if (canReadNonMultiSignature()) {
-            transaction.secondSignature = buf.readBuffer(64).toString("hex");
         }
 
         if (buf.getRemainderLength()) {
@@ -192,8 +181,8 @@ export class Deserializer {
     private static detectSchnorr(buf: ByteBuffer): boolean {
         const remaining: number = buf.getRemainderLength();
 
-        // `signature` / `secondSignature`
-        if (remaining === 64 || remaining === 128) {
+        // `signature`
+        if (remaining === 64) {
             return true;
         }
 
@@ -202,6 +191,7 @@ export class Deserializer {
             return true;
         }
 
+        // @TODO
         // only possiblity left is a type 4 transaction with and without a `secondSignature`.
         if ((remaining - 64) % 65 === 0 || (remaining - 128) % 65 === 0) {
             return true;

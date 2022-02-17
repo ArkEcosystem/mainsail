@@ -19,13 +19,4 @@ describe("WalletFactory", () => {
         expect(entity.getAddress()).toBeString();
         expect(entity.getPublicKey()).toBeString();
     });
-
-    it("should make a wallet with a second public key", () => {
-        const entity: Wallets.Wallet = factory.get("Wallet").withStates("secondPublicKey").make<Wallets.Wallet>();
-
-        expect(entity).toBeInstanceOf(Wallets.Wallet);
-        expect(entity.getAddress()).toBeString();
-        expect(entity.getPublicKey()).toBeString();
-        expect(entity.getAttribute("secondPublicKey")).toBeString();
-    });
 });

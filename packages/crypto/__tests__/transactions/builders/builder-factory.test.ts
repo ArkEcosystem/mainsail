@@ -5,7 +5,6 @@ import { DelegateRegistrationBuilder } from "../../../../../packages/crypto/src/
 import { DelegateResignationBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/delegate-resignation";
 import { MultiPaymentBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/multi-payment";
 import { MultiSignatureBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/multi-signature";
-import { SecondSignatureBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/second-signature";
 import { TransferBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/transfer";
 import { VoteBuilder } from "../../../../../packages/crypto/src/transactions/builders/transactions/vote";
 
@@ -24,10 +23,6 @@ describe("Builder Factory", () => {
 
     it("should create MultiSignatureBuilder", () => {
         expect(BuilderFactory.multiSignature()).toBeInstanceOf(MultiSignatureBuilder);
-    });
-
-    it("should create SecondSignatureBuilder", () => {
-        expect(BuilderFactory.secondSignature()).toBeInstanceOf(SecondSignatureBuilder);
     });
 
     it("should create TransferBuilder", () => {

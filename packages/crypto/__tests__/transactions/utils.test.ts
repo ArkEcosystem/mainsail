@@ -34,16 +34,6 @@ const createRandomTx = (type) => {
                 .amount("10000000000000")
                 .vendorField(Math.random().toString(36))
                 .sign(Math.random().toString(36))
-                .secondSign(Math.random().toString(36))
-                .build();
-            break;
-        }
-
-        case 1: {
-            // second signature
-            transaction = BuilderFactory.secondSignature()
-                .signatureAsset(Math.random().toString(36))
-                .sign(Math.random().toString(36))
                 .build();
             break;
         }
@@ -122,15 +112,8 @@ describe("Transaction", () => {
                 .forEach((transaction) => {
                     const newTransaction = TransactionFactory.fromBytes(TransactionUtils.toBytes(transaction.data));
 
-                    // TODO: Remove both from data when not needed
-                    delete transaction.data.signSignature;
                     if (transaction.data.recipientId === undefined) {
                         delete transaction.data.recipientId;
-                    }
-
-                    // @TODO: double check
-                    if (!transaction.data.secondSignature) {
-                        delete transaction.data.secondSignature;
                     }
 
                     if (transaction.data.version === 1) {
@@ -172,7 +155,6 @@ describe("Transaction", () => {
                 .vendorField(Math.random().toString(36))
                 .nonce("1")
                 .sign(Math.random().toString(36))
-                .secondSign(Math.random().toString(36))
                 .build();
 
             let hex = transaction.serialized.toString("hex");

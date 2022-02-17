@@ -24,14 +24,12 @@ import { configManager } from "@packages/crypto/src/managers";
 import {
     buildMultiSignatureWallet,
     buildRecipientWallet,
-    buildSecondSignatureWallet,
     buildSenderWallet,
     initApp,
 } from "../__support__/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
-let secondSignatureWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
@@ -64,22 +62,18 @@ beforeEach(() => {
     Factories.registerTransactionFactory(factoryBuilder);
 
     senderWallet = buildSenderWallet(factoryBuilder);
-    secondSignatureWallet = buildSecondSignatureWallet(factoryBuilder);
     multiSignatureWallet = buildMultiSignatureWallet();
     recipientWallet = buildRecipientWallet(factoryBuilder);
 
     walletRepository.index(senderWallet);
-    walletRepository.index(secondSignatureWallet);
     walletRepository.index(multiSignatureWallet);
     walletRepository.index(recipientWallet);
 });
 
 describe("VoteTransaction", () => {
     let voteTransaction: Interfaces.ITransaction;
-    let secondSignatureVoteTransaction: Interfaces.ITransaction;
     let multiSignatureVoteTransaction: Interfaces.ITransaction;
     let unvoteTransaction: Interfaces.ITransaction;
-    let secondSignatureUnvoteTransaction: Interfaces.ITransaction;
     let multiSignatureUnvoteTransaction: Interfaces.ITransaction;
     let voteUnvoteTransaction: Interfaces.ITransaction;
     let unvoteVoteTransaction: Interfaces.ITransaction;
@@ -124,13 +118,6 @@ describe("VoteTransaction", () => {
             .sign(passphrases[0])
             .build();
 
-        secondSignatureVoteTransaction = BuilderFactory.vote()
-            .votesAsset(["+" + delegateWallet1.getPublicKey()!])
-            .nonce("1")
-            .sign(passphrases[1])
-            .secondSign(passphrases[2])
-            .build();
-
         multiSignatureVoteTransaction = BuilderFactory.vote()
             .senderPublicKey(multiSignatureWallet.getPublicKey()!)
             .votesAsset(["+" + delegateWallet1.getPublicKey()!])
@@ -144,13 +131,6 @@ describe("VoteTransaction", () => {
             .votesAsset(["-" + delegateWallet1.getPublicKey()!])
             .nonce("1")
             .sign(passphrases[0])
-            .build();
-
-        secondSignatureUnvoteTransaction = BuilderFactory.vote()
-            .votesAsset(["-" + delegateWallet1.getPublicKey()!])
-            .nonce("1")
-            .sign(passphrases[1])
-            .secondSign(passphrases[2])
             .build();
 
         multiSignatureUnvoteTransaction = BuilderFactory.vote()
@@ -291,12 +271,6 @@ describe("VoteTransaction", () => {
             await expect(handler.throwIfCannotBeApplied(voteTransaction, senderWallet)).toResolve();
         });
 
-        it("should not throw - second sign vote", async () => {
-            await expect(
-                handler.throwIfCannotBeApplied(secondSignatureVoteTransaction, secondSignatureWallet),
-            ).toResolve();
-        });
-
         it("should not throw - multi sign vote", async () => {
             await expect(
                 handler.throwIfCannotBeApplied(multiSignatureVoteTransaction, multiSignatureWallet),
@@ -306,13 +280,6 @@ describe("VoteTransaction", () => {
         it("should not throw if the unvote is valid and the wallet has voted", async () => {
             senderWallet.setAttribute("vote", delegateWallet1.getPublicKey());
             await expect(handler.throwIfCannotBeApplied(unvoteTransaction, senderWallet)).toResolve();
-        });
-
-        it("should not throw - second sign unvote", async () => {
-            secondSignatureWallet.setAttribute("vote", delegateWallet1.getPublicKey());
-            await expect(
-                handler.throwIfCannotBeApplied(secondSignatureUnvoteTransaction, secondSignatureWallet),
-            ).toResolve();
         });
 
         it("should not throw - multi sign unvote", async () => {

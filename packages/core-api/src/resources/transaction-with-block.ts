@@ -23,7 +23,6 @@ export class TransactionWithBlockResource implements Resource {
 
         const sender: string = this.walletRepository.findByPublicKey(transactionData.senderPublicKey).getAddress();
         const recipient: string = transactionData.recipientId ?? sender;
-        const signSignature: string | undefined = transactionData.signSignature ?? transactionData.secondSignature;
         const confirmations: number = this.stateStore.getLastHeight() - blockData.height + 1;
 
         return {
@@ -38,7 +37,6 @@ export class TransactionWithBlockResource implements Resource {
             senderPublicKey: transactionData.senderPublicKey,
             recipient,
             signature: transactionData.signature,
-            signSignature,
             signatures: transactionData.signatures,
             vendorField: transactionData.vendorField,
             asset: transactionData.asset,

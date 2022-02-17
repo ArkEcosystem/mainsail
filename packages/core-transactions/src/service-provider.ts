@@ -52,8 +52,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
         this.app.bind(Container.Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
         this.app.bind(Container.Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-        this.app.bind(Container.Identifiers.TransactionHandler).to(One.SecondSignatureRegistrationTransactionHandler);
-        this.app.bind(Container.Identifiers.TransactionHandler).to(Two.SecondSignatureRegistrationTransactionHandler);
         this.app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
         this.app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
         this.app.bind(Container.Identifiers.TransactionHandler).to(One.VoteTransactionHandler);

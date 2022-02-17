@@ -19,7 +19,6 @@ export function getWalletAttributeSet(): Services.Attributes.AttributeSet {
     attributes.set("htlc");
     attributes.set("multiSignature");
     attributes.set("multiSignature.legacy");
-    attributes.set("secondPublicKey");
     attributes.set("vote");
 
     return attributes;

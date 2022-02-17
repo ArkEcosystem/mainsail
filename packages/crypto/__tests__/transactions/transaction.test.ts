@@ -139,9 +139,7 @@ describe("Transaction", () => {
 
             let { staticFees } = configManager.getMilestone().fees;
             expect(Two.TransferTransaction.staticFee()).toEqual(BigNumber.make(1234));
-            expect(Two.SecondSignatureRegistrationTransaction.staticFee()).toEqual(
-                BigNumber.make(staticFees.secondSignature),
-            );
+
             expect(Two.DelegateRegistrationTransaction.staticFee()).toEqual(
                 BigNumber.make(staticFees.delegateRegistration),
             );
@@ -158,9 +156,7 @@ describe("Transaction", () => {
             staticFees = configManager.getMilestone().fees.staticFees;
 
             expect(Two.TransferTransaction.staticFee()).toEqual(BigNumber.make(staticFees.transfer));
-            expect(Two.SecondSignatureRegistrationTransaction.staticFee()).toEqual(
-                BigNumber.make(staticFees.secondSignature),
-            );
+
             expect(Two.DelegateRegistrationTransaction.staticFee()).toEqual(
                 BigNumber.make(staticFees.delegateRegistration),
             );

@@ -58,18 +58,6 @@ export class Serializer {
         let assetSize = 0;
         let assetBytes: Buffer | Uint8Array | undefined;
 
-        if (transaction.type === TransactionType.SecondSignature && transaction.asset) {
-            const { signature } = transaction.asset;
-            const bytebuffer = new ByteBuffer(Buffer.alloc(33));
-
-            if (signature && signature.publicKey) {
-                bytebuffer.writeBuffer(Buffer.from(signature.publicKey, "hex"));
-            }
-
-            assetBytes = bytebuffer.getResult();
-            assetSize = assetBytes.length;
-        }
-
         if (
             transaction.type === TransactionType.DelegateRegistration &&
             transaction.asset &&
@@ -159,10 +147,6 @@ export class Serializer {
             bb.writeBuffer(Buffer.from(transaction.signature, "hex"));
         }
 
-        if (!options.excludeSecondSignature && transaction.secondSignature) {
-            bb.writeBuffer(Buffer.from(transaction.secondSignature, "hex"));
-        }
-
         return bb.getResult();
     }
 
@@ -214,12 +198,6 @@ export class Serializer {
     ): void {
         if (transaction.signature && !options.excludeSignature) {
             buff.writeBuffer(Buffer.from(transaction.signature, "hex"));
-        }
-
-        const secondSignature: string | undefined = transaction.secondSignature || transaction.signSignature;
-
-        if (secondSignature && !options.excludeSecondSignature) {
-            buff.writeBuffer(Buffer.from(secondSignature, "hex"));
         }
 
         if (transaction.signatures) {

@@ -7,13 +7,11 @@ import {
     ColdWalletError,
     InsufficientBalanceError,
     InvalidMultiSignaturesError,
-    InvalidSecondSignatureError,
     LegacyMultiSignatureError,
     LegacyMultiSignatureRegistrationError,
     MissingMultiSignatureOnSenderError,
     SenderWalletMismatchError,
     UnexpectedNonceError,
-    UnexpectedSecondSignatureError,
     UnsupportedMultiSignatureTransactionError,
 } from "../errors";
 
@@ -199,28 +197,6 @@ export abstract class TransactionHandler {
 
         if (data.senderPublicKey !== sender.getPublicKey()) {
             throw new SenderWalletMismatchError();
-        }
-
-        if (sender.hasSecondSignature()) {
-            AppUtils.assert.defined<string>(data.senderPublicKey);
-
-            // Ensure the database wallet already has a 2nd signature, in case we checked a pool wallet.
-            const dbSender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(data.senderPublicKey);
-
-            if (!dbSender.hasSecondSignature()) {
-                throw new UnexpectedSecondSignatureError();
-            }
-
-            if (!Transactions.Verifier.verifySecondSignature(data, dbSender.getAttribute("secondPublicKey"))) {
-                throw new InvalidSecondSignatureError();
-            }
-        } else if (data.secondSignature || data.signSignature) {
-            const isException =
-                Managers.configManager.get("network.name") === "devnet" &&
-                Managers.configManager.getMilestone().ignoreInvalidSecondSignatureField;
-            if (!isException) {
-                throw new UnexpectedSecondSignatureError();
-            }
         }
 
         // Prevent legacy multi signatures from being used

@@ -44,7 +44,6 @@ describe("Transfer Transaction", () => {
                 .amount("1")
                 .vendorField("dummy")
                 .sign("dummy passphrase")
-                .secondSign("dummy passphrase");
 
             expect(actual.build().verified).toBeTrue();
             expect(actual.verify()).toBeTrue();
@@ -67,31 +66,6 @@ describe("Transfer Transaction", () => {
             passphraseTransaction.sign(passphrase);
 
             expect(wifTransaction.data.signature).toBe(passphraseTransaction.data.signature);
-        });
-    });
-
-    describe("secondSignWithWif", () => {
-        it("should sign a transaction and match signed with a passphrase", () => {
-            const passphrase = "first passphrase";
-            const secondPassphrase = "second passphrase";
-            const network = 23;
-            const keys = Keys.fromPassphrase(secondPassphrase);
-            const wif = WIF.fromKeys(keys, devnet.network);
-
-            const wifTransaction = builder
-                .recipientId(identity.address)
-                .amount("10")
-                .fee("10")
-                .network(network)
-                .sign(passphrase);
-
-            const passphraseTransaction = BuilderFactory.transfer();
-            passphraseTransaction.data = { ...wifTransaction.data };
-
-            wifTransaction.secondSignWithWif(wif, 170);
-            passphraseTransaction.secondSign(secondPassphrase);
-
-            expect(wifTransaction.data.secondSignature).toBe(passphraseTransaction.data.secondSignature);
         });
     });
 

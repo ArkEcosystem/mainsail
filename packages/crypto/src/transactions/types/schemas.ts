@@ -31,8 +31,6 @@ export const transactionBaseSchema: Record<string, any> = {
         fee: { bignumber: { minimum: 0, bypassGenesis: true } },
         senderPublicKey: { $ref: "publicKey" },
         signature: { $ref: "alphanumeric" },
-        secondSignature: { $ref: "alphanumeric" },
-        signSignature: { $ref: "alphanumeric" },
         signatures: {
             type: "array",
             minItems: 1,
@@ -70,32 +68,6 @@ export const transfer = extend(transactionBaseSchema, {
         vendorField: { anyOf: [{ type: "null" }, { type: "string", format: "vendorField" }] },
         recipientId: { $ref: "address" },
         expiration: { type: "integer", minimum: 0 },
-    },
-});
-
-export const secondSignature = extend(transactionBaseSchema, {
-    $id: "secondSignature",
-    required: ["asset"],
-    properties: {
-        type: { transactionType: TransactionType.SecondSignature },
-        amount: { bignumber: { minimum: 0, maximum: 0 } },
-        fee: { bignumber: { minimum: 1 } },
-        secondSignature: { type: "null" },
-        asset: {
-            type: "object",
-            required: ["signature"],
-            properties: {
-                signature: {
-                    type: "object",
-                    required: ["publicKey"],
-                    properties: {
-                        publicKey: {
-                            $ref: "publicKey",
-                        },
-                    },
-                },
-            },
-        },
     },
 });
 

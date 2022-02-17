@@ -121,8 +121,6 @@ export const initApp = (): Application => {
 
     app.bind(Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(One.SecondSignatureRegistrationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.SecondSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
@@ -190,21 +188,6 @@ export const buildRecipientWallet = (factoryBuilder: FactoryBuilder): Wallets.Wa
             passphrase: "passphrase2",
         })
         .make();
-};
-
-export const buildSecondSignatureWallet = (factoryBuilder: FactoryBuilder): Wallets.Wallet => {
-    const wallet: Wallets.Wallet = factoryBuilder
-        .get("Wallet")
-        .withOptions({
-            passphrase: passphrases[1],
-            nonce: 0,
-        })
-        .make();
-
-    wallet.setBalance(Utils.BigNumber.make(7527654310));
-    wallet.setAttribute("secondPublicKey", "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17");
-
-    return wallet;
 };
 
 export const buildMultiSignatureWallet = (): Wallets.Wallet => {

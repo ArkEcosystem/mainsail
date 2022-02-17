@@ -190,14 +190,6 @@ export class Wallet implements Contracts.State.Wallet {
      * @returns {boolean}
      * @memberof Wallet
      */
-    public hasSecondSignature(): boolean {
-        return this.hasAttribute("secondPublicKey");
-    }
-
-    /**
-     * @returns {boolean}
-     * @memberof Wallet
-     */
     public hasMultiSignature(): boolean {
         return this.hasAttribute("multiSignature");
     }

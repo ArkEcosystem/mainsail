@@ -28,7 +28,7 @@ describe("Delegate Resignation Transaction", () => {
         });
 
         it("should be valid with a second signature", () => {
-            const actual = builder.sign("dummy passphrase").secondSign("dummy passphrase");
+            const actual = builder.sign("dummy passphrase");
 
             expect(actual.build().verified).toBeTrue();
             expect(actual.verify()).toBeTrue();

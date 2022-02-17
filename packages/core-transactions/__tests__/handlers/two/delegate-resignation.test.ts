@@ -25,14 +25,12 @@ import { configManager } from "@packages/crypto/src/managers";
 import {
     buildMultiSignatureWallet,
     buildRecipientWallet,
-    buildSecondSignatureWallet,
     buildSenderWallet,
     initApp,
 } from "../__support__/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
-let secondSignatureWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
@@ -65,12 +63,10 @@ beforeEach(() => {
     Factories.registerTransactionFactory(factoryBuilder);
 
     senderWallet = buildSenderWallet(factoryBuilder);
-    secondSignatureWallet = buildSecondSignatureWallet(factoryBuilder);
     multiSignatureWallet = buildMultiSignatureWallet();
     recipientWallet = buildRecipientWallet(factoryBuilder);
 
     walletRepository.index(senderWallet);
-    walletRepository.index(secondSignatureWallet);
     walletRepository.index(multiSignatureWallet);
     walletRepository.index(recipientWallet);
 });
@@ -81,7 +77,6 @@ describe("DelegateResignationTransaction", () => {
     const delegatePassphrase = "my secret passphrase";
 
     let delegateResignationTransaction: Interfaces.ITransaction;
-    let secondSignatureDelegateResignationTransaction: Interfaces.ITransaction;
     let handler: TransactionHandler;
     let voteHandler: TransactionHandler;
 
@@ -133,12 +128,6 @@ describe("DelegateResignationTransaction", () => {
             .nonce("1")
             .sign(delegatePassphrase)
             .build();
-
-        secondSignatureDelegateResignationTransaction = BuilderFactory.delegateResignation()
-            .nonce("1")
-            .sign(passphrases[1])
-            .secondSign(passphrases[2])
-            .build();
     });
 
     describe("bootstrap", () => {
@@ -185,27 +174,6 @@ describe("DelegateResignationTransaction", () => {
     describe("throwIfCannotBeApplied", () => {
         it("should not throw if wallet is a delegate", async () => {
             await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
-        });
-
-        it("should not throw if wallet is a delegate - second sign", async () => {
-            // Add extra delegate so we don't get NotEnoughDelegatesError
-            const anotherDelegate: Wallets.Wallet = factoryBuilder
-                .get("Wallet")
-                .withOptions({
-                    passphrase: "anotherDelegate",
-                    nonce: 0,
-                })
-                .make();
-
-            anotherDelegate.setAttribute("delegate", { username: "another" });
-            walletRepository.index(anotherDelegate);
-            allDelegates.push(anotherDelegate);
-
-            secondSignatureWallet.setAttribute("delegate", { username: "dummy" });
-            walletRepository.index(secondSignatureWallet);
-            await expect(
-                handler.throwIfCannotBeApplied(secondSignatureDelegateResignationTransaction, secondSignatureWallet),
-            ).toResolve();
         });
 
         it("should not throw if wallet is a delegate due too many delegates", async () => {

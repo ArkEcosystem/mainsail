@@ -9,7 +9,6 @@ describe("Helpers", () => {
         expect(factory("Peer")).toBeDefined();
         expect(factory("Round")).toBeDefined();
         expect(factory("Transfer")).toBeDefined();
-        expect(factory("SecondSignature")).toBeDefined();
         expect(factory("DelegateRegistration")).toBeDefined();
         expect(factory("DelegateResignation")).toBeDefined();
         expect(factory("Vote")).toBeDefined();

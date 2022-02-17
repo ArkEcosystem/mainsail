@@ -6,7 +6,7 @@ import { Wallets } from "@packages/core-state";
 import { StateStore } from "@packages/core-state/src/stores/state";
 import { Generators } from "@packages/core-test-framework/src";
 import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import { TransactionHandler, One } from "@packages/core-transactions/src/handlers";
+import { One, TransactionHandler } from "@packages/core-transactions/src/handlers";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@packages/crypto";
 import { configManager } from "@packages/crypto/src/managers";
@@ -14,14 +14,12 @@ import { configManager } from "@packages/crypto/src/managers";
 import {
     buildMultiSignatureWallet,
     buildRecipientWallet,
-    buildSecondSignatureWallet,
     buildSenderWallet,
     initApp,
 } from "../__support__/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
-let secondSignatureWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
@@ -55,12 +53,10 @@ beforeEach(() => {
     Factories.registerTransactionFactory(factoryBuilder);
 
     senderWallet = buildSenderWallet(factoryBuilder);
-    secondSignatureWallet = buildSecondSignatureWallet(factoryBuilder);
     multiSignatureWallet = buildMultiSignatureWallet();
     recipientWallet = buildRecipientWallet(factoryBuilder);
 
     walletRepository.index(senderWallet);
-    walletRepository.index(secondSignatureWallet);
     walletRepository.index(multiSignatureWallet);
     walletRepository.index(recipientWallet);
 });
@@ -74,10 +70,7 @@ describe("DelegateRegistrationTransaction V1", () => {
         );
 
         handler = transactionHandlerRegistry.getRegisteredHandlerByType(
-            Transactions.InternalTransactionType.from(
-                Enums.TransactionType.Vote,
-                Enums.TransactionTypeGroup.Core,
-            ),
+            Transactions.InternalTransactionType.from(Enums.TransactionType.Vote, Enums.TransactionTypeGroup.Core),
             1,
         );
     });

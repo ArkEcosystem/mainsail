@@ -117,12 +117,6 @@ export interface Wallet {
      * @returns {boolean}
      * @memberof Wallet
      */
-    hasSecondSignature(): boolean;
-
-    /**
-     * @returns {boolean}
-     * @memberof Wallet
-     */
     hasMultiSignature(): boolean;
 
     /**

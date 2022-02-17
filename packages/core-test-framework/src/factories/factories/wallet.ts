@@ -18,10 +18,4 @@ export const registerWalletFactory = (factory: FactoryBuilder): void => {
 
         return wallet;
     });
-
-    factory.get("Wallet").state("secondPublicKey", ({ entity }) => {
-        entity.setAttribute("secondPublicKey", Identities.PublicKey.fromPassphrase(generateMnemonic()));
-
-        return entity;
-    });
 };

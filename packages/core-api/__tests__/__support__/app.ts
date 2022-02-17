@@ -76,8 +76,6 @@ export const initApp = (): Application => {
 
     app.bind(Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(One.SecondSignatureRegistrationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.SecondSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.VoteTransactionHandler);

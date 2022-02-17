@@ -113,5 +113,4 @@ export const tearDown = async (): Promise<void> => {
 
 export const passphrases = {
     passphrase: "this is top secret passphrase number 1",
-    secondPassphrase: "this is top secret passphrase number 2",
 };

@@ -69,7 +69,6 @@ describe("GenerateCommand", () => {
                     fees: {
                         staticFees: {
                             transfer: 10000000,
-                            secondSignature: 500000000,
                             delegateRegistration: 2500000000,
                             vote: 100000000,
                             multiSignature: 500000000,
@@ -307,7 +306,6 @@ describe("GenerateCommand", () => {
                 epoch: "2020-11-04T00:00:00.000Z",
                 htlcEnabled: true,
                 feeStaticTransfer: 1,
-                feeStaticSecondSignature: 2,
                 feeStaticDelegateRegistration: 3,
                 feeStaticVote: 4,
                 feeStaticMultiSignature: 5,
@@ -320,7 +318,6 @@ describe("GenerateCommand", () => {
                 feeDynamicMinFeePool: 100,
                 feeDynamicMinFeeBroadcast: 200,
                 feeDynamicBytesTransfer: 1,
-                feeDynamicBytesSecondSignature: 2,
                 feeDynamicBytesDelegateRegistration: 3,
                 feeDynamicBytesVote: 4,
                 feeDynamicBytesMultiSignature: 5,
@@ -369,7 +366,6 @@ describe("GenerateCommand", () => {
                     fees: {
                         staticFees: {
                             transfer: 1,
-                            secondSignature: 2,
                             delegateRegistration: 3,
                             vote: 4,
                             multiSignature: 5,

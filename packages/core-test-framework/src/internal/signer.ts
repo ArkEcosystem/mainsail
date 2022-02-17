@@ -22,10 +22,6 @@ export class Signer {
 
         transaction.sign(opts.passphrase);
 
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
-
         this.incrementNonce();
         return transaction.getStruct();
     }
@@ -37,24 +33,8 @@ export class Signer {
             .usernameAsset(opts.username)
             .sign(opts.passphrase);
 
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
-
         this.incrementNonce();
         return transaction.getStruct();
-    }
-
-    public makeSecondSignature(opts: Record<string, any>): any {
-        const transaction = Transactions.BuilderFactory.secondSignature()
-            .fee(this.toSatoshi(opts.signatureFee))
-            .nonce(this.nonce.toString())
-            .signatureAsset(opts.secondPassphrase)
-            .sign(opts.passphrase)
-            .getStruct();
-
-        this.incrementNonce();
-        return transaction;
     }
 
     public makeVote(opts: Record<string, any>): any {
@@ -63,10 +43,6 @@ export class Signer {
             .nonce(this.nonce.toString())
             .votesAsset([`+${opts.delegate}`])
             .sign(opts.passphrase);
-
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
 
         this.incrementNonce();
         return transaction.getStruct();
@@ -87,10 +63,6 @@ export class Signer {
 
         transaction.sign(opts.passphrase);
 
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
-
         this.incrementNonce();
         return transaction.getStruct();
     }
@@ -106,10 +78,6 @@ export class Signer {
 
         transaction.sign(opts.passphrase);
 
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
-
         this.incrementNonce();
         return transaction.getStruct();
     }
@@ -123,10 +91,6 @@ export class Signer {
             .recipientId(opts.recipient)
             .sign(opts.passphrase);
 
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
-
         this.incrementNonce();
         return transaction.getStruct();
     }
@@ -138,10 +102,6 @@ export class Signer {
             .nonce(this.nonce.toString())
             .sign(opts.passphrase);
 
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
-
         this.incrementNonce();
         return transaction.getStruct();
     }
@@ -152,10 +112,6 @@ export class Signer {
             .htlcRefundAsset(opts.refund)
             .nonce(this.nonce.toString())
             .sign(opts.passphrase);
-
-        if (opts.secondPassphrase) {
-            transaction.secondSign(opts.secondPassphrase);
-        }
 
         this.incrementNonce();
         return transaction.getStruct();

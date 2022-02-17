@@ -52,15 +52,5 @@ describe("Htlc claim Transaction", () => {
             expect(actual.build().verified).toBeTrue();
             expect(actual.verify()).toBeTrue();
         });
-
-        it("should be valid with a second signature", () => {
-            const actual = builder
-                .htlcClaimAsset(htlcClaimAsset)
-                .sign("dummy passphrase")
-                .secondSign("dummy passphrase");
-
-            expect(actual.build().verified).toBeTrue();
-            expect(actual.verify()).toBeTrue();
-        });
     });
 });
