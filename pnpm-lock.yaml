@@ -818,7 +818,28 @@ importers:
     dependencies:
       ajv: 6.12.6
 
-  packages/crypto-signatures-ecdsa:
+  packages/crypto-keypair-secp256k1:
+    specifiers:
+      '@arkecosystem/core-test': workspace:^3.1.1
+      '@arkecosystem/crypto-contracts': workspace:*
+      bcrypto: 5.4.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
+
+  packages/crypto-signature-ecdsa:
+    specifiers:
+      '@arkecosystem/crypto-contracts': workspace:*
+      bcrypto: 5.4.0
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      bcrypto: 5.4.0
+
+  packages/crypto-signature-schnorr-legacy:
     specifiers:
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
@@ -827,14 +848,6 @@ importers:
       bcrypto: 5.4.0
 
   packages/crypto-signatures-schnorr:
-    specifiers:
-      '@arkecosystem/crypto-contracts': workspace:*
-      bcrypto: 5.4.0
-    dependencies:
-      '@arkecosystem/crypto-contracts': link:../crypto-contracts
-      bcrypto: 5.4.0
-
-  packages/crypto-signatures-schnorr-legacy:
     specifiers:
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
@@ -6296,7 +6309,6 @@ packages:
   /dequal/2.0.2:
     resolution: {integrity: sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==}
     engines: {node: '>=6'}
-    dev: false
 
   /destroy/1.0.4:
     resolution: {integrity: sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA=}
@@ -6434,7 +6446,6 @@ packages:
   /diff/5.0.0:
     resolution: {integrity: sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==}
     engines: {node: '>=0.3.1'}
-    dev: false
 
   /dir-glob/2.2.2:
     resolution: {integrity: sha512-f9LBi5QWzIW3I6e//uxZoLBlUt9kcp66qo0sSCxL6YZKc75R1c4MFCoe/LaZiBGmgujvQdxc5Bn3QhfyvK5Hsw==}
@@ -9647,7 +9658,6 @@ packages:
   /kleur/4.1.4:
     resolution: {integrity: sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA==}
     engines: {node: '>=6'}
-    dev: false
 
   /latest-version/5.1.0:
     resolution: {integrity: sha512-weT+r0kTkRQdCdYCNtkMwWXQTMEswKrFBkm4ckQOMVhhqhIMI1UT2hMj+1iigIhgSZm5gTmrRXBNoGUgaTY1xA==}
@@ -10376,7 +10386,6 @@ packages:
   /mri/1.1.4:
     resolution: {integrity: sha512-6y7IjGPm8AzlvoUrwAaw1tLnUBudaS3752vcd8JtrpGGQn+rXIe63LFVHm/YMwtqAuh+LJPCFdlLYPWM1nYn6w==}
     engines: {node: '>=4'}
-    dev: false
 
   /ms/2.0.0:
     resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
@@ -12359,7 +12368,6 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       mri: 1.1.4
-    dev: false
 
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -13871,7 +13879,6 @@ packages:
       diff: 5.0.0
       kleur: 4.1.4
       sade: 1.8.1
-    dev: false
 
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}
