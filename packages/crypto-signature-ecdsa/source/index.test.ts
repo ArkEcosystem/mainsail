@@ -6,7 +6,6 @@ describe("Signatory", ({ assert, it }) => {
 	it("should sign and verify", async () => {
 		assert.true(
 			await new Signatory().verify(
-				Buffer.from("64726e3da8", "hex"),
 				Buffer.from(
 					await new Signatory().sign(
 						Buffer.from("64726e3da8", "hex"),
@@ -14,6 +13,7 @@ describe("Signatory", ({ assert, it }) => {
 					),
 					"hex",
 				),
+				Buffer.from("64726e3da8", "hex"),
 				Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
 			),
 		);

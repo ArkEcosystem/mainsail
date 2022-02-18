@@ -9,12 +9,12 @@ describe("Signatory", ({ assert, it }) => {
 				Buffer.from(
 					await new Signatory().sign(
 						Buffer.from("64726e3da8", "hex"),
-						Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex"),
+						Buffer.from("170cc8a0103ed299675a0461681d70c07f61614853876dca0a8be0b53f3cd017", "hex"),
 					),
 					"hex",
 				),
 				Buffer.from("64726e3da8", "hex"),
-				Buffer.from("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
+				Buffer.from("4a62da810ef0dfe62b720f496af5005433bd96d95864a6693111d8fbfde65937", "hex"),
 			),
 		);
 	});
