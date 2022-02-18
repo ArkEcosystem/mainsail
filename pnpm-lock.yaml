@@ -912,6 +912,19 @@ importers:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
 
+  packages/crypto-hash-noble:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@noble/hashes': ^1.0.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@noble/hashes': 1.0.0
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
   packages/crypto-hash-wasm:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
