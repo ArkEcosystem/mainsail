@@ -899,6 +899,19 @@ importers:
     dependencies:
       ajv: 6.12.6
 
+  packages/crypto-hash-bcrypto:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      bcrypto: 5.4.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
   packages/crypto-identities:
     specifiers:
       '@types/tmp': ^0.2.0

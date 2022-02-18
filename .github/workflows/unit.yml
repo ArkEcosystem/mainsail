@@ -535,6 +535,31 @@ jobs:
               run: pnpm run build
             - name: Test
               run: cd packages/crypto-address-ss58 && pnpm run test
+    crypto-hash-bcrypto:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-crypto-hash-bcrypto
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/crypto-hash-bcrypto && pnpm run test
     crypto-identities:
         runs-on: ubuntu-latest
         strategy:

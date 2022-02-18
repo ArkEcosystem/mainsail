@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { HashAlgorithms } from "../../../../packages/crypto/source/crypto/hash-algorithms";
+import { HashAlgorithms } from "../../source/crypto/hash-algorithms";
 import fixtures from "./fixtures/crypto.json";
 
 const buffer = Buffer.from("Hello World");
@@ -8,10 +8,6 @@ const buffer = Buffer.from("Hello World");
 describe("Crypto - Utils", () => {
 	it("should return valid ripemd160", () => {
 		expect(HashAlgorithms.ripemd160(buffer).toString("hex")).toEqual(fixtures.ripemd160);
-	});
-
-	it("should return valid sha1", () => {
-		expect(HashAlgorithms.sha1(buffer).toString("hex")).toEqual(fixtures.sha1);
 	});
 
 	it("should return valid sha256", () => {

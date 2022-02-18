@@ -1,5 +1,6 @@
 export * from "./block";
 export * from "./crypto";
+export * from "./hash";
 export * from "./identities";
 export * from "./managers";
 export * from "./message";

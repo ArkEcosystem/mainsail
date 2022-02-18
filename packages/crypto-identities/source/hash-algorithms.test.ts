@@ -9,10 +9,6 @@ describe("HashAlgorithms", () => {
 		expect(HashAlgorithms.ripemd160(buffer).toString("hex")).toEqual("a830d7beb04eb7549ce990fb7dc962e499a27230");
 	});
 
-	it("should return valid sha1", () => {
-		expect(HashAlgorithms.sha1(buffer).toString("hex")).toEqual("0a4d55a8d778e5022fab701977c5d840bbc486d0");
-	});
-
 	it("should return valid sha256", () => {
 		expect(HashAlgorithms.sha256(buffer).toString("hex")).toEqual(
 			"a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e",
