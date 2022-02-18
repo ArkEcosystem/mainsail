@@ -1,14 +1,20 @@
-const { benchmarker } = require("@faustbrian/benchmarker");
 const { readdirSync } = require("fs");
-const { camelCase } = require("../distribution");
+const bench = require("micro-bmark");
 
-benchmarker(
-	"utils",
-	readdirSync(__dirname)
+const { run, mark } = bench; // or bench.mark
+
+run(async () => {
+	const suites = readdirSync(__dirname)
 		.filter((name) => name !== "index.js")
-		.sort()
-		.map((name) => ({
-			name: `${camelCase(name.slice(0, -3))}`,
-			scenarios: require(`./${name}`),
-		})),
-);
+		.filter((name) => name !== "helpers.js")
+		.sort();
+
+	for (const suite of suites) {
+		for (const [label, callback] of Object.entries(require(`./${suite}`))) {
+			await mark(label, callback);
+		}
+	}
+
+	bench.logMem();
+	bench.getTime();
+});

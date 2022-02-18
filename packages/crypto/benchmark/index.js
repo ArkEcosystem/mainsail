@@ -1,49 +1,23 @@
-const { benchmarker } = require("@faustbrian/benchmarker");
-const { Managers } = require("../distribution");
+const bench = require("micro-bmark");
+const { run, mark } = bench; // or bench.mark
 
-Managers.configManager.setFromPreset("mainnet");
+const registerSuite = async (suite) => {
+	for (const [label, callback] of Object.entries(require(suite))) {
+		await mark(label, callback);
+	}
+};
 
-benchmarker(
-	"core",
-	[
-		{
-			name: "new Block()",
-			scenarios: require("./block/create"),
-		},
-		{
-			name: "Block.serialize (0 transactions)",
-			scenarios: require("./block/serialize"),
-		},
-		{
-			name: "Block.serialize (150 transactions)",
-			scenarios: require("./block/serializeWithTransactions"),
-		},
-		{
-			name: "Block.deserialize (0 transactions)",
-			scenarios: require("./block/deserialize/0"),
-		},
-		{
-			name: "Block.deserialize (150 transactions)",
-			scenarios: require("./block/deserialize/150"),
-		},
-		{
-			name: "new Transaction (Type 0)",
-			scenarios: require("./transaction/create/0"),
-		},
-		{
-			name: "Transaction.serialize (Type 0)",
-			scenarios: require("./transaction/serialize/0"),
-		},
-		{
-			name: "Transaction.deserialize (Type 0)",
-			scenarios: require("./transaction/deserialize/0"),
-		},
-		{
-			name: "HashAlgorithms",
-			scenarios: require("./crypto/hash-algorithms"),
-		},
-	],
-	{
-		hideSummary: true,
-	},
-);
+run(async () => {
+	await registerSuite("./crypto/hash-algorithms");
+	// await registerSuite("./block/create");
+	// await registerSuite("./block/serialize");
+	// await registerSuite("./block/serializeWithTransactions");
+	// await registerSuite("./block/deserialize/0");
+	// await registerSuite("./block/deserialize/150");
+	// await registerSuite("./transaction/create/0");
+	// await registerSuite("./transaction/serialize/0");
+	// await registerSuite("./transaction/deserialize/0");
+
+	bench.logMem();
+	bench.getTime();
+});

@@ -1,14 +1,14 @@
-const { Crypto, Transactions, Utils } = require("../../distribution");
 const createHash = require("create-hash");
 const hashWASM = require("hash-wasm");
+const { Crypto, Transactions, Utils } = require("../../distribution");
 
 const nodeSha256 = (bytes) => createHash("sha256").update(bytes).digest();
 
 const prepareData = (data) => {
-	const bigNumbers = ["fee", "amount", "nonce"];
+	const bigNumbers = new Set(["fee", "amount", "nonce"]);
 
 	for (const [key, value] of Object.entries(data)) {
-		if (bigNumbers.includes(key)) {
+		if (bigNumbers.has(key)) {
 			data[key] = new Utils.BigNumber(value);
 		}
 	}
