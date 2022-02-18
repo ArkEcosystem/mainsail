@@ -2,12 +2,12 @@ import { SinonSpyStatic, spy } from "sinon";
 import { Callback, Context, suite, Test } from "uvu";
 import { z as schema } from "zod";
 
-import { assert } from "./assert.js";
-import { each, formatName } from "./each.js";
-import { runHook } from "./hooks.js";
-import { loader } from "./loader.js";
-import { nock } from "./nock.js";
-import { Stub } from "./stub.js";
+import { assert } from "./assert";
+import { each, formatName } from "./each";
+import { runHook } from "./hooks";
+import { loader } from "./loader";
+import { nock } from "./nock";
+import { Stub } from "./stub";
 
 type ContextFunction = () => Context;
 

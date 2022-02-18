@@ -28,7 +28,7 @@
 		"split2": "3.2.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"@types/pino": "6.3.11",
 		"@types/pump": "1.1.1",

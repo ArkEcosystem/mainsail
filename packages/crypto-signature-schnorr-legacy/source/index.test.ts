@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { Signatory } from "./index";
 

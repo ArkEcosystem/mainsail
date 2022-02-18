@@ -2,7 +2,7 @@ import { Application, Container, Providers, Services } from "@arkecosystem/core-
 import { ServiceProvider } from "./service-provider";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
 import importFresh from "import-fresh";
 
 const loadDefaults = () => importFresh("./defaults").defaults;

@@ -1,6 +1,6 @@
 import { Writable } from "stream";
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
 import { sleep } from "@arkecosystem/utils";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";

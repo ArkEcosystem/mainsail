@@ -20,7 +20,7 @@
 		"@noble/ed25519": "^1.6.0"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test": "workspace:^0.0.1",
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }

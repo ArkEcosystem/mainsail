@@ -1,3 +1,5 @@
+import "jest-extended";
+
 import { Application, Container } from "@packages/core-cli/source";
 import envPaths from "env-paths";
 
