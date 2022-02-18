@@ -18,7 +18,7 @@ describe("Methods -> BIP38", () => {
 		expect(() => new BIP38(bip38, "invalid-password")).toThrow();
 	});
 
-	it("should forge a block - bip38", () => {
+	it.skip("should forge a block - bip38", () => {
 		const delegate = new BIP38(dummy.bip38Passphrase, "bip38-password");
 
 		const spyDecryptKeys = jest.spyOn(delegate as any, "decryptKeysWithOtp");

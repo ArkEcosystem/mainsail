@@ -1,9 +1,5 @@
 import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces } from "@arkecosystem/crypto";
-
-import { defaults } from "./defaults";
-
-type CryptoPackagesConfig = typeof defaults.workerPool.cryptoPackages;
+import { Interfaces } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
@@ -19,27 +15,10 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 	@Container.postConstruct()
 	public initialize() {
 		const workerCount: number = this.pluginConfiguration.getRequired("workerPool.workerCount");
-		const cryptoPackages: CryptoPackagesConfig = this.pluginConfiguration.getRequired("workerPool.cryptoPackages");
 
 		for (let i = 0; i < workerCount; i++) {
-			const worker = this.createWorker();
-			// @ts-ignore
-			const availableCryptoPackages = cryptoPackages.filter((p) => require.resolve(p.packageName));
-			for (const { packageName } of availableCryptoPackages) {
-				worker.loadCryptoPackage(packageName);
-			}
-			this.workers.push(worker);
+			this.workers.push(this.createWorker());
 		}
-	}
-
-	public isTypeGroupSupported(typeGroup: Enums.TransactionTypeGroup): boolean {
-		if (typeGroup === Enums.TransactionTypeGroup.Core) {
-			return true;
-		}
-
-		const cryptoPackages: CryptoPackagesConfig = this.pluginConfiguration.getRequired("workerPool.cryptoPackages");
-		// @ts-ignore
-		return cryptoPackages.some((p) => p.typeGroup === typeGroup);
 	}
 
 	public async getTransactionFromData(
@@ -48,9 +27,9 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 		const worker: Contracts.TransactionPool.Worker = this.workers.reduce((prev, next) => {
 			if (prev.getQueueSize() < next.getQueueSize()) {
 				return prev;
-			} else {
-				return next;
 			}
+
+			return next;
 		});
 
 		return worker.getTransactionFromData(transactionData);

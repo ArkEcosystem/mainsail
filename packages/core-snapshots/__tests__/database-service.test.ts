@@ -51,7 +51,6 @@ const configuration = {
 	chunkSize: 50000,
 	dispatchUpdateStep: 1000,
 	connection: {},
-	cryptoPackages: [],
 };
 
 let logger;

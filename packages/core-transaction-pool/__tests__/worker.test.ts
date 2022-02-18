@@ -32,18 +32,6 @@ describe("Worker.getQueueSize", () => {
 	});
 });
 
-describe("Worker.loadCryptoPackage", () => {
-	it("should send 'loadCryptoPackage' action to subprocess", () => {
-		const ipcSubprocess = { sendAction: jest.fn() };
-		createWorkerSubprocess.mockReturnValueOnce(ipcSubprocess);
-		const worker = container.resolve(Worker);
-
-		worker.loadCryptoPackage("some-package-name");
-
-		expect(ipcSubprocess.sendAction).toBeCalledWith("loadCryptoPackage", "some-package-name");
-	});
-});
-
 describe("Worker.getTransactionFromData", () => {
 	it("should send 'getTransactionFromData' request to subprocess", async () => {
 		Managers.configManager.getMilestone().aip11 = true;

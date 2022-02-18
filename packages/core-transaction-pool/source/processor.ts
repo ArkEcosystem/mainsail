@@ -1,5 +1,5 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces, Transactions, Utils } from "@arkecosystem/crypto";
+import { Interfaces, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { InvalidTransactionDataError } from "./errors";
 
@@ -11,9 +11,6 @@ export class Processor implements Contracts.TransactionPool.Processor {
 
 	@Container.inject(Container.Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
-
-	@Container.inject(Container.Identifiers.TransactionPoolWorkerPool)
-	private readonly workerPool!: Contracts.TransactionPool.WorkerPool;
 
 	@Container.inject(Container.Identifiers.PeerTransactionBroadcaster)
 	@Container.optional()
@@ -29,14 +26,13 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		const broadcast: string[] = [];
 		const invalid: string[] = [];
 		const excess: string[] = [];
-		let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined = undefined;
+		let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
 		const broadcastTransactions: Interfaces.ITransaction[] = [];
 
 		try {
-			for (let i = 0; i < data.length; i++) {
-				const transactionData = data[i];
-				const entryId = transactionData instanceof Buffer ? String(i) : transactionData.id ?? String(i);
+			for (const [index, transactionData] of data.entries()) {
+				const entryId = transactionData instanceof Buffer ? String(index) : transactionData.id ?? String(index);
 
 				try {
 					const transaction =
@@ -59,10 +55,12 @@ export class Processor implements Contracts.TransactionPool.Processor {
 							excess.push(entryId);
 						}
 
-						if (!errors) errors = {};
+						if (!errors) {
+							errors = {};
+						}
 						errors[entryId] = {
-							type: error.type,
 							message: error.message,
+							type: error.type,
 						};
 					} else {
 						throw error;
@@ -70,7 +68,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				}
 			}
 		} finally {
-			if (this.transactionBroadcaster && broadcastTransactions.length !== 0) {
+			if (this.transactionBroadcaster && broadcastTransactions.length > 0) {
 				this.transactionBroadcaster
 					.broadcastTransactions(broadcastTransactions)
 					.catch((error) => this.logger.error(error.stack));
@@ -80,9 +78,9 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		return {
 			accept,
 			broadcast,
-			invalid,
-			excess,
 			errors,
+			excess,
+			invalid,
 		};
 	}
 
@@ -92,11 +90,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 			const txByteBuffer = new Utils.ByteBuffer(transactionData);
 			Transactions.Deserializer.deserializeCommon(transactionCommon, txByteBuffer);
 
-			if (this.workerPool.isTypeGroupSupported(transactionCommon.typeGroup || Enums.TransactionTypeGroup.Core)) {
-				return await this.workerPool.getTransactionFromData(transactionData);
-			} else {
-				return Transactions.TransactionFactory.fromBytes(transactionData);
-			}
+			return Transactions.TransactionFactory.fromBytes(transactionData);
 		} catch (error) {
 			throw new InvalidTransactionDataError(error.message);
 		}
@@ -106,11 +100,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		transactionData: Interfaces.ITransactionData,
 	): Promise<Interfaces.ITransaction> {
 		try {
-			if (this.workerPool.isTypeGroupSupported(transactionData.typeGroup || Enums.TransactionTypeGroup.Core)) {
-				return await this.workerPool.getTransactionFromData(transactionData);
-			} else {
-				return Transactions.TransactionFactory.fromData(transactionData);
-			}
+			return Transactions.TransactionFactory.fromData(transactionData);
 		} catch (error) {
 			throw new InvalidTransactionDataError(error.message);
 		}

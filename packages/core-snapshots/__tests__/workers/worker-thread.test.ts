@@ -17,7 +17,6 @@ const _workerData: Contracts.Worker.WorkerData = {
 		updateStep: 1000,
 		verify: true,
 	},
-	cryptoPackages: [],
 	networkConfig: Managers.configManager.all()!,
 };
 

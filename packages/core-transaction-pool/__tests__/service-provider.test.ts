@@ -93,7 +93,6 @@ describe("ServiceProvider", () => {
 			expect(result.value.dynamicFees.addonBytes.delegateResignation).toBeNumber();
 
 			expect(result.value.workerPool.workerCount).toBeNumber();
-			expect(result.value.workerPool.cryptoPackages).toBeArray();
 		});
 
 		it("should allow configuration extension", async () => {
@@ -497,50 +496,6 @@ describe("ServiceProvider", () => {
 				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
 				expect(result.error!.message).toEqual('"workerPool.workerCount" is required');
-			});
-
-			it("workerPool.cryptoPackages is required", async () => {
-				delete defaults.workerPool.cryptoPackages;
-				const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-				expect(result.error!.message).toEqual('"workerPool.cryptoPackages" is required');
-			});
-
-			// eslint-disable-next-line jest/no-disabled-tests
-			it.skip("workerPool.cryptoPackages[x].typeGroup is required && is integer && >= 2", async () => {
-				defaults.workerPool.cryptoPackages[0].typeGroup = false;
-				let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-				expect(result.error!.message).toEqual('"workerPool.cryptoPackages[0].typeGroup" must be a number');
-
-				defaults.workerPool.cryptoPackages[0].typeGroup = 1.12;
-				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-				expect(result.error!.message).toEqual('"workerPool.cryptoPackages[0].typeGroup" must be an integer');
-
-				defaults.workerPool.cryptoPackages[0].typeGroup = 0;
-				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-				expect(result.error!.message).toEqual(
-					'"workerPool.cryptoPackages[0].typeGroup" must be greater than or equal to 2',
-				);
-
-				delete defaults.workerPool.cryptoPackages[0].typeGroup;
-				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-				expect(result.error!.message).toEqual('"workerPool.cryptoPackages[0].typeGroup" is required');
-			});
-
-			it.skip("workerPool.cryptoPackages[x].packageName is required && must be string", async () => {
-				defaults.workerPool.cryptoPackages[0].packageName = 0;
-				let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-				expect(result.error!.message).toEqual('"workerPool.cryptoPackages[0].packageName" must be a string');
-
-				delete defaults.workerPool.cryptoPackages[0].packageName;
-				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-				expect(result.error!.message).toEqual('"workerPool.cryptoPackages[0].packageName" is required');
 			});
 		});
 	});

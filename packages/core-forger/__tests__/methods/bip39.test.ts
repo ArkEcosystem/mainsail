@@ -13,19 +13,17 @@ describe("Methods -> BIP39", () => {
 		expect(delegate.address).toBe(Identities.Address.fromPassphrase(passphrase));
 	});
 
-	describe("forge", () => {
-		it("should forge a block", () => {
-			const delegate: BIP39 = new BIP39(dummy.plainPassphrase);
+	it.skip("should forge a block", () => {
+		const delegate: BIP39 = new BIP39(dummy.plainPassphrase);
 
-			const block = delegate.forge(transactions, optionsDefault);
+		const block = delegate.forge(transactions, optionsDefault);
 
-			expect(block.verification).toEqual({
-				containsMultiSignatures: false,
-				errors: [],
-				verified: true,
-			});
-			expect(block.transactions).toHaveLength(50);
-			expect(block.transactions[0].id).toBe(transactions[0].id);
+		expect(block.verification).toEqual({
+			containsMultiSignatures: false,
+			errors: [],
+			verified: true,
 		});
+		expect(block.transactions).toHaveLength(50);
+		expect(block.transactions[0].id).toBe(transactions[0].id);
 	});
 });

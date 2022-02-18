@@ -18,10 +18,6 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
-	public loadCryptoPackage(packageName: string): void {
-		this.ipcSubprocess.sendAction("loadCryptoPackage", packageName);
-	}
-
 	public async getTransactionFromData(
 		transactionData: Interfaces.ITransactionData | Buffer,
 	): Promise<Interfaces.ITransaction> {
