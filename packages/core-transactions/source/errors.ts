@@ -119,12 +119,6 @@ export class NotSupportedForMultiSignatureWalletError extends TransactionError {
 	}
 }
 
-export class SwitchVoteDisabledError extends TransactionError {
-	public constructor() {
-		super(`Failed to apply transaction, because switch-vote is disabled.`);
-	}
-}
-
 export class AlreadyVotedError extends TransactionError {
 	public constructor() {
 		super(`Failed to apply transaction, because the sender wallet has already voted.`);

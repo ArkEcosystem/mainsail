@@ -1,5 +1,5 @@
-import { Container, Contracts, Utils, Enums as AppEnums } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces, Transactions, Managers } from "@arkecosystem/crypto";
+import { Container, Contracts, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
+import { Enums, Interfaces, Transactions } from "@arkecosystem/crypto";
 
 import {
 	AlreadyVotedError,
@@ -7,7 +7,6 @@ import {
 	UnvoteMismatchError,
 	VotedForNonDelegateError,
 	VotedForResignedDelegateError,
-	SwitchVoteDisabledError,
 } from "../../errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
 import { DelegateRegistrationTransactionHandler } from "./delegate-registration";
@@ -42,10 +41,6 @@ export class VoteTransactionHandler extends TransactionHandler {
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
-
-		if (transaction.data.asset.votes.length > 1 && !Managers.configManager.getMilestone().aip37) {
-			throw new SwitchVoteDisabledError();
-		}
 
 		let walletVote: string | undefined;
 		if (wallet.hasAttribute("vote")) {
@@ -87,7 +82,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 	public emitEvents(transaction: Interfaces.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 
-		for (const vote of transaction.data.asset!.votes) {
+		for (const vote of transaction.data.asset.votes) {
 			emitter.dispatch(vote.startsWith("+") ? AppEnums.VoteEvent.Vote : AppEnums.VoteEvent.Unvote, {
 				delegate: vote,
 				transaction: transaction.data,
@@ -138,7 +133,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 		Utils.assert.defined<Interfaces.ITransactionAsset>(transaction.data.asset?.votes);
 
-		for (const vote of transaction.data.asset.votes.slice().reverse()) {
+		for (const vote of [...transaction.data.asset.votes].reverse()) {
 			if (vote.startsWith("+")) {
 				sender.forgetAttribute("vote");
 			} else {

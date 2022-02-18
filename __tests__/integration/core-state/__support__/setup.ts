@@ -63,7 +63,6 @@ export const setUp = async (): Promise<Application> => {
 			await app.boot();
 
 			Managers.configManager.getMilestone().aip11 = true;
-			Managers.configManager.getMilestone().aip37 = true;
 
 			await AppUtils.sleep(1000);
 		});
