@@ -1,5 +1,3 @@
-// Matchers for https://jestjs.io/en/
-export * from "./matchers";
 // Entity Factories for commonly used entities like blocks and wallets
 export * from "./app";
 // CLI Helpers
