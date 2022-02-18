@@ -937,6 +937,25 @@ importers:
       util: 0.12.4
       uuid: 8.3.2
 
+  packages/crypto-key-pair-bls12-381:
+    specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@noble/bls12-381': ^1.2.0
+      bcrypto: ^5.4.0
+      bls12-381-keygen: ^0.2.1
+      micro-bip39: ^0.1.3
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@noble/bls12-381': 1.2.0
+      bcrypto: 5.4.0
+      bls12-381-keygen: 0.2.1
+      micro-bip39: 0.1.3
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
+
   packages/crypto-key-pair-schnorr:
     specifiers:
       '@arkecosystem/core-test': workspace:*
@@ -3083,6 +3102,10 @@ packages:
     resolution: {integrity: sha512-4wulV2SGeu4UxlXkNT0K88sG5g23tzmLMGFZgHSMkwz2Cd2zx2YFJNTEghdLioNdludTZQ5iQpMkQxrtyuS0mw==}
     dev: false
 
+  /@noble/hashes/0.5.9:
+    resolution: {integrity: sha512-7lN1Qh6d8DUGmfN36XRsbN/WcGIPNtTGhkw26vWId/DlCIGsYJJootTtPGghTLcn/AaXPx2Q0b3cacrwXa7OVw==}
+    dev: false
+
   /@noble/hashes/1.0.0:
     resolution: {integrity: sha512-DZVbtY62kc3kkBtMHqwCOfXrT/hnoORy5BJ4+HU1IR59X0KWAOqsfzQPcUl/lQLlG7qXbe/fZ3r/emxtAl+sqg==}
 
@@ -5013,6 +5036,12 @@ packages:
       buffer: 5.7.1
       inherits: 2.0.4
       readable-stream: 3.6.0
+
+  /bls12-381-keygen/0.2.1:
+    resolution: {integrity: sha512-4c9fBj7EUXeUoMnTKcQH2o0WY7R1oIhufOJh8cvtxm5niD2YuD/CmeRpUTP3fn7Q3o0PJqXsai+f9r9WIFt6mA==}
+    dependencies:
+      '@noble/hashes': 0.5.9
+    dev: false
 
   /blueimp-md5/2.19.0:
     resolution: {integrity: sha512-DRQrD6gJyy8FbiE4s+bDoXS9hiW3Vbx5uCdwvcCf3zLHL+Iv7LtGHLpr+GZV8rHG8tK766FGYBwRbu8pELTt+w==}
@@ -10282,6 +10311,19 @@ packages:
   /methods/1.1.2:
     resolution: {integrity: sha1-VSmk1nZUE07cxSZmVoNbD4Ua/O4=}
     engines: {node: '>= 0.6'}
+    dev: false
+
+  /micro-base/0.10.2:
+    resolution: {integrity: sha512-lqqJrT7lfJtDmmiQ4zRLZuIJBk96t0RAc5pCrrWpL9zDeH5i/SUL85mku9HqzTI/OCZ8EQ3aicbMW+eK5Nyu5w==}
+    deprecated: Switch to @scure/base for audited version of the lib & updates
+    dev: false
+
+  /micro-bip39/0.1.3:
+    resolution: {integrity: sha512-lEaRG/MKxFQvG19lfJfPkLIG0rgT28nWud3otN+VgAbrozGqXn2PLaZuYPsy9guQjIZWBTvoLw/HDJQxmMXjMA==}
+    deprecated: Switch to @scure/bip39 for audited version of the lib & updates
+    dependencies:
+      '@noble/hashes': 0.5.9
+      micro-base: 0.10.2
     dev: false
 
   /micro-memoize/2.1.2:
