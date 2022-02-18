@@ -244,7 +244,7 @@ export class Block implements IBlock {
 					}
 				}
 
-				if (transaction.data.version === 1 && !constants.block.acceptExpiredTransactionTimestamps) {
+				if (transaction.data.version === 1) {
 					const now: number = block.timestamp;
 					if (transaction.data.timestamp > now + 3600 + constants.blocktime) {
 						result.errors.push(`Encountered future transaction: ${transaction.data.id}`);

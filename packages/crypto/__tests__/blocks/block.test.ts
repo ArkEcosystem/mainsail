@@ -301,35 +301,6 @@ describe("Block", () => {
 			Managers.configManager.getMilestone().aip11 = true;
 		});
 
-		it("should accept block with future transaction timestamp if milestone is active", () => {
-			const delegate = new BIP39("super cool passphrase");
-			const optionsDefault = {
-				timestamp: 12345689,
-				previousBlock: {
-					id: "11111111",
-					idHex: "11111111",
-					height: 100,
-				},
-				reward: Utils.BigNumber.make(0),
-			};
-
-			const transactions = TransactionFactory.initialize()
-				.transfer("ANYiQJSPSoDT8U9Quh5vU8timD2RM7RS38", 1)
-				.withNetwork("mainnet")
-				.withVersion(1)
-				.withTimestamp(
-					optionsDefault.timestamp +
-						3601 +
-						configManager.getMilestone(optionsDefault.previousBlock.height).blocktime,
-				)
-				.withPassphrase("super cool passphrase")
-				.create();
-
-			const block = delegate.forge(transactions, optionsDefault);
-			expect(block.verification.verified).toBeTrue();
-			expect(block.verification.errors).toBeEmpty();
-		});
-
 		it("should reject block with future transaction timestamp if milestone is not active", () => {
 			const delegate = new BIP39("super cool passphrase");
 			const optionsDefault = {
