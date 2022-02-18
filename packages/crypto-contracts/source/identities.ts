@@ -4,11 +4,10 @@ export interface IKeyPair {
 	compressed: boolean;
 }
 
-// @TODO: handle network configuration in concrete implementations
 export interface AddressFactory {
-	fromMnemonic(passphrase: string): string;
+	fromMnemonic(passphrase: string): Promise<string>;
 
-	fromPublicKey(publicKey: string): string;
+	fromPublicKey(publicKey: Buffer): Promise<string>;
 
 	// fromWIF(wif: string, network?: Network): string;
 
@@ -16,11 +15,11 @@ export interface AddressFactory {
 
 	// fromPrivateKey(privateKey: IKeyPair): string;
 
-	validate(address: string): boolean;
+	validate(address: string): Promise<boolean>;
 }
 
 export interface IKeyPairFactory {
-	fromMnemonic(mnemonic: string, compressed?: boolean): IKeyPair;
+	fromMnemonic(mnemonic: string, compressed?: boolean): Promise<IKeyPair>;
 
-	fromPrivateKey(privateKey: Buffer | string, compressed?: boolean): IKeyPair;
+	fromPrivateKey(privateKey: Buffer, compressed?: boolean): Promise<IKeyPair>;
 }

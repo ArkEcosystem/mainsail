@@ -12,15 +12,15 @@ export class AddressFactory implements Contract {
 		this.#keyPairFactory = keyPairFactory;
 	}
 
-	public fromMnemonic(passphrase: string): string {
-		return this.fromPublicKey(this.#keyPairFactory.fromMnemonic(passphrase).publicKey);
+	public async fromMnemonic(passphrase: string): Promise<string> {
+		return this.fromPublicKey(Buffer.from((await this.#keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
 	}
 
-	public fromPublicKey(publicKey: string): string {
-		return bech32m.encode(this.#network.prefix, bech32m.toWords(Buffer.from(publicKey, "hex")));
+	public async fromPublicKey(publicKey: Buffer): Promise<string> {
+		return bech32m.encode(this.#network.prefix, bech32m.toWords(publicKey));
 	}
 
-	public validate(address: string): boolean {
+	public async validate(address: string): Promise<boolean> {
 		try {
 			bech32m.decode(address);
 

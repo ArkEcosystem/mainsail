@@ -1,14 +1,14 @@
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/crypto-contracts";
-import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import { getPublicKey } from "@noble/bls12-381";
+import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import { mnemonicToSeedSync } from "micro-bip39";
 
 export class KeyPairFactory implements Contract {
-	public fromMnemonic(mnemonic: string): IKeyPair {
+	public async fromMnemonic(mnemonic: string): Promise<IKeyPair> {
 		return this.#fromPrivateKey(deriveChild(deriveMaster(mnemonicToSeedSync(mnemonic)), 0));
 	}
 
-	public fromPrivateKey(privateKey: Buffer): IKeyPair {
+	public async fromPrivateKey(privateKey: Buffer): Promise<IKeyPair> {
 		return this.#fromPrivateKey(privateKey);
 	}
 

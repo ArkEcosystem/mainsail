@@ -13,12 +13,12 @@ export class AddressFactory implements Contract {
 		this.#keyPairFactory = keyPairFactory;
 	}
 
-	public fromMnemonic(passphrase: string): string {
-		return this.fromPublicKey(this.#keyPairFactory.fromMnemonic(passphrase).publicKey);
+	public async fromMnemonic(passphrase: string): Promise<string> {
+		return this.fromPublicKey(Buffer.from((await this.#keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
 	}
 
-	public fromPublicKey(publicKey: string): string {
-		const buffer: Buffer = RIPEMD160.digest(Buffer.from(publicKey, "hex"));
+	public async fromPublicKey(publicKey: Buffer): Promise<string> {
+		const buffer: Buffer = RIPEMD160.digest(publicKey);
 		const payload: Buffer = Buffer.alloc(21);
 
 		payload.writeUInt8(this.#network.pubKeyHash, 0);
@@ -27,7 +27,7 @@ export class AddressFactory implements Contract {
 		return this.#encodeCheck(payload);
 	}
 
-	public validate(address: string): boolean {
+	public async validate(address: string): Promise<boolean> {
 		try {
 			return this.#decodeCheck(address)[0] === this.#network.pubKeyHash;
 		} catch {
