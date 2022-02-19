@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/crypto-key-pair-secp256k1",
+	"name": "@arkecosystem/crypto-key-pair-secp256k1-bcrypto",
 	"version": "0.0.1",
 	"description": "secp256k1 Key Derivation",
 	"license": "MIT",

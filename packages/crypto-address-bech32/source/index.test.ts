@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
 import { KeyPairFactory as Schnorr } from "@arkecosystem/crypto-key-pair-schnorr";
-import { KeyPairFactory as Secp25k61 } from "@arkecosystem/crypto-key-pair-secp256k1";
+import { KeyPairFactory as Secp25k61 } from "@arkecosystem/crypto-key-pair-secp256k1-bcrypto";
 
 import { AddressFactory } from "./index";
 

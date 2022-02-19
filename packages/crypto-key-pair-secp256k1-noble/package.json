@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-address-bech32m",
+	"name": "@arkecosystem/crypto-key-pair-secp256k1-noble",
 	"version": "0.0.1",
-	"description": "bech32 Address Derivation",
+	"description": "secp256k1 Key Derivation",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -17,12 +17,10 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"@scure/base": "^1.0.0"
+		"@noble/secp256k1": "^1.5.4"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",
-		"@arkecosystem/crypto-key-pair-schnorr": "workspace:*",
-		"@arkecosystem/crypto-key-pair-secp256k1-bcrypto": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }
