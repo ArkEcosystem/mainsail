@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/crypto-key-pair-schnorr",
+	"name": "@arkecosystem/crypto-key-pair-schnorr-bcrypto",
 	"version": "0.0.1",
 	"description": "Schnorr Key Derivation",
 	"license": "MIT",

@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-address-ss558",
+	"name": "@arkecosystem/crypto-key-pair-schnorr-noble",
 	"version": "0.0.1",
-	"description": "ss58 Address Derivation",
+	"description": "Schnorr Key Derivation",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -17,13 +17,10 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"@polkadot/util": "^8.4.1",
-		"@polkadot/util-crypto": "^8.4.1"
+		"@noble/secp256k1": "^1.5.4"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",
-		"@arkecosystem/crypto-key-pair-schnorr-bcrypto": "workspace:*",
-		"@arkecosystem/crypto-key-pair-secp256k1-bcrypto": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }
