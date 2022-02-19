@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-key-pair-bls12-381",
+	"name": "@arkecosystem/crypto-key-pair-ed25519",
 	"version": "0.0.1",
-	"description": "BLS12-381 Key Derivation",
+	"description": "ed25519 Key Derivation",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -17,10 +17,9 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"@noble/bls12-381": "^1.2.0",
-		"@scure/bip39": "^1.0.0",
-		"bcrypto": "^5.4.0",
-		"bls12-381-keygen": "^0.2.1"
+		"@noble/ed25519": "^1.6.0",
+		"@noble/hashes": "^1.0.0",
+		"@scure/bip39": "^1.0.0"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",
