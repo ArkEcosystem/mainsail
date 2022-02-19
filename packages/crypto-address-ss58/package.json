@@ -22,8 +22,8 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/crypto-key-pair-ecdsa-bcrypto": "workspace:*",
 		"@arkecosystem/crypto-key-pair-schnorr-bcrypto": "workspace:*",
-		"@arkecosystem/crypto-key-pair-secp256k1-bcrypto": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/crypto-key-pair-secp256k1-noble",
+	"name": "@arkecosystem/crypto-key-pair-ecdsa-noble",
 	"version": "0.0.1",
 	"description": "secp256k1 Key Derivation",
 	"license": "MIT",

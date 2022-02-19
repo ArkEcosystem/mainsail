@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
+import { KeyPairFactory as ECDSA } from "@arkecosystem/crypto-key-pair-ecdsa-bcrypto";
 import { KeyPairFactory as Schnorr } from "@arkecosystem/crypto-key-pair-schnorr-bcrypto";
-import { KeyPairFactory as Secp25k61 } from "@arkecosystem/crypto-key-pair-secp256k1-bcrypto";
 
 import { AddressFactory } from "./index";
 
@@ -26,7 +26,7 @@ describe("AddressFactory", ({ assert, it }) => {
 				{
 					pubKeyHash: 23,
 				},
-				new Secp25k61(),
+				new ECDSA(),
 			).fromMnemonic(mnemonic),
 			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
 		);
@@ -50,7 +50,7 @@ describe("AddressFactory", ({ assert, it }) => {
 				{
 					pubKeyHash: 23,
 				},
-				new Secp25k61(),
+				new ECDSA(),
 			).fromPublicKey(Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex")),
 			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
 		);
@@ -61,7 +61,7 @@ describe("AddressFactory", ({ assert, it }) => {
 			{
 				pubKeyHash: 23,
 			},
-			new Secp25k61(),
+			new ECDSA(),
 		);
 
 		assert.true(await factory.validate("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu"));

@@ -635,6 +635,56 @@ jobs:
               run: pnpm run build
             - name: Test
               run: cd packages/crypto-key-pair-bls12-381 && pnpm run test
+    crypto-key-pair-ecdsa-bcrypto:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-crypto-key-pair-ecdsa-bcrypto
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/crypto-key-pair-ecdsa-bcrypto && pnpm run test
+    crypto-key-pair-ecdsa-noble:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-crypto-key-pair-ecdsa-noble
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/crypto-key-pair-ecdsa-noble && pnpm run test
     crypto-key-pair-schnorr-bcrypto:
         runs-on: ubuntu-latest
         strategy:
@@ -685,56 +735,6 @@ jobs:
               run: pnpm run build
             - name: Test
               run: cd packages/crypto-key-pair-schnorr-noble && pnpm run test
-    crypto-key-pair-secp256k1-bcrypto:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-key-pair-secp256k1-bcrypto
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-key-pair-secp256k1-bcrypto && pnpm run test
-    crypto-key-pair-secp256k1-noble:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-key-pair-secp256k1-noble
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-key-pair-secp256k1-noble && pnpm run test
     crypto-signature-bls12-381:
         runs-on: ubuntu-latest
         strategy:

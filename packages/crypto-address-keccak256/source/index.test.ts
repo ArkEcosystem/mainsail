@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
 import { KeyPairFactory as Schnorr } from "@arkecosystem/crypto-key-pair-schnorr-bcrypto";
-import { KeyPairFactory as Secp25k61 } from "@arkecosystem/crypto-key-pair-secp256k1-bcrypto";
+import { KeyPairFactory as ECDSA } from "@arkecosystem/crypto-key-pair-ecdsa-bcrypto";
 
 import { AddressFactory } from "./index";
 
@@ -17,7 +17,7 @@ describe("AddressFactory", ({ assert, it }) => {
 
 	it("should derive an address from an mnemonic (secp256k1)", async () => {
 		assert.is(
-			await new AddressFactory({}, new Secp25k61()).fromMnemonic(mnemonic),
+			await new AddressFactory({}, new ECDSA()).fromMnemonic(mnemonic),
 			"0xC7C50f33278bDe272ffe23865fF9fBd0155a5175",
 		);
 	});
@@ -33,7 +33,7 @@ describe("AddressFactory", ({ assert, it }) => {
 
 	it("should derive an address from a public key (secp256k1)", async () => {
 		assert.is(
-			await new AddressFactory({}, new Secp25k61()).fromPublicKey(
+			await new AddressFactory({}, new ECDSA()).fromPublicKey(
 				Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
 			),
 			"0xC7C50f33278bDe272ffe23865fF9fBd0155a5175",
@@ -41,7 +41,7 @@ describe("AddressFactory", ({ assert, it }) => {
 	});
 
 	it("should validate addresses", async () => {
-		const factory = new AddressFactory({}, new Secp25k61());
+		const factory = new AddressFactory({}, new ECDSA());
 
 		assert.true(await factory.validate("0x4D9AED240463043cFcf5B5Df16b9ad523930A181"));
 		assert.true(await factory.validate("0xC7C50f33278bDe272ffe23865fF9fBd0155a5175"));
