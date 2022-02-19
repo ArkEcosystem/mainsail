@@ -35,9 +35,9 @@ export class BlockTimeCalculator {
 		}
 
 		return height - milestone.height === 0;
-	};
+	}
 
-	public calculateBlockTime (height: number): number {
+	public calculateBlockTime(height: number): number {
 		const milestones = this.#configManager.get("milestones");
 
 		for (let i = milestones.length - 1; i >= 0; i--) {
@@ -48,5 +48,5 @@ export class BlockTimeCalculator {
 		}
 
 		throw new Error(`No milestones specifying any height were found`);
-	};
+	}
 }

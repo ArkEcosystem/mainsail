@@ -1,0 +1,29 @@
+{
+	"name": "@arkecosystem/crypto-config",
+	"version": "0.0.1",
+	"description": "Crypto utilities for the ARK Blockchain",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"bench": "node benchmark/index.js",
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/crypto-contracts": "workspace:*",
+		"@arkecosystem/crypto-errors": "workspace:*",
+		"deepmerge": "4.2.2",
+		"lodash.get": "4.4.2",
+		"lodash.set": "4.3.2"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}

@@ -37,11 +37,7 @@ export class Slots {
 		return (nextSlotTime - now) * 1000;
 	}
 
-	public getSlotNumber(
-		getTimeStampForBlock: GetBlockTimeStampLookup,
-		timestamp?: number,
-		height?: number,
-	): number {
+	public getSlotNumber(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): number {
 		if (timestamp === undefined) {
 			timestamp = this.getTime();
 		}
@@ -75,11 +71,7 @@ export class Slots {
 		return this.getSlotInfo(getTimeStampForBlock, timestamp, latestHeight).forgingStatus;
 	}
 
-	public getSlotInfo(
-		getTimeStampForBlock: GetBlockTimeStampLookup,
-		timestamp?: number,
-		height?: number,
-	): SlotInfo {
+	public getSlotInfo(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): SlotInfo {
 		if (timestamp === undefined) {
 			timestamp = this.getTime();
 		}
