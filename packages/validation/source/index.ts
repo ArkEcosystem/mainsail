@@ -56,4 +56,8 @@ export class Validator {
 	public removeSchema(schemaKeyReference: string | boolean | object | RegExp): void {
 		this.#ajv.removeSchema(schemaKeyReference);
 	}
+
+	public macro(callback: (ajv: Ajv.Ajv) => void): void {
+		callback(this.#ajv);
+	}
 }
