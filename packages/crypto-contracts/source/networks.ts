@@ -30,3 +30,9 @@ export interface IExceptions {
 	blocks?: string[];
 	transactions?: string[];
 }
+
+export interface MilestoneSearchResult {
+	found: boolean;
+	height: number;
+	data: any;
+}
