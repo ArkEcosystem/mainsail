@@ -1,12 +1,11 @@
 import { Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces, Utils } from "@arkecosystem/crypto";
+import { Interfaces } from "@arkecosystem/crypto";
 
 import {
 	AcceptBlockHandler,
 	AlreadyForgedHandler,
-	ExceptionHandler,
 	IncompatibleTransactionsHandler,
 	InvalidGeneratorHandler,
 	NonceOutOfOrderHandler,
@@ -48,10 +47,6 @@ export class BlockProcessor {
 	private readonly triggers!: Services.Triggers.Triggers;
 
 	public async process(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
-		if (Utils.isException({ ...block.data, transactions: block.transactions.map((tx) => tx.data) })) {
-			return this.app.resolve<ExceptionHandler>(ExceptionHandler).execute(block);
-		}
-
 		if (!(await this.verifyBlock(block))) {
 			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
 		}

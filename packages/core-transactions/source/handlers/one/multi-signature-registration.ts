@@ -1,5 +1,5 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
 import { LegacyMultiSignatureError, MultiSignatureAlreadyRegisteredError } from "../../errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
@@ -55,12 +55,6 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 		transaction: Interfaces.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		const { data }: Interfaces.ITransaction = transaction;
-
-		if (Utils.isException(data)) {
-			return;
-		}
-
 		throw new LegacyMultiSignatureError();
 	}
 

@@ -1,8 +1,6 @@
 import { HashAlgorithms } from "../crypto";
 import { AddressNetworkError } from "../errors";
 import { ISerializeOptions, ITransactionData } from "../interfaces";
-import { configManager } from "../managers";
-import { isException } from "../utils";
 import { Serializer } from "./serializer";
 import { TransactionTypeFactory } from "./types/factory";
 
@@ -25,16 +23,8 @@ export class Utils {
 		// during transfer serialization, the error is bubbled up to defer the
 		// `AddressNetworkByteError` until the actual id is available to call
 		// `isException`.
-		if (options.addressError && !isException({ id })) {
+		if (options.addressError) {
 			throw new AddressNetworkError(options.addressError);
-		}
-
-		// Apply fix for broken type 1 and 4 transactions, which were
-		// erroneously calculated with a recipient id.
-		const { transactionIdFixTable } = configManager.get("exceptions");
-
-		if (transactionIdFixTable && transactionIdFixTable[id]) {
-			return transactionIdFixTable[id];
 		}
 
 		return id;

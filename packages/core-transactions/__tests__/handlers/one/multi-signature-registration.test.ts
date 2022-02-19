@@ -217,13 +217,6 @@ describe("MultiSignatureRegistrationTransaction", () => {
 				LegacyMultiSignatureError,
 			);
 		});
-
-		it("should not throw if exception", async () => {
-			configManager.set("network.pubKeyHash", 99);
-			configManager.set("exceptions.transactions", [multiSignatureTransaction.id]);
-
-			await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).toResolve();
-		});
 	});
 
 	describe("throwIfCannotEnterPool", () => {

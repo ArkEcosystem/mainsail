@@ -1,5 +1,5 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Utils } from "@arkecosystem/crypto";
+import { Interfaces } from "@arkecosystem/crypto";
 
 import { Action } from "../contracts";
 
@@ -43,9 +43,7 @@ export class DownloadBlocks implements Action {
 		const useLookupHeight = empty ? lastDownloadedBlock.height : blocks[0].height;
 		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, useLookupHeight);
 
-		const chained: boolean =
-			!empty &&
-			(AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup) || Utils.isException(blocks[0]));
+		const chained: boolean = !empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup);
 
 		if (chained) {
 			this.logger.info(

@@ -1,21 +1,8 @@
 import { Deserializer } from "../../../../packages/crypto/source/blocks/deserializer";
-import { Serializer } from "../../../../packages/crypto/source/blocks/serializer";
-import { configManager } from "../../../../packages/crypto/source/managers";
-import { dummyBlock2, dummyBlock3 } from "../fixtures/block";
+import { dummyBlock2 } from "../fixtures/block";
 
 describe("block deserializer", () => {
 	describe("deserialize", () => {
-		it("should get block id from outlook table", () => {
-			const outlookTableBlockId = "123456";
-			configManager.set("exceptions.outlookTable", { [dummyBlock3.id]: outlookTableBlockId });
-
-			const deserialized = Deserializer.deserialize(Serializer.serialize(dummyBlock3), true).data;
-
-			expect(deserialized.id).toEqual(outlookTableBlockId);
-
-			configManager.set("exceptions.outlookTable", {});
-		});
-
 		it("should correctly deserialize a block", () => {
 			const deserialized = Deserializer.deserialize(Buffer.from(dummyBlock2.serializedFull, "hex")).data;
 

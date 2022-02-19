@@ -11,7 +11,7 @@ import {
 	ITransactionData,
 	ITransactionJson,
 } from "../interfaces";
-import { BigNumber, isException } from "../utils";
+import { BigNumber } from "../utils";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
 import { TransactionTypeFactory } from "./types";
@@ -58,7 +58,7 @@ export class TransactionFactory {
 	public static fromData(data: ITransactionData, strict = true, options: IDeserializeOptions = {}): ITransaction {
 		const { value, error } = Verifier.verifySchema(data, strict);
 
-		if (error && !isException(value)) {
+		if (error) {
 			throw new TransactionSchemaError(error);
 		}
 
@@ -79,9 +79,9 @@ export class TransactionFactory {
 			const transaction = Deserializer.deserialize(serialized, options);
 			transaction.data.id = Utils.getId(transaction.data, options);
 
-			const { value, error } = Verifier.verifySchema(transaction.data, strict);
+			const { error } = Verifier.verifySchema(transaction.data, strict);
 
-			if (error && !isException(value)) {
+			if (error) {
 				throw new TransactionSchemaError(error);
 			}
 

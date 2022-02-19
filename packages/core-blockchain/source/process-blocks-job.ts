@@ -1,7 +1,7 @@
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Blocks, Crypto, Interfaces, Utils as CryptoUtils } from "@arkecosystem/crypto";
+import { Blocks, Crypto, Interfaces } from "@arkecosystem/crypto";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
 import { RevertBlockHandler } from "./processor/handlers";
@@ -63,10 +63,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, this.blocks[0].height);
 
-		if (
-			!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup) &&
-			!CryptoUtils.isException(this.blocks[0])
-		) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup)) {
 			this.logger.warning(
 				Utils.getBlockNotChainedErrorMessage(
 					this.blockchain.getLastBlock().data,

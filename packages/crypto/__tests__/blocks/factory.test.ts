@@ -37,11 +37,6 @@ describe("BlockFactory", () => {
 			expectBlock(BlockFactory.fromData(dummyBlock));
 		});
 
-		it("should create a block with exceptions", () => {
-			// @ts-ignore
-			expect(() => BlockFactory.fromData(blockWithExceptions)).not.toThrow();
-		});
-
 		it("should throw on invalid input data - block property has an unexpected value", () => {
 			const b1 = Object.assign({}, blockWithExceptions, { timestamp: "abcd" });
 			expect(() => BlockFactory.fromData(b1 as any)).toThrowError(/Invalid.*timestamp.*integer.*abcd/i);

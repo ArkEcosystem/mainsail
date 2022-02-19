@@ -3,7 +3,7 @@ import { TransactionVersionError } from "../errors";
 import { Address } from "../identities";
 import { ISerializeOptions, ITransaction, ITransactionData } from "../interfaces";
 import { configManager } from "../managers/config";
-import { ByteBuffer, isException, isSupportedTransactionVersion } from "../utils";
+import { ByteBuffer, isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";
 
 // Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
@@ -94,13 +94,7 @@ export class Serializer {
 		if (transaction.senderPublicKey) {
 			bb.writeBuffer(Buffer.from(transaction.senderPublicKey, "hex"));
 
-			// Apply fix for broken type 1 and 4 transactions, which were
-			// erroneously calculated with a recipient id.
-			const { transactionIdFixTable } = configManager.get("exceptions");
-			const isBrokenTransaction: boolean =
-				transactionIdFixTable && Object.values(transactionIdFixTable).includes(transaction.id);
-
-			if (isBrokenTransaction || (transaction.recipientId && transaction.type !== 1 && transaction.type !== 4)) {
+			if (transaction.recipientId && transaction.type !== 1 && transaction.type !== 4) {
 				const recipientId =
 					transaction.recipientId || Address.fromPublicKey(transaction.senderPublicKey, transaction.network);
 				bb.writeBuffer(Address.toBuffer(recipientId).addressBuffer);
@@ -193,7 +187,7 @@ export class Serializer {
 		}
 
 		if (transaction.signatures) {
-			if (transaction.version === 1 && isException(transaction)) {
+			if (transaction.version === 1) {
 				buff.writeUInt8(0xff); // 0xff separator to signal start of multi-signature transactions
 				buff.writeBuffer(Buffer.from(transaction.signatures.join(""), "hex"));
 			} else if (!options.excludeMultiSignature) {

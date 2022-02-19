@@ -29,20 +29,6 @@ export class Deserializer {
 		block.idHex = Block.getIdHex(block);
 		block.id = Block.getId(block);
 
-		const { outlookTable } = configManager.get("exceptions");
-
-		if (outlookTable && outlookTable[block.id]) {
-			const constants = configManager.getMilestone(block.height);
-
-			if (constants.block.idFullSha256) {
-				block.id = outlookTable[block.id];
-				block.idHex = block.id;
-			} else {
-				block.id = outlookTable[block.id];
-				block.idHex = Block.toBytesHex(block.id);
-			}
-		}
-
 		return { data: block, transactions };
 	}
 

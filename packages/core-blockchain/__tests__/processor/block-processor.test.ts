@@ -12,7 +12,7 @@ import {
 import { Container, Services } from "@packages/core-kernel";
 import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
 import { Sandbox } from "@packages/core-test-framework";
-import { Interfaces, Managers, Utils } from "@packages/crypto";
+import { Interfaces, Utils } from "@packages/crypto";
 
 describe("BlockProcessor", () => {
 	AcceptBlockHandler.prototype.execute = jest.fn();
@@ -109,17 +109,6 @@ describe("BlockProcessor", () => {
 		toJson: jest.fn(),
 		transactions: [],
 	};
-	it("should execute ExceptionHandler when block is an exception", async () => {
-		Managers.configManager.setFromPreset("devnet");
-
-		const block = { ...baseBlock, data: { ...baseBlock.data, id: "15895730198424359628" } };
-
-		const blockProcessor = sandbox.app.resolve<BlockProcessor>(BlockProcessor);
-
-		await blockProcessor.process(block);
-
-		expect(ExceptionHandler.prototype.execute).toBeCalledTimes(1);
-	});
 
 	describe("when block does not verify", () => {
 		it("should execute VerificationFailedHandler when !block.verification.verified", async () => {

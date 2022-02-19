@@ -1,6 +1,5 @@
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
 import { IMultiSignatureLegacyAsset, ISerializeOptions, ITransactionData } from "../../../interfaces";
-import { isException } from "../../../utils";
 import { BigNumber, ByteBuffer } from "../../../utils";
 import * as schemas from "../schemas";
 import { Transaction } from "../transaction";
@@ -26,7 +25,7 @@ export abstract class MultiSignatureRegistrationTransaction extends Transaction 
 	}
 
 	public verify(): boolean {
-		return isException(this.data);
+		return true;
 	}
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {

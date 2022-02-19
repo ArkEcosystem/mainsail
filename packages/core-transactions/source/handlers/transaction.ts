@@ -1,7 +1,6 @@
 import { Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import assert from "assert";
 
 import {
 	ColdWalletError,
@@ -94,10 +93,6 @@ export abstract class TransactionHandler {
 
 		const data: Interfaces.ITransactionData = transaction.data;
 
-		if (Utils.isException(data)) {
-			this.logger.warning(`Transaction forcibly applied as an exception: ${transaction.id}.`);
-		}
-
 		await this.throwIfCannotBeApplied(transaction, sender);
 
 		// TODO: extract version specific code
@@ -112,26 +107,6 @@ export abstract class TransactionHandler {
 		}
 
 		const newBalance: Utils.BigNumber = sender.getBalance().minus(data.amount).minus(data.fee);
-
-		assert(Utils.isException(transaction.data) || !newBalance.isNegative());
-
-		// negativeBalanceExceptions check is never executed, because performGenericWalletChecks already checks balance
-		// if (process.env.CORE_ENV === "test") {
-		//     assert(Utils.isException(transaction.data.id) || !newBalance.isNegative());
-		// } else {
-		//     if (newBalance.isNegative()) {
-		//         const negativeBalanceExceptions: Record<string, Record<string, string>> =
-		//             Managers.configManager.get("exceptions.negativeBalances") || {};
-		//
-		//         AppUtils.assert.defined<string>(sender.publicKey);
-		//
-		//         const negativeBalances: Record<string, string> = negativeBalanceExceptions[sender.publicKey] || {};
-		//
-		//         if (!newBalance.isEqualTo(negativeBalances[sender.nonce.toString()] || 0)) {
-		//             throw new InsufficientBalanceError();
-		//         }
-		//     }
-		// }
 
 		sender.setBalance(newBalance);
 	}
@@ -171,10 +146,6 @@ export abstract class TransactionHandler {
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
 		const data: Interfaces.ITransactionData = transaction.data;
-
-		if (Utils.isException(data)) {
-			return;
-		}
 
 		this.verifyTransactionNonceApply(sender, transaction);
 

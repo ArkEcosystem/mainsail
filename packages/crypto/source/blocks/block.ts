@@ -3,7 +3,7 @@ import { Hash, HashAlgorithms, Slots } from "../crypto";
 import { BlockSchemaError } from "../errors";
 import { IBlock, IBlockData, IBlockJson, IBlockVerification, ITransaction, ITransactionData } from "../interfaces";
 import { configManager } from "../managers/config";
-import { BigNumber, isException } from "../utils";
+import { BigNumber } from "../utils";
 import { validator } from "../validation";
 import { Serializer } from "./serializer";
 
@@ -70,16 +70,14 @@ export class Block implements IBlock {
 
 			const match = err.dataPath.match(/\.transactions\[(\d+)]/);
 			if (match === null) {
-				if (!isException(data)) {
-					fatal = true;
-				}
+				fatal = true;
 			} else {
 				const txIndex = match[1];
 
 				if (data.transactions) {
 					const tx = data.transactions[txIndex];
 
-					if (tx.id === undefined || !isException(tx)) {
+					if (tx.id === undefined) {
 						fatal = true;
 					}
 				}
@@ -237,11 +235,7 @@ export class Block implements IBlock {
 					transaction.data.expiration > 0 &&
 					transaction.data.expiration <= this.data.height
 				) {
-					const isException =
-						configManager.get("network.name") === "devnet" && constants.ignoreExpiredTransactions;
-					if (!isException) {
-						result.errors.push(`Encountered expired transaction: ${transaction.data.id}`);
-					}
+					result.errors.push(`Encountered expired transaction: ${transaction.data.id}`);
 				}
 
 				if (transaction.data.version === 1) {

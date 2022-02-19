@@ -1,10 +1,8 @@
 import { SATOSHI } from "../constants";
-import { ITransactionData } from "../interfaces";
 import { configManager } from "../managers";
 import { BigNumber } from "./bignum";
 
 let genesisTransactions: { [key: string]: boolean };
-let whitelistedBlockAndTransactionIds: { [key: string]: boolean };
 let currentNetwork: number;
 
 export const formatSatoshi = (amount: BigNumber): string => {
@@ -14,54 +12,6 @@ export const formatSatoshi = (amount: BigNumber): string => {
 	});
 
 	return `${localeString} ${configManager.get("network.client.symbol")}`;
-};
-
-export const isIdException = (id: number | string | undefined): boolean => {
-	if (!id) {
-		return false;
-	}
-
-	const network: number = configManager.get("network.pubKeyHash");
-
-	if (!whitelistedBlockAndTransactionIds || currentNetwork !== network) {
-		currentNetwork = network;
-
-		whitelistedBlockAndTransactionIds = Object.fromEntries(
-			[
-				...(configManager.get("exceptions.blocks") || []),
-				...(configManager.get("exceptions.transactions") || []),
-			].map((curr) => [curr, true]),
-		);
-	}
-
-	return !!whitelistedBlockAndTransactionIds[id];
-};
-
-export const isException = (blockOrTransaction: { id?: string; transactions?: ITransactionData[] }): boolean => {
-	if (typeof blockOrTransaction.id !== "string") {
-		return false;
-	}
-
-	if (blockOrTransaction.id.length < 64) {
-		// old block ids, we check that the transactions inside the block are correct
-		const blockExceptionTxIds: string[] = (configManager.get("exceptions.blocksTransactions") || {})[
-			blockOrTransaction.id
-		];
-		const blockTransactions = blockOrTransaction.transactions || [];
-		if (!blockExceptionTxIds || blockExceptionTxIds.length !== blockTransactions.length) {
-			return false;
-		}
-
-		blockExceptionTxIds.sort();
-		const blockToCheckTxIds = blockTransactions.map((tx) => tx.id).sort();
-		for (const [i, blockExceptionTxId] of blockExceptionTxIds.entries()) {
-			if (blockToCheckTxIds[i] !== blockExceptionTxId) {
-				return false;
-			}
-		}
-	}
-
-	return isIdException(blockOrTransaction.id);
 };
 
 export const isGenesisTransaction = (id: string): boolean => {
