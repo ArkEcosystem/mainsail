@@ -7,6 +7,7 @@ export * from "./at";
 export * from "./base64";
 export * from "./big-number";
 export * from "./binary";
+export * from "./byte-buffer";
 export * from "./camel-case";
 export * from "./capped-map";
 export * from "./capped-set";
