@@ -57,7 +57,7 @@ export class Validator {
 		this.#ajv.removeSchema(schemaKeyReference);
 	}
 
-	public macro(callback: (ajv: Ajv.Ajv) => void): void {
+	public extend(callback: (ajv: Ajv.Ajv) => void): void {
 		callback(this.#ajv);
 	}
 }
