@@ -2,17 +2,16 @@ import assert from "assert";
 import ByteBuffer from "bytebuffer";
 
 import { PreviousBlockIdFormatError } from "@arkecosystem/crypto-errors";
-import { IBlock, IBlockData, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IBlock, IBlockData, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 import { Utils } from "@arkecosystem/crypto-transaction";
-import { Block } from "./block";
+import { toBytesHex } from "./utils";
 
+@Container.injectable()
 export class Serializer {
-	readonly #configuration: Configuration;
-
-	public constructor(configuration: Configuration) {
-		this.#configuration = configuration;
-	}
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
 
 	public size(block: IBlock): number {
 		let size = this.headerSize(block.data) + block.data.blockSignature.length / 2;
@@ -56,7 +55,7 @@ export class Serializer {
 	}
 
 	private headerSize(block: IBlockData): number {
-		const constants = this.#configuration.getMilestone(block.height - 1 || 1);
+		const constants = this.configuration.getMilestone(block.height - 1 || 1);
 
 		return (
 			4 + // version
@@ -74,7 +73,7 @@ export class Serializer {
 	}
 
 	private serializeHeader(block: IBlockData, buff: ByteBuffer): void {
-		const constants = this.#configuration.getMilestone(block.height - 1 || 1);
+		const constants = this.configuration.getMilestone(block.height - 1 || 1);
 
 		if (constants.block.idFullSha256) {
 			if (block.previousBlock.length !== 64) {
@@ -83,8 +82,7 @@ export class Serializer {
 
 			block.previousBlockHex = block.previousBlock;
 		} else {
-			// @ts-ignore
-			block.previousBlockHex = new Block(this.#configuration, {}).toBytesHex(block.previousBlock);
+			block.previousBlockHex = toBytesHex(block.previousBlock);
 		}
 
 		buff.writeUint32(block.version);
@@ -92,11 +90,11 @@ export class Serializer {
 		buff.writeUint32(block.height);
 		buff.append(block.previousBlockHex, "hex");
 		buff.writeUint32(block.numberOfTransactions);
-		// @ts-ignore - The ByteBuffer types say we can't use strings but the code actually handles them.
+		// The ByteBuffer types say we can't use strings but the code actually handles them.
 		buff.writeUint64(block.totalAmount.toString());
-		// @ts-ignore - The ByteBuffer types say we can't use strings but the code actually handles them.
+		// The ByteBuffer types say we can't use strings but the code actually handles them.
 		buff.writeUint64(block.totalFee.toString());
-		// @ts-ignore - The ByteBuffer types say we can't use strings but the code actually handles them.
+		// The ByteBuffer types say we can't use strings but the code actually handles them.
 		buff.writeUint64(block.reward.toString());
 		buff.writeUint32(block.payloadLength);
 		buff.append(block.payloadHash, "hex");

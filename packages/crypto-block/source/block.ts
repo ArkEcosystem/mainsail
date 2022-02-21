@@ -1,44 +1,47 @@
-import { HashFactory } from "@arkecosystem/crypto-hash-bcrypto";
-import { Signatory } from "@arkecosystem/crypto-signature-ecdsa";
 import { Slots } from "@arkecosystem/crypto-time";
-import { BlockSchemaError } from "@arkecosystem/crypto-errors";
+import { Container } from "@arkecosystem/container";
 import {
+	BINDINGS,
 	IBlock,
 	IBlockData,
 	IBlockJson,
 	IBlockVerification,
+	IHashFactory,
 	ITransaction,
 	ITransactionData,
+	Signatory,
 } from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { Validator } from "@arkecosystem/validation";
-import { Serializer } from "./serializer";
-import { Configuration } from "@packages/crypto-config/distribution";
+import { Configuration } from "@arkecosystem/crypto-config";
 
+import { Serializer } from "./serializer";
+
+@Container.injectable()
 export class Block implements IBlock {
-	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
+
+	@Container.inject(BINDINGS.Block.Serializer)
+	private readonly serializer: Serializer; // @TODO: create contract for block serializer
+
+	@Container.inject(BINDINGS.HashFactory)
+	private readonly hashFactory: IHashFactory;
+
+	@Container.inject(BINDINGS.SignatureFactory)
+	private readonly signatureFactory: Signatory;
+
+	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;
 	public data: IBlockData;
 	public transactions: ITransaction[];
 	public verification: IBlockVerification;
 
-	readonly #configuration: Configuration;
-
 	public constructor(
 		configuration: Configuration,
 		{ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string },
 	) {
-		this.#configuration = configuration;
+		this.configuration = configuration;
 		this.data = data;
-
-		// TODO genesis block calculated id is wrong for some reason
-		if (this.data.height === 1) {
-			if (id) {
-				this.applyGenesisBlockFix(id);
-			} else if (data.id) {
-				this.applyGenesisBlockFix(data.id);
-			}
-		}
 
 		// fix on real timestamp, this is overloading transaction
 		// timestamp with block timestamp for storage only
@@ -56,92 +59,23 @@ export class Block implements IBlock {
 		this.verification = void this.verify();
 	}
 
-	public async applySchema(data: IBlockData): Promise<IBlockData | undefined> {
-		let result = await new Validator({}).validate("block", data);
-
-		if (!result.error) {
-			return result.value;
-		}
-
-		for (const err of result.errors) {
-			let fatal = false;
-
-			const match = err.dataPath.match(/\.transactions\[(\d+)]/);
-			if (match === null) {
-				fatal = true;
-			} else {
-				const txIndex = match[1];
-
-				if (data.transactions) {
-					const tx = data.transactions[txIndex];
-
-					if (tx.id === undefined) {
-						fatal = true;
-					}
-				}
-			}
-
-			if (fatal) {
-				throw new BlockSchemaError(
-					data.height,
-					`Invalid data${err.dataPath ? " at " + err.dataPath : ""}: ` +
-						`${err.message}: ${JSON.stringify(err.data)}`,
-				);
-			}
-		}
-
-		return result.value;
-	}
-
-	public async getIdHex(data: IBlockData): Promise<string> {
-		const constants = this.#configuration.getMilestone(data.height);
-		const payloadHash: Buffer = new Serializer(this.#configuration).serialize(data);
-
-		const hash: Buffer = await new HashFactory().sha256(payloadHash);
-
-		if (constants.block.idFullSha256) {
-			return hash.toString("hex");
-		}
-
-		const temp: Buffer = Buffer.alloc(8);
-
-		for (let i = 0; i < 8; i++) {
-			temp[i] = hash[7 - i];
-		}
-
-		return temp.toString("hex");
-	}
-
-	public toBytesHex(data): string {
-		const temp: string = data ? BigNumber.make(data).toString(16) : "";
-
-		return "0".repeat(16 - temp.length) + temp;
-	}
-
-	public getId(data: IBlockData): string {
-		const constants = this.#configuration.getMilestone(data.height);
-		// @ts-ignore
-		const idHex: string = new Block(this.#configuration, {}).getIdHex(data);
-
-		return constants.block.idFullSha256 ? idHex : BigNumber.make(`0x${idHex}`).toString();
-	}
-
 	public getHeader(): IBlockData {
 		const header: IBlockData = Object.assign({}, this.data);
+
 		delete header.transactions;
 
 		return header;
 	}
 
 	public async verifySignature(): Promise<boolean> {
-		const bytes: Buffer = new Serializer(this.#configuration).serialize(this.data, false);
-		const hash: Buffer = await new HashFactory().sha256(bytes);
+		const bytes: Buffer = this.serializer.serialize(this.data, false);
+		const hash: Buffer = await this.hashFactory.sha256(bytes);
 
 		if (!this.data.blockSignature) {
 			throw new Error();
 		}
 
-		return new Signatory().verify(
+		return this.signatureFactory.verify(
 			hash,
 			Buffer.from(this.data.blockSignature, "hex"),
 			Buffer.from(this.data.generatorPublicKey, "hex"),
@@ -167,7 +101,7 @@ export class Block implements IBlock {
 		};
 
 		try {
-			const constants = this.#configuration.getMilestone(block.height);
+			const constants = this.configuration.getMilestone(block.height);
 
 			if (block.height !== 1 && !block.previousBlock) {
 				result.errors.push("Invalid previous block");
@@ -189,12 +123,12 @@ export class Block implements IBlock {
 
 			if (
 				block.timestamp >
-				new Slots(this.#configuration, {}).getTime() + this.#configuration.getMilestone(block.height).blocktime
+				new Slots(this.configuration, {}).getTime() + this.configuration.getMilestone(block.height).blocktime
 			) {
 				result.errors.push("Invalid block timestamp");
 			}
 
-			const size: number = new Serializer(this.#configuration).size(this);
+			const size: number = this.serializer.size(this);
 			if (size > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
@@ -269,8 +203,7 @@ export class Block implements IBlock {
 				result.errors.push("Invalid total fee");
 			}
 
-			// @ts-ignore
-			if ((await new HashFactory().sha256(payloadBuffers)).toString("hex") !== block.payloadHash) {
+			if ((await this.hashFactory.sha256(payloadBuffers)).toString("hex") !== block.payloadHash) {
 				result.errors.push("Invalid payload hash");
 			}
 		} catch (error) {
@@ -280,11 +213,5 @@ export class Block implements IBlock {
 		result.verified = result.errors.length === 0;
 
 		return result;
-	}
-
-	private applyGenesisBlockFix(id: string): void {
-		this.data.id = id;
-		// @ts-ignore
-		this.data.idHex = id.length === 64 ? id : new Block(this.#configuration, {}).toBytesHex(id); // if id.length is 64 it's already hex
 	}
 }

@@ -1173,11 +1173,11 @@ importers:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@noble/secp256k1': ^1.5.4
+      '@noble/secp256k1': ^1.5.5
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
-      '@noble/secp256k1': 1.5.4
+      '@noble/secp256k1': 1.5.5
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
@@ -3432,6 +3432,10 @@ packages:
 
   /@noble/secp256k1/1.5.4:
     resolution: {integrity: sha512-sOIQR+fSvgHlI+oeBMgrrxmePmLQMQloXP6DZGzcJ/Ek8N1dCgSWu+15K60qyvTI7mawp90A8G7UFb+D1ReeVQ==}
+    dev: false
+
+  /@noble/secp256k1/1.5.5:
+    resolution: {integrity: sha512-sZ1W6gQzYnu45wPrWx8D3kwI2/U29VYTx9OjbDAd7jwRItJ0cSTMPRL/C8AWZFn9kWFLQGqEXVEE86w4Z8LpIQ==}
     dev: false
 
   /@nodelib/fs.scandir/2.1.5:

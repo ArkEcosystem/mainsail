@@ -1,23 +1,26 @@
 import ByteBuffer from "bytebuffer";
 
-import { IBlockData, ITransaction } from "@arkecosystem/crypto-contracts";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IBlockData, ITransaction } from "@arkecosystem/crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
-import { Block } from "./block";
 import { Configuration } from "@arkecosystem/crypto-config";
 
+import { IdFactory } from "./id.factory";
+
+@Container.injectable()
 export class Deserializer {
-	readonly #configuration: Configuration;
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
 
-	public constructor(configuration: Configuration) {
-		this.#configuration = configuration;
-	}
+	@Container.inject(BINDINGS.Block.IdFactory)
+	private readonly idFactory: IdFactory;
 
-	public deserialize(
+	public async deserialize(
 		serialized: Buffer,
 		headerOnly = false,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
-	): { data: IBlockData; transactions: ITransaction[] } {
+	): Promise<{ data: IBlockData; transactions: ITransaction[] }> {
 		const block = {} as IBlockData;
 		let transactions: ITransaction[] = [];
 
@@ -32,10 +35,7 @@ export class Deserializer {
 			transactions = this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
 		}
 
-		// @ts-ignore
-		block.idHex = new Block(this.#configuration, {}).getIdHex(block);
-		// @ts-ignore
-		block.id = new Block(this.#configuration, {}).getId(block);
+		block.id = await this.idFactory.make(block);
 
 		return { data: block, transactions };
 	}
@@ -45,7 +45,7 @@ export class Deserializer {
 		block.timestamp = buf.readUint32();
 		block.height = buf.readUint32();
 
-		const constants = this.#configuration.getMilestone(block.height - 1 || 1);
+		const constants = this.configuration.getMilestone(block.height - 1 || 1);
 
 		if (constants.block.idFullSha256) {
 			const previousBlockFullSha256 = buf.readBytes(32).toString("hex");

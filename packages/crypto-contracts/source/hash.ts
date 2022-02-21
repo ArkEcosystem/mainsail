@@ -1,9 +1,9 @@
 export type HashInput = Buffer | Buffer[];
 
 export interface IHashFactory {
-	ripemd160(data: Buffer): Promise<Buffer>;
+	ripemd160(data: HashInput): Promise<Buffer>;
 
-	sha256(data: Buffer): Promise<Buffer>;
+	sha256(data: HashInput): Promise<Buffer>;
 
-	hash256(data: Buffer): Promise<Buffer>;
+	hash256(data: HashInput): Promise<Buffer>;
 }
