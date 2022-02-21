@@ -2,6 +2,7 @@ import { Container } from "@arkecosystem/container";
 import {
 	BINDINGS,
 	IBlock,
+	IBlockFactory,
 	IBlockData,
 	IBlockJson,
 	IHashFactory,
@@ -19,7 +20,7 @@ import { IdFactory } from "./id.factory";
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
 
 @Container.injectable()
-export class BlockFactory {
+export class BlockFactory implements IBlockFactory {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 

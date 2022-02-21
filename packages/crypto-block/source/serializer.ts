@@ -3,13 +3,13 @@ import ByteBuffer from "bytebuffer";
 
 import { PreviousBlockIdFormatError } from "@arkecosystem/crypto-errors";
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, IBlock, IBlockData, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, IBlock, IBlockData, IBlockSerializer, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 import { Utils } from "@arkecosystem/crypto-transaction";
 import { toBytesHex } from "./utils";
 
 @Container.injectable()
-export class Serializer {
+export class Serializer implements IBlockSerializer {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 

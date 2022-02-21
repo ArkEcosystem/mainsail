@@ -1,7 +1,7 @@
 import ByteBuffer from "bytebuffer";
 
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, IBlockData, ITransaction } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, IBlockData, IBlockDeserializer, ITransaction } from "@arkecosystem/crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 import { Configuration } from "@arkecosystem/crypto-config";
@@ -9,7 +9,7 @@ import { Configuration } from "@arkecosystem/crypto-config";
 import { IdFactory } from "./id.factory";
 
 @Container.injectable()
-export class Deserializer {
+export class Deserializer implements IBlockDeserializer {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 
