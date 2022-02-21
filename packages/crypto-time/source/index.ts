@@ -9,4 +9,5 @@ export const init = ({ configManager }) => {
 	};
 };
 
-export { BlockTimeCalculator, Slots };
+export { BlockTimeCalculator } from "./block-time-calculator";
+export { Slots } from "./slots";

@@ -26,12 +26,12 @@ export abstract class Transaction implements ITransaction {
 
 	public static type: number | undefined = undefined;
 	public static typeGroup: number | undefined = undefined;
-	public static version: number = 1;
+	public static version = 1;
 	public static key: string | undefined = undefined;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.ZERO;
 
-	public isVerified: boolean = false;
+	public isVerified = false;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public data: ITransactionData;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined

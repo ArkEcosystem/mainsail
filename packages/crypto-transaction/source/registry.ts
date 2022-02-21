@@ -4,7 +4,7 @@ import {
 	TransactionVersionAlreadyRegisteredError,
 	UnkownTransactionError,
 } from "./errors";
-import { One, Transaction, TransactionTypeFactory, Two } from "./types";
+import { Transaction, TransactionTypeFactory } from "./types";
 import { InternalTransactionType } from "./types/internal-transaction-type";
 import { Container } from "@arkecosystem/container";
 // import { BINDINGS } from "@arkecosystem/crypto-contracts";
@@ -13,7 +13,7 @@ import { Container } from "@arkecosystem/container";
 export type TransactionConstructor = typeof Transaction;
 
 @Container.injectable()
-class TransactionRegistry {
+export class TransactionRegistry {
 	// @Container.inject(BINDINGS.Validator)
 	// private readonly validator: Validator;
 
@@ -21,22 +21,6 @@ class TransactionRegistry {
 
 	public constructor() {
 		TransactionTypeFactory.initialize(this.transactionTypes);
-
-		this.registerTransactionType(One.TransferTransaction);
-		this.registerTransactionType(Two.TransferTransaction);
-
-		this.registerTransactionType(One.DelegateRegistrationTransaction);
-		this.registerTransactionType(Two.DelegateRegistrationTransaction);
-
-		this.registerTransactionType(One.VoteTransaction);
-		this.registerTransactionType(Two.VoteTransaction);
-
-		this.registerTransactionType(One.MultiSignatureRegistrationTransaction);
-		this.registerTransactionType(Two.MultiSignatureRegistrationTransaction);
-
-		this.registerTransactionType(Two.MultiPaymentTransaction);
-
-		this.registerTransactionType(Two.DelegateResignationTransaction);
 	}
 
 	public registerTransactionType(constructor: TransactionConstructor): void {

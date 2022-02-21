@@ -1348,6 +1348,104 @@ importers:
       process-es6: 0.11.6
       util: 0.12.4
 
+  packages/crypto-transaction-delegate-registration:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-delegate-resignation:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-multi-payment:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-multi-signature-registration:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-transfer:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-vote:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
   packages/crypto-validation:
     specifiers:
       '@arkecosystem/crypto-config': workspace:*
