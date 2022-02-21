@@ -1186,6 +1186,77 @@ importers:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       dayjs: 1.10.7
 
+  packages/crypto-transaction:
+    specifiers:
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-networks': workspace:*
+      '@arkecosystem/utils': workspace:*
+      '@arkecosystem/validation': workspace:*
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer: 6.0.3
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+      micro-bmark: ^0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
+    dependencies:
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-networks': link:../crypto-networks
+      '@arkecosystem/utils': link:../utils
+      '@arkecosystem/validation': link:../validation
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1_ajv@6.12.6
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+    devDependencies:
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      buffer: 6.0.3
+      micro-bmark: 0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
+
   packages/crypto-validation:
     specifiers:
       '@arkecosystem/crypto-config': workspace:*
