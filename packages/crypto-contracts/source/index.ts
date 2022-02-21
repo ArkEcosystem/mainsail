@@ -1,3 +1,4 @@
+export * from "./bindings";
 export * from "./block";
 export * from "./crypto";
 export * from "./hash";
