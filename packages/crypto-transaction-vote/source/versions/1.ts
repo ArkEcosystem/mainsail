@@ -1,8 +1,7 @@
 import { Container } from "@arkecosystem/container";
-
 import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class One extends Transaction {
@@ -14,7 +13,29 @@ export class One extends Transaction {
 	protected static defaultStaticFee: BigNumber = BigNumber.make("100000000");
 
 	public static getSchema(): schemas.TransactionSchema {
-		return schemas.vote;
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "vote",
+			required: ["asset"],
+			properties: {
+				type: { transactionType: TransactionType.Vote },
+				amount: { bignumber: { minimum: 0, maximum: 0 } },
+				fee: { bignumber: { minimum: 1 } },
+				recipientId: { $ref: "address" },
+				asset: {
+					type: "object",
+					required: ["votes"],
+					properties: {
+						votes: {
+							type: "array",
+							minItems: 1,
+							maxItems: 2,
+							additionalItems: false,
+							items: { $ref: "walletVote" },
+						},
+					},
+				},
+			},
+		});
 	}
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
@@ -37,7 +58,7 @@ export class One extends Transaction {
 		const votelength: number = buf.readUInt8();
 		data.asset = { votes: [] };
 
-		for (let i = 0; i < votelength; i++) {
+		for (let index = 0; index < votelength; index++) {
 			let vote: string = buf.readBuffer(34).toString("hex");
 			vote = (vote[1] === "1" ? "+" : "-") + vote.slice(2);
 

@@ -1,5 +1,4 @@
 import { Container } from "@arkecosystem/container";
-
 import {
 	IMultiSignatureLegacyAsset,
 	ISerializeOptions,
@@ -7,8 +6,8 @@ import {
 	TransactionType,
 	TransactionTypeGroup,
 } from "@arkecosystem/crypto-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { Configuration } from "@packages/crypto-config/distribution";
 
 @Container.injectable()
@@ -21,7 +20,60 @@ export abstract class One extends Transaction {
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
-		return schemas.multiSignatureLegacy;
+		const transactionBaseSchemaNoSignatures = schemas.extend(schemas.transactionBaseSchema, {});
+
+		delete transactionBaseSchemaNoSignatures.properties.signatures;
+
+		return schemas.extend(transactionBaseSchemaNoSignatures, {
+			$id: "multiSignatureLegacy",
+			properties: {
+				amount: { bignumber: { maximum: 0, minimum: 0 } },
+				asset: {
+					properties: {
+						multiSignatureLegacy: {
+							properties: {
+								keysgroup: {
+									additionalItems: false,
+									items: {
+										allOf: [
+											{ maximum: 67, minimum: 67, transform: ["toLowerCase"], type: "string" },
+										],
+									},
+									maxItems: 16,
+									minItems: 1,
+									type: "array",
+								},
+								lifetime: {
+									maximum: 72,
+									minimum: 1,
+									type: "integer",
+								},
+								min: {
+									maximum: { $data: "1/keysgroup/length" },
+									minimum: 1,
+									type: "integer",
+								},
+							},
+							required: ["keysgroup", "min", "lifetime"],
+							type: "object",
+						},
+					},
+					required: ["multiSignatureLegacy"],
+					type: "object",
+				},
+				fee: { bignumber: { minimum: 1 } },
+				signatures: {
+					additionalItems: false,
+					items: { $ref: "alphanumeric" },
+					maxItems: 1,
+					minItems: 1,
+					type: "array",
+				},
+				type: { transactionType: TransactionType.MultiSignature },
+				version: { anyOf: [{ type: "null" }, { const: 1 }] },
+			},
+			required: ["asset"],
+		});
 	}
 
 	public static staticFee(
@@ -63,10 +115,10 @@ export abstract class One extends Transaction {
 		const multiSignatureLegacy: IMultiSignatureLegacyAsset = { keysgroup: [], lifetime: 0, min: 0 };
 		multiSignatureLegacy.min = buf.readUInt8();
 
-		const num = buf.readUInt8();
+		const number_ = buf.readUInt8();
 		multiSignatureLegacy.lifetime = buf.readUInt8();
 
-		for (let index = 0; index < num; index++) {
+		for (let index = 0; index < number_; index++) {
 			const key: string = buf.readBuffer(33).toString("hex");
 			multiSignatureLegacy.keysgroup.push(key);
 		}

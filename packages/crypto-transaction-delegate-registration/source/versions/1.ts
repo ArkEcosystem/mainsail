@@ -1,8 +1,7 @@
 import { Container } from "@arkecosystem/container";
-
 import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export abstract class One extends Transaction {
@@ -14,7 +13,28 @@ export abstract class One extends Transaction {
 	protected static defaultStaticFee: BigNumber = BigNumber.make("2500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
-		return schemas.delegateRegistration;
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "delegateRegistration",
+			properties: {
+				amount: { bignumber: { maximum: 0, minimum: 0 } },
+				asset: {
+					properties: {
+						delegate: {
+							properties: {
+								username: { $ref: "delegateUsername" },
+							},
+							required: ["username"],
+							type: "object",
+						},
+					},
+					required: ["delegate"],
+					type: "object",
+				},
+				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
+				type: { transactionType: TransactionType.DelegateRegistration },
+			},
+			required: ["asset"],
+		});
 	}
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {

@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/container";
-
+import { Configuration } from "@arkecosystem/crypto-config";
 import {
 	IMultiSignatureAsset,
 	ISerializeOptions,
@@ -7,9 +7,8 @@ import {
 	TransactionType,
 	TransactionTypeGroup,
 } from "@arkecosystem/crypto-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
-import { Configuration } from "@arkecosystem/crypto-config";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class Two extends Transaction {
@@ -21,7 +20,35 @@ export class Two extends Transaction {
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
-		return schemas.multiSignature;
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "multiPayment",
+			properties: {
+				amount: { bignumber: { maximum: 0, minimum: 0 } },
+				asset: {
+					properties: {
+						payments: {
+							additionalItems: false,
+							items: {
+								properties: {
+									amount: { bignumber: { minimum: 1 } },
+									recipientId: { $ref: "address" },
+								},
+								required: ["amount", "recipientId"],
+								type: "object",
+							},
+							minItems: 2,
+							type: "array",
+							uniqueItems: false,
+						},
+					},
+					required: ["payments"],
+					type: "object",
+				},
+				fee: { bignumber: { minimum: 1 } },
+				type: { transactionType: TransactionType.MultiPayment },
+				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
+			},
+		});
 	}
 
 	public static staticFee(
@@ -59,11 +86,11 @@ export class Two extends Transaction {
 	public deserialize(buf: ByteBuffer): void {
 		const { data } = this;
 
-		const multiSignature: IMultiSignatureAsset = { publicKeys: [], min: 0 };
+		const multiSignature: IMultiSignatureAsset = { min: 0, publicKeys: [] };
 		multiSignature.min = buf.readUInt8();
 
 		const count = buf.readUInt8();
-		for (let i = 0; i < count; i++) {
+		for (let index = 0; index < count; index++) {
 			const publicKey = buf.readBuffer(33).toString("hex");
 			multiSignature.publicKeys.push(publicKey);
 		}

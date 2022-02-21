@@ -1,10 +1,8 @@
 import { Container } from "@arkecosystem/container";
-
-import { TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
+import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
 import { Address } from "@arkecosystem/crypto-identities";
-import { ISerializeOptions } from "@arkecosystem/crypto-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export abstract class One extends Transaction {
@@ -16,7 +14,17 @@ export abstract class One extends Transaction {
 	protected static defaultStaticFee: BigNumber = BigNumber.make("10000000");
 
 	public static getSchema(): schemas.TransactionSchema {
-		return schemas.transfer;
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "transfer",
+			properties: {
+				expiration: { minimum: 0, type: "integer" },
+				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
+				recipientId: { $ref: "address" },
+				type: { transactionType: TransactionType.Transfer },
+				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
+			},
+			required: ["recipientId"],
+		});
 	}
 
 	public hasVendorField(): boolean {
