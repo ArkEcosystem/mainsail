@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
 import { IHashFactory as Contract } from "@arkecosystem/crypto-contracts";
-import { Hash256, RIPEMD160, SHA256 } from "bcrypto";
+import { RIPEMD160, SHA256, Hash256 } from "bcrypto";
 
 export class HashFactory implements Contract {
 	public async ripemd160(data: Buffer): Promise<Buffer> {

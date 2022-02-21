@@ -13,8 +13,8 @@ export interface IBlock {
 	verification: IBlockVerification;
 
 	getHeader(): IBlockData;
-	verifySignature(): boolean;
-	verify(): IBlockVerification;
+	verifySignature(): Promise<boolean>;
+	verify(): Promise<IBlockVerification>;
 
 	toString(): string;
 	toJson(): IBlockJson;
