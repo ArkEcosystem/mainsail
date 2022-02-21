@@ -141,3 +141,7 @@ export interface ISerializeOptions {
 	// `AddressNetworkByteError` until the actual id is available to call `isException`.
 	addressError?: string;
 }
+
+export interface TransactionServiceProvider {
+	register(): Promise<void>;
+}
