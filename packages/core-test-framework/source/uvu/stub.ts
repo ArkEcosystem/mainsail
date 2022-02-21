@@ -44,6 +44,14 @@ export class Stub {
 		this.calledTimes(0);
 	}
 
+	public getCallArgs(index: number): any[] {
+		if (this.subject.callCount > index) {
+			return this.subject.getCall(index).args;
+		}
+
+		throw new Error(`Can't get args for call: ${index}`);
+	}
+
 	public restore(): void {
 		this.subject.restore();
 	}
