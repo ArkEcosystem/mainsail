@@ -1,11 +1,11 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, IHashFactory } from "@packages/crypto-contracts/distribution";
+import { BINDINGS, IHashFactory, ITransactionUtils } from "@packages/crypto-contracts/distribution";
 
 import { ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { TransactionTypeFactory } from "./types/factory";
 
 @Container.injectable()
-export class Utils {
+export class Utils implements ITransactionUtils {
 	@Container.inject(BINDINGS.Transaction.Serializer)
 	private readonly serializer: any;
 

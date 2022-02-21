@@ -1,40 +1,26 @@
-import { TransactionType, TransactionTypeGroup } from "./enums";
+import { Container } from "@arkecosystem/container";
+import { Configuration } from "@arkecosystem/crypto-config";
+import {
+	BINDINGS,
+	IDeserializeOptions,
+	ITransaction,
+	ITransactionData,
+	ITransactionDeserializer,
+} from "@arkecosystem/crypto-contracts";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+
 import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
 	TransactionVersionError,
 } from "./errors";
-import { Address } from "@arkecosystem/crypto-identities";
-import { IDeserializeOptions, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { isSupportedTransactionVersion } from "./helpers";
 import { TransactionTypeFactory } from "./types";
-import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
 
 @Container.injectable()
-export class Deserializer {
+export class Deserializer implements ITransactionDeserializer {
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: Configuration;
-
-	public applyV1Compatibility(transaction: ITransactionData): void {
-		transaction.typeGroup = TransactionTypeGroup.Core;
-
-		if (transaction.type === TransactionType.Vote && transaction.senderPublicKey) {
-			transaction.recipientId = Address.fromPublicKey(transaction.senderPublicKey, {
-				pubKeyHash: transaction.network,
-			});
-		} else if (
-			transaction.type === TransactionType.MultiSignature &&
-			transaction.asset &&
-			transaction.asset.multiSignatureLegacy
-		) {
-			transaction.asset.multiSignatureLegacy.keysgroup = transaction.asset.multiSignatureLegacy.keysgroup.map(
-				(k) => (k.startsWith("+") ? k : `+${k}`),
-			);
-		}
-	}
 
 	public deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): ITransaction {
 		const data = {} as ITransactionData;
@@ -50,18 +36,8 @@ export class Deserializer {
 
 		this.deserializeSignatures(data, buff);
 
-		if (data.version) {
-			if (
-				options.acceptLegacyVersion ||
-				options.disableVersionCheck ||
-				isSupportedTransactionVersion(this.configuration, data.version)
-			) {
-				if (data.version === 1) {
-					this.applyV1Compatibility(data);
-				}
-			} else {
-				throw new TransactionVersionError(data.version);
-			}
+		if (data.version && !isSupportedTransactionVersion(this.configuration, data.version)) {
+			throw new TransactionVersionError(data.version);
 		}
 
 		instance.serialized = buff.getResult();
@@ -166,9 +142,9 @@ export class Deserializer {
 
 				const count: number = buf.getRemainderLength() / 65;
 				const publicKeyIndexes: { [index: number]: boolean } = {};
-				for (let i = 0; i < count; i++) {
+				for (let index = 0; index < count; index++) {
 					const multiSignaturePart: string = buf.readBuffer(65).toString("hex");
-					const publicKeyIndex: number = parseInt(multiSignaturePart.slice(0, 2), 16);
+					const publicKeyIndex: number = Number.parseInt(multiSignaturePart.slice(0, 2), 16);
 
 					if (!publicKeyIndexes[publicKeyIndex]) {
 						publicKeyIndexes[publicKeyIndex] = true;

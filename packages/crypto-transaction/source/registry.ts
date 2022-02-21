@@ -7,13 +7,13 @@ import {
 import { Transaction, TransactionTypeFactory } from "./types";
 import { InternalTransactionType } from "./types/internal-transaction-type";
 import { Container } from "@arkecosystem/container";
-// import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { ITransactionRegistry } from "@arkecosystem/crypto-contracts";
 // import { Validator } from "@arkecosystem/validation";
 
 export type TransactionConstructor = typeof Transaction;
 
 @Container.injectable()
-export class TransactionRegistry {
+export class TransactionRegistry implements ITransactionRegistry {
 	// @Container.inject(BINDINGS.Validator)
 	// private readonly validator: Validator;
 

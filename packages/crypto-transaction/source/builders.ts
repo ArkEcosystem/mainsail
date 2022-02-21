@@ -1,17 +1,22 @@
-import { TransactionFactory } from "./factory";
-import { Utils } from "./utils";
+import { Container } from "@arkecosystem/container";
+import { Configuration } from "@arkecosystem/crypto-config";
+import {
+	BINDINGS,
+	IKeyPair,
+	ITransaction,
+	ITransactionData,
+	ITransactionSigner,
+	ITransactionUtils,
+	ITransactionVerifier,
+} from "@arkecosystem/crypto-contracts";
+import { Address, Keys } from "@arkecosystem/crypto-identities";
 import { Slots } from "@arkecosystem/crypto-time";
+import { BigNumber } from "@arkecosystem/utils";
+
 import { TransactionTypeGroup } from "./enums";
 import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "./errors";
-import { Address, Keys } from "@arkecosystem/crypto-identities";
-import { IKeyPair, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
-import { BigNumber } from "@arkecosystem/utils";
+import { TransactionFactory } from "./factory";
 import { maxVendorFieldLength } from "./helpers";
-import { Signer } from "./signer";
-import { Verifier } from "./verifier";
-import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
 
 @Container.injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
@@ -22,13 +27,13 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	protected readonly factory: TransactionFactory;
 
 	@Container.inject(BINDINGS.Transaction.Signer)
-	protected readonly signer: Signer;
+	protected readonly signer: ITransactionSigner;
 
 	@Container.inject(BINDINGS.Transaction.Utils)
-	protected readonly utils: Utils;
+	protected readonly utils: ITransactionUtils;
 
 	@Container.inject(BINDINGS.Transaction.Verifier)
-	protected readonly verifier: Verifier;
+	protected readonly verifier: ITransactionVerifier;
 
 	public data: ITransactionData;
 
@@ -39,9 +44,9 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	public constructor() {
 		this.data = {
 			id: undefined,
+			nonce: BigNumber.ZERO,
 			timestamp: new Slots(this.configuration, {}).getTime(),
 			typeGroup: TransactionTypeGroup.Test,
-			nonce: BigNumber.ZERO,
 			version: this.configuration.getMilestone().aip11 ? 0x02 : 0x01,
 		} as ITransactionData;
 	}
@@ -160,13 +165,13 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		}
 
 		const struct: ITransactionData = {
-			id: (await this.utils.getId(this.data)).toString(),
-			signature: this.data.signature,
-			version: this.data.version,
-			type: this.data.type,
 			fee: this.data.fee,
-			senderPublicKey: this.data.senderPublicKey,
+			id: (await this.utils.getId(this.data)).toString(),
 			network: this.data.network,
+			senderPublicKey: this.data.senderPublicKey,
+			signature: this.data.signature,
+			type: this.data.type,
+			version: this.data.version,
 		} as ITransactionData;
 
 		if (this.data.version === 1) {

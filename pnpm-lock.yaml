@@ -961,8 +961,10 @@ importers:
 
   packages/crypto-contracts:
     specifiers:
+      '@arkecosystem/utils': workspace:*
       ajv: 6.12.6
     dependencies:
+      '@arkecosystem/utils': link:../utils
       ajv: 6.12.6
 
   packages/crypto-errors:

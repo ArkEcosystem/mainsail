@@ -15,6 +15,7 @@
 		"clean": "del dist"
 	},
 	"dependencies": {
+		"@arkecosystem/utils": "workspace:*",
 		"ajv": "6.12.6"
 	}
 }

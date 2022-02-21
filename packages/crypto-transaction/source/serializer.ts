@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, ITransactionSerializer } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 import { ByteBuffer } from "@arkecosystem/utils";
 
@@ -11,7 +11,7 @@ import { isSupportedTransactionVersion } from "./helpers";
 import { TransactionTypeFactory } from "./types";
 
 @Container.injectable()
-export class Serializer {
+export class Serializer implements ITransactionSerializer {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 

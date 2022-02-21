@@ -1,9 +1,8 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, Signatory } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, ITransactionUtils, Signatory } from "@arkecosystem/crypto-contracts";
 
 import { IKeyPair, ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { numberToHex } from "./helpers";
-import { Utils } from "./utils";
 
 @Container.injectable()
 export class Signer {
@@ -11,7 +10,7 @@ export class Signer {
 	private readonly signatureFactory: Signatory;
 
 	@Container.inject(BINDINGS.Transaction.Utils)
-	private readonly utils: Utils;
+	private readonly utils: ITransactionUtils;
 
 	public async sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): Promise<string> {
 		if (!options || options.excludeSignature === undefined) {

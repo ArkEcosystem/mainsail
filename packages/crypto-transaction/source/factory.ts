@@ -1,42 +1,44 @@
+import { Container } from "@arkecosystem/container";
+import { Configuration } from "@arkecosystem/crypto-config";
+import {
+	BINDINGS,
+	IDeserializeOptions,
+	ISerializeOptions,
+	ITransaction,
+	ITransactionData,
+	ITransactionDeserializer,
+	ITransactionFactory,
+	ITransactionJson,
+	ITransactionSerializer,
+	ITransactionUtils,
+	ITransactionVerifier,
+} from "@arkecosystem/crypto-contracts";
+import { BigNumber } from "@arkecosystem/utils";
+
 import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 	TransactionVersionError,
 } from "./errors";
-import {
-	IDeserializeOptions,
-	ISerializeOptions,
-	ITransaction,
-	ITransactionData,
-	ITransactionJson,
-} from "@arkecosystem/crypto-contracts";
-import { BigNumber } from "@arkecosystem/utils";
-import { Deserializer } from "./deserializer";
-import { Serializer } from "./serializer";
 import { TransactionTypeFactory } from "./types";
-import { Utils } from "./utils";
-import { Verifier } from "./verifier";
-import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
 
 @Container.injectable()
-export class TransactionFactory {
+export class TransactionFactory implements ITransactionFactory {
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: Configuration;
 
 	@Container.inject(BINDINGS.Transaction.Deserializer)
-	private readonly deserializer: Deserializer;
+	private readonly deserializer: ITransactionDeserializer;
 
 	@Container.inject(BINDINGS.Transaction.Serializer)
-	private readonly serializer: Serializer;
+	private readonly serializer: ITransactionSerializer;
 
 	@Container.inject(BINDINGS.Transaction.Utils)
-	private readonly utils: Utils;
+	private readonly utils: ITransactionUtils;
 
 	@Container.inject(BINDINGS.Transaction.Verifier)
-	private readonly verifier: Verifier;
+	private readonly verifier: ITransactionVerifier;
 
 	public async fromHex(hex: string): Promise<ITransaction> {
 		return this.fromSerialized(hex);
@@ -86,11 +88,6 @@ export class TransactionFactory {
 		}
 
 		const transaction: ITransaction = TransactionTypeFactory.create(value);
-
-		const { version } = transaction.data;
-		if (version === 1) {
-			this.deserializer.applyV1Compatibility(transaction.data);
-		}
 
 		this.serializer.serialize(transaction);
 

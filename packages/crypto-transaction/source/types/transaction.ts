@@ -1,20 +1,20 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
-
-import { TransactionTypeGroup } from "../enums";
-import { NotImplemented } from "../errors";
-import { Address } from "@arkecosystem/crypto-identities";
+import { Configuration } from "@arkecosystem/crypto-config";
 import {
+	BINDINGS,
 	ISchemaValidationResult,
 	ISerializeOptions,
 	ITransaction,
 	ITransactionData,
 	ITransactionJson,
+	ITransactionVerifier,
 } from "@arkecosystem/crypto-contracts";
+import { Address } from "@arkecosystem/crypto-identities";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
-import { Verifier } from "../verifier";
+
+import { TransactionTypeGroup } from "../enums";
+import { NotImplemented } from "../errors";
 import { TransactionSchema } from "./schemas";
-import { Configuration } from "@arkecosystem/crypto-config";
 
 @Container.injectable()
 export abstract class Transaction implements ITransaction {
@@ -22,7 +22,7 @@ export abstract class Transaction implements ITransaction {
 	protected readonly configuration: Configuration;
 
 	@Container.inject(BINDINGS.Transaction.Verifier)
-	private readonly verifier: Verifier;
+	private readonly verifier: ITransactionVerifier;
 
 	public static type: number | undefined = undefined;
 	public static typeGroup: number | undefined = undefined;

@@ -1,19 +1,21 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, Signatory } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
-
-import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";
 import {
+	BINDINGS,
 	IMultiSignatureAsset,
 	ISchemaValidationResult,
 	ITransactionData,
+	ITransactionUtils,
+	ITransactionVerifier,
 	IVerifyOptions,
+	Signatory,
 } from "@arkecosystem/crypto-contracts";
+
+import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";
 import { TransactionTypeFactory } from "./types/factory";
-import { Utils } from "./utils";
 
 @Container.injectable()
-export class Verifier {
+export class Verifier implements ITransactionVerifier {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 
@@ -24,7 +26,7 @@ export class Verifier {
 	private readonly validator: any;
 
 	@Container.inject(BINDINGS.Transaction.Utils)
-	private readonly utils: Utils;
+	private readonly utils: ITransactionUtils;
 
 	public async verify(data: ITransactionData, options?: IVerifyOptions): Promise<boolean> {
 		if (this.configuration.getMilestone().aip11 && (!data.version || data.version === 1)) {
@@ -55,9 +57,9 @@ export class Verifier {
 		let verifiedSignatures = 0;
 
 		if (signatures) {
-			for (let i = 0; i < signatures.length; i++) {
-				const signature: string = signatures[i];
-				const publicKeyIndex: number = parseInt(signature.slice(0, 2), 16);
+			for (let index = 0; index < signatures.length; index++) {
+				const signature: string = signatures[index];
+				const publicKeyIndex: number = Number.parseInt(signature.slice(0, 2), 16);
 
 				if (!publicKeyIndexes[publicKeyIndex]) {
 					publicKeyIndexes[publicKeyIndex] = true;
@@ -81,7 +83,7 @@ export class Verifier {
 				if (verifiedSignatures === min) {
 					verified = true;
 					break;
-				} else if (signatures.length - (i + 1 - verifiedSignatures) < min) {
+				} else if (signatures.length - (index + 1 - verifiedSignatures) < min) {
 					break;
 				}
 			}

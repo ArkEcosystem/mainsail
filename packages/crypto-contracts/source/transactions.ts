@@ -1,4 +1,6 @@
+import { ByteBuffer } from "@arkecosystem/utils";
 import { ErrorObject } from "ajv";
+import { IKeyPair } from "./identities";
 
 export interface ITransaction {
 	readonly id: string | undefined;
@@ -144,4 +146,59 @@ export interface ISerializeOptions {
 
 export interface TransactionServiceProvider {
 	register(): Promise<void>;
+}
+
+export interface ITransactionVerifier {
+	verify(data: ITransactionData, options?: IVerifyOptions): Promise<boolean>;
+
+	verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): Promise<boolean>;
+
+	verifyHash(data: ITransactionData, disableVersionCheck?: boolean): Promise<boolean>;
+
+	verifySchema(data: ITransactionData, strict?: boolean): ISchemaValidationResult;
+}
+
+export interface ITransactionSigner {
+	sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): Promise<string>;
+	multiSign(transaction: ITransactionData, keys: IKeyPair, index?: number): Promise<string>;
+}
+
+export interface ITransactionSerializer {
+	getBytes(transaction: ITransactionData, options?: ISerializeOptions): Buffer;
+
+	serialize(transaction: ITransaction, options?: ISerializeOptions): Buffer;
+}
+
+export interface ITransactionDeserializer {
+	deserialize(serialized: string | Buffer, options?: IDeserializeOptions): ITransaction;
+
+	deserializeCommon(transaction: ITransactionData, buf: ByteBuffer): void;
+}
+
+export interface ITransactionFactory {
+	fromHex(hex: string): Promise<ITransaction>;
+
+	fromBytes(buff: Buffer, strict?: boolean, options?: IDeserializeOptions): Promise<ITransaction>;
+
+	fromBytesUnsafe(buff: Buffer, id?: string): Promise<ITransaction>;
+
+	fromJson(json: ITransactionJson): Promise<ITransaction>;
+
+	fromData(data: ITransactionData, strict?: boolean, options?: IDeserializeOptions): Promise<ITransaction>;
+}
+
+export type TransactionConstructor = any;
+
+export interface ITransactionRegistry {
+	registerTransactionType(constructor: TransactionConstructor): void;
+
+	deregisterTransactionType(constructor: TransactionConstructor): void;
+}
+
+export interface ITransactionUtils {
+	toBytes(data: ITransactionData): Buffer;
+
+	toHash(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer>;
+
+	getId(transaction: ITransactionData, options?: ISerializeOptions): Promise<string>;
 }
