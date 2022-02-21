@@ -13,6 +13,9 @@ export class Serializer {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 
+	@Container.inject(BINDINGS.Transaction.Utils)
+	private readonly utils: Utils;
+
 	public size(block: IBlock): number {
 		let size = this.headerSize(block.data) + block.data.blockSignature.length / 2;
 
@@ -23,7 +26,7 @@ export class Serializer {
 		return size;
 	}
 
-	public serializeWithTransactions(block: IBlockData): Buffer {
+	public async serializeWithTransactions(block: IBlockData): Promise<Buffer> {
 		const transactions: ITransactionData[] = block.transactions || [];
 		block.numberOfTransactions = block.numberOfTransactions || transactions.length;
 
@@ -34,7 +37,7 @@ export class Serializer {
 			.skip(transactions.length * 4);
 
 		for (const [i, transaction] of transactions.entries()) {
-			const serialized: Buffer = Utils.toBytes(transaction);
+			const serialized: Buffer = await this.utils.toBytes(transaction);
 			buff.writeUint32(serialized.length, serializedHeader.length + i * 4);
 			buff.append(serialized);
 		}

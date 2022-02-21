@@ -85,7 +85,7 @@ export class BlockFactory {
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): Promise<IBlock | undefined> {
 		if (await applySchema(data)) {
-			const serialized: Buffer = this.serializer.serializeWithTransactions(data);
+			const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
 			const block: IBlock = this.blockFactory({
 				...(await this.deserializer.deserialize(serialized, false, options)),
 				id: data.id,

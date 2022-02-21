@@ -1275,11 +1275,13 @@ importers:
 
   packages/crypto-transaction:
     specifiers:
+      '@arkecosystem/container': workspace:*
       '@arkecosystem/crypto-config': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@arkecosystem/crypto-errors': workspace:*
       '@arkecosystem/crypto-identities': workspace:*
       '@arkecosystem/crypto-networks': workspace:*
+      '@arkecosystem/crypto-time': workspace:*
       '@arkecosystem/utils': workspace:*
       '@arkecosystem/validation': workspace:*
       '@types/bip32': 2.0.0
@@ -1309,11 +1311,13 @@ importers:
       process-es6: 0.11.6
       util: 0.12.4
     dependencies:
+      '@arkecosystem/container': link:../container
       '@arkecosystem/crypto-config': link:../crypto-config
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       '@arkecosystem/crypto-errors': link:../crypto-errors
       '@arkecosystem/crypto-identities': link:../crypto-identities
       '@arkecosystem/crypto-networks': link:../crypto-networks
+      '@arkecosystem/crypto-time': link:../crypto-time
       '@arkecosystem/utils': link:../utils
       '@arkecosystem/validation': link:../validation
       ajv: 6.12.6

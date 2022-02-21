@@ -16,6 +16,9 @@ export class Deserializer {
 	@Container.inject(BINDINGS.Block.IdFactory)
 	private readonly idFactory: IdFactory;
 
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly transactionFactory: TransactionFactory;
+
 	public async deserialize(
 		serialized: Buffer,
 		headerOnly = false,
@@ -32,7 +35,7 @@ export class Deserializer {
 
 		headerOnly = headerOnly || buf.remaining() === 0;
 		if (!headerOnly) {
-			transactions = this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
+			transactions = await this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
 		}
 
 		block.id = await this.idFactory.make(block);
@@ -77,11 +80,11 @@ export class Deserializer {
 		block.blockSignature = buf.readBytes(signatureLength()).toString("hex");
 	}
 
-	private deserializeTransactions(
+	private async deserializeTransactions(
 		block: IBlockData,
 		buf: ByteBuffer,
 		deserializeTransactionsUnchecked = false,
-	): ITransaction[] {
+	): Promise<ITransaction[]> {
 		const transactionLengths: number[] = [];
 
 		for (let i = 0; i < block.numberOfTransactions; i++) {
@@ -93,8 +96,8 @@ export class Deserializer {
 		for (const length of transactionLengths) {
 			const transactionBytes = buf.readBytes(length).toBuffer();
 			const transaction = deserializeTransactionsUnchecked
-				? TransactionFactory.fromBytesUnsafe(transactionBytes)
-				: TransactionFactory.fromBytes(transactionBytes);
+				? await this.transactionFactory.fromBytesUnsafe(transactionBytes)
+				: await this.transactionFactory.fromBytes(transactionBytes);
 			transactions.push(transaction);
 			block.transactions.push(transaction.data);
 		}

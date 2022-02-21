@@ -17,7 +17,7 @@ export interface ITransaction {
 	serialize(options?: ISerializeOptions): any | undefined; // @TODO: use ByteBuffer from ../../crypto/utils
 	deserialize(buf: any): void; // @TODO: use ByteBuffer from ../../crypto/utils
 
-	verify(options?: IVerifyOptions): boolean;
+	verify(options?: IVerifyOptions): Promise<boolean>;
 	verifySchema(strict?: boolean): ISchemaValidationResult;
 
 	toJson(): ITransactionJson;
