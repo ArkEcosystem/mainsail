@@ -126,6 +126,14 @@ importers:
       uuid: 8.3.2
       yaml: 1.10.2
 
+  packages/container:
+    specifiers:
+      inversify: 5.1.1
+      reflect-metadata: 0.1.13
+    dependencies:
+      inversify: 5.1.1
+      reflect-metadata: 0.1.13
+
   packages/core:
     specifiers:
       '@arkecosystem/core-api': workspace:*
