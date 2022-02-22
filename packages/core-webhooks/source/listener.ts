@@ -1,7 +1,7 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { performance } from "perf_hooks";
 
-import * as conditions from "./conditions";
+import { conditions } from "./conditions";
 import { Database } from "./database";
 import { WebhookEvent } from "./events";
 import { Identifiers } from "./identifiers";

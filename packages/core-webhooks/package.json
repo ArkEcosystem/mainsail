@@ -12,7 +12,9 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 -r html pnpm run test",
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@arkecosystem/core-kernel": "workspace:*",
@@ -25,10 +27,14 @@
 		"uuid": "8.3.2"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"@types/fs-extra": "8.1.2",
 		"@types/hapi__boom": "7.4.1",
 		"@types/hapi__joi": "17.1.7",
-		"@types/uuid": "8.3.1"
+		"@types/uuid": "8.3.1",
+		"import-fresh": "3.3.0",
+		"tmp": "0.2.1",
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"
