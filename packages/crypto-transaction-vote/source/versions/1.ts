@@ -38,7 +38,7 @@ export class One extends Transaction {
 		});
 	}
 
-	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(100));
 
@@ -53,7 +53,7 @@ export class One extends Transaction {
 		return buff;
 	}
 
-	public deserialize(buf: ByteBuffer): void {
+	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 		const votelength: number = buf.readUInt8();
 		data.asset = { votes: [] };

@@ -18,5 +18,12 @@ export const BINDINGS = {
 		Utils: Symbol.for("Crypto<Transaction.Utils>"),
 		Verifier: Symbol.for("Crypto<Transaction.Verifier>"),
 	},
+	Identity: {
+		AddressFactory: Symbol.for("Crypto<Identity.AddressFactory>"),
+		PublicKeyFactory: Symbol.for("Crypto<Identity.PublicKeyFactory>"),
+		PrivateKeyFactory: Symbol.for("Crypto<Identity.PrivateKeyFactory>"),
+		KeyPairFactory: Symbol.for("Crypto<Identity.KeyPairFactory>"),
+		WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
+	},
 	Validator: Symbol.for("Crypto<Validator>"),
 };

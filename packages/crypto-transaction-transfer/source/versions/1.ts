@@ -1,6 +1,5 @@
 import { Container } from "@arkecosystem/container";
 import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
-import { Address } from "@arkecosystem/crypto-identities";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
@@ -31,16 +30,16 @@ export abstract class One extends Transaction {
 		return true;
 	}
 
-	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(33));
 		buff.writeBigUInt64LE(data.amount.toBigInt());
 		buff.writeUInt32LE(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer, addressError } = Address.toBuffer(
+			const { addressBuffer, addressError } = await this.addressFactory.toBuffer(
 				data.recipientId,
-				this.configuration.get("network"),
+				this.configuration.get("network.pubKeyHash"),
 			);
 
 			if (options) {
@@ -53,10 +52,10 @@ export abstract class One extends Transaction {
 		return buff;
 	}
 
-	public deserialize(buf: ByteBuffer): void {
+	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
 		data.expiration = buf.readUInt32LE();
-		data.recipientId = Address.fromBuffer(buf.readBuffer(21));
+		data.recipientId = await this.addressFactory.fromBuffer(buf.readBuffer(21));
 	}
 }

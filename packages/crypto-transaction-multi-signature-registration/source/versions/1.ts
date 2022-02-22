@@ -93,7 +93,7 @@ export abstract class One extends Transaction {
 		return true;
 	}
 
-	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
 		const legacyAsset: IMultiSignatureLegacyAsset = data.asset.multiSignatureLegacy;
@@ -109,7 +109,7 @@ export abstract class One extends Transaction {
 		return buff;
 	}
 
-	public deserialize(buf: ByteBuffer): void {
+	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 
 		const multiSignatureLegacy: IMultiSignatureLegacyAsset = { keysgroup: [], lifetime: 0, min: 0 };

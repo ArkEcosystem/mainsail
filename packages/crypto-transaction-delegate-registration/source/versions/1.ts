@@ -37,7 +37,7 @@ export abstract class One extends Transaction {
 		});
 	}
 
-	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
 		if (data.asset && data.asset.delegate) {
@@ -54,7 +54,7 @@ export abstract class One extends Transaction {
 		return undefined;
 	}
 
-	public deserialize(buf: ByteBuffer): void {
+	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 		const usernameLength = buf.readUInt8();
 

@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
-import { KeyPairFactory as Schnorr } from "@arkecosystem/crypto-key-pair-schnorr-bcrypto";
-import { KeyPairFactory as ECDSA } from "@arkecosystem/crypto-key-pair-ecdsa-bcrypto";
+import { KeyPairFactory as Schnorr } from "@arkecosystem/crypto-key-pair-schnorr";
+import { KeyPairFactory as ECDSA } from "@arkecosystem/crypto-key-pair-ecdsa";
 
 import { AddressFactory } from "./index";
 

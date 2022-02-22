@@ -2,14 +2,15 @@ import { Container } from "@arkecosystem/container";
 import { Configuration } from "@arkecosystem/crypto-config";
 import {
 	BINDINGS,
+	IAddressFactory,
 	IKeyPair,
+	IKeyPairFactory,
 	ITransaction,
 	ITransactionData,
 	ITransactionSigner,
 	ITransactionUtils,
 	ITransactionVerifier,
 } from "@arkecosystem/crypto-contracts";
-import { Address, Keys } from "@arkecosystem/crypto-identities";
 import { Slots } from "@arkecosystem/crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -20,11 +21,17 @@ import { maxVendorFieldLength } from "./helpers";
 
 @Container.injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
+	@Container.inject(BINDINGS.Identity.AddressFactory)
+	private readonly addressFactory: IAddressFactory;
+
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: Configuration;
 
 	@Container.inject(BINDINGS.Transaction.Factory)
 	protected readonly factory: TransactionFactory;
+
+	@Container.inject(BINDINGS.Identity.KeyPairFactory)
+	private readonly keyPairFactory: IKeyPairFactory;
 
 	@Container.inject(BINDINGS.Transaction.Signer)
 	protected readonly signer: ITransactionSigner;
@@ -130,27 +137,25 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public async sign(passphrase: string): Promise<TBuilder> {
-		const keys: IKeyPair = Keys.fromPassphrase(passphrase);
+		const keys: IKeyPair = await this.keyPairFactory.fromMnemonic(passphrase);
 		return this.signWithKeyPair(keys);
 	}
 
 	public async signWithWif(wif: string, networkWif?: number): Promise<TBuilder> {
-		const keys: IKeyPair = Keys.fromWIF(wif, {
+		const keys: IKeyPair = await this.keyPairFactory.fromWIF(wif, {
 			wif: networkWif || this.configuration.get("network.wif"),
 		} as any);
 
 		return this.signWithKeyPair(keys);
 	}
 
-	public multiSign(passphrase: string, index: number): TBuilder {
-		const keys: IKeyPair = Keys.fromPassphrase(passphrase);
+	public async multiSign(passphrase: string, index: number): Promise<TBuilder> {
+		const keys: IKeyPair = await this.keyPairFactory.fromMnemonic(passphrase);
 		return this.multiSignWithKeyPair(index, keys);
 	}
 
-	public multiSignWithWif(index: number, wif: string, networkWif?: number): TBuilder {
-		const keys = Keys.fromWIF(wif, {
-			wif: networkWif || this.configuration.get("network.wif"),
-		} as any);
+	public async multiSignWithWif(index: number, wif: string, networkWif?: number): Promise<TBuilder> {
+		const keys = await this.keyPairFactory.fromWIF(wif, networkWif || this.configuration.get("network.wif"));
 
 		return this.multiSignWithKeyPair(index, keys);
 	}
@@ -192,7 +197,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		this.data.senderPublicKey = keys.publicKey;
 
 		if (this.signWithSenderAsRecipient) {
-			this.data.recipientId = Address.fromPublicKey(keys.publicKey, { pubKeyHash: this.data.network });
+			this.data.recipientId = await this.addressFactory.fromPublicKey(keys.publicKey, this.data.network);
 		}
 
 		this.data.signature = await this.signer.sign(this.getSigningObject(), keys, {

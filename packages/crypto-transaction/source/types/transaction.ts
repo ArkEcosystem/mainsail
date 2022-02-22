@@ -2,6 +2,7 @@ import { Container } from "@arkecosystem/container";
 import { Configuration } from "@arkecosystem/crypto-config";
 import {
 	BINDINGS,
+	IAddressFactory,
 	ISchemaValidationResult,
 	ISerializeOptions,
 	ITransaction,
@@ -9,7 +10,6 @@ import {
 	ITransactionJson,
 	ITransactionVerifier,
 } from "@arkecosystem/crypto-contracts";
-import { Address } from "@arkecosystem/crypto-identities";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionTypeGroup } from "../enums";
@@ -18,6 +18,9 @@ import { TransactionSchema } from "./schemas";
 
 @Container.injectable()
 export abstract class Transaction implements ITransaction {
+	@Container.inject(BINDINGS.Identity.AddressFactory)
+	protected readonly addressFactory: IAddressFactory;
+
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: Configuration;
 
@@ -84,17 +87,23 @@ export abstract class Transaction implements ITransaction {
 		return data;
 	}
 
-	public toString(): string {
+	public async toString(): Promise<string> {
 		const parts: string[] = [];
 
 		if (this.data.senderPublicKey && this.data.nonce) {
 			parts.push(
-				`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}#${
-					this.data.nonce
-				}`,
+				`${await this.addressFactory.fromPublicKey(
+					this.data.senderPublicKey,
+					this.configuration.get("network"),
+				)}#${this.data.nonce}`,
 			);
 		} else if (this.data.senderPublicKey) {
-			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}`);
+			parts.push(
+				`${await this.addressFactory.fromPublicKey(
+					this.data.senderPublicKey,
+					this.configuration.get("network"),
+				)}`,
+			);
 		}
 
 		if (this.data.id) {
@@ -110,8 +119,8 @@ export abstract class Transaction implements ITransaction {
 		return false;
 	}
 
-	public abstract serialize(): ByteBuffer | undefined;
-	public abstract deserialize(buf: ByteBuffer): void;
+	public abstract serialize(): Promise<ByteBuffer | undefined>;
+	public abstract deserialize(buf: ByteBuffer): Promise<void>;
 
 	public get id(): string | undefined {
 		return this.data.id;

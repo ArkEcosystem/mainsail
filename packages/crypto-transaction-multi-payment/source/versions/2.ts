@@ -68,7 +68,7 @@ export class Two extends Transaction {
 		return this.configuration.getMilestone().aip11 && (await super.verify());
 	}
 
-	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 33));
@@ -83,7 +83,7 @@ export class Two extends Transaction {
 		return buff;
 	}
 
-	public deserialize(buf: ByteBuffer): void {
+	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 
 		const multiSignature: IMultiSignatureAsset = { min: 0, publicKeys: [] };

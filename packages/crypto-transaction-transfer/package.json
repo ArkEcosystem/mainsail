@@ -10,16 +10,14 @@
 		"/distribution"
 	],
 	"scripts": {
-		"bench": "node benchmark/index.js",
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"clean": "del dist"
 	},
 	"dependencies": {
 		"@arkecosystem/container": "workspace:*",
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"@arkecosystem/crypto-identities": "workspace:*",
+		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@arkecosystem/crypto-transaction": "workspace:*",
 		"@arkecosystem/utils": "workspace:*"
 	},

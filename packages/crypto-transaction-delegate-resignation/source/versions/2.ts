@@ -27,11 +27,11 @@ export abstract class Two extends Transaction {
 		return this.configuration.getMilestone().aip11 && (await super.verify());
 	}
 
-	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		return new ByteBuffer(Buffer.alloc(0));
 	}
 
-	public deserialize(buf: ByteBuffer): void {
+	public async deserialize(buf: ByteBuffer): Promise<void> {
 		return;
 	}
 }
