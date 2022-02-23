@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/validation",
-	"version": "0.0.1",
-	"description": "Crypto utilities for the ARK Blockchain",
+	"name": "@arkecosystem/core-crypto-wif",
+	"version": "1.1.1",
+	"description": "Standalone version of identity interactions for the ARK Blockchain. Developed for TypeScript.",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -17,8 +17,16 @@
 	"dependencies": {
 		"@arkecosystem/container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
-		"ajv": "6.12.6",
-		"ajv-keywords": "3.4.1"
+		"wif": "^2.0.6"
+	},
+	"devDependencies": {
+		"@types/tmp": "^0.2.0",
+		"@types/uuid": "^8.0.0",
+		"@types/wif": "^2.0.1",
+		"big-integer": "^1.6.48",
+		"tmp": "^0.2.0",
+		"util": "^0.12.3",
+		"uuid": "^8.0.0"
 	},
 	"engines": {
 		"node": ">=16.x"

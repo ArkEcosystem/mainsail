@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/crypto",
+	"name": "@arkecosystem/core-crypto-transaction",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
@@ -10,16 +10,20 @@
 		"/distribution"
 	],
 	"scripts": {
-		"bench": "node benchmark/index.js",
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"clean": "del dist"
 	},
 	"dependencies": {
+		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-crypto-errors": "workspace:*",
 		"@arkecosystem/core-crypto-networks": "workspace:*",
+		"@arkecosystem/core-crypto-time": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
-		"@arkecosystem/utils": "1.3.1",
+		"@arkecosystem/utils": "workspace:*",
+		"@arkecosystem/validation": "workspace:*",
 		"ajv": "6.12.6",
 		"ajv-keywords": "3.4.1",
 		"bcrypto": "5.4.0",

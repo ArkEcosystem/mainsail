@@ -1,26 +1,27 @@
 {
-	"name": "@arkecosystem/validation",
+	"name": "@arkecosystem/core-crypto-hash-noble",
 	"version": "0.0.1",
-	"description": "Crypto utilities for the ARK Blockchain",
+	"description": "Hashing powered by @noble/hashes",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
-		"/distribution"
+		"distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist"
+		"clean": "del dist",
+		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
 		"@arkecosystem/container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
-		"ajv": "6.12.6",
-		"ajv-keywords": "3.4.1"
+		"@noble/hashes": "^1.0.0"
 	},
-	"engines": {
-		"node": ">=16.x"
+	"devDependencies": {
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"uvu": "^0.5.3"
 	}
 }

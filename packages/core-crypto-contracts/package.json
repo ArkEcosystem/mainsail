@@ -1,0 +1,21 @@
+{
+	"name": "@arkecosystem/core-crypto-contracts",
+	"version": "0.0.1",
+	"description": "Implementation Contracts for Cryptography",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist"
+	},
+	"dependencies": {
+		"@arkecosystem/utils": "workspace:*",
+		"ajv": "6.12.6"
+	}
+}

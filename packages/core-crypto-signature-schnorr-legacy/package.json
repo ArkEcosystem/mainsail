@@ -1,13 +1,13 @@
 {
-	"name": "@arkecosystem/validation",
+	"name": "@arkecosystem/core-crypto-signature-schnorr-legacy",
 	"version": "0.0.1",
-	"description": "Crypto utilities for the ARK Blockchain",
+	"description": "Schnorr (BCH)",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
-		"/distribution"
+		"distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
@@ -17,10 +17,10 @@
 	"dependencies": {
 		"@arkecosystem/container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
-		"ajv": "6.12.6",
-		"ajv-keywords": "3.4.1"
+		"bcrypto": "5.4.0"
 	},
-	"engines": {
-		"node": ">=16.x"
+	"devDependencies": {
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"uvu": "^0.5.3"
 	}
 }

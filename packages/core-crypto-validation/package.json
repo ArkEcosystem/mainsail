@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/validation",
+	"name": "@arkecosystem/core-crypto-validation",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
@@ -15,10 +15,12 @@
 		"clean": "del dist"
 	},
 	"dependencies": {
-		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"ajv": "6.12.6",
-		"ajv-keywords": "3.4.1"
+		"ajv-keywords": "3.4.1",
+		"ipaddr.js": "2.0.1"
 	},
 	"engines": {
 		"node": ">=16.x"

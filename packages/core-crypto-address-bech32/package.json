@@ -1,0 +1,30 @@
+{
+	"name": "@arkecosystem/core-crypto-address-bech32",
+	"version": "0.0.1",
+	"description": "bech32 Address Derivation",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
+		"test": "uvu -r tsm source .test.ts"
+	},
+	"dependencies": {
+		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@scure/base": "^1.0.0"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-crypto-key-pair-ecdsa": "workspace:*",
+		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"uvu": "^0.5.3"
+	}
+}

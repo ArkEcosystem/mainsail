@@ -110,6 +110,406 @@ jobs:
               run: pnpm run build
             - name: Test
               run: cd packages/core-cli && pnpm run test
+    core-crypto-address-base58:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-address-base58
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-address-base58 && pnpm run test
+    core-crypto-address-bech32:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-address-bech32
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-address-bech32 && pnpm run test
+    core-crypto-address-bech32m:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-address-bech32m
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-address-bech32m && pnpm run test
+    core-crypto-address-keccak256:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-address-keccak256
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-address-keccak256 && pnpm run test
+    core-crypto-address-ss58:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-address-ss58
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-address-ss58 && pnpm run test
+    core-crypto-hash-bcrypto:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-hash-bcrypto
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-hash-bcrypto && pnpm run test
+    core-crypto-hash-noble:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-hash-noble
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-hash-noble && pnpm run test
+    core-crypto-hash-wasm:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-hash-wasm
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-hash-wasm && pnpm run test
+    core-crypto-key-pair-bls12-381:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-key-pair-bls12-381
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-key-pair-bls12-381 && pnpm run test
+    core-crypto-key-pair-ecdsa:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-key-pair-ecdsa
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-key-pair-ecdsa && pnpm run test
+    core-crypto-key-pair-ed25519:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-key-pair-ed25519
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-key-pair-ed25519 && pnpm run test
+    core-crypto-key-pair-schnorr:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-key-pair-schnorr
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-key-pair-schnorr && pnpm run test
+    core-crypto-signature-bls12-381:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-signature-bls12-381
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-signature-bls12-381 && pnpm run test
+    core-crypto-signature-ecdsa:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-signature-ecdsa
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-signature-ecdsa && pnpm run test
+    core-crypto-signature-ed25519:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-signature-ed25519
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-signature-ed25519 && pnpm run test
+    core-crypto-signature-schnorr:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version:
+                    - 16.x
+        concurrency:
+            group: ${{ github.head_ref }}-unit-core-crypto-signature-schnorr
+            cancel-in-progress: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: true
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: pnpm
+            - name: Build
+              run: pnpm run build
+            - name: Test
+              run: cd packages/core-crypto-signature-schnorr && pnpm run test
     core-database:
         runs-on: ubuntu-latest
         strategy:
@@ -385,406 +785,6 @@ jobs:
               run: pnpm run build
             - name: Test
               run: cd packages/crypto && pnpm run test
-    crypto-address-base58:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-address-base58
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-address-base58 && pnpm run test
-    crypto-address-bech32:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-address-bech32
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-address-bech32 && pnpm run test
-    crypto-address-bech32m:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-address-bech32m
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-address-bech32m && pnpm run test
-    crypto-address-keccak256:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-address-keccak256
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-address-keccak256 && pnpm run test
-    crypto-address-ss58:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-address-ss58
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-address-ss58 && pnpm run test
-    crypto-hash-bcrypto:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-hash-bcrypto
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-hash-bcrypto && pnpm run test
-    crypto-hash-noble:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-hash-noble
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-hash-noble && pnpm run test
-    crypto-hash-wasm:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-hash-wasm
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-hash-wasm && pnpm run test
-    crypto-key-pair-bls12-381:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-key-pair-bls12-381
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-key-pair-bls12-381 && pnpm run test
-    crypto-key-pair-ecdsa:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-key-pair-ecdsa
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-key-pair-ecdsa && pnpm run test
-    crypto-key-pair-ed25519:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-key-pair-ed25519
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-key-pair-ed25519 && pnpm run test
-    crypto-key-pair-schnorr:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-key-pair-schnorr
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-key-pair-schnorr && pnpm run test
-    crypto-signature-bls12-381:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-signature-bls12-381
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-signature-bls12-381 && pnpm run test
-    crypto-signature-ecdsa:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-signature-ecdsa
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-signature-ecdsa && pnpm run test
-    crypto-signature-ed25519:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-signature-ed25519
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-signature-ed25519 && pnpm run test
-    crypto-signature-schnorr:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version:
-                    - 16.x
-        concurrency:
-            group: ${{ github.head_ref }}-unit-crypto-signature-schnorr
-            cancel-in-progress: true
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.head_ref }}
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: true
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: pnpm
-            - name: Build
-              run: pnpm run build
-            - name: Test
-              run: cd packages/crypto-signature-schnorr && pnpm run test
     utils:
         runs-on: ubuntu-latest
         strategy:

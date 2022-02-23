@@ -1,0 +1,32 @@
+{
+	"name": "@arkecosystem/core-crypto-key-pair-bls12-381",
+	"version": "0.0.1",
+	"description": "BLS12-381 Key Derivation",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
+		"test": "uvu -r tsm source .test.ts"
+	},
+	"dependencies": {
+		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-crypto-errors": "workspace:*",
+		"@noble/bls12-381": "^1.2.0",
+		"@scure/bip39": "^1.0.0",
+		"bcrypto": "^5.4.0",
+		"bls12-381-keygen": "^0.2.1",
+		"wif": "^2.0.6"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"uvu": "^0.5.3"
+	}
+}
