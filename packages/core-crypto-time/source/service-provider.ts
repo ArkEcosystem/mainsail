@@ -1,5 +1,6 @@
-import { Providers } from "@arkecosystem/core-kernel";
 import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
+
 import { BlockTimeCalculator } from "./block-time-calculator";
 import { Slots } from "./slots";
 

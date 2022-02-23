@@ -1,6 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, TransactionServiceProvider as Contract } from "@arkecosystem/core-crypto-contracts";
+import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
+import { Providers } from "@arkecosystem/core-kernel";
 
 import { One } from "./versions/1";
 import { Two } from "./versions/2";
@@ -8,12 +9,11 @@ import { Two } from "./versions/2";
 export * from "./builder";
 
 @Container.injectable()
-export class TransactionServiceProvider implements Contract {
-	@Container.inject(BINDINGS.Transaction.Registry)
-	private readonly registry: TransactionRegistry;
-
+export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.registry.registerTransactionType(One);
-		this.registry.registerTransactionType(Two);
+		const registry: TransactionRegistry = this.app.get(BINDINGS.Transaction.Registry);
+
+		registry.registerTransactionType(One);
+		registry.registerTransactionType(Two);
 	}
 }

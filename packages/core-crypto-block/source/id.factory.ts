@@ -4,7 +4,7 @@ import { BINDINGS, IBlockData, IHashFactory } from "@arkecosystem/core-crypto-co
 import { Serializer } from "./serializer";
 
 @Container.injectable()
-export class IdFactory {
+export class IDFactory {
 	@Container.inject(BINDINGS.HashFactory)
 	private readonly hashFactory: IHashFactory;
 

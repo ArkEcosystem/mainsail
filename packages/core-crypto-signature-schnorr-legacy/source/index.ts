@@ -1,14 +1,10 @@
-import { Container } from "@arkecosystem/core-container";
-import { Signatory as Contract } from "@arkecosystem/core-crypto-contracts";
-import { secp256k1 } from "bcrypto";
+import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 
-@Container.injectable()
-export class Signatory implements Contract {
-	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
-		return secp256k1.schnorrSign(message, privateKey).toString("hex");
-	}
+import { Signatory } from "./signatory";
 
-	public async verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
-		return secp256k1.schnorrVerify(message, signature, publicKey);
+export class ServiceProvider extends Providers.ServiceProvider {
+	public async register(): Promise<void> {
+		this.app.bind(BINDINGS.SignatureFactory).to(Signatory).inSingletonScope();
 	}
 }

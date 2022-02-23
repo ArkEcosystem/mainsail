@@ -18,6 +18,7 @@
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
 		"hash-wasm": "^4.9.0"
 	},
 	"devDependencies": {

@@ -16,7 +16,7 @@ import { BigNumber } from "@arkecosystem/utils";
 import { Block } from "./block";
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
 import { Deserializer } from "./deserializer";
-import { IdFactory } from "./id.factory";
+import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
 import { applySchema } from "./utils";
 
@@ -34,8 +34,8 @@ export class BlockFactory implements IBlockFactory {
 	@Container.inject(INTERNAL_FACTORY)
 	private readonly blockFactory: InternalFactory; // @TODO: create contract for block deserializer
 
-	@Container.inject(BINDINGS.Block.IdFactory)
-	private readonly idFactory: IdFactory;
+	@Container.inject(BINDINGS.Block.IDFactory)
+	private readonly idFactory: IDFactory;
 
 	@Container.inject(BINDINGS.HashFactory)
 	private readonly hashFactory: IHashFactory;

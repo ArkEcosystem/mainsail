@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { KeyPairFactory } from "./index";
+import { KeyPairFactory } from "./pair";
 
 const mnemonic =
 	"question measure debris increase false feature journey height fun agent coach office only shell nation skill track upset distance behave easy devote floor shy";

@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
 		"bcrypto": "5.4.0"
 	},
 	"devDependencies": {

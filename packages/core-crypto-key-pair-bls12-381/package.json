@@ -19,6 +19,7 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-errors": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
 		"@noble/bls12-381": "^1.2.0",
 		"@scure/bip39": "^1.0.0",
 		"bcrypto": "^5.4.0",

@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { HashFactory } from "./index";
+import { HashFactory } from "./hash.factory";
 
 describe("HashFactory", ({ assert, it }) => {
 	it("should create a hash with the RIPEMD160 method", async () => {

@@ -1,41 +1,10 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	AddressFactory as Contract,
-	BINDINGS,
-	IConfiguration,
-	IKeyPairFactory,
-} from "@arkecosystem/core-crypto-contracts";
-import { hexToU8a, isHex } from "@polkadot/util";
-import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
+import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 
-@Container.injectable()
-export class AddressFactory implements Contract {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+import { AddressFactory } from "./address.factory";
 
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
-
-	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey, "hex"));
-	}
-
-	public async fromPublicKey(publicKey: Buffer): Promise<string> {
-		return encodeAddress(publicKey, this.configuration.get("network.address.ss58"));
-	}
-
-	public async validate(address: string): Promise<boolean> {
-		try {
-			encodeAddress(
-				isHex(address)
-					? hexToU8a(address)
-					: decodeAddress(address, this.configuration.get("network.address.ss58")),
-				this.configuration.get("network.address.ss58"),
-			);
-
-			return true;
-		} catch {
-			return false;
-		}
+export class ServiceProvider extends Providers.ServiceProvider {
+	public async register(): Promise<void> {
+		this.app.bind(BINDINGS.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
 	}
 }

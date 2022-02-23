@@ -18,6 +18,7 @@
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
 		"@noble/bls12-381": "^1.2.0"
 	},
 	"devDependencies": {

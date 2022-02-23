@@ -5,15 +5,15 @@ import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 import ByteBuffer from "bytebuffer";
 
-import { IdFactory } from "./id.factory";
+import { IDFactory } from "./id.factory";
 
 @Container.injectable()
 export class Deserializer implements IBlockDeserializer {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 
-	@Container.inject(BINDINGS.Block.IdFactory)
-	private readonly idFactory: IdFactory;
+	@Container.inject(BINDINGS.Block.IDFactory)
+	private readonly idFactory: IDFactory;
 
 	@Container.inject(BINDINGS.Transaction.Factory)
 	private readonly transactionFactory: TransactionFactory;

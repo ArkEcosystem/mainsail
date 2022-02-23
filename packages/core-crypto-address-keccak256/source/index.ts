@@ -1,21 +1,10 @@
-import { Container } from "@arkecosystem/core-container";
-import { AddressFactory as Contract, BINDINGS, IKeyPairFactory } from "@arkecosystem/core-crypto-contracts";
-import { ethers } from "ethers";
+import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 
-@Container.injectable()
-export class AddressFactory implements Contract {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+import { AddressFactory } from "./address.factory";
 
-	public async fromMnemonic(passphrase: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
-	}
-
-	public async fromPublicKey(publicKey: Buffer): Promise<string> {
-		return ethers.utils.computeAddress(`0x${publicKey.toString("hex")}`);
-	}
-
-	public async validate(address: string): Promise<boolean> {
-		return ethers.utils.isAddress(address);
+export class ServiceProvider extends Providers.ServiceProvider {
+	public async register(): Promise<void> {
+		this.app.bind(BINDINGS.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
 	}
 }

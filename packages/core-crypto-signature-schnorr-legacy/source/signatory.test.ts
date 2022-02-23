@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { Signatory } from "./index";
+import { Signatory } from "./signatory";
 
 describe("Signatory", ({ assert, it }) => {
 	it("should sign and verify", async () => {

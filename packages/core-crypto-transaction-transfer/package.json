@@ -18,6 +18,7 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@arkecosystem/utils": "workspace:*"
 	},

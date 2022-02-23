@@ -3,6 +3,7 @@ export * from "./deserializer";
 export * from "./factory";
 export * from "./registry";
 export * from "./serializer";
+export * from "./service-provider";
 export * from "./signer";
 export * from "./types";
 export * from "./utils";

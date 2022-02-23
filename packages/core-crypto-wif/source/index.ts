@@ -1,19 +1,10 @@
-import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IKeyPair, IKeyPairFactory, IWIFFactory } from "@arkecosystem/core-crypto-contracts";
-import wif from "wif";
+import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 
-@Container.injectable()
-export class WIF implements IWIFFactory {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+import { WIFFactory } from "./wif.factory";
 
-	public async fromMnemonic(mnemonic: string, version: number): Promise<string> {
-		const { compressed, privateKey }: IKeyPair = await this.keyPairFactory.fromMnemonic(mnemonic);
-
-		return wif.encode(version, Buffer.from(privateKey, "hex"), compressed);
-	}
-
-	public async fromKeys(keys: IKeyPair, version: number): Promise<string> {
-		return wif.encode(version, Buffer.from(keys.privateKey, "hex"), keys.compressed);
+export class ServiceProvider extends Providers.ServiceProvider {
+	public async register(): Promise<void> {
+		this.app.bind(BINDINGS.Identity.WifFactory).to(WIFFactory).inSingletonScope();
 	}
 }

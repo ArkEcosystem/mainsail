@@ -2,7 +2,7 @@ export const BINDINGS = {
 	Block: {
 		Deserializer: Symbol.for("Crypto<Block.Deserializer>"),
 		Factory: Symbol.for("Crypto<Block.Factory>"),
-		IdFactory: Symbol.for("Crypto<Block.IdFactory>"),
+		IDFactory: Symbol.for("Crypto<Block.IDFactory>"),
 		Serializer: Symbol.for("Crypto<Block.Serializer>"),
 		Verifier: Symbol.for("Crypto<Block.Verifier>"),
 	},
@@ -17,8 +17,8 @@ export const BINDINGS = {
 	},
 	SignatureFactory: Symbol.for("Crypto<SignatureFactory>"),
 	Time: {
-		Slots: Symbol.for("Crypto<Time.Slots>"),
 		BlockTimeCalculator: Symbol.for("Crypto<Time.BlockTimeCalculator>"),
+		Slots: Symbol.for("Crypto<Time.Slots>"),
 	},
 	Transaction: {
 		Deserializer: Symbol.for("Crypto<Transaction.Deserializer>"),
