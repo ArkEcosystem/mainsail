@@ -1,12 +1,12 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Transactions } from "@arkecosystem/crypto";
 import { AlreadyVotedError, NoVoteError, UnvoteMismatchError } from "../../errors";
-import { One } from "../index";
+import { VoteTransactionHandler as One } from "../one/vote";
 import { TransactionHandlerConstructor } from "../transaction";
 import { DelegateRegistrationTransactionHandler } from "./delegate-registration";
 
 @Container.injectable()
-export class VoteTransactionHandler extends One.VoteTransactionHandler {
+export class VoteTransactionHandler extends One {
 	@Container.inject(Container.Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 

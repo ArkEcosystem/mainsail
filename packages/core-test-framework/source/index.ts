@@ -14,3 +14,5 @@ export * as Mocks from "./mocks"; // todo: export as Utils
 export * from "./utils"; // todo: export as Utils
 // internals are also useful for bridgechains
 export * from "./internal";
+// mnemonics
+export { default as passphrases } from "./internal/passphrases.json";

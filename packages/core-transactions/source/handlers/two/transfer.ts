@@ -1,10 +1,10 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { Transactions } from "@arkecosystem/crypto";
 
-import { One } from "../index";
+import { TransferTransactionHandler as One } from "../one/transfer";
 
 @Container.injectable()
-export class TransferTransactionHandler extends One.TransferTransactionHandler {
+export class TransferTransactionHandler extends One {
 	public getConstructor(): Transactions.TransactionConstructor {
 		return Transactions.Two.TransferTransaction;
 	}

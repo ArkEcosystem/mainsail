@@ -1,11 +1,10 @@
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Transactions, Utils } from "@arkecosystem/crypto";
 
-import { One } from "../index";
+import { DelegateRegistrationTransactionHandler as One } from "../one/delegate-registration";
 
 @Container.injectable()
-export class DelegateRegistrationTransactionHandler extends One.DelegateRegistrationTransactionHandler {
+export class DelegateRegistrationTransactionHandler extends One {
 	@Container.inject(Container.Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 

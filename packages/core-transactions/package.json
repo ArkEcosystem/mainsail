@@ -13,7 +13,8 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
 		"@arkecosystem/core-database": "workspace:*",
@@ -21,7 +22,11 @@
 		"@arkecosystem/crypto": "workspace:*"
 	},
 	"devDependencies": {
-		"bytebuffer": "5.0.1"
+		"@arkecosystem/core-state": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/core-transaction-pool": "workspace:*",
+		"bytebuffer": "5.0.1",
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"
