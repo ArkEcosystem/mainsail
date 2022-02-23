@@ -1,5 +1,7 @@
+import { Container } from "@arkecosystem/container";
 import dayjs from "dayjs";
-import { MilestoneSearchResult } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, IConfiguration, MilestoneSearchResult } from "@arkecosystem/crypto-contracts";
+import { BlockTimeCalculator } from "./block-time-calculator";
 
 export interface SlotInfo {
 	startTime: number;
@@ -11,21 +13,20 @@ export interface SlotInfo {
 
 export type GetBlockTimeStampLookup = (blockheight: number) => number;
 
+@Container.injectable()
 export class Slots {
-	readonly #configManager: any;
-	readonly #calculator: any;
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
 
-	public constructor(configManager, calculator) {
-		this.#configManager = configManager;
-		this.#calculator = calculator;
-	}
+	@Container.inject(BINDINGS.Time.BlockTimeCalculator)
+	private readonly calculator: BlockTimeCalculator;
 
 	public getTime(time?: number): number {
 		if (time === undefined) {
 			time = dayjs().valueOf();
 		}
 
-		const start: number = dayjs(this.#configManager.getMilestone(1).epoch).valueOf();
+		const start: number = dayjs(this.configuration.getMilestone(1).epoch).valueOf();
 
 		return Math.floor((time - start) / 1000);
 	}
@@ -78,11 +79,11 @@ export class Slots {
 
 		height = this.getLatestHeight(height);
 
-		let blockTime = this.#calculator.calculateBlockTime(1);
+		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
 		let lastSpanEndTime = 0;
 		let previousMilestoneHeight = 1;
-		let nextMilestone = this.#configManager.getNextMilestoneWithNewKey(1, "blocktime");
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
 		for (let i = 0; i < this.getMilestonesWhichAffectBlockTimes().length - 1; i++) {
 			if (height < nextMilestone.height) {
@@ -95,7 +96,7 @@ export class Slots {
 
 			blockTime = nextMilestone.data;
 			previousMilestoneHeight = nextMilestone.height;
-			nextMilestone = this.#configManager.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
 		}
 
 		const slotNumberUpUntilThisTimestamp = Math.floor((timestamp - lastSpanEndTime) / blockTime);
@@ -116,17 +117,17 @@ export class Slots {
 	public getMilestonesWhichAffectBlockTimes(): Array<MilestoneSearchResult> {
 		const milestones: Array<MilestoneSearchResult> = [
 			{
-				data: this.#configManager.getMilestone(1).blocktime,
+				data: this.configuration.getMilestone(1).blocktime,
 				found: true,
 				height: 1,
 			},
 		];
 
-		let nextMilestone = this.#configManager.getNextMilestoneWithNewKey(1, "blocktime");
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
 		while (nextMilestone.found) {
 			milestones.push(nextMilestone);
-			nextMilestone = this.#configManager.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
 		}
 
 		return milestones;
@@ -137,12 +138,12 @@ export class Slots {
 		height: number,
 		getTimeStampForBlock: GetBlockTimeStampLookup,
 	): number {
-		let blockTime = this.#calculator.calculateBlockTime(1);
+		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
 		let milestoneHeight = 1;
 		let lastSpanEndTime = 0;
 
-		let nextMilestone = this.#configManager.getNextMilestoneWithNewKey(1, "blocktime");
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
 		for (let i = 0; i < this.getMilestonesWhichAffectBlockTimes().length - 1; i++) {
 			if (height < nextMilestone.height) {
@@ -155,7 +156,7 @@ export class Slots {
 
 			blockTime = nextMilestone.data;
 			milestoneHeight = nextMilestone.height;
-			nextMilestone = this.#configManager.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
 		}
 
 		return lastSpanEndTime + (slotNumber - totalSlotsFromLastSpan) * blockTime;
@@ -165,7 +166,7 @@ export class Slots {
 		if (!height) {
 			// TODO: is the config manager the best way to retrieve most recent height?
 			// Or should this class maintain its own cache?
-			const configConfiguredHeight = this.#configManager.getHeight();
+			const configConfiguredHeight = this.configuration.getHeight();
 			if (configConfiguredHeight) {
 				return configConfiguredHeight;
 			} else {

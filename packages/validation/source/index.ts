@@ -1,10 +1,13 @@
+import { Container } from "@arkecosystem/container";
 import { ISchemaValidationResult } from "@arkecosystem/crypto-contracts";
 import Ajv from "ajv";
 import keywords from "ajv-keywords";
 
+@Container.injectable()
 export class Validator {
 	readonly #ajv: Ajv.Ajv;
 
+	@Container.post
 	public constructor(options: Record<string, any>) {
 		this.#ajv = new Ajv({
 			$data: true,

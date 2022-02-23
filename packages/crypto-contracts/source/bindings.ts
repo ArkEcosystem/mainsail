@@ -16,6 +16,10 @@ export const BINDINGS = {
 		WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
 	},
 	SignatureFactory: Symbol.for("Crypto<SignatureFactory>"),
+	Time: {
+		Slots: Symbol.for("Crypto<Time.Slots>"),
+		BlockTimeCalculator: Symbol.for("Crypto<Time.BlockTimeCalculator>"),
+	},
 	Transaction: {
 		Deserializer: Symbol.for("Crypto<Transaction.Deserializer>"),
 		Factory: Symbol.for("Crypto<Transaction.Factory>"),

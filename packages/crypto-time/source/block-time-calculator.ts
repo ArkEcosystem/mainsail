@@ -1,16 +1,17 @@
-export class BlockTimeCalculator {
-	readonly #configManager: any;
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IConfiguration } from "@arkecosystem/crypto-contracts";
 
-	public constructor(configManager) {
-		this.#configManager = configManager;
-	}
+@Container.injectable()
+export class BlockTimeCalculator {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
 
 	public isNewBlockTime(height: number): boolean {
 		if (height === 1) {
 			return true;
 		}
 
-		const milestones = this.#configManager.get("milestones");
+		const milestones = this.configuration.get("milestones");
 
 		let milestone;
 
@@ -38,7 +39,7 @@ export class BlockTimeCalculator {
 	}
 
 	public calculateBlockTime(height: number): number {
-		const milestones = this.#configManager.get("milestones");
+		const milestones = this.configuration.get("milestones");
 
 		for (let i = milestones.length - 1; i >= 0; i--) {
 			const milestone = milestones[i];

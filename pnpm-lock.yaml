@@ -1302,9 +1302,13 @@ importers:
 
   packages/crypto-time:
     specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       dayjs: 1.10.7
     dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       dayjs: 1.10.7
 
@@ -1569,10 +1573,12 @@ importers:
 
   packages/validation:
     specifiers:
+      '@arkecosystem/container': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       ajv: 6.12.6
       ajv-keywords: 3.4.1
     dependencies:
+      '@arkecosystem/container': link:../container
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       ajv: 6.12.6
       ajv-keywords: 3.4.1_ajv@6.12.6
