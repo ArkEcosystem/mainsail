@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import {
 	BINDINGS,
 	IKeyPairFactory,
@@ -44,8 +44,8 @@ export class PublicKeyFactory implements IPublicKeyFactory {
 		return schnorr.publicKeyVerify(Buffer.from(publicKey, "hex"));
 	}
 
-	#numberToHex(num: number, padding = 2): string {
-		const indexHex: string = Number(num).toString(16);
+	#numberToHex(number_: number, padding = 2): string {
+		const indexHex: string = Number(number_).toString(16);
 
 		return "0".repeat(padding - indexHex.length) + indexHex;
 	}

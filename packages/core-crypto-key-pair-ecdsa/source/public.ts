@@ -1,9 +1,9 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import {
-	IPublicKeyFactory,
-	IMultiSignatureAsset,
 	BINDINGS,
 	IKeyPairFactory,
+	IMultiSignatureAsset,
+	IPublicKeyFactory,
 } from "@arkecosystem/core-crypto-contracts";
 import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/core-crypto-errors";
 import { secp256k1 } from "bcrypto";
@@ -46,8 +46,8 @@ export class PublicKeyFactory implements IPublicKeyFactory {
 		return secp256k1.publicKeyVerify(Buffer.from(publicKey, "hex"));
 	}
 
-	#numberToHex(num: number, padding = 2): string {
-		const indexHex: string = Number(num).toString(16);
+	#numberToHex(number_: number, padding = 2): string {
+		const indexHex: string = Number(number_).toString(16);
 
 		return "0".repeat(padding - indexHex.length) + indexHex;
 	}

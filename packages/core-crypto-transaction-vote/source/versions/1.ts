@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
@@ -15,26 +15,26 @@ export class One extends Transaction {
 	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
 			$id: "vote",
-			required: ["asset"],
 			properties: {
-				type: { transactionType: TransactionType.Vote },
-				amount: { bignumber: { minimum: 0, maximum: 0 } },
-				fee: { bignumber: { minimum: 1 } },
-				recipientId: { $ref: "address" },
+				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
-					type: "object",
-					required: ["votes"],
 					properties: {
 						votes: {
-							type: "array",
-							minItems: 1,
-							maxItems: 2,
 							additionalItems: false,
 							items: { $ref: "walletVote" },
+							maxItems: 2,
+							minItems: 1,
+							type: "array",
 						},
 					},
+					required: ["votes"],
+					type: "object",
 				},
+				fee: { bignumber: { minimum: 1 } },
+				recipientId: { $ref: "address" },
+				type: { transactionType: TransactionType.Vote },
 			},
+			required: ["asset"],
 		});
 	}
 

@@ -1,9 +1,10 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
 	IBlock,
-	IBlockFactory,
 	IBlockData,
+	IBlockFactory,
 	IBlockJson,
 	IHashFactory,
 	IKeyPair,
@@ -11,13 +12,13 @@ import {
 	Signatory,
 } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
+
 import { Block } from "./block";
-import { Deserializer } from "./deserializer";
-import { Serializer } from "./serializer";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { applySchema } from "./utils";
-import { IdFactory } from "./id.factory";
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
+import { Deserializer } from "./deserializer";
+import { IdFactory } from "./id.factory";
+import { Serializer } from "./serializer";
+import { applySchema } from "./utils";
 
 @Container.injectable()
 export class BlockFactory implements IBlockFactory {

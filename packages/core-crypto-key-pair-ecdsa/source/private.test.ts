@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/container";
-import { describe } from "@arkecosystem/core-test-framework";
+import { Container } from "@arkecosystem/core-container";
 import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { KeyPairFactory } from "./pair";
 import { PrivateKeyFactory } from "./private";

@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 @Container.injectable()
@@ -15,16 +15,16 @@ export class BlockTimeCalculator {
 
 		let milestone;
 
-		for (let i = milestones.length - 1; i >= 0; i--) {
-			const temp = milestones[i];
+		for (let index = milestones.length - 1; index >= 0; index--) {
+			const temporary = milestones[index];
 
-			if (temp.height > height) {
+			if (temporary.height > height) {
 				continue;
 			}
 
-			if (!milestone || temp.blocktime === milestone.blocktime) {
-				if (temp.blocktime) {
-					milestone = temp;
+			if (!milestone || temporary.blocktime === milestone.blocktime) {
+				if (temporary.blocktime) {
+					milestone = temporary;
 				}
 			} else {
 				break;
@@ -41,8 +41,8 @@ export class BlockTimeCalculator {
 	public calculateBlockTime(height: number): number {
 		const milestones = this.configuration.get("milestones");
 
-		for (let i = milestones.length - 1; i >= 0; i--) {
-			const milestone = milestones[i];
+		for (let index = milestones.length - 1; index >= 0; index--) {
+			const milestone = milestones[index];
 			if (milestone.height <= height && milestone.blocktime) {
 				return milestone.blocktime;
 			}

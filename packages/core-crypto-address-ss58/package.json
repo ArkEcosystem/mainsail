@@ -16,7 +16,7 @@
 		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
-		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@polkadot/util": "^8.4.1",
 		"@polkadot/util-crypto": "^8.4.1"

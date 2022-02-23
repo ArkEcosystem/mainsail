@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { BINDINGS, TransactionServiceProvider as Contract } from "@arkecosystem/core-crypto-contracts";
 import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 

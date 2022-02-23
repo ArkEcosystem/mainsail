@@ -1,5 +1,5 @@
-import { Slots } from "@arkecosystem/core-crypto-time";
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
 	IBlock,
@@ -11,8 +11,8 @@ import {
 	ITransactionData,
 	Signatory,
 } from "@arkecosystem/core-crypto-contracts";
+import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 
 import { Serializer } from "./serializer";
 

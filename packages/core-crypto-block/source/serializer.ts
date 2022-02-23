@@ -1,11 +1,11 @@
+import { Container } from "@arkecosystem/core-container";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+import { BINDINGS, IBlock, IBlockData, IBlockSerializer, ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import { PreviousBlockIdFormatError } from "@arkecosystem/core-crypto-errors";
+import { Utils } from "@arkecosystem/core-crypto-transaction";
 import assert from "assert";
 import ByteBuffer from "bytebuffer";
 
-import { PreviousBlockIdFormatError } from "@arkecosystem/core-crypto-errors";
-import { Container } from "@arkecosystem/container";
-import { BINDINGS, IBlock, IBlockData, IBlockSerializer, ITransactionData } from "@arkecosystem/core-crypto-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Utils } from "@arkecosystem/core-crypto-transaction";
 import { toBytesHex } from "./utils";
 
 @Container.injectable()
@@ -36,9 +36,9 @@ export class Serializer implements IBlockSerializer {
 			.append(serializedHeader)
 			.skip(transactions.length * 4);
 
-		for (const [i, transaction] of transactions.entries()) {
+		for (const [index, transaction] of transactions.entries()) {
 			const serialized: Buffer = await this.utils.toBytes(transaction);
-			buff.writeUint32(serialized.length, serializedHeader.length + i * 4);
+			buff.writeUint32(serialized.length, serializedHeader.length + index * 4);
 			buff.append(serialized);
 		}
 

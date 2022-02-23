@@ -1,8 +1,8 @@
-import { Container } from "@arkecosystem/container";
-import { describe } from "@arkecosystem/core-test-framework";
+import { Container } from "@arkecosystem/core-container";
 import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 import { KeyPairFactory as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { KeyPairFactory as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { AddressFactory } from "./index";
 

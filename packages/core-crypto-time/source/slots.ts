@@ -1,6 +1,7 @@
-import { Container } from "@arkecosystem/container";
-import dayjs from "dayjs";
+import { Container } from "@arkecosystem/core-container";
 import { BINDINGS, IConfiguration, MilestoneSearchResult } from "@arkecosystem/core-crypto-contracts";
+import dayjs from "dayjs";
+
 import { BlockTimeCalculator } from "./block-time-calculator";
 
 export interface SlotInfo {
@@ -85,7 +86,7 @@ export class Slots {
 		let previousMilestoneHeight = 1;
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
-		for (let i = 0; i < this.getMilestonesWhichAffectBlockTimes().length - 1; i++) {
+		for (let index = 0; index < this.getMilestonesWhichAffectBlockTimes().length - 1; index++) {
 			if (height < nextMilestone.height) {
 				break;
 			}
@@ -145,7 +146,7 @@ export class Slots {
 
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
-		for (let i = 0; i < this.getMilestonesWhichAffectBlockTimes().length - 1; i++) {
+		for (let index = 0; index < this.getMilestonesWhichAffectBlockTimes().length - 1; index++) {
 			if (height < nextMilestone.height) {
 				break;
 			}

@@ -1,6 +1,6 @@
+import { Container } from "@arkecosystem/core-container";
 import { IConfiguration, IMilestone, MilestoneSearchResult, NetworkConfig } from "@arkecosystem/core-crypto-contracts";
 import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-crypto-errors";
-import { Container } from "@arkecosystem/container";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";

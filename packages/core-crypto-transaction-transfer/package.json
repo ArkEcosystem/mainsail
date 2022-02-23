@@ -15,7 +15,7 @@
 		"clean": "del dist"
 	},
 	"dependencies": {
-		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",

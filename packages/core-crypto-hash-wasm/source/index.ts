@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { HashInput, IHashFactory as Contract } from "@arkecosystem/core-crypto-contracts";
 import { ripemd160, sha256 } from "hash-wasm";
 

@@ -1,3 +1,6 @@
+import { Container } from "@arkecosystem/core-container";
+import { ITransactionRegistry } from "@arkecosystem/core-crypto-contracts";
+
 import {
 	TransactionAlreadyRegisteredError,
 	TransactionKeyAlreadyRegisteredError,
@@ -6,8 +9,6 @@ import {
 } from "./errors";
 import { Transaction, TransactionTypeFactory } from "./types";
 import { InternalTransactionType } from "./types/internal-transaction-type";
-import { Container } from "@arkecosystem/container";
-import { ITransactionRegistry } from "@arkecosystem/core-crypto-contracts";
 // import { Validator } from "@arkecosystem/core-validation";
 
 export type TransactionConstructor = typeof Transaction;
@@ -32,7 +33,7 @@ export class TransactionRegistry implements ITransactionRegistry {
 
 		const internalType: InternalTransactionType = InternalTransactionType.from(type, typeGroup);
 		for (const registeredConstructors of this.transactionTypes.values()) {
-			if (registeredConstructors.size) {
+			if (registeredConstructors.size > 0) {
 				const first = [...registeredConstructors.values()][0];
 				if (
 					first.key === constructor.key &&

@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { ISchemaValidationResult } from "@arkecosystem/core-crypto-contracts";
 import Ajv from "ajv";
 import keywords from "ajv-keywords";

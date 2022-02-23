@@ -16,7 +16,7 @@
 		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
-		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-errors": "workspace:*",
 		"@noble/bls12-381": "^1.2.0",

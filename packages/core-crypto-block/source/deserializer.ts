@@ -1,10 +1,9 @@
-import ByteBuffer from "bytebuffer";
-
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BINDINGS, IBlockData, IBlockDeserializer, ITransaction } from "@arkecosystem/core-crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import ByteBuffer from "bytebuffer";
 
 import { IdFactory } from "./id.factory";
 
@@ -74,7 +73,7 @@ export class Deserializer implements IBlockDeserializer {
 
 			buf.reset();
 
-			return parseInt(lengthHex, 16) + 2;
+			return Number.parseInt(lengthHex, 16) + 2;
 		};
 
 		block.blockSignature = buf.readBytes(signatureLength()).toString("hex");
@@ -87,7 +86,7 @@ export class Deserializer implements IBlockDeserializer {
 	): Promise<ITransaction[]> {
 		const transactionLengths: number[] = [];
 
-		for (let i = 0; i < block.numberOfTransactions; i++) {
+		for (let index = 0; index < block.numberOfTransactions; index++) {
 			transactionLengths.push(buf.readUint32());
 		}
 

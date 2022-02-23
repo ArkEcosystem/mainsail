@@ -1,11 +1,16 @@
-import { Container } from "@arkecosystem/container";
-import { BINDINGS, ITransactionSerializer } from "@arkecosystem/core-crypto-contracts";
+import { Container } from "@arkecosystem/core-container";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import {
+	BINDINGS,
+	ISerializeOptions,
+	ITransaction,
+	ITransactionData,
+	ITransactionSerializer,
+} from "@arkecosystem/core-crypto-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionTypeGroup } from "./enums";
 import { TransactionVersionError } from "./errors";
-import { ISerializeOptions, ITransaction, ITransactionData } from "@arkecosystem/core-crypto-contracts";
 import { isSupportedTransactionVersion } from "./helpers";
 import { TransactionTypeFactory } from "./types";
 

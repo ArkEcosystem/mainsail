@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BINDINGS, IBlock } from "@arkecosystem/core-crypto-contracts";
 

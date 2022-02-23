@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { HashInput, IHashFactory as Contract } from "@arkecosystem/core-crypto-contracts";
-import { RIPEMD160, SHA256, Hash256 } from "bcrypto";
+import { Hash256, RIPEMD160, SHA256 } from "bcrypto";
 
 @Container.injectable()
 export class HashFactory implements Contract {

@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { AddressFactory as Contract, BINDINGS, IKeyPairFactory } from "@arkecosystem/core-crypto-contracts";
 import { ethers } from "ethers";
 

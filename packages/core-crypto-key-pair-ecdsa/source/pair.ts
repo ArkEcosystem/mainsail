@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/core-crypto-contracts";
 import { secp256k1, SHA256 } from "bcrypto";
 import WIF from "wif";

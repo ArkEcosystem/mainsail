@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { BINDINGS, IKeyPair, IKeyPairFactory, IWIFFactory } from "@arkecosystem/core-crypto-contracts";
 import wif from "wif";
 

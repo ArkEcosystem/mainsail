@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/container",
+	"name": "@arkecosystem/core-container",
 	"version": "0.0.1",
 	"description": "Kernel of ARK Core",
 	"license": "MIT",

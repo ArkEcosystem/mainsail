@@ -1,8 +1,8 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/core-crypto-contracts";
 import { getPublicKey } from "@noble/ed25519";
-import { mnemonicToSeedSync } from "@scure/bip39";
 import { sha256 } from "@noble/hashes/sha256";
+import { mnemonicToSeedSync } from "@scure/bip39";
 import WIF from "wif";
 
 @Container.injectable()

@@ -1,5 +1,5 @@
-import { Container } from "@arkecosystem/container";
-
+import { Container } from "@arkecosystem/core-container";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	IMultiSignatureAsset,
 	ISerializeOptions,
@@ -7,10 +7,8 @@ import {
 	TransactionType,
 	TransactionTypeGroup,
 } from "@arkecosystem/core-crypto-contracts";
-
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class Two extends Transaction {
@@ -38,8 +36,8 @@ export class Two extends Transaction {
 								publicKeys: {
 									additionalItems: false,
 									items: { $ref: "publicKey" },
-									minItems: 1,
 									maxItems: 16,
+									minItems: 1,
 									type: "array",
 									uniqueItems: true,
 								},
@@ -101,11 +99,11 @@ export class Two extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 
-		const multiSignature: IMultiSignatureAsset = { publicKeys: [], min: 0 };
+		const multiSignature: IMultiSignatureAsset = { min: 0, publicKeys: [] };
 		multiSignature.min = buf.readUInt8();
 
 		const count = buf.readUInt8();
-		for (let i = 0; i < count; i++) {
+		for (let index = 0; index < count; index++) {
 			const publicKey = buf.readBuffer(33).toString("hex");
 			multiSignature.publicKeys.push(publicKey);
 		}

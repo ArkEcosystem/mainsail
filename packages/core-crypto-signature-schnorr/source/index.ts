@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/container";
+import { Container } from "@arkecosystem/core-container";
 import { Signatory as Contract } from "@arkecosystem/core-crypto-contracts";
 import { schnorr } from "bcrypto";
 
