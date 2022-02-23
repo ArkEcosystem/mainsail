@@ -16,6 +16,7 @@
 		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
+		"@arkecosystem/container": "workspace:*",
 		"@arkecosystem/crypto-contracts": "workspace:*",
 		"bcrypto": "5.4.0"
 	},

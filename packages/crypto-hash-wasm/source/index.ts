@@ -1,6 +1,8 @@
+import { Container } from "@arkecosystem/container";
 import { HashInput, IHashFactory as Contract } from "@arkecosystem/crypto-contracts";
 import { ripemd160, sha256 } from "hash-wasm";
 
+@Container.injectable()
 export class HashFactory implements Contract {
 	public async ripemd160(data: HashInput): Promise<Buffer> {
 		return Buffer.from(await ripemd160(Array.isArray(data) ? Buffer.concat(data) : data), "hex");

@@ -1,6 +1,8 @@
+import { Container } from "@arkecosystem/container";
 import { Signatory as Contract } from "@arkecosystem/crypto-contracts";
 import { sign, verify } from "@noble/bls12-381";
 
+@Container.injectable()
 export class Signatory implements Contract {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return Buffer.from(await sign(message, privateKey)).toString("hex");
