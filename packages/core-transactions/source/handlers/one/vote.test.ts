@@ -17,7 +17,7 @@ describe<{
 	factoryBuilder: Factories.FactoryBuilder;
 	store: any;
 	handler: TransactionHandler;
-}>("DelegateRegistrationTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("DelegateRegistrationTransaction V1", ({ assert, afterEach, beforeEach, it, spyFn, stub }) => {
 	beforeEach((context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
@@ -28,7 +28,7 @@ describe<{
 
 		context.app = initApp();
 		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue({
-			streamByCriteria: spy(),
+			streamByCriteria: spyFn(),
 		});
 
 		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);

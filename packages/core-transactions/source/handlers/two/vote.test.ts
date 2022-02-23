@@ -35,7 +35,7 @@ describe<{
 	handler: TransactionHandler;
 	store: any;
 	transactionHistoryService: any;
-}>("VoteTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("VoteTransaction", ({ assert, afterEach, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach(async (context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
@@ -214,8 +214,8 @@ describe<{
 
 		context.handler.emitEvents(context.voteTransaction, emitter);
 
-		assert.true(mock.calledWith(AppEnums.VoteEvent.Vote));
-		assert.false(mock.calledWith(AppEnums.VoteEvent.Unvote));
+		mock.calledWith(AppEnums.VoteEvent.Vote);
+		mock.notCalledWith(AppEnums.VoteEvent.Unvote);
 	});
 
 	it("emitEvents should dispatch for unvote", async (context) => {
@@ -226,8 +226,8 @@ describe<{
 
 		context.handler.emitEvents(context.unvoteTransaction, emitter);
 
-		assert.false(mock.calledWith(AppEnums.VoteEvent.Vote));
-		assert.true(mock.calledWith(AppEnums.VoteEvent.Unvote));
+		mock.notCalledWith(AppEnums.VoteEvent.Vote);
+		mock.calledWith(AppEnums.VoteEvent.Unvote);
 	});
 
 	it("emitEvents should dispatch for vote-unvote", async (context) => {
@@ -238,8 +238,8 @@ describe<{
 
 		context.handler.emitEvents(context.voteUnvoteTransaction, emitter);
 
-		assert.true(mock.calledWith(AppEnums.VoteEvent.Vote));
-		assert.true(mock.calledWith(AppEnums.VoteEvent.Unvote));
+		mock.calledWith(AppEnums.VoteEvent.Vote);
+		mock.calledWith(AppEnums.VoteEvent.Unvote);
 	});
 
 	it("emitEvents should throw if asset.votes is undefined", async (context) => {
@@ -486,9 +486,9 @@ describe<{
 	it("applyForSender should throw if asset.vote is undefined", async (context) => {
 		context.voteTransaction.data.asset.votes = undefined;
 
-		context.handler.throwIfCannotBeApplied = spy();
+		context.handler.throwIfCannotBeApplied = spyFn();
 
-		assert.rejects(
+		await assert.rejects(
 			() => context.handler.applyToSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);
@@ -497,9 +497,9 @@ describe<{
 	it("applyForSender should throw if asset is undefined", async (context) => {
 		context.voteTransaction.data.asset = undefined;
 
-		context.handler.throwIfCannotBeApplied = spy();
+		context.handler.throwIfCannotBeApplied = spyFn();
 
-		assert.rejects(
+		await assert.rejects(
 			() => context.handler.applyToSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);

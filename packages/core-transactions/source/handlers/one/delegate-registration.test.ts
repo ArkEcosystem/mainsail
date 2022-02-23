@@ -15,13 +15,13 @@ describe<{
 	walletRepository: Contracts.State.WalletRepository;
 	handler: TransactionHandler;
 	store: any;
-}>("DelegateRegistrationTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("DelegateRegistrationTransaction V1", ({ assert, afterEach, beforeEach, it, spyFn, stub }) => {
 	beforeEach(async (context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		let transactionHistoryService = {
-			streamByCriteria: spy(),
+			streamByCriteria: spyFn(),
 		};
 
 		const config = Generators.generateCryptoConfigRaw();

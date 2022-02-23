@@ -1,5 +1,5 @@
-import { SinonSpyStatic, spy } from "sinon";
 import { Callback, Context, suite, Test } from "uvu";
+import sinon from "sinon";
 import { z as schema } from "zod";
 
 import { assert } from "./assert";
@@ -7,6 +7,7 @@ import { each, formatName } from "./each";
 import { runHook } from "./hooks";
 import { loader } from "./loader";
 import { nock } from "./nock";
+import { Spy } from "./spy";
 import { Stub } from "./stub";
 
 type ContextFunction<T> = () => T;
@@ -26,7 +27,8 @@ interface CallbackArguments<T> {
 	only: Function;
 	schema: typeof schema;
 	skip: Function;
-	spy: SinonSpyStatic;
+	spy: (owner?: object, method?: string) => Spy;
+	spyFn: sinon.SinonSpyStatic;
 	stub: (owner: object, method: string) => Stub;
 }
 
@@ -34,6 +36,7 @@ type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
 
 const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
 	let stubs: Stub[] = [];
+	let spies: Spy[] = [];
 
 	suite.before(() => {
 		nock.disableNetConnect();
@@ -50,7 +53,12 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			stub.restore();
 		}
 
+		for (const stub of spies) {
+			stub.restore();
+		}
+
 		stubs = [];
+		spies = [];
 	});
 
 	callback({
@@ -67,7 +75,14 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		only: suite.only,
 		schema,
 		skip: suite.skip,
-		spy,
+		spy: (owner: object, method: string) => {
+			const result: Spy = new Spy(owner, method);
+
+			spies.push(result);
+
+			return result;
+		},
+		spyFn: sinon.spy,
 		stub: (owner: object, method: string) => {
 			const result: Stub = new Stub(owner, method);
 

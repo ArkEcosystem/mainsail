@@ -24,7 +24,7 @@ describe<{
 	delegateRegistrationTransaction: Interfaces.ITransaction;
 	store: any;
 	transactionHistoryService: any;
-}>("DelegateRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("DelegateRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
@@ -239,7 +239,7 @@ describe<{
 			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
 		);
 
-		assert.true(mock.calledOnce);
+		mock.calledOnce();
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet has a multi signature", async (context) => {
@@ -423,7 +423,7 @@ describe<{
 
 		await context.handler.apply(context.delegateRegistrationTransaction);
 
-		assert.true(mock.calledOnce);
+		mock.calledOnce();
 
 		assert.equal(
 			context.senderWallet.getBalance(),
@@ -441,7 +441,7 @@ describe<{
 
 		await context.handler.revert(context.delegateRegistrationTransaction);
 
-		assert.true(mock2.calledOnce);
+		mock2.calledOnce();
 
 		assert.equal(context.senderWallet.getBalance(), walletBalance);
 		assert.equal(context.senderWallet.getNonce(), Utils.BigNumber.ZERO);
@@ -458,7 +458,7 @@ describe<{
 
 	it("applyForSender should throw if asset.delegate.username is undefined", async (context) => {
 		context.delegateRegistrationTransaction.data.asset.delegate.username = undefined;
-		context.handler.throwIfCannotBeApplied = spy();
+		context.handler.throwIfCannotBeApplied = spyFn();
 
 		await assert.rejects(
 			() => context.handler.applyToSender(context.delegateRegistrationTransaction),
@@ -468,7 +468,7 @@ describe<{
 
 	it("applyForSender should throw if asset.delegate is undefined", async (context) => {
 		context.delegateRegistrationTransaction.data.asset.delegate = undefined;
-		context.handler.throwIfCannotBeApplied = spy();
+		context.handler.throwIfCannotBeApplied = spyFn();
 
 		await assert.rejects(
 			() => context.handler.applyToSender(context.delegateRegistrationTransaction),
@@ -478,7 +478,7 @@ describe<{
 
 	it("applyForSender should throw if asset is undefined", async (context) => {
 		context.delegateRegistrationTransaction.data.asset = undefined;
-		context.handler.throwIfCannotBeApplied = spy();
+		context.handler.throwIfCannotBeApplied = spyFn();
 
 		await assert.rejects(
 			() => context.handler.applyToSender(context.delegateRegistrationTransaction),

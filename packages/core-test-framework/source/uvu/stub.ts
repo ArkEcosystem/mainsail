@@ -1,10 +1,11 @@
 import { SinonStub, stub } from "sinon";
-import { ok } from "uvu/assert";
 
-export class Stub {
-	private readonly subject: SinonStub;
+import { Fake } from "./fake";
 
+export class Stub extends Fake<SinonStub> {
 	public constructor(target: object, method: string) {
+		super();
+
 		this.subject = stub(target, method as never);
 	}
 
@@ -26,37 +27,9 @@ export class Stub {
 		return this;
 	}
 
-	public callsFake(value: (...args: any[]) => any): Stub {
+	public callsFake(value: (...arguments_: any[]) => any): Stub {
 		this.subject.callsFake(value);
 
 		return this;
-	}
-
-	public calledWith(message: string | object): void {
-		ok(this.subject.calledWith(message));
-	}
-
-	public calledOnce(): void {
-		this.calledTimes(1);
-	}
-
-	public neverCalled(): void {
-		this.calledTimes(0);
-	}
-
-	public getCallArgs(index: number): any[] {
-		if (this.subject.callCount > index) {
-			return this.subject.getCall(index).args;
-		}
-
-		throw new Error(`Can't get args for call: ${index}`);
-	}
-
-	public restore(): void {
-		this.subject.restore();
-	}
-
-	private calledTimes(times: number): void {
-		ok(this.subject.callCount === times);
 	}
 }

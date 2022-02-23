@@ -20,7 +20,7 @@ describe<{
 	handler: TransactionHandler;
 	store: any;
 	transactionHistoryService: any;
-}>("MultiPaymentTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("MultiPaymentTransaction", ({ assert, beforeEach, it, spyFn, stub }) => {
 	beforeEach(async (context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
@@ -174,7 +174,7 @@ describe<{
 	it("applyToSender should throw if asset is undefined", async (context) => {
 		context.multiPaymentTransaction.data.asset = undefined;
 
-		context.handler.throwIfCannotBeApplied = spy();
+		context.handler.throwIfCannotBeApplied = spyFn();
 
 		await assert.rejects(
 			() => context.handler.applyToSender(context.multiPaymentTransaction),

@@ -27,7 +27,7 @@ describe<{
 	handler: TransactionHandler;
 	store: any;
 	transactionHistoryService: any;
-}>("MultiSignatureRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("MultiSignatureRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spyFn, stub }) => {
 	beforeEach(async (context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
@@ -393,7 +393,7 @@ describe<{
 	it("applyToRecipient should throw if asset is undefined", async (context) => {
 		context.multiSignatureTransaction.data.asset = undefined;
 
-		context.handler.throwIfCannotBeApplied = spy();
+		context.handler.throwIfCannotBeApplied = spyFn();
 
 		await assert.rejects(
 			() => context.handler.applyToRecipient(context.multiSignatureTransaction),
