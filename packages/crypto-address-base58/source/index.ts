@@ -1,27 +1,25 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { AddressFactory as Contract, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
+import { Container } from "@arkecosystem/container";
+import { AddressFactory as Contract, BINDINGS, IConfiguration, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
 import { RIPEMD160, SHA256 } from "bcrypto";
 import { base58 } from "bstring";
 
+@Container.injectable()
 export class AddressFactory implements Contract {
-	readonly #network: any;
-	readonly #keyPairFactory: IKeyPairFactory;
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
 
-	// @TODO: network type once final structure is known
-	public constructor(network: any, keyPairFactory: IKeyPairFactory) {
-		this.#network = network;
-		this.#keyPairFactory = keyPairFactory;
-	}
+	@Container.inject(BINDINGS.Identity.KeyPairFactory)
+	private readonly keyPairFactory: IKeyPairFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.#keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
+		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
 	}
 
 	public async fromPublicKey(publicKey: Buffer): Promise<string> {
 		const buffer: Buffer = RIPEMD160.digest(publicKey);
 		const payload: Buffer = Buffer.alloc(21);
 
-		payload.writeUInt8(this.#network.pubKeyHash, 0);
+		payload.writeUInt8(this.configuration.get("network.address.base58"), 0);
 		buffer.copy(payload, 1);
 
 		return this.#encodeCheck(payload);
@@ -29,7 +27,7 @@ export class AddressFactory implements Contract {
 
 	public async validate(address: string): Promise<boolean> {
 		try {
-			return this.#decodeCheck(address)[0] === this.#network.pubKeyHash;
+			return this.#decodeCheck(address)[0] === this.configuration.get("network.address.base58");
 		} catch {
 			return false;
 		}

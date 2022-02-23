@@ -1,26 +1,32 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { AddressFactory as Contract, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
+import { Container } from "@arkecosystem/container";
+import { AddressFactory as Contract, BINDINGS, IConfiguration, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
 import { hexToU8a, isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
 
+@Container.injectable()
 export class AddressFactory implements Contract {
-	readonly #keyPairFactory: IKeyPairFactory;
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
 
-	public constructor(_: any, keyPairFactory: IKeyPairFactory) {
-		this.#keyPairFactory = keyPairFactory;
-	}
+	@Container.inject(BINDINGS.Identity.KeyPairFactory)
+	private readonly keyPairFactory: IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.#keyPairFactory.fromMnemonic(mnemonic)).publicKey, "hex"));
+		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey, "hex"));
 	}
 
 	public async fromPublicKey(publicKey: Buffer): Promise<string> {
-		return encodeAddress(publicKey);
+		return encodeAddress(publicKey, this.configuration.get("network.address.ss58"));
 	}
 
 	public async validate(address: string): Promise<boolean> {
 		try {
-			encodeAddress(isHex(address) ? hexToU8a(address) : decodeAddress(address));
+			encodeAddress(
+				isHex(address)
+					? hexToU8a(address)
+					: decodeAddress(address, this.configuration.get("network.address.ss58")),
+				this.configuration.get("network.address.ss58"),
+			);
 
 			return true;
 		} catch {

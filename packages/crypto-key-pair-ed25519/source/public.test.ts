@@ -1,28 +1,38 @@
+import { Container } from "@arkecosystem/container";
 import { describe } from "@arkecosystem/core-test-framework";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
 
+import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe("PublicKeyFactory", ({ assert, it }) => {
-	it("should derive a key pair from an mnemonic", async () => {
+describe<{ container: Container.Container }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
+	beforeEach((context) => {
+		context.container = new Container.Container();
+		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
+	});
+
+	it("should derive a key pair from an mnemonic", async (context) => {
 		assert.is(
-			await new PublicKeyFactory().fromMnemonic(mnemonic),
+			await context.container.resolve(PublicKeyFactory).fromMnemonic(mnemonic),
 			"ddfadb0a7938faa598f1ea34cab907e1e520db0652eb40a7edfe6c195511780b",
 		);
 	});
 
-	it("should derive from a WIF", async () => {
+	it("should derive from a WIF", async (context) => {
 		assert.is(
-			await new PublicKeyFactory().fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
+			await context.container
+				.resolve(PublicKeyFactory)
+				.fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128),
 			"4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29",
 		);
 	});
 
-	// it("should derive from a musig", async () => {
+	// it("should derive from a musig", async (context) => {
 	// 	assert.is(
-	// 		await new PublicKeyFactory().fromMultiSignatureAsset({
+	// 		await context.container.resolve(PublicKeyFactory).fromMultiSignatureAsset({
 	// 			min: 3,
 	// 			publicKeys: [
 	// 				'b79902f435d268d6d37ac3ab01f4536a86c192fa07ba5b63b5f8e4d0e05755cfeab9d35fbedb9c02919fe02a81f8b06d',
@@ -37,7 +47,7 @@ describe("PublicKeyFactory", ({ assert, it }) => {
 	// each(
 	// 	"should pass with valid public keys",
 	// 	async ({ dataset }) => {
-	// 		assert.true(await new PublicKeyFactory().verify(dataset));
+	// 		assert.true(await context.container.resolve(PublicKeyFactory).verify(dataset));
 	// 	},
 	// 	[
 	// 		"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb",
@@ -48,7 +58,7 @@ describe("PublicKeyFactory", ({ assert, it }) => {
 	// each(
 	// 	"should fail with invalid public keys",
 	// 	async ({ dataset }) => {
-	// 		assert.false(await new PublicKeyFactory().verify(dataset));
+	// 		assert.false(await context.container.resolve(PublicKeyFactory).verify(dataset));
 	// 	},
 	// 	[
 	// 		"0",

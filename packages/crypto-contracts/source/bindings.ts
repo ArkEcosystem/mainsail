@@ -8,6 +8,13 @@ export const BINDINGS = {
 	},
 	Configuration: Symbol.for("Crypto<Configuration>"),
 	HashFactory: Symbol.for("Crypto<HashFactory>"),
+	Identity: {
+		AddressFactory: Symbol.for("Crypto<Identity.AddressFactory>"),
+		KeyPairFactory: Symbol.for("Crypto<Identity.KeyPairFactory>"),
+		PrivateKeyFactory: Symbol.for("Crypto<Identity.PrivateKeyFactory>"),
+		PublicKeyFactory: Symbol.for("Crypto<Identity.PublicKeyFactory>"),
+		WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
+	},
 	SignatureFactory: Symbol.for("Crypto<SignatureFactory>"),
 	Transaction: {
 		Deserializer: Symbol.for("Crypto<Transaction.Deserializer>"),
@@ -17,13 +24,6 @@ export const BINDINGS = {
 		Signer: Symbol.for("Crypto<Transaction.Signer>"),
 		Utils: Symbol.for("Crypto<Transaction.Utils>"),
 		Verifier: Symbol.for("Crypto<Transaction.Verifier>"),
-	},
-	Identity: {
-		AddressFactory: Symbol.for("Crypto<Identity.AddressFactory>"),
-		PublicKeyFactory: Symbol.for("Crypto<Identity.PublicKeyFactory>"),
-		PrivateKeyFactory: Symbol.for("Crypto<Identity.PrivateKeyFactory>"),
-		KeyPairFactory: Symbol.for("Crypto<Identity.KeyPairFactory>"),
-		WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
 	},
 	Validator: Symbol.for("Crypto<Validator>"),
 };

@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { AddressFactory as Contract, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
+import { Container } from "@arkecosystem/container";
+import { AddressFactory as Contract, BINDINGS, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
 import { ethers } from "ethers";
 
+@Container.injectable()
 export class AddressFactory implements Contract {
-	readonly #keyPairFactory: IKeyPairFactory;
-
-	// @TODO: network type once final structure is known
-	public constructor(_: any, keyPairFactory: IKeyPairFactory) {
-		this.#keyPairFactory = keyPairFactory;
-	}
+	@Container.inject(BINDINGS.Identity.KeyPairFactory)
+	private readonly keyPairFactory: IKeyPairFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.#keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
+		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
 	}
 
 	public async fromPublicKey(publicKey: Buffer): Promise<string> {

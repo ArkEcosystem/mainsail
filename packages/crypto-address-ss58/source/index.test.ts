@@ -1,50 +1,90 @@
+import { Container } from "@arkecosystem/container";
 import { describe } from "@arkecosystem/core-test-framework";
-import { KeyPairFactory as Schnorr } from "@arkecosystem/crypto-key-pair-schnorr";
+import { BINDINGS, IConfiguration } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
 import { KeyPairFactory as ECDSA } from "@arkecosystem/crypto-key-pair-ecdsa";
+import { KeyPairFactory as Schnorr } from "@arkecosystem/crypto-key-pair-schnorr";
 
 import { AddressFactory } from "./index";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe("AddressFactory", ({ assert, it }) => {
-	it("should derive an address from an mnemonic (schnorr)", async () => {
+describe<{ container: Container.Container }>("AddressFactory", ({ assert, beforeEach, it }) => {
+	beforeEach((context) => {
+		context.container = new Container.Container();
+		context.container.bind(BINDINGS.Configuration).to(Configuration).inSingletonScope();
+
+		context.container.get<IConfiguration>(BINDINGS.Configuration).setConfig({
+			milestones: [],
+			network: {
+				// @ts-ignore
+				address: {
+					ss58: 0,
+				},
+			},
+		});
+	});
+
+	it("should derive an address from an mnemonic (schnorr)", async (context) => {
+		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(Schnorr).inSingletonScope();
+
 		assert.is(
-			await new AddressFactory({ addressHash: 0 }, new Schnorr()).fromMnemonic(mnemonic),
-			"5HKE9eJ4Qj2Zzx7AcammMbTeVAKLXuouQEfgdZj7YQ99tN1U",
+			await context.container.resolve(AddressFactory).fromMnemonic(mnemonic),
+			"16FXHyZ8GWJ3SV7gaDpmVkHoLnJzEDN3UjQAnriU6VAg4hNi",
 		);
 	});
 
-	it("should derive an address from an mnemonic (secp256k1)", async () => {
+	it("should derive an address from an mnemonic (secp256k1)", async (context) => {
+		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(ECDSA).inSingletonScope();
+
 		assert.is(
-			await new AddressFactory({ addressHash: 0 }, new ECDSA()).fromMnemonic(mnemonic),
-			"KWDxqHwgJhad7Co3qiHDDeUYzGNHVWHPxCjYGcvVersEvsZwi",
+			await context.container.resolve(AddressFactory).fromMnemonic(mnemonic),
+			"1PcW4xBLRNvDufL5HpTqdT65HEjsPmFc3Z4ZdueNV3x8uVc2",
 		);
 	});
 
-	it("should derive an address from a public key (schnorr)", async () => {
+	it("should derive an address from a public key (schnorr)", async (context) => {
+		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(Schnorr).inSingletonScope();
+
 		assert.is(
-			await new AddressFactory({ addressHash: 0 }, new Schnorr()).fromPublicKey(
-				Buffer.from("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
-			),
-			"5HKE9eJ4Qj2Zzx7AcammMbTeVAKLXuouQEfgdZj7YQ99tN1U",
+			await context.container
+				.resolve(AddressFactory)
+				.fromPublicKey(Buffer.from("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex")),
+			"16FXHyZ8GWJ3SV7gaDpmVkHoLnJzEDN3UjQAnriU6VAg4hNi",
 		);
 	});
 
-	it("should derive an address from a public key (secp256k1)", async () => {
+	it("should derive an address from a public key (secp256k1)", async (context) => {
+		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(ECDSA).inSingletonScope();
+
 		assert.is(
-			await new AddressFactory({ addressHash: 0 }, new ECDSA()).fromPublicKey(
-				Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
-			),
-			"KWDxqHwgJhad7Co3qiHDDeUYzGNHVWHPxCjYGcvVersEvsZwi",
+			await context.container
+				.resolve(AddressFactory)
+				.fromPublicKey(
+					Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
+				),
+			"1PcW4xBLRNvDufL5HpTqdT65HEjsPmFc3Z4ZdueNV3x8uVc2",
 		);
 	});
 
-	it("should validate addresses", async () => {
-		const factory = new AddressFactory({ addressHash: 0 }, new ECDSA());
+	it("should validate addresses", async (context) => {
+		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(ECDSA).inSingletonScope();
 
-		assert.true(await factory.validate("5HKE9eJ4Qj2Zzx7AcammMbTeVAKLXuouQEfgdZj7YQ99tN1U"));
-		assert.true(await factory.validate("KWDxqHwgJhad7Co3qiHDDeUYzGNHVWHPxCjYGcvVersEvsZwi"));
-		assert.false(await factory.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
+		assert.true(
+			await context.container
+				.resolve(AddressFactory)
+				.validate("1PcW4xBLRNvDufL5HpTqdT65HEjsPmFc3Z4ZdueNV3x8uVc2"),
+		);
+		assert.true(
+			await context.container
+				.resolve(AddressFactory)
+				.validate("1PcW4xBLRNvDufL5HpTqdT65HEjsPmFc3Z4ZdueNV3x8uVc2"),
+		);
+		assert.false(
+			await context.container
+				.resolve(AddressFactory)
+				.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"),
+		);
 	});
 });

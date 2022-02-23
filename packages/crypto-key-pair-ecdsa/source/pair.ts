@@ -1,7 +1,9 @@
+import { Container } from "@arkecosystem/container";
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/crypto-contracts";
 import { secp256k1, SHA256 } from "bcrypto";
 import WIF from "wif";
 
+@Container.injectable()
 export class KeyPairFactory implements Contract {
 	public async fromMnemonic(mnemonic: string, compressed = true): Promise<IKeyPair> {
 		return this.fromPrivateKey(SHA256.digest(Buffer.from(mnemonic, "utf8")), compressed);

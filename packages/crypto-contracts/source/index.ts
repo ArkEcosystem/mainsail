@@ -1,5 +1,6 @@
 export * from "./bindings";
 export * from "./block";
+export * from "./config";
 export * from "./crypto";
 export * from "./enums";
 export * from "./hash";

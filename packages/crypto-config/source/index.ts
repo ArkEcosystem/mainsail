@@ -1,21 +1,16 @@
-import { IMilestone, MilestoneSearchResult, NetworkConfig } from "@arkecosystem/crypto-contracts";
+import { IConfiguration, IMilestone, MilestoneSearchResult, NetworkConfig } from "@arkecosystem/crypto-contracts";
 import { InvalidMilestoneConfigurationError } from "@arkecosystem/crypto-errors";
+import { Container } from "@arkecosystem/container";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
 
-export class Configuration {
-	readonly #networks: Record<string, NetworkConfig>;
+@Container.injectable()
+export class Configuration implements IConfiguration {
 	#config: NetworkConfig | undefined;
 	#height: number | undefined;
 	#milestone: IMilestone | undefined;
 	#milestones: Record<string, any> | undefined;
-
-	public constructor(networks: Record<string, NetworkConfig>) {
-		this.#networks = networks;
-
-		this.setConfig(networks.devnet as unknown as NetworkConfig);
-	}
 
 	public setConfig(config: NetworkConfig): void {
 		this.#config = {
@@ -27,14 +22,6 @@ export class Configuration {
 
 		this.validateMilestones();
 		this.buildConstants();
-	}
-
-	public setFromPreset(network: string): void {
-		this.setConfig(this.getPreset(network));
-	}
-
-	public getPreset(network: string): NetworkConfig {
-		return this.#networks[network.toLowerCase()];
 	}
 
 	public all(): NetworkConfig | undefined {

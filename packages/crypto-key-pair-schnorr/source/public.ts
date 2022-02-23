@@ -1,22 +1,19 @@
-import { IPublicKeyFactory, IMultiSignatureAsset } from "@arkecosystem/crypto-contracts";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IKeyPairFactory, IMultiSignatureAsset, IPublicKeyFactory } from "@arkecosystem/crypto-contracts";
 import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/crypto-errors";
 import { schnorr } from "bcrypto";
 
-import { KeyPairFactory } from "./pair";
-
+@Container.injectable()
 export class PublicKeyFactory implements IPublicKeyFactory {
-	readonly #keyPairFactory: KeyPairFactory;
-
-	public constructor() {
-		this.#keyPairFactory = new KeyPairFactory();
-	}
+	@Container.inject(BINDINGS.Identity.KeyPairFactory)
+	private readonly keyPairFactory: IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return (await this.#keyPairFactory.fromMnemonic(mnemonic)).publicKey;
+		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
 	}
 
 	public async fromWIF(wif: string, version: number): Promise<string> {
-		return (await this.#keyPairFactory.fromWIF(wif, version)).publicKey;
+		return (await this.keyPairFactory.fromWIF(wif, version)).publicKey;
 	}
 
 	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
