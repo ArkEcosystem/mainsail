@@ -13,7 +13,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:proto": "pnpm run pbjs && pnpm run pbts",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
+		"clean": "del distribution",
 		"pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
 		"pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
 		"test": "cross-env CORE_ENV=test jest --forceExit"

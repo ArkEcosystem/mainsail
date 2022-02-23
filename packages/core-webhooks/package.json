@@ -11,7 +11,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
+		"clean": "del distribution",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 -r html pnpm run test",
 		"test:file": "uvu -r tsm source"

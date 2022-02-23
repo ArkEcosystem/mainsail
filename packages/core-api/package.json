@@ -12,7 +12,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
+		"clean": "del distribution",
 		"test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\""
 	},
 	"dependencies": {

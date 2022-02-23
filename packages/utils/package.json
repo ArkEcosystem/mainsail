@@ -13,7 +13,7 @@
 		"bench": "pnpm run build && node benchmark/index.js",
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
+		"clean": "del distribution",
 		"test": "jest"
 	},
 	"dependencies": {
