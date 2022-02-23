@@ -8,7 +8,7 @@ import { Transaction, TransactionTypeFactory } from "./types";
 import { InternalTransactionType } from "./types/internal-transaction-type";
 import { Container } from "@arkecosystem/container";
 import { ITransactionRegistry } from "@arkecosystem/core-crypto-contracts";
-// import { Validator } from "@arkecosystem/validation";
+// import { Validator } from "@arkecosystem/core-validation";
 
 export type TransactionConstructor = typeof Transaction;
 

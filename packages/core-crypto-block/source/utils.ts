@@ -1,7 +1,7 @@
 import { IBlockData } from "@arkecosystem/core-crypto-contracts";
 import { BlockSchemaError } from "@arkecosystem/core-crypto-errors";
 import { BigNumber } from "@arkecosystem/utils";
-import { Validator } from "@arkecosystem/validation";
+import { Validator } from "@arkecosystem/core-validation";
 
 export const toBytesHex = (data): string => {
 	const temporary: string = data ? BigNumber.make(data).toString(16) : "";

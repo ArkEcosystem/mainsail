@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/validation",
+	"name": "@arkecosystem/core-validation",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",

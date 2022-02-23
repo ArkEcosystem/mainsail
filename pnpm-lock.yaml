@@ -469,10 +469,10 @@ importers:
       '@arkecosystem/core-crypto-networks': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': 1.3.1
-      '@arkecosystem/validation': workspace:*
       '@types/bip32': 2.0.0
       '@types/bip39': 2.4.2
       '@types/buffer-xor': 2.0.0
@@ -507,10 +507,10 @@ importers:
       '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
       '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/crypto': link:../crypto
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
-      '@arkecosystem/validation': link:../validation
       ajv: 6.12.6
       ajv-keywords: 3.4.1_ajv@6.12.6
       bcrypto: 5.4.0
@@ -870,9 +870,9 @@ importers:
       '@arkecosystem/core-crypto-errors': workspace:*
       '@arkecosystem/core-crypto-networks': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
-      '@arkecosystem/validation': workspace:*
       '@types/bip32': 2.0.0
       '@types/bip39': 2.4.2
       '@types/buffer-xor': 2.0.0
@@ -906,9 +906,9 @@ importers:
       '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
       '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
       '@arkecosystem/core-crypto-time': link:../core-crypto-time
+      '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
-      '@arkecosystem/validation': link:../validation
       ajv: 6.12.6
       ajv-keywords: 3.4.1_ajv@6.12.6
       bcrypto: 5.4.0
@@ -1426,6 +1426,18 @@ importers:
       bytebuffer: 5.0.1
       uvu: 0.5.3
 
+  packages/core-validation:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/core-crypto-contracts': workspace:*
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1_ajv@6.12.6
+
   packages/core-webhooks:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
@@ -1570,18 +1582,6 @@ importers:
       micro-bmark: 0.1.3
       pluralize: 8.0.0
       random-object: 1.3.4
-
-  packages/validation:
-    specifiers:
-      '@arkecosystem/container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1
-    dependencies:
-      '@arkecosystem/container': link:../container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1_ajv@6.12.6
 
 packages:
 
