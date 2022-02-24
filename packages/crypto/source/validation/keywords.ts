@@ -1,13 +1,11 @@
-import { Ajv } from "ajv";
-import ajvKeywords from "ajv-keywords";
-
+import Ajv from "ajv";
 import { TransactionType } from "../enums";
-import { ITransactionData } from "../interfaces";
 import { configManager } from "../managers";
 import { BigNumber, isGenesisTransaction } from "../utils";
 
 const maxBytes = (ajv: Ajv) => {
-	ajv.addKeyword("maxBytes", {
+	ajv.addKeyword({
+		keyword: "maxBytes",
 		compile(schema, parentSchema) {
 			return (data) => {
 				if ((parentSchema as any).type !== "string") {
@@ -27,20 +25,21 @@ const maxBytes = (ajv: Ajv) => {
 };
 
 const transactionType = (ajv: Ajv) => {
-	ajv.addKeyword("transactionType", {
+	ajv.addKeyword({
+		keyword: "transactionType",
 		// @ts-ignore
 		compile(schema) {
-			return (data, dataPath, parentObject: ITransactionData) => {
+			return (data, context) => {
 				// Impose dynamic multipayment limit based on milestone
 				if (
 					data === TransactionType.MultiPayment &&
-					parentObject &&
-					(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
-					parentObject.asset &&
-					parentObject.asset.payments
+					context.parentData &&
+					(!context.parentData.typeGroup || context.parentData.typeGroup === 1) &&
+					context.parentData.asset &&
+					context.parentData.asset.payments
 				) {
 					const limit: number = configManager.getMilestone().multiPaymentLimit || 256;
-					return parentObject.asset.payments.length <= limit;
+					return context.parentData.asset.payments.length <= limit;
 				}
 
 				return data === schema;
@@ -55,7 +54,8 @@ const transactionType = (ajv: Ajv) => {
 };
 
 const network = (ajv: Ajv) => {
-	ajv.addKeyword("network", {
+	ajv.addKeyword({
+		keyword: "network",
 		compile(schema) {
 			return (data) => schema && data === configManager.get("network.pubKeyHash");
 		},
@@ -67,12 +67,13 @@ const network = (ajv: Ajv) => {
 };
 
 const bignumber = (ajv: Ajv) => {
-	const instanceOf = ajvKeywords.get("instanceof").definition;
+	const instanceOf = require("ajv-keywords/dist/definitions/instanceof");
 	instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
 
-	ajv.addKeyword("bignumber", {
+	ajv.addKeyword({
+		keyword: "bignumber",
 		compile(schema) {
-			return (data, dataPath, parentObject: any, property) => {
+			return (data, context) => {
 				const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : 0;
 				const maximum = typeof schema.maximum !== "undefined" ? schema.maximum : "9223372036854775807"; // 8 byte maximum
 
@@ -87,16 +88,16 @@ const bignumber = (ajv: Ajv) => {
 					return false;
 				}
 
-				if (parentObject && property) {
-					parentObject[property] = bignum;
+				if (context.parentData && context.parentDataProperty) {
+					context.parentData[context.parentDataProperty] = bignum;
 				}
 
 				let bypassGenesis = false;
-				if (schema.bypassGenesis && parentObject.id) {
+				if (schema.bypassGenesis && context.parentData.id) {
 					if (schema.block) {
-						bypassGenesis = parentObject.height === 1;
+						bypassGenesis = context.parentData.height === 1;
 					} else {
-						bypassGenesis = isGenesisTransaction(parentObject.id);
+						bypassGenesis = isGenesisTransaction(context.parentData.id);
 					}
 				}
 
@@ -113,7 +114,6 @@ const bignumber = (ajv: Ajv) => {
 		},
 		errors: false,
 		metaSchema: {
-			additionalItems: false,
 			properties: {
 				block: { type: "boolean" },
 				bypassGenesis: { type: "boolean" },
@@ -127,12 +127,13 @@ const bignumber = (ajv: Ajv) => {
 };
 
 const blockId = (ajv: Ajv) => {
-	ajv.addKeyword("blockId", {
+	ajv.addKeyword({
+		keyword: "blockId",
 		compile(schema) {
-			return (data, dataPath, parentObject: any) => {
+			return (data, context) => {
 				if (
-					parentObject &&
-					parentObject.height === 1 &&
+					context.parentData &&
+					context.parentData.height === 1 &&
 					schema.allowNullWhenGenesis &&
 					(!data || Number(data) === 0)
 				) {
@@ -148,8 +149,8 @@ const blockId = (ajv: Ajv) => {
 				const isPartial = /^\d{1,20}$/.test(data) || /^[\da-f]{16}$/i.test(data);
 				const isFullSha256 = /^[\da-f]{64}$/i.test(data);
 
-				if (parentObject && parentObject.height) {
-					const height = schema.isPreviousBlock ? parentObject.height - 1 : parentObject.height;
+				if (context.parentData && context.parentData.height) {
+					const height = schema.isPreviousBlock ? context.parentData.height - 1 : context.parentData.height;
 					const constants = configManager.getMilestone(height ?? 1); // if height === 0 set it to 1
 					return constants.block.idFullSha256 ? isFullSha256 : isPartial;
 				}
@@ -159,7 +160,6 @@ const blockId = (ajv: Ajv) => {
 		},
 		errors: false,
 		metaSchema: {
-			additionalItems: false,
 			properties: {
 				allowNullWhenGenesis: { type: "boolean" },
 				isPreviousBlock: { type: "boolean" },

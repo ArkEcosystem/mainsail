@@ -1,4 +1,4 @@
-import { Ajv } from "ajv";
+import Ajv from "ajv";
 
 import { isValidPeer, maxVendorFieldLength } from "../utils";
 

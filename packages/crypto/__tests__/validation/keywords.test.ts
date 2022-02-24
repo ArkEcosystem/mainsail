@@ -113,7 +113,7 @@ describe("keyword blockId", () => {
 
 describe("keyword bignumber", () => {
 	it("should be ok if only one possible value is allowed", () => {
-		const schema = { bignumber: { minimum: 100, maximum: 100 } };
+		const schema = { bignumber: { type: "number", minimum: 100, maximum: 100 } };
 		const validate = ajv.compile(schema);
 
 		expect(validate(100)).toBeTrue();
@@ -122,7 +122,7 @@ describe("keyword bignumber", () => {
 	});
 
 	it("should be ok if above or equal minimum", () => {
-		const schema = { bignumber: { minimum: 20 }, additionalItems: false };
+		const schema = { bignumber: { type: "number", minimum: 20 } };
 		const validate = ajv.compile(schema);
 
 		expect(validate(25)).toBeTrue();
@@ -131,7 +131,7 @@ describe("keyword bignumber", () => {
 	});
 
 	it("should be ok if above or equal maximum", () => {
-		const schema = { bignumber: { maximum: 20 }, additionalItems: false };
+		const schema = { bignumber: { type: "number", maximum: 20 } };
 		const validate = ajv.compile(schema);
 
 		expect(validate(20)).toBeTrue();
@@ -149,7 +149,7 @@ describe("keyword bignumber", () => {
 	});
 
 	it("should be ok for number, string and bignumber as input", () => {
-		const schema = { bignumber: { minimum: 100, maximum: 2000 }, additionalItems: false };
+		const schema = { bignumber: { type: "number", minimum: 100, maximum: 2000 } };
 		const validate = ajv.compile(schema);
 
 		for (const value of [100, 1e2, 1020.0, 500, 2000]) {
@@ -218,7 +218,7 @@ describe("keyword bignumber", () => {
 			const schema = {
 				type: "object",
 				properties: {
-					amount: { bignumber: { minimum: 100, bypassGenesis: true } },
+					amount: { bignumber: { type: "number", minimum: 100, bypassGenesis: true } },
 				},
 			};
 

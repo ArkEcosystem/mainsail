@@ -9,6 +9,7 @@ const registerSuite = async (suite) => {
 
 run(async () => {
 	await registerSuite("./crypto/hash-algorithms");
+	await registerSuite("./validation");
 	// await registerSuite("./block/create");
 	// await registerSuite("./block/serialize");
 	// await registerSuite("./block/serializeWithTransactions");

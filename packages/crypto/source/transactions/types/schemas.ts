@@ -25,19 +25,18 @@ export const transactionBaseSchema: Record<string, any> = {
 		version: { enum: [1, 2] },
 		network: { $ref: "networkByte" },
 		timestamp: { type: "integer", minimum: 0 },
-		nonce: { bignumber: { minimum: 0 } },
+		nonce: { bignumber: { type: "number", minimum: 0 } },
 		typeGroup: { type: "integer", minimum: 0 },
-		amount: { bignumber: { minimum: 1, bypassGenesis: true } },
-		fee: { bignumber: { minimum: 0, bypassGenesis: true } },
+		amount: { bignumber: { type: "number", minimum: 1, bypassGenesis: true } },
+		fee: { bignumber: { type: "number", minimum: 0, bypassGenesis: true } },
 		senderPublicKey: { $ref: "publicKey" },
 		signature: { $ref: "alphanumeric" },
 		signatures: {
 			type: "array",
 			minItems: 1,
 			maxItems: 16,
-			additionalItems: false,
 			uniqueItems: true,
-			items: { allOf: [{ minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
+			items: { allOf: [{ type: "string", minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
 		},
 	},
 };
@@ -64,7 +63,7 @@ export const transfer = extend(transactionBaseSchema, {
 	required: ["recipientId"],
 	properties: {
 		type: { transactionType: TransactionType.Transfer },
-		fee: { bignumber: { minimum: 1, bypassGenesis: true } },
+		fee: { bignumber: { type: "number", minimum: 1, bypassGenesis: true } },
 		vendorField: { anyOf: [{ type: "null" }, { type: "string", format: "vendorField" }] },
 		recipientId: { $ref: "address" },
 		expiration: { type: "integer", minimum: 0 },
@@ -76,8 +75,8 @@ export const delegateRegistration = extend(transactionBaseSchema, {
 	required: ["asset"],
 	properties: {
 		type: { transactionType: TransactionType.DelegateRegistration },
-		amount: { bignumber: { minimum: 0, maximum: 0 } },
-		fee: { bignumber: { minimum: 1, bypassGenesis: true } },
+		amount: { bignumber: { type: "number", minimum: 0, maximum: 0 } },
+		fee: { bignumber: { type: "number", minimum: 1, bypassGenesis: true } },
 		asset: {
 			type: "object",
 			required: ["delegate"],
@@ -99,8 +98,8 @@ export const vote = extend(transactionBaseSchema, {
 	required: ["asset"],
 	properties: {
 		type: { transactionType: TransactionType.Vote },
-		amount: { bignumber: { minimum: 0, maximum: 0 } },
-		fee: { bignumber: { minimum: 1 } },
+		amount: { bignumber: { type: "number", minimum: 0, maximum: 0 } },
+		fee: { bignumber: { type: "number", minimum: 1 } },
 		recipientId: { $ref: "address" },
 		asset: {
 			type: "object",
@@ -110,7 +109,6 @@ export const vote = extend(transactionBaseSchema, {
 					type: "array",
 					minItems: 1,
 					maxItems: 2,
-					additionalItems: false,
 					items: { $ref: "walletVote" },
 				},
 			},
@@ -123,8 +121,8 @@ export const multiSignature = extend(transactionBaseSchema, {
 	required: ["asset", "signatures"],
 	properties: {
 		type: { transactionType: TransactionType.MultiSignature },
-		amount: { bignumber: { minimum: 0, maximum: 0 } },
-		fee: { bignumber: { minimum: 1 } },
+		amount: { bignumber: { type: "number", minimum: 0, maximum: 0 } },
+		fee: { bignumber: { type: "number", minimum: 1 } },
 		asset: {
 			type: "object",
 			required: ["multiSignature"],
@@ -142,7 +140,6 @@ export const multiSignature = extend(transactionBaseSchema, {
 							type: "array",
 							minItems: 1,
 							maxItems: 16,
-							additionalItems: false,
 							uniqueItems: true,
 							items: { $ref: "publicKey" },
 						},
@@ -154,9 +151,8 @@ export const multiSignature = extend(transactionBaseSchema, {
 			type: "array",
 			minItems: { $data: "1/asset/multiSignature/min" },
 			maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },
-			additionalItems: false,
 			uniqueItems: true,
-			items: { allOf: [{ minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
+			items: { allOf: [{ type: "string", minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
 		},
 	},
 });
@@ -171,8 +167,8 @@ export const multiSignatureLegacy = extend(transactionBaseSchemaNoSignatures, {
 	properties: {
 		version: { anyOf: [{ type: "null" }, { const: 1 }] },
 		type: { transactionType: TransactionType.MultiSignature },
-		amount: { bignumber: { minimum: 0, maximum: 0 } },
-		fee: { bignumber: { minimum: 1 } },
+		amount: { bignumber: { type: "number", minimum: 0, maximum: 0 } },
+		fee: { bignumber: { type: "number", minimum: 1 } },
 		asset: {
 			type: "object",
 			required: ["multiSignatureLegacy"],
@@ -195,7 +191,6 @@ export const multiSignatureLegacy = extend(transactionBaseSchemaNoSignatures, {
 							type: "array",
 							minItems: 1,
 							maxItems: 16,
-							additionalItems: false,
 							items: {
 								allOf: [{ type: "string", minimum: 67, maximum: 67, transform: ["toLowerCase"] }],
 							},
@@ -208,7 +203,6 @@ export const multiSignatureLegacy = extend(transactionBaseSchemaNoSignatures, {
 			type: "array",
 			minItems: 1,
 			maxItems: 1,
-			additionalItems: false,
 			items: { $ref: "alphanumeric" },
 		},
 	},
@@ -218,8 +212,8 @@ export const multiPayment = extend(transactionBaseSchema, {
 	$id: "multiPayment",
 	properties: {
 		type: { transactionType: TransactionType.MultiPayment },
-		amount: { bignumber: { minimum: 0, maximum: 0 } },
-		fee: { bignumber: { minimum: 1 } },
+		amount: { bignumber: { type: "number", minimum: 0, maximum: 0 } },
+		fee: { bignumber: { type: "number", minimum: 1 } },
 		vendorField: { anyOf: [{ type: "null" }, { type: "string", format: "vendorField" }] },
 		asset: {
 			type: "object",
@@ -228,13 +222,12 @@ export const multiPayment = extend(transactionBaseSchema, {
 				payments: {
 					type: "array",
 					minItems: 2,
-					additionalItems: false,
 					uniqueItems: false,
 					items: {
 						type: "object",
 						required: ["amount", "recipientId"],
 						properties: {
-							amount: { bignumber: { minimum: 1 } },
+							amount: { bignumber: { type: "number", minimum: 1 } },
 							recipientId: { $ref: "address" },
 						},
 					},
@@ -248,8 +241,8 @@ export const delegateResignation = extend(transactionBaseSchema, {
 	$id: "delegateResignation",
 	properties: {
 		type: { transactionType: TransactionType.DelegateResignation },
-		amount: { bignumber: { minimum: 0, maximum: 0 } },
-		fee: { bignumber: { minimum: 1 } },
+		amount: { bignumber: { type: "number", minimum: 0, maximum: 0 } },
+		fee: { bignumber: { type: "number", minimum: 1 } },
 	},
 });
 

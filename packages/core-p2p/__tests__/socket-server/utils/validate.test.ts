@@ -18,7 +18,7 @@ describe("validate", () => {
 
 		const schema = { type: "object", maxProperties: 0 };
 		const data = { oneProp: "1" };
-		const expectedError = new Error("Data validation error : data should NOT have more than 0 properties");
+		const expectedError = new Error("Data validation error : data must NOT have more than 0 items");
 		expectedError.name = SocketErrors.Validation;
 
 		expect(() => validate(schema, data)).toThrow(expectedError);

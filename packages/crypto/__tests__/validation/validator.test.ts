@@ -26,12 +26,12 @@ describe("validator", () => {
 
 			it("should expect a timestamp if version = 1 or absent", () => {
 				expect(validator.validate("transferSigned", transaction).error).toEqual(
-					"data should have required property '.timestamp'",
+					"data must have required property 'timestamp'",
 				);
 
 				transaction.version = 1;
 				expect(validator.validate("transferSigned", transaction).error).toEqual(
-					"data should have required property '.timestamp'",
+					"data must have required property 'timestamp'",
 				);
 
 				transaction.timestamp = 12222;
@@ -42,7 +42,7 @@ describe("validator", () => {
 				transaction.version = 2;
 
 				expect(validator.validate("transferSigned", transaction).error).toEqual(
-					"data should have required property '.nonce'",
+					"data must have required property 'nonce'",
 				);
 
 				transaction.nonce = BigNumber.ZERO;
