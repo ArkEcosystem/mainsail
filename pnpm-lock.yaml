@@ -1138,10 +1138,12 @@ importers:
       '@arkecosystem/crypto': workspace:*
       '@arkecosystem/utils': 1.3.1
       dayjs: 1.10.7
+      import-fresh: 3.3.0
       joi: 17.4.2
       pg: 8.7.1
       reflect-metadata: 0.1.13
       typeorm: 0.2.25
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto': link:../crypto
@@ -1151,6 +1153,9 @@ importers:
       pg: 8.7.1
       reflect-metadata: 0.1.13
       typeorm: 0.2.25
+    devDependencies:
+      import-fresh: 3.3.0
+      uvu: 0.5.3
 
   packages/core-forger:
     specifiers:
@@ -1373,7 +1378,6 @@ importers:
       '@arkecosystem/core-api': workspace:*
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
-      '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-forger': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
@@ -1408,7 +1412,6 @@ importers:
       '@arkecosystem/core-api': link:../core-api
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
-      '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-forger': link:../core-forger
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
@@ -4226,6 +4229,12 @@ packages:
 
   /@sinonjs/fake-timers/8.1.0:
     resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
+    dependencies:
+      '@sinonjs/commons': 1.8.3
+    dev: false
+
+  /@sinonjs/fake-timers/9.1.0:
+    resolution: {integrity: sha512-M8vapsv9qQupMdzrVzkn5rb9jG7aUTEPAZdMtME2PuBaefksFZVE2C1g4LBRTkF/k3nRDNbDc5tp5NFC1PEYxA==}
     dependencies:
       '@sinonjs/commons': 1.8.3
     dev: false
@@ -11148,7 +11157,7 @@ packages:
     resolution: {integrity: sha512-yr5kW2THW1AkxVmCnKEh4nbYkJdB3I7LUkiUgOvEkOp414mc2UMaHMA7pjq1nYowhdoJZGwEKGaQVbxfpWj10A==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-      '@sinonjs/fake-timers': 8.1.0
+      '@sinonjs/fake-timers': 9.1.0
       '@sinonjs/text-encoding': 0.7.1
       just-extend: 4.2.1
       path-to-regexp: 1.8.0

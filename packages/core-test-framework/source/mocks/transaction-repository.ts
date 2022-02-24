@@ -1,4 +1,4 @@
-import { Models, Repositories } from "@arkecosystem/core-database";
+import { Models, Repositories } from "../../../core-database";
 
 export type FeeStatistics = {
 	type: number;

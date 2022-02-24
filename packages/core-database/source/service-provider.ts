@@ -1,5 +1,4 @@
 import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
-import { Connection, createConnection, getCustomRepository } from "typeorm";
 import Joi from "joi";
 
 import { BlockFilter } from "./block-filter";
@@ -10,6 +9,7 @@ import { ModelConverter } from "./model-converter";
 import { BlockRepository, RoundRepository, TransactionRepository } from "./repositories";
 import { TransactionFilter } from "./transaction-filter";
 import { TransactionHistoryService } from "./transaction-history-service";
+import { typeorm } from "./typeorm";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 import { WalletsTableService } from "./wallets-table-service";
 
@@ -52,9 +52,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return true;
 	}
 
-	public async connect(): Promise<Connection> {
+	public async connect(): Promise<any> {
 		const connection: Record<string, any> = this.config().all().connection as any;
-		this.app
+
+		void this.app
 			.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService)
 			.dispatch(DatabaseEvent.PRE_CONNECT);
 
@@ -63,40 +64,40 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			connection.logger = this.app.get(Container.Identifiers.DatabaseLogger);
 		}
 
-		return createConnection({
+		return typeorm.createConnection({
 			...(connection as any),
-			namingStrategy: new SnakeNamingStrategy(),
-			migrations: [__dirname + "/migrations/*.js"],
-			migrationsRun: true,
 			// TODO: expose entities to allow extending the models by plugins
 			entities: [__dirname + "/models/*.js"],
+			migrations: [__dirname + "/migrations/*.js"],
+			migrationsRun: true,
+			namingStrategy: new SnakeNamingStrategy(),
 		});
 	}
 
 	public getRoundRepository(): RoundRepository {
-		return getCustomRepository(RoundRepository);
+		return typeorm.getCustomRepository(RoundRepository);
 	}
 
 	public getBlockRepository(): BlockRepository {
-		return getCustomRepository(BlockRepository);
+		return typeorm.getCustomRepository(BlockRepository);
 	}
 
 	public getTransactionRepository(): TransactionRepository {
-		return getCustomRepository(TransactionRepository);
+		return typeorm.getCustomRepository(TransactionRepository);
 	}
 
 	public configSchema(): object {
 		return Joi.object({
 			connection: Joi.object({
-				type: Joi.string().required(),
-				host: Joi.string().required(),
-				port: Joi.number().integer().min(1).max(65535).required(),
 				database: Joi.string().required(),
-				username: Joi.string().required(),
-				password: Joi.string().required(),
 				entityPrefix: Joi.string().required(),
-				synchronize: Joi.bool().required(),
+				host: Joi.string().required(),
 				logging: Joi.bool().required(),
+				password: Joi.string().required(),
+				port: Joi.number().integer().min(1).max(65_535).required(),
+				synchronize: Joi.bool().required(),
+				type: Joi.string().required(),
+				username: Joi.string().required(),
 			}).required(),
 		}).unknown(true);
 	}

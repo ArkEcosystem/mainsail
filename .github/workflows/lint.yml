@@ -18,6 +18,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
+              with:
+                  token: ${{ secrets.GH_TOKEN }}
 
             - name: Cache pnpm modules
               uses: actions/cache@v2

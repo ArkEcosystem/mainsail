@@ -1,4 +1,4 @@
-import { Repositories } from "@arkecosystem/core-database";
+import { Repositories } from "../../../core-database";
 
 export type DelegateForgedBlock = {
 	generatorPublicKey: string;

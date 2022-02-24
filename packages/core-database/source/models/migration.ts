@@ -6,6 +6,9 @@ export class Migration {
 	@PrimaryGeneratedColumn()
 	public id!: number;
 
-	@Column()
+	@Column({
+		nullable: false,
+		type: "varchar",
+	})
 	public name!: string;
 }

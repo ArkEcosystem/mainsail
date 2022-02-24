@@ -1,4 +1,5 @@
-import { QueryHelper } from "../../../../packages/core-database/source/utils/query-helper";
+import { QueryHelper } from "./query-helper";
+import { describe } from "../../../core-test-framework";
 
 type UserEntity = {
 	id: number;
@@ -16,44 +17,42 @@ const userMetadata = {
 	],
 };
 
-describe("QueryHelper.getColumnName", () => {
+describe("QueryHelper.getColumnName", ({ assert, it }) => {
 	it("should throw when column name can't be found", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
-		const check = () => queryHelper.getColumnName(userMetadata as any, "unknown" as any);
 
-		expect(check).toThrow();
+		assert.rejects(() => queryHelper.getColumnName(userMetadata as any, "unknown" as any));
 	});
 
 	it("should return column name", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const columnName = queryHelper.getColumnName(userMetadata as any, "fullName");
 
-		expect(columnName).toEqual("full_name");
+		assert.equal(columnName, "full_name");
 	});
 });
 
-describe("QueryHelper.getWhereExpressionSql", () => {
+describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should throw when unexpected expression is passed", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
-		const check = () => queryHelper.getWhereExpressionSql(userMetadata as any, { op: "nonsense" } as any);
 
-		expect(check).toThrow();
+		assert.rejects(() => queryHelper.getWhereExpressionSql(userMetadata as any, { op: "nonsense" } as any));
 	});
 
 	it("should convert TrueExpression to 'TRUE'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, { op: "true" });
 
-		expect(sqlExpression.query).toEqual("TRUE");
-		expect(sqlExpression.parameters).toEqual({});
+		assert.equal(sqlExpression.query, "TRUE");
+		assert.equal(sqlExpression.parameters, {});
 	});
 
 	it("should convert FalseExpression to 'FALSE'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, { op: "false" });
 
-		expect(sqlExpression.query).toEqual("FALSE");
-		expect(sqlExpression.parameters).toEqual({});
+		assert.equal(sqlExpression.query, "FALSE");
+		assert.equal(sqlExpression.parameters, {});
 	});
 
 	it("should convert EqualExpression to 'column = :p1'", () => {
@@ -64,8 +63,8 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			value: 5,
 		});
 
-		expect(sqlExpression.query).toEqual("id = :p1");
-		expect(sqlExpression.parameters).toEqual({ p1: 5 });
+		assert.equal(sqlExpression.query, "id = :p1");
+		assert.equal(sqlExpression.parameters, { p1: 5 });
 	});
 
 	it("should convert BetweenExpression to 'column BETWEEN :p1 AND :p2'", () => {
@@ -77,8 +76,8 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			to: 35,
 		});
 
-		expect(sqlExpression.query).toEqual("age BETWEEN :p1 AND :p2");
-		expect(sqlExpression.parameters).toEqual({ p1: 26, p2: 35 });
+		assert.equal(sqlExpression.query, "age BETWEEN :p1 AND :p2");
+		assert.equal(sqlExpression.parameters, { p1: 26, p2: 35 });
 	});
 
 	it("should convert GreaterThanEqualExpression to 'column >= :p1'", () => {
@@ -89,8 +88,8 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			value: 26,
 		});
 
-		expect(sqlExpression.query).toEqual("age >= :p1");
-		expect(sqlExpression.parameters).toEqual({ p1: 26 });
+		assert.equal(sqlExpression.query, "age >= :p1");
+		assert.equal(sqlExpression.parameters, { p1: 26 });
 	});
 
 	it("should convert LessThanEqualExpression to 'column <= :p1'", () => {
@@ -101,8 +100,8 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			value: 35,
 		});
 
-		expect(sqlExpression.query).toEqual("age <= :p1");
-		expect(sqlExpression.parameters).toEqual({ p1: 35 });
+		assert.equal(sqlExpression.query, "age <= :p1");
+		assert.equal(sqlExpression.parameters, { p1: 35 });
 	});
 
 	it("should convert LikeExpression to 'column LIKE :p1'", () => {
@@ -113,8 +112,8 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			pattern: "%Dmitry%",
 		});
 
-		expect(sqlExpression.query).toEqual("full_name LIKE :p1");
-		expect(sqlExpression.parameters).toEqual({ p1: "%Dmitry%" });
+		assert.equal(sqlExpression.query, "full_name LIKE :p1");
+		assert.equal(sqlExpression.parameters, { p1: "%Dmitry%" });
 	});
 
 	it("should convert ContainsExpression to 'column @> :p1'", () => {
@@ -127,8 +126,8 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			},
 		});
 
-		expect(sqlExpression.query).toEqual("data @> :p1");
-		expect(sqlExpression.parameters).toEqual({
+		assert.equal(sqlExpression.query, "data @> :p1");
+		assert.equal(sqlExpression.parameters, {
 			p1: {
 				creditCard: { number: "5555 5555 5555 5555" },
 			},
@@ -145,8 +144,8 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			],
 		});
 
-		expect(sqlExpression.query).toEqual("(full_name LIKE :p1 AND age >= :p2)");
-		expect(sqlExpression.parameters).toEqual({ p1: "%Dmitry%", p2: 35 });
+		assert.equal(sqlExpression.query, "(full_name LIKE :p1 AND age >= :p2)");
+		assert.equal(sqlExpression.parameters, { p1: "%Dmitry%", p2: 35 });
 	});
 
 	it("should convert OrExpression to (expression1 OR expression2)", () => {
@@ -159,7 +158,7 @@ describe("QueryHelper.getWhereExpressionSql", () => {
 			],
 		});
 
-		expect(sqlExpression.query).toEqual("(full_name LIKE :p1 OR age >= :p2)");
-		expect(sqlExpression.parameters).toEqual({ p1: "%Dmitry%", p2: 35 });
+		assert.equal(sqlExpression.query, "(full_name LIKE :p1 OR age >= :p2)");
+		assert.equal(sqlExpression.parameters, { p1: "%Dmitry%", p2: 35 });
 	});
 });

@@ -1,83 +1,84 @@
-import { SnakeNamingStrategy } from "../../../../packages/core-database/source/utils/snake-naming-strategy";
+import { SnakeNamingStrategy } from "./snake-naming-strategy";
+import { describe } from "../../../core-test-framework";
 
-describe("SnakeNamingStrategy.tableName", () => {
+describe("SnakeNamingStrategy.tableName", ({ assert, it }) => {
 	it("should convert class name to snake-case table name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.tableName("MyClass", "");
-		expect(snakeName).toEqual("my_class");
+		assert.equal(snakeName, "my_class");
 	});
 
 	it("should return custom name if provided", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.tableName("MyClass", "MYCLASSTABLE");
-		expect(snakeName).toEqual("MYCLASSTABLE");
+		assert.equal(snakeName, "MYCLASSTABLE");
 	});
 });
 
-describe("SnakeNamingStrategy.columnName", () => {
+describe("SnakeNamingStrategy.columnName", ({ assert, it }) => {
 	it("should convert class property to snake-case column name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.columnName("myProperty", "", []);
-		expect(snakeName).toEqual("my_property");
+		assert.equal(snakeName, "my_property");
 	});
 
 	it("should return custom name if provided", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.columnName("myProperty", "MYPROPERTYCOLUMN", []);
-		expect(snakeName).toEqual("MYPROPERTYCOLUMN");
+		assert.equal(snakeName, "MYPROPERTYCOLUMN");
 	});
 });
 
-describe("SnakeNamingStrategy.relationName", () => {
+describe("SnakeNamingStrategy.relationName", ({ assert, it }) => {
 	it("should convert class property to snake-case column name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.relationName("myProperty");
-		expect(snakeName).toEqual("my_property");
+		assert.equal(snakeName, "my_property");
 	});
 });
 
-describe("SnakeNamingStrategy.joinColumnName", () => {
+describe("SnakeNamingStrategy.joinColumnName", ({ assert, it }) => {
 	it("should convert class property to snake-case column name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.joinColumnName("MyClass", "myProperty");
-		expect(snakeName).toEqual("my_class_my_property");
+		assert.equal(snakeName, "my_class_my_property");
 	});
 });
 
-describe("SnakeNamingStrategy.joinTableName", () => {
+describe("SnakeNamingStrategy.joinTableName", ({ assert, it }) => {
 	it("should convert class and property to snake-case table name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.joinTableName("MyClass", "MyOtherClass", "myProperty", "myOtherProperty");
-		expect(snakeName).toEqual("my_class_my_property__my_other_class");
+		assert.equal(snakeName, "my_class_my_property__my_other_class");
 	});
 });
 
-describe("SnakeNamingStrategy.joinTableColumnName", () => {
+describe("SnakeNamingStrategy.joinTableColumnName", ({ assert, it }) => {
 	it("should convert class and property to snake-case column name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.joinTableColumnName("MyClass", "myProperty", "");
-		expect(snakeName).toEqual("my_class_my_property");
+		assert.equal(snakeName, "my_class_my_property");
 	});
 
 	it("should convert class and column to snake-case column name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.joinTableColumnName("MyClass", "myProperty", "my_property_column");
-		expect(snakeName).toEqual("my_class_my_property_column");
+		assert.equal(snakeName, "my_class_my_property_column");
 	});
 });
 
-describe("SnakeNamingStrategy.classTableInheritanceParentColumnName", () => {
+describe("SnakeNamingStrategy.classTableInheritanceParentColumnName", ({ assert, it }) => {
 	it("should convert parent table and column to column name", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.classTableInheritanceParentColumnName("my_class", "id");
-		expect(snakeName).toEqual("my_class_id");
+		assert.equal(snakeName, "my_class_id");
 	});
 });
 
-describe("SnakeNamingStrategy.eagerJoinRelationAlias", () => {
+describe("SnakeNamingStrategy.eagerJoinRelationAlias", ({ assert, it }) => {
 	it("should convert property path to alias", () => {
 		const snakeNamingStrategy = new SnakeNamingStrategy();
 		const snakeName = snakeNamingStrategy.eagerJoinRelationAlias("my_table_alias", "some.property");
-		expect(snakeName).toEqual("my_table_alias__some_property");
+		assert.equal(snakeName, "my_table_alias__some_property");
 	});
 });

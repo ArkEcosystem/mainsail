@@ -1,4 +1,4 @@
-import { Models } from "@arkecosystem/core-database";
+import { Models } from "../../../core-database";
 import { Interfaces, Utils } from "@arkecosystem/crypto";
 
 export const mapTransactionToModel = (

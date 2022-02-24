@@ -30,12 +30,12 @@ export class ModelConverter implements Contracts.Database.ModelConverter {
 	}
 
 	public getTransactionModels(transactions: Interfaces.ITransaction[]): Contracts.Database.TransactionModel[] {
-		return transactions.map((t) => {
-			return Object.assign(new Transaction(), t.data, {
+		return transactions.map((t) =>
+			Object.assign(new Transaction(), t.data, {
 				timestamp: t.timestamp,
 				serialized: t.serialized,
-			});
-		});
+			}),
+		);
 	}
 
 	public getTransactionData(models: Contracts.Database.TransactionModel[]): Interfaces.ITransactionData[] {

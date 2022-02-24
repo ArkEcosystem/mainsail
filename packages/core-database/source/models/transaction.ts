@@ -67,7 +67,9 @@ export class Transaction implements Contracts.Database.TransactionModel {
 	public senderPublicKey!: string;
 
 	@Column({
+		length: 36,
 		default: undefined,
+		type: "varchar",
 	})
 	public recipientId!: string;
 
