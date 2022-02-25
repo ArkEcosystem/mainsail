@@ -1157,6 +1157,16 @@ importers:
       import-fresh: 3.3.0
       uvu: 0.5.3
 
+  packages/core-fees:
+    specifiers:
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/crypto': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/crypto': link:../crypto
+      '@arkecosystem/utils': link:../utils
+
   packages/core-forger:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
@@ -4397,7 +4407,7 @@ packages:
   /@types/fs-extra/8.1.2:
     resolution: {integrity: sha512-SvSrYXfWSc7R4eqnOzbQF4TZmfpNSM9FrSWLU3EUnWBuyZqNBOrv1B1JA3byUDPUl9z4Ab3jeZG2eDdySlgNMg==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 17.0.18
     dev: true
 
   /@types/functional-red-black-tree/1.0.1:
