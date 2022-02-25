@@ -1179,6 +1179,18 @@ importers:
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto': link:../crypto
 
+  packages/core-fees-static:
+    specifiers:
+      '@arkecosystem/core-fees': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-transactions': workspace:*
+      '@arkecosystem/crypto': workspace:*
+    dependencies:
+      '@arkecosystem/core-fees': link:../core-fees
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-transactions': link:../core-transactions
+      '@arkecosystem/crypto': link:../crypto
+
   packages/core-forger:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*

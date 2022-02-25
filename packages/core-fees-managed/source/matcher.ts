@@ -20,49 +20,14 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	private readonly feeRegistry: FeeRegistry;
 
 	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
-		const feeString = Utils.formatSatoshi(transaction.data.fee);
-
-		const addonBytes: number = this.feeRegistry.get("managed", transaction.key, transaction.data.version);
-		const height: number = this.stateStore.getLastHeight();
-		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-
-		const minFeePool: Utils.BigNumber = handler.dynamicFee({
-			addonBytes,
-			height,
-			satoshiPerByte: 3000, // @TODO
-			transaction,
-		});
-		const minFeeString = Utils.formatSatoshi(minFeePool);
-
-		if (transaction.data.fee.isGreaterThanEqual(minFeePool)) {
-			this.logger.debug(`${transaction} eligible to enter pool (fee ${feeString} >= ${minFeeString})`);
-
-			return;
-		}
-
-		this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} < ${minFeeString})`);
-
-		throw new TransactionFeeToLowError(transaction);
-
-		// const staticFeeString = Utils.formatSatoshi(transaction.staticFee);
-
-		// if (transaction.data.fee.isEqualTo(transaction.staticFee)) {
-		// 	this.logger.debug(`${transaction} eligible to enter pool (fee ${feeString} = ${staticFeeString})`);
-
-		// 	return;
-		// }
-		// if (transaction.data.fee.isLessThan(transaction.staticFee)) {
-		// 	this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} < ${staticFeeString})`);
-
-		// 	throw new TransactionFeeToLowError(transaction);
-		// }
-
-		// this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} > ${staticFeeString})`);
-
-		// throw new TransactionFeeToHighError(transaction);
+		await this.#throwIfCannot("pool entrance", transaction);
 	}
 
 	public async throwIfCannotBroadcast(transaction: Interfaces.ITransaction): Promise<void> {
+		await this.#throwIfCannot("broadcast", transaction);
+	}
+
+	async #throwIfCannot(action: string, transaction: Interfaces.ITransaction): Promise<void> {
 		const feeString = Utils.formatSatoshi(transaction.data.fee);
 
 		const addonBytes: number = this.feeRegistry.get("managed", transaction.key, transaction.data.version);
@@ -78,27 +43,13 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		const minFeeString = Utils.formatSatoshi(minFeeBroadcast);
 
 		if (transaction.data.fee.isGreaterThanEqual(minFeeBroadcast)) {
-			this.logger.debug(`${transaction} eligible for broadcast (fee ${feeString} >= ${minFeeString})`);
+			this.logger.debug(`${transaction} eligible for ${action} (fee ${feeString} >= ${minFeeString})`);
 
 			return;
 		}
 
-		this.logger.notice(`${transaction} not eligible for broadcast (fee ${feeString} < ${minFeeString})`);
+		this.logger.notice(`${transaction} not eligible for ${action} (fee ${feeString} < ${minFeeString})`);
 
 		throw new TransactionFeeToLowError(transaction);
-
-		// const staticFeeString = Utils.formatSatoshi(transaction.staticFee);
-
-		// if (transaction.data.fee.isEqualTo(transaction.staticFee)) {
-		// 	this.logger.debug(`${transaction} eligible for broadcast (fee ${feeString} = ${staticFeeString})`);
-		// 	return;
-		// }
-		// if (transaction.data.fee.isLessThan(transaction.staticFee)) {
-		// 	this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} < ${staticFeeString})`);
-		// 	throw new TransactionFeeToLowError(transaction);
-		// }
-
-		// this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} > ${staticFeeString})`);
-		// throw new TransactionFeeToHighError(transaction);
 	}
 }
