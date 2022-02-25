@@ -21,6 +21,7 @@ importers:
       babel-loader: 8.2.2
       c8: ~7.10.0
       capture-console: 1.0.1
+      chalk: 4.1.2
       cpy-cli: 3.1.1
       create-hash: 1.2.0
       cross-env: 7.0.3
@@ -82,6 +83,7 @@ importers:
       babel-loader: 8.2.2_@babel+core@7.15.5
       c8: 7.10.0
       capture-console: 1.0.1
+      chalk: 4.1.2
       cpy-cli: 3.1.1
       create-hash: 1.2.0
       cross-env: 7.0.3
