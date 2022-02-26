@@ -1,5 +1,6 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Transactions } from "@arkecosystem/crypto";
 
 import { Block } from "./models/block";
 import { Transaction } from "./models/transaction";

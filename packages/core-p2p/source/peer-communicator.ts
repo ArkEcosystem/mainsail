@@ -1,5 +1,6 @@
 import { Container, Contracts, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
-import { Blocks, Interfaces, Managers, Transactions, Validation } from "@arkecosystem/crypto";
+import { Blocks, Managers, Transactions, Validation } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import dayjs from "dayjs";
 import delay from "delay";
 

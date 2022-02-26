@@ -1,5 +1,6 @@
 import { Container, Contracts, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Managers, Transactions } from "@arkecosystem/crypto";
 
 import { NotEnoughDelegatesError, WalletAlreadyResignedError, WalletNotADelegateError } from "../../errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";

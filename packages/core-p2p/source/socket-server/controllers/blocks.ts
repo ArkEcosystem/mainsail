@@ -1,6 +1,7 @@
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Providers, Utils } from "@arkecosystem/core-kernel";
-import { Blocks, Interfaces, Managers } from "@arkecosystem/crypto";
+import { Blocks, Managers } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";

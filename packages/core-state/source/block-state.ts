@@ -1,6 +1,7 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Enums, Identities, Interfaces, Utils } from "@arkecosystem/crypto";
+import { Enums, Identities, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 // todo: review the implementation
 @Container.injectable()

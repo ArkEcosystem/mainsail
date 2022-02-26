@@ -1,5 +1,6 @@
 import { Types } from "@arkecosystem/core-kernel";
-import { Crypto, Interfaces, Transactions, Utils } from "@arkecosystem/crypto";
+import { Crypto, Transactions, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import ByteBuffer from "bytebuffer";
 import { ensureDirSync, existsSync, writeJSONSync } from "fs-extra";
 import { resolve } from "path";

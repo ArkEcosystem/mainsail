@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces } from "@arkecosystem/crypto";
+import { Enums } from "@arkecosystem/crypto";
 
 import { Comparator, IteratorMany } from "./utils";
 
@@ -98,13 +99,11 @@ export class Query implements Contracts.TransactionPool.Query {
 				const comparator: Comparator<Interfaces.ITransaction> = (
 					a: Interfaces.ITransaction,
 					b: Interfaces.ITransaction,
-				) => {
-					return a.data.fee.comparedTo(b.data.fee);
-				};
+				) => a.data.fee.comparedTo(b.data.fee);
 
-				const iterators: Iterator<Interfaces.ITransaction>[] = Array.from(this.mempool.getSenderMempools())
+				const iterators: Iterator<Interfaces.ITransaction>[] = [...this.mempool.getSenderMempools()]
 					.map((p) => p.getFromLatest())
-					.map((i) => i[Symbol.iterator]());
+					.map((index) => index[Symbol.iterator]());
 
 				return new IteratorMany<Interfaces.ITransaction>(iterators, comparator);
 			},
@@ -119,13 +118,11 @@ export class Query implements Contracts.TransactionPool.Query {
 				const comparator: Comparator<Interfaces.ITransaction> = (
 					a: Interfaces.ITransaction,
 					b: Interfaces.ITransaction,
-				) => {
-					return b.data.fee.comparedTo(a.data.fee);
-				};
+				) => b.data.fee.comparedTo(a.data.fee);
 
-				const iterators: Iterator<Interfaces.ITransaction>[] = Array.from(this.mempool.getSenderMempools())
+				const iterators: Iterator<Interfaces.ITransaction>[] = [...this.mempool.getSenderMempools()]
 					.map((p) => p.getFromEarliest())
-					.map((i) => i[Symbol.iterator]());
+					.map((index) => index[Symbol.iterator]());
 
 				return new IteratorMany<Interfaces.ITransaction>(iterators, comparator);
 			},

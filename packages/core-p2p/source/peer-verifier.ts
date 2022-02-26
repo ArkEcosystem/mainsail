@@ -1,7 +1,8 @@
+import assert from "assert";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
-import { Blocks, Interfaces } from "@arkecosystem/crypto";
-import assert from "assert";
+import { Blocks } from "@arkecosystem/crypto";
 import pluralize from "pluralize";
 import { inspect } from "util";
 
@@ -136,7 +137,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			height = this.app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore).getLastHeight();
 
 			assert(Number.isInteger(height));
-		} catch (error) {
+		} catch {
 			throw new Error(`Couldn't derive our chain height: ${height}`);
 		}
 
@@ -234,9 +235,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 
 			const ourBlocksPrint = ourBlocks.map((b) => `{ height=${b.height}, id=${b.id} }`).join(", ");
-			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[
-				ourBlocks.length - 1
-			].height.toLocaleString()}]`;
+			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks.at(
+				- 1
+			).height.toLocaleString()}]`;
 
 			const msRemaining = this.throwIfPastDeadline(deadline);
 
@@ -305,18 +306,16 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const endHeight = Math.min(claimedHeight, lastBlockHeightInRound);
 
 		for (let height = startHeight; height <= endHeight; height++) {
-			if (hisBlocksByHeight[height] === undefined) {
-				if (
+			if (hisBlocksByHeight[height] === undefined &&
 					!(await this.fetchBlocksFromHeight({
-						height,
-						endHeight,
 						blocksByHeight: hisBlocksByHeight,
 						deadline,
+						endHeight,
+						height,
 					}))
 				) {
 					return false;
 				}
-			}
 			assert(hisBlocksByHeight[height] !== undefined);
 
 			if (!this.verifyPeerBlock(hisBlocksByHeight[height], height, delegates)) {
@@ -332,7 +331,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	): Promise<Record<string, Contracts.State.Wallet>> {
 		let delegates = (await this.app
 			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-			.call("getActiveDelegates", { roundInfo })) as Contracts.State.Wallet[];
+			.call("getActiveDelegates", { roundInfo }));
 
 		if (delegates.length === 0) {
 			// This must be the current round, still not saved into the database (it is saved
@@ -342,7 +341,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			const dposRound = this.dposState.getRoundInfo();
 			assert.strictEqual(dposRound.round, roundInfo.round);
 			assert.strictEqual(dposRound.maxDelegates, roundInfo.maxDelegates);
-			delegates = this.dposState.getRoundDelegates().slice();
+			delegates = [...this.dposState.getRoundDelegates()];
 		}
 
 		const delegatesByPublicKey: Record<string, Contracts.State.Wallet> = {};
@@ -371,14 +370,14 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			// returns blocks from the next one, thus we do -1
 			response = await this.communicator.getPeerBlocks(this.peer, {
-				fromBlockHeight: height - 1,
 				blockLimit: Math.max(Math.min(endHeight - height + 1, 400), 1),
+				fromBlockHeight: height - 1,
 				headersOnly: true,
 			});
-		} catch (err) {
+		} catch (error) {
 			this.log(
 				Severity.DEBUG_EXTRA,
-				`failure: could not get blocks starting from height ${height} from peer: exception: ${err.message}`,
+				`failure: could not get blocks starting from height ${height} from peer: exception: ${error.message}`,
 			);
 			return false;
 		}
@@ -392,8 +391,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return false;
 		}
 
-		for (let i = 0; i < response.length; i++) {
-			blocksByHeight[height + i] = response[i];
+		for (const [index, element] of response.entries()) {
+			blocksByHeight[height + index] = element;
 		}
 
 		return true;
@@ -446,7 +445,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	private throwIfPastDeadline(deadline: number): number {
-		const now = new Date().getTime();
+		const now = Date.now();
 
 		if (deadline <= now) {
 			// Throw an exception so that it can cancel everything and break out of peer.ping().
@@ -456,24 +455,24 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return deadline - now;
 	}
 
-	private anyToString(val: any): string {
-		return inspect(val, { sorted: true, breakLength: Infinity });
+	private anyToString(value: any): string {
+		return inspect(value, { breakLength: Number.POSITIVE_INFINITY, sorted: true });
 	}
 
-	private log(severity: Severity, msg: string): void {
-		const fullMsg = `${this.logPrefix} ${msg}`;
+	private log(severity: Severity, message: string): void {
+		const fullMessage = `${this.logPrefix} ${message}`;
 		switch (severity) {
 			case Severity.DEBUG_EXTRA:
 				/* istanbul ignore else */
 				if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
-					this.logger.debug(fullMsg);
+					this.logger.debug(fullMessage);
 				}
 				break;
 			case Severity.DEBUG:
-				this.logger.debug(fullMsg);
+				this.logger.debug(fullMessage);
 				break;
 			case Severity.INFO:
-				this.logger.info(fullMsg);
+				this.logger.info(fullMessage);
 				break;
 		}
 	}

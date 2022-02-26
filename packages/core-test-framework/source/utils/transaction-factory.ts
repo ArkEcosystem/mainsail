@@ -1,5 +1,6 @@
 import { Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Identities, Interfaces, Managers, Transactions, Types, Utils } from "@arkecosystem/crypto";
+import { Identities, Managers, Transactions, Types, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import secrets from "../internal/passphrases.json";
 import { getWalletNonce } from "./generic";

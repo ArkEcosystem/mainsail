@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { Managers, Transactions } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class Worker implements Contracts.TransactionPool.Worker {

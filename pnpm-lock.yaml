@@ -1508,6 +1508,7 @@ importers:
 
   packages/core-transactions:
     specifiers:
+      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -1517,6 +1518,7 @@ importers:
       bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
+      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto': link:../crypto

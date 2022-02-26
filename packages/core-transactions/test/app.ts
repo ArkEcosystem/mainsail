@@ -13,7 +13,8 @@ import {
 	ThrowIfCannotEnterPoolAction,
 	VerifyTransactionAction,
 } from "@arkecosystem/core-transaction-pool";
-import { Identities, Interfaces, Utils } from "@arkecosystem/crypto";
+import { Identities, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import { ServiceProvider } from "../source/service-provider";
 import { TransactionHandlerProvider } from "../source/handlers/handler-provider";

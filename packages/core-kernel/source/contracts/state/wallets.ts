@@ -1,4 +1,5 @@
-import { Interfaces, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Utils } from "@arkecosystem/crypto";
 
 // todo: review all interfaces in here and document them properly. Remove ones that are no longer needed.
 

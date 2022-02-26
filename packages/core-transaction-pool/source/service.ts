@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { Transactions } from "@arkecosystem/crypto";
 
 import { TransactionAlreadyInPoolError, TransactionPoolFullError } from "./errors";
 

@@ -1,5 +1,6 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { InsufficientBalanceError } from "../../errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";

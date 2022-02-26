@@ -1,7 +1,8 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Blocks, Crypto, Interfaces } from "@arkecosystem/crypto";
+import { Blocks, Crypto } from "@arkecosystem/crypto";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
 import { RevertBlockHandler } from "./processor/handlers";
@@ -50,13 +51,13 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	}
 
 	public async handle(): Promise<void> {
-		if (!this.blocks.length) {
+		if (this.blocks.length === 0) {
 			return;
 		}
 
 		const lastHeight = this.blockchain.getLastBlock().data.height;
 		const fromHeight = this.blocks[0].height;
-		const toHeight = this.blocks[this.blocks.length - 1].height;
+		const toHeight = this.blocks.at(- 1).height;
 		this.logger.debug(
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
@@ -78,13 +79,11 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		const acceptedBlocks: Interfaces.IBlock[] = [];
-		let forkBlock: Interfaces.IBlock | undefined = undefined;
+		let forkBlock: Interfaces.IBlock | undefined;
 		let lastProcessResult: BlockProcessorResult | undefined;
-		let lastProcessedBlock: Interfaces.IBlock | undefined = undefined;
+		let lastProcessedBlock: Interfaces.IBlock | undefined;
 
-		const acceptedBlockTimeLookup = (height: number) => {
-			return acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
-		};
+		const acceptedBlockTimeLookup = (height: number) => acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
 
 		try {
 			for (const block of this.blocks) {
@@ -102,8 +101,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 				Utils.assert.defined<Interfaces.IBlock>(blockInstance);
 
 				lastProcessResult = await this.triggers.call("processBlock", {
-					blockProcessor: this.app.get<BlockProcessor>(Container.Identifiers.BlockProcessor),
 					block: blockInstance,
+					blockProcessor: this.app.get<BlockProcessor>(Container.Identifiers.BlockProcessor),
 				});
 
 				lastProcessedBlock = blockInstance;
@@ -133,7 +132,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		if (acceptedBlocks.length > 0) {
 			try {
 				await this.blockRepository.saveBlocks(acceptedBlocks);
-				this.stateStore.setLastStoredBlockHeight(acceptedBlocks[acceptedBlocks.length - 1].data.height);
+				this.stateStore.setLastStoredBlockHeight(acceptedBlocks.at(- 1).data.height);
 			} catch (error) {
 				this.logger.error(
 					`Could not save ${Utils.pluralize("block", acceptedBlocks.length, true)}) to database : ${

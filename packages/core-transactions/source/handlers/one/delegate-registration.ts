@@ -1,5 +1,6 @@
 import { Container, Contracts, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces, Transactions, Utils } from "@arkecosystem/crypto";
+import { Enums, Transactions, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import {
 	NotSupportedForMultiSignatureWalletError,

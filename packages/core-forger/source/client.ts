@@ -1,6 +1,7 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
-import { Blocks, Interfaces } from "@arkecosystem/crypto";
+import { Blocks } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { RelayHost } from "./interfaces";

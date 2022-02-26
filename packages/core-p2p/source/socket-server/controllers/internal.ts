@@ -1,6 +1,7 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
+import { Crypto, Managers } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import Hapi from "@hapi/hapi";
 
 import { Controller } from "./controller";

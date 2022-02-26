@@ -1,7 +1,8 @@
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Blocks, Interfaces, Managers } from "@arkecosystem/crypto";
+import { Blocks, Managers } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import { RoundState } from "./round-state";
 

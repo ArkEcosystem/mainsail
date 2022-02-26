@@ -1,4 +1,5 @@
-import { Identities, Interfaces } from "@arkecosystem/crypto";
+import { Identities } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { generateMnemonic } from "bip39";
 
 import { FactoryBuilder } from "../factory-builder";

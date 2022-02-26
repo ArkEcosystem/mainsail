@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces, Transactions } from "@arkecosystem/crypto";
+import { Enums, Transactions } from "@arkecosystem/crypto";
 
 import {
 	AlreadyVotedError,
@@ -35,8 +36,8 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 	public async bootstrap(): Promise<void> {
 		const criteria = {
-			typeGroup: this.getConstructor().typeGroup,
 			type: this.getConstructor().type,
+			typeGroup: this.getConstructor().typeGroup,
 		};
 
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {

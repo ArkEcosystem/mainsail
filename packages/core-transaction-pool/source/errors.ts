@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces, Utils } from "@arkecosystem/crypto";
+import { Utils } from "@arkecosystem/crypto";
 
 export class RetryTransactionError extends Contracts.TransactionPool.PoolError {
 	public constructor(transaction: Interfaces.ITransaction) {
@@ -62,10 +63,10 @@ export class TransactionPoolFullError extends Contracts.TransactionPool.PoolErro
 	public readonly required: Utils.BigNumber;
 
 	public constructor(transaction: Interfaces.ITransaction, required: Utils.BigNumber) {
-		const msg =
+		const message =
 			`${transaction} fee ${Utils.formatSatoshi(transaction.data.fee)} ` +
 			`is lower than ${Utils.formatSatoshi(required)} already in pool`;
-		super(msg, "ERR_POOL_FULL");
+		super(message, "ERR_POOL_FULL");
 		this.required = required;
 	}
 }

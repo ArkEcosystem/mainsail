@@ -1,5 +1,6 @@
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto, Identities, Interfaces, Managers } from "@arkecosystem/crypto";
+import { Crypto, Identities, Managers } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import forge from "node-forge";
 import wif from "wif";
 

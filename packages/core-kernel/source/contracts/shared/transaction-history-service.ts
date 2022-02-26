@@ -1,4 +1,5 @@
-import { Interfaces, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Utils } from "@arkecosystem/crypto";
 
 import {
 	Options,

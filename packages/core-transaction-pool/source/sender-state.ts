@@ -1,6 +1,7 @@
 import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
+import { Crypto, Managers } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import {
 	RetryTransactionError,

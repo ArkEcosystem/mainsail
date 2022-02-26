@@ -1,6 +1,7 @@
 import { Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { Enums, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import {
 	ColdWalletError,

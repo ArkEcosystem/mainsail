@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Transactions, Utils } from "@arkecosystem/crypto";
+import { Transactions, Utils } from "@arkecosystem/crypto";
 
 import { InvalidTransactionDataError } from "./errors";
 

@@ -1,6 +1,7 @@
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Blocks, Crypto, Identities, Interfaces, Utils } from "@arkecosystem/crypto";
+import { Blocks, Crypto, Identities, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import assert from "assert";
 
 @Container.injectable()

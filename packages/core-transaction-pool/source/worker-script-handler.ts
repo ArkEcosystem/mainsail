@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { Managers, Transactions } from "@arkecosystem/crypto";
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
 	public setConfig(networkConfig: any): void {
@@ -17,6 +18,6 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 			typeof transactionData === "string"
 				? Transactions.TransactionFactory.fromBytes(Buffer.from(transactionData, "hex"))
 				: Transactions.TransactionFactory.fromData(transactionData);
-		return { id: tx.id!, serialized: tx.serialized.toString("hex"), isVerified: tx.isVerified };
+		return { id: tx.id, isVerified: tx.isVerified, serialized: tx.serialized.toString("hex") };
 	}
 }

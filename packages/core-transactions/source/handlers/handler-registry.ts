@@ -1,5 +1,6 @@
 import { Container, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Transactions } from "@arkecosystem/crypto";
 
 import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
 import { TransactionHandlerProvider } from "./handler-provider";

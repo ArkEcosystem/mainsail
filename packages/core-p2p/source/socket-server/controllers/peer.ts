@@ -1,6 +1,7 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
-import { Crypto, Interfaces } from "@arkecosystem/crypto";
+import { Crypto } from "@arkecosystem/crypto";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
@@ -47,7 +48,7 @@ export class PeerController extends Controller {
 			(request.payload as any).ids,
 		);
 
-		if (!commonBlocks.length) {
+		if (commonBlocks.length === 0) {
 			throw new MissingCommonBlockError();
 		}
 
@@ -64,13 +65,13 @@ export class PeerController extends Controller {
 		const slotInfo = Crypto.Slots.getSlotInfo(blockTimeLookup);
 
 		return {
-			state: {
-				height: lastBlock.data.height,
-				forgingAllowed: slotInfo.forgingStatus,
-				currentSlot: slotInfo.slotNumber,
-				header: lastBlock.getHeader(),
-			},
 			config: getPeerConfig(this.app),
+			state: {
+				currentSlot: slotInfo.slotNumber,
+				forgingAllowed: slotInfo.forgingStatus,
+				header: lastBlock.getHeader(),
+				height: lastBlock.data.height,
+			},
 		};
 	}
 }

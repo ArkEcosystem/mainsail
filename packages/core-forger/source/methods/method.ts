@@ -1,5 +1,6 @@
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Blocks, Crypto, Interfaces, Utils } from "@arkecosystem/crypto";
+import { Blocks, Crypto, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 export abstract class Method {
 	protected createBlock(

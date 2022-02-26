@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers } from "@arkecosystem/crypto";
+import { Managers } from "@arkecosystem/crypto";
 
 import { TransactionHasExpiredError } from "./errors";
 

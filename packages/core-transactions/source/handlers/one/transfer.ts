@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { Managers, Transactions } from "@arkecosystem/crypto";
 
 import { isRecipientOnActiveNetwork } from "../../utils";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";

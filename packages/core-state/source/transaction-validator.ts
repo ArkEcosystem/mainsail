@@ -1,6 +1,7 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { Transactions } from "@arkecosystem/crypto";
 import { strictEqual } from "assert";
 
 @Container.injectable()

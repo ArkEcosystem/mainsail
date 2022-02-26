@@ -19,6 +19,7 @@
 	"dependencies": {
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/crypto": "workspace:*"
 	},
 	"devDependencies": {

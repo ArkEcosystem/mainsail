@@ -1,6 +1,7 @@
 import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { Blocks, Crypto, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { Blocks, Crypto, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { generateMnemonic } from "bip39";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";

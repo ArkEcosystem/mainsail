@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto, Interfaces } from "@arkecosystem/crypto";
+import { Crypto } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {

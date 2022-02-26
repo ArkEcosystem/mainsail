@@ -1,4 +1,5 @@
-import { Interfaces, Managers, Utils } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Managers, Utils } from "@arkecosystem/crypto";
 
 import { assert } from "./assert";
 

@@ -1,7 +1,8 @@
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Blocks, Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
+import { Blocks, Crypto, Managers } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
 import { StateMachine } from "./state-machine";

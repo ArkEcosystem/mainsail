@@ -1,7 +1,8 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { Managers, Transactions } from "@arkecosystem/crypto";
 
 import { Client } from "./client";
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
@@ -25,15 +26,15 @@ export class ForgerService {
 
 	private usernames: { [key: string]: string } = {};
 
-	private isStopped: boolean = false;
+	private isStopped = false;
 
 	private round: Contracts.P2P.CurrentRound | undefined;
 
 	private lastForgedBlock: Interfaces.IBlock | undefined;
 
-	private initialized: boolean = false;
+	private initialized = false;
 
-	private logAppReady: boolean = true;
+	private logAppReady = true;
 
 	public getRound(): Contracts.P2P.CurrentRound | undefined {
 		return this.round;
@@ -59,12 +60,12 @@ export class ForgerService {
 
 		this.delegates = delegates;
 
-		let timeout: number = 2000;
+		let timeout = 2000;
 		try {
 			await this.loadRound();
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
 			timeout = Math.max(0, this.getRoundRemainingSlotTime(this.round));
-		} catch (error) {
+		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {
 			this.checkLater(timeout);
@@ -125,11 +126,11 @@ export class ForgerService {
 			if (
 				await this.app
 					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-					.call("isForgingAllowed", { forgerService: this, delegate, networkState })
+					.call("isForgingAllowed", { delegate, forgerService: this, networkState })
 			) {
 				await this.app
 					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-					.call("forgeNewBlock", { forgerService: this, delegate, round: this.round, networkState });
+					.call("forgeNewBlock", { delegate, forgerService: this, networkState, round: this.round });
 			}
 
 			this.logAppReady = true;
@@ -175,12 +176,12 @@ export class ForgerService {
 
 		const block: Interfaces.IBlock | undefined = delegate.forge(transactions, {
 			previousBlock: {
+				height: networkState.getNodeHeight(),
 				id: networkState.getLastBlockId(),
 				idHex: networkState.getLastBlockId(),
-				height: networkState.getNodeHeight(),
 			},
-			timestamp: round.timestamp,
 			reward: round.reward,
+			timestamp: round.timestamp,
 		});
 
 		AppUtils.assert.defined<Interfaces.IBlock>(block);
@@ -227,15 +228,20 @@ export class ForgerService {
 	}
 
 	public isForgingAllowed(networkState: Contracts.P2P.NetworkState, delegate: Delegate): boolean {
-		if (networkState.status === NetworkStateStatus.Unknown) {
+		switch (networkState.status) {
+		case NetworkStateStatus.Unknown: {
 			this.logger.info("Failed to get network state from client. Will not forge.");
 			return false;
-		} else if (networkState.status === NetworkStateStatus.ColdStart) {
+		}
+		case NetworkStateStatus.ColdStart: {
 			this.logger.info("Skipping slot because of cold start. Will not forge.");
 			return false;
-		} else if (networkState.status === NetworkStateStatus.BelowMinimumPeers) {
+		}
+		case NetworkStateStatus.BelowMinimumPeers: {
 			this.logger.info("Network reach is not sufficient to get quorum. Will not forge.");
 			return false;
+		}
+		// No default
 		}
 
 		const overHeightBlockHeaders: Array<{
@@ -280,10 +286,10 @@ export class ForgerService {
 	private async loadRound(): Promise<void> {
 		this.round = await this.client.getRound();
 
-		this.usernames = this.round.delegates.reduce((acc, wallet) => {
+		this.usernames = this.round.delegates.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
 
-			return Object.assign(acc, {
+			return Object.assign(accumulator, {
 				[wallet.publicKey]: wallet.delegate.username,
 			});
 		}, {});

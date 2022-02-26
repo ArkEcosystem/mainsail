@@ -1,4 +1,5 @@
-import { Crypto, Interfaces } from "@arkecosystem/crypto";
+import { Crypto } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 type BlockChainedDetails = {
 	followsPrevious: boolean;

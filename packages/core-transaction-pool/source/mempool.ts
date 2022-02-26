@@ -1,5 +1,6 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Identities, Interfaces } from "@arkecosystem/crypto";
+import { Identities } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
@@ -12,7 +13,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 
 	public getSize(): number {
-		return Array.from(this.senderMempools.values()).reduce((sum, p) => sum + p.getSize(), 0);
+		return [...this.senderMempools.values()].reduce((sum, p) => sum + p.getSize(), 0);
 	}
 
 	public hasSenderMempool(senderPublicKey: string): boolean {
