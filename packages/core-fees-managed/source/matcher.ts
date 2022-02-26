@@ -1,8 +1,7 @@
+import { FeeRegistry, TransactionFeeToLowError } from "@arkecosystem/core-fees";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
 import { Interfaces, Utils } from "@arkecosystem/crypto";
-import { TransactionFeeToLowError } from "@arkecosystem/core-fees";
-import { FeeRegistry } from "@arkecosystem/core-fees";
 
 @Container.injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
@@ -30,7 +29,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	async #throwIfCannot(action: string, transaction: Interfaces.ITransaction): Promise<void> {
 		const feeString = Utils.formatSatoshi(transaction.data.fee);
 
-		const addonBytes: number = this.feeRegistry.get("managed", transaction.key, transaction.data.version);
+		const addonBytes: number = this.feeRegistry.get(transaction.key, transaction.data.version);
 		const height: number = this.stateStore.getLastHeight();
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 

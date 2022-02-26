@@ -9,7 +9,6 @@ import {
 	VerifyTransactionAction,
 } from "./actions";
 import { Collator } from "./collator";
-import { DynamicFeeMatcher } from "./dynamic-fee-matcher";
 import { ExpirationService } from "./expiration-service";
 import { Mempool } from "./mempool";
 import { Processor } from "./processor";
@@ -20,7 +19,6 @@ import { Service } from "./service";
 import { Storage } from "./storage";
 import { Worker } from "./worker";
 import { WorkerPool } from "./worker-pool";
-import { ProcessorDynamicFeeExtension } from "./processor-dynamic-fee-extension";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -44,22 +42,22 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): object {
 		return Joi.object({
-			enabled: Joi.bool().required(),
-			storage: Joi.string().required(),
-			maxTransactionsInPool: Joi.number().integer().min(1).required(),
-			maxTransactionsPerSender: Joi.number().integer().min(1).required(),
 			allowedSenders: Joi.array().items(Joi.string()).required(),
-			maxTransactionsPerRequest: Joi.number().integer().min(1).required(),
-			maxTransactionAge: Joi.number().integer().min(1).required(),
-			maxTransactionBytes: Joi.number().integer().min(1).required(),
 			dynamicFees: Joi.object({
-				enabled: Joi.bool().required(),
-				minFeePool: Joi.number().integer().min(0).when("enabled", { is: true, then: Joi.required() }),
-				minFeeBroadcast: Joi.number().integer().min(0).when("enabled", { is: true, then: Joi.required() }),
 				addonBytes: Joi.object()
 					.when("enabled", { is: true, then: Joi.required() })
 					.pattern(Joi.string(), Joi.number().integer().min(0).required()),
+				enabled: Joi.bool().required(),
+				minFeeBroadcast: Joi.number().integer().min(0).when("enabled", { is: true, then: Joi.required() }),
+				minFeePool: Joi.number().integer().min(0).when("enabled", { is: true, then: Joi.required() }),
 			}).required(),
+			enabled: Joi.bool().required(),
+			maxTransactionAge: Joi.number().integer().min(1).required(),
+			maxTransactionBytes: Joi.number().integer().min(1).required(),
+			maxTransactionsInPool: Joi.number().integer().min(1).required(),
+			maxTransactionsPerRequest: Joi.number().integer().min(1).required(),
+			maxTransactionsPerSender: Joi.number().integer().min(1).required(),
+			storage: Joi.string().required(),
 			workerPool: Joi.object({
 				workerCount: Joi.number().integer().min(1).required(),
 			}).required(),
@@ -68,7 +66,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	private registerServices(): void {
 		this.app.bind(Container.Identifiers.TransactionPoolCollator).to(Collator);
-		this.app.bind(Container.Identifiers.TransactionPoolDynamicFeeMatcher).to(DynamicFeeMatcher);
 		this.app.bind(Container.Identifiers.TransactionPoolExpirationService).to(ExpirationService);
 		this.app.bind(Container.Identifiers.TransactionPoolMempool).to(Mempool).inSingletonScope();
 		this.app.bind(Container.Identifiers.TransactionPoolProcessor).to(Processor);
@@ -89,14 +86,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Container.Identifiers.TransactionPoolWorkerFactory)
 			.toAutoFactory(Container.Identifiers.TransactionPoolWorker);
-		this.app.bind(Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory).toFactory(() => {
-			return () => {
-				const subprocess = fork(`${__dirname}/worker-script.js`);
-				return new AppUtils.IpcSubprocess<Contracts.TransactionPool.WorkerScriptHandler>(subprocess);
-			};
+		this.app.bind(Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory).toFactory(() => () => {
+			const subprocess = fork(`${__dirname}/worker-script.js`);
+			return new AppUtils.IpcSubprocess<Contracts.TransactionPool.WorkerScriptHandler>(subprocess);
 		});
-
-		this.app.bind(Container.Identifiers.TransactionPoolProcessorExtension).to(ProcessorDynamicFeeExtension);
 	}
 
 	private registerActions(): void {

@@ -12,8 +12,8 @@ export class Service implements Contracts.TransactionPool.Service {
 	@Container.inject(Container.Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.TransactionPoolDynamicFeeMatcher)
-	private readonly dynamicFeeMatcher!: Contracts.TransactionPool.DynamicFeeMatcher;
+	@Container.inject(Container.Identifiers.Fee.Matcher)
+	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
 
 	@Container.inject(Container.Identifiers.TransactionPoolStorage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
@@ -99,7 +99,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			});
 
 			try {
-				await this.dynamicFeeMatcher.throwIfCannotEnterPool(transaction);
+				await this.feeMatcher.throwIfCannotEnterPool(transaction);
 				await this.addTransactionToMempool(transaction);
 				this.logger.debug(`${transaction} added to pool`);
 				this.events.dispatch(Enums.TransactionEvent.AddedToPool, transaction.data);

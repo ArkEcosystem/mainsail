@@ -165,7 +165,6 @@ export const Identifiers = {
 	StateWalletSyncService: Symbol.for("State<WalletSyncService>"),
 	TransactionPoolCleaner: Symbol.for("TransactionPool<Cleaner>"),
 	TransactionPoolCollator: Symbol.for("TransactionPool<Collator>"),
-	TransactionPoolDynamicFeeMatcher: Symbol.for("TransactionPool<DynamicFeeMatcher>"),
 	TransactionPoolExpirationService: Symbol.for("TransactionPool<ExpirationService>"),
 	TransactionPoolMempool: Symbol.for("TransactionPool<Mempool>"),
 

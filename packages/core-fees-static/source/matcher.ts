@@ -23,7 +23,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	#throwIfCannot(action: string, transaction: Interfaces.ITransaction): void {
 		const feeString = Utils.formatSatoshi(transaction.data.fee);
 
-		const staticFee = this.feeRegistry.get("static", transaction.key, transaction.data.version);
+		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);
 		const staticFeeString = Utils.formatSatoshi(BigNumber.make(staticFee));
 
 		if (transaction.data.fee.isEqualTo(staticFee)) {

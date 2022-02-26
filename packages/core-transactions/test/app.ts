@@ -4,7 +4,6 @@ import { Factories, getWalletAttributeSet, Mocks, passphrases } from "@arkecosys
 import {
 	ApplyTransactionAction,
 	Collator,
-	DynamicFeeMatcher,
 	ExpirationService,
 	Mempool,
 	Query,
@@ -19,6 +18,7 @@ import { Identities, Interfaces, Utils } from "@arkecosystem/crypto";
 import { ServiceProvider } from "../source/service-provider";
 import { TransactionHandlerProvider } from "../source/handlers/handler-provider";
 import { TransactionHandlerRegistry } from "../source/handlers/handler-registry";
+import { FeeMatcher as DynamicFeeMatcher } from "../../core-fees-managed/source/matcher";
 import {
 	DelegateRegistrationTransactionHandler,
 	MultiSignatureRegistrationTransactionHandler,
@@ -97,7 +97,7 @@ export const initApp = (): Application => {
 	app.bind(Container.Identifiers.TransactionPoolQuery).to(Query).inSingletonScope();
 
 	app.bind(Container.Identifiers.TransactionPoolCollator).to(Collator);
-	app.bind(Container.Identifiers.TransactionPoolDynamicFeeMatcher).to(DynamicFeeMatcher);
+	app.bind(Container.Identifiers.Fee.Matcher).to(DynamicFeeMatcher);
 	app.bind(Container.Identifiers.TransactionPoolExpirationService).to(ExpirationService);
 
 	app.bind(Container.Identifiers.TransactionPoolSenderMempool).to(SenderMempool);
