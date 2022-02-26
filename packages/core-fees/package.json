@@ -16,7 +16,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"engines": {

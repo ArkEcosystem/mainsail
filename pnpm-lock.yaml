@@ -1163,37 +1163,41 @@ importers:
 
   packages/core-fees:
     specifiers:
+      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/crypto': workspace:*
       '@arkecosystem/utils': workspace:*
     dependencies:
+      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/crypto': link:../crypto
       '@arkecosystem/utils': link:../utils
 
   packages/core-fees-managed:
     specifiers:
+      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-transactions': workspace:*
-      '@arkecosystem/crypto': workspace:*
+      '@arkecosystem/utils': workspace:*
     dependencies:
+      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-transactions': link:../core-transactions
-      '@arkecosystem/crypto': link:../crypto
+      '@arkecosystem/utils': link:../utils
 
   packages/core-fees-static:
     specifiers:
+      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-transactions': workspace:*
-      '@arkecosystem/crypto': workspace:*
+      '@arkecosystem/utils': workspace:*
     dependencies:
+      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-transactions': link:../core-transactions
-      '@arkecosystem/crypto': link:../crypto
+      '@arkecosystem/utils': link:../utils
 
   packages/core-forger:
     specifiers:
