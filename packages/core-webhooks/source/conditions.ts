@@ -1,10 +1,10 @@
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 const toBoolean = (value): boolean => (value.toString().toLowerCase().trim() === "true" ? true : false);
 
 const compareBigNumber = (value, expected, comparison): boolean => {
 	try {
-		return Utils.BigNumber.make(value)[comparison](expected);
+		return BigNumber.make(value)[comparison](expected);
 	} catch {
 		return false;
 	}

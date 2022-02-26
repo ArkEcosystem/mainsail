@@ -1541,7 +1541,7 @@ importers:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
-      '@arkecosystem/crypto': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@hapi/boom': 9.0.0
       '@hapi/hapi': 20.1.5
       '@types/fs-extra': 8.1.2
@@ -1557,7 +1557,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/crypto': link:../crypto
+      '@arkecosystem/utils': link:../utils
       '@hapi/boom': 9.0.0
       '@hapi/hapi': 20.1.5
       fs-extra: 8.1.0

@@ -18,7 +18,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"@hapi/boom": "9.0.0",
 		"@hapi/hapi": "20.1.5",
 		"fs-extra": "8.1.0",
