@@ -46,6 +46,9 @@ export abstract class TransactionHandler {
 		return transaction.isVerified;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public dynamicFee({
 		addonBytes,
 		satoshiPerByte,

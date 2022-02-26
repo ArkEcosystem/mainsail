@@ -1,17 +1,9 @@
 import { FeeRegistry, TransactionFeeToLowError } from "@arkecosystem/core-fees";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
 import { Interfaces, Utils } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "blockchain")
-	private readonly handlerRegistry: Handlers.Registry;
-
-	@Container.inject(Container.Identifiers.StateStore)
-	private readonly stateStore: Contracts.State.StateStore;
-
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -19,7 +11,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	private readonly feeRegistry: FeeRegistry;
 
 	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
-		await this.#throwIfCannot("pool entrance", transaction);
+		await this.#throwIfCannot("pool", transaction);
 	}
 
 	public async throwIfCannotBroadcast(transaction: Interfaces.ITransaction): Promise<void> {
@@ -29,19 +21,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	async #throwIfCannot(action: string, transaction: Interfaces.ITransaction): Promise<void> {
 		const feeString = Utils.formatSatoshi(transaction.data.fee);
 
-		const addonBytes: number = this.feeRegistry.get(transaction.key, transaction.data.version);
-		const height: number = this.stateStore.getLastHeight();
-		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
+		const minFee: Utils.BigNumber = this.#calculateMinFee(transaction);
+		const minFeeString = Utils.formatSatoshi(minFee);
 
-		const minFeeBroadcast: Utils.BigNumber = handler.dynamicFee({
-			addonBytes,
-			height,
-			satoshiPerByte: 3000, // @TODO
-			transaction,
-		});
-		const minFeeString = Utils.formatSatoshi(minFeeBroadcast);
-
-		if (transaction.data.fee.isGreaterThanEqual(minFeeBroadcast)) {
+		if (transaction.data.fee.isGreaterThanEqual(minFee)) {
 			this.logger.debug(`${transaction} eligible for ${action} (fee ${feeString} >= ${minFeeString})`);
 
 			return;
@@ -50,5 +33,14 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		this.logger.notice(`${transaction} not eligible for ${action} (fee ${feeString} < ${minFeeString})`);
 
 		throw new TransactionFeeToLowError(transaction);
+	}
+
+	#calculateMinFee(transaction: Interfaces.ITransaction): Utils.BigNumber {
+		const addonBytes = this.feeRegistry.get(transaction.key, transaction.data.version) || 0;
+		const satoshiPerByte = 3000; // @TODO
+
+		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
+
+		return Utils.BigNumber.make(addonBytes + transactionSizeInBytes).times(satoshiPerByte);
 	}
 }
