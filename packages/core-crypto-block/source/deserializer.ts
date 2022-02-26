@@ -1,5 +1,4 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BINDINGS, IBlockData, IBlockDeserializer, ITransaction } from "@arkecosystem/core-crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
@@ -9,9 +8,6 @@ import { IDFactory } from "./id.factory";
 
 @Container.injectable()
 export class Deserializer implements IBlockDeserializer {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
 	@Container.inject(BINDINGS.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
@@ -47,16 +43,9 @@ export class Deserializer implements IBlockDeserializer {
 		block.timestamp = buf.readUint32();
 		block.height = buf.readUint32();
 
-		const constants = this.configuration.getMilestone(block.height - 1 || 1);
-
-		if (constants.block.idFullSha256) {
-			const previousBlockFullSha256 = buf.readBytes(32).toString("hex");
-			block.previousBlockHex = previousBlockFullSha256;
-			block.previousBlock = previousBlockFullSha256;
-		} else {
-			block.previousBlockHex = buf.readBytes(8).toString("hex");
-			block.previousBlock = BigNumber.make(`0x${block.previousBlockHex}`).toString();
-		}
+		const previousBlockFullSha256 = buf.readBytes(32).toString("hex");
+		block.previousBlockHex = previousBlockFullSha256;
+		block.previousBlock = previousBlockFullSha256;
 
 		block.numberOfTransactions = buf.readUint32();
 		block.totalAmount = BigNumber.make(buf.readUint64().toString());

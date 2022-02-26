@@ -118,12 +118,6 @@ export class CryptoGenerator extends Generator {
 				height: 100000,
 				vendorFieldLength: 255,
 			},
-			{
-				height: 4000000,
-				block: {
-					idFullSha256: true,
-				},
-			},
 		];
 	}
 

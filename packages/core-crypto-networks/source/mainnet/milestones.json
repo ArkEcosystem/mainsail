@@ -44,12 +44,6 @@
 		"vendorFieldLength": 255
 	},
 	{
-		"height": 8204000,
-		"block": {
-			"idFullSha256": true
-		}
-	},
-	{
 		"height": 11273000,
 		"aip11": true
 	}

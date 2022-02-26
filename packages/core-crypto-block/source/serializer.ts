@@ -1,18 +1,12 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BINDINGS, IBlock, IBlockData, IBlockSerializer, ITransactionData } from "@arkecosystem/core-crypto-contracts";
 import { PreviousBlockIdFormatError } from "@arkecosystem/core-crypto-errors";
 import { Utils } from "@arkecosystem/core-crypto-transaction";
 import assert from "assert";
 import ByteBuffer from "bytebuffer";
 
-import { toBytesHex } from "./utils";
-
 @Container.injectable()
 export class Serializer implements IBlockSerializer {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
 	@Container.inject(BINDINGS.Transaction.Utils)
 	private readonly utils: Utils;
 
@@ -58,13 +52,11 @@ export class Serializer implements IBlockSerializer {
 	}
 
 	private headerSize(block: IBlockData): number {
-		const constants = this.configuration.getMilestone(block.height - 1 || 1);
-
 		return (
 			4 + // version
 			4 + // timestamp
 			4 + // height
-			(constants.block.idFullSha256 ? 32 : 8) + // previousBlock
+			32 + // previousBlock
 			4 + // numberOfTransactions
 			8 + // totalAmount
 			8 + // totalFee
@@ -76,17 +68,11 @@ export class Serializer implements IBlockSerializer {
 	}
 
 	private serializeHeader(block: IBlockData, buff: ByteBuffer): void {
-		const constants = this.configuration.getMilestone(block.height - 1 || 1);
-
-		if (constants.block.idFullSha256) {
-			if (block.previousBlock.length !== 64) {
-				throw new PreviousBlockIdFormatError(block.height, block.previousBlock);
-			}
-
-			block.previousBlockHex = block.previousBlock;
-		} else {
-			block.previousBlockHex = toBytesHex(block.previousBlock);
+		if (block.previousBlock.length !== 64) {
+			throw new PreviousBlockIdFormatError(block.height, block.previousBlock);
 		}
+
+		block.previousBlockHex = block.previousBlock;
 
 		buff.writeUint32(block.version);
 		buff.writeUint32(block.timestamp);

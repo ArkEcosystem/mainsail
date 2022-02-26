@@ -1,7 +1,7 @@
 import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Blocks, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
 import { Client } from "./client";
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
@@ -176,9 +176,7 @@ export class ForgerService {
 		const block: Interfaces.IBlock | undefined = delegate.forge(transactions, {
 			previousBlock: {
 				id: networkState.getLastBlockId(),
-				idHex: Managers.configManager.getMilestone().block.idFullSha256
-					? networkState.getLastBlockId()
-					: Blocks.Block.toBytesHex(networkState.getLastBlockId()),
+				idHex: networkState.getLastBlockId(),
 				height: networkState.getNodeHeight(),
 			},
 			timestamp: round.timestamp,

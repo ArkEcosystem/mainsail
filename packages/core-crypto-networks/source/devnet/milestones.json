@@ -57,12 +57,6 @@
 		"vendorFieldLength": 255
 	},
 	{
-		"height": 1895000,
-		"block": {
-			"idFullSha256": true
-		}
-	},
-	{
 		"height": 2300000,
 		"ignoreExpiredTransactions": false
 	},

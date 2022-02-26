@@ -513,7 +513,6 @@ export class Command extends Commands.Command {
 				activeDelegates: options.delegates,
 				aip11: true,
 				block: {
-					idFullSha256: true,
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
 					version: 0,
@@ -546,7 +545,6 @@ export class Command extends Commands.Command {
 		// we need to set aip11 and network.pubKeyHash for tx builder to build v2 txs without issue
 		Managers.configManager.getMilestone().aip11 = true;
 		Managers.configManager.set("network.pubKeyHash", options.pubKeyHash);
-		Managers.configManager.getMilestone().block = { idFullSha256: true }; // so that generated block has full sha256 id
 
 		const premineWallet: Wallet = this.createWallet(options.pubKeyHash);
 

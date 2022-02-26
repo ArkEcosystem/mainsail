@@ -145,18 +145,7 @@ export const registerKeywords = (configuration: Configuration) => {
 						return false;
 					}
 
-					// Partial SHA256 block id (old/legacy), before the switch to full SHA256.
-					// 8 byte integer either decimal without leading zeros or hex with leading zeros.
-					const isPartial = /^\d{1,20}$/.test(data) || /^[\da-f]{16}$/i.test(data);
-					const isFullSha256 = /^[\da-f]{64}$/i.test(data);
-
-					if (parentObject && parentObject.height) {
-						const height = schema.isPreviousBlock ? parentObject.height - 1 : parentObject.height;
-						const constants = configuration.getMilestone(height ?? 1); // if height === 0 set it to 1
-						return constants.block.idFullSha256 ? isFullSha256 : isPartial;
-					}
-
-					return isPartial || isFullSha256;
+					return /^[\da-f]{64}$/i.test(data);
 				};
 			},
 			errors: false,
