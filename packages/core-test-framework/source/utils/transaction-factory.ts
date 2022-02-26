@@ -249,10 +249,6 @@ export class TransactionFactory {
 			Managers.configManager.setFromPreset(this.network);
 		}
 
-		// // ensure we use aip11
-		// Managers.configManager.getMilestone().aip11 = true;
-		// this.builder.data.version = 2;
-
 		if (!this.senderPublicKey) {
 			this.senderPublicKey = Identities.PublicKey.fromPassphrase(this.passphrase);
 		}
@@ -308,16 +304,6 @@ export class TransactionFactory {
 
 			this.builder.senderPublicKey(this.senderPublicKey);
 
-			const isDevelop = !["mainnet", "devnet"].includes(Managers.configManager.get("network.name"));
-
-			const aip11: boolean = Managers.configManager.getMilestone().aip11;
-
-			if (this.builder.data.version === 1 && aip11) {
-				Managers.configManager.getMilestone().aip11 = false;
-			} /* istanbul ignore else */ else if (isDevelop) {
-				Managers.configManager.getMilestone().aip11 = true;
-			}
-
 			let sign = true;
 
 			if (this.passphraseList && this.passphraseList.length) {
@@ -332,14 +318,7 @@ export class TransactionFactory {
 				this.builder.sign(this.passphrase);
 			}
 
-			const transaction = this.builder[method]();
-
-			/* istanbul ignore else */
-			if (isDevelop) {
-				Managers.configManager.getMilestone().aip11 = true;
-			}
-
-			transactions.push(transaction);
+			transactions.push(this.builder[method]());
 		}
 
 		return transactions;

@@ -511,7 +511,6 @@ export class Command extends Commands.Command {
 		return [
 			{
 				activeDelegates: options.delegates,
-				aip11: true,
 				block: {
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
@@ -542,8 +541,6 @@ export class Command extends Commands.Command {
 	}
 
 	private generateCryptoGenesisBlock(genesisWallet, delegates, options: Options) {
-		// we need to set aip11 and network.pubKeyHash for tx builder to build v2 txs without issue
-		Managers.configManager.getMilestone().aip11 = true;
 		Managers.configManager.set("network.pubKeyHash", options.pubKeyHash);
 
 		const premineWallet: Wallet = this.createWallet(options.pubKeyHash);

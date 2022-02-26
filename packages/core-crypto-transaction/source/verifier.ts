@@ -1,5 +1,4 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
 	IMultiSignatureAsset,
@@ -7,7 +6,6 @@ import {
 	ITransactionData,
 	ITransactionUtils,
 	ITransactionVerifier,
-	IVerifyOptions,
 	Signatory,
 } from "@arkecosystem/core-crypto-contracts";
 
@@ -16,9 +14,6 @@ import { TransactionTypeFactory } from "./types/factory";
 
 @Container.injectable()
 export class Verifier implements ITransactionVerifier {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
 	@Container.inject(BINDINGS.SignatureFactory)
 	private readonly signatureFactory: Signatory;
 
@@ -27,14 +22,6 @@ export class Verifier implements ITransactionVerifier {
 
 	@Container.inject(BINDINGS.Transaction.Utils)
 	private readonly utils: ITransactionUtils;
-
-	public async verify(data: ITransactionData, options?: IVerifyOptions): Promise<boolean> {
-		if (this.configuration.getMilestone().aip11 && (!data.version || data.version === 1)) {
-			return false;
-		}
-
-		return this.verifyHash(data, options?.disableVersionCheck);
-	}
 
 	public async verifySignatures(
 		transaction: ITransactionData,

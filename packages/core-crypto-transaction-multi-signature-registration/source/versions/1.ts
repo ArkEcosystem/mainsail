@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
-	IMultiSignatureLegacyAsset,
+	IMultiSignatureAsset,
 	ISerializeOptions,
 	ITransactionData,
 	TransactionType,
@@ -11,7 +11,7 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
-export abstract class One extends Transaction {
+export class One extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
@@ -20,59 +20,47 @@ export abstract class One extends Transaction {
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
-		const transactionBaseSchemaNoSignatures = schemas.extend(schemas.transactionBaseSchema, {});
-
-		delete transactionBaseSchemaNoSignatures.properties.signatures;
-
-		return schemas.extend(transactionBaseSchemaNoSignatures, {
-			$id: "multiSignatureLegacy",
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "multiSignature",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
-						multiSignatureLegacy: {
+						multiSignature: {
 							properties: {
-								keysgroup: {
+								min: {
+									maximum: { $data: "1/publicKeys/length" },
+									minimum: 1,
+									type: "integer",
+								},
+								publicKeys: {
 									additionalItems: false,
-									items: {
-										allOf: [
-											{ maximum: 67, minimum: 67, transform: ["toLowerCase"], type: "string" },
-										],
-									},
+									items: { $ref: "publicKey" },
 									maxItems: 16,
 									minItems: 1,
 									type: "array",
-								},
-								lifetime: {
-									maximum: 72,
-									minimum: 1,
-									type: "integer",
-								},
-								min: {
-									maximum: { $data: "1/keysgroup/length" },
-									minimum: 1,
-									type: "integer",
+									uniqueItems: true,
 								},
 							},
-							required: ["keysgroup", "min", "lifetime"],
+							required: ["min", "publicKeys"],
 							type: "object",
 						},
 					},
-					required: ["multiSignatureLegacy"],
+					required: ["multiSignature"],
 					type: "object",
 				},
 				fee: { bignumber: { minimum: 1 } },
 				signatures: {
 					additionalItems: false,
-					items: { $ref: "alphanumeric" },
-					maxItems: 1,
-					minItems: 1,
+					items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }] },
+					maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },
+					minItems: { $data: "1/asset/multiSignature/min" },
 					type: "array",
+					uniqueItems: true,
 				},
 				type: { transactionType: TransactionType.MultiSignature },
-				version: { anyOf: [{ type: "null" }, { const: 1 }] },
 			},
-			required: ["asset"],
+			required: ["asset", "signatures"],
 		});
 	}
 
@@ -80,31 +68,26 @@ export abstract class One extends Transaction {
 		configuration: Configuration,
 		feeContext: { height?: number; data?: ITransactionData } = {},
 	): BigNumber {
-		if (feeContext.data?.asset?.multiSignatureLegacy) {
+		if (feeContext.data?.asset?.multiSignature) {
 			return super
 				.staticFee(configuration, feeContext)
-				.times(feeContext.data.asset.multiSignatureLegacy.keysgroup.length + 1);
+				.times(feeContext.data.asset.multiSignature.publicKeys.length + 1);
 		}
 
 		return super.staticFee(configuration, feeContext);
 	}
 
-	public async verify(): Promise<boolean> {
-		return true;
-	}
-
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
+		const { min, publicKeys } = data.asset.multiSignature;
+		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 33));
 
-		const legacyAsset: IMultiSignatureLegacyAsset = data.asset.multiSignatureLegacy;
-		const joined: string = legacyAsset.keysgroup.map((k) => (k.startsWith("+") ? k.slice(1) : k)).join("");
-		const keysgroupBuffer: Buffer = Buffer.from(joined, "hex");
-		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(keysgroupBuffer.length + 3));
+		buff.writeUInt8(min);
+		buff.writeUInt8(publicKeys.length);
 
-		buff.writeUInt8(legacyAsset.min);
-		buff.writeUInt8(legacyAsset.keysgroup.length);
-		buff.writeUInt8(legacyAsset.lifetime);
-		buff.writeBuffer(keysgroupBuffer);
+		for (const publicKey of publicKeys) {
+			buff.writeBuffer(Buffer.from(publicKey, "hex"));
+		}
 
 		return buff;
 	}
@@ -112,17 +95,15 @@ export abstract class One extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 
-		const multiSignatureLegacy: IMultiSignatureLegacyAsset = { keysgroup: [], lifetime: 0, min: 0 };
-		multiSignatureLegacy.min = buf.readUInt8();
+		const multiSignature: IMultiSignatureAsset = { min: 0, publicKeys: [] };
+		multiSignature.min = buf.readUInt8();
 
-		const number_ = buf.readUInt8();
-		multiSignatureLegacy.lifetime = buf.readUInt8();
-
-		for (let index = 0; index < number_; index++) {
-			const key: string = buf.readBuffer(33).toString("hex");
-			multiSignatureLegacy.keysgroup.push(key);
+		const count = buf.readUInt8();
+		for (let index = 0; index < count; index++) {
+			const publicKey = buf.readBuffer(33).toString("hex");
+			multiSignature.publicKeys.push(publicKey);
 		}
 
-		data.asset = { multiSignatureLegacy };
+		data.asset = { multiSignature };
 	}
 }

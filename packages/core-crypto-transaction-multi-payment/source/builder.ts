@@ -1,18 +1,17 @@
-import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/core-crypto-errors";
 import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
-
-import { BigNumber } from "@arkecosystem/utils";
+import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/core-crypto-errors";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
+import { BigNumber } from "@arkecosystem/utils";
 
-import { Two } from "./versions/2";
+import { One } from "./versions/1";
 
 export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder> {
 	public constructor() {
 		super();
 
-		this.data.type = Two.type;
-		this.data.typeGroup = Two.typeGroup;
-		this.data.fee = Two.staticFee(this.configuration);
+		this.data.type = One.type;
+		this.data.typeGroup = One.typeGroup;
+		this.data.fee = One.staticFee(this.configuration);
 		this.data.vendorField = undefined;
 		this.data.asset = {
 			payments: [],

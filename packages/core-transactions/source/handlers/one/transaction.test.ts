@@ -111,7 +111,6 @@ describe<{
 		);
 
 		context.transferTransaction = Transactions.BuilderFactory.transfer()
-			.version(2)
 			.recipientId(context.recipientWallet.getAddress())
 			.amount("10000000")
 			.nonce(Utils.BigNumber.ONE.toString())

@@ -98,8 +98,7 @@ export abstract class TransactionHandler {
 
 		await this.throwIfCannotBeApplied(transaction, sender);
 
-		// TODO: extract version specific code
-		if (data.version && data.version > 1) {
+		if (data.version) {
 			this.verifyTransactionNonceApply(sender, transaction);
 
 			AppUtils.assert.defined<AppUtils.BigNumber>(data.nonce);
@@ -193,19 +192,17 @@ export abstract class TransactionHandler {
 	}
 
 	protected verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Interfaces.ITransaction): void {
-		const version: number = transaction.data.version || 1;
 		const nonce: AppUtils.BigNumber = transaction.data.nonce || AppUtils.BigNumber.ZERO;
 
-		if (version > 1 && !wallet.getNonce().plus(1).isEqualTo(nonce)) {
+		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
 			throw new UnexpectedNonceError(nonce, wallet, false);
 		}
 	}
 
 	protected verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Interfaces.ITransaction): void {
-		const version: number = transaction.data.version || 1;
 		const nonce: AppUtils.BigNumber = transaction.data.nonce || AppUtils.BigNumber.ZERO;
 
-		if (version > 1 && !wallet.getNonce().isEqualTo(nonce)) {
+		if (!wallet.getNonce().isEqualTo(nonce)) {
 			throw new UnexpectedNonceError(nonce, wallet, true);
 		}
 	}

@@ -4,7 +4,6 @@ import {
 	BINDINGS,
 	IAddressFactory,
 	ISchemaValidationResult,
-	ISerializeOptions,
 	ITransaction,
 	ITransactionData,
 	ITransactionJson,
@@ -63,8 +62,8 @@ export abstract class Transaction implements ITransaction {
 		return this.defaultStaticFee;
 	}
 
-	public async verify(options?: ISerializeOptions): Promise<boolean> {
-		return this.verifier.verify(this.data, options);
+	public async verify(): Promise<boolean> {
+		return this.verifier.verifyHash(this.data);
 	}
 
 	public verifySchema(): ISchemaValidationResult {

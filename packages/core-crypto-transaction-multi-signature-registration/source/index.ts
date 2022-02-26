@@ -4,7 +4,6 @@ import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { One } from "./versions/1";
-import { Two } from "./versions/2";
 
 export * from "./builder";
 
@@ -14,6 +13,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const registry: TransactionRegistry = this.app.get(BINDINGS.Transaction.Registry);
 
 		registry.registerTransactionType(One);
-		registry.registerTransactionType(Two);
 	}
 }

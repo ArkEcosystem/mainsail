@@ -37,17 +37,3 @@ export const numberToHex = (number_: number, padding = 2): string => {
 
 export const maxVendorFieldLength = (configuration: Configuration, height?: number): number =>
 	configuration.getMilestone(height).vendorFieldLength;
-
-export const isSupportedTransactionVersion = (configuration: Configuration, version: number): boolean => {
-	const aip11: boolean = configuration.getMilestone().aip11;
-
-	if (aip11 && version !== 2) {
-		return false;
-	}
-
-	if (!aip11 && version !== 1) {
-		return false;
-	}
-
-	return true;
-};

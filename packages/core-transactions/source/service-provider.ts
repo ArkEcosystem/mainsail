@@ -1,6 +1,6 @@
 import { Container, Providers, Services } from "@arkecosystem/core-kernel";
 
-import { One, TransactionHandlerConstructor, Two } from "./handlers";
+import { One, TransactionHandlerConstructor } from "./handlers";
 import { TransactionHandlerProvider } from "./handlers/handler-provider";
 import { TransactionHandlerRegistry } from "./handlers/handler-registry";
 
@@ -47,15 +47,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "null"));
 
 		this.app.bind(Container.Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
-		this.app.bind(Container.Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
 		this.app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
-		this.app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
 		this.app.bind(Container.Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
-		this.app.bind(Container.Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
 		this.app.bind(Container.Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
-		this.app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-		this.app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
-		this.app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
+		this.app.bind(Container.Identifiers.TransactionHandler).to(One.MultiPaymentTransactionHandler);
+		this.app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateResignationTransactionHandler);
 
 		this.app
 			.bind(Container.Identifiers.TransactionHandlerConstructors)

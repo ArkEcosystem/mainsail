@@ -2,16 +2,16 @@ import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 
-import { Two } from "./versions/2";
+import { One } from "./versions/1";
 
 export class DelegateResignationBuilder extends TransactionBuilder<DelegateResignationBuilder> {
 	public constructor() {
 		super();
 
-		this.data.type = Two.type;
-		this.data.typeGroup = Two.typeGroup;
+		this.data.type = One.type;
+		this.data.typeGroup = One.typeGroup;
 		this.data.version = 2;
-		this.data.fee = Two.staticFee(this.configuration);
+		this.data.fee = One.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.senderPublicKey = undefined;
 	}

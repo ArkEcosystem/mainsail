@@ -57,7 +57,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			nonce: BigNumber.ZERO,
 			timestamp: this.slots.getTime(),
 			typeGroup: TransactionTypeGroup.Test,
-			version: this.configuration.getMilestone().aip11 ? 0x02 : 0x01,
+			version: 0x01,
 		} as ITransactionData;
 	}
 

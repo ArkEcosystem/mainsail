@@ -9,12 +9,7 @@ import {
 } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-import {
-	DuplicateParticipantInMultiSignatureError,
-	InvalidTransactionBytesError,
-	TransactionVersionError,
-} from "./errors";
-import { isSupportedTransactionVersion } from "./helpers";
+import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "./errors";
 import { TransactionTypeFactory } from "./types";
 
 @Container.injectable()
@@ -35,10 +30,6 @@ export class Deserializer implements ITransactionDeserializer {
 		instance.deserialize(buff);
 
 		this.deserializeSignatures(data, buff);
-
-		if (data.version && !isSupportedTransactionVersion(this.configuration, data.version)) {
-			throw new TransactionVersionError(data.version);
-		}
 
 		instance.serialized = buff.getResult();
 

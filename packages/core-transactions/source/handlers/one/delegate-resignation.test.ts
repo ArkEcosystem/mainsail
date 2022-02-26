@@ -37,7 +37,6 @@ describe<{
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.delegateResignationTransaction = Transactions.BuilderFactory.delegateResignation()
-			.version(2)
 			.nonce("1")
 			.sign(delegatePassphrase)
 			.build();

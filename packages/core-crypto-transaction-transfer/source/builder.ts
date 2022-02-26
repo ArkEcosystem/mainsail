@@ -2,15 +2,15 @@ import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Two } from "./versions/2";
+import { One } from "./versions/1";
 
 export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 	public constructor() {
 		super();
 
-		this.data.type = Two.type;
-		this.data.typeGroup = Two.typeGroup;
-		this.data.fee = Two.staticFee(this.configuration);
+		this.data.type = One.type;
+		this.data.typeGroup = One.typeGroup;
+		this.data.fee = One.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;

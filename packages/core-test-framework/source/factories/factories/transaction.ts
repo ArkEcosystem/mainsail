@@ -1,4 +1,4 @@
-import { Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { Identities, Transactions, Utils } from "@arkecosystem/crypto";
 
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder";
@@ -7,12 +7,10 @@ import { FactoryFunctionOptions } from "../types";
 const sign = ({ entity, options }: FactoryFunctionOptions) => entity.sign(options.passphrase || secrets[0]);
 
 const multiSign = ({ entity, options }: FactoryFunctionOptions) => {
-	Managers.configManager.getMilestone().aip11 = true; // todo: remove this after reworking the crypto package
-
 	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
-	for (let i = 0; i < passphrases.length; i++) {
-		entity.multiSign(passphrases[i], i);
+	for (const [index, passphrase] of passphrases.entries()) {
+		entity.multiSign(passphrase, index);
 	}
 
 	return entity;
@@ -67,7 +65,7 @@ export const registerTransferFactory = (factory: FactoryBuilder): void => {
 export const registerDelegateRegistrationFactory = (factory: FactoryBuilder): void => {
 	factory.set("DelegateRegistration", ({ options }) =>
 		Transactions.BuilderFactory.delegateRegistration().usernameAsset(
-			options.username || Math.random().toString(36).substring(8),
+			options.username || Math.random().toString(36).slice(8),
 		),
 	);
 
@@ -75,8 +73,6 @@ export const registerDelegateRegistrationFactory = (factory: FactoryBuilder): vo
 };
 
 export const registerDelegateResignationFactory = (factory: FactoryBuilder): void => {
-	Managers.configManager.getMilestone().aip11 = true; // todo: remove this after reworking the crypto package
-
 	factory.set("DelegateResignation", () => Transactions.BuilderFactory.delegateResignation());
 	factory.get("DelegateResignation").state("sign", sign);
 };
@@ -121,8 +117,8 @@ export const registerMultiSignatureFactory = (factory: FactoryBuilder): void => 
 
 		builder
 			.multiSignatureAsset({
-				publicKeys,
 				min: options.min || 2,
+				publicKeys,
 			})
 			.senderPublicKey(publicKeys[0]);
 

@@ -11,7 +11,6 @@ import { ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionTypeGroup } from "./enums";
 import { TransactionVersionError } from "./errors";
-import { isSupportedTransactionVersion } from "./helpers";
 import { TransactionTypeFactory } from "./types";
 
 @Container.injectable()
@@ -22,15 +21,11 @@ export class Serializer implements ITransactionSerializer {
 	public getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
 		const version: number = transaction.version || 1;
 
-		if (
-			options.acceptLegacyVersion ||
-			options.disableVersionCheck ||
-			isSupportedTransactionVersion(this.configuration, version)
-		) {
+		if (version) {
 			return this.serialize(TransactionTypeFactory.create(transaction), options);
-		} else {
-			throw new TransactionVersionError(version);
 		}
+
+		throw new TransactionVersionError(version);
 	}
 
 	public serialize(transaction: ITransaction, options: ISerializeOptions = {}): Buffer {

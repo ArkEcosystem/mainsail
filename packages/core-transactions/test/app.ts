@@ -21,18 +21,12 @@ import { TransactionHandlerRegistry } from "../source/handlers/handler-registry"
 import { FeeMatcher as DynamicFeeMatcher } from "../../core-fees-managed/source/matcher";
 import {
 	DelegateRegistrationTransactionHandler,
+	DelegateResignationTransactionHandler,
+	MultiPaymentTransactionHandler,
 	MultiSignatureRegistrationTransactionHandler,
 	TransferTransactionHandler,
 	VoteTransactionHandler,
 } from "../source/handlers/one";
-import {
-	DelegateRegistrationTransactionHandler as Two_DelegateRegistrationTransactionHandler,
-	DelegateResignationTransactionHandler,
-	MultiPaymentTransactionHandler,
-	MultiSignatureRegistrationTransactionHandler as Two_MultiSignatureRegistrationTransactionHandler,
-	TransferTransactionHandler as Two_TransferTransactionHandler,
-	VoteTransactionHandler as Two_VoteTransactionHandler,
-} from "../source/handlers/two";
 
 const logger = {
 	debug: () => {},
@@ -115,13 +109,9 @@ export const initApp = (): Application => {
 	app.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue(Mocks.TransactionRepository.instance);
 
 	app.bind(Container.Identifiers.TransactionHandler).to(TransferTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two_TransferTransactionHandler);
 	app.bind(Container.Identifiers.TransactionHandler).to(DelegateRegistrationTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two_DelegateRegistrationTransactionHandler);
 	app.bind(Container.Identifiers.TransactionHandler).to(VoteTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two_VoteTransactionHandler);
 	app.bind(Container.Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two_MultiSignatureRegistrationTransactionHandler);
 	app.bind(Container.Identifiers.TransactionHandler).to(MultiPaymentTransactionHandler);
 	app.bind(Container.Identifiers.TransactionHandler).to(DelegateResignationTransactionHandler);
 

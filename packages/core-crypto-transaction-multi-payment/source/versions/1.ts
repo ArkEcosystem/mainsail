@@ -11,56 +11,43 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
-export class Two extends Transaction {
+export class One extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
-	public static version = 2;
+	public static version = 1;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
-			$id: "multiSignature",
+			$id: "multiPayment",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
-						multiSignature: {
-							properties: {
-								min: {
-									maximum: { $data: "1/publicKeys/length" },
-									minimum: 1,
-									type: "integer",
+						payments: {
+							additionalItems: false,
+							items: {
+								properties: {
+									amount: { bignumber: { minimum: 1 } },
+									recipientId: { $ref: "address" },
 								},
-								publicKeys: {
-									additionalItems: false,
-									items: { $ref: "publicKey" },
-									maxItems: 16,
-									minItems: 1,
-									type: "array",
-									uniqueItems: true,
-								},
+								required: ["amount", "recipientId"],
+								type: "object",
 							},
-							required: ["min", "publicKeys"],
-							type: "object",
+							minItems: 2,
+							type: "array",
+							uniqueItems: false,
 						},
 					},
-					required: ["multiSignature"],
+					required: ["payments"],
 					type: "object",
 				},
 				fee: { bignumber: { minimum: 1 } },
-				signatures: {
-					additionalItems: false,
-					items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }] },
-					maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },
-					minItems: { $data: "1/asset/multiSignature/min" },
-					type: "array",
-					uniqueItems: true,
-				},
-				type: { transactionType: TransactionType.MultiSignature },
+				type: { transactionType: TransactionType.MultiPayment },
+				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
 			},
-			required: ["asset", "signatures"],
 		});
 	}
 
@@ -75,10 +62,6 @@ export class Two extends Transaction {
 		}
 
 		return super.staticFee(configuration, feeContext);
-	}
-
-	public async verify(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 && (await super.verify());
 	}
 
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
