@@ -9,6 +9,7 @@ import {
 	IHashFactory,
 	IKeyPair,
 	ITransaction,
+	IValidator,
 	Signatory,
 } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
@@ -16,9 +17,9 @@ import { BigNumber } from "@arkecosystem/utils";
 import { Block } from "./block";
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
 import { Deserializer } from "./deserializer";
+import { BlockSchemaError } from "./errors";
 import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
-import { applySchema } from "./utils";
 
 @Container.injectable()
 export class BlockFactory implements IBlockFactory {
@@ -42,6 +43,9 @@ export class BlockFactory implements IBlockFactory {
 
 	@Container.inject(BINDINGS.SignatureFactory)
 	private readonly signatureFactory: Signatory;
+
+	@Container.inject(BINDINGS.Validator)
+	private readonly validator: IValidator;
 
 	// @todo: add a proper type hint for data
 	public async make(data: any, keys: IKeyPair): Promise<IBlock | undefined> {
@@ -86,7 +90,7 @@ export class BlockFactory implements IBlockFactory {
 		data: IBlockData,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): Promise<IBlock | undefined> {
-		if (await applySchema(data)) {
+		if (await this.#applySchema(data)) {
 			const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
 			const block: IBlock = this.blockFactory({
 				...(await this.deserializer.deserialize(serialized, false, options)),
@@ -105,7 +109,7 @@ export class BlockFactory implements IBlockFactory {
 			serialized,
 		);
 
-		const validated: IBlockData | undefined = await applySchema(deserialized.data);
+		const validated: IBlockData | undefined = await this.#applySchema(deserialized.data);
 
 		if (validated) {
 			deserialized.data = validated;
@@ -115,5 +119,42 @@ export class BlockFactory implements IBlockFactory {
 		block.serialized = serialized.toString("hex");
 
 		return block;
+	}
+
+	async #applySchema(data: IBlockData): Promise<IBlockData | undefined> {
+		const result = await this.validator.validate("block", data);
+
+		if (!result.error) {
+			return result.value;
+		}
+
+		for (const error of result.errors) {
+			let fatal = false;
+
+			const match = error.dataPath.match(/\.transactions\[(\d+)]/);
+			if (match === null) {
+				fatal = true;
+			} else {
+				const txIndex = match[1];
+
+				if (data.transactions) {
+					const tx = data.transactions[txIndex];
+
+					if (tx.id === undefined) {
+						fatal = true;
+					}
+				}
+			}
+
+			if (fatal) {
+				throw new BlockSchemaError(
+					data.height,
+					`Invalid data${error.dataPath ? " at " + error.dataPath : ""}: ` +
+						`${error.message}: ${JSON.stringify(error.data)}`,
+				);
+			}
+		}
+
+		return result.value;
 	}
 }

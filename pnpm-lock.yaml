@@ -910,6 +910,7 @@ importers:
       '@arkecosystem/core-crypto-errors': workspace:*
       '@arkecosystem/core-crypto-networks': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
@@ -947,6 +948,7 @@ importers:
       '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
       '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
       '@arkecosystem/core-crypto-time': link:../core-crypto-time
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/crypto-identities': 1.2.0

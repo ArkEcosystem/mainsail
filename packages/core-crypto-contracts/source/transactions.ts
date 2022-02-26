@@ -1,6 +1,7 @@
 import { ByteBuffer } from "@arkecosystem/utils";
-import { ErrorObject } from "ajv";
+
 import { IKeyPair } from "./identities";
+import { ISchemaValidationResult } from "./validator";
 
 export interface ITransaction {
 	readonly id: string | undefined;
@@ -97,13 +98,6 @@ export interface ITransactionJson {
 	blockId?: string;
 	sequence?: number;
 }
-
-export interface ISchemaValidationResult<T = any> {
-	value: T | undefined;
-	error: any;
-	errors?: ErrorObject[] | undefined;
-}
-
 export interface IMultiPaymentItem {
 	amount: any; // @TODO: use ByteBuffer from ../../crypto/utils
 	recipientId: string;

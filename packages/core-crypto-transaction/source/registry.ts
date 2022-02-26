@@ -1,5 +1,6 @@
 import { Container } from "@arkecosystem/core-container";
-import { ITransactionRegistry } from "@arkecosystem/core-crypto-contracts";
+import { BINDINGS, ITransactionRegistry, IValidator } from "@arkecosystem/core-crypto-contracts";
+import { schemas } from "@arkecosystem/core-crypto-validation";
 
 import {
 	TransactionAlreadyRegisteredError,
@@ -9,16 +10,18 @@ import {
 } from "./errors";
 import { Transaction, TransactionTypeFactory } from "./types";
 import { InternalTransactionType } from "./types/internal-transaction-type";
-// import { Validator } from "@arkecosystem/core-validation";
+import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 
 export type TransactionConstructor = typeof Transaction;
 
 @Container.injectable()
 export class TransactionRegistry implements ITransactionRegistry {
-	// @Container.inject(BINDINGS.Validator)
-	// private readonly validator: Validator;
+	@Container.inject(BINDINGS.Validator)
+	private readonly validator: IValidator;
 
 	private readonly transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>> = new Map();
+
+	readonly #transactionSchemas = new Map<string, TransactionSchema>();
 
 	public constructor() {
 		TransactionTypeFactory.initialize(this.transactionTypes);
@@ -57,7 +60,7 @@ export class TransactionRegistry implements ITransactionRegistry {
 		}
 
 		this.transactionTypes.get(internalType)!.set(constructor.version, constructor);
-		this.updateSchemas(constructor);
+		this.#updateSchemas(constructor.getSchema());
 	}
 
 	public deregisterTransactionType(constructor: TransactionConstructor): void {
@@ -72,7 +75,7 @@ export class TransactionRegistry implements ITransactionRegistry {
 			throw new UnkownTransactionError(internalType.toString());
 		}
 
-		this.updateSchemas(constructor, true);
+		this.#updateSchemas(constructor.getSchema(), true);
 
 		const constructors = this.transactionTypes.get(internalType)!;
 		if (!constructors.has(version)) {
@@ -86,9 +89,37 @@ export class TransactionRegistry implements ITransactionRegistry {
 		}
 	}
 
-	private updateSchemas(transaction: TransactionConstructor, remove?: boolean): void {
-		// @TODO
-		// this.validator.extendTransaction(transaction.getSchema(), remove);
+	#updateSchemas(schema: TransactionSchema, remove?: boolean): void {
+		this.validator.extend((ajv) => {
+			if (ajv.getSchema(schema.$id)) {
+				remove = true;
+			}
+
+			if (remove) {
+				this.#transactionSchemas.delete(schema.$id);
+
+				ajv.removeSchema(schema.$id);
+				ajv.removeSchema(`${schema.$id}Signed`);
+				ajv.removeSchema(`${schema.$id}Strict`);
+			}
+
+			this.#transactionSchemas.set(schema.$id, schema);
+
+			ajv.addSchema(schema);
+			ajv.addSchema(signedSchema(schema));
+			ajv.addSchema(strictSchema(schema));
+
+			// Update schemas
+			ajv.removeSchema("block");
+			ajv.removeSchema("transactions");
+			ajv.addSchema({
+				$id: "transactions",
+				additionalItems: false,
+				items: { anyOf: [...this.#transactionSchemas.keys()].map((schema) => ({ $ref: `${schema}Signed` })) },
+				type: "array",
+			});
+			ajv.addSchema(schemas.block);
+		});
 	}
 }
 

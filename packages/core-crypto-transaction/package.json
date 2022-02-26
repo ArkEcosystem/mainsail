@@ -21,6 +21,7 @@
 		"@arkecosystem/core-crypto-errors": "workspace:*",
 		"@arkecosystem/core-crypto-networks": "workspace:*",
 		"@arkecosystem/core-crypto-time": "workspace:*",
+		"@arkecosystem/core-crypto-validation": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-validation": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",

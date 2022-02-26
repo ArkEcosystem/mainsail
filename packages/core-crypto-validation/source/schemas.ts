@@ -1,4 +1,4 @@
-export const registerSchemas = () => ({
+export const schemas = {
 	address: {
 		$id: "address",
 		allOf: [{ maxLength: 34, minLength: 34 }, { $ref: "base58" }],
@@ -31,21 +31,21 @@ export const registerSchemas = () => ({
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
+			blockSignature: { $ref: "hex" },
+			generatorPublicKey: { $ref: "publicKey" },
 			height: { minimum: 1, type: "integer" },
 			id: { blockId: {} },
 			idHex: { blockId: {} },
 			numberOfTransactions: { type: "integer" },
 			payloadHash: { $ref: "hex" },
-			blockSignature: { $ref: "hex" },
-			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
-			generatorPublicKey: { $ref: "publicKey" },
-			previousBlockHex: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
 			payloadLength: { minimum: 0, type: "integer" },
-			timestamp: { minimum: 0, type: "integer" },
+			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
+			previousBlockHex: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
 			reward: { bignumber: { minimum: 0 } },
-			version: { type: "integer", minimum: 0 },
+			timestamp: { minimum: 0, type: "integer" },
 			totalAmount: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
 			totalFee: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
+			version: { minimum: 0, type: "integer" },
 		},
 		required: [
 			"id",
@@ -108,4 +108,4 @@ export const registerSchemas = () => ({
 		$id: "walletVote",
 		allOf: [{ pattern: "^[+|-][a-zA-Z0-9]{66}$", type: "string" }, { transform: ["toLowerCase"] }],
 	},
-});
+};
