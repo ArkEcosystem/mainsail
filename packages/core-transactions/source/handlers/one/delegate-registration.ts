@@ -1,6 +1,8 @@
+import Interfaces, { TransactionType } from "@arkecosystem/core-crypto-contracts";
+import Transactions from "@arkecosystem/core-crypto-transaction";
+import { One as DelegateRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-delegate-registration";
 import { Container, Contracts, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Enums, Transactions, Utils } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 
 import {
 	NotSupportedForMultiSignatureWalletError,
@@ -40,13 +42,13 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return Transactions.One.DelegateRegistrationTransaction;
+		return DelegateRegistrationTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
 		const criteria = {
-			typeGroup: this.getConstructor().typeGroup,
 			type: this.getConstructor().type,
+			typeGroup: this.getConstructor().typeGroup,
 		};
 
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
@@ -56,12 +58,12 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 			const wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 
 			wallet.setAttribute<Contracts.State.WalletDelegateAttributes>("delegate", {
-				username: transaction.asset.delegate.username,
-				voteBalance: Utils.BigNumber.ZERO,
-				forgedFees: Utils.BigNumber.ZERO,
-				forgedRewards: Utils.BigNumber.ZERO,
+				forgedFees: BigNumber.ZERO,
+				forgedRewards: BigNumber.ZERO,
 				producedBlocks: 0,
 				rank: undefined,
+				username: transaction.asset.delegate.username,
+				voteBalance: BigNumber.ZERO,
 			});
 
 			this.walletRepository.index(wallet);
@@ -142,7 +144,7 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 
 		if (hasSender) {
 			throw new Contracts.TransactionPool.PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Enums.TransactionType.DelegateRegistration}' in the pool`,
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${TransactionType.DelegateRegistration}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
@@ -152,7 +154,7 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 		const hasUsername: boolean = this.poolQuery
 			.getAll()
 			.whereKind(transaction)
-			.wherePredicate(/* istanbul ignore next */ (t) => t.data.asset?.delegate?.username === username)
+			.wherePredicate(async (t) => t.data.asset?.delegate?.username === username)
 			.has();
 
 		if (hasUsername) {
@@ -173,12 +175,12 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 		AppUtils.assert.defined<string>(transaction.data.asset?.delegate?.username);
 
 		sender.setAttribute<Contracts.State.WalletDelegateAttributes>("delegate", {
-			username: transaction.data.asset.delegate.username,
-			voteBalance: Utils.BigNumber.ZERO,
-			forgedFees: Utils.BigNumber.ZERO,
-			forgedRewards: Utils.BigNumber.ZERO,
+			forgedFees: BigNumber.ZERO,
+			forgedRewards: BigNumber.ZERO,
 			producedBlocks: 0,
 			round: 0,
+			username: transaction.data.asset.delegate.username,
+			voteBalance: BigNumber.ZERO,
 		});
 
 		this.walletRepository.index(sender);

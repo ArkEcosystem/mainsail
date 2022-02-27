@@ -1,5 +1,6 @@
 import { Contracts } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
+
 import { blocks } from "./proto/protos";
 
 const hardLimitNumberOfBlocks = 400;
@@ -7,41 +8,11 @@ const hardLimitNumberOfTransactions = 500;
 
 export const getBlocks = {
 	request: {
-		serialize: (obj: blocks.IGetBlocksRequest): Buffer => Buffer.from(blocks.GetBlocksRequest.encode(obj).finish()),
 		deserialize: (payload: Buffer): blocks.IGetBlocksRequest => blocks.GetBlocksRequest.decode(payload),
+		serialize: (object: blocks.IGetBlocksRequest): Buffer =>
+			Buffer.from(blocks.GetBlocksRequest.encode(object).finish()),
 	},
 	response: {
-		serialize: (obj): Buffer => {
-			const blockBuffers: Buffer[] = [];
-
-			for (const block of obj) {
-				let txBuffers: Buffer[] = [];
-
-				if (block.transactions) {
-					for (const transaction of block.transactions) {
-						const txBuffer = Buffer.from(transaction, "hex");
-						const txLengthBuffer = Buffer.alloc(4);
-						txLengthBuffer.writeUInt32BE(txBuffer.byteLength);
-						txBuffers.push(txLengthBuffer, txBuffer);
-					}
-				}
-
-				const blockEncoded = blocks.GetBlocksResponse.BlockHeader.encode({
-					...block,
-					totalAmount: block.totalAmount.toString(),
-					totalFee: block.totalFee.toString(),
-					reward: block.reward.toString(),
-					transactions: Buffer.concat(txBuffers),
-				}).finish();
-
-				const blockBuffer = Buffer.from(blockEncoded);
-				const blockLengthBuffer = Buffer.alloc(4);
-				blockLengthBuffer.writeUInt32BE(blockBuffer.length);
-				blockBuffers.push(blockLengthBuffer, blockBuffer);
-			}
-
-			return Buffer.concat(blockBuffers);
-		},
 		deserialize: (payload: Buffer) => {
 			const blocksBuffer = Buffer.from(payload);
 			const blocksBuffers: Buffer[] = [];
@@ -68,19 +39,49 @@ export const getBlocks = {
 				}
 				return {
 					...blockWithTxBuffer,
-					totalAmount: new Utils.BigNumber(blockWithTxBuffer.totalAmount as string),
-					totalFee: new Utils.BigNumber(blockWithTxBuffer.totalFee as string),
-					reward: new Utils.BigNumber(blockWithTxBuffer.reward as string),
+					reward: new BigNumber(blockWithTxBuffer.reward),
+					totalAmount: new BigNumber(blockWithTxBuffer.totalAmount),
+					totalFee: new BigNumber(blockWithTxBuffer.totalFee),
 					transactions: txs,
 				};
 			});
+		},
+		serialize: (object): Buffer => {
+			const blockBuffers: Buffer[] = [];
+
+			for (const block of object) {
+				const txBuffers: Buffer[] = [];
+
+				if (block.transactions) {
+					for (const transaction of block.transactions) {
+						const txBuffer = Buffer.from(transaction, "hex");
+						const txLengthBuffer = Buffer.alloc(4);
+						txLengthBuffer.writeUInt32BE(txBuffer.byteLength);
+						txBuffers.push(txLengthBuffer, txBuffer);
+					}
+				}
+
+				const blockEncoded = blocks.GetBlocksResponse.BlockHeader.encode({
+					...block,
+					reward: block.reward.toString(),
+					totalAmount: block.totalAmount.toString(),
+					totalFee: block.totalFee.toString(),
+					transactions: Buffer.concat(txBuffers),
+				}).finish();
+
+				const blockBuffer = Buffer.from(blockEncoded);
+				const blockLengthBuffer = Buffer.alloc(4);
+				blockLengthBuffer.writeUInt32BE(blockBuffer.length);
+				blockBuffers.push(blockLengthBuffer, blockBuffer);
+			}
+
+			return Buffer.concat(blockBuffers);
 		},
 	},
 };
 
 export const postBlock = {
 	request: {
-		serialize: (obj: blocks.IPostBlockRequest): Buffer => Buffer.from(blocks.PostBlockRequest.encode(obj).finish()),
 		deserialize: (payload: Buffer) => {
 			const decoded = blocks.PostBlockRequest.decode(payload);
 			return {
@@ -88,13 +89,12 @@ export const postBlock = {
 				block: Buffer.from(decoded.block),
 			};
 		},
+		serialize: (object: blocks.IPostBlockRequest): Buffer =>
+			Buffer.from(blocks.PostBlockRequest.encode(object).finish()),
 	},
 	response: {
-		serialize: (obj: blocks.IPostBlockResponse): Buffer => {
-			return Buffer.from(blocks.PostBlockResponse.encode(obj).finish());
-		},
-		deserialize: (payload: Buffer): Contracts.P2P.PostBlockResponse => {
-			return blocks.PostBlockResponse.decode(payload);
-		},
+		deserialize: (payload: Buffer): Contracts.P2P.PostBlockResponse => blocks.PostBlockResponse.decode(payload),
+		serialize: (object: blocks.IPostBlockResponse): Buffer =>
+			Buffer.from(blocks.PostBlockResponse.encode(object).finish()),
 	},
 };

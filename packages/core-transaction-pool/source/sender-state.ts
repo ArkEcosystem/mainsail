@@ -1,7 +1,6 @@
 import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Crypto, Managers } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 
 import {
 	RetryTransactionError,
@@ -32,6 +31,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@Container.inject(Container.Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly slots: any;
+
 	private corrupt = false;
 
 	public async apply(transaction: Interfaces.ITransaction): Promise<void> {
@@ -40,12 +42,12 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
 
-		const currentNetwork: number = Managers.configManager.get<number>("network.pubKeyHash");
+		const currentNetwork: number = this.configuration.get<number>("network.pubKeyHash");
 		if (transaction.data.network && transaction.data.network !== currentNetwork) {
 			throw new TransactionFromWrongNetworkError(transaction, currentNetwork);
 		}
 
-		const now: number = Crypto.Slots.getTime();
+		const now: number = this.slots.getTime();
 		if (transaction.timestamp > now + 3600) {
 			const secondsInFuture: number = transaction.timestamp - now;
 			throw new TransactionFromFutureError(transaction, secondsInFuture);

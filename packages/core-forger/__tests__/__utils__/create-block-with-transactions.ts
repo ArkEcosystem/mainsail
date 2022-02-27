@@ -16,9 +16,9 @@ export const expectedBlock = {
 	previousBlockHex: "0000000000a98ac7",
 	previousBlock: "11111111",
 	numberOfTransactions: 50,
-	totalAmount: Utils.BigNumber.make(500),
-	totalFee: Utils.BigNumber.make(500000000),
-	reward: Utils.BigNumber.make(0),
+	totalAmount: BigNumber.make(500),
+	totalFee: BigNumber.make(500000000),
+	reward: BigNumber.make(0),
 	payloadLength: 1600,
 	generatorPublicKey: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
 };
@@ -30,7 +30,7 @@ export const optionsDefault = {
 		idHex: "11111111",
 		height: 2,
 	},
-	reward: Utils.BigNumber.make(0),
+	reward: BigNumber.make(0),
 };
 
 export const transactions = TransactionFactory.initialize()

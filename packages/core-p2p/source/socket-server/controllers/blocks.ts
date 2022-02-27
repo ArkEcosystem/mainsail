@@ -1,7 +1,6 @@
+import Interfaces, { BINDINGS, IBlockDeserializer, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Providers, Utils } from "@arkecosystem/core-kernel";
-import { Blocks, Managers } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
@@ -12,7 +11,7 @@ import { Controller } from "./controller";
 export class BlocksController extends Controller {
 	@Container.inject(Container.Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@Container.inject(Container.Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
@@ -20,24 +19,28 @@ export class BlocksController extends Controller {
 	@Container.inject(Container.Identifiers.DatabaseService)
 	private readonly database!: DatabaseService;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration!: IConfiguration;
+
+	@Container.inject(BINDINGS.Block.Deserializer)
+	private readonly deserializer!: IBlockDeserializer;
+
 	public async postBlock(
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<{ status: boolean; height: number }> {
 		const blockBuffer: Buffer = request.payload.block;
 
-		const deserializedHeader = Blocks.Deserializer.deserialize(blockBuffer, true);
+		const deserializedHeader = await this.deserializer.deserialize(blockBuffer, true);
 
-		if (
-			deserializedHeader.data.numberOfTransactions > Managers.configManager.getMilestone().block.maxTransactions
-		) {
+		if (deserializedHeader.data.numberOfTransactions > this.configuration.getMilestone().block.maxTransactions) {
 			throw new TooManyTransactionsError(deserializedHeader.data);
 		}
 
 		const deserialized: {
 			data: Interfaces.IBlockData;
 			transactions: Interfaces.ITransaction[];
-		} = Blocks.Deserializer.deserialize(blockBuffer);
+		} = await this.deserializer.deserialize(blockBuffer);
 
 		const block: Interfaces.IBlockData = {
 			...deserialized.data,
@@ -45,21 +48,25 @@ export class BlocksController extends Controller {
 		};
 
 		const fromForger: boolean = Utils.isWhitelisted(
-			this.configuration.getOptional<string[]>("remoteAccess", []),
+			this.pluginConfiguration.getOptional<string[]>("remoteAccess", []),
 			request.info.remoteAddress,
 		);
 
 		if (!fromForger) {
 			if (this.blockchain.pingBlock(block)) {
-				return { status: true, height: this.blockchain.getLastHeight() };
+				return { height: this.blockchain.getLastHeight(), status: true };
 			}
 
 			const lastDownloadedBlock: Interfaces.IBlockData = this.blockchain.getLastDownloadedBlock();
 
-			const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.height);
+			const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+				this.app,
+				block.height,
+				this.configuration,
+			);
 
-			if (!Utils.isBlockChained(lastDownloadedBlock, block, blockTimeLookup)) {
-				return { status: false, height: this.blockchain.getLastHeight() };
+			if (!Utils.isBlockChained(lastDownloadedBlock, block, blockTimeLookup, this.configuration)) {
+				return { height: this.blockchain.getLastHeight(), status: false };
 			}
 		}
 
@@ -73,34 +80,35 @@ export class BlocksController extends Controller {
 
 		await this.blockchain.handleIncomingBlock(block, fromForger);
 
-		return { status: true, height: this.blockchain.getLastHeight() };
+		return { height: this.blockchain.getLastHeight(), status: true };
 	}
 
 	public async getBlocks(
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<Interfaces.IBlockData[] | Contracts.Shared.DownloadBlock[]> {
-		const reqBlockHeight: number = +(request.payload as any).lastBlockHeight + 1;
-		const reqBlockLimit: number = +(request.payload as any).blockLimit || 400;
-		const reqHeadersOnly: boolean = !!(request.payload as any).headersOnly;
+		const requestBlockHeight: number = +(request.payload as any).lastBlockHeight + 1;
+		const requestBlockLimit: number = +(request.payload as any).blockLimit || 400;
+		const requestHeadersOnly = !!(request.payload as any).headersOnly;
 
 		const lastHeight: number = this.blockchain.getLastHeight();
-		if (reqBlockHeight > lastHeight) {
+		if (requestBlockHeight > lastHeight) {
 			return [];
 		}
 
 		const blocks: Contracts.Shared.DownloadBlock[] = await this.database.getBlocksForDownload(
-			reqBlockHeight,
-			reqBlockLimit,
-			reqHeadersOnly,
+			requestBlockHeight,
+			requestBlockLimit,
+			requestHeadersOnly,
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
 		const blocksToReturn: Contracts.Shared.DownloadBlock[] = [];
 		const maxPayloadWithMargin = constants.DEFAULT_MAX_PAYLOAD - 100 * 1024; // 100KB margin because we're dealing with estimates
-		for (let i = 0, sizeEstimate = 0; sizeEstimate < maxPayloadWithMargin && i < blocks.length; i++) {
-			blocksToReturn.push(blocks[i]);
-			sizeEstimate += blocks[i].transactions?.reduce((acc, curr) => acc + curr.length, 0) ?? 0;
+		for (let index = 0, sizeEstimate = 0; sizeEstimate < maxPayloadWithMargin && index < blocks.length; index++) {
+			blocksToReturn.push(blocks[index]);
+			sizeEstimate +=
+				blocks[index].transactions?.reduce((accumulator, current) => accumulator + current.length, 0) ?? 0;
 			// We estimate the size of each block -- as it will be sent through p2p -- with the length of the
 			// associated transactions. When blocks are big, size of the block header is negligible compared to its
 			// transactions. And here we just want a broad limit to stop when getting close to p2p max payload.
@@ -111,7 +119,7 @@ export class BlocksController extends Controller {
 				"block",
 				blocksToReturn.length,
 				true,
-			)} from height ${reqBlockHeight.toLocaleString()}`,
+			)} from height ${requestBlockHeight.toLocaleString()}`,
 		);
 
 		return blocksToReturn;

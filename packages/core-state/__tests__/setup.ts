@@ -58,15 +58,15 @@ export const setUpDefaults = {
 	getSentTransaction: [
 		{
 			senderPublicKey: "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece",
-			amount: Utils.BigNumber.make(22222),
-			fee: Utils.BigNumber.make(33333),
-			nonce: Utils.BigNumber.ONE,
+			amount: BigNumber.make(22222),
+			fee: BigNumber.make(33333),
+			nonce: BigNumber.ONE,
 		},
 	],
 	getBlockRewards: [
 		{
 			generatorPublicKey: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
-			rewards: Utils.BigNumber.make(10000),
+			rewards: BigNumber.make(10000),
 		},
 	],
 	getRegisteredHandlers: [],
@@ -289,7 +289,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		await sandbox.boot();
 
 		// todo: get rid of the need for this, requires an instance based crypto package
-		Managers.configManager.setConfig(
+		this.configuration.setConfig(
 			sandbox.app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).get("crypto"),
 		);
 	}

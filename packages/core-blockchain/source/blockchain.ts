@@ -1,8 +1,7 @@
+import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Blocks, Crypto, Managers } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
 import { StateMachine } from "./state-machine";
@@ -16,7 +15,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 	@Container.inject(Container.Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-blockchain")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@Container.inject(Container.Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
@@ -48,19 +47,28 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Block.Factory)
+	private readonly blockFactory: IBlockFactory;
+
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
+
 	private queue!: Contracts.Kernel.Queue;
 
 	private stopped!: boolean;
-	private booted: boolean = false;
-	private missedBlocks: number = 0;
-	private lastCheckNetworkHealthTs: number = 0;
+	private booted = false;
+	private missedBlocks = 0;
+	private lastCheckNetworkHealthTs = 0;
 
 	@Container.postConstruct()
 	public async initialize(): Promise<void> {
 		this.stopped = false;
 
 		// flag to force a network start
-		this.stateStore.setNetworkStart(this.configuration.getOptional("options.networkStart", false));
+		this.stateStore.setNetworkStart(this.pluginConfiguration.getOptional("options.networkStart", false));
 
 		if (this.stateStore.getNetworkStart()) {
 			this.logger.warning(
@@ -148,7 +156,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	public setWakeUp(): void {
 		this.stateStore.setWakeUpTimeout(() => {
 			this.dispatch("WAKEUP");
-		}, 60000);
+		}, 60_000);
 	}
 
 	public resetWakeUp(): void {
@@ -168,14 +176,18 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	}
 
 	public async handleIncomingBlock(block: Interfaces.IBlockData, fromForger = false): Promise<void> {
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.height);
+		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			block.height,
+			this.configuration,
+		);
 
-		const currentSlot: number = Crypto.Slots.getSlotNumber(blockTimeLookup);
-		const receivedSlot: number = Crypto.Slots.getSlotNumber(blockTimeLookup, block.timestamp);
+		const currentSlot: number = this.slots.getSlotNumber(blockTimeLookup);
+		const receivedSlot: number = this.slots.getSlotNumber(blockTimeLookup, block.timestamp);
 
 		if (fromForger) {
-			const minimumMs: number = 2000;
-			const timeLeftInMs: number = Crypto.Slots.getTimeInMsUntilNextSlot(blockTimeLookup);
+			const minimumMs = 2000;
+			const timeLeftInMs: number = this.slots.getTimeInMsUntilNextSlot(blockTimeLookup);
 			if (currentSlot !== receivedSlot || timeLeftInMs < minimumMs) {
 				this.logger.info(`Discarded block ${block.height.toLocaleString()} because it was received too late.`);
 				return;
@@ -215,7 +227,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		};
 
 		const lastDownloadedHeight: number = this.getLastDownloadedBlock().height;
-		const milestoneHeights: number[] = Managers.configManager
+		const milestoneHeights: number[] = this.configuration
 			.getMilestones()
 			.map((milestone) => milestone.height)
 			.sort((a, b) => a - b)
@@ -274,23 +286,25 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 				blocksToRemove.pop();
 
 				let newLastBlock: Interfaces.IBlock;
+				// eslint-disable-next-line unicorn/prefer-at
 				if (blocksToRemove[blocksToRemove.length - 1].height === 1) {
 					newLastBlock = this.stateStore.getGenesisBlock();
 				} else {
-					const tempNewLastBlockData: Interfaces.IBlockData = blocksToRemove[blocksToRemove.length - 1];
+					// eslint-disable-next-line unicorn/prefer-at
+					const temporaryNewLastBlockData: Interfaces.IBlockData = blocksToRemove[blocksToRemove.length - 1];
 
-					Utils.assert.defined<Interfaces.IBlockData>(tempNewLastBlockData);
+					Utils.assert.defined<Interfaces.IBlockData>(temporaryNewLastBlockData);
 
-					const tempNewLastBlock: Interfaces.IBlock | undefined = Blocks.BlockFactory.fromData(
-						tempNewLastBlockData,
+					const temporaryNewLastBlock: Interfaces.IBlock | undefined = await this.blockFactory.fromData(
+						temporaryNewLastBlockData,
 						{
 							deserializeTransactionsUnchecked: true,
 						},
 					);
 
-					Utils.assert.defined<Interfaces.IBlockData>(tempNewLastBlock);
+					Utils.assert.defined<Interfaces.IBlockData>(temporaryNewLastBlock);
 
-					newLastBlock = tempNewLastBlock;
+					newLastBlock = temporaryNewLastBlock;
 				}
 
 				this.stateStore.setLastBlock(newLastBlock);
@@ -338,8 +352,8 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 					})`,
 				);
 			}
-		} catch (err) {
-			this.logger.error(err.stack);
+		} catch (error) {
+			this.logger.error(error.stack);
 			this.logger.warning("Shutting down app, because state might be corrupted");
 			process.exit(1);
 		}
@@ -381,9 +395,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 		block = block || this.getLastBlock().data;
 
-		return (
-			Crypto.Slots.getTime() - block.timestamp < 3 * Managers.configManager.getMilestone(block.height).blocktime
-		);
+		return this.slots.getTime() - block.timestamp < 3 * this.configuration.getMilestone(block.height).blocktime;
 	}
 
 	public getLastBlock(): Interfaces.IBlock {
@@ -412,10 +424,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 	public async checkMissingBlocks(): Promise<void> {
 		this.missedBlocks++;
-		if (
-			this.missedBlocks >= Managers.configManager.getMilestone().activeDelegates / 3 - 1 &&
-			Math.random() <= 0.8
-		) {
+		if (this.missedBlocks >= this.configuration.getMilestone().activeDelegates / 3 - 1 && Math.random() <= 0.8) {
 			this.resetMissedBlocks();
 
 			// do not check network health here more than every 10 minutes

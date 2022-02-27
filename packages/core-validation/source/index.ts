@@ -1,5 +1,5 @@
+import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
-import { BINDINGS } from "@packages/core-crypto-contracts/distribution";
 
 import { Validator } from "./validator";
 

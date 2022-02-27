@@ -1,5 +1,5 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
 
 interface ChunkData {
 	key: string;
@@ -10,7 +10,7 @@ interface ChunkData {
 export class ChunkCache implements Contracts.P2P.ChunkCache {
 	private downloadedChunksCache: ChunkData[] = [];
 
-	private downloadedChunksCacheMax: number = 100;
+	private downloadedChunksCacheMax = 100;
 
 	public has(key: string): boolean {
 		return this.downloadedChunksCache.some((chunkData) => chunkData.key === key);
@@ -28,8 +28,8 @@ export class ChunkCache implements Contracts.P2P.ChunkCache {
 
 	public set(key: string, data: Interfaces.IBlockData[]): void {
 		this.downloadedChunksCache.push({
-			key: key,
 			data: data,
+			key: key,
 		});
 
 		if (this.downloadedChunksCache.length > this.downloadedChunksCacheMax) {

@@ -1,8 +1,7 @@
-import assert from "assert";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
-import { Blocks } from "@arkecosystem/crypto";
+import assert from "assert";
 import pluralize from "pluralize";
 import { inspect } from "util";
 
@@ -38,6 +37,12 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 	@Container.inject(Container.Identifiers.PeerCommunicator)
 	private communicator!: Contracts.P2P.PeerCommunicator;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration!: IConfiguration;
+
+	@Container.inject(BINDINGS.Block.Factory)
+	private readonly blockFactory!: IBlockFactory;
 
 	private logPrefix!: string;
 
@@ -104,13 +109,13 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 
 			if (claimedHeight < this.ourHeight()) {
-				const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight);
+				const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight, this.configuration);
 				const delegates = await this.getDelegatesByRound(roundInfo);
 				if (this.verifyPeerBlock(blockHeader, claimedHeight, delegates)) {
 					return true;
 				}
 			} else {
-				const claimedBlock: Interfaces.IBlock | undefined = Blocks.BlockFactory.fromData(blockHeader);
+				const claimedBlock: Interfaces.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
 				if (claimedBlock?.verifySignature()) {
 					return true;
 				}
@@ -235,9 +240,10 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 
 			const ourBlocksPrint = ourBlocks.map((b) => `{ height=${b.height}, id=${b.id} }`).join(", ");
-			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks.at(
-				- 1
-			).height.toLocaleString()}]`;
+			// eslint-disable-next-line unicorn/prefer-at
+			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[
+				ourBlocks.length - 1
+			].height.toLocaleString()}]`;
 
 			const msRemaining = this.throwIfPastDeadline(deadline);
 
@@ -290,7 +296,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	private async verifyPeerBlocks(startHeight: number, claimedHeight: number, deadline: number): Promise<boolean> {
-		const roundInfo = Utils.roundCalculator.calculateRound(startHeight);
+		const roundInfo = Utils.roundCalculator.calculateRound(startHeight, this.configuration);
 		const { maxDelegates, roundHeight } = roundInfo;
 		const lastBlockHeightInRound = roundHeight + maxDelegates - 1;
 
@@ -306,16 +312,17 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const endHeight = Math.min(claimedHeight, lastBlockHeightInRound);
 
 		for (let height = startHeight; height <= endHeight; height++) {
-			if (hisBlocksByHeight[height] === undefined &&
-					!(await this.fetchBlocksFromHeight({
-						blocksByHeight: hisBlocksByHeight,
-						deadline,
-						endHeight,
-						height,
-					}))
-				) {
-					return false;
-				}
+			if (
+				hisBlocksByHeight[height] === undefined &&
+				!(await this.fetchBlocksFromHeight({
+					blocksByHeight: hisBlocksByHeight,
+					deadline,
+					endHeight,
+					height,
+				}))
+			) {
+				return false;
+			}
 			assert(hisBlocksByHeight[height] !== undefined);
 
 			if (!this.verifyPeerBlock(hisBlocksByHeight[height], height, delegates)) {
@@ -329,9 +336,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	private async getDelegatesByRound(
 		roundInfo: Contracts.Shared.RoundInfo,
 	): Promise<Record<string, Contracts.State.Wallet>> {
-		let delegates = (await this.app
+		let delegates: any = await this.app
 			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-			.call("getActiveDelegates", { roundInfo }));
+			.call("getActiveDelegates", { roundInfo });
 
 		if (delegates.length === 0) {
 			// This must be the current round, still not saved into the database (it is saved
@@ -398,12 +405,12 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return true;
 	}
 
-	private verifyPeerBlock(
+	private async verifyPeerBlock(
 		blockData: Interfaces.IBlockData,
 		expectedHeight: number,
 		delegatesByPublicKey: Record<string, Contracts.State.Wallet>,
-	): boolean {
-		const block: Interfaces.IBlock | undefined = Blocks.BlockFactory.fromData(blockData);
+	): Promise<boolean> {
+		const block: Interfaces.IBlock | undefined = await this.blockFactory.fromData(blockData);
 
 		Utils.assert.defined<Interfaces.IBlock>(block);
 

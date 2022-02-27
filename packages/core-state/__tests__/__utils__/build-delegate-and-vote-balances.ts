@@ -29,13 +29,13 @@ export const buildDelegateAndVoteWallets = (numberDelegates: number, walletRepo:
 		const delegate = walletRepo.createWallet(Identities.Address.fromPublicKey(delegateKey));
 		delegate.setPublicKey(delegateKey);
 		delegate.setAttribute("delegate.username", `delegate${i}`);
-		delegate.setAttribute("delegate.voteBalance", CryptoUtils.BigNumber.ZERO);
+		delegate.setAttribute("delegate.voteBalance", CryptoBigNumber.ZERO);
 
 		// @ts-ignore
 		delegate.events = undefined;
 
 		const voter = walletRepo.createWallet(Identities.Address.fromPublicKey(voterKeys[i]));
-		const totalBalance = CryptoUtils.BigNumber.make(i + 1)
+		const totalBalance = CryptoBigNumber.make(i + 1)
 			.times(1000)
 			.times(SATOSHI);
 		voter.setBalance(totalBalance);

@@ -1,6 +1,8 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Transactions from "@arkecosystem/core-crypto-transaction";
+import { One as MultiPaymentTransaction } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { InsufficientBalanceError } from "../../errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
@@ -19,13 +21,13 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return Transactions.Two.MultiPaymentTransaction;
+		return MultiPaymentTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
 		const criteria = {
-			typeGroup: this.getConstructor().typeGroup,
 			type: this.getConstructor().type,
+			typeGroup: this.getConstructor().typeGroup,
 		};
 
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
@@ -42,7 +44,7 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 	}
 
 	public async isActivated(): Promise<boolean> {
-		return Managers.configManager.getMilestone().aip11 === true;
+		return this.configuration.getMilestone().aip11 === true;
 	}
 
 	public async throwIfCannotBeApplied(
@@ -52,7 +54,7 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		const payments: Interfaces.IMultiPaymentItem[] = transaction.data.asset.payments;
-		const totalPaymentsAmount = payments.reduce((a, p) => a.plus(p.amount), Utils.BigNumber.ZERO);
+		const totalPaymentsAmount = payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
 		if (wallet.getBalance().minus(totalPaymentsAmount).minus(transaction.data.fee).isNegative()) {
 			throw new InsufficientBalanceError();
@@ -66,10 +68,7 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
-		const totalPaymentsAmount = transaction.data.asset.payments.reduce(
-			(a, p) => a.plus(p.amount),
-			Utils.BigNumber.ZERO,
-		);
+		const totalPaymentsAmount = transaction.data.asset.payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -83,10 +82,7 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
-		const totalPaymentsAmount = transaction.data.asset.payments.reduce(
-			(a, p) => a.plus(p.amount),
-			Utils.BigNumber.ZERO,
-		);
+		const totalPaymentsAmount = transaction.data.asset.payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 

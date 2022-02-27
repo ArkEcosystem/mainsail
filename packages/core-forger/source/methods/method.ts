@@ -1,16 +1,23 @@
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Blocks, Crypto, Utils } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Interfaces, { BINDINGS, IBlockFactory, IHashFactory } from "@arkecosystem/core-crypto-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 
+@Container.injectable()
 export abstract class Method {
-	protected createBlock(
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly blockFactory: IBlockFactory;
+
+	@Container.inject(BINDINGS.HashFactory)
+	private readonly hashFactory: IHashFactory;
+
+	protected async createBlock(
 		keys: Interfaces.IKeyPair,
 		transactions: Interfaces.ITransactionData[],
 		options: Record<string, any>,
-	): Interfaces.IBlock {
-		const totals: { amount: Utils.BigNumber; fee: Utils.BigNumber } = {
-			amount: Utils.BigNumber.ZERO,
-			fee: Utils.BigNumber.ZERO,
+	): Promise<Interfaces.IBlock> {
+		const totals: { amount: BigNumber; fee: BigNumber } = {
+			amount: BigNumber.ZERO,
+			fee: BigNumber.ZERO,
 		};
 
 		const payloadBuffers: Buffer[] = [];
@@ -23,12 +30,12 @@ export abstract class Method {
 			payloadBuffers.push(Buffer.from(transaction.id, "hex"));
 		}
 
-		return Blocks.BlockFactory.make(
+		return this.blockFactory.make(
 			{
 				generatorPublicKey: keys.publicKey,
 				height: options.previousBlock.height + 1,
 				numberOfTransactions: transactions.length,
-				payloadHash: Crypto.HashAlgorithms.sha256(payloadBuffers).toString("hex"),
+				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength: 32 * transactions.length,
 				previousBlock: options.previousBlock.id,
 				previousBlockHex: options.previousBlock.idHex,

@@ -1,7 +1,6 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
-import { Crypto, Identities, Managers, Networks } from "@arkecosystem/crypto";
 import { validateMnemonic } from "bip39";
-import { writeJSONSync } from "fs-extra";
+// import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
 import wif from "wif";
 
@@ -15,8 +14,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("bip39", "A delegate plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
@@ -68,7 +67,7 @@ export class Command extends Commands.Command {
 	}
 
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
-		let decodedWIF;
+		// let decodedWIF;
 
 		await this.components.taskList([
 			{
@@ -79,35 +78,35 @@ export class Command extends Commands.Command {
 				},
 				title: "Validating passphrase is BIP39 compliant.",
 			},
-			{
-				task: () => {
-					Managers.configManager.setFromPreset(flags.network);
-				},
-				title: "Prepare crypto.",
-			},
+			// {
+			// 	task: () => {
+			// 		this.configuration.setFromPreset(flags.network);
+			// 	},
+			// 	title: "Prepare crypto.",
+			// },
 			{
 				task: () => {
 					// @ts-ignore
-					decodedWIF = wif.decode(Identities.WIF.fromPassphrase(flags.bip39));
+					decodedWIF = wif.decode(Identities.WIF.fromMnemonic(flags.bip39));
 				},
 				title: "Loading private key.",
 			},
-			{
-				task: () => {
-					const delegatesConfig = this.app.getCorePath("config", "delegates.json");
+			// {
+			// 	task: () => {
+			// 		const delegatesConfig = this.app.getCorePath("config", "delegates.json");
 
-					const delegates = require(delegatesConfig);
-					delegates.bip38 = Crypto.bip38.encrypt(
-						decodedWIF.privateKey,
-						decodedWIF.compressed,
-						flags.password,
-					);
-					delegates.secrets = [];
+			// 		const delegates = require(delegatesConfig);
+			// 		delegates.bip38 = Crypto.bip38.encrypt(
+			// 			decodedWIF.privateKey,
+			// 			decodedWIF.compressed,
+			// 			flags.password,
+			// 		);
+			// 		delegates.secrets = [];
 
-					writeJSONSync(delegatesConfig, delegates);
-				},
-				title: "Encrypting BIP39 passphrase.",
-			},
+			// 		writeJSONSync(delegatesConfig, delegates);
+			// 	},
+			// 	title: "Encrypting BIP39 passphrase.",
+			// },
 		]);
 	}
 }

@@ -1,4 +1,4 @@
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 export interface SenderMempool {
 	isDisposable(): boolean;

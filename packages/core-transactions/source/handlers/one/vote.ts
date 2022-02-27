@@ -1,6 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { TransactionType } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
-import { Enums, Transactions } from "@arkecosystem/crypto";
+import Transactions from "@arkecosystem/core-crypto-transaction";
+import { One as VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
 
 import {
 	AlreadyVotedError,
@@ -31,7 +32,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return Transactions.One.VoteTransaction;
+		return VoteTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
@@ -136,7 +137,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 		if (hasSender) {
 			throw new Contracts.TransactionPool.PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Enums.TransactionType.Vote}' in the pool`,
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${TransactionType.Vote}' in the pool`,
 				"ERR_PENDING",
 			);
 		}

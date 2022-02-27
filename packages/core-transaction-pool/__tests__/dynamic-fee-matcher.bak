@@ -42,14 +42,14 @@ describe("when dynamic fees are enabled", () => {
 	beforeEach(() => {
 		configuration.getRequired.mockReturnValueOnce({ enabled: true, minFeePool, minFeeBroadcast, addonBytes });
 		stateStore.getLastHeight.mockReturnValueOnce(height);
-		handler.dynamicFee.mockReturnValueOnce(new Utils.BigNumber(1000));
+		handler.dynamicFee.mockReturnValueOnce(new BigNumber(1000));
 	});
 
 	describe("DynamicFeeMatcher.throwIfCannotEnterPool", () => {
 		it("should allow entering pool when fee is higher or equal than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(1000) },
+				data: { fee: new BigNumber(1000) },
 			} as Interfaces.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -71,7 +71,7 @@ describe("when dynamic fees are enabled", () => {
 		it("should not allow entering pool when fee is lower than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(999) },
+				data: { fee: new BigNumber(999) },
 			} as Interfaces.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -97,7 +97,7 @@ describe("when dynamic fees are enabled", () => {
 		it("should allow broadcast when fee is higher or equal than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(1000) },
+				data: { fee: new BigNumber(1000) },
 			} as Interfaces.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -119,7 +119,7 @@ describe("when dynamic fees are enabled", () => {
 		it("should not allow broadcast when fee is lower than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(999) },
+				data: { fee: new BigNumber(999) },
 			} as Interfaces.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -150,8 +150,8 @@ describe("when dynamic fees are disabled", () => {
 		it("should allow entering pool when fee equals static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1000) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1000) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -163,8 +163,8 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is lower than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(999) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(999) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -178,8 +178,8 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is higher than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1001) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1001) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -195,8 +195,8 @@ describe("when dynamic fees are disabled", () => {
 		it("should allow entering pool when fee equals static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1000) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1000) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -208,8 +208,8 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is lower than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(999) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(999) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
@@ -223,8 +223,8 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is higher than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1001) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1001) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);

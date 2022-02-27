@@ -1,6 +1,17 @@
-import { Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Identities, Managers, Transactions, Types, Utils } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, {
+	BINDINGS,
+	IAddressFactory,
+	IConfiguration,
+	IPublicKeyFactory,
+} from "@arkecosystem/core-crypto-contracts";
+import { DelegateRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-delegate-registration";
+import { DelegateResignationBuilder } from "@arkecosystem/core-crypto-transaction-delegate-resignation";
+import { MultiPaymentBuilder } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { MultiSignatureBuilder } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
+import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
+import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
+import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
 import secrets from "../internal/passphrases.json";
 import { getWalletNonce } from "./generic";
@@ -13,13 +24,23 @@ interface IPassphrasePair {
 
 // todo: replace this by the use of real factories
 export class TransactionFactory {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Identity.AddressFactory)
+	private readonly addressFactory: IAddressFactory;
+
+	@Container.inject(BINDINGS.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: IPublicKeyFactory;
+
 	protected builder: any;
 	protected app: Contracts.Kernel.Application;
 
-	private network: Types.NetworkName = "testnet";
+	// @ts-ignore
+	private network = "testnet";
 	private networkConfig: Interfaces.NetworkConfig | undefined;
-	private nonce: Utils.BigNumber | undefined;
-	private fee: Utils.BigNumber | undefined;
+	private nonce: BigNumber | undefined;
+	private fee: BigNumber | undefined;
 	private timestamp: number | undefined;
 	private passphrase: string = defaultPassphrase;
 	private passphraseList: string[] | undefined;
@@ -39,10 +60,14 @@ export class TransactionFactory {
 		return new TransactionFactory(app);
 	}
 
-	public transfer(recipientId?: string, amount: number = 2 * 1e8, vendorField?: string): TransactionFactory {
-		const builder = Transactions.BuilderFactory.transfer()
-			.amount(Utils.BigNumber.make(amount).toFixed())
-			.recipientId(recipientId || Identities.Address.fromPassphrase(defaultPassphrase));
+	public async transfer(
+		recipientId?: string,
+		amount: number = 2 * 1e8,
+		vendorField?: string,
+	): Promise<TransactionFactory> {
+		const builder = new TransferBuilder()
+			.amount(BigNumber.make(amount).toFixed())
+			.recipientId(recipientId || (await this.addressFactory.fromMnemonic(defaultPassphrase)));
 
 		if (vendorField) {
 			builder.vendorField(vendorField);
@@ -54,7 +79,7 @@ export class TransactionFactory {
 	}
 
 	public delegateRegistration(username?: string): TransactionFactory {
-		const builder = Transactions.BuilderFactory.delegateRegistration();
+		const builder = new DelegateRegistrationBuilder();
 
 		if (username) {
 			builder.usernameAsset(username);
@@ -66,40 +91,40 @@ export class TransactionFactory {
 	}
 
 	public delegateResignation(): TransactionFactory {
-		this.builder = Transactions.BuilderFactory.delegateResignation();
+		this.builder = new DelegateResignationBuilder();
 
 		return this;
 	}
 
 	public vote(publicKey?: string): TransactionFactory {
-		this.builder = Transactions.BuilderFactory.vote().votesAsset([
-			`+${publicKey || Identities.PublicKey.fromPassphrase(defaultPassphrase)}`,
+		this.builder = new VoteBuilder().votesAsset([
+			`+${publicKey || this.publicKeyFactory.fromMnemonic(defaultPassphrase)}`,
 		]);
 
 		return this;
 	}
 
 	public unvote(publicKey?: string): TransactionFactory {
-		this.builder = Transactions.BuilderFactory.vote().votesAsset([
-			`-${publicKey || Identities.PublicKey.fromPassphrase(defaultPassphrase)}`,
+		this.builder = new VoteBuilder().votesAsset([
+			`-${publicKey || this.publicKeyFactory.fromMnemonic(defaultPassphrase)}`,
 		]);
 
 		return this;
 	}
 
-	public multiSignature(participants?: string[], min?: number): TransactionFactory {
+	public async multiSignature(participants?: string[], min?: number): Promise<TransactionFactory> {
 		let passphrases: string[] | undefined;
 		if (!participants) {
 			passphrases = [secrets[0], secrets[1], secrets[2]];
 		}
 
 		participants = participants || [
-			Identities.PublicKey.fromPassphrase(secrets[0]),
-			Identities.PublicKey.fromPassphrase(secrets[1]),
-			Identities.PublicKey.fromPassphrase(secrets[2]),
+			await this.publicKeyFactory.fromMnemonic(secrets[0]),
+			await this.publicKeyFactory.fromMnemonic(secrets[1]),
+			await this.publicKeyFactory.fromMnemonic(secrets[2]),
 		];
 
-		this.builder = Transactions.BuilderFactory.multiSignature().multiSignatureAsset({
+		this.builder = new MultiSignatureBuilder().multiSignatureAsset({
 			min: min || participants.length,
 			publicKeys: participants,
 		});
@@ -114,7 +139,7 @@ export class TransactionFactory {
 	}
 
 	public multiPayment(payments: Array<{ recipientId: string; amount: string }>): TransactionFactory {
-		const builder = Transactions.BuilderFactory.multiPayment();
+		const builder = new MultiPaymentBuilder();
 
 		for (const payment of payments) {
 			builder.addPayment(payment.recipientId, payment.amount);
@@ -126,7 +151,7 @@ export class TransactionFactory {
 	}
 
 	public withFee(fee: number): TransactionFactory {
-		this.fee = Utils.BigNumber.make(fee);
+		this.fee = BigNumber.make(fee);
 
 		return this;
 	}
@@ -137,7 +162,7 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public withNetwork(network: Types.NetworkName): TransactionFactory {
+	public withNetwork(network: string): TransactionFactory {
 		this.network = network;
 
 		return this;
@@ -150,7 +175,7 @@ export class TransactionFactory {
 	}
 
 	public withHeight(height: number): TransactionFactory {
-		Managers.configManager.setHeight(height);
+		this.configuration.setHeight(height);
 
 		return this;
 	}
@@ -161,7 +186,7 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public withNonce(nonce: Utils.BigNumber): TransactionFactory {
+	public withNonce(nonce: BigNumber): TransactionFactory {
 		this.nonce = nonce;
 
 		return this;
@@ -209,19 +234,19 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public create(quantity = 1): Interfaces.ITransactionData[] {
+	public async create(quantity = 1): Promise<Interfaces.ITransactionData[]> {
 		return this.make<Interfaces.ITransactionData>(quantity, "getStruct");
 	}
 
-	public createOne(): Interfaces.ITransactionData {
-		return this.create(1)[0];
+	public async createOne(): Promise<Interfaces.ITransactionData> {
+		return (await this.create(1))[0];
 	}
 
-	public build(quantity = 1): Interfaces.ITransaction[] {
+	public async build(quantity = 1): Promise<Interfaces.ITransaction[]> {
 		return this.make<Interfaces.ITransaction>(quantity, "build");
 	}
 
-	public getNonce(): Utils.BigNumber {
+	public getNonce(): BigNumber {
 		if (this.nonce) {
 			return this.nonce;
 		}
@@ -232,8 +257,8 @@ export class TransactionFactory {
 	}
 
 	/* istanbul ignore next */
-	private make<T>(quantity = 1, method: string): T[] {
-		if (this.passphrasePairs && this.passphrasePairs.length) {
+	private async make<T>(quantity = 1, method: string): Promise<T[]> {
+		if (this.passphrasePairs && this.passphrasePairs.length > 0) {
 			return this.passphrasePairs.map(
 				(passphrasePair: IPassphrasePair) =>
 					this.withPassphrase(passphrasePair.passphrase).sign<T>(quantity, method)[0],
@@ -243,28 +268,24 @@ export class TransactionFactory {
 		return this.sign<T>(quantity, method);
 	}
 
-	private sign<T>(quantity: number, method: string): T[] {
-		if (this.networkConfig !== undefined) {
-			Managers.configManager.setConfig(this.networkConfig);
-		} else {
-			Managers.configManager.setFromPreset(this.network);
-		}
+	private async sign<T>(quantity: number, method: string): Promise<T[]> {
+		this.configuration.setConfig(this.networkConfig);
 
 		if (!this.senderPublicKey) {
-			this.senderPublicKey = Identities.PublicKey.fromPassphrase(this.passphrase);
+			this.senderPublicKey = await this.publicKeyFactory.fromMnemonic(this.passphrase);
 		}
 
 		const transactions: T[] = [];
 		let nonce = this.getNonce();
 
-		for (let i = 0; i < quantity; i++) {
+		for (let index = 0; index < quantity; index++) {
 			if (this.builder.constructor.name === "TransferBuilder") {
 				// @FIXME: when we use any of the "withPassphrase*" methods the builder will
 				// always remember the previous vendor field instead generating a new one on each iteration
 				const vendorField: string = this.builder.data.vendorField;
 
 				if (!vendorField || (vendorField && vendorField.startsWith("Test Transaction"))) {
-					this.builder.vendorField(`Test Transaction ${i + 1}`);
+					this.builder.vendorField(`Test Transaction ${index + 1}`);
 				}
 			}
 
@@ -273,9 +294,7 @@ export class TransactionFactory {
 				// always remember the previous username instead generating a new one on each iteration
 				!this.builder.data.asset.delegate.username
 			) {
-				this.builder = Transactions.BuilderFactory.delegateRegistration().usernameAsset(
-					this.getRandomUsername(),
-				);
+				this.builder = new DelegateRegistrationBuilder().usernameAsset(this.getRandomUsername());
 			}
 
 			if (this.version) {
@@ -307,9 +326,9 @@ export class TransactionFactory {
 
 			let sign = true;
 
-			if (this.passphraseList && this.passphraseList.length) {
-				for (let i = 0; i < this.passphraseList.length; i++) {
-					this.builder.multiSign(this.passphraseList[i], i);
+			if (this.passphraseList && this.passphraseList.length > 0) {
+				for (let index = 0; index < this.passphraseList.length; index++) {
+					this.builder.multiSign(this.passphraseList[index], index);
 				}
 
 				sign = this.builder.constructor.name === "MultiSignatureBuilder";

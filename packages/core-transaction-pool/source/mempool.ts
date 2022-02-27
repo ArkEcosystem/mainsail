@@ -1,6 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IAddressFactory } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Identities } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
@@ -9,6 +8,9 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	@Container.inject(Container.Identifiers.TransactionPoolSenderMempoolFactory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly addressFactory: IAddressFactory;
 
 	private readonly senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 
@@ -39,7 +41,9 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		if (!senderMempool) {
 			senderMempool = this.createSenderMempool();
 			this.senderMempools.set(transaction.data.senderPublicKey, senderMempool);
-			this.logger.debug(`${Identities.Address.fromPublicKey(transaction.data.senderPublicKey)} state created`);
+			this.logger.debug(
+				`${await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey)} state created`,
+			);
 		}
 
 		try {
@@ -48,7 +52,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			if (senderMempool.isDisposable()) {
 				this.senderMempools.delete(transaction.data.senderPublicKey);
 				this.logger.debug(
-					`${Identities.Address.fromPublicKey(transaction.data.senderPublicKey)} state disposed`,
+					`${await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey)} state disposed`,
 				);
 			}
 		}
@@ -65,7 +69,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		} finally {
 			if (senderMempool.isDisposable()) {
 				this.senderMempools.delete(senderPublicKey);
-				this.logger.debug(`${Identities.Address.fromPublicKey(senderPublicKey)} state disposed`);
+				this.logger.debug(`${await this.addressFactory.fromPublicKey(senderPublicKey)} state disposed`);
 			}
 		}
 	}
@@ -81,7 +85,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		} finally {
 			if (senderMempool.isDisposable()) {
 				this.senderMempools.delete(senderPublicKey);
-				this.logger.debug(`${Identities.Address.fromPublicKey(senderPublicKey)} state disposed`);
+				this.logger.debug(`${await this.addressFactory.fromPublicKey(senderPublicKey)} state disposed`);
 			}
 		}
 	}

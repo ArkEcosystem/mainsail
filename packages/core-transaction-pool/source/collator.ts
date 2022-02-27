@@ -1,6 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Managers } from "@arkecosystem/crypto";
 
 import { TransactionHasExpiredError } from "./errors";
 
@@ -24,9 +23,12 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
 	public async getBlockCandidateTransactions(): Promise<Interfaces.ITransaction[]> {
 		const height: number = this.blockchain.getLastBlock().data.height;
-		const milestone = Managers.configManager.getMilestone(height);
+		const milestone = this.configuration.getMilestone(height);
 		const blockHeaderSize =
 			4 + // version
 			4 + // timestamp

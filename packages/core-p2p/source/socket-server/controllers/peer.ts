@@ -1,7 +1,6 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
-import { Crypto } from "@arkecosystem/crypto";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
@@ -19,6 +18,12 @@ export class PeerController extends Controller {
 
 	@Container.inject(Container.Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration!: IConfiguration;
+
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots!: any;
 
 	public getPeers(request: Hapi.Request, h: Hapi.ResponseToolkit): Contracts.P2P.PeerBroadcast[] {
 		const peerIp = getPeerIp(request.socket);
@@ -61,8 +66,12 @@ export class PeerController extends Controller {
 	public async getStatus(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerPingResponse> {
 		const lastBlock: Interfaces.IBlock = this.blockchain.getLastBlock();
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, lastBlock.data.height);
-		const slotInfo = Crypto.Slots.getSlotInfo(blockTimeLookup);
+		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			lastBlock.data.height,
+			this.configuration,
+		);
+		const slotInfo = this.slots.getSlotInfo(blockTimeLookup);
 
 		return {
 			config: getPeerConfig(this.app),

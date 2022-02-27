@@ -1,8 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Blocks, Crypto } from "@arkecosystem/crypto";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
 import { RevertBlockHandler } from "./processor/handlers";
@@ -40,6 +39,15 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Block.Factory)
+	private readonly blockFactory: IBlockFactory;
+
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
+
 	private blocks: Interfaces.IBlockData[] = [];
 
 	public getBlocks(): Interfaces.IBlockData[] {
@@ -57,19 +65,32 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 		const lastHeight = this.blockchain.getLastBlock().data.height;
 		const fromHeight = this.blocks[0].height;
-		const toHeight = this.blocks.at(- 1).height;
+		// eslint-disable-next-line unicorn/prefer-at
+		const toHeight = this.blocks[this.blocks.length - 1].height;
 		this.logger.debug(
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, this.blocks[0].height);
+		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			this.blocks[0].height,
+			this.configuration,
+		);
 
-		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup)) {
+		if (
+			!Utils.isBlockChained(
+				this.blockchain.getLastBlock().data,
+				this.blocks[0],
+				blockTimeLookup,
+				this.configuration,
+			)
+		) {
 			this.logger.warning(
 				Utils.getBlockNotChainedErrorMessage(
 					this.blockchain.getLastBlock().data,
 					this.blocks[0],
 					blockTimeLookup,
+					this.configuration,
 				),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
@@ -83,12 +104,13 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		let lastProcessResult: BlockProcessorResult | undefined;
 		let lastProcessedBlock: Interfaces.IBlock | undefined;
 
-		const acceptedBlockTimeLookup = (height: number) => acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
+		const acceptedBlockTimeLookup = (height: number) =>
+			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
 
 		try {
 			for (const block of this.blocks) {
-				const currentSlot: number = Crypto.Slots.getSlotNumber(acceptedBlockTimeLookup);
-				const blockSlot: number = Crypto.Slots.getSlotNumber(acceptedBlockTimeLookup, block.timestamp);
+				const currentSlot: number = this.slots.getSlotNumber(acceptedBlockTimeLookup);
+				const blockSlot: number = this.slots.getSlotNumber(acceptedBlockTimeLookup, block.timestamp);
 
 				if (blockSlot > currentSlot) {
 					this.logger.error(
@@ -97,7 +119,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 					break;
 				}
 
-				const blockInstance = Blocks.BlockFactory.fromData(block);
+				const blockInstance = this.blockFactory.fromData(block);
 				Utils.assert.defined<Interfaces.IBlock>(blockInstance);
 
 				lastProcessResult = await this.triggers.call("processBlock", {
@@ -132,7 +154,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		if (acceptedBlocks.length > 0) {
 			try {
 				await this.blockRepository.saveBlocks(acceptedBlocks);
-				this.stateStore.setLastStoredBlockHeight(acceptedBlocks.at(- 1).data.height);
+				// eslint-disable-next-line unicorn/prefer-at
+				this.stateStore.setLastStoredBlockHeight(acceptedBlocks[acceptedBlocks.length - 1].data.height);
 			} catch (error) {
 				this.logger.error(
 					`Could not save ${Utils.pluralize("block", acceptedBlocks.length, true)}) to database : ${
@@ -169,7 +192,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		// block that was written into the database.
 
 		const lastHeight: number = blocksToRevert[0].data.height;
-		const deleteRoundsAfter: number = Utils.roundCalculator.calculateRound(lastHeight).round;
+		const deleteRoundsAfter: number = Utils.roundCalculator.calculateRound(lastHeight, this.configuration).round;
 
 		this.logger.info(
 			`Reverting ${Utils.pluralize(

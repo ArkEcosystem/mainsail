@@ -1,4 +1,4 @@
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 export type EqualCriteria<T> = T;
 export type NumericCriteria<T> = T | { from: T } | { to: T } | { from: T; to: T };
@@ -21,8 +21,8 @@ export type StandardCriteriaOfItem<T> = T extends any[]
 	? boolean | string
 	: T extends number
 	? NumericCriteria<number | string>
-	: T extends BigInt | Utils.BigNumber
-	? NumericCriteria<number | BigInt | Utils.BigNumber | string>
+	: T extends BigInt | BigNumber
+	? NumericCriteria<number | BigInt | BigNumber | string>
 	: T extends string
 	? string
 	: T extends object

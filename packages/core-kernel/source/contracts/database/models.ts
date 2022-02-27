@@ -1,4 +1,4 @@
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 export interface BlockModel {
 	id: string;
@@ -7,9 +7,9 @@ export interface BlockModel {
 	previousBlock: string;
 	height: number;
 	numberOfTransactions: number;
-	totalAmount: Utils.BigNumber;
-	totalFee: Utils.BigNumber;
-	reward: Utils.BigNumber;
+	totalAmount: BigNumber;
+	totalFee: BigNumber;
+	reward: BigNumber;
 	payloadLength: number;
 	payloadHash: string;
 	generatorPublicKey: string;
@@ -23,14 +23,14 @@ export interface TransactionModel {
 	blockHeight: number;
 	sequence: number;
 	timestamp: number;
-	nonce: Utils.BigNumber;
+	nonce: BigNumber;
 	senderPublicKey: string;
 	recipientId: string;
 	type: number;
 	typeGroup: number;
 	vendorField: string | undefined;
-	amount: Utils.BigNumber;
-	fee: Utils.BigNumber;
+	amount: BigNumber;
+	fee: BigNumber;
 	serialized: Buffer;
 	asset: Record<string, any>;
 }

@@ -20,9 +20,9 @@ export class CoreGenerator extends Generator {
 
 		this.writePeers();
 
-		this.writeDelegates(
-			this.generateCoreDelegates(this.options.crypto.flags.delegates, this.options.crypto.flags.pubKeyHash),
-		);
+		// this.writeDelegates(
+		// 	this.generateCoreDelegates(this.options.crypto.flags.delegates, this.options.crypto.flags.pubKeyHash),
+		// );
 
 		this.writeEnvironment();
 
@@ -47,15 +47,15 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-	private writeDelegates(delegates): void {
-		const filePath: string = resolve(this.destination, "delegates.json");
+	// private writeDelegates(delegates): void {
+	// 	const filePath: string = resolve(this.destination, "delegates.json");
 
-		if (this.options.core.delegates) {
-			writeJSONSync(filePath, this.options.core.delegates, { spaces: 4 });
-		} else {
-			writeJSONSync(filePath, { secrets: delegates.map((d) => d.passphrase) }, { spaces: 4 });
-		}
-	}
+	// 	if (this.options.core.delegates) {
+	// 		writeJSONSync(filePath, this.options.core.delegates, { spaces: 4 });
+	// 	} else {
+	// 		writeJSONSync(filePath, { secrets: delegates.map((d) => d.passphrase) }, { spaces: 4 });
+	// 	}
+	// }
 
 	private writeEnvironment(): void {
 		const filePath: string = resolve(this.destination, ".env");

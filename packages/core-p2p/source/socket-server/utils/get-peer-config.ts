@@ -1,5 +1,5 @@
+import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Providers, Services, Utils } from "@arkecosystem/core-kernel";
-import { Managers } from "@arkecosystem/crypto";
 
 type PluginConfig = { package: string; options: any };
 
@@ -21,17 +21,13 @@ const transformPlugins = (plugins: PluginConfig[]): Contracts.P2P.PeerPlugins =>
 			enabled: typeof pluginConfig.options.enabled === "boolean" ? pluginConfig.options.enabled : true, // default to true because "enabled" flag is in different place based on which plugin
 			port,
 		};
-
-		if (name.includes("core-api")) {
-			result[name].estimateTotalCount = pluginConfig.options.options.estimateTotalCount;
-		}
 	}
 
 	return result;
 };
 
-const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Application) => {
-	return plugins.map((plugin) => {
+const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Application) =>
+	plugins.map((plugin) => {
 		const serviceProvider: Providers.ServiceProvider = app
 			.get<Providers.ServiceProviderRepository>(Container.Identifiers.ServiceProviderRepository)
 			.get(plugin.package);
@@ -41,24 +37,24 @@ const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Applica
 		Utils.assert.defined<string>(serviceProviderName);
 
 		return {
-			package: plugin.package,
 			options: serviceProvider.config().all(),
+			package: plugin.package,
 		};
 	});
-};
 
 export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.PeerConfig => {
+	const configuration: IConfiguration = app.get(BINDINGS.Configuration);
+
 	return {
-		version: app.version(),
 		network: {
-			version: Managers.configManager.get("network.pubKeyHash"),
-			name: Managers.configManager.get("network.name"),
-			nethash: Managers.configManager.get("network.nethash"),
-			explorer: Managers.configManager.get("network.client.explorer"),
+			explorer: configuration.get("network.client.explorer"),
+			name: configuration.get("network.name"),
+			nethash: configuration.get("network.nethash"),
 			token: {
-				name: Managers.configManager.get("network.client.token"),
-				symbol: Managers.configManager.get("network.client.symbol"),
+				name: configuration.get("network.client.token"),
+				symbol: configuration.get("network.client.symbol"),
 			},
+			version: configuration.get("network.pubKeyHash"),
 		},
 		plugins: transformPlugins(
 			getPluginsConfig(
@@ -66,5 +62,6 @@ export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.
 				app,
 			),
 		),
+		version: app.version(),
 	};
 };

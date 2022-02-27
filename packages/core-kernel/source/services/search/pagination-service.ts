@@ -1,19 +1,18 @@
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
+import createTree from "functional-red-black-tree";
 
 import { Pagination, ResultsPage, Sorting } from "../../contracts/search";
 import { injectable } from "../../ioc";
 import { get } from "../../utils";
 
-import createTree from "functional-red-black-tree";
-
 @injectable()
 export class PaginationService {
 	public getEmptyPage(): ResultsPage<any> {
-		return { results: [], totalCount: 0, meta: { totalCountIsEstimate: false } };
+		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
 	}
 
 	public getPage<T>(pagination: Pagination, sorting: Sorting, items: Iterable<T>): ResultsPage<T> {
-		const all = Array.from(items);
+		const all = [...items];
 
 		const results =
 			sorting.length === 0
@@ -21,9 +20,9 @@ export class PaginationService {
 				: this.getTop(sorting, pagination.offset + pagination.limit, all).slice(pagination.offset);
 
 		return {
+			meta: { totalCountIsEstimate: false },
 			results,
 			totalCount: all.length,
-			meta: { totalCountIsEstimate: false },
 		};
 	}
 
@@ -36,17 +35,16 @@ export class PaginationService {
 			return [];
 		}
 
-		let tree = createTree<T, undefined>((a, b) => {
-			return this.compare(a, b, sorting);
-		});
+		let tree = createTree<T, undefined>((a, b) => this.compare(a, b, sorting));
 
 		for (const item of items) {
 			if (tree.length < count || this.compare(item, tree.end.key, sorting) === -1) {
-				tree = tree.insert(item, undefined);
+				// @ts-ignore
+				tree = tree.insert(item);
 			}
 
 			if (tree.length > count) {
-				tree = tree.remove(tree.end.key!);
+				tree = tree.remove(tree.end.key);
 			}
 		}
 
@@ -59,12 +57,24 @@ export class PaginationService {
 			let valueB = get(b, property);
 
 			// undefined and null are always at the end regardless of direction
-			if (typeof valueA === "undefined" && typeof valueB === "undefined") return 0;
-			if (typeof valueA === "undefined" && typeof valueB !== "undefined") return 1;
-			if (typeof valueA !== "undefined" && typeof valueB === "undefined") return -1;
-			if (valueA === null && valueB === null) return 0;
-			if (valueA === null && valueB !== null) return 1;
-			if (valueA !== null && valueB === null) return -1;
+			if (typeof valueA === "undefined" && typeof valueB === "undefined") {
+				return 0;
+			}
+			if (typeof valueA === "undefined" && typeof valueB !== "undefined") {
+				return 1;
+			}
+			if (typeof valueA !== "undefined" && typeof valueB === "undefined") {
+				return -1;
+			}
+			if (valueA === null && valueB === null) {
+				return 0;
+			}
+			if (valueA === null && valueB !== null) {
+				return 1;
+			}
+			if (valueA !== null && valueB === null) {
+				return -1;
+			}
 
 			if (direction === "desc") {
 				[valueA, valueB] = [valueB, valueA];
@@ -76,21 +86,29 @@ export class PaginationService {
 				(typeof valueA === "number" && typeof valueB === "number") ||
 				(typeof valueA === "bigint" && typeof valueB === "bigint")
 			) {
-				if (valueA < valueB) return -1;
-				if (valueA > valueB) return 1;
+				if (valueA < valueB) {
+					return -1;
+				}
+				if (valueA > valueB) {
+					return 1;
+				}
 				continue;
 			}
 
-			if (valueA instanceof Utils.BigNumber && valueB instanceof Utils.BigNumber) {
-				if (valueA.isLessThan(valueB)) return -1;
-				if (valueA.isGreaterThan(valueB)) return 1;
+			if (valueA instanceof BigNumber && valueB instanceof BigNumber) {
+				if (valueA.isLessThan(valueB)) {
+					return -1;
+				}
+				if (valueA.isGreaterThan(valueB)) {
+					return 1;
+				}
 				continue;
 			}
 
 			if (typeof valueA !== typeof valueB) {
-				throw new Error(`Mismatched types '${typeof valueA}' and '${typeof valueB}' at '${property}'`);
+				throw new TypeError(`Mismatched types '${typeof valueA}' and '${typeof valueB}' at '${property}'`);
 			} else {
-				throw new Error(`Unexpected type at '${property}'`);
+				throw new TypeError(`Unexpected type at '${property}'`);
 			}
 		}
 

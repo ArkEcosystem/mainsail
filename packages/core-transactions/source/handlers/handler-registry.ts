@@ -1,10 +1,10 @@
 import { Container, Utils } from "@arkecosystem/core-kernel";
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Transactions } from "@arkecosystem/crypto";
 
 import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandler } from "./transaction";
+import { InternalTransactionType } from "@arkecosystem/core-crypto-transaction";
 
 @Container.injectable()
 export class TransactionHandlerRegistry {
@@ -25,15 +25,12 @@ export class TransactionHandlerRegistry {
 		return this.handlers;
 	}
 
-	public getRegisteredHandlerByType(
-		internalType: Transactions.InternalTransactionType,
-		version = 1,
-	): TransactionHandler {
+	public getRegisteredHandlerByType(internalType: InternalTransactionType, version = 1): TransactionHandler {
 		for (const handler of this.handlers) {
 			const transactionConstructor = handler.getConstructor();
 			Utils.assert.defined<number>(transactionConstructor.type);
 			Utils.assert.defined<number>(transactionConstructor.typeGroup);
-			const handlerInternalType = Transactions.InternalTransactionType.from(
+			const handlerInternalType = InternalTransactionType.from(
 				transactionConstructor.type,
 				transactionConstructor.typeGroup,
 			);
@@ -55,7 +52,7 @@ export class TransactionHandlerRegistry {
 	}
 
 	public async getActivatedHandlerByType(
-		internalType: Transactions.InternalTransactionType,
+		internalType: InternalTransactionType,
 		version = 1,
 	): Promise<TransactionHandler> {
 		const handler = this.getRegisteredHandlerByType(internalType, version);
@@ -66,7 +63,7 @@ export class TransactionHandlerRegistry {
 	}
 
 	public async getActivatedHandlerForData(transactionData: Interfaces.ITransactionData): Promise<TransactionHandler> {
-		const internalType = Transactions.InternalTransactionType.from(transactionData.type, transactionData.typeGroup);
+		const internalType = InternalTransactionType.from(transactionData.type, transactionData.typeGroup);
 		return this.getActivatedHandlerByType(internalType, transactionData.version);
 	}
 }

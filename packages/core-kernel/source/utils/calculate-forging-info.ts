@@ -1,5 +1,4 @@
-import { Crypto, Managers } from "@arkecosystem/crypto";
-
+import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { ForgingInfo } from "../contracts/shared";
 
 export interface MilestoneSearchResult {
@@ -8,20 +7,22 @@ export interface MilestoneSearchResult {
 	data: any;
 }
 
-export const getMilestonesWhichAffectActiveDelegateCount = (): Array<MilestoneSearchResult> => {
+export const getMilestonesWhichAffectActiveDelegateCount = (
+	configuration: IConfiguration,
+): Array<MilestoneSearchResult> => {
 	const milestones: Array<MilestoneSearchResult> = [
 		{
-			data: Managers.configManager.getMilestone(1).activeDelegates,
+			data: configuration.getMilestone(1).activeDelegates,
 			found: true,
 			height: 1,
 		},
 	];
 
-	let nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(1, "activeDelegates");
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeDelegates");
 
 	while (nextMilestone.found) {
 		milestones.push(nextMilestone);
-		nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
+		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
 	}
 
 	return milestones;
@@ -31,10 +32,18 @@ export const calculateForgingInfo = (
 	timestamp: number,
 	height: number,
 	getTimeStampForBlock: (blockheight: number) => number,
+	configuration: IConfiguration,
+	slots,
 ): ForgingInfo => {
-	const slotInfo = Crypto.Slots.getSlotInfo(getTimeStampForBlock, timestamp, height);
+	const slotInfo = slots.getSlotInfo(getTimeStampForBlock, timestamp, height);
 
-	const [currentForger, nextForger] = findIndex(height, slotInfo.slotNumber, getTimeStampForBlock);
+	const [currentForger, nextForger] = findIndex(
+		height,
+		slotInfo.slotNumber,
+		getTimeStampForBlock,
+		configuration,
+		slots,
+	);
 	const canForge = slotInfo.forgingStatus;
 
 	return { blockTimestamp: slotInfo.startTime, canForge, currentForger, nextForger };
@@ -44,25 +53,27 @@ const findIndex = (
 	height: number,
 	slotNumber: number,
 	getTimeStampForBlock: (blockheight: number) => number,
+	configuration: IConfiguration,
+	slots,
 ): [number, number] => {
-	let nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(1, "activeDelegates");
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeDelegates");
 
 	let lastSpanSlotNumber = 0;
-	let activeDelegates = Managers.configManager.getMilestone(1).activeDelegates;
+	let activeDelegates = configuration.getMilestone(1).activeDelegates;
 
-	const milestones = getMilestonesWhichAffectActiveDelegateCount();
+	const milestones = getMilestonesWhichAffectActiveDelegateCount(configuration);
 
-	for (let i = 0; i < milestones.length - 1; i++) {
+	for (let index = 0; index < milestones.length - 1; index++) {
 		if (height < nextMilestone.height) {
 			break;
 		}
 
 		const lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1);
 		lastSpanSlotNumber =
-			Crypto.Slots.getSlotInfo(getTimeStampForBlock, lastSpanEndTime, nextMilestone.height - 1).slotNumber + 1;
+			slots.getSlotInfo(getTimeStampForBlock, lastSpanEndTime, nextMilestone.height - 1).slotNumber + 1;
 		activeDelegates = nextMilestone.data;
 
-		nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
+		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
 	}
 
 	const currentForger = (slotNumber - lastSpanSlotNumber) % activeDelegates;

@@ -1,13 +1,33 @@
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto, Identities, Managers } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, {
+	BINDINGS,
+	IAddressFactory,
+	IConfiguration,
+	IKeyPairFactory,
+	IWIFFactory,
+} from "@arkecosystem/core-crypto-contracts";
 import forge from "node-forge";
 import wif from "wif";
+import bip38 from "bip38";
+import { Container } from "@arkecosystem/core-kernel";
 
 import { Delegate } from "../interfaces";
 import { Method } from "./method";
 
+@Container.injectable()
 export class BIP38 extends Method implements Delegate {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly addressFactory: IAddressFactory;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly keyPairFactory: IKeyPairFactory;
+
+	@Container.inject(BINDINGS.Identity.WifFactory)
+	private readonly wifFactory: IWIFFactory;
+
 	public keys: Interfaces.IKeyPair | undefined;
 
 	public publicKey: string;
@@ -24,59 +44,62 @@ export class BIP38 extends Method implements Delegate {
 
 	private readonly iterations: number = 5000;
 
-	public constructor(bip38: string, password: string) {
-		super();
-
-		this.keys = this.decryptPassphrase(bip38, password);
+	public async configure(bip38: string, password: string): Promise<BIP38> {
+		this.keys = await this.decryptPassphrase(bip38, password);
 		this.publicKey = this.keys.publicKey;
-		this.address = Identities.Address.fromPublicKey(this.keys.publicKey);
+		this.address = await this.addressFactory.fromPublicKey(this.keys.publicKey);
 		this.otpSecret = forge.random.getBytesSync(128);
 
 		this.encryptKeysWithOtp();
+
+		return this;
 	}
 
-	public forge(transactions: Interfaces.ITransactionData[], options: Record<string, any>): Interfaces.IBlock {
+	public async forge(
+		transactions: Interfaces.ITransactionData[],
+		options: Record<string, any>,
+	): Promise<Interfaces.IBlock> {
 		this.decryptKeysWithOtp();
 
 		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
 
-		const block: Interfaces.IBlock = this.createBlock(this.keys, transactions, options);
+		const block: Interfaces.IBlock = await this.createBlock(this.keys, transactions, options);
 
 		this.encryptKeysWithOtp();
 
 		return block;
 	}
 
-	private encryptKeysWithOtp(): void {
+	private async encryptKeysWithOtp(): Promise<void> {
 		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
 
-		const wifKey: string = Identities.WIF.fromKeys(this.keys);
+		const wifKey: string = await this.wifFactory.fromKeys(this.keys, this.configuration.get("network.wif"));
 
 		this.keys = undefined;
 		this.otp = forge.random.getBytesSync(16);
 		this.encryptedKeys = this.encryptDataWithOtp(wifKey, this.otp);
 	}
 
-	private decryptKeysWithOtp(): void {
+	private async decryptKeysWithOtp(): Promise<void> {
 		AppUtils.assert.defined<string>(this.encryptedKeys);
 		AppUtils.assert.defined<string>(this.otp);
 
 		const wifKey: string = this.decryptDataWithOtp(this.encryptedKeys, this.otp);
 
-		this.keys = Identities.Keys.fromWIF(wifKey);
+		this.keys = await this.keyPairFactory.fromWIF(wifKey, this.configuration.get("network.wif"));
 		this.otp = undefined;
 		this.encryptedKeys = undefined;
 	}
 
-	private decryptPassphrase(passphrase: string, password: string): Interfaces.IKeyPair {
-		const decryptedWif: Interfaces.IDecryptResult = Crypto.bip38.decrypt(passphrase, password);
+	private async decryptPassphrase(passphrase: string, password: string): Promise<Interfaces.IKeyPair> {
+		const decryptedWif: Interfaces.IDecryptResult = bip38.decrypt(passphrase, password);
 		const wifKey: string = wif.encode(
-			Managers.configManager.get("network.wif"),
+			this.configuration.get("network.wif"),
 			decryptedWif.privateKey,
 			decryptedWif.compressed,
 		);
 
-		return Identities.Keys.fromWIF(wifKey);
+		return this.keyPairFactory.fromWIF(wifKey, this.configuration.get("network.wif"));
 	}
 
 	private encryptDataWithOtp(content: string, password: string): string {

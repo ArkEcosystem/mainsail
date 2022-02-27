@@ -1,4 +1,4 @@
-import { Managers, Utils } from "@arkecosystem/crypto";
+import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
-export const isRecipientOnActiveNetwork = (recipientId: string): boolean =>
-	Utils.Base58.decodeCheck(recipientId).readUInt8(0) === Managers.configManager.get("network.pubKeyHash");
+export const isRecipientOnActiveNetwork = (recipientId: string, base58, configuration: IConfiguration): boolean =>
+	base58.decodeCheck(recipientId).readUInt8(0) === configuration.get("network.pubKeyHash");

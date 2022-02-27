@@ -1,6 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Providers, Utils } from "@arkecosystem/core-kernel";
-import { Crypto } from "@arkecosystem/crypto";
 
 import { NetworkStateStatus } from "./enums";
 
@@ -44,6 +43,8 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	public static async analyze(
 		monitor: Contracts.P2P.NetworkMonitor,
 		repository: Contracts.P2P.PeerRepository,
+		cryptoConfiguration: IConfiguration,
+		slots,
 	): Promise<Contracts.P2P.NetworkState> {
 		// @ts-ignore - app exists but isn't on the interface for now
 		const lastBlock: Interfaces.IBlock = monitor.app
@@ -54,6 +55,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			// @ts-ignore - app exists but isn't on the interface for now
 			monitor.app,
 			lastBlock.data.height,
+			cryptoConfiguration,
 		);
 
 		const peers: Contracts.P2P.Peer[] = repository.getPeers();
@@ -74,7 +76,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			return new NetworkState(NetworkStateStatus.BelowMinimumPeers, lastBlock);
 		}
 
-		return this.analyzeNetwork(lastBlock, peers, blockTimeLookup);
+		return this.analyzeNetwork(lastBlock, peers, blockTimeLookup, slots);
 	}
 
 	public static parse(data: any): Contracts.P2P.NetworkState {
@@ -94,9 +96,10 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		lastBlock,
 		peers: Contracts.P2P.Peer[],
 		getTimeStampForBlock: (height: number) => number,
+		slots,
 	): Contracts.P2P.NetworkState {
 		const networkState = new NetworkState(NetworkStateStatus.Default, lastBlock);
-		const currentSlot = Crypto.Slots.getSlotNumber(getTimeStampForBlock);
+		const currentSlot = slots.getSlotNumber(getTimeStampForBlock);
 
 		for (const peer of peers) {
 			networkState.update(peer, currentSlot);

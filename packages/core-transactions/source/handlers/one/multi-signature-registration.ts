@@ -1,6 +1,12 @@
+import Interfaces, {
+	BINDINGS,
+	IAddressFactory,
+	IPublicKeyFactory,
+	TransactionType,
+} from "@arkecosystem/core-crypto-contracts";
+import Transactions from "@arkecosystem/core-crypto-transaction";
+import { One as MultiSignatureRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Enums, Identities, Managers, Transactions } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import {
 	InvalidMultiSignatureError,
@@ -13,10 +19,16 @@ import { TransactionHandler, TransactionHandlerConstructor } from "../transactio
 @Container.injectable()
 export class MultiSignatureRegistrationTransactionHandler extends TransactionHandler {
 	@Container.inject(Container.Identifiers.TransactionPoolQuery)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	private readonly poolQuery: Contracts.TransactionPool.Query;
 
 	@Container.inject(Container.Identifiers.TransactionHistoryService)
-	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
+	private readonly transactionHistoryService: Contracts.Shared.TransactionHistoryService;
+
+	@Container.inject(BINDINGS.Identity.AddressFactory)
+	private readonly addressFactory: IAddressFactory;
+
+	@Container.inject(BINDINGS.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: IPublicKeyFactory;
 
 	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
 		return [];
@@ -27,14 +39,14 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return Transactions.Two.MultiSignatureRegistrationTransaction;
+		return MultiSignatureRegistrationTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
 		const criteria = {
-			version: this.getConstructor().version,
-			typeGroup: this.getConstructor().typeGroup,
 			type: this.getConstructor().type,
+			typeGroup: this.getConstructor().typeGroup,
+			version: this.getConstructor().version,
 		};
 
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
@@ -42,7 +54,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 
 			const multiSignature: Contracts.State.WalletMultiSignatureAttributes = transaction.asset.multiSignature;
 			const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
-				Identities.PublicKey.fromMultiSignatureAsset(multiSignature),
+				await this.publicKeyFactory.fromMultiSignatureAsset(multiSignature),
 			);
 
 			if (wallet.hasMultiSignature()) {
@@ -55,7 +67,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 	}
 
 	public async isActivated(): Promise<boolean> {
-		return Managers.configManager.getMilestone().aip11 === true;
+		return this.configuration.getMilestone().aip11 === true;
 	}
 
 	public async throwIfCannotBeApplied(
@@ -79,7 +91,9 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 
 		AppUtils.assert.defined<Interfaces.IMultiSignatureAsset>(data.asset.multiSignature);
 
-		const multiSigPublicKey: string = Identities.PublicKey.fromMultiSignatureAsset(data.asset.multiSignature);
+		const multiSigPublicKey: string = await this.publicKeyFactory.fromMultiSignatureAsset(
+			data.asset.multiSignature,
+		);
 		const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(multiSigPublicKey);
 
 		if (recipientWallet.hasMultiSignature()) {
@@ -104,20 +118,18 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 
 		if (hasSender) {
 			throw new Contracts.TransactionPool.PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Enums.TransactionType.MultiSignature}' in the pool`,
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${TransactionType.MultiSignature}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
 
-		const address = Identities.Address.fromMultiSignatureAsset(transaction.data.asset.multiSignature);
+		const address = await this.addressFactory.fromMultiSignatureAsset(transaction.data.asset.multiSignature);
 		const hasAddress: boolean = this.poolQuery
 			.getAll()
 			.whereKind(transaction)
 			.wherePredicate(
-				(t) =>
-					Identities.Address.fromMultiSignatureAsset(
-						t.data.asset!.multiSignature as Interfaces.IMultiSignatureAsset,
-					) === address,
+				async (t) =>
+					(await this.addressFactory.fromMultiSignatureAsset(t.data.asset.multiSignature)) === address,
 			)
 			.has();
 
@@ -145,7 +157,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 		AppUtils.assert.defined<Interfaces.IMultiSignatureAsset>(data.asset?.multiSignature);
 
 		const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
-			Identities.PublicKey.fromMultiSignatureAsset(data.asset.multiSignature),
+			await this.publicKeyFactory.fromMultiSignatureAsset(data.asset.multiSignature),
 		);
 
 		recipientWallet.setAttribute("multiSignature", data.asset.multiSignature);
@@ -157,7 +169,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 		AppUtils.assert.defined<Interfaces.IMultiSignatureAsset>(data.asset?.multiSignature);
 
 		const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
-			Identities.PublicKey.fromMultiSignatureAsset(data.asset.multiSignature),
+			await this.publicKeyFactory.fromMultiSignatureAsset(data.asset.multiSignature),
 		);
 
 		recipientWallet.forgetAttribute("multiSignature");

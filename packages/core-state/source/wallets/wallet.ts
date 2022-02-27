@@ -1,12 +1,12 @@
 import { Contracts, Services } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
 	protected publicKey: string | undefined;
-	protected balance: Utils.BigNumber = Utils.BigNumber.ZERO;
-	protected nonce: Utils.BigNumber = Utils.BigNumber.ZERO;
+	protected balance: BigNumber = BigNumber.ZERO;
+	protected nonce: BigNumber = BigNumber.ZERO;
 
 	public constructor(
 		protected readonly address: string,
@@ -36,11 +36,11 @@ export class Wallet implements Contracts.State.Wallet {
 		});
 	}
 
-	public getBalance(): Utils.BigNumber {
+	public getBalance(): BigNumber {
 		return this.balance;
 	}
 
-	public setBalance(balance: Utils.BigNumber): void {
+	public setBalance(balance: BigNumber): void {
 		const previousValue = this.balance;
 
 		this.balance = balance;
@@ -54,11 +54,11 @@ export class Wallet implements Contracts.State.Wallet {
 		});
 	}
 
-	public getNonce(): Utils.BigNumber {
+	public getNonce(): BigNumber {
 		return this.nonce;
 	}
 
-	public setNonce(nonce: Utils.BigNumber): void {
+	public setNonce(nonce: BigNumber): void {
 		const previousValue = this.nonce;
 
 		this.nonce = nonce;
@@ -72,24 +72,24 @@ export class Wallet implements Contracts.State.Wallet {
 		});
 	}
 
-	public increaseBalance(balance: Utils.BigNumber): Contracts.State.Wallet {
+	public increaseBalance(balance: BigNumber): Contracts.State.Wallet {
 		this.setBalance(this.balance.plus(balance));
 
 		return this;
 	}
 
-	public decreaseBalance(balance: Utils.BigNumber): Contracts.State.Wallet {
+	public decreaseBalance(balance: BigNumber): Contracts.State.Wallet {
 		this.setBalance(this.balance.minus(balance));
 
 		return this;
 	}
 
 	public increaseNonce(): void {
-		this.setNonce(this.nonce.plus(Utils.BigNumber.ONE));
+		this.setNonce(this.nonce.plus(BigNumber.ONE));
 	}
 
 	public decreaseNonce(): void {
-		this.setNonce(this.nonce.minus(Utils.BigNumber.ONE));
+		this.setNonce(this.nonce.minus(BigNumber.ONE));
 	}
 
 	public getData(): Contracts.State.WalletData {

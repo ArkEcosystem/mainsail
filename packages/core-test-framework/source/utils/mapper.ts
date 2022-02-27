@@ -1,5 +1,5 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { Models } from "../../../core-database";
 
@@ -8,13 +8,13 @@ export const mapTransactionToModel = (
 	blockHeight?: number,
 	sequence?: number,
 ): Models.Transaction => ({
-	amount: Utils.BigNumber.make(transaction.data.amount),
+	amount: BigNumber.make(transaction.data.amount),
 	asset: transaction.data.asset as Record<string, any>,
 	blockHeight: blockHeight ?? transaction.data.blockHeight ?? 0,
 	blockId: transaction.data.blockId || "",
-	fee: Utils.BigNumber.make(transaction.data.fee),
+	fee: BigNumber.make(transaction.data.fee),
 	id: transaction.id,
-	nonce: transaction.data.nonce || Utils.BigNumber.make(1),
+	nonce: transaction.data.nonce || BigNumber.make(1),
 	recipientId: transaction.data.recipientId || "",
 	senderPublicKey: transaction.data.senderPublicKey || "",
 	sequence: sequence ?? transaction.data.sequence ?? 0,

@@ -1,7 +1,6 @@
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Crypto, Managers } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 import Hapi from "@hapi/hapi";
 
 import { Controller } from "./controller";
@@ -27,6 +26,12 @@ export class InternalController extends Controller {
 
 	@Container.inject(Container.Identifiers.TransactionPoolCollator)
 	private readonly collator!: Contracts.TransactionPool.Collator;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration!: IConfiguration;
+
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots!: any;
 
 	public async acceptNewPeer(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<void> {
 		return this.peerProcessor.validateAndAcceptPeer({
@@ -55,9 +60,9 @@ export class InternalController extends Controller {
 		const lastBlock = this.blockchain.getLastBlock();
 
 		const height = lastBlock.data.height + 1;
-		const roundInfo = Utils.roundCalculator.calculateRound(height);
+		const roundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
 
-		const reward = Managers.configManager.getMilestone(height).reward;
+		const reward = this.configuration.getMilestone(height).reward;
 		const delegates: Contracts.P2P.DelegateWallet[] = (
 			await this.databaseInteraction.getActiveDelegates(roundInfo)
 		).map((wallet) => ({
@@ -65,20 +70,30 @@ export class InternalController extends Controller {
 			delegate: wallet.getAttribute("delegate"),
 		}));
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, height);
+		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			height,
+			this.configuration,
+		);
 
-		const timestamp = Crypto.Slots.getTime();
-		const forgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(timestamp, height, blockTimeLookup);
+		const timestamp = this.slots.getTime();
+		const forgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
+			timestamp,
+			height,
+			blockTimeLookup,
+			this.configuration,
+			this.slots,
+		);
 
 		return {
+			canForge: forgingInfo.canForge,
 			current: roundInfo.round,
+			currentForger: delegates[forgingInfo.currentForger],
+			delegates,
+			lastBlock: lastBlock.data,
+			nextForger: delegates[forgingInfo.nextForger],
 			reward,
 			timestamp: forgingInfo.blockTimestamp,
-			delegates,
-			currentForger: delegates[forgingInfo.currentForger],
-			nextForger: delegates[forgingInfo.nextForger],
-			lastBlock: lastBlock.data,
-			canForge: forgingInfo.canForge,
 		};
 	}
 

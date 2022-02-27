@@ -1,6 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Enums } from "@arkecosystem/crypto";
 
 import { Comparator, IteratorMany } from "./utils";
 
@@ -29,23 +28,23 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	}
 
 	public whereId(id: string): QueryIterable {
-		return this.wherePredicate((t) => t.id === id);
+		return this.wherePredicate(async (t) => t.id === id);
 	}
 
-	public whereType(type: Enums.TransactionType | number): QueryIterable {
-		return this.wherePredicate((t) => t.type === type);
+	public whereType(type: TransactionType | number): QueryIterable {
+		return this.wherePredicate(async (t) => t.type === type);
 	}
 
-	public whereTypeGroup(typeGroup: Enums.TransactionTypeGroup | number): QueryIterable {
-		return this.wherePredicate((t) => t.typeGroup === typeGroup);
+	public whereTypeGroup(typeGroup: TransactionTypeGroup | number): QueryIterable {
+		return this.wherePredicate(async (t) => t.typeGroup === typeGroup);
 	}
 
 	public whereVersion(version: number): QueryIterable {
-		return this.wherePredicate((t) => t.data.version === version);
+		return this.wherePredicate(async (t) => t.data.version === version);
 	}
 
 	public whereKind(transaction: Interfaces.ITransaction): QueryIterable {
-		return this.wherePredicate((t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
+		return this.wherePredicate(async (t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
 	}
 
 	public has(): boolean {

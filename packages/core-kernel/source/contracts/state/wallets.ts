@@ -1,5 +1,5 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 // todo: review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
@@ -34,8 +34,8 @@ export enum WalletIndexes {
 export interface WalletData {
 	address: string;
 	publicKey?: string;
-	balance: Utils.BigNumber;
-	nonce: Utils.BigNumber;
+	balance: BigNumber;
+	nonce: BigNumber;
 	attributes: Record<string, any>;
 }
 
@@ -46,17 +46,17 @@ export interface Wallet {
 
 	setPublicKey(publicKey: string): void;
 
-	getBalance(): Utils.BigNumber;
+	getBalance(): BigNumber;
 
-	setBalance(balance: Utils.BigNumber): void;
+	setBalance(balance: BigNumber): void;
 
-	getNonce(): Utils.BigNumber;
+	getNonce(): BigNumber;
 
-	setNonce(nonce: Utils.BigNumber): void;
+	setNonce(nonce: BigNumber): void;
 
-	increaseBalance(balance: Utils.BigNumber): Wallet;
+	increaseBalance(balance: BigNumber): Wallet;
 
-	decreaseBalance(balance: Utils.BigNumber): Wallet;
+	decreaseBalance(balance: BigNumber): Wallet;
 
 	increaseNonce(): void;
 
@@ -87,9 +87,9 @@ export type WalletFactory = (address: string) => Wallet;
 
 export interface WalletDelegateAttributes {
 	username: string;
-	voteBalance: Utils.BigNumber;
-	forgedFees: Utils.BigNumber;
-	forgedRewards: Utils.BigNumber;
+	voteBalance: BigNumber;
+	forgedFees: BigNumber;
+	forgedRewards: BigNumber;
 	producedBlocks: number;
 	rank?: number;
 	lastBlock?: Interfaces.IBlockData;
@@ -131,7 +131,7 @@ export interface WalletRepository {
 
 	findByIndexes(indexes: string[], key: string): Wallet;
 
-	getNonce(publicKey: string): Utils.BigNumber;
+	getNonce(publicKey: string): BigNumber;
 
 	index(wallet: Wallet): void;
 

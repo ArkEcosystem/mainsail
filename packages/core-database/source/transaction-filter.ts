@@ -1,5 +1,5 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Enums } from "@arkecosystem/crypto";
+import { TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
 
 import { Transaction } from "./models/transaction";
 
@@ -134,8 +134,8 @@ export class TransactionFilter implements Contracts.Database.TransactionFilter {
 		const multipaymentRecipientIdExpression: Contracts.Search.AndExpression<Transaction> = {
 			op: "and",
 			expressions: [
-				{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
-				{ op: "equal", property: "type", value: Enums.TransactionType.MultiPayment },
+				{ op: "equal", property: "typeGroup", value: TransactionTypeGroup.Core },
+				{ op: "equal", property: "type", value: TransactionType.MultiPayment },
 				{ op: "contains", property: "asset", value: { payments: [{ recipientId: criteria }] } },
 			],
 		};
@@ -145,8 +145,8 @@ export class TransactionFilter implements Contracts.Database.TransactionFilter {
 			const delegateRegistrationExpression: Contracts.Search.AndExpression<Transaction> = {
 				op: "and",
 				expressions: [
-					{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
-					{ op: "equal", property: "type", value: Enums.TransactionType.DelegateRegistration },
+					{ op: "equal", property: "typeGroup", value: TransactionTypeGroup.Core },
+					{ op: "equal", property: "type", value: TransactionType.DelegateRegistration },
 					{ op: "equal", property: "senderPublicKey", value: recipientWallet.getPublicKey() },
 				],
 			};
@@ -233,7 +233,7 @@ export class TransactionFilter implements Contracts.Database.TransactionFilter {
 		criteria: Contracts.Shared.TransactionCriteria,
 	): Promise<Contracts.Search.Expression<Transaction>> {
 		if (hasOrCriteria(criteria.type) && hasOrCriteria(criteria.typeGroup) === false) {
-			return { op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core };
+			return { op: "equal", property: "typeGroup", value: TransactionTypeGroup.Core };
 		} else {
 			return { op: "true" };
 		}

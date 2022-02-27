@@ -1,5 +1,4 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
 @Container.injectable()
@@ -15,8 +14,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("host", "The host address of the database.", Joi.string())
 			.setFlag("port", "The port of the database.", Joi.number())
 			.setFlag("database", "The name of the database.", Joi.string())
@@ -25,10 +24,10 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const envFile = this.app.getCorePath("config", ".env");
+		const environmentFile = this.app.getCorePath("config", ".env");
 
 		if (this.validFlags.some((flag: string) => this.hasFlag(flag))) {
-			this.environment.updateVariables(envFile, this.confirm(this.getFlags()));
+			this.environment.updateVariables(environmentFile, this.confirm(this.getFlags()));
 
 			return;
 		}
@@ -77,7 +76,7 @@ export class Command extends Commands.Command {
 			this.components.fatal("You'll need to confirm the input to continue.");
 		}
 
-		this.environment.updateVariables(envFile, this.confirm(response));
+		this.environment.updateVariables(environmentFile, this.confirm(response));
 	}
 
 	private confirm(flags: Contracts.AnyObject): Contracts.AnyObject {

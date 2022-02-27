@@ -1,5 +1,4 @@
 import { Application, Container, Providers, Services, Types } from "@arkecosystem/core-kernel";
-import { Managers } from "@arkecosystem/crypto";
 import { removeSync } from "fs-extra";
 import { setGracefulCleanup } from "tmp";
 
@@ -29,9 +28,9 @@ export class Sandbox {
 			flags: {
 				blocktime: 8,
 				delegates: 51,
+				distribute: true,
 				explorer: "http://uexplorer.ark.io",
 				maxBlockPayload: 2_097_152,
-				distribute: true,
 				maxTxPerBlock: 150,
 				network: "unitnet",
 				premine: "15300000000000000",
@@ -78,12 +77,12 @@ export class Sandbox {
 		const milestones = require(this.paths.crypto.milestones);
 		const network = require(this.paths.crypto.network);
 
-		Managers.configManager.setConfig({
-			exceptions,
-			genesisBlock,
-			milestones,
-			network,
-		});
+		// this.configuration.setConfig({
+		// 	exceptions,
+		// 	genesisBlock,
+		// 	milestones,
+		// 	network,
+		// });
 
 		this.app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).merge({
 			crypto: {

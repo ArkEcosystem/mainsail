@@ -1,5 +1,5 @@
 import { Stores } from "@arkecosystem/core-state";
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 let mockBlock: Partial<Interfaces.IBlock> | undefined;
 let lastHeight = 0;

@@ -1,5 +1,5 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class DposState implements Contracts.State.DposState {
@@ -40,7 +40,7 @@ export class DposState implements Contracts.State.DposState {
 					voter.getAttribute("vote"),
 				);
 
-				const voteBalance: Utils.BigNumber = delegate.getAttribute("delegate.voteBalance");
+				const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance");
 
 				delegate.setAttribute("delegate.voteBalance", voteBalance.plus(voter.getBalance()));
 			}
@@ -59,8 +59,8 @@ export class DposState implements Contracts.State.DposState {
 		}
 
 		this.activeDelegates.sort((a, b) => {
-			const voteBalanceA: Utils.BigNumber = a.getAttribute("delegate.voteBalance");
-			const voteBalanceB: Utils.BigNumber = b.getAttribute("delegate.voteBalance");
+			const voteBalanceA: BigNumber = a.getAttribute("delegate.voteBalance");
+			const voteBalanceB: BigNumber = b.getAttribute("delegate.voteBalance");
 
 			const diff = voteBalanceB.comparedTo(voteBalanceA);
 
@@ -82,8 +82,8 @@ export class DposState implements Contracts.State.DposState {
 			return diff;
 		});
 
-		for (let i = 0; i < this.activeDelegates.length; i++) {
-			this.activeDelegates[i].setAttribute("delegate.rank", i + 1);
+		for (let index = 0; index < this.activeDelegates.length; index++) {
+			this.activeDelegates[index].setAttribute("delegate.rank", index + 1);
 		}
 	}
 
@@ -97,9 +97,9 @@ export class DposState implements Contracts.State.DposState {
 
 		this.roundInfo = roundInfo;
 		this.roundDelegates = [];
-		for (let i = 0; i < roundInfo.maxDelegates; i++) {
-			this.activeDelegates[i].setAttribute("delegate.round", roundInfo.round);
-			this.roundDelegates.push(this.activeDelegates[i]);
+		for (let index = 0; index < roundInfo.maxDelegates; index++) {
+			this.activeDelegates[index].setAttribute("delegate.round", roundInfo.round);
+			this.roundDelegates.push(this.activeDelegates[index]);
 		}
 		this.logger.debug(
 			`Loaded ${roundInfo.maxDelegates} active ` + AppUtils.pluralize("delegate", roundInfo.maxDelegates),

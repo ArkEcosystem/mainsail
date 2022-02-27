@@ -1,21 +1,22 @@
-import { Errors, Managers } from "@arkecosystem/crypto";
+import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-crypto-errors";
 
 import { RoundInfo } from "../contracts/shared";
 import { getMilestonesWhichAffectActiveDelegateCount } from "./calculate-forging-info";
 
-export const isNewRound = (height: number): boolean => {
-	const milestones = Managers.configManager.get("milestones");
+export const isNewRound = (height: number, configuration: IConfiguration): boolean => {
+	const milestones = configuration.get("milestones");
 
 	// Since milestones are merged, find the first milestone to introduce the delegate count.
 	let milestone;
-	for (let i = milestones.length - 1; i >= 0; i--) {
-		const temp = milestones[i];
-		if (temp.height > height) {
+	for (let index = milestones.length - 1; index >= 0; index--) {
+		const temporary = milestones[index];
+		if (temporary.height > height) {
 			continue;
 		}
 
-		if (!milestone || temp.activeDelegates === milestone.activeDelegates) {
-			milestone = temp;
+		if (!milestone || temporary.activeDelegates === milestone.activeDelegates) {
+			milestone = temporary;
 		} else {
 			break;
 		}
@@ -24,7 +25,7 @@ export const isNewRound = (height: number): boolean => {
 	return height === 1 || (height - milestone.height) % milestone.activeDelegates === 0;
 };
 
-export const calculateRound = (height: number): RoundInfo => {
+export const calculateRound = (height: number, configuration: IConfiguration): RoundInfo => {
 	const result: RoundInfo = {
 		maxDelegates: 0,
 		nextRound: 0,
@@ -32,20 +33,20 @@ export const calculateRound = (height: number): RoundInfo => {
 		roundHeight: 1,
 	};
 
-	let nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(1, "activeDelegates");
-	let activeDelegates = Managers.configManager.getMilestone(1).activeDelegates;
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeDelegates");
+	let activeDelegates = configuration.getMilestone(1).activeDelegates;
 	let milestoneHeight = 1;
 
-	const milestones = getMilestonesWhichAffectActiveDelegateCount();
+	const milestones = getMilestonesWhichAffectActiveDelegateCount(configuration);
 
-	for (let i = 0; i < milestones.length - 1; i++) {
+	for (let index = 0; index < milestones.length - 1; index++) {
 		if (height < nextMilestone.height) {
 			break;
 		}
 
 		const spanHeight = nextMilestone.height - milestoneHeight;
 		if (spanHeight % activeDelegates !== 0) {
-			throw new Errors.InvalidMilestoneConfigurationError(
+			throw new InvalidMilestoneConfigurationError(
 				`Bad milestone at height: ${height}. The number of delegates can only be changed at the beginning of a new round.`,
 			);
 		}
@@ -57,7 +58,7 @@ export const calculateRound = (height: number): RoundInfo => {
 		activeDelegates = nextMilestone.data;
 		milestoneHeight = nextMilestone.height;
 
-		nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
+		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
 	}
 
 	const heightFromLastSpan = height - milestoneHeight;

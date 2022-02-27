@@ -20,12 +20,12 @@ export class FixtureGenerator {
 			wallet.publicKey = `${address}`;
 			wallet.setAttribute("delegate.username", `username-${address}`);
 
-			wallet.balance = Utils.BigNumber.make(100);
+			wallet.balance = BigNumber.make(100);
 			wallet.setAttribute("delegate", {
 				username: `username-${address}`,
-				voteBalance: Utils.BigNumber.make(200),
-				forgedRewards: Utils.BigNumber.ZERO,
-				forgedFees: Utils.BigNumber.ZERO,
+				voteBalance: BigNumber.make(200),
+				forgedRewards: BigNumber.ZERO,
+				forgedFees: BigNumber.ZERO,
 			});
 			wallet.setAttribute("vote", `vote-${address}`);
 			return wallet;

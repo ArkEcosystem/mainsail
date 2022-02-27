@@ -1,6 +1,8 @@
+import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { BigNumber } from "@arkecosystem/utils";
+
 import { Wallet, WalletDelegateAttributes } from "../contracts/state";
 import { calculate as calculateSupply } from "./supply-calculator";
-import { BigNumber } from "./";
 
 const toDecimal = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
 	const decimals = 2;
@@ -12,8 +14,8 @@ const toDecimal = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
 	return +Number(div).toFixed(2);
 };
 
-export const calculateApproval = (delegate: Wallet, height = 1): number => {
-	const totalSupply: BigNumber = BigNumber.make(calculateSupply(height));
+export const calculateApproval = (delegate: Wallet, height = 1, configuration: IConfiguration): number => {
+	const totalSupply: BigNumber = BigNumber.make(calculateSupply(height, configuration));
 	const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance");
 
 	return toDecimal(voteBalance, totalSupply);

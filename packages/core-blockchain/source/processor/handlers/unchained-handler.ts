@@ -1,5 +1,5 @@
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
 
 import { BlockProcessorResult } from "../block-processor";
 import { BlockHandler } from "../contracts";
@@ -24,7 +24,10 @@ export class UnchainedHandler implements BlockHandler {
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	private isValidGenerator: boolean = false;
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	private isValidGenerator = false;
 
 	// todo: remove the need for this method
 	public initialize(isValidGenerator: boolean): this {
@@ -42,11 +45,14 @@ export class UnchainedHandler implements BlockHandler {
 
 		switch (status) {
 			case UnchainedBlockStatus.DoubleForging: {
-				const roundInfo: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(block.data.height);
+				const roundInfo: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(
+					block.data.height,
+					this.configuration,
+				);
 
-				const delegates: Contracts.State.Wallet[] = (await this.triggers.call("getActiveDelegates", {
+				const delegates: Contracts.State.Wallet[] = await this.triggers.call("getActiveDelegates", {
 					roundInfo,
-				})) as Contracts.State.Wallet[];
+				});
 
 				if (delegates.some((delegate) => delegate.getPublicKey() === block.data.generatorPublicKey)) {
 					return BlockProcessorResult.Rollback;

@@ -1,5 +1,5 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
 
 import { SenderExceededMaximumTransactionCountError } from "./errors";
 
@@ -12,7 +12,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@Container.inject(Container.Identifiers.TransactionPoolSenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
-	private concurrency: number = 0;
+	private concurrency = 0;
 
 	private readonly lock: AppUtils.Lock = new AppUtils.Lock();
 
@@ -27,11 +27,11 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	}
 
 	public getFromEarliest(): Iterable<Interfaces.ITransaction> {
-		return this.transactions.slice();
+		return [...this.transactions];
 	}
 
 	public getFromLatest(): Iterable<Interfaces.ITransaction> {
-		return this.transactions.slice().reverse();
+		return [...this.transactions].reverse();
 	}
 
 	public async addTransaction(transaction: Interfaces.ITransaction): Promise<void> {
@@ -77,7 +77,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 						await this.senderState.revert(removedTransaction);
 					}
 					return removedTransactions;
-				} catch (error) {
+				} catch {
 					const otherRemovedTransactions = this.transactions.splice(0, this.transactions.length).reverse();
 					return [...removedTransactions, ...otherRemovedTransactions];
 				}

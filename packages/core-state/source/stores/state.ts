@@ -1,7 +1,6 @@
-import { Container, Contracts, Enums, Providers, Utils } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Managers } from "@arkecosystem/crypto";
 import assert from "assert";
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { Container, Contracts, Enums, Providers, Utils } from "@arkecosystem/core-kernel";
 import { OrderedMap, OrderedSet, Seq } from "immutable";
 
 // todo: extract block and transaction behaviours into their respective stores
@@ -13,10 +12,13 @@ export class StateStore implements Contracts.State.StateStore {
 
 	@Container.inject(Container.Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-state")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration!: IConfiguration;
 
 	private blockchain: any = {};
 	private genesisBlock?: Interfaces.IBlock;
@@ -34,9 +36,7 @@ export class StateStore implements Contracts.State.StateStore {
 
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
-	private lastBlocks: OrderedMap<number } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlock> = OrderedMap<number } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlock>();
+	private lastBlocks: OrderedMap<number, Interfaces.IBlock> = OrderedMap<number, Interfaces.IBlock>();
 	// Stores the last n incoming transaction ids. The amount of transaction ids
 	// can be configured with the option `state.maxLastTransactionIds`.
 	private cachedTransactionIds: OrderedSet<string> = OrderedSet();
@@ -162,7 +162,7 @@ import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlock>();
 	}
 
 	public getMaxLastBlocks(): number {
-		return this.configuration.getRequired<number>("storage.maxLastBlocks");
+		return this.pluginConfiguration.getRequired<number>("storage.maxLastBlocks");
 	}
 
 	public getLastHeight(): number {
@@ -186,9 +186,9 @@ import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlock>();
 
 		this.lastBlocks = this.lastBlocks.set(block.data.height, block);
 
-		Managers.configManager.setHeight(block.data.height);
+		this.configuration.setHeight(block.data.height);
 
-		if (Managers.configManager.isNewMilestone()) {
+		if (this.configuration.isNewMilestone()) {
 			this.logger.notice("Milestone change");
 			this.app
 				.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService)
@@ -208,8 +208,7 @@ import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlock>();
 		return this.lastBlocks.valueSeq().reverse().toArray();
 	}
 
-	public getLastBlocksData(headersOnly?: boolean): Seq<number } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData> {
+	public getLastBlocksData(headersOnly?: boolean): Seq<number, Interfaces.IBlockData> {
 		return this.mapToBlockData(this.lastBlocks.valueSeq().reverse(), headersOnly);
 	}
 
@@ -279,7 +278,7 @@ import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData> {
 		});
 
 		// Cap the Set of last transaction ids to maxLastTransactionIds
-		const maxLastTransactionIds = this.configuration.getRequired<number>("storage.maxLastTransactionIds");
+		const maxLastTransactionIds = this.pluginConfiguration.getRequired<number>("storage.maxLastTransactionIds");
 
 		if (this.cachedTransactionIds.size > maxLastTransactionIds) {
 			this.cachedTransactionIds = this.cachedTransactionIds.takeLast(maxLastTransactionIds);
@@ -331,11 +330,9 @@ import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData> {
 
 	// Map Block instances to block data.
 	private mapToBlockData(
-		blocks: Seq<number } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlock>,
+		blocks: Seq<number, Interfaces.IBlock>,
 		headersOnly?: boolean,
-	): Seq<number } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData> {
+	): Seq<number, Interfaces.IBlockData> {
 		return blocks.map((block) => ({
 			...block.data,
 			transactions: headersOnly ? undefined : block.transactions.map((tx) => tx.data),

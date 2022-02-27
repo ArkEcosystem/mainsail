@@ -18,7 +18,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		const delegates: Delegate[] = this.makeDelegates();
+		const delegates: Delegate[] = await this.makeDelegates();
 
 		const forgerService = this.app.get<ForgerService>(Container.Identifiers.ForgerService);
 
@@ -105,17 +105,17 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 	}
 
-	private makeDelegates(): Delegate[] {
+	private async makeDelegates(): Promise<Delegate[]> {
 		const delegates: Set<Delegate> = new Set<Delegate>();
 
 		for (const secret of this.app.config("delegates.secrets")) {
-			delegates.add(DelegateFactory.fromBIP39(secret));
+			delegates.add(await DelegateFactory.fromBIP39(secret));
 		}
 
 		const { bip38, password } = this.app.config("app.flags")!;
 
 		if (bip38) {
-			delegates.add(DelegateFactory.fromBIP38(bip38, password));
+			delegates.add(await DelegateFactory.fromBIP38(bip38, password));
 		}
 
 		return [...delegates];

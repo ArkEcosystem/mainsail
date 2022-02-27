@@ -1,22 +1,31 @@
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
-import { Managers, Utils as CryptoUtils } from "@arkecosystem/crypto";
+import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 import { Delegate } from "./interfaces";
 
 @Container.injectable()
 export class DelegateTracker {
 	@Container.inject(Container.Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
+	private readonly app: Contracts.Kernel.Application;
 
 	@Container.inject(Container.Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	private readonly logger: Contracts.Kernel.Logger;
 
 	@Container.inject(Container.Identifiers.BlockchainService)
-	private readonly blockchainService!: Contracts.Blockchain.Blockchain;
+	private readonly blockchainService: Contracts.Blockchain.Blockchain;
 
 	@Container.inject(Container.Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
-	private readonly walletRepository!: Contracts.State.WalletRepository;
+	private readonly walletRepository: Contracts.State.WalletRepository;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
+
+	@Container.inject(BINDINGS.Time.BlockTimeCalculator)
+	private readonly blockTimeCalculator: any;
 
 	private delegates: Delegate[] = [];
 
@@ -29,9 +38,9 @@ export class DelegateTracker {
 	public async handle(): Promise<void> {
 		// Arrange...
 		const { height, timestamp } = this.blockchainService.getLastBlock().data;
-		const maxDelegates = Managers.configManager.getMilestone(height).activeDelegates;
-		const blockTime: number = CryptoUtils.calculateBlockTime(height);
-		const round: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(height);
+		const maxDelegates = this.configuration.getMilestone(height).activeDelegates;
+		const blockTime: number = this.blockTimeCalculator.calculateBlockTime(height);
+		const round: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
 
 		const activeDelegates: any = await this.app
 			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
@@ -41,12 +50,18 @@ export class DelegateTracker {
 			(delegate: Contracts.State.Wallet) => delegate.getPublicKey(),
 		);
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, height);
+		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			height,
+			this.configuration,
+		);
 
 		const forgingInfo: Contracts.Shared.ForgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
 			timestamp,
 			height,
 			blockTimeLookup,
+			this.configuration,
+			this.slots,
 		);
 
 		// Determine Next Forgers...

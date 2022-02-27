@@ -1,6 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {
@@ -9,10 +8,16 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 
 	@Container.inject(Container.Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-transaction-pool")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@Container.inject(Container.Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
 
 	public canExpire(transaction: Interfaces.ITransaction): boolean {
 		if (transaction.data.version && transaction.data.version >= 2) {
@@ -37,11 +42,15 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		} else {
 			// ! dynamic block time wasn't available during v1 times
 			const currentHeight: number = this.stateStore.getLastHeight();
-			const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, currentHeight);
+			const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
+				this.app,
+				currentHeight,
+				this.configuration,
+			);
 
-			const createdSecondsAgo: number = Crypto.Slots.getTime() - transaction.data.timestamp;
-			const createdBlocksAgo: number = Crypto.Slots.getSlotNumber(blockTimeLookup, createdSecondsAgo);
-			const maxTransactionAge: number = this.configuration.getRequired<number>("maxTransactionAge");
+			const createdSecondsAgo: number = this.slots.getTime() - transaction.data.timestamp;
+			const createdBlocksAgo: number = this.slots.getSlotNumber(blockTimeLookup, createdSecondsAgo);
+			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 
 			return Math.floor(currentHeight - createdBlocksAgo + maxTransactionAge);
 		}

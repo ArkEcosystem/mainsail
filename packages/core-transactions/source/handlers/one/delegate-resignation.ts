@@ -1,6 +1,7 @@
-import { Container, Contracts, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Managers, Transactions } from "@arkecosystem/crypto";
+import { Container, Contracts, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Transactions from "@arkecosystem/core-crypto-transaction";
+import { One as DelegateResignationTransaction } from "@arkecosystem/core-crypto-transaction-delegate-resignation";
 
 import { NotEnoughDelegatesError, WalletAlreadyResignedError, WalletNotADelegateError } from "../../errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
@@ -25,13 +26,13 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return Transactions.Two.DelegateResignationTransaction;
+		return DelegateResignationTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
 		const criteria = {
-			typeGroup: this.getConstructor().typeGroup,
 			type: this.getConstructor().type,
+			typeGroup: this.getConstructor().typeGroup,
 		};
 
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
@@ -43,7 +44,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 		}
 	}
 	public async isActivated(): Promise<boolean> {
-		return Managers.configManager.getMilestone().aip11 === true;
+		return this.configuration.getMilestone().aip11 === true;
 	}
 
 	public async throwIfCannotBeApplied(
@@ -58,7 +59,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 			throw new WalletAlreadyResignedError();
 		}
 
-		const requiredDelegatesCount: number = Managers.configManager.getMilestone().activeDelegates;
+		const requiredDelegatesCount: number = this.configuration.getMilestone().activeDelegates;
 		const currentDelegatesCount: number = this.walletRepository
 			.allByUsername()
 			.filter((w) => w.hasAttribute("delegate.resigned") === false).length;

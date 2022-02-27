@@ -1,5 +1,5 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { Options, OrCriteria, OrEqualCriteria, OrNumericCriteria, Pagination, ResultsPage, Sorting } from "../search";
 import { OrTransactionCriteria } from "./transaction-history-service";
@@ -11,9 +11,9 @@ export type BlockCriteria = {
 	previousBlock?: OrEqualCriteria<string>;
 	height?: OrNumericCriteria<number>;
 	numberOfTransactions?: OrNumericCriteria<number>;
-	totalAmount?: OrNumericCriteria<Utils.BigNumber>;
-	totalFee?: OrNumericCriteria<Utils.BigNumber>;
-	reward?: OrNumericCriteria<Utils.BigNumber>;
+	totalAmount?: OrNumericCriteria<BigNumber>;
+	totalFee?: OrNumericCriteria<BigNumber>;
+	reward?: OrNumericCriteria<BigNumber>;
 	payloadLength?: OrNumericCriteria<number>;
 	payloadHash?: OrEqualCriteria<string>;
 	generatorPublicKey?: OrEqualCriteria<string>;

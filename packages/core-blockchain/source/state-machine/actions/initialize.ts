@@ -1,8 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Managers } from "@arkecosystem/crypto";
 
 import { Action } from "../contracts";
 
@@ -32,6 +31,9 @@ export class Initialize implements Action {
 	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
 	public async handle(): Promise<void> {
 		try {
 			const block: Interfaces.IBlock = this.stateStore.getLastBlock();
@@ -50,7 +52,7 @@ export class Initialize implements Action {
 
 			// only genesis block? special case of first round needs to be dealt with
 			if (block.data.height === 1) {
-				if (block.data.payloadHash !== Managers.configManager.get("network.nethash")) {
+				if (block.data.payloadHash !== this.configuration.get("network.nethash")) {
 					this.logger.error("FATAL: The genesis block payload hash is different from configured the nethash");
 
 					return this.blockchain.dispatch("FAILURE");
@@ -63,7 +65,7 @@ export class Initialize implements Action {
 			 *  state machine data init      *
 			 ******************************* */
 			// Delete all rounds from the future due to shutdown before processBlocks finished writing the blocks.
-			const roundInfo = AppUtils.roundCalculator.calculateRound(block.data.height);
+			const roundInfo = AppUtils.roundCalculator.calculateRound(block.data.height, this.configuration);
 			await this.databaseService.deleteRound(roundInfo.round + 1);
 
 			if (this.stateStore.getNetworkStart()) {

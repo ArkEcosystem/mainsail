@@ -1,5 +1,5 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import assert from "assert";
 
 import { BlockRepository } from "./repositories/block-repository";
@@ -46,7 +46,7 @@ export class BlockHistoryService implements Contracts.Shared.BlockHistoryService
 		const expression = await this.blockFilter.getExpression(criteria);
 		const modelResultsPage = await this.blockRepository.listByExpression(expression, sorting, pagination, options);
 		const models = modelResultsPage.results;
-		const data = this.modelConverter.getBlockData(models);
+		const data = await this.modelConverter.getBlockData(models);
 		return { ...modelResultsPage, results: data };
 	}
 
@@ -101,7 +101,7 @@ export class BlockHistoryService implements Contracts.Shared.BlockHistoryService
 			transactionBlockCriteria,
 		);
 		const transactionModels = await this.transactionRepository.findManyByExpression(transactionExpression);
-		const blockDataWithTransactionData = this.modelConverter.getBlockDataWithTransactionData(
+		const blockDataWithTransactionData = await this.modelConverter.getBlockDataWithTransactionData(
 			blockModels,
 			transactionModels,
 		);

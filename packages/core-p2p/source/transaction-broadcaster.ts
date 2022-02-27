@@ -1,6 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, ITransactionSerializer } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Providers, Utils } from "@arkecosystem/core-kernel";
-import { Transactions } from "@arkecosystem/crypto";
 
 import { PeerCommunicator } from "./peer-communicator";
 
@@ -19,6 +18,9 @@ export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcas
 	@Container.inject(Container.Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
+	@Container.inject(BINDINGS.Transaction.Serializer)
+	private readonly serializer!: ITransactionSerializer;
+
 	public async broadcastTransactions(transactions: Interfaces.ITransaction[]): Promise<void> {
 		if (transactions.length === 0) {
 			this.logger.warning("Broadcasting 0 transactions");
@@ -32,7 +34,7 @@ export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcas
 		const peersString = Utils.pluralize("peer", peers.length, true);
 		this.logger.debug(`Broadcasting ${transactionsString} to ${peersString}`);
 
-		const transactionsBroadcast: Buffer[] = transactions.map((t) => Transactions.Serializer.serialize(t));
+		const transactionsBroadcast: Buffer[] = transactions.map((t) => this.serializer.serialize(t));
 		const promises = peers.map((p) => this.communicator.postTransactions(p, transactionsBroadcast));
 
 		await Promise.all(promises);

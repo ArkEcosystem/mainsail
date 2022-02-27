@@ -16,9 +16,10 @@
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"better-sqlite3": "7.4.3",
 		"fs-extra": "8.1.0",
 		"joi": "17.4.2"

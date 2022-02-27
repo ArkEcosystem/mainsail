@@ -1,5 +1,5 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Identities, Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { WalletIndexNotFoundError } from "./errors";
 import { WalletIndex } from "./wallet-index";
@@ -63,7 +63,8 @@ export class WalletRepositoryClone extends WalletRepository {
 
 	public findByPublicKey(publicKey: string): Contracts.State.Wallet {
 		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
-			const wallet = this.findByAddress(Identities.Address.fromPublicKey(publicKey));
+			// @TODO
+			const wallet = this.findByAddress(void this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			super.index(wallet);
 		}
@@ -109,7 +110,7 @@ export class WalletRepositoryClone extends WalletRepository {
 		);
 	}
 
-	public getNonce(publicKey: string): Utils.BigNumber {
+	public getNonce(publicKey: string): BigNumber {
 		if (this.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey)) {
 			return this.findByPublicKey(publicKey).getNonce();
 		}
@@ -118,7 +119,7 @@ export class WalletRepositoryClone extends WalletRepository {
 			return this.blockchainWalletRepository.findByPublicKey(publicKey).getNonce();
 		}
 
-		return Utils.BigNumber.ZERO;
+		return BigNumber.ZERO;
 	}
 
 	public forgetOnIndex(index: string, key: string): void {

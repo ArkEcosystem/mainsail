@@ -37,10 +37,7 @@ export abstract class One extends Transaction {
 		buff.writeUInt32LE(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer, addressError } = await this.addressFactory.toBuffer(
-				data.recipientId,
-				this.configuration.get("network.pubKeyHash"),
-			);
+			const { addressBuffer, addressError } = await this.addressFactory.toBuffer(data.recipientId);
 
 			if (options) {
 				options.addressError = addressError;

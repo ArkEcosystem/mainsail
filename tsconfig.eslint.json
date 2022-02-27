@@ -18,10 +18,6 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": false,
 		"pretty": true,
-		"paths": {
-			"@packages/*": ["packages/*"],
-			"@tests/*": ["__tests__/*"]
-		},
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"sourceMap": true,

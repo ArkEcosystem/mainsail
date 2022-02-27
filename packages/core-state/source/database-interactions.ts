@@ -1,8 +1,7 @@
+import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Blocks, Managers } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import { RoundState } from "./round-state";
 
@@ -40,14 +39,20 @@ export class DatabaseInteraction {
 	@Container.inject(Container.Identifiers.RoundState)
 	private readonly roundState!: RoundState;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Block.Factory)
+	private readonly blockFactory: IBlockFactory;
+
 	public async initialize(): Promise<void> {
 		try {
 			this.events.dispatch(Enums.StateEvent.Starting);
 
-			const genesisBlockJson = Managers.configManager.get("genesisBlock");
-			const genesisBlock = Blocks.BlockFactory.fromJson(genesisBlockJson);
+			const genesisBlockJson = this.configuration.get("genesisBlock");
+			const genesisBlock = await this.blockFactory.fromJson(genesisBlockJson);
 
-			this.stateStore.setGenesisBlock(genesisBlock!);
+			this.stateStore.setGenesisBlock(genesisBlock);
 
 			if (process.env.CORE_RESET_DATABASE) {
 				await this.reset();
@@ -77,8 +82,8 @@ export class DatabaseInteraction {
 		await this.roundState.revertBlock(block);
 		await this.blockState.revertBlock(block);
 
-		for (let i = block.transactions.length - 1; i >= 0; i--) {
-			this.events.dispatch(Enums.TransactionEvent.Reverted, block.transactions[i].data);
+		for (let index = block.transactions.length - 1; index >= 0; index--) {
+			this.events.dispatch(Enums.TransactionEvent.Reverted, block.transactions[index].data);
 		}
 
 		this.events.dispatch(Enums.BlockEvent.Reverted, block.data);
@@ -109,13 +114,13 @@ export class DatabaseInteraction {
 
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
-		let lastHeight: number = 1;
+		let lastHeight = 1;
 		const latest: Interfaces.IBlockData | undefined = await this.databaseService.findLatestBlock();
 		if (latest) {
 			lastHeight = latest.height;
 		}
 
-		Managers.configManager.setHeight(lastHeight);
+		this.configuration.setHeight(lastHeight);
 
 		const getLastBlock = async (): Promise<Interfaces.IBlock | undefined> => {
 			try {
@@ -154,8 +159,8 @@ export class DatabaseInteraction {
 
 	private configureState(lastBlock: Interfaces.IBlock): void {
 		this.stateStore.setLastBlock(lastBlock);
-		const { blocktime, block } = Managers.configManager.getMilestone();
-		const blocksPerDay: number = Math.ceil(86400 / blocktime);
+		const { blocktime, block } = this.configuration.getMilestone();
+		const blocksPerDay: number = Math.ceil(86_400 / blocktime);
 		this.stateBlockStore.resize(blocksPerDay);
 		this.stateTransactionStore.resize(blocksPerDay * block.maxTransactions);
 	}

@@ -1,4 +1,3 @@
-import { Networks } from "@arkecosystem/crypto";
 import { existsSync, readdirSync } from "fs-extra";
 import prompts from "prompts";
 
@@ -59,6 +58,6 @@ export class DiscoverNetwork {
 	}
 
 	private isValidNetwork(network: string): boolean {
-		return Object.keys(Networks).includes(network);
+		return ["livenet", "testnet"].includes(network);
 	}
 }

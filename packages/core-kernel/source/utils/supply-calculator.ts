@@ -1,23 +1,23 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Managers, Utils } from "@arkecosystem/crypto";
+import Interfaces, { IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { assert } from "./assert";
 
 // todo: review the implementation
-export const calculate = (height: number): string => {
-	const config: Interfaces.NetworkConfig | undefined = Managers.configManager.all();
+export const calculate = (height: number, configuration: IConfiguration): string => {
+	const config: Interfaces.NetworkConfig | undefined = configuration.all();
 
 	assert.defined<Interfaces.NetworkConfig>(config);
 
 	const { genesisBlock, milestones } = config;
 
-	const totalAmount: Utils.BigNumber = Utils.BigNumber.make(genesisBlock.totalAmount);
+	const totalAmount: BigNumber = BigNumber.make(genesisBlock.totalAmount);
 
 	if (height === 0 || milestones.length === 0) {
 		return totalAmount.toFixed();
 	}
 
-	let rewards: Utils.BigNumber = Utils.BigNumber.ZERO;
+	let rewards: BigNumber = BigNumber.ZERO;
 	let currentHeight = 0;
 	let constantIndex = 0;
 
@@ -35,7 +35,7 @@ export const calculate = (height: number): string => {
 		currentHeight += heightJump;
 
 		if (currentHeight >= constants.height) {
-			rewards = rewards.plus(Utils.BigNumber.make(constants.reward).times(heightJump));
+			rewards = rewards.plus(BigNumber.make(constants.reward).times(heightJump));
 		}
 	}
 

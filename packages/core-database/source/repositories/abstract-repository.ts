@@ -1,4 +1,5 @@
 import { Contracts, Utils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 import { ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
@@ -66,7 +67,7 @@ export abstract class AbstractRepository<TEntity extends ObjectLiteral> extends 
 					this.addWhere(totalCountQueryBuilder, expression);
 
 					const totalCountRow = await totalCountQueryBuilder.getRawOne();
-					const totalCount = parseFloat(totalCountRow["total_count"]);
+					const totalCount = Number.parseFloat(totalCountRow["total_count"]);
 
 					await queryRunner.commitTransaction();
 
@@ -78,7 +79,7 @@ export abstract class AbstractRepository<TEntity extends ObjectLiteral> extends 
 					for (const resultsExplainedRow of resultsExplainedRows) {
 						const match = resultsExplainedRow["QUERY PLAN"].match(/rows=(\d+)/);
 						if (match) {
-							totalCountEstimated = parseFloat(match[1]);
+							totalCountEstimated = Number.parseFloat(match[1]);
 						}
 					}
 
@@ -115,7 +116,7 @@ export abstract class AbstractRepository<TEntity extends ObjectLiteral> extends 
 				if (value === undefined || value === null) {
 					propertyValue = undefined;
 				} else if (columnMetadata.type === "bigint") {
-					propertyValue = Utils.BigNumber.make(value);
+					propertyValue = BigNumber.make(value);
 				} else if (columnMetadata.propertyName === "vendorField") {
 					propertyValue = value.toString("utf8");
 				} else {
@@ -141,7 +142,7 @@ export abstract class AbstractRepository<TEntity extends ObjectLiteral> extends 
 	}
 
 	private addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Contracts.Search.Sorting): void {
-		if (sorting.length) {
+		if (sorting.length > 0) {
 			const column = this.queryHelper.getColumnName(this.metadata, sorting[0].property);
 			queryBuilder.orderBy(column, sorting[0].direction === "desc" ? "DESC" : "ASC");
 

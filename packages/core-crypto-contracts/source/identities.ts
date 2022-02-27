@@ -21,21 +21,21 @@ export interface AddressFactory {
 }
 
 export interface IAddressFactory {
-	fromMnemonic(mnemonic: string, pubKeyHash: number): Promise<string>;
+	fromMnemonic(mnemonic: string): Promise<string>;
 
-	fromPublicKey(publicKey: string, pubKeyHash: number): Promise<string>;
+	fromPublicKey(publicKey: string): Promise<string>;
 
-	fromWIF(wif: string, options: { pubKeyHash: number; wif: number }): Promise<string>;
+	fromWIF(wif: string): Promise<string>;
 
-	fromMultiSignatureAsset(asset: IMultiSignatureAsset, pubKeyHash: number): Promise<string>;
+	fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string>;
 
-	fromPrivateKey(privateKey: IKeyPair, pubKeyHash: number): Promise<string>;
+	fromPrivateKey(privateKey: IKeyPair): Promise<string>;
 
 	fromBuffer(buffer: Buffer): Promise<string>;
 
-	toBuffer(address: string, pubKeyHash: number): Promise<{ addressBuffer: Buffer; addressError?: string }>;
+	toBuffer(address: string): Promise<{ addressBuffer: Buffer; addressError?: string }>;
 
-	validate(address: string, pubKeyHash: number): Promise<boolean>;
+	validate(address: string): Promise<boolean>;
 }
 
 export interface IPublicKeyFactory {

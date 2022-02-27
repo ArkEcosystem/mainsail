@@ -1,6 +1,7 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto, Managers, Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 import cloneDeep from "lodash.clonedeep";
+import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 const defaultblockTimestampLookup = (height: number): number => {
 	/* istanbul ignore next */
@@ -15,24 +16,26 @@ export const snoozeForBlock = async (
 	sleep = 0,
 	height = 1,
 	blockTimestampLookupByHeight = defaultblockTimestampLookup,
+	configuration: IConfiguration,
+	slots,
 ): Promise<void> => {
-	const blockTime: number = Managers.configManager.getMilestone(height).blocktime * 1000;
-	const remainingTimeInSlot: number = Crypto.Slots.getTimeInMsUntilNextSlot(blockTimestampLookupByHeight);
+	const blockTime: number = configuration.getMilestone(height).blocktime * 1000;
+	const remainingTimeInSlot: number = slots.getTimeInMsUntilNextSlot(blockTimestampLookupByHeight);
 	const sleepTime: number = sleep * 1000;
 
 	return AppUtils.sleep(blockTime + remainingTimeInSlot + sleepTime);
 };
 
-export const injectMilestone = (index: number, milestone: Record<string, any>): void =>
-	(Managers.configManager as any).milestones.splice(index, 0, {
-		...cloneDeep(Managers.configManager.getMilestone()),
+export const injectMilestone = (index: number, milestone: Record<string, any>, configuration: IConfiguration): void =>
+	(configuration as any).milestones.splice(index, 0, {
+		...cloneDeep(configuration.getMilestone()),
 		...milestone,
 	});
 
 export const getLastHeight = (app: Contracts.Kernel.Application): number =>
 	app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore).getLastHeight();
 
-export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): Utils.BigNumber =>
+export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): BigNumber =>
 	app
 		.getTagged<Contracts.State.WalletRepository>(Container.Identifiers.WalletRepository, "state", "blockchain")
 		.getNonce(senderPublicKey);
@@ -54,12 +57,12 @@ export const resetBlockchain = async (app: Contracts.Kernel.Application) => {
 	// app.get<Contracts.TransactionPool.Connection>(Container.Identifiers.TransactionPoolService).flush();
 };
 
-export const getWalletNonce = (app: Contracts.Kernel.Application, publicKey: string): Utils.BigNumber => {
+export const getWalletNonce = (app: Contracts.Kernel.Application, publicKey: string): BigNumber => {
 	try {
 		return app
 			.getTagged<Contracts.State.WalletRepository>(Container.Identifiers.WalletRepository, "state", "blockchain")
 			.getNonce(publicKey);
 	} catch {
-		return Utils.BigNumber.ZERO;
+		return BigNumber.ZERO;
 	}
 };

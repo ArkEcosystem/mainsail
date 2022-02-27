@@ -1,6 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Transactions } from "@arkecosystem/crypto";
 
 import { TransactionAlreadyInPoolError, TransactionPoolFullError } from "./errors";
 
@@ -8,7 +7,7 @@ import { TransactionAlreadyInPoolError, TransactionPoolFullError } from "./error
 export class Service implements Contracts.TransactionPool.Service {
 	@Container.inject(Container.Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-transaction-pool")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@Container.inject(Container.Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
@@ -33,6 +32,9 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly transactionFactory: ITransactionFactory;
 
 	private readonly lock: AppUtils.Lock = new AppUtils.Lock();
 
@@ -134,7 +136,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			for (const { id, serialized } of previouslyForgedTransactions) {
 				try {
-					const previouslyForgedTransaction = Transactions.TransactionFactory.fromBytes(serialized);
+					const previouslyForgedTransaction = await this.transactionFactory.fromBytes(serialized);
 
 					AppUtils.assert.defined<string>(previouslyForgedTransaction.id);
 					AppUtils.assert.defined<string>(previouslyForgedTransaction.data.senderPublicKey);
@@ -157,7 +159,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				}
 			}
 
-			const maxTransactionAge: number = this.configuration.getRequired<number>("maxTransactionAge");
+			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 			const lastHeight: number = this.stateStore.getLastHeight();
 			const expiredHeight: number = lastHeight - maxTransactionAge;
 
@@ -168,7 +170,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 				if (height > expiredHeight) {
 					try {
-						const previouslyStoredTransaction = Transactions.TransactionFactory.fromBytes(serialized);
+						const previouslyStoredTransaction = await this.transactionFactory.fromBytes(serialized);
 						await this.addTransactionToMempool(previouslyStoredTransaction);
 						previouslyStoredSuccesses++;
 					} catch (error) {
@@ -290,7 +292,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	private async removeOldTransactions(): Promise<void> {
-		const maxTransactionAge: number = this.configuration.getRequired<number>("maxTransactionAge");
+		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 		const lastHeight: number = this.stateStore.getLastHeight();
 		const expiredHeight: number = lastHeight - maxTransactionAge;
 
@@ -351,7 +353,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	private async removeLowestPriorityTransactions(): Promise<void> {
-		const maxTransactionsInPool: number = this.configuration.getRequired<number>("maxTransactionsInPool");
+		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
 		while (this.getPoolSize() > maxTransactionsInPool) {
 			await this.removeLowestPriorityTransaction();
@@ -361,7 +363,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	private async addTransactionToMempool(transaction: Interfaces.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const maxTransactionsInPool: number = this.configuration.getRequired<number>("maxTransactionsInPool");
+		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
 			await this.removeOldTransactions();

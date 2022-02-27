@@ -1,4 +1,4 @@
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { StandardCriteriaOf, StandardCriteriaOfItem } from "../../contracts/search";
 import { injectable } from "../../ioc";
@@ -27,11 +27,11 @@ export class StandardCriteriaService {
 				//   ]
 				// }
 
-				return criteria.some((criteriaItem, i) => {
+				return criteria.some((criteriaItem, index) => {
 					try {
 						return this.testStandardCriteriaItem(value, criteriaItem);
 					} catch (error) {
-						this.rethrowError(error, String(i));
+						this.rethrowError(error, String(index));
 					}
 				});
 			} else {
@@ -58,10 +58,10 @@ export class StandardCriteriaService {
 			return this.testNumberValueCriteriaItem(value, criteriaItem as StandardCriteriaOfItem<number>);
 		}
 
-		if (typeof value === "bigint" || value instanceof Utils.BigNumber) {
+		if (typeof value === "bigint" || value instanceof BigNumber) {
 			return this.testBigNumberValueCriteriaItem(
 				value,
-				criteriaItem as StandardCriteriaOfItem<BigInt | Utils.BigNumber>,
+				criteriaItem as StandardCriteriaOfItem<BigInt | BigNumber>,
 			);
 		}
 
@@ -112,7 +112,7 @@ export class StandardCriteriaService {
 			throw new InvalidCriteria(value, criteriaItem, []);
 		}
 
-		if (criteriaItem.indexOf("%") === -1) {
+		if (!criteriaItem.includes("%")) {
 			return criteriaItem === value;
 		}
 
@@ -139,16 +139,12 @@ export class StandardCriteriaService {
 		}
 
 		if (typeof criteriaItem === "object" && criteriaItem !== null) {
-			if ("from" in criteriaItem) {
-				if (isNaN(Number(criteriaItem["from"]))) {
-					throw new InvalidCriteria(value, criteriaItem.from, ["from"]);
-				}
+			if ("from" in criteriaItem && isNaN(Number(criteriaItem["from"]))) {
+				throw new InvalidCriteria(value, criteriaItem.from, ["from"]);
 			}
 
-			if ("to" in criteriaItem) {
-				if (isNaN(Number(criteriaItem["to"]))) {
-					throw new InvalidCriteria(value, criteriaItem.to, ["to"]);
-				}
+			if ("to" in criteriaItem && isNaN(Number(criteriaItem["to"]))) {
+				throw new InvalidCriteria(value, criteriaItem.to, ["to"]);
 			}
 
 			if ("from" in criteriaItem && "to" in criteriaItem) {
@@ -168,21 +164,21 @@ export class StandardCriteriaService {
 	}
 
 	private testBigNumberValueCriteriaItem(
-		value: BigInt | Utils.BigNumber,
-		criteriaItem: StandardCriteriaOfItem<BigInt | Utils.BigNumber>,
+		value: BigInt | BigNumber,
+		criteriaItem: StandardCriteriaOfItem<BigInt | BigNumber>,
 	): boolean {
-		// Utils.BigNumber.make doesn't perform instanceof check
-		const bnValue = value instanceof Utils.BigNumber ? value : Utils.BigNumber.make(value);
+		// BigNumber.make doesn't perform instanceof check
+		const bnValue = value instanceof BigNumber ? value : BigNumber.make(value);
 
 		if (
 			typeof criteriaItem === "number" ||
 			typeof criteriaItem === "string" ||
 			typeof criteriaItem === "bigint" ||
-			criteriaItem instanceof Utils.BigNumber
+			criteriaItem instanceof BigNumber
 		) {
 			try {
 				return bnValue.isEqualTo(criteriaItem);
-			} catch (error) {
+			} catch {
 				throw new InvalidCriteria(value, criteriaItem, []);
 			}
 		}
@@ -204,8 +200,8 @@ export class StandardCriteriaService {
 			} catch (error) {
 				if ("from" in criteriaItem) {
 					try {
-						Utils.BigNumber.make(criteriaItem.from);
-					} catch (error) {
+						BigNumber.make(criteriaItem.from);
+					} catch {
 						throw new InvalidCriteria(value, criteriaItem.from, ["from"]);
 					}
 				}
@@ -213,8 +209,8 @@ export class StandardCriteriaService {
 				/* istanbul ignore else */
 				if ("to" in criteriaItem) {
 					try {
-						Utils.BigNumber.make(criteriaItem.to);
-					} catch (error) {
+						BigNumber.make(criteriaItem.to);
+					} catch {
 						throw new InvalidCriteria(value, criteriaItem.to, ["to"]);
 					}
 				}
@@ -233,9 +229,7 @@ export class StandardCriteriaService {
 
 		if (criteriaKeys.length === 1 && criteriaKeys[0] === "*") {
 			try {
-				return Object.values(value).some((v) => {
-					return this.testStandardCriterias(v, criteriaItem["*"]);
-				});
+				return Object.values(value).some((v) => this.testStandardCriterias(v, criteriaItem["*"]));
 			} catch (error) {
 				this.rethrowError(error, "*");
 			}

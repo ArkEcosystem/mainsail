@@ -34,9 +34,9 @@
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
-		"@arkecosystem/core-api": "workspace:*",
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-forger": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
@@ -46,7 +46,6 @@
 		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/core-webhooks": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"argon2": "0.28.2",
 		"bip39": "3.0.4",

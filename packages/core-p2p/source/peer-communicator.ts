@@ -1,6 +1,10 @@
+import Interfaces, {
+	BINDINGS,
+	IBlockSerializer,
+	ITransactionFactory,
+	IValidator,
+} from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
-import { Blocks, Managers, Transactions, Validation } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -35,6 +39,15 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@Container.inject(Container.Identifiers.QueueFactory)
 	private readonly createQueue!: Types.QueueFactory;
 
+	@Container.inject(BINDINGS.Block.Serializer)
+	private readonly serializer: IBlockSerializer;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly transactionFactory: ITransactionFactory;
+
+	@Container.inject(BINDINGS.Validator)
+	private readonly validator!: IValidator;
+
 	private outgoingRateLimiter!: RateLimiter;
 
 	private postTransactionsQueueByIp: Map<string, Contracts.Kernel.Queue> = new Map();
@@ -42,12 +55,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@Container.postConstruct()
 	public initialize(): void {
 		this.outgoingRateLimiter = buildRateLimiter({
+			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
+
+			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
+
+			remoteAccess: [],
 			// White listing anybody here means we would not throttle ourselves when sending
 			// them requests, ie we could spam them.
 			whitelist: [],
-			remoteAccess: [],
-			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
-			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
 		});
 
 		this.events.listen(Enums.PeerEvent.Disconnect, {
@@ -56,13 +71,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postBlock(peer: Contracts.P2P.Peer, block: Interfaces.IBlock) {
-		const postBlockTimeout = 10000;
+		const postBlockTimeout = 10_000;
 
 		const response = await this.emit(
 			peer,
 			"p2p.blocks.postBlock",
 			{
-				block: Blocks.Serializer.serializeWithTransactions({
+				block: this.serializer.serializeWithTransactions({
 					...block.data,
 					transactions: block.transactions.map((tx) => tx.data),
 				}),
@@ -76,7 +91,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
-		const postTransactionsTimeout = 10000;
+		const postTransactionsTimeout = 10_000;
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
 		if (!this.postTransactionsQueueByIp.get(peer.ip)) {
@@ -99,7 +114,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	// ! peerVerifier.checkState can take more time !
 	// TODO refactor ?
 	public async ping(peer: Contracts.P2P.Peer, timeoutMsec: number, force = false): Promise<any> {
-		const deadline = new Date().getTime() + timeoutMsec;
+		const deadline = Date.now() + timeoutMsec;
 
 		if (peer.recentlyPinged() && !force) {
 			return undefined;
@@ -124,7 +139,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			const peerVerifier = this.app.resolve(PeerVerifier).initialize(peer);
 
-			if (deadline <= new Date().getTime()) {
+			if (deadline <= Date.now()) {
 				throw new PeerPingTimeoutError(timeoutMsec);
 			}
 
@@ -189,9 +204,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			peer,
 			"p2p.blocks.getBlocks",
 			{
-				lastBlockHeight: fromBlockHeight,
 				blockLimit,
 				headersOnly,
+				lastBlockHeight: fromBlockHeight,
 				serialized: true,
 			},
 			this.configuration.getRequired<number>("getBlocksTimeout"),
@@ -199,7 +214,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			false,
 		);
 
-		if (!peerBlocks || !peerBlocks.length) {
+		if (!peerBlocks || peerBlocks.length === 0) {
 			this.logger.debug(
 				`Peer ${peer.ip} did not return any blocks via height ${fromBlockHeight.toLocaleString()}.`,
 			);
@@ -214,18 +229,22 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				continue;
 			}
 
-			block.transactions = block.transactions.map((transaction) => {
-				const { data } = Transactions.TransactionFactory.fromBytesUnsafe(Buffer.from(transaction, "hex"));
+			for (let index = 0; index < block.transactions.length; index++) {
+				const { data } = await this.transactionFactory.fromBytesUnsafe(
+					Buffer.from(block.transactions[index], "hex"),
+				);
 				data.blockId = block.id;
-				return data;
-			});
+
+				block.transactions[index] = data;
+			}
 		}
+		this.configuration;
 
 		return peerBlocks;
 	}
 
 	private validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
-		if (config.network.nethash !== Managers.configManager.get("network.nethash")) {
+		if (config.network.nethash !== this.configuration.get("network.nethash")) {
 			return false;
 		}
 
@@ -238,14 +257,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return true;
 	}
 
-	private validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string): boolean {
+	private async validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
 		const schema = replySchemas[endpoint];
 		if (schema === undefined) {
 			this.logger.error(`Can't validate reply from "${endpoint}": none of the predefined schemas matches.`);
 			return false;
 		}
 
-		const { error } = Validation.validator.validate(schema, reply);
+		const { error } = await this.validator.validate(schema, reply);
 		if (error) {
 			/* istanbul ignore else */
 			if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
@@ -264,7 +283,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		payload: any,
 		timeout?: number,
 		maxPayload?: number,
-		disconnectOnError: boolean = true,
+		disconnectOnError = true,
 	) {
 		await this.throttle(peer, event);
 
@@ -275,7 +294,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			this.connector.forgetError(peer);
 
-			const timeBeforeSocketCall: number = new Date().getTime();
+			const timeBeforeSocketCall: number = Date.now();
 
 			maxPayload = maxPayload || constants.DEFAULT_MAX_PAYLOAD_CLIENT;
 			await this.connector.connect(peer, maxPayload);
@@ -295,7 +314,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			peer.sequentialErrorCounter = 0; // reset counter if response is successful, keep it after emit
 
-			peer.latency = new Date().getTime() - timeBeforeSocketCall;
+			peer.latency = Date.now() - timeBeforeSocketCall;
 
 			if (!this.validateReply(peer, parsedResponsePayload, event)) {
 				const validationError = new Error(
@@ -304,9 +323,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				validationError.name = SocketErrors.Validation;
 				throw validationError;
 			}
-		} catch (e) {
-			this.handleSocketError(peer, event, e, disconnectOnError);
-			return undefined;
+		} catch (error) {
+			this.handleSocketError(peer, event, error, disconnectOnError);
+			return;
 		}
 
 		return parsedResponsePayload;
@@ -327,7 +346,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error, disconnect: boolean = true): void {
+	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error, disconnect = true): void {
 		if (!error.name) {
 			return;
 		}

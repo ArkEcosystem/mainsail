@@ -1,4 +1,3 @@
-import { Crypto } from "@arkecosystem/crypto";
 import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 type BlockChainedDetails = {
@@ -14,12 +13,13 @@ const getBlockChainedDetails = (
 	previousBlock: Interfaces.IBlockData,
 	nextBlock: Interfaces.IBlockData,
 	getTimeStampForBlock: (blockheight: number) => number,
+	slots,
 ): BlockChainedDetails => {
 	const followsPrevious: boolean = nextBlock.previousBlock === previousBlock.id;
 	const isPlusOne: boolean = nextBlock.height === previousBlock.height + 1;
 
-	const previousSlot: number = Crypto.Slots.getSlotNumber(getTimeStampForBlock, previousBlock.timestamp);
-	const nextSlot: number = Crypto.Slots.getSlotNumber(getTimeStampForBlock, nextBlock.timestamp);
+	const previousSlot: number = slots.getSlotNumber(getTimeStampForBlock, previousBlock.timestamp);
+	const nextSlot: number = slots.getSlotNumber(getTimeStampForBlock, nextBlock.timestamp);
 	const isAfterPreviousSlot: boolean = previousSlot < nextSlot;
 
 	const isChained: boolean = followsPrevious && isPlusOne && isAfterPreviousSlot;
@@ -31,8 +31,9 @@ export const isBlockChained = (
 	previousBlock: Interfaces.IBlockData,
 	nextBlock: Interfaces.IBlockData,
 	getTimeStampForBlock: (blockheight: number) => number,
+	slots,
 ): boolean => {
-	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock);
+	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock, slots);
 	return details.isChained;
 };
 
@@ -40,8 +41,9 @@ export const getBlockNotChainedErrorMessage = (
 	previousBlock: Interfaces.IBlockData,
 	nextBlock: Interfaces.IBlockData,
 	getTimeStampForBlock: (blockheight: number) => number,
+	slots,
 ): string => {
-	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock);
+	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock, slots);
 
 	if (details.isChained) {
 		throw new Error("Block had no chain error");

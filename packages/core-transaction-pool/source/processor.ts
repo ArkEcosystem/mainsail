@@ -1,6 +1,10 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, {
+	BINDINGS,
+	ITransactionDeserializer,
+	ITransactionFactory,
+} from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Transactions, Utils } from "@arkecosystem/crypto";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 import { InvalidTransactionDataError } from "./errors";
 
@@ -19,6 +23,12 @@ export class Processor implements Contracts.TransactionPool.Processor {
 
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly transactionFactory: ITransactionFactory;
+
+	@Container.inject(BINDINGS.Transaction.Deserializer)
+	private readonly deserializer: ITransactionDeserializer;
 
 	public async process(
 		data: Interfaces.ITransactionData[] | Buffer[],
@@ -88,10 +98,10 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Interfaces.ITransaction> {
 		try {
 			const transactionCommon = {} as Interfaces.ITransactionData;
-			const txByteBuffer = new Utils.ByteBuffer(transactionData);
-			Transactions.Deserializer.deserializeCommon(transactionCommon, txByteBuffer);
+			const txByteBuffer = new ByteBuffer(transactionData);
+			this.deserializer.deserializeCommon(transactionCommon, txByteBuffer);
 
-			return Transactions.TransactionFactory.fromBytes(transactionData);
+			return this.transactionFactory.fromBytes(transactionData);
 		} catch (error) {
 			throw new InvalidTransactionDataError(error.message);
 		}
@@ -101,7 +111,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		transactionData: Interfaces.ITransactionData,
 	): Promise<Interfaces.ITransaction> {
 		try {
-			return Transactions.TransactionFactory.fromData(transactionData);
+			return this.transactionFactory.fromData(transactionData);
 		} catch (error) {
 			throw new InvalidTransactionDataError(error.message);
 		}

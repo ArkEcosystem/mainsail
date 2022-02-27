@@ -1,5 +1,5 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import {
 	Options,
@@ -22,13 +22,13 @@ export type TransactionCriteria = {
 	blockId?: OrEqualCriteria<string>;
 	sequence?: OrNumericCriteria<number>;
 	timestamp?: OrNumericCriteria<number>;
-	nonce?: OrNumericCriteria<Utils.BigNumber>;
+	nonce?: OrNumericCriteria<BigNumber>;
 	senderPublicKey?: OrEqualCriteria<string>;
 	type?: OrEqualCriteria<number>;
 	typeGroup?: OrEqualCriteria<number>;
 	vendorField?: OrLikeCriteria<string>;
-	amount?: OrNumericCriteria<Utils.BigNumber>;
-	fee?: OrNumericCriteria<Utils.BigNumber>;
+	amount?: OrNumericCriteria<BigNumber>;
+	fee?: OrNumericCriteria<BigNumber>;
 	asset?: OrContainsCriteria<Record<string, any>>;
 };
 

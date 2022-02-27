@@ -1,5 +1,6 @@
+import { BINDINGS, ITransactionRegistry, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
+import { InternalTransactionType } from "@arkecosystem/core-crypto-transaction";
 import { Container, Services, Utils } from "@arkecosystem/core-kernel";
-import { Enums, Transactions } from "@arkecosystem/crypto";
 
 import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "../errors";
 import { TransactionHandlerConstructor } from "./transaction";
@@ -11,6 +12,9 @@ export class TransactionHandlerProvider {
 
 	@Container.inject(Container.Identifiers.TransactionHandlerConstructors)
 	private readonly handlerConstructors!: TransactionHandlerConstructor[];
+
+	@Container.inject(BINDINGS.Transaction.Registry)
+	private readonly transactionRegistry!: ITransactionRegistry;
 
 	private registered = false;
 
@@ -33,7 +37,7 @@ export class TransactionHandlerProvider {
 		Utils.assert.defined<number>(transactionConstructor.type);
 		Utils.assert.defined<number>(transactionConstructor.typeGroup);
 
-		const internalType = Transactions.InternalTransactionType.from(
+		const internalType = InternalTransactionType.from(
 			transactionConstructor.type,
 			transactionConstructor.typeGroup,
 		);
@@ -54,14 +58,14 @@ export class TransactionHandlerProvider {
 			}
 		}
 
-		if (transactionConstructor.typeGroup !== Enums.TransactionTypeGroup.Core) {
-			Transactions.TransactionRegistry.registerTransactionType(transactionConstructor);
+		if (transactionConstructor.typeGroup !== TransactionTypeGroup.Core) {
+			this.transactionRegistry.registerTransactionType(transactionConstructor);
 		}
 	}
 
 	private hasOtherHandlerHandling(
 		handlerConstructor: TransactionHandlerConstructor,
-		internalType: Transactions.InternalTransactionType,
+		internalType: InternalTransactionType,
 		version: number,
 	) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {
@@ -75,7 +79,7 @@ export class TransactionHandlerProvider {
 			Utils.assert.defined<number>(otherTransactionConstructor.type);
 			Utils.assert.defined<number>(otherTransactionConstructor.typeGroup);
 
-			const otherInternalType = Transactions.InternalTransactionType.from(
+			const otherInternalType = InternalTransactionType.from(
 				otherTransactionConstructor.type,
 				otherTransactionConstructor.typeGroup,
 			);

@@ -1,21 +1,17 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import assert from "assert";
 
 // todo: review its implementation and finally integrate it as planned in v2
 @Container.injectable()
 export class BlockStore implements Contracts.State.BlockStore {
-	private readonly byId: Utils.CappedMap<string } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData>;
-	private readonly byHeight: Utils.CappedMap<number } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData>;
+	private readonly byId: Utils.CappedMap<string, Interfaces.IBlockData>;
+	private readonly byHeight: Utils.CappedMap<number, Interfaces.IBlockData>;
 	private lastBlock: Interfaces.IBlock | undefined;
 
 	public constructor(maxSize: number) {
-		this.byId = new Utils.CappedMap<string } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData>(maxSize);
-		this.byHeight = new Utils.CappedMap<number } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";.IBlockData>(maxSize);
+		this.byId = new Utils.CappedMap<string, Interfaces.IBlockData>(maxSize);
+		this.byHeight = new Utils.CappedMap<number, Interfaces.IBlockData>(maxSize);
 	}
 
 	public get(key: string | number): Interfaces.IBlockData | undefined {

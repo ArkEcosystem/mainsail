@@ -1,5 +1,5 @@
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 import { Action } from "../contracts";
 
@@ -19,6 +19,9 @@ export class DownloadBlocks implements Action {
 
 	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
 
 	public async handle(): Promise<void> {
 		const lastDownloadedBlock: Interfaces.IBlockData =
@@ -41,9 +44,14 @@ export class DownloadBlocks implements Action {
 		const empty: boolean = !blocks || blocks.length === 0;
 
 		const useLookupHeight = empty ? lastDownloadedBlock.height : blocks[0].height;
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, useLookupHeight);
+		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			useLookupHeight,
+			this.configuration,
+		);
 
-		const chained: boolean = !empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup);
+		const chained: boolean =
+			!empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup, this.configuration);
 
 		if (chained) {
 			this.logger.info(

@@ -1,5 +1,6 @@
 import { Contracts } from "@arkecosystem/core-kernel";
-import { Transactions, Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
+import { InternalTransactionType } from "@arkecosystem/core-crypto-transaction";
 
 export class TransactionError extends Error {
 	public constructor(message: string) {
@@ -20,31 +21,31 @@ export class TransactionError extends Error {
 }
 
 export class InvalidTransactionTypeError extends TransactionError {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} does not exist.`);
 	}
 }
 
 export class DeactivatedTransactionHandlerError extends TransactionError {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is deactivated.`);
 	}
 }
 
 export class UnsatisfiedDependencyError extends TransactionError {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is missing required dependencies`);
 	}
 }
 
 export class AlreadyRegisteredError extends TransactionError {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is already registered`);
 	}
 }
 
 export class UnexpectedNonceError extends TransactionError {
-	public constructor(txNonce: Utils.BigNumber, sender: Contracts.State.Wallet, reversal: boolean) {
+	public constructor(txNonce: BigNumber, sender: Contracts.State.Wallet, reversal: boolean) {
 		const action: string = reversal ? "revert" : "apply";
 		super(
 			`Cannot ${action} a transaction with nonce ${txNonce.toFixed()}: the ` +

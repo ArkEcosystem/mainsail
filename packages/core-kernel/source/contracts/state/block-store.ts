@@ -1,4 +1,4 @@
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 export interface BlockStore {
 	get(key: string | number): Interfaces.IBlockData | undefined;

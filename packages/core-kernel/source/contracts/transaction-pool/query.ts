@@ -1,7 +1,6 @@
-import { Enums } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
 
-export type QueryPredicate = (transaction: Interfaces.ITransaction) => boolean;
+export type QueryPredicate = (transaction: Interfaces.ITransaction) => Promise<boolean>;
 
 export interface Query {
 	getAll(): QueryIterable;
@@ -13,8 +12,8 @@ export interface Query {
 export interface QueryIterable extends Iterable<Interfaces.ITransaction> {
 	wherePredicate(predicate: QueryPredicate): QueryIterable;
 	whereId(id: string): QueryIterable;
-	whereType(type: Enums.TransactionType | number): QueryIterable;
-	whereTypeGroup(typeGroup: Enums.TransactionTypeGroup | number): QueryIterable;
+	whereType(type: TransactionType | number): QueryIterable;
+	whereTypeGroup(typeGroup: TransactionTypeGroup | number): QueryIterable;
 	whereVersion(version: number): QueryIterable;
 	whereKind(transaction: Interfaces.ITransaction): QueryIterable;
 

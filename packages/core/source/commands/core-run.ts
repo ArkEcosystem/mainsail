@@ -1,5 +1,4 @@
 import { Commands, Container, Contracts, Utils } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
 import { buildBIP38 } from "../internal/crypto";
@@ -12,8 +11,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("env", "", Joi.string().default("production"))
 			.setFlag("networkStart", "Indicate that this is the first start of seeds.", Joi.boolean())
 			.setFlag("disableDiscovery", "Permanently disable all peer discovery.", Joi.boolean())

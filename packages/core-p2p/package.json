@@ -19,10 +19,12 @@
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-crypto-validation": "workspace:*",
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"@hapi/boom": "9.0.0",
 		"@hapi/bounce": "2.0.0",
 		"@hapi/hapi": "20.1.5",

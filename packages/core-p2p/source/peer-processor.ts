@@ -1,5 +1,5 @@
+import { isValidPeer } from "@arkecosystem/core-crypto-validation";
 import { Container, Contracts, Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
 
 import { PeerFactory } from "./contracts";
 import { DisconnectInvalidPeers } from "./listeners";
@@ -30,7 +30,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public server: any;
-	public nextUpdateNetworkStatusScheduled: boolean = false;
+	public nextUpdateNetworkStatusScheduled = false;
 
 	@Container.postConstruct()
 	public initialize(): void {
@@ -58,7 +58,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		if (!Utils.isValidPeer(peer) || this.repository.hasPendingPeer(peer.ip)) {
+		if (!isValidPeer(peer) || this.repository.hasPendingPeer(peer.ip)) {
 			return false;
 		}
 
@@ -110,7 +110,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			}
 
 			this.events.dispatch(Enums.PeerEvent.Added, newPeer);
-		} catch (error) {
+		} catch {
 			this.connector.disconnect(newPeer);
 		} finally {
 			this.repository.forgetPendingPeer(peer);

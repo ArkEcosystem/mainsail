@@ -1,7 +1,8 @@
 import { Repositories } from "@arkecosystem/core-database";
 import { Application, Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Managers, Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
+import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 // todo: review the implementation
 @Container.injectable()
@@ -32,6 +33,9 @@ export class StateBuilder {
 	@Container.inject(Container.Identifiers.ConfigRepository)
 	private readonly configRepository!: Services.Config.ConfigRepository;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration!: IConfiguration;
+
 	public async run(): Promise<void> {
 		this.events = this.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
 
@@ -48,13 +52,14 @@ export class StateBuilder {
 			await this.buildSentTransactions();
 
 			const capitalize = (key: string) => key[0].toUpperCase() + key.slice(1);
-			for (let i = 0; i < registeredHandlers.length; i++) {
-				const handler = registeredHandlers[i];
+			for (const [index, handler] of registeredHandlers.entries()) {
 				const ctorKey: string | undefined = handler.getConstructor().key;
 				const version = handler.getConstructor().version;
 				AppUtils.assert.defined<string>(ctorKey);
 
-				this.logger.info(`State Generation - Step ${3 + i} of ${steps}: ${capitalize(ctorKey)} v${version}`);
+				this.logger.info(
+					`State Generation - Step ${3 + index} of ${steps}: ${capitalize(ctorKey)} v${version}`,
+				);
 				await handler.bootstrap();
 			}
 
@@ -71,8 +76,8 @@ export class StateBuilder {
 			this.verifyWalletsConsistency();
 
 			this.events.dispatch(Enums.StateEvent.BuilderFinished);
-		} catch (ex) {
-			this.logger.error(ex.stack);
+		} catch (error) {
+			this.logger.error(error.stack);
 		}
 	}
 
@@ -81,7 +86,7 @@ export class StateBuilder {
 
 		for (const block of blocks) {
 			const wallet = this.walletRepository.findByPublicKey(block.generatorPublicKey);
-			wallet.increaseBalance(Utils.BigNumber.make(block.rewards));
+			wallet.increaseBalance(BigNumber.make(block.rewards));
 		}
 	}
 
@@ -90,8 +95,8 @@ export class StateBuilder {
 
 		for (const transaction of transactions) {
 			const wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
-			wallet.setNonce(Utils.BigNumber.make(transaction.nonce));
-			wallet.decreaseBalance(Utils.BigNumber.make(transaction.amount).plus(transaction.fee));
+			wallet.setNonce(BigNumber.make(transaction.nonce));
+			wallet.decreaseBalance(BigNumber.make(transaction.amount).plus(transaction.fee));
 		}
 	}
 
@@ -99,9 +104,9 @@ export class StateBuilder {
 		const logNegativeBalance = (wallet, type, balance) =>
 			this.logger.warning(`Wallet ${wallet.address} has a negative ${type} of '${balance}'`);
 
-		const genesisPublicKeys: Record<string, true> = Managers.configManager
-			.get("genesisBlock.transactions")
-			.reduce((acc, curr) => Object.assign(acc, { [curr.senderPublicKey]: true }), {});
+		const genesisPublicKeys: Record<string, true> = Object.fromEntries(
+			this.configuration.get("genesisBlock.transactions").map((current) => [current.senderPublicKey, true]),
+		);
 
 		for (const wallet of this.walletRepository.allByAddress()) {
 			if (
@@ -139,7 +144,7 @@ export class StateBuilder {
 			}
 
 			if (wallet.hasAttribute("delegate.voteBalance")) {
-				const voteBalance: Utils.BigNumber = wallet.getAttribute("delegate.voteBalance");
+				const voteBalance: BigNumber = wallet.getAttribute("delegate.voteBalance");
 
 				if (voteBalance.isLessThan(0)) {
 					logNegativeBalance(wallet, "vote balance", voteBalance);

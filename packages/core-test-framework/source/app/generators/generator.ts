@@ -1,29 +1,28 @@
-import { Identities } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { generateMnemonic } from "bip39";
+// import Interfaces from "@arkecosystem/core-crypto-contracts";
+// import { generateMnemonic } from "bip39";
 
-import passphrases from "../../internal/passphrases.json";
-import { SandboxOptions, Wallet } from "../contracts";
+// import passphrases from "../../internal/passphrases.json";
+import { SandboxOptions } from "../contracts";
 
 export abstract class Generator {
 	protected options: SandboxOptions = {
 		core: {},
 		crypto: {
 			flags: {
+				blocktime: 8,
+				delegates: 51,
+				distribute: true,
+				explorer: "http://uexplorer.ark.io",
+				maxBlockPayload: 2_097_152,
+				maxTxPerBlock: 150,
 				network: "unitnet",
 				premine: "15300000000000000",
-				delegates: 51,
-				blocktime: 8,
-				maxTxPerBlock: 150,
-				maxBlockPayload: 2097152,
-				rewardHeight: 75600,
-				rewardAmount: 200000000,
 				pubKeyHash: 23,
-				wif: 186,
-				token: "UARK",
+				rewardAmount: 200_000_000,
+				rewardHeight: 75_600,
 				symbol: "UѦ",
-				explorer: "http://uexplorer.ark.io",
-				distribute: true,
+				token: "UARK",
+				wif: 186,
 			},
 		},
 	};
@@ -34,31 +33,31 @@ export abstract class Generator {
 		}
 	}
 
-	protected generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Wallet[] {
-		const wallets: Wallet[] = [];
+	// protected generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Wallet[] {
+	// 	const wallets: Wallet[] = [];
 
-		for (let i = 0; i < activeDelegates; i++) {
-			const delegateWallet: Wallet = this.createWallet(pubKeyHash, passphrases[i]);
-			delegateWallet.username = `genesis_${i + 1}`;
+	// 	for (let index = 0; index < activeDelegates; index++) {
+	// 		const delegateWallet: Wallet = this.createWallet(pubKeyHash, passphrases[index]);
+	// 		delegateWallet.username = `genesis_${index + 1}`;
 
-			wallets.push(delegateWallet);
-		}
+	// 		wallets.push(delegateWallet);
+	// 	}
 
-		return wallets;
-	}
+	// 	return wallets;
+	// }
 
-	protected createWallet(pubKeyHash: number, passphrase?: string): Wallet {
-		if (!passphrase) {
-			passphrase = generateMnemonic();
-		}
+	// protected createWallet(pubKeyHash: number, passphrase?: string): Wallet {
+	// 	if (!passphrase) {
+	// 		passphrase = generateMnemonic();
+	// 	}
 
-		const keys: Interfaces.IKeyPair = Identities.Keys.fromPassphrase(passphrase);
+	// 	const keys: Interfaces.IKeyPair = Identities.Keys.fromMnemonic(passphrase);
 
-		return {
-			address: Identities.Address.fromPublicKey(keys.publicKey, pubKeyHash),
-			passphrase,
-			keys,
-			username: undefined,
-		};
-	}
+	// 	return {
+	// 		address: this.addressFactory.fromPublicKey(keys.publicKey, pubKeyHash),
+	// 		keys,
+	// 		passphrase,
+	// 		username: undefined,
+	// 	};
+	// }
 }

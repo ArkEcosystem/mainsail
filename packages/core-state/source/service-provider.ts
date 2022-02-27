@@ -1,5 +1,5 @@
 import { Container, Contracts, Providers, Services } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import Joi from "joi";
 
 import { BuildDelegateRankingAction, GetActiveDelegatesAction } from "./actions";

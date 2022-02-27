@@ -1,5 +1,5 @@
 import { Contracts } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 import { Column, Entity, Index } from "typeorm";
 
 import { transformBigInt, transformVendorField } from "../utils/transform";
@@ -57,7 +57,7 @@ export class Transaction implements Contracts.Database.TransactionModel {
 		transformer: transformBigInt,
 		type: "bigint",
 	})
-	public nonce!: Utils.BigNumber;
+	public nonce!: BigNumber;
 
 	@Column({
 		length: 66,
@@ -98,14 +98,14 @@ export class Transaction implements Contracts.Database.TransactionModel {
 		transformer: transformBigInt,
 		type: "bigint",
 	})
-	public amount!: Utils.BigNumber;
+	public amount!: BigNumber;
 
 	@Column({
 		nullable: false,
 		transformer: transformBigInt,
 		type: "bigint",
 	})
-	public fee!: Utils.BigNumber;
+	public fee!: BigNumber;
 
 	@Column({
 		nullable: false,

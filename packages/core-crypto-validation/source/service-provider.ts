@@ -1,5 +1,5 @@
+import { BINDINGS, IValidator } from "@arkecosystem/core-crypto-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
-import { BINDINGS, IValidator } from "@packages/core-crypto-contracts/distribution";
 
 import { registerFormats } from "./formats";
 import { registerKeywords } from "./keywords";

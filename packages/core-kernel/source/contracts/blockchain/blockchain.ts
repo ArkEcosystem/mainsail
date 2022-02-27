@@ -1,4 +1,4 @@
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 import { Queue } from "../kernel/queue";
 import { BlockPing } from "../state/state-store";

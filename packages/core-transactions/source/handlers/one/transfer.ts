@@ -1,6 +1,8 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Transactions from "@arkecosystem/core-crypto-transaction";
+import { One as TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import { Managers, Transactions } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { isRecipientOnActiveNetwork } from "../../utils";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
@@ -18,7 +20,7 @@ export class TransferTransactionHandler extends TransactionHandler {
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return Transactions.One.TransferTransaction;
+		return TransferTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
@@ -26,7 +28,7 @@ export class TransferTransactionHandler extends TransactionHandler {
 
 		for (const transaction of transactions) {
 			const wallet: Contracts.State.Wallet = this.walletRepository.findByAddress(transaction.recipientId);
-			wallet.increaseBalance(Utils.BigNumber.make(transaction.amount));
+			wallet.increaseBalance(BigNumber.make(transaction.amount));
 		}
 	}
 
@@ -49,8 +51,9 @@ export class TransferTransactionHandler extends TransactionHandler {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
 
-		if (!isRecipientOnActiveNetwork(recipientId)) {
-			const network: string = Managers.configManager.get<string>("network.pubKeyHash");
+		// @TODO
+		if (!isRecipientOnActiveNetwork(recipientId, undefined, this.configuration)) {
+			const network: string = this.configuration.get<string>("network.pubKeyHash");
 			throw new Contracts.TransactionPool.PoolError(
 				`Recipient ${recipientId} is not on the same network: ${network} `,
 				"ERR_INVALID_RECIPIENT",

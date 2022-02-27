@@ -1,5 +1,5 @@
 import { Application, Container, Types } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Paths } from "env-paths";
 
 export interface Wallet {

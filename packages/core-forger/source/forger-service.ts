@@ -1,8 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IConfiguration, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Managers, Transactions } from "@arkecosystem/crypto";
 
 import { Client } from "./client";
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
@@ -12,13 +11,19 @@ import { Delegate } from "./interfaces";
 @Container.injectable()
 export class ForgerService {
 	@Container.inject(Container.Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
+	private readonly app: Contracts.Kernel.Application;
 
 	@Container.inject(Container.Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	private readonly logger: Contracts.Kernel.Logger;
 
 	@Container.inject(Container.Identifiers.TransactionHandlerProvider)
-	private readonly handlerProvider!: Handlers.TransactionHandlerProvider;
+	private readonly handlerProvider: Handlers.TransactionHandlerProvider;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly transactionFactory: ITransactionFactory;
 
 	private client!: Client;
 
@@ -170,11 +175,11 @@ export class ForgerService {
 		networkState: Contracts.P2P.NetworkState,
 	): Promise<void> {
 		AppUtils.assert.defined<number>(networkState.getNodeHeight());
-		Managers.configManager.setHeight(networkState.getNodeHeight()!);
+		this.configuration.setHeight(networkState.getNodeHeight()!);
 
 		const transactions: Interfaces.ITransactionData[] = await this.getTransactionsForForging();
 
-		const block: Interfaces.IBlock | undefined = delegate.forge(transactions, {
+		const block: Interfaces.IBlock | undefined = await delegate.forge(transactions, {
 			previousBlock: {
 				height: networkState.getNodeHeight(),
 				id: networkState.getLastBlockId(),
@@ -217,9 +222,14 @@ export class ForgerService {
 			this.logger.error("Could not get unconfirmed transactions from transaction pool.");
 			return [];
 		}
-		const transactions = response.transactions.map(
-			(hex) => Transactions.TransactionFactory.fromBytesUnsafe(Buffer.from(hex, "hex")).data,
-		);
+
+		const transactions = [];
+		for (let index = 0; index < response.transactions.length; index++) {
+			transactions.push(
+				(await this.transactionFactory.fromBytesUnsafe(Buffer.from(response.transactions[index], "hex"))).data,
+			);
+		}
+
 		this.logger.debug(
 			`Received ${AppUtils.pluralize("transaction", transactions.length, true)} ` +
 				`from the pool containing ${AppUtils.pluralize("transaction", response.poolSize, true)} total`,
@@ -229,19 +239,19 @@ export class ForgerService {
 
 	public isForgingAllowed(networkState: Contracts.P2P.NetworkState, delegate: Delegate): boolean {
 		switch (networkState.status) {
-		case NetworkStateStatus.Unknown: {
-			this.logger.info("Failed to get network state from client. Will not forge.");
-			return false;
-		}
-		case NetworkStateStatus.ColdStart: {
-			this.logger.info("Skipping slot because of cold start. Will not forge.");
-			return false;
-		}
-		case NetworkStateStatus.BelowMinimumPeers: {
-			this.logger.info("Network reach is not sufficient to get quorum. Will not forge.");
-			return false;
-		}
-		// No default
+			case NetworkStateStatus.Unknown: {
+				this.logger.info("Failed to get network state from client. Will not forge.");
+				return false;
+			}
+			case NetworkStateStatus.ColdStart: {
+				this.logger.info("Skipping slot because of cold start. Will not forge.");
+				return false;
+			}
+			case NetworkStateStatus.BelowMinimumPeers: {
+				this.logger.info("Network reach is not sufficient to get quorum. Will not forge.");
+				return false;
+			}
+			// No default
 		}
 
 		const overHeightBlockHeaders: Array<{
@@ -347,8 +357,8 @@ export class ForgerService {
 	}
 
 	private getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
-		const epoch = new Date(Managers.configManager.getMilestone(1).epoch).getTime();
-		const blocktime = Managers.configManager.getMilestone(round.lastBlock.height).blocktime;
+		const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
+		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
 
 		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
 	}

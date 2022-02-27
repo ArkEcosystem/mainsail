@@ -1,5 +1,4 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
 import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
@@ -14,8 +13,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("bip39", "A delegate plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}

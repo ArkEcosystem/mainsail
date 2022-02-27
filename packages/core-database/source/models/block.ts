@@ -1,5 +1,5 @@
 import { Contracts } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 import { Column, Entity, Index } from "typeorm";
 
 import { transformBigInt } from "../utils/transform";
@@ -54,21 +54,21 @@ export class Block implements Contracts.Database.BlockModel {
 		transformer: transformBigInt,
 		type: "bigint",
 	})
-	public totalAmount!: Utils.BigNumber;
+	public totalAmount!: BigNumber;
 
 	@Column({
 		nullable: false,
 		transformer: transformBigInt,
 		type: "bigint",
 	})
-	public totalFee!: Utils.BigNumber;
+	public totalFee!: BigNumber;
 
 	@Column({
 		nullable: false,
 		transformer: transformBigInt,
 		type: "bigint",
 	})
-	public reward!: Utils.BigNumber;
+	public reward!: BigNumber;
 
 	@Column({
 		nullable: false,

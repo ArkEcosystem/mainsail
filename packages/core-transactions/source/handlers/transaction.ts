@@ -1,7 +1,14 @@
+import Interfaces, {
+	BINDINGS,
+	IConfiguration,
+	ITransactionVerifier,
+	TransactionConstructor,
+	TransactionType,
+	TransactionTypeGroup,
+} from "@arkecosystem/core-crypto-contracts";
 import { Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Enums, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 
 import {
 	ColdWalletError,
@@ -33,6 +40,12 @@ export abstract class TransactionHandler {
 	@Container.inject(Container.Identifiers.LogService)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
+	@Container.inject(BINDINGS.Configuration)
+	protected readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Transaction.Verifier)
+	protected readonly verifier: ITransactionVerifier;
+
 	public async verify(transaction: Interfaces.ITransaction): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -41,7 +54,7 @@ export abstract class TransactionHandler {
 		);
 
 		if (senderWallet.hasMultiSignature()) {
-			transaction.isVerified = this.verifySignatures(senderWallet, transaction.data);
+			transaction.isVerified = await this.verifySignatures(senderWallet, transaction.data);
 		}
 
 		return transaction.isVerified;
@@ -50,11 +63,7 @@ export abstract class TransactionHandler {
 	/**
 	 * @deprecated
 	 */
-	public dynamicFee({
-		addonBytes,
-		satoshiPerByte,
-		transaction,
-	}: Contracts.Shared.DynamicFeeContext): Utils.BigNumber {
+	public dynamicFee({ addonBytes, satoshiPerByte, transaction }: Contracts.Shared.DynamicFeeContext): BigNumber {
 		addonBytes = addonBytes || 0;
 
 		if (satoshiPerByte <= 0) {
@@ -62,7 +71,7 @@ export abstract class TransactionHandler {
 		}
 
 		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
-		return Utils.BigNumber.make(addonBytes + transactionSizeInBytes).times(satoshiPerByte);
+		return BigNumber.make(addonBytes + transactionSizeInBytes).times(satoshiPerByte);
 	}
 
 	public async throwIfCannotBeApplied(
@@ -102,14 +111,14 @@ export abstract class TransactionHandler {
 		if (data.version) {
 			this.verifyTransactionNonceApply(sender, transaction);
 
-			AppUtils.assert.defined<AppUtils.BigNumber>(data.nonce);
+			AppUtils.assert.defined<BigNumber>(data.nonce);
 
 			sender.setNonce(data.nonce);
 		} else {
 			sender.increaseNonce();
 		}
 
-		const newBalance: Utils.BigNumber = sender.getBalance().minus(data.amount).minus(data.fee);
+		const newBalance: BigNumber = sender.getBalance().minus(data.amount).minus(data.fee);
 
 		sender.setBalance(newBalance);
 	}
@@ -133,15 +142,12 @@ export abstract class TransactionHandler {
 
 	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {}
 
-	public verifySignatures(
+	public async verifySignatures(
 		wallet: Contracts.State.Wallet,
 		transaction: Interfaces.ITransactionData,
 		multiSignature?: Interfaces.IMultiSignatureAsset,
-	): boolean {
-		return Transactions.Verifier.verifySignatures(
-			transaction,
-			multiSignature || wallet.getAttribute("multiSignature"),
-		);
+	): Promise<boolean> {
+		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
 	}
 
 	protected async performGenericWalletChecks(
@@ -162,9 +168,8 @@ export abstract class TransactionHandler {
 
 		// Prevent legacy multi signatures from being used
 		const isMultiSignatureRegistration: boolean =
-			transaction.type === Enums.TransactionType.MultiSignature &&
-			transaction.typeGroup === Enums.TransactionTypeGroup.Core;
-		if (isMultiSignatureRegistration && !Managers.configManager.getMilestone().aip11) {
+			transaction.type === TransactionType.MultiSignature && transaction.typeGroup === TransactionTypeGroup.Core;
+		if (isMultiSignatureRegistration && !this.configuration.getMilestone().aip11) {
 			throw new LegacyMultiSignatureRegistrationError();
 		}
 
@@ -172,19 +177,19 @@ export abstract class TransactionHandler {
 			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 			// Ensure the database wallet already has a multi signature, in case we checked a pool wallet.
-			const dbSender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+			const databaseSender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
 
-			if (!dbSender.hasMultiSignature()) {
+			if (!databaseSender.hasMultiSignature()) {
 				throw new MissingMultiSignatureOnSenderError();
 			}
 
-			if (dbSender.hasAttribute("multiSignature.legacy")) {
+			if (databaseSender.hasAttribute("multiSignature.legacy")) {
 				throw new LegacyMultiSignatureError();
 			}
 
-			if (!this.verifySignatures(dbSender, data, dbSender.getAttribute("multiSignature"))) {
+			if (!this.verifySignatures(databaseSender, data, databaseSender.getAttribute("multiSignature"))) {
 				throw new InvalidMultiSignaturesError();
 			}
 		} else if (transaction.data.signatures && !isMultiSignatureRegistration) {
@@ -193,7 +198,7 @@ export abstract class TransactionHandler {
 	}
 
 	protected verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Interfaces.ITransaction): void {
-		const nonce: AppUtils.BigNumber = transaction.data.nonce || AppUtils.BigNumber.ZERO;
+		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
 			throw new UnexpectedNonceError(nonce, wallet, false);
@@ -201,14 +206,14 @@ export abstract class TransactionHandler {
 	}
 
 	protected verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Interfaces.ITransaction): void {
-		const nonce: AppUtils.BigNumber = transaction.data.nonce || AppUtils.BigNumber.ZERO;
+		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().isEqualTo(nonce)) {
 			throw new UnexpectedNonceError(nonce, wallet, true);
 		}
 	}
 
-	public abstract getConstructor(): Transactions.TransactionConstructor;
+	public abstract getConstructor(): TransactionConstructor;
 
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
 

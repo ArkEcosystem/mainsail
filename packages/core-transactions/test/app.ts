@@ -1,3 +1,4 @@
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Application, Container, Contracts, Providers, Services } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { Factories, getWalletAttributeSet, Mocks, passphrases } from "@arkecosystem/core-test-framework";
@@ -13,13 +14,11 @@ import {
 	ThrowIfCannotEnterPoolAction,
 	VerifyTransactionAction,
 } from "@arkecosystem/core-transaction-pool";
-import { Identities, Utils } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Identities } from "@arkecosystem/crypto";
 
-import { ServiceProvider } from "../source/service-provider";
+import { FeeMatcher as DynamicFeeMatcher } from "../../core-fees-managed/source/matcher";
 import { TransactionHandlerProvider } from "../source/handlers/handler-provider";
 import { TransactionHandlerRegistry } from "../source/handlers/handler-registry";
-import { FeeMatcher as DynamicFeeMatcher } from "../../core-fees-managed/source/matcher";
 import {
 	DelegateRegistrationTransactionHandler,
 	DelegateResignationTransactionHandler,
@@ -28,6 +27,7 @@ import {
 	TransferTransactionHandler,
 	VoteTransactionHandler,
 } from "../source/handlers/one";
+import { ServiceProvider } from "../source/service-provider";
 
 const logger = {
 	debug: () => {},
@@ -159,7 +159,7 @@ export const buildSenderWallet = (
 		})
 		.make();
 
-	wallet.setBalance(Utils.BigNumber.make(7_527_654_310));
+	wallet.setBalance(BigNumber.make(7_527_654_310));
 
 	return wallet;
 };
@@ -187,7 +187,7 @@ export const buildMultiSignatureWallet = (): Wallets.Wallet => {
 		new Services.Attributes.AttributeMap(getWalletAttributeSet()),
 	);
 	wallet.setPublicKey(Identities.PublicKey.fromMultiSignatureAsset(multiSignatureAsset));
-	wallet.setBalance(Utils.BigNumber.make(100_390_000_000));
+	wallet.setBalance(BigNumber.make(100_390_000_000));
 	wallet.setAttribute("multiSignature", multiSignatureAsset);
 
 	return wallet;

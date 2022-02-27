@@ -1,5 +1,6 @@
+import { BINDINGS, IAddressFactory } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Identities, Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "./errors";
 import { WalletIndex } from "./wallet-index";
@@ -12,6 +13,9 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	@Container.inject(Container.Identifiers.WalletFactory)
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
+
+	@Container.inject(BINDINGS.Identity.AddressFactory)
+	protected readonly addressFactory: IAddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};
 
@@ -69,7 +73,8 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	public findByPublicKey(publicKey: string): Contracts.State.Wallet {
 		const index = this.getIndex(Contracts.State.WalletIndexes.PublicKeys);
 		if (publicKey && !index.has(publicKey)) {
-			const wallet = this.findByAddress(Identities.Address.fromPublicKey(publicKey));
+			// @TODO
+			const wallet = this.findByAddress(void this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			index.set(publicKey, wallet);
 		}
@@ -118,12 +123,12 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.getIndex(indexName).has(key);
 	}
 
-	public getNonce(publicKey: string): Utils.BigNumber {
+	public getNonce(publicKey: string): BigNumber {
 		if (this.hasByPublicKey(publicKey)) {
 			return this.findByPublicKey(publicKey).getNonce();
 		}
 
-		return Utils.BigNumber.ZERO;
+		return BigNumber.ZERO;
 	}
 
 	public index(wallets: Contracts.State.Wallet | Contracts.State.Wallet[]): void {

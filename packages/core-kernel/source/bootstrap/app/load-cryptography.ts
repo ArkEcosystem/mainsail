@@ -1,5 +1,4 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Managers } from "@arkecosystem/crypto";
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 import { Application } from "../../contracts/kernel";
 import { Identifiers, inject, injectable } from "../../ioc";
@@ -10,30 +9,22 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class LoadCryptography implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app: Application;
 
 	@inject(Identifiers.ConfigRepository)
-	private readonly configRepository!: ConfigRepository;
+	private readonly configRepository: ConfigRepository;
+
+	@inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
 
 	public async bootstrap(): Promise<void> {
-		this.configRepository.hasAll([
-			"crypto.genesisBlock",
-			"crypto.exceptions",
-			"crypto.milestones",
-			"crypto.network",
-		])
-			? this.fromConfigRepository()
-			: this.fromPreset();
+		this.fromConfigRepository();
 
-		const networkConfig: Interfaces.NetworkConfig | undefined = Managers.configManager.all();
+		const networkConfig: Interfaces.NetworkConfig | undefined = this.configuration.all();
 
 		assert.defined<Interfaces.NetworkConfig>(networkConfig);
 
 		this.app.bind<Interfaces.NetworkConfig>(Identifiers.Crypto).toConstantValue(networkConfig);
-	}
-
-	private fromPreset(): void {
-		Managers.configManager.setFromPreset(this.app.network() as any);
 	}
 
 	private fromConfigRepository(): void {
@@ -44,6 +35,6 @@ export class LoadCryptography implements Bootstrapper {
 			network: this.configRepository.get<Interfaces.Network>("crypto.network")!,
 		};
 
-		Managers.configManager.setConfig(config);
+		this.configuration.setConfig(config);
 	}
 }

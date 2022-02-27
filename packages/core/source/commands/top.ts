@@ -15,7 +15,7 @@ export class Command extends Commands.Command {
 	public requiresNetwork = false;
 
 	public configure(): void {
-		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));
+		this.definition.setFlag("token", "The name of the token.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {

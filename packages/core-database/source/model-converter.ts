@@ -1,47 +1,52 @@
+import Interfaces, { BINDINGS, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Transactions } from "@arkecosystem/crypto";
 
 import { Block } from "./models/block";
 import { Transaction } from "./models/transaction";
 
 @Container.injectable()
 export class ModelConverter implements Contracts.Database.ModelConverter {
-	public getBlockModels(blocks: Interfaces.IBlock[]): Contracts.Database.BlockModel[] {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly transactionFactory: ITransactionFactory;
+
+	public async getBlockModels(blocks: Interfaces.IBlock[]): Promise<Contracts.Database.BlockModel[]> {
 		return blocks.map((b) => Object.assign(new Block(), b.data));
 	}
 
-	public getBlockData(models: Contracts.Database.BlockModel[]): Interfaces.IBlockData[] {
+	public async getBlockData(models: Contracts.Database.BlockModel[]): Promise<Interfaces.IBlockData[]> {
 		return models;
 	}
 
-	public getBlockDataWithTransactionData(
+	public async getBlockDataWithTransactionData(
 		blockModels: Contracts.Database.BlockModel[],
 		transactionModels: Contracts.Database.TransactionModel[],
-	): Contracts.Shared.BlockDataWithTransactionData[] {
-		const blockData = this.getBlockData(blockModels);
-		const transactionData = this.getTransactionData(transactionModels);
+	): Promise<Contracts.Shared.BlockDataWithTransactionData[]> {
+		const blockData = await this.getBlockData(blockModels);
+		const transactionData = await this.getTransactionData(transactionModels);
 
-		const blockDataWithTransactions = blockData.map((data) => {
+		return blockData.map((data) => {
 			const transactions = transactionData.filter((t) => t.blockId === data.id);
 			return { data, transactions };
 		});
-
-		return blockDataWithTransactions;
 	}
 
-	public getTransactionModels(transactions: Interfaces.ITransaction[]): Contracts.Database.TransactionModel[] {
+	public async getTransactionModels(
+		transactions: Interfaces.ITransaction[],
+	): Promise<Contracts.Database.TransactionModel[]> {
 		return transactions.map((t) =>
 			Object.assign(new Transaction(), t.data, {
-				timestamp: t.timestamp,
 				serialized: t.serialized,
+				timestamp: t.timestamp,
 			}),
 		);
 	}
 
-	public getTransactionData(models: Contracts.Database.TransactionModel[]): Interfaces.ITransactionData[] {
-		return models.map((model) => {
-			const data = Transactions.TransactionFactory.fromBytesUnsafe(model.serialized, model.id).data;
+	public async getTransactionData(
+		models: Contracts.Database.TransactionModel[],
+	): Promise<Interfaces.ITransactionData[]> {
+		for (let index = 0; index < models.length; index++) {
+			const model = models[index];
+			const { data } = await this.transactionFactory.fromBytesUnsafe(model.serialized, model.id);
 
 			// set_row_nonce trigger
 			data.nonce = model.nonce;
@@ -51,21 +56,24 @@ export class ModelConverter implements Contracts.Database.ModelConverter {
 			data.blockHeight = model.blockHeight;
 			data.sequence = model.sequence;
 
-			return data;
-		});
+			// @ts-ignore
+			models[index] = data;
+		}
+
+		return models;
 	}
 
-	public getTransactionDataWithBlockData(
+	public async getTransactionDataWithBlockData(
 		transactionModels: Contracts.Database.TransactionModel[],
 		blockModels: Contracts.Database.BlockModel[],
-	): Contracts.Shared.TransactionDataWithBlockData[] {
-		const transactionData = this.getTransactionData(transactionModels);
-		const blockData = this.getBlockData(blockModels);
+	): Promise<Contracts.Shared.TransactionDataWithBlockData[]> {
+		const transactionData = await this.getTransactionData(transactionModels);
+		const blockData = await this.getBlockData(blockModels);
 
 		return transactionData.map((data) => {
 			const block = blockData.find((b) => b.id === data.blockId);
 			AppUtils.assert.defined<Interfaces.IBlockData>(block);
-			return { data, block };
+			return { block, data };
 		});
 	}
 }

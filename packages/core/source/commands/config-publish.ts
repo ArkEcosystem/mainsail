@@ -1,8 +1,7 @@
-import { resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import Joi from "joi";
+import { resolve } from "path";
 
 @Container.injectable()
 export class Command extends Commands.Command {
@@ -17,8 +16,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
 	}
 
@@ -28,12 +27,12 @@ export class Command extends Commands.Command {
 		}
 
 		const response = await this.components.prompt([
-			{
-				choices: Object.keys(Networks).map((network) => ({ title: network, value: network })),
-				message: "Please select which network you want to operate on",
-				name: "network",
-				type: "select",
-			},
+			// {
+			// 	choices: Object.keys(Networks).map((network) => ({ title: network, value: network })),
+			// 	message: "Please select which network you want to operate on",
+			// 	name: "network",
+			// 	type: "select",
+			// },
 			{
 				message: "Can you confirm?",
 				name: "confirm",
@@ -57,39 +56,39 @@ export class Command extends Commands.Command {
 			.rebind(Container.Identifiers.ApplicationPaths)
 			.toConstantValue(this.environment.getPaths(flags.token, flags.network));
 
-		const configDest = this.app.getCorePath("config");
-		const configSrc = resolve(__dirname, `../../bin/config/${flags.network}`);
+		const configDestination = this.app.getCorePath("config");
+		const configSource = resolve(__dirname, `../../bin/config/${flags.network}`);
 
 		await this.components.taskList([
 			{
 				task: () => {
 					if (flags.reset) {
-						removeSync(configDest);
+						removeSync(configDestination);
 					}
 
-					if (existsSync(configDest)) {
+					if (existsSync(configDestination)) {
 						this.components.fatal("Please use the --reset flag if you wish to reset your configuration.");
 					}
 
-					if (!existsSync(configSrc)) {
-						this.components.fatal(`Couldn't find the core configuration files at ${configSrc}.`);
+					if (!existsSync(configSource)) {
+						this.components.fatal(`Couldn't find the core configuration files at ${configSource}.`);
 					}
 
-					ensureDirSync(configDest);
+					ensureDirSync(configDestination);
 				},
 				title: "Prepare directories",
 			},
 			{
 				task: () => {
-					if (!existsSync(`${configSrc}/.env`)) {
-						this.components.fatal(`Couldn't find the environment file at ${configSrc}/.env.`);
+					if (!existsSync(`${configSource}/.env`)) {
+						this.components.fatal(`Couldn't find the environment file at ${configSource}/.env.`);
 					}
 
-					copySync(`${configSrc}/.env`, `${configDest}/.env`);
+					copySync(`${configSource}/.env`, `${configDestination}/.env`);
 				},
 				title: "Publish environment",
 			},
-			{ task: () => copySync(configSrc, configDest), title: "Publish configuration" },
+			{ task: () => copySync(configSource, configDestination), title: "Publish configuration" },
 		]);
 	}
 }

@@ -6,6 +6,7 @@ import { Providers } from "@arkecosystem/core-kernel";
 import { One } from "./versions/1";
 
 export * from "./builder";
+export * from "./versions";
 
 @Container.injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

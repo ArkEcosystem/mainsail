@@ -1,7 +1,6 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
-import { Blocks } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, { BINDINGS, IBlockSerializer } from "@arkecosystem/core-crypto-contracts";
 
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { RelayHost } from "./interfaces";
@@ -11,7 +10,10 @@ const MAX_PAYLOAD_CLIENT = 20 * 1024 * 1024; // allow large value of max payload
 @Container.injectable()
 export class Client {
 	@Container.inject(Container.Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	private readonly logger: Contracts.Kernel.Logger;
+
+	@Container.inject(BINDINGS.Block.Serializer)
+	private readonly serializer: IBlockSerializer;
 
 	public hosts: RelayHost[] = [];
 
@@ -56,7 +58,7 @@ export class Client {
 
 		try {
 			await this.emit("p2p.blocks.postBlock", {
-				block: Blocks.Serializer.serializeWithTransactions({
+				block: this.serializer.serializeWithTransactions({
 					...block.data,
 					transactions: block.transactions.map((tx) => tx.data),
 				}),

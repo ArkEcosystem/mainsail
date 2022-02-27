@@ -1,5 +1,5 @@
 import { Blockchain } from "@arkecosystem/core-blockchain";
-import { Interfaces } from "@arkecosystem/crypto";
+import Interfaces from "@arkecosystem/core-crypto-contracts";
 
 let mockBlock: Partial<Interfaces.IBlock> | undefined;
 let mockIsSynced = true;

@@ -1,5 +1,6 @@
-import { Utils } from "@arkecosystem/core-kernel";
-import { Crypto, Enums } from "@arkecosystem/crypto";
+import { BINDINGS, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
+import { Container } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 import dayjs from "dayjs";
 import { EntityRepository, In } from "typeorm";
 
@@ -17,6 +18,9 @@ type FeeStatistics = {
 };
 @EntityRepository(Transaction)
 export class TransactionRepository extends AbstractRepository<Transaction> {
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
+
 	public async findByBlockIds(blockIds: string[]): Promise<
 		Array<{
 			id: string;
@@ -64,7 +68,7 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 		minFee = minFee || 0;
 
 		if (days) {
-			const age = Crypto.Slots.getTime(dayjs().subtract(days, "day").valueOf());
+			const age = this.slots.getTime(dayjs().subtract(days, "day").valueOf());
 
 			return this.createQueryBuilder()
 				.select(['type_group AS "typeGroup"', "type"])
@@ -144,8 +148,8 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 			.select([])
 			.addSelect("recipient_id", "recipientId")
 			.addSelect("SUM(amount)", "amount")
-			.where(`type_group = ${Enums.TransactionTypeGroup.Core}`)
-			.andWhere(`type = ${Enums.TransactionType.Transfer}`)
+			.where(`type_group = ${TransactionTypeGroup.Core}`)
+			.andWhere(`type = ${TransactionType.Transfer}`)
 			.groupBy("recipient_id")
 			.getRawMany();
 	}
@@ -155,7 +159,7 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 		typeGroup: number,
 		limit?: number,
 		offset?: number,
-	): Promise<Array<Transaction & { blockHeight: number; blockGeneratorPublicKey: string; reward: Utils.BigNumber }>> {
+	): Promise<Array<Transaction & { blockHeight: number; blockGeneratorPublicKey: string; reward: BigNumber }>> {
 		const transactions = await this.createQueryBuilder("transactions")
 			.select()
 			.addSelect('blocks.height as "blockHeight"')
@@ -177,7 +181,7 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 				// @ts-ignore
 				(entity: any, key: string, value: number | string) => {
 					if (key === "reward") {
-						entity[key] = Utils.BigNumber.make(value);
+						entity[key] = BigNumber.make(value);
 					} else {
 						entity[key] = value;
 					}

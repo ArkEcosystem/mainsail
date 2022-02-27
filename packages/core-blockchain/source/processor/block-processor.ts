@@ -1,7 +1,8 @@
+import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 import {
 	AcceptBlockHandler,
@@ -46,6 +47,12 @@ export class BlockProcessor {
 	@Container.inject(Container.Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
+
 	public async process(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
 		if (!(await this.verifyBlock(block))) {
 			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
@@ -59,13 +66,18 @@ export class BlockProcessor {
 			return this.app.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler).execute();
 		}
 
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.data.height);
+		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			block.data.height,
+			this.configuration,
+		);
 
 		const isValidGenerator: boolean = await this.validateGenerator(block);
 		const isChained: boolean = AppUtils.isBlockChained(
 			this.blockchain.getLastBlock().data,
 			block.data,
 			blockTimeLookup,
+			this.configuration,
 		);
 		if (!isChained) {
 			return this.app.resolve<UnchainedHandler>(UnchainedHandler).initialize(isValidGenerator).execute(block);
@@ -96,7 +108,7 @@ export class BlockProcessor {
 					await handler.verify(transaction);
 				}
 
-				block.verification = block.verify();
+				block.verification = await block.verify();
 			} catch (error) {
 				this.logger.warning(`Failed to verify block, because: ${error.message}`);
 				block.verification.verified = false;
@@ -135,13 +147,13 @@ export class BlockProcessor {
 				for (const stateBlock of this.stateStore
 					.getLastBlocks()
 					.filter((block) => block.data.height > this.stateStore.getLastStoredBlockHeight())) {
-					stateBlock.transactions.forEach((tx) => {
+					for (const tx of stateBlock.transactions) {
 						AppUtils.assert.defined<string>(tx.id);
 
 						if (transactionIdsSet.has(tx.id)) {
 							forgedIds.push(tx.id);
 						}
-					});
+					}
 				}
 			}
 
@@ -161,8 +173,8 @@ export class BlockProcessor {
 	}
 
 	private blockContainsIncompatibleTransactions(block: Interfaces.IBlock): boolean {
-		for (let i = 1; i < block.transactions.length; i++) {
-			if (block.transactions[i].data.version !== block.transactions[0].data.version) {
+		for (let index = 1; index < block.transactions.length; index++) {
+			if (block.transactions[index].data.version !== block.transactions[0].data.version) {
 				return true;
 			}
 		}
@@ -190,7 +202,7 @@ export class BlockProcessor {
 
 			AppUtils.assert.defined<string>(data.nonce);
 
-			const nonce: AppUtils.BigNumber = data.nonce;
+			const nonce: BigNumber = BigNumber.make(data.nonce);
 
 			if (!nonceBySender[sender].plus(1).isEqualTo(nonce)) {
 				this.logger.warning(
@@ -209,9 +221,16 @@ export class BlockProcessor {
 	}
 
 	private async validateGenerator(block: Interfaces.IBlock): Promise<boolean> {
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.data.height);
+		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			block.data.height,
+			this.configuration,
+		);
 
-		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(block.data.height);
+		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(
+			block.data.height,
+			this.configuration,
+		);
 		const delegates: Contracts.State.Wallet[] = await this.triggers.call("getActiveDelegates", {
 			roundInfo,
 		});
@@ -220,6 +239,8 @@ export class BlockProcessor {
 			block.data.timestamp,
 			block.data.height,
 			blockTimeLookup,
+			this.configuration,
+			this.slots,
 		);
 
 		const forgingDelegate: Contracts.State.Wallet = delegates[forgingInfo.currentForger];

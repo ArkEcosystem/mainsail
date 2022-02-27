@@ -1,6 +1,5 @@
+import Interfaces, { BINDINGS, IBlockFactory, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
-import { Blocks, Transactions } from "@arkecosystem/crypto";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Connection } from "typeorm";
 
 import { DatabaseEvent } from "./events";
@@ -32,6 +31,12 @@ export class DatabaseService {
 
 	@Container.inject(Container.Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
+
+	@Container.inject(BINDINGS.Block.Factory)
+	private readonly blockFactory: IBlockFactory;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	private readonly transactionFactory: ITransactionFactory;
 
 	public async initialize(): Promise<void> {
 		try {
@@ -74,11 +79,15 @@ export class DatabaseService {
 			id: string;
 		}> = await this.transactionRepository.find({ blockId: block.id });
 
-		block.transactions = transactions.map(
-			({ serialized, id }) => Transactions.TransactionFactory.fromBytesUnsafe(serialized, id).data,
-		);
+		block.transactions = [];
 
-		return Blocks.BlockFactory.fromData(block, {
+		for (const [index, transaction] of transactions.entries()) {
+			block.transactions[index] = (
+				await this.transactionFactory.fromBytesUnsafe(transaction.serialized, transaction.id)
+			).data;
+		}
+
+		return this.blockFactory.fromData(block, {
 			deserializeTransactionsUnchecked: true,
 		});
 	}
@@ -131,13 +140,17 @@ export class DatabaseService {
 			id: string;
 			blockId: string;
 			serialized: Buffer;
-		}> = await this.transactionRepository.findByBlockIds([block.id!]);
+		}> = await this.transactionRepository.findByBlockIds([block.id]);
 
-		block.transactions = transactions.map(
-			({ serialized, id }) => Transactions.TransactionFactory.fromBytesUnsafe(serialized, id).data,
-		);
+		block.transactions = [];
 
-		const lastBlock: Interfaces.IBlock = Blocks.BlockFactory.fromData(block, {
+		for (const [index, transaction] of transactions.entries()) {
+			block.transactions[index] = (
+				await this.transactionFactory.fromBytesUnsafe(transaction.serialized, transaction.id)
+			).data;
+		}
+
+		const lastBlock: Interfaces.IBlock = await this.blockFactory.fromData(block, {
 			deserializeTransactionsUnchecked: true,
 		})!;
 
@@ -261,17 +274,19 @@ export class DatabaseService {
 	}
 
 	private async loadTransactionsForBlocks(blocks: Interfaces.IBlockData[]): Promise<void> {
-		const dbTransactions: Array<{
+		const databaseTransactions: Array<{
 			id: string;
 			blockId: string;
 			serialized: Buffer;
 		}> = await this.getTransactionsForBlocks(blocks);
 
-		const transactions = dbTransactions.map((tx) => {
-			const { data } = Transactions.TransactionFactory.fromBytesUnsafe(tx.serialized, tx.id);
-			data.blockId = tx.blockId;
-			return data;
-		});
+		const transactions = [];
+
+		for (const transaction of databaseTransactions) {
+			const { data } = await this.transactionFactory.fromBytesUnsafe(transaction.serialized, transaction.id);
+			data.blockId = transaction.blockId;
+			transactions.push(data);
+		}
 
 		for (const block of blocks) {
 			if (block.numberOfTransactions > 0) {
@@ -287,11 +302,11 @@ export class DatabaseService {
 			serialized: Buffer;
 		}>
 	> {
-		if (!blocks.length) {
+		if (blocks.length === 0) {
 			return [];
 		}
 
-		const ids: string[] = blocks.map((block: Interfaces.IBlockData) => block.id!);
+		const ids: string[] = blocks.map((block: Interfaces.IBlockData) => block.id);
 		return this.transactionRepository.findByBlockIds(ids);
 	}
 }

@@ -1,6 +1,5 @@
-import { Contracts, Utils } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Transactions } from "@arkecosystem/crypto";
+import Interfaces, { BINDINGS, IConfiguration, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
+import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { EntityRepository, In } from "typeorm";
 
 import { Block, Round, Transaction } from "../models";
@@ -8,6 +7,12 @@ import { AbstractRepository } from "./abstract-repository";
 
 @EntityRepository(Block)
 export class BlockRepository extends AbstractRepository<Block> {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Configuration)
+	private readonly transactionFactory: ITransactionFactory;
+
 	public async findLatest(): Promise<Interfaces.IBlockData | undefined> {
 		return this.findOne({
 			order: { height: "DESC" },
@@ -62,7 +67,7 @@ export class BlockRepository extends AbstractRepository<Block> {
 				block,
 				// @ts-ignore
 				(entity: Block & { transactions: string[] }, _, value: Buffer[] | undefined) => {
-					if (value && value.length) {
+					if (value && value.length > 0) {
 						entity.transactions = value.map((buffer) => buffer.toString("hex"));
 					} else {
 						entity.transactions = [];
@@ -74,21 +79,30 @@ export class BlockRepository extends AbstractRepository<Block> {
 
 	public async findByHeightRangeWithTransactions(start: number, end: number): Promise<Interfaces.IBlockData[]> {
 		const blocks = await this.findByHeightRangeWithTransactionsRaw(start, end);
-		return blocks.map((block) =>
+
+		for (const block of blocks) {
 			this.rawToEntity(
 				block,
 				// @ts-ignore
-				(entity: Block & { transactions: Interfaces.ITransactionData[] }, _, value: Buffer[] | undefined) => {
-					if (value && value.length) {
-						entity.transactions = value.map(
-							(buffer) => Transactions.TransactionFactory.fromBytesUnsafe(buffer).data,
-						);
+				async (
+					entity: Block & { transactions: Interfaces.ITransactionData[] },
+					_,
+					value: Buffer[] | undefined,
+				) => {
+					if (value && value.length > 0) {
+						entity.transactions = [];
+
+						for (const element of value) {
+							entity.transactions.push((await this.transactionFactory.fromBytesUnsafe(element)).data);
+						}
 					} else {
 						entity.transactions = [];
 					}
 				},
-			),
-		);
+			);
+		}
+
+		return blocks;
 	}
 
 	public async getStatistics(): Promise<{
@@ -186,8 +200,8 @@ export class BlockRepository extends AbstractRepository<Block> {
 	}
 
 	public async deleteBlocks(blocks: Interfaces.IBlockData[]): Promise<void> {
-		const continuousChunk = blocks.every((block, i, arr) =>
-			i === 0 ? true : block.height - arr[i - 1].height === 1,
+		const continuousChunk = blocks.every((block, index, array) =>
+			index === 0 ? true : block.height - array[index - 1].height === 1,
 		);
 
 		if (!continuousChunk) {
@@ -195,9 +209,10 @@ export class BlockRepository extends AbstractRepository<Block> {
 		}
 
 		return this.manager.transaction(async (manager) => {
+			// eslint-disable-next-line unicorn/prefer-at
 			const lastBlockHeight: number = blocks[blocks.length - 1].height;
 			const targetBlockHeight: number = blocks[0].height - 1;
-			const roundInfo = Utils.roundCalculator.calculateRound(targetBlockHeight);
+			const roundInfo = Utils.roundCalculator.calculateRound(targetBlockHeight, this.configuration);
 			const targetRound = roundInfo.round;
 			const blockIds = blocks.map((b) => b.id);
 
@@ -248,7 +263,7 @@ export class BlockRepository extends AbstractRepository<Block> {
 				.getRawOne();
 
 			const targetHeight = maxHeightRow["max_height"] - count;
-			const roundInfo = Utils.roundCalculator.calculateRound(targetHeight);
+			const roundInfo = Utils.roundCalculator.calculateRound(targetHeight, this.configuration);
 			const targetRound = roundInfo.round;
 
 			const blockIdRows = await manager

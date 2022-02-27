@@ -1,4 +1,4 @@
-import { Managers } from "@arkecosystem/crypto";
+import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 import { Application } from "../contracts/kernel/application";
 import { Identifiers } from "../ioc/identifiers";
@@ -6,8 +6,9 @@ import { Identifiers } from "../ioc/identifiers";
 const mapHeightToMilestoneSpanTimestamp = async (
 	height: number,
 	findBlockTimestampByHeight: (height: number) => Promise<number>,
+	configuration: IConfiguration,
 ): Promise<(height: number) => number> => {
-	let nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(1, "blocktime");
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
 	// TODO: could cache this object here to reduce slow calls to DB.
 	const heightMappedToBlockTimestamp: Map<number, number> = new Map();
@@ -19,7 +20,7 @@ const mapHeightToMilestoneSpanTimestamp = async (
 
 		heightMappedToBlockTimestamp.set(endSpanBlockHeight, await findBlockTimestampByHeight(endSpanBlockHeight));
 
-		nextMilestone = Managers.configManager.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
 	}
 
 	return (height) => {
@@ -34,7 +35,11 @@ const mapHeightToMilestoneSpanTimestamp = async (
 	};
 };
 
-export const getBlockTimeLookup = async (app: Application, height: number): Promise<(height: number) => number> => {
+export const getBlockTimeLookup = async (
+	app: Application,
+	height: number,
+	configuration: IConfiguration,
+): Promise<(height: number) => number> => {
 	const databaseService = app.get<any>(Identifiers.DatabaseService);
 
 	const getBlockTimestampByHeight = async (height: number): Promise<number> => {
@@ -42,5 +47,5 @@ export const getBlockTimeLookup = async (app: Application, height: number): Prom
 		return blocks[0].timestamp;
 	};
 
-	return await mapHeightToMilestoneSpanTimestamp(height, getBlockTimestampByHeight);
+	return await mapHeightToMilestoneSpanTimestamp(height, getBlockTimestampByHeight, configuration);
 };

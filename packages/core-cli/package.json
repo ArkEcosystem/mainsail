@@ -16,8 +16,8 @@
 		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"boxen": "4.2.0",
 		"cli-table3": "0.6.0",
