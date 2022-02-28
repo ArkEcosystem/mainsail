@@ -198,7 +198,6 @@ importers:
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-state': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/async': 3.2.7
       delay: 4.4.1
@@ -209,7 +208,6 @@ importers:
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-state': link:../core-state
-      '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/utils': link:../utils
       joi: 17.4.2
       xstate: 4.23.4
@@ -1123,13 +1121,11 @@ importers:
       '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/utils': link:../utils
 
   packages/core-fees-static:
@@ -1137,13 +1133,11 @@ importers:
       '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/utils': link:../utils
 
   packages/core-forger:
@@ -1151,7 +1145,6 @@ importers:
       '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
@@ -1163,7 +1156,6 @@ importers:
       '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
-      '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/utils': link:../utils
       bip38: 3.1.1
       joi: 17.4.2
@@ -1357,7 +1349,6 @@ importers:
       '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/utils': workspace:*
       delay: 4.4.1
       immutable: 4.0.0-rc.14
@@ -1366,7 +1357,6 @@ importers:
       '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/utils': link:../utils
       immutable: 4.0.0-rc.14
       joi: 17.4.2
@@ -1460,7 +1450,6 @@ importers:
     specifiers:
       '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/better-sqlite3': 5.4.3
       '@types/fs-extra': 8.1.2
@@ -1470,7 +1459,6 @@ importers:
     dependencies:
       '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/utils': link:../utils
       better-sqlite3: 7.4.3
       fs-extra: 8.1.0

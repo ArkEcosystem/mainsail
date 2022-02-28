@@ -1,7 +1,6 @@
 import Interfaces, { BINDINGS, IConfiguration, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
-import { Handlers } from "@arkecosystem/core-transactions";
 
 import { Client } from "./client";
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
@@ -17,7 +16,7 @@ export class ForgerService {
 	private readonly logger: Contracts.Kernel.Logger;
 
 	@Container.inject(Container.Identifiers.TransactionHandlerProvider)
-	private readonly handlerProvider: Handlers.TransactionHandlerProvider;
+	private readonly handlerProvider: Contracts.Transactions.ITransactionHandlerProvider;
 
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: IConfiguration;

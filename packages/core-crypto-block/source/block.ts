@@ -1,11 +1,12 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
 	IBlock,
 	IBlockData,
 	IBlockJson,
+	IBlockSerializer,
 	IBlockVerification,
+	IConfiguration,
 	IHashFactory,
 	ITransaction,
 	ITransactionData,
@@ -14,15 +15,13 @@ import {
 import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Serializer } from "./serializer";
-
 @Container.injectable()
 export class Block implements IBlock {
 	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
+	private readonly configuration: IConfiguration;
 
 	@Container.inject(BINDINGS.Block.Serializer)
-	private readonly serializer: Serializer; // @TODO: create contract for block serializer
+	private readonly serializer: IBlockSerializer; // @TODO: create contract for block serializer
 
 	@Container.inject(BINDINGS.HashFactory)
 	private readonly hashFactory: IHashFactory;
@@ -40,7 +39,7 @@ export class Block implements IBlock {
 	public verification: IBlockVerification;
 
 	public constructor(
-		configuration: Configuration,
+		configuration: IConfiguration,
 		{ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string },
 	) {
 		this.configuration = configuration;

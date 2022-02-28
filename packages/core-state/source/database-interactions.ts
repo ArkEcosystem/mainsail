@@ -1,7 +1,6 @@
 import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
 
 import { RoundState } from "./round-state";
 
@@ -28,7 +27,7 @@ export class DatabaseInteraction {
 
 	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
 	@Container.tagged("state", "blockchain")
-	private readonly handlerRegistry!: Handlers.Registry;
+	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@Container.inject(Container.Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;

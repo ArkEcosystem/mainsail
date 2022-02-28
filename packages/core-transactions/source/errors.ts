@@ -1,6 +1,5 @@
 import { Contracts } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { InternalTransactionType } from "@arkecosystem/core-crypto-transaction";
 
 export class TransactionError extends Error {
 	public constructor(message: string) {
@@ -21,25 +20,25 @@ export class TransactionError extends Error {
 }
 
 export class InvalidTransactionTypeError extends TransactionError {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: Contracts.Transactions.InternalTransactionType) {
 		super(`Transaction type ${type.toString()} does not exist.`);
 	}
 }
 
 export class DeactivatedTransactionHandlerError extends TransactionError {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: Contracts.Transactions.InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is deactivated.`);
 	}
 }
 
 export class UnsatisfiedDependencyError extends TransactionError {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: Contracts.Transactions.InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is missing required dependencies`);
 	}
 }
 
 export class AlreadyRegisteredError extends TransactionError {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: Contracts.Transactions.InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is already registered`);
 	}
 }

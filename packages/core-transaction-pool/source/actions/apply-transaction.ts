@@ -1,10 +1,9 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Services, Types } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
+import { Contracts, Services, Types } from "@arkecosystem/core-kernel";
 
 export class ApplyTransactionAction extends Services.Triggers.Action {
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {
-		const handler: Handlers.TransactionHandler = arguments_.handler;
+		const handler: Contracts.Transactions.ITransactionHandler = arguments_.handler;
 		const transaction: Interfaces.ITransaction = arguments_.transaction;
 
 		return handler.apply(transaction);

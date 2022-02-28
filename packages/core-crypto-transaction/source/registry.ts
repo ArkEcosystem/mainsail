@@ -1,6 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
 import { BINDINGS, ITransactionRegistry, IValidator } from "@arkecosystem/core-crypto-contracts";
 import { schemas } from "@arkecosystem/core-crypto-validation";
+import { Contracts } from "@arkecosystem/core-kernel";
 
 import {
 	TransactionAlreadyRegisteredError,
@@ -9,7 +10,6 @@ import {
 	UnkownTransactionError,
 } from "./errors";
 import { Transaction, TransactionTypeFactory } from "./types";
-import { InternalTransactionType } from "./types/internal-transaction-type";
 import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 
 export type TransactionConstructor = typeof Transaction;
@@ -19,7 +19,10 @@ export class TransactionRegistry implements ITransactionRegistry {
 	@Container.inject(BINDINGS.Validator)
 	private readonly validator: IValidator;
 
-	private readonly transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>> = new Map();
+	private readonly transactionTypes: Map<
+		Contracts.Transactions.InternalTransactionType,
+		Map<number, TransactionConstructor>
+	> = new Map();
 
 	readonly #transactionSchemas = new Map<string, TransactionSchema>();
 
@@ -34,13 +37,14 @@ export class TransactionRegistry implements ITransactionRegistry {
 			throw new TypeError();
 		}
 
-		const internalType: InternalTransactionType = InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.InternalTransactionType =
+			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 		for (const registeredConstructors of this.transactionTypes.values()) {
 			if (registeredConstructors.size > 0) {
 				const first = [...registeredConstructors.values()][0];
 				if (
 					first.key === constructor.key &&
-					InternalTransactionType.from(first.type, first.typeGroup) !== internalType
+					Contracts.Transactions.InternalTransactionType.from(first.type, first.typeGroup) !== internalType
 				) {
 					throw new TransactionKeyAlreadyRegisteredError(first.key);
 				}
@@ -70,7 +74,8 @@ export class TransactionRegistry implements ITransactionRegistry {
 			throw new TypeError();
 		}
 
-		const internalType: InternalTransactionType = InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.InternalTransactionType =
+			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 		if (!this.transactionTypes.has(internalType)) {
 			throw new UnkownTransactionError(internalType.toString());
 		}

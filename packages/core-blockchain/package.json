@@ -20,7 +20,6 @@
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"joi": "17.4.2",
 		"xstate": "4.23.4"

@@ -5,7 +5,6 @@ import Interfaces, {
 	TransactionTypeGroup,
 } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
 // todo: review the implementation
@@ -15,7 +14,7 @@ export class BlockState implements Contracts.State.BlockState {
 	private walletRepository!: Contracts.State.WalletRepository;
 
 	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	private handlerRegistry!: Handlers.Registry;
+	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@Container.inject(Container.Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;

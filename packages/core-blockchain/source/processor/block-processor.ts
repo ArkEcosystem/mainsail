@@ -1,7 +1,6 @@
 import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
 import {
@@ -99,7 +98,7 @@ export class BlockProcessor {
 		if (block.verification.containsMultiSignatures) {
 			try {
 				for (const transaction of block.transactions) {
-					const registry = this.app.getTagged<Handlers.Registry>(
+					const registry = this.app.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
 						Container.Identifiers.TransactionHandlerRegistry,
 						"state",
 						"blockchain",

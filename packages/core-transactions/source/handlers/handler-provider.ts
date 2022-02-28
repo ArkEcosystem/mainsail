@@ -1,12 +1,11 @@
 import { BINDINGS, ITransactionRegistry, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
-import { InternalTransactionType } from "@arkecosystem/core-crypto-transaction";
-import { Container, Services, Utils } from "@arkecosystem/core-kernel";
+import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 
 import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "../errors";
 import { TransactionHandlerConstructor } from "./transaction";
 
 @Container.injectable()
-export class TransactionHandlerProvider {
+export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
 	@Container.inject(Container.Identifiers.WalletAttributes)
 	private readonly attributeSet!: Services.Attributes.AttributeSet;
 
@@ -37,7 +36,7 @@ export class TransactionHandlerProvider {
 		Utils.assert.defined<number>(transactionConstructor.type);
 		Utils.assert.defined<number>(transactionConstructor.typeGroup);
 
-		const internalType = InternalTransactionType.from(
+		const internalType = Contracts.Transactions.InternalTransactionType.from(
 			transactionConstructor.type,
 			transactionConstructor.typeGroup,
 		);
@@ -65,7 +64,7 @@ export class TransactionHandlerProvider {
 
 	private hasOtherHandlerHandling(
 		handlerConstructor: TransactionHandlerConstructor,
-		internalType: InternalTransactionType,
+		internalType: Contracts.Transactions.InternalTransactionType,
 		version: number,
 	) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {
@@ -79,7 +78,7 @@ export class TransactionHandlerProvider {
 			Utils.assert.defined<number>(otherTransactionConstructor.type);
 			Utils.assert.defined<number>(otherTransactionConstructor.typeGroup);
 
-			const otherInternalType = InternalTransactionType.from(
+			const otherInternalType = Contracts.Transactions.InternalTransactionType.from(
 				otherTransactionConstructor.type,
 				otherTransactionConstructor.typeGroup,
 			);

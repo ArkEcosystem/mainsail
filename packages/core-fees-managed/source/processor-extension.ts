@@ -1,5 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { ITransaction } from "@arkecosystem/core-crypto-contracts";
+import { Container, Contracts } from "@arkecosystem/core-kernel";
 
 @Container.injectable()
 export class ProcessorExtension extends Contracts.TransactionPool.ProcessorExtension {

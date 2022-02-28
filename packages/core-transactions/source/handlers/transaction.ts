@@ -60,20 +60,6 @@ export abstract class TransactionHandler {
 		return transaction.isVerified;
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public dynamicFee({ addonBytes, satoshiPerByte, transaction }: Contracts.Shared.DynamicFeeContext): BigNumber {
-		addonBytes = addonBytes || 0;
-
-		if (satoshiPerByte <= 0) {
-			satoshiPerByte = 1;
-		}
-
-		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
-		return BigNumber.make(addonBytes + transactionSizeInBytes).times(satoshiPerByte);
-	}
-
 	public async throwIfCannotBeApplied(
 		transaction: Interfaces.ITransaction,
 		sender: Contracts.State.Wallet,

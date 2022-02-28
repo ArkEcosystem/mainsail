@@ -19,7 +19,6 @@
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"immutable": "4.0.0-rc.14",
 		"joi": "17.4.2"

@@ -1,8 +1,7 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { TransactionFeeToHighError, TransactionFeeToLowError } from "@arkecosystem/core-fees";
-import { FeeRegistry } from "@arkecosystem/core-fees";
-import { BigNumber } from "@arkecosystem/utils";
 import { ITransaction } from "@arkecosystem/core-crypto-contracts";
+import { FeeRegistry, TransactionFeeToHighError, TransactionFeeToLowError } from "@arkecosystem/core-fees";
+import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {

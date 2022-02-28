@@ -2,6 +2,63 @@
 	"core": {
 		"plugins": [
 			{
+				"package": "@arkecosystem/core-validation"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-config"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-time"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-validation"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-hash-bcrypto"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-signature-schnorr"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-key-pair-schnorr"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-address-base58"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-wif"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-block"
+			},
+			{
+				"package": "@arkecosystem/core-fees"
+			},
+			{
+				"package": "@arkecosystem/core-fees-static"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-delegate-registration"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-delegate-resignation"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-multi-payment"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-multi-signature-registration"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-transfer"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-vote"
+			},
+			{
 				"package": "@arkecosystem/core-logger-pino"
 			},
 			{

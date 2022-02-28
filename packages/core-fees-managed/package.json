@@ -18,7 +18,6 @@
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-fees": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"engines": {
