@@ -7,13 +7,13 @@ import { TransactionHandlerConstructor } from "./transaction";
 @Container.injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
 	@Container.inject(Container.Identifiers.WalletAttributes)
-	private readonly attributeSet!: Services.Attributes.AttributeSet;
+	private readonly attributeSet: Services.Attributes.AttributeSet;
 
 	@Container.inject(Container.Identifiers.TransactionHandlerConstructors)
-	private readonly handlerConstructors!: TransactionHandlerConstructor[];
+	private readonly handlerConstructors: TransactionHandlerConstructor[];
 
 	@Container.inject(BINDINGS.Transaction.Registry)
-	private readonly transactionRegistry!: ITransactionRegistry;
+	private readonly transactionRegistry: ITransactionRegistry;
 
 	private registered = false;
 

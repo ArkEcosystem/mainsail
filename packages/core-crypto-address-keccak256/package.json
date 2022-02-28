@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"ethers": "^5.5.4"

@@ -8,9 +8,9 @@ import {
 	ITransactionVerifier,
 	Signatory,
 } from "@arkecosystem/core-crypto-contracts";
+import { Contracts } from "@arkecosystem/core-kernel";
 
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";
-import { TransactionTypeFactory } from "./types/factory";
 
 @Container.injectable()
 export class Verifier implements ITransactionVerifier {
@@ -22,6 +22,9 @@ export class Verifier implements ITransactionVerifier {
 
 	@Container.inject(BINDINGS.Transaction.Utils)
 	private readonly utils: ITransactionUtils;
+
+	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async verifySignatures(
 		transaction: ITransactionData,
@@ -95,7 +98,7 @@ export class Verifier implements ITransactionVerifier {
 	}
 
 	public verifySchema(data: ITransactionData, strict = true): ISchemaValidationResult {
-		const transactionType = TransactionTypeFactory.get(data.type, data.typeGroup, data.version);
+		const transactionType = this.transactionTypeFactory.get(data.type, data.typeGroup, data.version);
 
 		if (!transactionType) {
 			throw new Error();

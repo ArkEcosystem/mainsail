@@ -13,6 +13,7 @@ import {
 	ITransactionUtils,
 	ITransactionVerifier,
 } from "@arkecosystem/core-crypto-contracts";
+import { Contracts } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import {
@@ -21,7 +22,6 @@ import {
 	TransactionSchemaError,
 	TransactionVersionError,
 } from "./errors";
-import { TransactionTypeFactory } from "./types";
 
 @Container.injectable()
 export class TransactionFactory implements ITransactionFactory {
@@ -39,6 +39,9 @@ export class TransactionFactory implements ITransactionFactory {
 
 	@Container.inject(BINDINGS.Transaction.Verifier)
 	private readonly verifier: ITransactionVerifier;
+
+	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async fromHex(hex: string): Promise<ITransaction> {
 		return this.fromSerialized(hex);
@@ -87,7 +90,7 @@ export class TransactionFactory implements ITransactionFactory {
 			throw new TransactionSchemaError(error);
 		}
 
-		const transaction: ITransaction = TransactionTypeFactory.create(value);
+		const transaction: ITransaction = this.transactionTypeFactory.create(value);
 
 		await this.serializer.serialize(transaction);
 

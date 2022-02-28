@@ -7,15 +7,18 @@ import {
 	ITransactionData,
 	ITransactionDeserializer,
 } from "@arkecosystem/core-crypto-contracts";
+import { Contracts } from "@arkecosystem/core-kernel";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "./errors";
-import { TransactionTypeFactory } from "./types";
 
 @Container.injectable()
 export class Deserializer implements ITransactionDeserializer {
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: IConfiguration;
+
+	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): Promise<ITransaction> {
 		const data = {} as ITransactionData;
@@ -23,7 +26,7 @@ export class Deserializer implements ITransactionDeserializer {
 		const buff: ByteBuffer = this.getByteBuffer(serialized);
 		this.deserializeCommon(data, buff);
 
-		const instance: ITransaction = TransactionTypeFactory.create(data);
+		const instance: ITransaction = this.transactionTypeFactory.create(data);
 		this.deserializeVendorField(instance, buff);
 
 		// Deserialize type specific parts

@@ -7,8 +7,7 @@ import {
 	ITransactionSerializer,
 	ITransactionUtils,
 } from "@arkecosystem/core-crypto-contracts";
-
-import { TransactionTypeFactory } from "./types/factory";
+import { Contracts } from "@arkecosystem/core-kernel";
 
 @Container.injectable()
 export class Utils implements ITransactionUtils {
@@ -18,8 +17,11 @@ export class Utils implements ITransactionUtils {
 	@Container.inject(BINDINGS.HashFactory)
 	private readonly hashFactory: IHashFactory;
 
+	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+
 	public async toBytes(data: ITransactionData): Promise<Buffer> {
-		return this.serializer.serialize(TransactionTypeFactory.create(data));
+		return this.serializer.serialize(this.transactionTypeFactory.create(data));
 	}
 
 	public async toHash(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer> {

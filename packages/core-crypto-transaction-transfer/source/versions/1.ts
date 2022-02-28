@@ -32,16 +32,12 @@ export class TransferTransaction extends Transaction {
 
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
-		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(33));
+		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(64));
 		buff.writeBigUInt64LE(data.amount.toBigInt());
 		buff.writeUInt32LE(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer, addressError } = await this.addressFactory.toBuffer(data.recipientId);
-
-			if (options) {
-				options.addressError = addressError;
-			}
+			const { addressBuffer } = await this.addressFactory.toBuffer(data.recipientId);
 
 			buff.writeBuffer(addressBuffer);
 		}

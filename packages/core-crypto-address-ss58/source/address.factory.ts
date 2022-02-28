@@ -1,15 +1,17 @@
 import { Container } from "@arkecosystem/core-container";
 import {
-	AddressFactory as Contract,
 	BINDINGS,
+	IAddressFactory,
 	IConfiguration,
+	IKeyPair,
 	IKeyPairFactory,
+	IMultiSignatureAsset,
 } from "@arkecosystem/core-crypto-contracts";
 import { hexToU8a, isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
 
 @Container.injectable()
-export class AddressFactory implements Contract {
+export class AddressFactory implements IAddressFactory {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: IConfiguration;
 
@@ -17,11 +19,34 @@ export class AddressFactory implements Contract {
 	private readonly keyPairFactory: IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey, "hex"));
+		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey);
 	}
 
-	public async fromPublicKey(publicKey: Buffer): Promise<string> {
-		return encodeAddress(publicKey, this.configuration.get("network.address.ss58"));
+	public async fromPublicKey(publicKey: string): Promise<string> {
+		return encodeAddress(Buffer.from(publicKey, "hex"), this.configuration.get("network.address.ss58"));
+	}
+
+	public async fromWIF(wif: string): Promise<string> {
+		return "";
+	}
+
+	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
+		return "";
+	}
+
+	public async fromPrivateKey(privateKey: IKeyPair): Promise<string> {
+		return "";
+	}
+
+	public async fromBuffer(buffer: Buffer): Promise<string> {
+		return "";
+	}
+
+	public async toBuffer(address: string): Promise<{
+		addressBuffer: Buffer;
+		addressError?: string;
+	}> {
+		return { addressBuffer: Buffer.alloc(1) };
 	}
 
 	public async validate(address: string): Promise<boolean> {

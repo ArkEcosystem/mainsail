@@ -26,6 +26,7 @@ export const BINDINGS = {
 		Registry: Symbol.for("Crypto<Transaction.Registry>"),
 		Serializer: Symbol.for("Crypto<Transaction.Serializer>"),
 		Signer: Symbol.for("Crypto<Transaction.Signer>"),
+		TypeFactory: Symbol.for("Crypto<Transaction.TypeFactory>"),
 		Utils: Symbol.for("Crypto<Transaction.Utils>"),
 		Verifier: Symbol.for("Crypto<Transaction.Verifier>"),
 	},

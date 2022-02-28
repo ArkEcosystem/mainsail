@@ -50,7 +50,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
-				.fromPublicKey(Buffer.from("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex")),
+				.fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
 			"AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8",
 		);
 	});
@@ -61,9 +61,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
-				.fromPublicKey(
-					Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
-				),
+				.fromPublicKey("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
 			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
 		);
 	});

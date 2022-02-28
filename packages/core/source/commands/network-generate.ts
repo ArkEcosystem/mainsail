@@ -1,5 +1,5 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { ServiceProvider as CoreCryptoAddressBase58 } from "@arkecosystem/core-crypto-address-base58";
+import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@arkecosystem/core-crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@arkecosystem/core-crypto-config";
 import Interfaces, {
@@ -324,7 +324,7 @@ export class Command extends Commands.Command {
 		await this.app.resolve<CoreCryptoHashBcrypto>(CoreCryptoHashBcrypto).register();
 		await this.app.resolve<CoreCryptoSignatureSchnorr>(CoreCryptoSignatureSchnorr).register();
 		await this.app.resolve<CoreCryptoKeyPairSchnorr>(CoreCryptoKeyPairSchnorr).register();
-		await this.app.resolve<CoreCryptoAddressBase58>(CoreCryptoAddressBase58).register();
+		await this.app.resolve<CoreCryptoAddressBech32m>(CoreCryptoAddressBech32m).register();
 		await this.app.resolve<CoreCryptoWif>(CoreCryptoWif).register();
 		await this.app.resolve<CoreCryptoBlock>(CoreCryptoBlock).register();
 		await this.app.resolve<CoreFees>(CoreFees).register();
@@ -415,110 +415,129 @@ export class Command extends Commands.Command {
 	}
 
 	private async generateNetwork(flags: Options): Promise<void> {
-		this.app.get<IConfiguration>(BINDINGS.Configuration).set("network.address.base58", flags.pubKeyHash);
+		try {
+			// @TODO
+			this.app.get<IConfiguration>(BINDINGS.Configuration).set("network.address.base58", flags.pubKeyHash);
+			// @TODO
+			this.app.get<IConfiguration>(BINDINGS.Configuration).set("network.address.bech32m", "ark");
 
-		const paths = envPaths(flags.token, { suffix: "core" });
-		const configPath = flags.configPath ? flags.configPath : paths.config;
+			const paths = envPaths(flags.token, { suffix: "core" });
+			const configPath = flags.configPath ? flags.configPath : paths.config;
 
-		const coreConfigDestination = join(configPath, flags.network);
-		const cryptoConfigDestination = join(coreConfigDestination, "crypto");
+			const coreConfigDestination = join(configPath, flags.network);
+			const cryptoConfigDestination = join(coreConfigDestination, "crypto");
 
-		const delegates: any[] = await this.generateCoreDelegates(flags.delegates, flags.pubKeyHash);
+			const delegates: any[] = await this.generateCoreDelegates(flags.delegates, flags.pubKeyHash);
 
-		const genesisWallet = this.createWallet(flags.pubKeyHash);
+			const genesisWallet = await this.createWallet(flags.pubKeyHash);
 
-		await this.components.taskList([
-			{
-				task: async () => {
-					if (!flags.overwriteConfig) {
-						if (existsSync(coreConfigDestination)) {
-							throw new Error(`${coreConfigDestination} already exists.`);
+			await this.components.taskList([
+				{
+					task: async () => {
+						if (!flags.overwriteConfig) {
+							if (existsSync(coreConfigDestination)) {
+								throw new Error(`${coreConfigDestination} already exists.`);
+							}
+
+							if (existsSync(cryptoConfigDestination)) {
+								throw new Error(`${cryptoConfigDestination} already exists.`);
+							}
 						}
 
-						if (existsSync(cryptoConfigDestination)) {
-							throw new Error(`${cryptoConfigDestination} already exists.`);
-						}
-					}
-
-					ensureDirSync(coreConfigDestination);
-					ensureDirSync(cryptoConfigDestination);
+						ensureDirSync(coreConfigDestination);
+						ensureDirSync(cryptoConfigDestination);
+					},
+					title: `Prepare directories.`,
 				},
-				title: `Prepare directories.`,
-			},
-			{
-				task: async () => {
-					writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, { spaces: 4 });
+				{
+					task: async () => {
+						writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, {
+							spaces: 4,
+						});
+					},
+					title: "Persist genesis wallet to genesis-wallet.json in core config path.",
 				},
-				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
-			},
-			{
-				task: async () => {
-					// Milestones
-					const milestones = this.generateCryptoMilestones(flags);
+				{
+					task: async () => {
+						// Milestones
+						const milestones = this.generateCryptoMilestones(flags);
 
-					writeJSONSync(resolve(cryptoConfigDestination, "milestones.json"), milestones, {
-						spaces: 4,
-					});
+						writeJSONSync(resolve(cryptoConfigDestination, "milestones.json"), milestones, {
+							spaces: 4,
+						});
 
-					this.app.get<IConfiguration>(BINDINGS.Configuration).setConfig({
-						// @ts-ignore
-						exceptions: {},
-						// @ts-ignore
-						genesisBlock: {},
-						milestones,
-						// @ts-ignore
-						network: {},
-					});
+						this.app.get<IConfiguration>(BINDINGS.Configuration).setConfig({
+							// @ts-ignore
+							exceptions: {},
+							// @ts-ignore
+							genesisBlock: {},
+							milestones,
+							// @ts-ignore
+							network: {
+								// @ts-ignore
+								address: {
+									base58: 12,
+									bech32m: "ark",
+								},
+							},
+						});
 
-					// Genesis Block
-					const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, delegates, flags);
+						// Genesis Block
+						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, delegates, flags);
 
-					writeJSONSync(
-						resolve(cryptoConfigDestination, "network.json"),
-						this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
-						{ spaces: 4 },
-					);
+						writeJSONSync(
+							resolve(cryptoConfigDestination, "network.json"),
+							this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
+							{ spaces: 4 },
+						);
 
-					writeJSONSync(resolve(cryptoConfigDestination, "genesisBlock.json"), genesisBlock, { spaces: 4 });
+						writeJSONSync(resolve(cryptoConfigDestination, "genesisBlock.json"), genesisBlock, {
+							spaces: 4,
+						});
 
-					writeJSONSync(resolve(cryptoConfigDestination, "exceptions.json"), {});
+						writeJSONSync(resolve(cryptoConfigDestination, "exceptions.json"), {});
 
-					writeFileSync(
-						resolve(cryptoConfigDestination, "index.ts"),
-						[
-							'import exceptions from "./exceptions.json";',
-							'import genesisBlock from "./genesisBlock.json";',
-							'import milestones from "./milestones.json";',
-							'import network from "./network.json";',
-							"",
-							`export const ${flags.network} = { exceptions, genesisBlock, milestones, network };`,
-							"",
-						].join("\n"),
-					);
+						writeFileSync(
+							resolve(cryptoConfigDestination, "index.ts"),
+							[
+								'import exceptions from "./exceptions.json";',
+								'import genesisBlock from "./genesisBlock.json";',
+								'import milestones from "./milestones.json";',
+								'import network from "./network.json";',
+								"",
+								`export const ${flags.network} = { exceptions, genesisBlock, milestones, network };`,
+								"",
+							].join("\n"),
+						);
+					},
+					title: "Generate crypto network configuration.",
 				},
-				title: "Generate crypto network configuration.",
-			},
-			{
-				task: async () => {
-					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), {
-						spaces: 4,
-					});
+				{
+					task: async () => {
+						writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), {
+							spaces: 4,
+						});
 
-					writeJSONSync(
-						resolve(coreConfigDestination, "delegates.json"),
-						{ secrets: delegates.map((d) => d.passphrase) },
-						{ spaces: 4 },
-					);
+						writeJSONSync(
+							resolve(coreConfigDestination, "delegates.json"),
+							{ secrets: delegates.map((d) => d.passphrase) },
+							{ spaces: 4 },
+						);
 
-					writeFileSync(resolve(coreConfigDestination, ".env"), this.generateEnvironmentVariables(flags));
+						writeFileSync(resolve(coreConfigDestination, ".env"), this.generateEnvironmentVariables(flags));
 
-					writeJSONSync(resolve(coreConfigDestination, "app.json"), this.generateApp(flags), { spaces: 4 });
+						writeJSONSync(resolve(coreConfigDestination, "app.json"), this.generateApp(flags), {
+							spaces: 4,
+						});
+					},
+					title: "Generate Core network configuration.",
 				},
-				title: "Generate Core network configuration.",
-			},
-		]);
+			]);
 
-		this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
+			this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	private generateCryptoNetwork(nethash: string, options: Options) {
@@ -679,14 +698,6 @@ export class Command extends Commands.Command {
 		const keys: Interfaces.IKeyPair = await this.app
 			.get<IKeyPairFactory>(BINDINGS.Identity.KeyPairFactory)
 			.fromMnemonic(passphrase);
-
-		// try {
-		// 	console.log(await this.app
-		// 		.get<IAddressFactory>(BINDINGS.Identity.AddressFactory)
-		// 		.fromPublicKey(keys.publicKey))
-		// } catch (error) {
-		// 	console.log(error)
-		// }
 
 		return {
 			address: await this.app

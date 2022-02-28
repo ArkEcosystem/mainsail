@@ -1,4 +1,8 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Interfaces, {
+	ITransaction,
+	ITransactionData,
+	TransactionConstructor,
+} from "@arkecosystem/core-crypto-contracts";
 
 import { EventDispatcher } from "./kernel";
 import { Wallet } from "./state";
@@ -76,6 +80,7 @@ export class InternalTransactionType {
 		}
 
 		const compositeType = `${typeGroup}-${type}`;
+
 		if (!this.types.has(compositeType)) {
 			this.types.set(compositeType, new InternalTransactionType(type, typeGroup));
 		}
@@ -107,4 +112,12 @@ export enum TransactionTypeGroup {
 
 	// Everything above is available to anyone
 	Reserved = 1000,
+}
+
+export interface ITransactionTypeFactory {
+	initialize(transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>>);
+
+	create(data: ITransactionData): ITransaction;
+
+	get(type: number, typeGroup?: number, version?: number): TransactionConstructor | undefined;
 }

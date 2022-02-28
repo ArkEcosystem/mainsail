@@ -7,22 +7,25 @@ import {
 	ITransactionData,
 	ITransactionSerializer,
 } from "@arkecosystem/core-crypto-contracts";
+import { Contracts } from "@arkecosystem/core-kernel";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionTypeGroup } from "./enums";
 import { TransactionVersionError } from "./errors";
-import { TransactionTypeFactory } from "./types";
 
 @Container.injectable()
 export class Serializer implements ITransactionSerializer {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: IConfiguration;
 
+	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+
 	public async getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Promise<Buffer> {
 		const version: number = transaction.version || 1;
 
 		if (version) {
-			return this.serialize(TransactionTypeFactory.create(transaction), options);
+			return this.serialize(this.transactionTypeFactory.create(transaction), options);
 		}
 
 		throw new TransactionVersionError(version);

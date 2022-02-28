@@ -6,20 +6,6 @@ export interface IKeyPair {
 	compressed: boolean;
 }
 
-export interface AddressFactory {
-	fromMnemonic(mnemonic: string): Promise<string>;
-
-	fromPublicKey(publicKey: Buffer): Promise<string>;
-
-	// fromWIF(wif: string, network?: Network): string;
-
-	// fromMultiSignatureAsset(asset: IMultiSignatureAsset): string;
-
-	// fromPrivateKey(privateKey: IKeyPair): string;
-
-	validate(address: string): Promise<boolean>;
-}
-
 export interface IAddressFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
 

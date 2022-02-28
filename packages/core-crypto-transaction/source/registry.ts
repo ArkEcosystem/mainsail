@@ -9,7 +9,7 @@ import {
 	TransactionVersionAlreadyRegisteredError,
 	UnkownTransactionError,
 } from "./errors";
-import { Transaction, TransactionTypeFactory } from "./types";
+import { Transaction } from "./types";
 import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 
 export type TransactionConstructor = typeof Transaction;
@@ -19,6 +19,9 @@ export class TransactionRegistry implements ITransactionRegistry {
 	@Container.inject(BINDINGS.Validator)
 	private readonly validator: IValidator;
 
+	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+
 	private readonly transactionTypes: Map<
 		Contracts.Transactions.InternalTransactionType,
 		Map<number, TransactionConstructor>
@@ -26,8 +29,9 @@ export class TransactionRegistry implements ITransactionRegistry {
 
 	readonly #transactionSchemas = new Map<string, TransactionSchema>();
 
-	public constructor() {
-		TransactionTypeFactory.initialize(this.transactionTypes);
+	@Container.postConstruct()
+	public postConstruct() {
+		this.transactionTypeFactory.initialize(this.transactionTypes);
 	}
 
 	public registerTransactionType(constructor: TransactionConstructor): void {
@@ -39,6 +43,7 @@ export class TransactionRegistry implements ITransactionRegistry {
 
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
+
 		for (const registeredConstructors of this.transactionTypes.values()) {
 			if (registeredConstructors.size > 0) {
 				const first = [...registeredConstructors.values()][0];
