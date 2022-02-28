@@ -15,7 +15,6 @@ export class IpcHandler<T> {
 
 	public handleAction<K extends Actions<T>>(method: K): void {
 		process.on("message", (message) => {
-			/* istanbul ignore else */
 			if (message.method === method) {
 				// @ts-ignore
 				this.handler[method](...message.args);
@@ -25,7 +24,6 @@ export class IpcHandler<T> {
 
 	public handleRequest<K extends Requests<T>>(method: K): void {
 		process.on("message", async (message) => {
-			/* istanbul ignore else */
 			if (message.method === method) {
 				try {
 					// @ts-ignore

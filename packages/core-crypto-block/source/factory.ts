@@ -1,11 +1,11 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
 	IBlock,
 	IBlockData,
 	IBlockFactory,
 	IBlockJson,
+	IConfiguration,
 	IHashFactory,
 	IKeyPair,
 	ITransaction,
@@ -24,7 +24,7 @@ import { Serializer } from "./serializer";
 @Container.injectable()
 export class BlockFactory implements IBlockFactory {
 	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
+	private readonly configuration: IConfiguration;
 
 	@Container.inject(BINDINGS.Block.Serializer)
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer

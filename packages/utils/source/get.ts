@@ -10,20 +10,18 @@ export const get = <T, V>(object: T, path: string | string[], defaultValue?: V):
 
 	const pathSegments: string[] = getPathSegments(path);
 
-	for (let i = 0; i < pathSegments.length; i++) {
-		if (!isEnumerable(object, pathSegments[i])) {
+	for (let index = 0; index < pathSegments.length; index++) {
+		if (!isEnumerable(object, pathSegments[index])) {
 			return defaultValue;
 		}
 
-		object = object[pathSegments[i]];
+		object = object[pathSegments[index]];
 
 		if (object === undefined || object === null) {
-			/* istanbul ignore else */
-			if (i !== pathSegments.length - 1) {
+			if (index !== pathSegments.length - 1) {
 				return defaultValue;
 			}
 
-			/* istanbul ignore next */
 			break;
 		}
 	}

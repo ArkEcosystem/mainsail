@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
+	IConfiguration,
 	IDeserializeOptions,
 	ITransaction,
 	ITransactionData,
@@ -15,9 +15,9 @@ import { TransactionTypeFactory } from "./types";
 @Container.injectable()
 export class Deserializer implements ITransactionDeserializer {
 	@Container.inject(BINDINGS.Configuration)
-	protected readonly configuration: Configuration;
+	protected readonly configuration: IConfiguration;
 
-	public deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): ITransaction {
+	public async deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): Promise<ITransaction> {
 		const data = {} as ITransactionData;
 
 		const buff: ByteBuffer = this.getByteBuffer(serialized);
@@ -27,7 +27,7 @@ export class Deserializer implements ITransactionDeserializer {
 		this.deserializeVendorField(instance, buff);
 
 		// Deserialize type specific parts
-		instance.deserialize(buff);
+		await instance.deserialize(buff);
 
 		this.deserializeSignatures(data, buff);
 

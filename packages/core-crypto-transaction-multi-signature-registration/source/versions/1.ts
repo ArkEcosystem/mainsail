@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
+	IConfiguration,
 	IMultiSignatureAsset,
 	ISerializeOptions,
 	ITransactionData,
@@ -11,7 +11,7 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
-export class One extends Transaction {
+export class MultiSignatureRegistrationTransaction extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
@@ -65,7 +65,7 @@ export class One extends Transaction {
 	}
 
 	public static staticFee(
-		configuration: Configuration,
+		configuration: IConfiguration,
 		feeContext: { height?: number; data?: ITransactionData } = {},
 	): BigNumber {
 		if (feeContext.data?.asset?.multiSignature) {

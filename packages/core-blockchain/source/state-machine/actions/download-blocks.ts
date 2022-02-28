@@ -1,5 +1,5 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
 
@@ -67,9 +67,10 @@ export class DownloadBlocks implements Action {
 
 			try {
 				this.blockchain.enqueueBlocks(blocks);
+				// eslint-disable-next-line unicorn/prefer-at
 				this.stateStore.setLastDownloadedBlock(blocks[blocks.length - 1]);
 				this.blockchain.dispatch("DOWNLOADED");
-			} catch (error) {
+			} catch {
 				this.logger.warning(`Failed to enqueue downloaded block.`);
 
 				this.blockchain.dispatch("NOBLOCK");
@@ -90,7 +91,6 @@ export class DownloadBlocks implements Action {
 				this.blockchain.clearQueue();
 			}
 
-			/* istanbul ignore else */
 			if (this.blockchain.getQueue().size() === 0) {
 				this.stateStore.setNoBlockCounter(this.stateStore.getNoBlockCounter() + 1);
 				this.stateStore.setLastDownloadedBlock(this.stateStore.getLastBlock().data);

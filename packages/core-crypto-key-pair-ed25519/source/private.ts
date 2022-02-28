@@ -10,7 +10,7 @@ export class PrivateKeyFactory implements IPrivateKeyFactory {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).privateKey;
 	}
 
-	public async fromWIF(wif: string, version: number): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif, version)).privateKey;
+	public async fromWIF(wif: string): Promise<string> {
+		return (await this.keyPairFactory.fromWIF(wif)).privateKey;
 	}
 }

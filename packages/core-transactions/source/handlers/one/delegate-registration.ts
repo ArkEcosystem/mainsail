@@ -1,6 +1,6 @@
 import Interfaces, { TransactionType } from "@arkecosystem/core-crypto-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { One as DelegateRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-delegate-registration";
+import { DelegateRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-delegate-registration";
 import { Container, Contracts, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 

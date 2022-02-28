@@ -1,4 +1,3 @@
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import Interfaces, {
 	BINDINGS,
 	IAddressFactory,
@@ -6,10 +5,10 @@ import Interfaces, {
 	IKeyPairFactory,
 	IWIFFactory,
 } from "@arkecosystem/core-crypto-contracts";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import bip38 from "bip38";
 import forge from "node-forge";
 import wif from "wif";
-import bip38 from "bip38";
-import { Container } from "@arkecosystem/core-kernel";
 
 import { Delegate } from "../interfaces";
 import { Method } from "./method";
@@ -50,7 +49,7 @@ export class BIP38 extends Method implements Delegate {
 		this.address = await this.addressFactory.fromPublicKey(this.keys.publicKey);
 		this.otpSecret = forge.random.getBytesSync(128);
 
-		this.encryptKeysWithOtp();
+		await this.encryptKeysWithOtp();
 
 		return this;
 	}
@@ -59,13 +58,13 @@ export class BIP38 extends Method implements Delegate {
 		transactions: Interfaces.ITransactionData[],
 		options: Record<string, any>,
 	): Promise<Interfaces.IBlock> {
-		this.decryptKeysWithOtp();
+		await this.decryptKeysWithOtp();
 
 		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
 
 		const block: Interfaces.IBlock = await this.createBlock(this.keys, transactions, options);
 
-		this.encryptKeysWithOtp();
+		await this.encryptKeysWithOtp();
 
 		return block;
 	}
@@ -73,7 +72,7 @@ export class BIP38 extends Method implements Delegate {
 	private async encryptKeysWithOtp(): Promise<void> {
 		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
 
-		const wifKey: string = await this.wifFactory.fromKeys(this.keys, this.configuration.get("network.wif"));
+		const wifKey: string = await this.wifFactory.fromKeys(this.keys);
 
 		this.keys = undefined;
 		this.otp = forge.random.getBytesSync(16);
@@ -86,7 +85,7 @@ export class BIP38 extends Method implements Delegate {
 
 		const wifKey: string = this.decryptDataWithOtp(this.encryptedKeys, this.otp);
 
-		this.keys = await this.keyPairFactory.fromWIF(wifKey, this.configuration.get("network.wif"));
+		this.keys = await this.keyPairFactory.fromWIF(wifKey);
 		this.otp = undefined;
 		this.encryptedKeys = undefined;
 	}
@@ -99,7 +98,7 @@ export class BIP38 extends Method implements Delegate {
 			decryptedWif.compressed,
 		);
 
-		return this.keyPairFactory.fromWIF(wifKey, this.configuration.get("network.wif"));
+		return this.keyPairFactory.fromWIF(wifKey);
 	}
 
 	private encryptDataWithOtp(content: string, password: string): string {

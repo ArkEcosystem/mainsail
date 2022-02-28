@@ -17,8 +17,8 @@ export interface ITransaction {
 	serialized: Buffer;
 	timestamp: number;
 
-	serialize(options?: ISerializeOptions): any | undefined; // @TODO: use ByteBuffer from ../../crypto/utils
-	deserialize(buf: any): void; // @TODO: use ByteBuffer from ../../crypto/utils
+	serialize(options?: ISerializeOptions): Promise<any | undefined>; // @TODO: use ByteBuffer from ../../crypto/utils
+	deserialize(buf: any): Promise<void>; // @TODO: use ByteBuffer from ../../crypto/utils
 
 	verify(options?: IVerifyOptions): Promise<boolean>;
 	verifySchema(strict?: boolean): ISchemaValidationResult;
@@ -156,13 +156,13 @@ export interface ITransactionSigner {
 }
 
 export interface ITransactionSerializer {
-	getBytes(transaction: ITransactionData, options?: ISerializeOptions): Buffer;
+	getBytes(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer>;
 
-	serialize(transaction: ITransaction, options?: ISerializeOptions): Buffer;
+	serialize(transaction: ITransaction, options?: ISerializeOptions): Promise<Buffer>;
 }
 
 export interface ITransactionDeserializer {
-	deserialize(serialized: string | Buffer, options?: IDeserializeOptions): ITransaction;
+	deserialize(serialized: string | Buffer, options?: IDeserializeOptions): Promise<ITransaction>;
 
 	deserializeCommon(transaction: ITransactionData, buf: ByteBuffer): void;
 }
@@ -188,7 +188,7 @@ export interface ITransactionRegistry {
 }
 
 export interface ITransactionUtils {
-	toBytes(data: ITransactionData): Buffer;
+	toBytes(data: ITransactionData): Promise<Buffer>;
 
 	toHash(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer>;
 

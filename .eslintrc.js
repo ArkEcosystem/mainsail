@@ -143,7 +143,7 @@ module.exports = {
 		"unicorn/prevent-abbreviations": "warn",
 		"unused-imports/no-unused-imports-ts": "warn",
 		"unicorn/prefer-object-from-entries": "warn",
-		"@typescript-eslint/no-floating-promises": "warn",
+		"@typescript-eslint/no-floating-promises": "error",
 		"@typescript-eslint/await-thenable": "warn",
 		"@typescript-eslint/unbound-method": "warn",
 		"promise/always-return": "warn",

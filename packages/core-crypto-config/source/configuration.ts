@@ -30,7 +30,16 @@ export class Configuration implements IConfiguration {
 
 	public set<T = any>(key: string, value: T): void {
 		if (!this.#config) {
-			throw new Error();
+			this.#config = {
+				// @ts-ignore
+				exceptions: {},
+				// @ts-ignore
+				genesisBlock: {},
+				// @ts-ignore
+				milestones: {},
+				// @ts-ignore
+				network: {},
+			};
 		}
 
 		set(this.#config, key, value);

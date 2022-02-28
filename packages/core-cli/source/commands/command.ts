@@ -49,7 +49,6 @@ export abstract class Command {
 
 	protected input!: Input;
 
-	/* istanbul ignore next */
 	@postConstruct()
 	// todo: for some reason this isn't recognized in tests for being called
 	public configure(): void {

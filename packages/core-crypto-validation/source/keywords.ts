@@ -1,5 +1,4 @@
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import { IConfiguration, ITransactionData } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Ajv } from "ajv";
 import ajvKeywords from "ajv-keywords";
@@ -14,7 +13,7 @@ export enum TransactionType {
 	DelegateResignation = 7,
 }
 
-export const registerKeywords = (configuration: Configuration) => {
+export const registerKeywords = (configuration: IConfiguration) => {
 	const maxBytes = (ajv: Ajv) => {
 		ajv.addKeyword("maxBytes", {
 			compile(schema, parentSchema) {

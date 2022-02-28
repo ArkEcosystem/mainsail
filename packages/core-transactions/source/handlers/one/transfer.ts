@@ -1,6 +1,6 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { One as TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
+import { TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 

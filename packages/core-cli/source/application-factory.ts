@@ -50,14 +50,14 @@ import { Config, Environment, Installer, Logger, PluginManager, ProcessManager, 
 import { Process } from "./utils";
 
 export class ApplicationFactory {
-	public static make(container: Container, pkg: PackageJson): Application {
+	public static make(container: Container, package_: PackageJson): Application {
 		const app: Application = new Application(container);
 
 		// Package
-		app.bind(Identifiers.Package).toConstantValue(pkg);
+		app.bind(Identifiers.Package).toConstantValue(package_);
 
 		// Paths
-		app.bind(Identifiers.ConsolePaths).toConstantValue(envPaths(pkg.name!));
+		app.bind(Identifiers.ConsolePaths).toConstantValue(envPaths(package_.name));
 
 		// Factories
 		app.bind(Identifiers.ActionFactory).to(ActionFactory).inSingletonScope();

@@ -282,7 +282,6 @@ export class Client {
 		});
 
 		ws.addEventListener("error", (event) => {
-			/* istanbul ignore next */
 			if (timeout) {
 				clearTimeout(timeout);
 			}
@@ -436,7 +435,6 @@ export class Client {
 			record.reject = reject;
 		});
 
-		/* istanbul ignore next */
 		if (this._settings.timeout) {
 			record.timeout = setTimeout(() => {
 				record.timeout = null;
@@ -488,7 +486,6 @@ export class Client {
 
 		let error: any = null;
 		if (update.statusCode && update.statusCode >= 400) {
-			/* istanbul ignore next */
 			update.payload =
 				update.payload instanceof Buffer
 					? (update.payload as Buffer).slice(0, 512).toString() // slicing to reduce possible intensive toString() call

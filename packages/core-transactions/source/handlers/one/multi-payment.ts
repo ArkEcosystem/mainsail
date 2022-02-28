@@ -1,7 +1,7 @@
 import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { One as MultiPaymentTransaction } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { MultiPaymentTransaction } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { InsufficientBalanceError } from "../../errors";

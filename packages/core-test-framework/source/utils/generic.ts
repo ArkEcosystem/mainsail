@@ -1,14 +1,13 @@
+import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import cloneDeep from "lodash.clonedeep";
-import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
 
 const defaultblockTimestampLookup = (height: number): number => {
-	/* istanbul ignore next */
 	if (height === 1) {
 		return 0;
 	}
-	/* istanbul ignore next */
+
 	throw new Error(`Attempted to lookup block with height ${height}, but no lookup implementation was provided`);
 };
 
@@ -49,7 +48,6 @@ export const resetBlockchain = async (app: Contracts.Kernel.Application) => {
 	const blockchain = app.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService);
 	const height: number = blockchain.getLastBlock().data.height;
 
-	/* istanbul ignore else */
 	if (height) {
 		await blockchain.removeBlocks(height - 1);
 	}

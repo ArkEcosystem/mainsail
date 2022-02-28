@@ -56,7 +56,6 @@ export const getBlockNotChainedErrorMessage = (
 
 	let messageDetail: string | undefined;
 
-	/* istanbul ignore else */
 	if (!details.followsPrevious) {
 		messageDetail = `previous block id mismatch`;
 	} else if (!details.isPlusOne) {

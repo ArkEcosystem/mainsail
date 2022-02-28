@@ -17,8 +17,8 @@ export class PublicKeyFactory implements IPublicKeyFactory {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
 	}
 
-	public async fromWIF(wif: string, version: number): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif, version)).publicKey;
+	public async fromWIF(wif: string): Promise<string> {
+		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
 	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {

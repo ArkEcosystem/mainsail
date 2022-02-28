@@ -22,7 +22,7 @@ export class Signer {
 		this.nonce = BigNumber.make(nonce || 0);
 	}
 
-	public makeTransfer(options: Record<string, any>) {
+	public async makeTransfer(options: Record<string, any>) {
 		const transaction = new TransferBuilder()
 			.fee(this.toSatoshi(options.transferFee))
 			.nonce(this.nonce.toString())
@@ -33,7 +33,7 @@ export class Signer {
 			transaction.vendorField(options.vendorField);
 		}
 
-		transaction.sign(options.passphrase);
+		await transaction.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();
@@ -71,16 +71,16 @@ export class Signer {
 			.nonce(this.nonce.toString());
 
 		for (const [index, passphrase] of options.passphrases.split(",").entries()) {
-			transaction.multiSign(passphrase, index);
+			await transaction.multiSign(passphrase, index);
 		}
 
-		transaction.sign(options.passphrase);
+		await transaction.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();
 	}
 
-	public makeMultipayment(options: Record<string, any>) {
+	public async makeMultipayment(options: Record<string, any>) {
 		const transaction = new MultiPaymentBuilder()
 			.fee(this.toSatoshi(options.multipaymentFee))
 			.nonce(this.nonce.toString());
@@ -89,7 +89,7 @@ export class Signer {
 			transaction.addPayment(payment.recipientId, payment.amount);
 		}
 
-		transaction.sign(options.passphrase);
+		await transaction.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();

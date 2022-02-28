@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
+	IConfiguration,
 	ISerializeOptions,
 	ITransaction,
 	ITransactionData,
@@ -16,9 +16,9 @@ import { TransactionTypeFactory } from "./types";
 @Container.injectable()
 export class Serializer implements ITransactionSerializer {
 	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
+	private readonly configuration: IConfiguration;
 
-	public getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
+	public async getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Promise<Buffer> {
 		const version: number = transaction.version || 1;
 
 		if (version) {
@@ -28,7 +28,7 @@ export class Serializer implements ITransactionSerializer {
 		throw new TransactionVersionError(version);
 	}
 
-	public serialize(transaction: ITransaction, options: ISerializeOptions = {}): Buffer {
+	public async serialize(transaction: ITransaction, options: ISerializeOptions = {}): Promise<Buffer> {
 		const buff: ByteBuffer = new ByteBuffer(
 			Buffer.alloc(this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192),
 		);
@@ -36,7 +36,7 @@ export class Serializer implements ITransactionSerializer {
 		this.serializeCommon(transaction.data, buff);
 		this.serializeVendorField(transaction, buff);
 
-		const serialized: ByteBuffer | undefined = transaction.serialize(options);
+		const serialized: ByteBuffer | undefined = await transaction.serialize(options);
 
 		if (!serialized) {
 			throw new Error();

@@ -1,5 +1,8 @@
+import { Container } from "@arkecosystem/core-kernel";
+
 export const Identifiers = {
-	Application: Symbol.for("Application"),
+	// @TODO
+	Application: Container.Identifiers.Application,
 	ApplicationPaths: Symbol.for("Paths<Application>"),
 	Commands: Symbol.for("Commands"),
 	Config: Symbol.for("Config"),

@@ -4,7 +4,7 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
-export abstract class One extends Transaction {
+export class TransferTransaction extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.Transfer;
 	public static key = "transfer";

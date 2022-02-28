@@ -1,9 +1,9 @@
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Ajv } from "ajv";
+import { IConfiguration } from "packages/core-crypto-contracts/distribution";
 
 import { isValidPeer } from "./is-valid-peer";
 
-export const registerFormats = (configuration: Configuration) => {
+export const registerFormats = (configuration: IConfiguration) => {
 	const vendorField = (ajv: Ajv) => {
 		ajv.addFormat("vendorField", (data) => {
 			try {

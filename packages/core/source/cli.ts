@@ -1,7 +1,7 @@
+import { platform } from "os";
 import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@arkecosystem/core-cli";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
-import { platform } from "os";
 import { join, resolve } from "path";
 import { PackageJson } from "type-fest";
 
@@ -16,13 +16,13 @@ export class CommandLineInterface {
 		this.setNodePath();
 
 		// Load the package information. Only needed for updates and installations.
-		const pkg: PackageJson = require("../package.json");
+		const package_: PackageJson = require("../package.json");
 
 		// Create the application we will work with
-		this.app = ApplicationFactory.make(new Container.Container(), pkg);
+		this.app = ApplicationFactory.make(new Container.Container(), package_);
 
 		// Check for updates
-		this.app.get<Contracts.Updater>(Container.Identifiers.Updater).check();
+		await this.app.get<Contracts.Updater>(Container.Identifiers.Updater).check();
 
 		// Parse arguments and flags
 		const { args, flags } = InputParser.parseArgv(this.argv);
@@ -44,9 +44,9 @@ export class CommandLineInterface {
 
 		if (!commandInstance) {
 			commandSignature = await this.app.resolve(Plugins.SuggestCommand).execute({
+				bin: Object.keys(package_.bin)[0],
 				signature: commandSignature,
 				signatures: Object.keys(commands),
-				bin: Object.keys(pkg.bin)[0],
 			});
 
 			if (commandSignature) {
@@ -73,7 +73,6 @@ export class CommandLineInterface {
 	}
 
 	private setNodePath(): void {
-		/* istanbul ignore next */
 		const delimiter = platform() === "win32" ? ";" : ":";
 
 		if (!process.env.NODE_PATH) {
@@ -81,7 +80,6 @@ export class CommandLineInterface {
 		}
 
 		const setPathIfExists = (path: string) => {
-			/* istanbul ignore else */
 			if (existsSync(path)) {
 				process.env.NODE_PATH += `${delimiter}${path}`;
 			}
@@ -94,44 +92,44 @@ export class CommandLineInterface {
 	}
 
 	private async detectNetworkAndToken(flags: any): Promise<{ token: string; network?: string }> {
-		const tempFlags = {
+		const temporaryFlags = {
 			token: "ark",
 			...flags,
 		};
 
-		if (tempFlags.token && tempFlags.network) {
-			return tempFlags;
+		if (temporaryFlags.token && temporaryFlags.network) {
+			return temporaryFlags;
 		}
 
-		const config = await this.app.resolve(Commands.DiscoverConfig).discover(tempFlags.token);
+		const config = await this.app.resolve(Commands.DiscoverConfig).discover(temporaryFlags.token);
 		if (config) {
 			return {
-				token: config.token,
 				network: config.network,
+				token: config.token,
 			};
 		}
 
 		try {
-			tempFlags.network = await this.app.resolve(Commands.DiscoverNetwork).discover(
-				envPaths(tempFlags.token, {
+			temporaryFlags.network = await this.app.resolve(Commands.DiscoverNetwork).discover(
+				envPaths(temporaryFlags.token, {
 					suffix: "core",
 				}).config,
 			);
 		} catch {}
 
-		return tempFlags;
+		return temporaryFlags;
 	}
 
 	private async discoverCommands(dirname: string, flags: any): Promise<Contracts.CommandList> {
 		const commandsDiscoverer = this.app.resolve(Commands.DiscoverCommands);
 		const commands: Contracts.CommandList = commandsDiscoverer.within(resolve(dirname, "./commands"));
 
-		const tempFlags = await this.detectNetworkAndToken(flags);
+		const temporaryFlags = await this.detectNetworkAndToken(flags);
 
-		if (tempFlags.network) {
+		if (temporaryFlags.network) {
 			const plugins = await this.app
 				.get<Contracts.PluginManager>(Container.Identifiers.PluginManager)
-				.list(tempFlags.token, tempFlags.network);
+				.list(temporaryFlags.token, temporaryFlags.network);
 
 			const commandsFromPlugins = commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
 

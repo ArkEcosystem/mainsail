@@ -19,7 +19,7 @@ import {
 	MissingMultiSignatureOnSenderError,
 	SenderWalletMismatchError,
 	UnexpectedNonceError,
-	UnsupportedMultiSignatureTransactionError,
+	UnsupportedMultiSignatureRegistrationTransactionError,
 } from "../errors";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
@@ -179,7 +179,7 @@ export abstract class TransactionHandler {
 				throw new InvalidMultiSignaturesError();
 			}
 		} else if (transaction.data.signatures && !isMultiSignatureRegistration) {
-			throw new UnsupportedMultiSignatureTransactionError();
+			throw new UnsupportedMultiSignatureRegistrationTransactionError();
 		}
 	}
 

@@ -5,9 +5,8 @@
 import { FactoryBuilder } from "../factory-builder";
 
 const defaultBlockTimestampLookup = (height: number): number => {
-	/* istanbul ignore next */
 	if (height === 1) return 0;
-	/* istanbul ignore next */
+
 	throw new Error(`Attempted to lookup block with height ${height}, but no lookup implementation was provided`);
 };
 

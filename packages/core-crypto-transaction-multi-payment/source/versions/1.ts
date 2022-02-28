@@ -1,9 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
-	IMultiSignatureAsset,
+	IMultiPaymentItem,
 	ISerializeOptions,
-	ITransactionData,
 	TransactionType,
 	TransactionTypeGroup,
 } from "@arkecosystem/core-crypto-contracts";
@@ -11,13 +9,13 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
-export class One extends Transaction {
+export class MultiPaymentTransaction extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
-	public static type: number = TransactionType.MultiSignature;
-	public static key = "multiSignature";
+	public static type: number = TransactionType.MultiPayment;
+	public static key = "multiPayment";
 	public static version = 1;
 
-	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
+	protected static defaultStaticFee: BigNumber = BigNumber.make("10000000");
 
 	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
@@ -51,46 +49,41 @@ export class One extends Transaction {
 		});
 	}
 
-	public static staticFee(
-		configuration: Configuration,
-		feeContext: { height?: number; data?: ITransactionData } = {},
-	): BigNumber {
-		if (feeContext.data?.asset?.multiSignature) {
-			return super
-				.staticFee(configuration, feeContext)
-				.times(feeContext.data.asset.multiSignature.publicKeys.length + 1);
-		}
-
-		return super.staticFee(configuration, feeContext);
-	}
-
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
-		const { min, publicKeys } = data.asset.multiSignature;
-		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 33));
 
-		buff.writeUInt8(min);
-		buff.writeUInt8(publicKeys.length);
+		if (data.asset && data.asset.payments) {
+			const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + data.asset.payments.length * 29));
+			buff.writeUInt16LE(data.asset.payments.length);
 
-		for (const publicKey of publicKeys) {
-			buff.writeBuffer(Buffer.from(publicKey, "hex"));
+			for (const payment of data.asset.payments) {
+				buff.writeBigUInt64LE(payment.amount.toBigInt());
+
+				const { addressBuffer, addressError } = await this.addressFactory.toBuffer(payment.recipientId);
+				options.addressError = addressError || options.addressError;
+
+				buff.writeBuffer(addressBuffer);
+			}
+
+			return buff;
 		}
 
-		return buff;
+		return undefined;
 	}
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
+		const payments: IMultiPaymentItem[] = [];
+		const total: number = buf.readUInt16LE();
 
-		const multiSignature: IMultiSignatureAsset = { min: 0, publicKeys: [] };
-		multiSignature.min = buf.readUInt8();
-
-		const count = buf.readUInt8();
-		for (let index = 0; index < count; index++) {
-			const publicKey = buf.readBuffer(33).toString("hex");
-			multiSignature.publicKeys.push(publicKey);
+		for (let index = 0; index < total; index++) {
+			payments.push({
+				amount: BigNumber.make(buf.readBigUInt64LE().toString()),
+				recipientId: await this.addressFactory.fromBuffer(buf.readBuffer(21)),
+			});
 		}
 
-		data.asset = { multiSignature };
+		data.amount = BigNumber.ZERO;
+		data.asset = { payments };
 	}
 }

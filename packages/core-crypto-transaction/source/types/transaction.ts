@@ -1,8 +1,8 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
 	IAddressFactory,
+	IConfiguration,
 	ISchemaValidationResult,
 	ITransaction,
 	ITransactionData,
@@ -21,7 +21,7 @@ export abstract class Transaction implements ITransaction {
 	protected readonly addressFactory: IAddressFactory;
 
 	@Container.inject(BINDINGS.Configuration)
-	protected readonly configuration: Configuration;
+	protected readonly configuration: IConfiguration;
 
 	@Container.inject(BINDINGS.Transaction.Verifier)
 	private readonly verifier: ITransactionVerifier;
@@ -46,7 +46,7 @@ export abstract class Transaction implements ITransaction {
 	}
 
 	public static staticFee(
-		configuration: Configuration,
+		configuration: IConfiguration,
 		feeContext: { height?: number; data?: ITransactionData } = {},
 	): BigNumber {
 		const milestones = configuration.getMilestone(feeContext.height);

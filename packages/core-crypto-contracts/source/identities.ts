@@ -41,7 +41,7 @@ export interface IAddressFactory {
 export interface IPublicKeyFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
 
-	fromWIF(wif: string, version: number): Promise<string>;
+	fromWIF(wif: string): Promise<string>;
 
 	fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string>;
 
@@ -51,7 +51,7 @@ export interface IPublicKeyFactory {
 export interface IPrivateKeyFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
 
-	fromWIF(wif: string, version: number): Promise<string>;
+	fromWIF(wif: string): Promise<string>;
 }
 
 export interface IKeyPairFactory {
@@ -59,11 +59,11 @@ export interface IKeyPairFactory {
 
 	fromPrivateKey(privateKey: Buffer): Promise<IKeyPair>;
 
-	fromWIF(wif: string, version: number): Promise<IKeyPair>;
+	fromWIF(wif: string): Promise<IKeyPair>;
 }
 
 export interface IWIFFactory {
-	fromMnemonic(mnemonic: string, version: number): Promise<string>;
+	fromMnemonic(mnemonic: string): Promise<string>;
 
-	fromKeys(keys: IKeyPair, version: number): Promise<string>;
+	fromKeys(keys: IKeyPair): Promise<string>;
 }

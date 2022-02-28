@@ -1,17 +1,19 @@
 import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
-import { BigNumber } from "@arkecosystem/utils";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
+import { Container } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
-import { One } from "./versions/1";
+import { DelegateResignationTransaction } from "./versions/1";
 
+@Container.injectable()
 export class DelegateResignationBuilder extends TransactionBuilder<DelegateResignationBuilder> {
-	public constructor() {
-		super();
+	@Container.postConstruct()
+	public postConstruct() {
+		this.initializeData();
 
-		this.data.type = One.type;
-		this.data.typeGroup = One.typeGroup;
-		this.data.version = 2;
-		this.data.fee = One.staticFee(this.configuration);
+		this.data.type = DelegateResignationTransaction.type;
+		this.data.typeGroup = DelegateResignationTransaction.typeGroup;
+		this.data.fee = DelegateResignationTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.senderPublicKey = undefined;
 	}

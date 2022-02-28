@@ -51,7 +51,7 @@ export class CheckPreviousBlockAddSchema20190718000000 implements MigrationInter
 	}
 
 	public async down(queryRunner: QueryRunner): Promise<any> {
-		queryRunner.query(`
+		await queryRunner.query(`
             ALTER TABLE blocks DROP CONSTRAINT "chained_blocks";
             DROP FUNCTION check_previous_block;
 

@@ -183,7 +183,6 @@ export class StandardCriteriaService {
 			}
 		}
 
-		/* istanbul ignore else */
 		if (typeof criteriaItem === "object" && criteriaItem !== null) {
 			try {
 				if ("from" in criteriaItem && "to" in criteriaItem) {
@@ -206,7 +205,6 @@ export class StandardCriteriaService {
 					}
 				}
 
-				/* istanbul ignore else */
 				if ("to" in criteriaItem) {
 					try {
 						BigNumber.make(criteriaItem.to);
@@ -216,7 +214,7 @@ export class StandardCriteriaService {
 				}
 
 				// unreachable
-				/* istanbul ignore next */
+
 				throw error;
 			}
 		}

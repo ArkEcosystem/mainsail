@@ -1,15 +1,18 @@
 import { IMultiSignatureAsset, ITransactionData } from "@arkecosystem/core-crypto-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
+import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { One } from "./versions/1";
+import { MultiSignatureRegistrationTransaction } from "./versions/1";
 
+@Container.injectable()
 export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuilder> {
-	public constructor() {
-		super();
+	@Container.postConstruct()
+	public postConstruct() {
+		this.initializeData();
 
-		this.data.type = One.type;
-		this.data.typeGroup = One.typeGroup;
+		this.data.type = MultiSignatureRegistrationTransaction.type;
+		this.data.typeGroup = MultiSignatureRegistrationTransaction.typeGroup;
 		this.data.version = 2;
 		this.data.fee = BigNumber.ZERO;
 		this.data.amount = BigNumber.ZERO;
@@ -24,7 +27,7 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 
 			if (publicKeys.length <= 16) {
 				publicKeys.push(publicKey);
-				this.data.fee = One.staticFee(this.configuration, {
+				this.data.fee = MultiSignatureRegistrationTransaction.staticFee(this.configuration, {
 					data: this.data,
 				});
 			}
@@ -44,7 +47,7 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 	public multiSignatureAsset(multiSignature: IMultiSignatureAsset): MultiSignatureBuilder {
 		if (this.data.asset && this.data.asset.multiSignature) {
 			this.data.asset.multiSignature = multiSignature;
-			this.data.fee = One.staticFee(this.configuration, {
+			this.data.fee = MultiSignatureRegistrationTransaction.staticFee(this.configuration, {
 				data: this.data,
 			});
 		}

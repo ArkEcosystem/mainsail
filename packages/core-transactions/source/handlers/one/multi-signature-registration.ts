@@ -5,7 +5,7 @@ import Interfaces, {
 	TransactionType,
 } from "@arkecosystem/core-crypto-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { One as MultiSignatureRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
+import { MultiSignatureRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import {

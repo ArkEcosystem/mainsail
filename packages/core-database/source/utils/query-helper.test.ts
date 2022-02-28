@@ -1,5 +1,5 @@
-import { QueryHelper } from "./query-helper";
 import { describe } from "../../../core-test-framework";
+import { QueryHelper } from "./query-helper";
 
 type UserEntity = {
 	id: number;
@@ -10,10 +10,10 @@ type UserEntity = {
 
 const userMetadata = {
 	columns: [
-		{ propertyName: "id", databaseName: "id" },
-		{ propertyName: "fullName", databaseName: "full_name" },
-		{ propertyName: "age", databaseName: "age" },
-		{ propertyName: "data", databaseName: "data" },
+		{ databaseName: "id", propertyName: "id" },
+		{ databaseName: "full_name", propertyName: "fullName" },
+		{ databaseName: "age", propertyName: "age" },
+		{ databaseName: "data", propertyName: "data" },
 	],
 };
 
@@ -58,8 +58,8 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert EqualExpression to 'column = :p1'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			property: "id",
 			op: "equal",
+			property: "id",
 			value: 5,
 		});
 
@@ -70,9 +70,9 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert BetweenExpression to 'column BETWEEN :p1 AND :p2'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			property: "age",
-			op: "between",
 			from: 26,
+			op: "between",
+			property: "age",
 			to: 35,
 		});
 
@@ -83,8 +83,8 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert GreaterThanEqualExpression to 'column >= :p1'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			property: "age",
 			op: "greaterThanEqual",
+			property: "age",
 			value: 26,
 		});
 
@@ -95,8 +95,8 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert LessThanEqualExpression to 'column <= :p1'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			property: "age",
 			op: "lessThanEqual",
+			property: "age",
 			value: 35,
 		});
 
@@ -107,9 +107,9 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert LikeExpression to 'column LIKE :p1'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			property: "fullName",
 			op: "like",
 			pattern: "%Dmitry%",
+			property: "fullName",
 		});
 
 		assert.equal(sqlExpression.query, "full_name LIKE :p1");
@@ -119,8 +119,8 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert ContainsExpression to 'column @> :p1'", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			property: "data",
 			op: "contains",
+			property: "data",
 			value: {
 				creditCard: { number: "5555 5555 5555 5555" },
 			},
@@ -137,11 +137,11 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert AndExpression to (expression1 AND expression2)", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			op: "and",
 			expressions: [
-				{ property: "fullName", op: "like", pattern: "%Dmitry%" },
-				{ property: "age", op: "greaterThanEqual", value: 35 },
+				{ op: "like", pattern: "%Dmitry%", property: "fullName" },
+				{ op: "greaterThanEqual", property: "age", value: 35 },
 			],
+			op: "and",
 		});
 
 		assert.equal(sqlExpression.query, "(full_name LIKE :p1 AND age >= :p2)");
@@ -151,11 +151,11 @@ describe("QueryHelper.getWhereExpressionSql", ({ assert, it }) => {
 	it("should convert OrExpression to (expression1 OR expression2)", () => {
 		const queryHelper = new QueryHelper<UserEntity>();
 		const sqlExpression = queryHelper.getWhereExpressionSql(userMetadata as any, {
-			op: "or",
 			expressions: [
-				{ property: "fullName", op: "like", pattern: "%Dmitry%" },
-				{ property: "age", op: "greaterThanEqual", value: 35 },
+				{ op: "like", pattern: "%Dmitry%", property: "fullName" },
+				{ op: "greaterThanEqual", property: "age", value: 35 },
 			],
+			op: "or",
 		});
 
 		assert.equal(sqlExpression.query, "(full_name LIKE :p1 OR age >= :p2)");

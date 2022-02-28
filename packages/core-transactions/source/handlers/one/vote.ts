@@ -1,7 +1,7 @@
 import Interfaces, { TransactionType } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { One as VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
+import { VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
+import { Container, Contracts, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
 
 import {
 	AlreadyVotedError,

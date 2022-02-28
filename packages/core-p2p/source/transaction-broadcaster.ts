@@ -34,7 +34,11 @@ export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcas
 		const peersString = Utils.pluralize("peer", peers.length, true);
 		this.logger.debug(`Broadcasting ${transactionsString} to ${peersString}`);
 
-		const transactionsBroadcast: Buffer[] = transactions.map((t) => this.serializer.serialize(t));
+		const transactionsBroadcast: Buffer[] = [];
+		for (const transaction of transactions) {
+			transactionsBroadcast.push(await this.serializer.serialize(transaction));
+		}
+
 		const promises = peers.map((p) => this.communicator.postTransactions(p, transactionsBroadcast));
 
 		await Promise.all(promises);

@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
+	IConfiguration,
 	IDeserializeOptions,
 	ISerializeOptions,
 	ITransaction,
@@ -26,7 +26,7 @@ import { TransactionTypeFactory } from "./types";
 @Container.injectable()
 export class TransactionFactory implements ITransactionFactory {
 	@Container.inject(BINDINGS.Configuration)
-	protected readonly configuration: Configuration;
+	protected readonly configuration: IConfiguration;
 
 	@Container.inject(BINDINGS.Transaction.Deserializer)
 	private readonly deserializer: ITransactionDeserializer;
@@ -58,7 +58,7 @@ export class TransactionFactory implements ITransactionFactory {
 	public async fromBytesUnsafe(buff: Buffer, id?: string): Promise<ITransaction> {
 		try {
 			const options: IDeserializeOptions | ISerializeOptions = { acceptLegacyVersion: true };
-			const transaction = this.deserializer.deserialize(buff, options);
+			const transaction = await this.deserializer.deserialize(buff, options);
 			transaction.data.id = id || (await this.utils.getId(transaction.data, options));
 			transaction.isVerified = true;
 
@@ -89,7 +89,7 @@ export class TransactionFactory implements ITransactionFactory {
 
 		const transaction: ITransaction = TransactionTypeFactory.create(value);
 
-		this.serializer.serialize(transaction);
+		await this.serializer.serialize(transaction);
 
 		return this.fromBytes(transaction.serialized, strict, options);
 	}
@@ -100,7 +100,7 @@ export class TransactionFactory implements ITransactionFactory {
 		options: IDeserializeOptions = {},
 	): Promise<ITransaction> {
 		try {
-			const transaction = this.deserializer.deserialize(serialized, options);
+			const transaction = await this.deserializer.deserialize(serialized, options);
 			transaction.data.id = await this.utils.getId(transaction.data, options);
 
 			const { error } = this.verifier.verifySchema(transaction.data, strict);

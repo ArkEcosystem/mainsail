@@ -28,7 +28,7 @@ export class Socket {
 	private _sending;
 	private _lastPinged;
 
-	public constructor(ws, req, listener) {
+	public constructor(ws, request, listener) {
 		this._ws = ws;
 		this._listener = listener;
 		this._helloed = false;
@@ -43,9 +43,9 @@ export class Socket {
 		this.app = {};
 
 		this.info = {
-			remoteAddress: req.socket.remoteAddress,
-			remotePort: req.socket.remotePort,
-			"x-forwarded-for": req.headers["x-forwarded-for"],
+			remoteAddress: request.socket.remoteAddress,
+			remotePort: request.socket.remotePort,
+			"x-forwarded-for": request.headers["x-forwarded-for"],
 		};
 
 		this._ws.on("message", (message) => this._onMessage(message));
@@ -85,25 +85,23 @@ export class Socket {
 		try {
 			string = stringifyNesMessage(message);
 			if (options.replace) {
-				Object.keys(options.replace).forEach((token) => {
+				for (const token of Object.keys(options.replace)) {
 					string = string.replace(`"${token}"`, options.replace[token]);
-				});
+				}
 			}
 		} catch (error) {
 			this.server.log(["nes", "serialization", "error"], message.type);
 
-			/* istanbul ignore else */
 			if (message.id) {
 				return this._error(Boom.internal("Failed serializing message"), message);
 			}
 
-			/* istanbul ignore next */
 			return Promise.reject(error);
 		}
 
 		const team = new Teamwork.Team();
 		this._packets.push({ message: string, team, type: message.type });
-		this._flush();
+		void this._flush(); // @TODO
 		return team.work;
 	}
 
@@ -116,11 +114,11 @@ export class Socket {
 			}
 		}
 
-		return undefined;
+		return;
 	}
 
 	private async _flush() {
-		if (this._sending || !this._packets.length) {
+		if (this._sending || this._packets.length === 0) {
 			return;
 		}
 
@@ -135,17 +133,17 @@ export class Socket {
 		if (maxChunkChars && packet.message.length > maxChunkChars) {
 			messages = [];
 			const parts = Math.ceil(packet.message.length / maxChunkChars);
-			for (let i = 0; i < parts; ++i) {
-				const last = i === parts - 1;
+			for (let index = 0; index < parts; ++index) {
+				const last = index === parts - 1;
 				const prefix = last ? "!" : "+";
-				messages.push(prefix + packet.message.slice(i * maxChunkChars, (i + 1) * maxChunkChars));
+				messages.push(prefix + packet.message.slice(index * maxChunkChars, (index + 1) * maxChunkChars));
 			}
 		}
 
 		let error;
 		for (const message of messages) {
 			const team = new Teamwork.Team();
-			this._ws.send(message, (err) => team.attend(err));
+			this._ws.send(message, (error_) => team.attend(error_));
 			try {
 				await team.work;
 			} catch (error_) {
@@ -165,11 +163,11 @@ export class Socket {
 	}
 
 	//@ts-ignore
-	private _error(err, request?) {
-		if (err.output?.statusCode === protocol.gracefulErrorStatusCode) {
-			err = Boom.boomify(err);
+	private _error(error, request?) {
+		if (error.output?.statusCode === protocol.gracefulErrorStatusCode) {
+			error = Boom.boomify(error);
 
-			const message = Hoek.clone(err.output);
+			const message = Hoek.clone(error.output);
 			delete message.payload.statusCode;
 			message.headers = this._filterHeaders(message.headers);
 
@@ -265,7 +263,6 @@ export class Socket {
 	}
 
 	private async _processHello(request) {
-		/* istanbul ignore next */
 		if (this._helloed) {
 			throw Boom.badRequest("Connection already initialized");
 		}
@@ -361,7 +358,7 @@ export class Socket {
 	private _filterHeaders(headers) {
 		const filter = this._listener._settings.headers;
 		if (!filter) {
-			return undefined;
+			return;
 		}
 
 		if (filter === "*") {

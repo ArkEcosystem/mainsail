@@ -83,7 +83,7 @@ export class InvalidMultiSignaturesError extends TransactionError {
 	}
 }
 
-export class UnsupportedMultiSignatureTransactionError extends TransactionError {
+export class UnsupportedMultiSignatureRegistrationTransactionError extends TransactionError {
 	public constructor() {
 		super(`Failed to apply transaction, because the transaction does not support multi signatures.`);
 	}

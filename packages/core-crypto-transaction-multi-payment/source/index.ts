@@ -3,7 +3,7 @@ import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 import { Providers } from "@arkecosystem/core-kernel";
 
-import { One } from "./versions/1";
+import { MultiPaymentTransaction } from "./versions/1";
 
 export * from "./builder";
 export * from "./versions";
@@ -13,6 +13,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		const registry: TransactionRegistry = this.app.get(BINDINGS.Transaction.Registry);
 
-		registry.registerTransactionType(One);
+		registry.registerTransactionType(MultiPaymentTransaction);
 	}
 }

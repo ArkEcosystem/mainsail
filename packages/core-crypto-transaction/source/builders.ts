@@ -1,8 +1,8 @@
 import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import {
 	BINDINGS,
 	IAddressFactory,
+	IConfiguration,
 	IKeyPair,
 	IKeyPairFactory,
 	ITransaction,
@@ -25,7 +25,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	private readonly addressFactory: IAddressFactory;
 
 	@Container.inject(BINDINGS.Configuration)
-	protected readonly configuration: Configuration;
+	protected readonly configuration: IConfiguration;
 
 	@Container.inject(BINDINGS.Transaction.Factory)
 	protected readonly factory: TransactionFactory;
@@ -50,16 +50,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	protected signWithSenderAsRecipient = false;
 
 	private disableVersionCheck = false;
-
-	public constructor() {
-		this.data = {
-			id: undefined,
-			nonce: BigNumber.ZERO,
-			timestamp: this.slots.getTime(),
-			typeGroup: TransactionTypeGroup.Test,
-			version: 0x01,
-		} as ITransactionData;
-	}
 
 	public async build(data: Partial<ITransactionData> = {}): Promise<ITransaction> {
 		return this.factory.fromData({ ...this.data, ...data }, false, {
@@ -144,10 +134,8 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.signWithKeyPair(keys);
 	}
 
-	public async signWithWif(wif: string, networkWif?: number): Promise<TBuilder> {
-		const keys: IKeyPair = await this.keyPairFactory.fromWIF(wif, {
-			wif: networkWif || this.configuration.get("network.wif"),
-		} as any);
+	public async signWithWif(wif: string): Promise<TBuilder> {
+		const keys: IKeyPair = await this.keyPairFactory.fromWIF(wif);
 
 		return this.signWithKeyPair(keys);
 	}
@@ -157,8 +145,8 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.multiSignWithKeyPair(index, keys);
 	}
 
-	public async multiSignWithWif(index: number, wif: string, networkWif?: number): Promise<TBuilder> {
-		const keys = await this.keyPairFactory.fromWIF(wif, networkWif || this.configuration.get("network.wif"));
+	public async multiSignWithWif(index: number, wif: string): Promise<TBuilder> {
+		const keys = await this.keyPairFactory.fromWIF(wif);
 
 		return this.multiSignWithKeyPair(index, keys);
 	}
@@ -174,7 +162,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 
 		const struct: ITransactionData = {
 			fee: this.data.fee,
-			id: (await this.utils.getId(this.data)).toString(),
+			id: await this.utils.getId(this.data),
 			network: this.data.network,
 			senderPublicKey: this.data.senderPublicKey,
 			signature: this.data.signature,
@@ -210,13 +198,13 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	private multiSignWithKeyPair(index: number, keys: IKeyPair): TBuilder {
+	private async multiSignWithKeyPair(index: number, keys: IKeyPair): Promise<TBuilder> {
 		if (!this.data.signatures) {
 			this.data.signatures = [];
 		}
 
 		this.version(2);
-		this.signer.multiSign(this.getSigningObject(), keys, index);
+		await this.signer.multiSign(this.getSigningObject(), keys, index);
 
 		return this.instance();
 	}
@@ -233,6 +221,16 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		}
 
 		return data;
+	}
+
+	protected initializeData() {
+		this.data = {
+			id: undefined,
+			nonce: BigNumber.ZERO,
+			timestamp: this.slots.getTime(),
+			typeGroup: TransactionTypeGroup.Test,
+			version: 0x01,
+		} as ITransactionData;
 	}
 
 	protected abstract instance(): TBuilder;

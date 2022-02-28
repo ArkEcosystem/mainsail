@@ -256,7 +256,6 @@ export class TransactionFactory {
 		return getWalletNonce(this.app, this.senderPublicKey);
 	}
 
-	/* istanbul ignore next */
 	private async make<T>(quantity = 1, method: string): Promise<T[]> {
 		if (this.passphrasePairs && this.passphrasePairs.length > 0) {
 			return this.passphrasePairs.map(

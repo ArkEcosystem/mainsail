@@ -60,7 +60,7 @@ export class WalletSyncService implements Contracts.Kernel.EventListener {
 	public handle({ name, data }): void {
 		switch (name) {
 			case Enums.StateEvent.BuilderFinished:
-				this.initializeWalletsTable(this.stateStore.getLastHeight());
+				void this.initializeWalletsTable(this.stateStore.getLastHeight()); // @TODO
 				break;
 			case WalletEvent.AttributeSet:
 			case WalletEvent.AttributeForget:
@@ -68,10 +68,10 @@ export class WalletSyncService implements Contracts.Kernel.EventListener {
 				this.updatedAddresses.add(data.wallet.address);
 				break;
 			case Enums.BlockEvent.Applied:
-				this.syncWalletsTable(data.height);
+				void this.syncWalletsTable(data.height); // @TODO
 				break;
 			case Enums.BlockEvent.Reverted:
-				this.syncWalletsTable(data.height - 1);
+				void this.syncWalletsTable(data.height - 1); // @TODO
 				break;
 		}
 	}
@@ -90,7 +90,7 @@ export class WalletSyncService implements Contracts.Kernel.EventListener {
 
 				this.logger.info(`Wallets table initialized at height ${blockHeight.toLocaleString()}`);
 			} catch (error) {
-				this.app.terminate("Failed to initialize wallets table", error);
+				await this.app.terminate("Failed to initialize wallets table", error);
 			}
 		});
 	}
@@ -114,7 +114,7 @@ export class WalletSyncService implements Contracts.Kernel.EventListener {
 
 				this.logger.info(`Wallets table synchronized at height ${blockHeight.toLocaleString()}`);
 			} catch (error) {
-				this.app.terminate("Failed to synchronize wallets table", error);
+				await this.app.terminate("Failed to synchronize wallets table", error);
 			}
 		});
 	}
