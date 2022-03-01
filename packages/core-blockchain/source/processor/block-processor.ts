@@ -248,7 +248,9 @@ export class BlockProcessor {
 			"state",
 			"blockchain",
 		);
-		const generatorWallet: Contracts.State.Wallet = walletRepository.findByPublicKey(block.data.generatorPublicKey);
+		const generatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+			block.data.generatorPublicKey,
+		);
 
 		let generatorUsername: string;
 		try {
@@ -266,7 +268,7 @@ export class BlockProcessor {
 		} else if (forgingDelegate.getPublicKey() !== block.data.generatorPublicKey) {
 			AppUtils.assert.defined<string>(forgingDelegate.getPublicKey());
 
-			const forgingWallet: Contracts.State.Wallet = walletRepository.findByPublicKey(
+			const forgingWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				forgingDelegate.getPublicKey()!,
 			);
 			const forgingUsername: string = forgingWallet.getAttribute("delegate.username");

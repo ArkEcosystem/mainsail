@@ -38,7 +38,9 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 
-			const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				transaction.senderPublicKey,
+			);
 			wallet.setAttribute("delegate.resigned", true);
 			this.walletRepository.index(wallet);
 		}
@@ -84,7 +86,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 			.has();
 
 		if (hasSender) {
-			const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
 			throw new Contracts.TransactionPool.PoolError(
@@ -99,7 +101,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const senderWallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const senderWallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		senderWallet.setAttribute("delegate.resigned", true);
 
@@ -111,7 +113,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const senderWallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const senderWallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		senderWallet.forgetAttribute("delegate.resigned");
 

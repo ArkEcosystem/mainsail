@@ -49,7 +49,7 @@ export abstract class TransactionHandler {
 	public async verify(transaction: Interfaces.ITransaction): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const senderWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+		const senderWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 			transaction.data.senderPublicKey,
 		);
 
@@ -88,7 +88,9 @@ export abstract class TransactionHandler {
 	public async applyToSender(transaction: Interfaces.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Interfaces.ITransactionData = transaction.data;
 
@@ -112,7 +114,9 @@ export abstract class TransactionHandler {
 	public async revertForSender(transaction: Interfaces.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Interfaces.ITransactionData = transaction.data;
 
@@ -163,7 +167,7 @@ export abstract class TransactionHandler {
 			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 			// Ensure the database wallet already has a multi signature, in case we checked a pool wallet.
-			const databaseSender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+			const databaseSender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
 

@@ -45,7 +45,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 			Utils.assert.defined<string>(transaction.senderPublicKey);
 			Utils.assert.defined<string[]>(transaction.asset?.votes);
 
-			const wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 
 			for (const vote of transaction.asset.votes) {
 				const hasVoted: boolean = wallet.hasAttribute("vote");
@@ -86,7 +86,9 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 		for (const vote of transaction.data.asset.votes) {
 			const delegatePublicKey: string = vote.slice(1);
-			const delegateWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(delegatePublicKey);
+			const delegateWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				delegatePublicKey,
+			);
 
 			if (vote.startsWith("+")) {
 				if (walletVote) {
@@ -148,7 +150,9 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 
@@ -166,7 +170,9 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		Utils.assert.defined<Interfaces.ITransactionAsset>(transaction.data.asset?.votes);
 

@@ -1,4 +1,3 @@
-import assert from "assert";
 import Interfaces, {
 	BINDINGS,
 	IAddressFactory,
@@ -9,6 +8,7 @@ import Interfaces, {
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import assert from "assert";
 
 @Container.injectable()
 export class RoundState {
@@ -119,7 +119,9 @@ export class RoundState {
 
 				const delegate = {
 					round: roundInfo.round,
-					username: (await this.walletRepository.findByPublicKey(publicKey)).getAttribute("delegate.username"),
+					username: (await this.walletRepository.findByPublicKey(publicKey)).getAttribute(
+						"delegate.username",
+					),
 					voteBalance: BigNumber.make(balance),
 				};
 				AppUtils.assert.defined(delegate.username);
@@ -210,7 +212,9 @@ export class RoundState {
 			);
 
 			if (!isBlockProduced) {
-				const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(delegate.getPublicKey()!);
+				const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+					delegate.getPublicKey()!,
+				);
 
 				this.logger.debug(
 					`Delegate ${wallet.getAttribute(

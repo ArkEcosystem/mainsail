@@ -1,5 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
 import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Container, Contracts } from "@arkecosystem/core-kernel";
 import assert from "assert";
 
 import { BlockRepository } from "./repositories/block-repository";
@@ -35,8 +35,8 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 	): Promise<Interfaces.ITransactionData[]> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [
-			{ property: "blockHeight", direction: "asc" },
-			{ property: "sequence", direction: "asc" },
+			{ direction: "asc", property: "blockHeight" },
+			{ direction: "asc", property: "sequence" },
 		];
 		const models = await this.transactionRepository.findManyByExpression(expression, sorting);
 		return this.modelConverter.getTransactionData(models);
@@ -47,11 +47,12 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 	): AsyncIterable<Interfaces.ITransactionData> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [
-			{ property: "blockHeight", direction: "asc" },
-			{ property: "sequence", direction: "asc" },
+			{ direction: "asc", property: "blockHeight" },
+			{ direction: "asc", property: "sequence" },
 		];
 		for await (const model of this.transactionRepository.streamByExpression(expression, sorting)) {
-			yield this.modelConverter.getTransactionData([model])[0];
+			// @TODO: proper streaming without await
+			yield (await this.modelConverter.getTransactionData([model]))[0];
 		}
 	}
 

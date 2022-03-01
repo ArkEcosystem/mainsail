@@ -34,7 +34,7 @@ export const injectMilestone = (index: number, milestone: Record<string, any>, c
 export const getLastHeight = (app: Contracts.Kernel.Application): number =>
 	app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore).getLastHeight();
 
-export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): BigNumber =>
+export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): Promise<BigNumber> =>
 	app
 		.getTagged<Contracts.State.WalletRepository>(Container.Identifiers.WalletRepository, "state", "blockchain")
 		.getNonce(senderPublicKey);
@@ -55,7 +55,7 @@ export const resetBlockchain = async (app: Contracts.Kernel.Application) => {
 	// app.get<Contracts.TransactionPool.Connection>(Container.Identifiers.TransactionPoolService).flush();
 };
 
-export const getWalletNonce = (app: Contracts.Kernel.Application, publicKey: string): BigNumber => {
+export const getWalletNonce = async (app: Contracts.Kernel.Application, publicKey: string): Promise<BigNumber> => {
 	try {
 		return app
 			.getTagged<Contracts.State.WalletRepository>(Container.Identifiers.WalletRepository, "state", "blockchain")

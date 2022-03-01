@@ -1,5 +1,5 @@
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 
 import { Delegate } from "./interfaces";
 
@@ -66,9 +66,9 @@ export class DelegateTracker {
 
 		// Determine Next Forgers...
 		const nextForgers: string[] = [];
-		for (let i = 0; i <= maxDelegates; i++) {
+		for (let index = 0; index <= maxDelegates; index++) {
 			const delegate: string | undefined =
-				activeDelegatesPublicKeys[(forgingInfo.currentForger + i) % maxDelegates];
+				activeDelegatesPublicKeys[(forgingInfo.currentForger + index) % maxDelegates];
 
 			if (delegate) {
 				nextForgers.push(delegate);
@@ -86,19 +86,21 @@ export class DelegateTracker {
 		}
 
 		// Determine Next Forger Usernames...
-		this.logger.debug(
-			`Next Forgers: ${JSON.stringify(
-				nextForgers.slice(0, 5).map((publicKey: string) => this.getUsername(publicKey)),
-			)}`,
-		);
+		const nextForgersUsernames = [];
+
+		for (let index = 0; index < nextForgers.slice(0, 5).length; index++) {
+			nextForgersUsernames[index] = await this.getUsername(nextForgers[index]);
+		}
+
+		this.logger.debug(`Next Forgers: ${JSON.stringify(nextForgersUsernames)}`);
 
 		const secondsToNextRound: number = (maxDelegates - forgingInfo.currentForger - 1) * blockTime;
 
 		for (const delegate of this.delegates) {
 			let indexInNextForgers = 0;
-			for (let i = 0; i < nextForgers.length; i++) {
-				if (nextForgers[i] === delegate.publicKey) {
-					indexInNextForgers = i;
+			for (const [index, nextForger] of nextForgers.entries()) {
+				if (nextForger === delegate.publicKey) {
+					indexInNextForgers = index;
 					break;
 				}
 			}
@@ -119,7 +121,7 @@ export class DelegateTracker {
 		this.logger.debug(`Round ${round.round} will end in ${Utils.prettyTime(secondsToNextRound * 1000)}.`);
 	}
 
-	private getUsername(publicKey: string): string {
-		return this.walletRepository.findByPublicKey(publicKey).getAttribute("delegate.username");
+	private async getUsername(publicKey: string): Promise<string> {
+		return (await this.walletRepository.findByPublicKey(publicKey)).getAttribute("delegate.username");
 	}
 }

@@ -34,7 +34,9 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 			AppUtils.assert.defined<object>(transaction.asset?.payments);
 
-			const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+			const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				transaction.senderPublicKey,
+			);
 			for (const payment of transaction.asset.payments) {
 				const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(payment.recipientId);
 				recipient.increaseBalance(payment.amount);
@@ -72,7 +74,9 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		sender.decreaseBalance(totalPaymentsAmount);
 	}
@@ -86,7 +90,9 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		sender.increaseBalance(totalPaymentsAmount);
 	}

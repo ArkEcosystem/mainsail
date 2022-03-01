@@ -246,7 +246,7 @@ export class TransactionFactory {
 		return this.make<Interfaces.ITransaction>(quantity, "build");
 	}
 
-	public getNonce(): BigNumber {
+	public async getNonce(): Promise<BigNumber> {
 		if (this.nonce) {
 			return this.nonce;
 		}
@@ -275,7 +275,7 @@ export class TransactionFactory {
 		}
 
 		const transactions: T[] = [];
-		let nonce = this.getNonce();
+		let nonce = await this.getNonce();
 
 		for (let index = 0; index < quantity; index++) {
 			if (this.builder.constructor.name === "TransferBuilder") {

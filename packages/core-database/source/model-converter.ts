@@ -6,7 +6,7 @@ import { Transaction } from "./models/transaction";
 
 @Container.injectable()
 export class ModelConverter implements Contracts.Database.ModelConverter {
-	@Container.inject(BINDINGS.Configuration)
+	@Container.inject(BINDINGS.Transaction.Factory)
 	private readonly transactionFactory: ITransactionFactory;
 
 	public async getBlockModels(blocks: Interfaces.IBlock[]): Promise<Contracts.Database.BlockModel[]> {

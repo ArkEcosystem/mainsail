@@ -53,7 +53,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 			AppUtils.assert.defined<Interfaces.IMultiSignatureAsset>(transaction.asset?.multiSignature);
 
 			const multiSignature: Contracts.State.WalletMultiSignatureAttributes = transaction.asset.multiSignature;
-			const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 				await this.publicKeyFactory.fromMultiSignatureAsset(multiSignature),
 			);
 
@@ -94,7 +94,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 		const multiSigPublicKey: string = await this.publicKeyFactory.fromMultiSignatureAsset(
 			data.asset.multiSignature,
 		);
-		const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(multiSigPublicKey);
+		const recipientWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(multiSigPublicKey);
 
 		if (recipientWallet.hasMultiSignature()) {
 			throw new MultiSignatureAlreadyRegisteredError();
@@ -156,7 +156,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 
 		AppUtils.assert.defined<Interfaces.IMultiSignatureAsset>(data.asset?.multiSignature);
 
-		const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+		const recipientWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 			await this.publicKeyFactory.fromMultiSignatureAsset(data.asset.multiSignature),
 		);
 
@@ -168,7 +168,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 
 		AppUtils.assert.defined<Interfaces.IMultiSignatureAsset>(data.asset?.multiSignature);
 
-		const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+		const recipientWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 			await this.publicKeyFactory.fromMultiSignatureAsset(data.asset.multiSignature),
 		);
 

@@ -92,7 +92,9 @@ export class BlockState implements Contracts.State.BlockState {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		let recipient: Contracts.State.Wallet | undefined;
 		if (transaction.data.recipientId) {
