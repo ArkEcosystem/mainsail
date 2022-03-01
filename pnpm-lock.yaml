@@ -1138,6 +1138,7 @@ importers:
       import-fresh: 3.3.0
       joi: 17.4.2
       pg: 8.7.1
+      pg-query-stream: ^4.2.3
       reflect-metadata: 0.1.13
       typeorm: 0.2.25
       uvu: ^0.5.3
@@ -1148,6 +1149,7 @@ importers:
       dayjs: 1.10.7
       joi: 17.4.2
       pg: 8.7.1
+      pg-query-stream: 4.2.3_pg@8.7.1
       reflect-metadata: 0.1.13
       typeorm: 0.2.25
     devDependencies:
@@ -11930,6 +11932,14 @@ packages:
     resolution: {integrity: sha512-r5o/V/ORTA6TmUnyWZR9nCj1klXCO2CEKNRlVuJptZe85QuhFayC7WeMic7ndayT5IRIR0S0xFxFi2ousartlQ==}
     dev: false
 
+  /pg-cursor/2.7.3_pg@8.7.1:
+    resolution: {integrity: sha512-vmjXRMD4jZK/oHaaYk6clTypgHNlzCCAqyLCO5d/UeI42egJVE5H4ZfZWACub3jzkHUXXyvibH207zAJg9iBOw==}
+    peerDependencies:
+      pg: ^8
+    dependencies:
+      pg: 8.7.1
+    dev: false
+
   /pg-int8/1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
@@ -11945,6 +11955,14 @@ packages:
 
   /pg-protocol/1.5.0:
     resolution: {integrity: sha512-muRttij7H8TqRNu/DxrAJQITO4Ac7RmX3Klyr/9mJEOBeIpgnF8f9jAfRz5d3XwQZl5qBjF9gLsUtMPJE0vezQ==}
+    dev: false
+
+  /pg-query-stream/4.2.3_pg@8.7.1:
+    resolution: {integrity: sha512-3mrOzffAoGGi2EqsfTdKanKn444ZB+E+Gbz/EJL3rd0thlXD3kb3ZBrwX42bRnQssrEd7/kVFM1FbiIMSQ5ung==}
+    dependencies:
+      pg-cursor: 2.7.3_pg@8.7.1
+    transitivePeerDependencies:
+      - pg
     dev: false
 
   /pg-types/2.2.0:

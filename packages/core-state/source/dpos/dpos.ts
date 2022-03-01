@@ -33,10 +33,10 @@ export class DposState implements Contracts.State.DposState {
 	}
 
 	// Only called during integrity verification on boot.
-	public buildVoteBalances(): void {
+	public async buildVoteBalances(): Promise<void> {
 		for (const voter of this.walletRepository.allByPublicKey()) {
 			if (voter.hasVoted()) {
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+				const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					voter.getAttribute("vote"),
 				);
 

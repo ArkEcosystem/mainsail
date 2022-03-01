@@ -38,9 +38,7 @@ export class Block implements IBlock {
 	public transactions: ITransaction[];
 	public verification: IBlockVerification;
 
-	public init(
-		{ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string },
-	) {
+	public init({ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string }) {
 		this.data = data;
 
 		// fix on real timestamp, this is overloading transaction

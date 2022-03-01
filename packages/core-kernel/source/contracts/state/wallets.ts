@@ -123,7 +123,7 @@ export interface WalletRepository {
 
 	getIndexNames(): string[];
 
-	findByPublicKey(publicKey: string): Wallet;
+	findByPublicKey(publicKey: string): Promise<Wallet>;
 
 	findByUsername(username: string): Wallet;
 
@@ -131,7 +131,7 @@ export interface WalletRepository {
 
 	findByIndexes(indexes: string[], key: string): Wallet;
 
-	getNonce(publicKey: string): BigNumber;
+	getNonce(publicKey: string): Promise<BigNumber>;
 
 	index(wallet: Wallet): void;
 

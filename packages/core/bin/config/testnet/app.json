@@ -1,131 +1,131 @@
 {
-    "core": {
-        "plugins": [
-            {
-                "package": "@arkecosystem/core-validation"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-config"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-time"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-validation"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-hash-bcrypto"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-signature-schnorr"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-key-pair-schnorr"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-address-bech32m"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-wif"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-block"
-            },
-            {
-                "package": "@arkecosystem/core-fees"
-            },
-            {
-                "package": "@arkecosystem/core-fees-static"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-transaction"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-transaction-delegate-registration"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-transaction-delegate-resignation"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-transaction-multi-payment"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-transaction-multi-signature-registration"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-transaction-transfer"
-            },
-            {
-                "package": "@arkecosystem/core-crypto-transaction-vote"
-            },
-            {
-                "package": "@arkecosystem/core-logger-pino"
-            },
-            {
-                "package": "@arkecosystem/core-state"
-            },
-            {
-                "package": "@arkecosystem/core-database"
-            },
-            {
-                "package": "@arkecosystem/core-transactions"
-            },
-            {
-                "package": "@arkecosystem/core-transaction-pool"
-            },
-            {
-                "package": "@arkecosystem/core-p2p"
-            },
-            {
-                "package": "@arkecosystem/core-blockchain"
-            },
-            {
-                "package": "@arkecosystem/core-webhooks"
-            },
-            {
-                "package": "@arkecosystem/core-forger"
-            }
-        ]
-    },
-    "relay": {
-        "plugins": [
-            {
-                "package": "@arkecosystem/core-logger-pino"
-            },
-            {
-                "package": "@arkecosystem/core-state"
-            },
-            {
-                "package": "@arkecosystem/core-database"
-            },
-            {
-                "package": "@arkecosystem/core-transactions"
-            },
-            {
-                "package": "@arkecosystem/core-transaction-pool"
-            },
-            {
-                "package": "@arkecosystem/core-p2p"
-            },
-            {
-                "package": "@arkecosystem/core-blockchain"
-            },
-            {
-                "package": "@arkecosystem/core-webhooks"
-            }
-        ]
-    },
-    "forger": {
-        "plugins": [
-            {
-                "package": "@arkecosystem/core-logger-pino"
-            },
-            {
-                "package": "@arkecosystem/core-transactions"
-            },
-            {
-                "package": "@arkecosystem/core-forger"
-            }
-        ]
-    }
+	"core": {
+		"plugins": [
+			{
+				"package": "@arkecosystem/core-validation"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-config"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-time"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-validation"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-hash-bcrypto"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-signature-schnorr"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-key-pair-schnorr"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-address-bech32m"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-wif"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-block"
+			},
+			{
+				"package": "@arkecosystem/core-fees"
+			},
+			{
+				"package": "@arkecosystem/core-fees-static"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-delegate-registration"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-delegate-resignation"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-multi-payment"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-multi-signature-registration"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-transfer"
+			},
+			{
+				"package": "@arkecosystem/core-crypto-transaction-vote"
+			},
+			{
+				"package": "@arkecosystem/core-logger-pino"
+			},
+			{
+				"package": "@arkecosystem/core-state"
+			},
+			{
+				"package": "@arkecosystem/core-database"
+			},
+			{
+				"package": "@arkecosystem/core-transactions"
+			},
+			{
+				"package": "@arkecosystem/core-transaction-pool"
+			},
+			{
+				"package": "@arkecosystem/core-p2p"
+			},
+			{
+				"package": "@arkecosystem/core-blockchain"
+			},
+			{
+				"package": "@arkecosystem/core-webhooks"
+			},
+			{
+				"package": "@arkecosystem/core-forger"
+			}
+		]
+	},
+	"relay": {
+		"plugins": [
+			{
+				"package": "@arkecosystem/core-logger-pino"
+			},
+			{
+				"package": "@arkecosystem/core-state"
+			},
+			{
+				"package": "@arkecosystem/core-database"
+			},
+			{
+				"package": "@arkecosystem/core-transactions"
+			},
+			{
+				"package": "@arkecosystem/core-transaction-pool"
+			},
+			{
+				"package": "@arkecosystem/core-p2p"
+			},
+			{
+				"package": "@arkecosystem/core-blockchain"
+			},
+			{
+				"package": "@arkecosystem/core-webhooks"
+			}
+		]
+	},
+	"forger": {
+		"plugins": [
+			{
+				"package": "@arkecosystem/core-logger-pino"
+			},
+			{
+				"package": "@arkecosystem/core-transactions"
+			},
+			{
+				"package": "@arkecosystem/core-forger"
+			}
+		]
+	}
 }

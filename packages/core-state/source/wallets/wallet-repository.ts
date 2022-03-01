@@ -70,11 +70,10 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return wallet;
 	}
 
-	public findByPublicKey(publicKey: string): Contracts.State.Wallet {
+	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		const index = this.getIndex(Contracts.State.WalletIndexes.PublicKeys);
 		if (publicKey && !index.has(publicKey)) {
-			// @TODO
-			const wallet = this.findByAddress(void this.addressFactory.fromPublicKey(publicKey));
+			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			index.set(publicKey, wallet);
 		}
@@ -123,9 +122,9 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.getIndex(indexName).has(key);
 	}
 
-	public getNonce(publicKey: string): BigNumber {
+	public async getNonce(publicKey: string): Promise<BigNumber> {
 		if (this.hasByPublicKey(publicKey)) {
-			return this.findByPublicKey(publicKey).getNonce();
+			return (await this.findByPublicKey(publicKey)).getNonce();
 		}
 
 		return BigNumber.ZERO;

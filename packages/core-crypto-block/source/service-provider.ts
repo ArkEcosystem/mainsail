@@ -13,8 +13,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(INTERNAL_FACTORY)
 			.toFactory<IBlock>(
-				(context: Container.interfaces.Context) => (data) =>
-					context.container.resolve(Block).init(data),
+				(context: Container.interfaces.Context) => (data) => context.container.resolve(Block).init(data),
 			);
 
 		this.app.bind(BINDINGS.Block.Deserializer).to(Deserializer).inSingletonScope();

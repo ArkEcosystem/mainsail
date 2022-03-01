@@ -61,10 +61,9 @@ export class WalletRepositoryClone extends WalletRepository {
 		return wallet;
 	}
 
-	public findByPublicKey(publicKey: string): Contracts.State.Wallet {
+	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
-			// @TODO
-			const wallet = this.findByAddress(void this.addressFactory.fromPublicKey(publicKey));
+			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			super.index(wallet);
 		}
@@ -110,13 +109,13 @@ export class WalletRepositoryClone extends WalletRepository {
 		);
 	}
 
-	public getNonce(publicKey: string): BigNumber {
+	public async getNonce(publicKey: string): Promise<BigNumber> {
 		if (this.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey)) {
-			return this.findByPublicKey(publicKey).getNonce();
+			return (await this.findByPublicKey(publicKey)).getNonce();
 		}
 
 		if (this.blockchainWalletRepository.hasByPublicKey(publicKey)) {
-			return this.blockchainWalletRepository.findByPublicKey(publicKey).getNonce();
+			return (await this.blockchainWalletRepository.findByPublicKey(publicKey)).getNonce();
 		}
 
 		return BigNumber.ZERO;

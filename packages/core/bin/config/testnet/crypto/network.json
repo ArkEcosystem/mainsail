@@ -1,22 +1,22 @@
 {
-    "address": {
-        "base58": 30,
-        "bech32m": "ark"
-    },
-    "aip20": 0,
-    "bip32": {
-        "private": 70615956,
-        "public": 70617039
-    },
-    "client": {
-        "explorer": "https://explorer.ark.io",
-        "symbol": "TѦ",
-        "token": "ARK"
-    },
-    "messagePrefix": "testnet message:\n",
-    "name": "testnet",
-    "nethash": "98009d65f1127eab81d42e6a4e0d245e8b6e1598d0a804506e4c72f0e6edea92",
-    "pubKeyHash": 30,
-    "slip44": 1,
-    "wif": 186
+	"address": {
+		"base58": 30,
+		"bech32m": "ark"
+	},
+	"aip20": 0,
+	"bip32": {
+		"private": 70615956,
+		"public": 70617039
+	},
+	"client": {
+		"explorer": "https://explorer.ark.io",
+		"symbol": "TѦ",
+		"token": "ARK"
+	},
+	"messagePrefix": "testnet message:\n",
+	"name": "testnet",
+	"nethash": "98009d65f1127eab81d42e6a4e0d245e8b6e1598d0a804506e4c72f0e6edea92",
+	"pubKeyHash": 30,
+	"slip44": 1,
+	"wif": 186
 }

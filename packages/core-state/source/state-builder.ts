@@ -88,7 +88,7 @@ export class StateBuilder {
 		const blocks = await this.blockRepository.getBlockRewards();
 
 		for (const block of blocks) {
-			const wallet = this.walletRepository.findByPublicKey(block.generatorPublicKey);
+			const wallet = await this.walletRepository.findByPublicKey(block.generatorPublicKey);
 			wallet.increaseBalance(BigNumber.make(block.rewards));
 		}
 	}
@@ -97,7 +97,7 @@ export class StateBuilder {
 		const transactions = await this.transactionRepository.getSentTransactions();
 
 		for (const transaction of transactions) {
-			const wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 			wallet.setNonce(BigNumber.make(transaction.nonce));
 			wallet.decreaseBalance(BigNumber.make(transaction.amount).plus(transaction.fee));
 		}

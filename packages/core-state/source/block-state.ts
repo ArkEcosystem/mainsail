@@ -27,11 +27,11 @@ export class BlockState implements Contracts.State.BlockState {
 
 	public async applyBlock(block: Interfaces.IBlock): Promise<void> {
 		if (block.data.height === 1) {
-			this.initGenesisForgerWallet(block.data.generatorPublicKey);
+			await this.initGenesisForgerWallet(block.data.generatorPublicKey);
 		}
 
 		const previousBlock = this.state.getLastBlock();
-		const forgerWallet = this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
+		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
 		// if (!forgerWallet) {
 		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
@@ -60,7 +60,7 @@ export class BlockState implements Contracts.State.BlockState {
 	}
 
 	public async revertBlock(block: Interfaces.IBlock): Promise<void> {
-		const forgerWallet = this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
+		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
 		// if (!forgerWallet) {
 		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
@@ -92,7 +92,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		let recipient: Contracts.State.Wallet | undefined;
 		if (transaction.data.recipientId) {
@@ -102,7 +102,7 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 
 		// @ts-ignore - Apply vote balance updates
-		this.applyVoteBalances(sender, recipient, transaction.data);
+		await this.applyVoteBalances(sender, recipient, transaction.data);
 	}
 
 	public async revertTransaction(transaction: Interfaces.ITransaction): Promise<void> {
@@ -112,7 +112,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(data.senderPublicKey);
 
 		let recipient: Contracts.State.Wallet | undefined;
 		if (transaction.data.recipientId) {
@@ -124,25 +124,25 @@ export class BlockState implements Contracts.State.BlockState {
 		await transactionHandler.revert(transaction);
 
 		// @ts-ignore - Revert vote balance updates
-		this.revertVoteBalances(sender, recipient, data);
+		await this.revertVoteBalances(sender, recipient, data);
 	}
 
-	public increaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber) {
+	public async increaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
 		// ? packages/core-transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
 		// ? is it guaranteed that delegate wallet exists, so delegateWallet.getAttribute("delegate.voteBalance") is safe?
 		if (wallet.hasVoted()) {
 			const delegatePulicKey = wallet.getAttribute<string>("vote");
-			const delegateWallet = this.walletRepository.findByPublicKey(delegatePulicKey);
+			const delegateWallet = await this.walletRepository.findByPublicKey(delegatePulicKey);
 			const oldDelegateVoteBalance = delegateWallet.getAttribute<BigNumber>("delegate.voteBalance");
 			const newDelegateVoteBalance = oldDelegateVoteBalance.plus(amount);
 			delegateWallet.setAttribute("delegate.voteBalance", newDelegateVoteBalance);
 		}
 	}
 
-	public decreaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber) {
+	public async decreaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
 		if (wallet.hasVoted()) {
 			const delegatePulicKey = wallet.getAttribute<string>("vote");
-			const delegateWallet = this.walletRepository.findByPublicKey(delegatePulicKey);
+			const delegateWallet = await this.walletRepository.findByPublicKey(delegatePulicKey);
 			const oldDelegateVoteBalance = delegateWallet.getAttribute<BigNumber>("delegate.voteBalance");
 			const newDelegateVoteBalance = oldDelegateVoteBalance.minus(amount);
 			delegateWallet.setAttribute("delegate.voteBalance", newDelegateVoteBalance);
@@ -150,19 +150,19 @@ export class BlockState implements Contracts.State.BlockState {
 	}
 
 	// WALLETS
-	private applyVoteBalances(
+	private async applyVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
 		transaction: Interfaces.ITransactionData,
-	): void {
+	): Promise<void> {
 		return this.updateVoteBalances(sender, recipient, transaction, false);
 	}
 
-	private revertVoteBalances(
+	private async revertVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
 		transaction: Interfaces.ITransactionData,
-	): void {
+	): Promise<void> {
 		return this.updateVoteBalances(sender, recipient, transaction, true);
 	}
 
@@ -190,12 +190,12 @@ export class BlockState implements Contracts.State.BlockState {
 		forgerWallet.decreaseBalance(balanceDecrease);
 	}
 
-	private updateVoteBalances(
+	private async updateVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
 		transaction: Interfaces.ITransactionData,
 		revert: boolean,
-	): void {
+	): Promise<void> {
 		if (transaction.type === TransactionType.Vote && transaction.typeGroup === TransactionTypeGroup.Core) {
 			AppUtils.assert.defined<Interfaces.ITransactionAsset>(transaction.asset?.votes);
 
@@ -206,7 +206,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 			for (let index = 0; index < transaction.asset.votes.length; index++) {
 				const vote: string = transaction.asset.votes[index];
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(vote.slice(1));
+				const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote.slice(1));
 
 				// first unvote also changes vote balance by fee
 				const senderVoteDelegatedAmount =
@@ -227,7 +227,7 @@ export class BlockState implements Contracts.State.BlockState {
 		} else {
 			// Update vote balance of the sender's delegate
 			if (sender.hasVoted()) {
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+				const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					sender.getAttribute("vote"),
 				);
 
@@ -266,7 +266,7 @@ export class BlockState implements Contracts.State.BlockState {
 					const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByAddress(recipientId);
 					if (recipientWallet.hasVoted()) {
 						const vote = recipientWallet.getAttribute("vote");
-						const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(vote);
+						const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
 						const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance", BigNumber.ZERO);
 						delegate.setAttribute(
 							"delegate.voteBalance",
@@ -278,7 +278,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 			// Update vote balance of recipient's delegate
 			if (recipient && recipient.hasVoted()) {
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+				const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					recipient.getAttribute("vote"),
 				);
 				const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance", BigNumber.ZERO);

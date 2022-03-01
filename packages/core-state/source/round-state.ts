@@ -119,7 +119,7 @@ export class RoundState {
 
 				const delegate = {
 					round: roundInfo.round,
-					username: this.walletRepository.findByPublicKey(publicKey).getAttribute("delegate.username"),
+					username: (await this.walletRepository.findByPublicKey(publicKey)).getAttribute("delegate.username"),
 					voteBalance: BigNumber.make(balance),
 				};
 				AppUtils.assert.defined(delegate.username);
@@ -203,14 +203,14 @@ export class RoundState {
 		}
 	}
 
-	private detectMissedRound(): void {
+	private async detectMissedRound(): Promise<void> {
 		for (const delegate of this.forgingDelegates) {
 			const isBlockProduced = this.blocksInCurrentRound.some(
 				(blockGenerator) => blockGenerator.data.generatorPublicKey === delegate.getPublicKey(),
 			);
 
 			if (!isBlockProduced) {
-				const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(delegate.getPublicKey()!);
+				const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(delegate.getPublicKey()!);
 
 				this.logger.debug(
 					`Delegate ${wallet.getAttribute(
