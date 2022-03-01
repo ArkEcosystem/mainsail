@@ -77,7 +77,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			peer,
 			"p2p.blocks.postBlock",
 			{
-				block: this.serializer.serializeWithTransactions({
+				block: await this.serializer.serializeWithTransactions({
 					...block.data,
 					transactions: block.transactions.map((tx) => tx.data),
 				}),

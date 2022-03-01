@@ -58,7 +58,7 @@ export class Client {
 
 		try {
 			await this.emit("p2p.blocks.postBlock", {
-				block: this.serializer.serializeWithTransactions({
+				block: await this.serializer.serializeWithTransactions({
 					...block.data,
 					transactions: block.transactions.map((tx) => tx.data),
 				}),

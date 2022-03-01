@@ -23,6 +23,9 @@ export class DownloadBlocks implements Action {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: IConfiguration;
 
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
+
 	public async handle(): Promise<void> {
 		const lastDownloadedBlock: Interfaces.IBlockData =
 			this.stateStore.getLastDownloadedBlock() || this.stateStore.getLastBlock().data;
@@ -51,7 +54,7 @@ export class DownloadBlocks implements Action {
 		);
 
 		const chained: boolean =
-			!empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup, this.configuration);
+			!empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup, this.slots);
 
 		if (chained) {
 			this.logger.info(

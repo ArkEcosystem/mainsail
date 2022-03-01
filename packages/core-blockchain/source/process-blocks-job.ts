@@ -77,20 +77,13 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			this.configuration,
 		);
 
-		if (
-			!Utils.isBlockChained(
-				this.blockchain.getLastBlock().data,
-				this.blocks[0],
-				blockTimeLookup,
-				this.configuration,
-			)
-		) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup, this.slots)) {
 			this.logger.warning(
 				Utils.getBlockNotChainedErrorMessage(
 					this.blockchain.getLastBlock().data,
 					this.blocks[0],
 					blockTimeLookup,
-					this.configuration,
+					this.slots,
 				),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
@@ -119,7 +112,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 					break;
 				}
 
-				const blockInstance = this.blockFactory.fromData(block);
+				const blockInstance = await this.blockFactory.fromData(block);
 				Utils.assert.defined<Interfaces.IBlock>(blockInstance);
 
 				lastProcessResult = await this.triggers.call("processBlock", {

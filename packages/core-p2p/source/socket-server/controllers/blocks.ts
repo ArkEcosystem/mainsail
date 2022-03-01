@@ -25,6 +25,9 @@ export class BlocksController extends Controller {
 	@Container.inject(BINDINGS.Block.Deserializer)
 	private readonly deserializer!: IBlockDeserializer;
 
+	@Container.inject(BINDINGS.Time.Slots)
+	private readonly slots: any;
+
 	public async postBlock(
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
@@ -65,7 +68,7 @@ export class BlocksController extends Controller {
 				this.configuration,
 			);
 
-			if (!Utils.isBlockChained(lastDownloadedBlock, block, blockTimeLookup, this.configuration)) {
+			if (!Utils.isBlockChained(lastDownloadedBlock, block, blockTimeLookup, this.slots)) {
 				return { height: this.blockchain.getLastHeight(), status: false };
 			}
 		}

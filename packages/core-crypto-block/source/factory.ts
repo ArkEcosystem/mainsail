@@ -88,7 +88,7 @@ export class BlockFactory implements IBlockFactory {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
-		const block: IBlock = this.blockFactory({
+		const block: IBlock = await this.blockFactory({
 			...(await this.deserializer.deserialize(serialized, false, options)),
 			id: data.id,
 		});
@@ -108,7 +108,7 @@ export class BlockFactory implements IBlockFactory {
 			deserialized.data = validated;
 		}
 
-		const block: IBlock = this.blockFactory(deserialized);
+		const block: IBlock = await this.blockFactory(deserialized);
 		block.serialized = serialized.toString("hex");
 
 		return block;

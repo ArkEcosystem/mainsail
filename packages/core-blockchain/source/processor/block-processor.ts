@@ -76,7 +76,7 @@ export class BlockProcessor {
 			this.blockchain.getLastBlock().data,
 			block.data,
 			blockTimeLookup,
-			this.configuration,
+			this.slots,
 		);
 		if (!isChained) {
 			return this.app.resolve<UnchainedHandler>(UnchainedHandler).initialize(isValidGenerator).execute(block);
