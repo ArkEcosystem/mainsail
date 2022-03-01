@@ -2,6 +2,7 @@ import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/
 import Joi from "joi";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
+import { DELEGATE_FACTORY } from "./bindings";
 import { DelegateFactory } from "./delegate-factory";
 import { DelegateTracker } from "./delegate-tracker";
 import { ForgerService } from "./forger-service";
@@ -10,7 +11,8 @@ import { CurrentDelegateProcessAction, LastForgedBlockRemoteAction, NextSlotProc
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind<ForgerService>(Container.Identifiers.ForgerService).to(ForgerService).inSingletonScope();
+		this.app.bind(Container.Identifiers.ForgerService).to(ForgerService).inSingletonScope();
+		this.app.bind(DELEGATE_FACTORY).to(DelegateFactory).inSingletonScope();
 
 		this.registerActions();
 
@@ -109,13 +111,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const delegates: Set<Delegate> = new Set<Delegate>();
 
 		for (const secret of this.app.config("delegates.secrets")) {
-			delegates.add(await DelegateFactory.fromBIP39(secret));
+			delegates.add(await this.app.get<DelegateFactory>(DELEGATE_FACTORY).fromBIP39(secret));
 		}
 
 		const { bip38, password } = this.app.config("app.flags")!;
 
 		if (bip38) {
-			delegates.add(await DelegateFactory.fromBIP38(bip38, password));
+			delegates.add(await this.app.get<DelegateFactory>(DELEGATE_FACTORY).fromBIP38(bip38, password));
 		}
 
 		return [...delegates];

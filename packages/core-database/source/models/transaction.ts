@@ -60,7 +60,7 @@ export class Transaction implements Contracts.Database.TransactionModel {
 	public nonce!: BigNumber;
 
 	@Column({
-		length: 66,
+		length: 64, //64=schnorr,66=ecdsa
 		nullable: false,
 		type: "varchar",
 	})

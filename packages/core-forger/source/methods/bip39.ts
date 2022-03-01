@@ -12,7 +12,7 @@ export class BIP39 extends Method implements Delegate {
 	@Container.inject(BINDINGS.Identity.KeyPairFactory)
 	private readonly keyPairFactory: IKeyPairFactory;
 
-	readonly #passphrase: string;
+	#passphrase: string;
 
 	public keys: Interfaces.IKeyPair | undefined;
 
@@ -20,20 +20,19 @@ export class BIP39 extends Method implements Delegate {
 
 	public address: string;
 
-	public constructor(passphrase: string) {
-		super();
-
+	public async configure(passphrase: string): Promise<BIP39> {
 		this.#passphrase = passphrase;
+		this.keys = await this.keyPairFactory.fromMnemonic(this.#passphrase);
+		this.publicKey = this.keys.publicKey;
+		this.address = await this.addressFactory.fromPublicKey(this.publicKey);
+
+		return this;
 	}
 
 	public async forge(
 		transactions: Interfaces.ITransactionData[],
 		options: Record<string, any>,
 	): Promise<Interfaces.IBlock> {
-		this.keys = await this.keyPairFactory.fromMnemonic(this.#passphrase);
-		this.publicKey = this.keys.publicKey;
-		this.address = await this.addressFactory.fromPublicKey(this.publicKey);
-
 		return this.createBlock(this.keys, transactions, options);
 	}
 }

@@ -54,6 +54,7 @@ export class Block implements IBlock {
 
 		delete this.data.transactions;
 
+		// @TODO
 		this.verification = void this.verify();
 
 		return this;

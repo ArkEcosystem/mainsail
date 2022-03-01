@@ -84,7 +84,7 @@ export class Block implements Contracts.Database.BlockModel {
 	public payloadHash!: string;
 
 	@Column({
-		length: 66,
+		length: 64, //64=schnorr,66=ecdsa
 		nullable: false,
 		type: "varchar",
 	})

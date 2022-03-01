@@ -86,6 +86,7 @@ export class RoundState {
 		const roundInfo = this.getRound(block.data.height);
 
 		this.blocksInCurrentRound = await this.getBlocksForRound();
+
 		await this.setForgingDelegatesOfRound(roundInfo);
 
 		await this.databaseService.deleteRound(roundInfo.round + 1);
@@ -132,7 +133,8 @@ export class RoundState {
 			}
 		}
 
-		return this.shuffleDelegates(roundInfo, delegates);
+		// @TODO: why is delegates undefined here and blowing up
+		return this.shuffleDelegates(roundInfo, delegates ?? []);
 	}
 
 	public async detectMissedBlocks(block: Interfaces.IBlock): Promise<void> {
@@ -174,7 +176,7 @@ export class RoundState {
 
 			this.logger.info(`Starting Round ${roundInfo.round.toLocaleString()}`);
 
-			this.detectMissedRound();
+			await this.detectMissedRound();
 
 			this.dposState.buildDelegateRanking();
 			this.dposState.setDelegatesRound(roundInfo);

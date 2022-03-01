@@ -1,10 +1,10 @@
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import Interfaces, { BINDINGS, IBlockFactory, IHashFactory } from "@arkecosystem/core-crypto-contracts";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 @Container.injectable()
 export abstract class Method {
-	@Container.inject(BINDINGS.Transaction.Factory)
+	@Container.inject(BINDINGS.Block.Factory)
 	private readonly blockFactory: IBlockFactory;
 
 	@Container.inject(BINDINGS.HashFactory)
@@ -42,9 +42,9 @@ export abstract class Method {
 				reward: options.reward,
 				timestamp: options.timestamp,
 				totalAmount: totals.amount,
-				version: 0,
 				totalFee: totals.fee,
 				transactions,
+				version: 0,
 			},
 			keys,
 		)!; // todo: this method should never return undefined

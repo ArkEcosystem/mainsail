@@ -8,7 +8,7 @@ import { transformBigInt } from "../utils/transform";
 })
 export class Round {
 	@Column({
-		length: 66,
+		length: 64, //64=schnorr,66=ecdsa
 		nullable: false,
 		primary: true,
 		type: "varchar",
