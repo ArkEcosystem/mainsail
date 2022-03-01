@@ -48,19 +48,19 @@ export class Signature implements ISignature {
 	}
 
 	public serialize(buffer: ByteBuffer, signature: string): void {
-        buffer.append(signature, "hex");
+		buffer.append(signature, "hex");
 	}
 
 	public deserialize(buffer: ByteBuffer): string {
-        const signatureLength = (): number => {
-            buffer.mark();
+		const signatureLength = (): number => {
+			buffer.mark();
 
-            const lengthHex: string = buffer.skip(1).readBytes(1).toString("hex");
+			const lengthHex: string = buffer.skip(1).readBytes(1).toString("hex");
 
-            buffer.reset();
+			buffer.reset();
 
-            return parseInt(lengthHex, 16) + 2;
-        };
+			return parseInt(lengthHex, 16) + 2;
+		};
 
 		return buffer.readBytes(signatureLength()).toString("hex");
 	}

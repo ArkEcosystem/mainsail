@@ -10,6 +10,7 @@ export const BINDINGS = {
 	HashFactory: Symbol.for("Crypto<HashFactory>"),
 	Identity: {
 		AddressFactory: Symbol.for("Crypto<Identity.AddressFactory>"),
+		AddressSerializer: Symbol.for("Crypto<Identity.AddressSerializer>"),
 		KeyPairFactory: Symbol.for("Crypto<Identity.KeyPairFactory>"),
 		PrivateKeyFactory: Symbol.for("Crypto<Identity.PrivateKeyFactory>"),
 		PublicKeyFactory: Symbol.for("Crypto<Identity.PublicKeyFactory>"),

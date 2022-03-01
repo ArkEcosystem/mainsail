@@ -14,7 +14,7 @@ export class Signature implements ISignature {
 	}
 
 	public serialize(buffer: ByteBuffer, signature: string): void {
-        buffer.append(signature, "hex");
+		buffer.append(signature, "hex");
 	}
 
 	public deserialize(buffer: ByteBuffer): string {

@@ -1,3 +1,5 @@
+import ByteBuffer from "bytebuffer";
+
 import { IMultiSignatureAsset } from "./transactions";
 
 export interface IKeyPair {
@@ -52,4 +54,10 @@ export interface IWIFFactory {
 	fromMnemonic(mnemonic: string): Promise<string>;
 
 	fromKeys(keys: IKeyPair): Promise<string>;
+}
+
+export interface IAddressSerializer {
+	serialize(buffer: ByteBuffer, address: string): void;
+
+	deserialize(buffer: ByteBuffer): Buffer;
 }
