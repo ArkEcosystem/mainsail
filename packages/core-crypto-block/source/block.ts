@@ -10,7 +10,7 @@ import {
 	IHashFactory,
 	ITransaction,
 	ITransactionData,
-	Signatory,
+	ISignature,
 } from "@arkecosystem/core-crypto-contracts";
 import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
@@ -26,8 +26,8 @@ export class Block implements IBlock {
 	@Container.inject(BINDINGS.HashFactory)
 	private readonly hashFactory: IHashFactory;
 
-	@Container.inject(BINDINGS.SignatureFactory)
-	private readonly signatureFactory: Signatory;
+	@Container.inject(BINDINGS.Signature)
+	private readonly signatureFactory: ISignature;
 
 	@Container.inject(BINDINGS.Time.Slots)
 	private readonly slots: Slots;

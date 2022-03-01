@@ -106,7 +106,7 @@ import { FactoryBuilder } from "../factory-builder";
 // 	factory.get("Unvote").state("multiSign", multiSign);
 // };
 
-// export const registerMultiSignatureFactory = (factory: FactoryBuilder): void => {
+// export const registerMultiSignature = (factory: FactoryBuilder): void => {
 // 	factory.set("MultiSignature", ({ options }) => {
 // 		const builder = applyModifiers(Transactions.BuilderFactory.multiSignature(), options);
 
@@ -151,6 +151,6 @@ export const registerTransactionFactory = (factory: FactoryBuilder): void => {
 	// registerDelegateResignationFactory(factory);
 	// registerVoteFactory(factory);
 	// registerUnvoteFactory(factory);
-	// registerMultiSignatureFactory(factory);
+	// registerMultiSignature(factory);
 	// registerMultiPaymentFactory(factory);
 };

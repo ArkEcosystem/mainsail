@@ -25,6 +25,7 @@
 		"@scure/bip39": "^1.0.0",
 		"bcrypto": "^5.4.0",
 		"bls12-381-keygen": "^0.2.1",
+		"bytebuffer": "5.0.1",
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {

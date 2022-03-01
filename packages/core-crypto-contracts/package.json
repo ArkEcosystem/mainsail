@@ -16,6 +16,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/utils": "workspace:*",
-		"ajv": "6.12.6"
+		"ajv": "6.12.6",
+		"bytebuffer": "5.0.1"
 	}
 }

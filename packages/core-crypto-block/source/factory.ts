@@ -9,7 +9,7 @@ import {
 	IKeyPair,
 	ITransaction,
 	IValidator,
-	Signatory,
+	ISignature,
 } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -36,8 +36,8 @@ export class BlockFactory implements IBlockFactory {
 	@Container.inject(BINDINGS.HashFactory)
 	private readonly hashFactory: IHashFactory;
 
-	@Container.inject(BINDINGS.SignatureFactory)
-	private readonly signatureFactory: Signatory;
+	@Container.inject(BINDINGS.Signature)
+	private readonly signatureFactory: ISignature;
 
 	@Container.inject(BINDINGS.Validator)
 	private readonly validator: IValidator;

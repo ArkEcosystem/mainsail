@@ -1,13 +1,13 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { Signatory } from "./signatory";
+import { Signature } from "./signature";
 
-describe("Signatory", ({ assert, it }) => {
+describe("Signature", ({ assert, it }) => {
 	it("should sign and verify", async () => {
 		assert.true(
-			await new Signatory().verify(
+			await new Signature().verify(
 				Buffer.from(
-					await new Signatory().sign(
+					await new Signature().sign(
 						Buffer.from("64726e3da8", "hex"),
 						Buffer.from("67d53f170b908cabb9eb326c3c337762d59289a8fec79f7bc9254b584b73265c", "hex"),
 					),

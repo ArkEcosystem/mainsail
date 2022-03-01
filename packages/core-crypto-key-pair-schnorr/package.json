@@ -22,6 +22,7 @@
 		"@arkecosystem/core-crypto-errors": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"bcrypto": "5.4.0",
+		"bytebuffer": "5.0.1",
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {

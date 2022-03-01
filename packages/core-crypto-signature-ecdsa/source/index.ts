@@ -1,10 +1,10 @@
 import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
-import { Signatory } from "./signatory";
+import { Signature } from "./signature";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(BINDINGS.SignatureFactory).to(Signatory).inSingletonScope();
+		this.app.bind(BINDINGS.Signature).to(Signature).inSingletonScope();
 	}
 }

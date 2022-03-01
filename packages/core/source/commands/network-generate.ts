@@ -13,7 +13,7 @@ import Interfaces, {
 	ITransactionSerializer,
 	ITransactionSigner,
 	ITransactionUtils,
-	Signatory,
+	ISignature,
 } from "@arkecosystem/core-crypto-contracts";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@arkecosystem/core-crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
@@ -854,7 +854,7 @@ export class Command extends Commands.Command {
 
 	private async signBlock(block, keys: Interfaces.IKeyPair): Promise<string> {
 		return this.app
-			.get<Signatory>(BINDINGS.SignatureFactory)
+			.get<ISignature>(BINDINGS.Signature)
 			.sign(
 				await this.app
 					.get<IHashFactory>(BINDINGS.HashFactory)

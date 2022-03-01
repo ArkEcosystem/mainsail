@@ -6,7 +6,7 @@ import {
 	ITransactionData,
 	ITransactionUtils,
 	ITransactionVerifier,
-	Signatory,
+	ISignature,
 } from "@arkecosystem/core-crypto-contracts";
 import { Contracts } from "@arkecosystem/core-kernel";
 
@@ -14,8 +14,8 @@ import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetEr
 
 @Container.injectable()
 export class Verifier implements ITransactionVerifier {
-	@Container.inject(BINDINGS.SignatureFactory)
-	private readonly signatureFactory: Signatory;
+	@Container.inject(BINDINGS.Signature)
+	private readonly signatureFactory: ISignature;
 
 	@Container.inject(BINDINGS.Validator)
 	private readonly validator: any;

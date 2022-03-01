@@ -19,7 +19,8 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@noble/bls12-381": "^1.2.0"
+		"@noble/bls12-381": "^1.2.0",
+		"bytebuffer": "5.0.1"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",
