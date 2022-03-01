@@ -130,7 +130,7 @@ export class LocalConfigLoader implements ConfigLoader {
 	}
 
 	private loadCryptography(): void {
-		const files: string[] = ["genesisBlock", "exceptions", "milestones", "network"];
+		const files: string[] = ["genesisBlock", "milestones", "network"];
 
 		for (const file of files) {
 			if (!existsSync(this.app.configPath(`crypto/${file}.json`))) {

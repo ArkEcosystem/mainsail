@@ -40,7 +40,6 @@ export class CryptoGenerator extends Generator {
 		// this.writeNetwork(genesisBlock.payloadHash);
 
 		return {
-			exceptions: resolve(this.destination, "exceptions.json"),
 			genesisBlock: resolve(this.destination, "genesisBlock.json"),
 			milestones: resolve(this.destination, "milestones.json"),
 			network: resolve(this.destination, "network.json"),
@@ -328,16 +327,6 @@ export class CryptoGenerator extends Generator {
 	// 	byteBuffer.flip();
 
 	// 	return byteBuffer.toBuffer();
-	// }
-
-	// private writeExceptions(): void {
-	// 	const filePath: string = resolve(this.destination, "exceptions.json");
-
-	// 	if (this.options.crypto.exceptions) {
-	// 		writeJSONSync(filePath, this.options.crypto.exceptions, { spaces: 4 });
-	// 	} else {
-	// 		writeJSONSync(resolve(this.destination, "exceptions.json"), {});
-	// 	}
 	// }
 
 	// private writeGenesisBlock(genesisBlock: Types.JsonObject): void {

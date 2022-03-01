@@ -38,11 +38,9 @@ export class Block implements IBlock {
 	public transactions: ITransaction[];
 	public verification: IBlockVerification;
 
-	public constructor(
-		configuration: IConfiguration,
+	public init(
 		{ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string },
 	) {
-		this.configuration = configuration;
 		this.data = data;
 
 		// fix on real timestamp, this is overloading transaction
@@ -59,6 +57,8 @@ export class Block implements IBlock {
 		delete this.data.transactions;
 
 		this.verification = void this.verify();
+
+		return this;
 	}
 
 	public getHeader(): IBlockData {

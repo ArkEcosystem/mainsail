@@ -10,8 +10,6 @@ export * from "./register-base-paths";
 // Configuration
 export * from "./load-environment-variables";
 export * from "./load-configuration";
-export * from "./load-cryptography";
-// export * from "./watch-configuration";
 
 // Service Providers - Application
 export * from "./load-service-providers";

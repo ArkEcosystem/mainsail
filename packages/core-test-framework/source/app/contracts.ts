@@ -44,7 +44,6 @@ export interface CryptoFlags {
 
 export interface CryptoOptions {
 	flags: CryptoFlags;
-	exceptions?: Types.JsonObject;
 	genesisBlock?: Types.JsonObject;
 	milestones?: Types.JsonObject;
 	network?: Types.JsonObject;
@@ -65,7 +64,6 @@ export interface CoreConfigPaths {
 
 export interface CryptoConfigPaths {
 	root: string;
-	exceptions: string;
 	genesisBlock: string;
 	milestones: string;
 	network: string;

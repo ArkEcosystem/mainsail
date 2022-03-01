@@ -129,7 +129,6 @@ describe<{
 	});
 
 	afterEach((context) => {
-		Managers.configManager.set("exceptions.transactions", []);
 		Managers.configManager.set("network.pubKeyHash", context.pubKeyHash);
 		Managers.configManager.getMilestone().aip11 = undefined;
 		process.env.CORE_ENV = undefined;
@@ -327,7 +326,6 @@ describe<{
 	});
 
 	it("apply should resolve defined as exception", async (context) => {
-		Managers.configManager.set("exceptions.transactions", [context.transferTransaction.id]);
 		Managers.configManager.set("network.pubKeyHash", 99);
 		await assert.resolves(() => context.handler.apply(context.transferTransaction));
 	});
@@ -446,7 +444,6 @@ describe<{
 	});
 
 	afterEach(() => {
-		Managers.configManager.set("exceptions.transactions", []);
 		Managers.configManager.getMilestone().aip11 = undefined;
 		process.env.CORE_ENV = undefined;
 		Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);

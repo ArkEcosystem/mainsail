@@ -59,7 +59,7 @@ export class VoteTransaction extends Transaction {
 		data.asset = { votes: [] };
 
 		for (let index = 0; index < votelength; index++) {
-			let vote: string = buf.readBuffer(34).toString("hex");
+			let vote: string = buf.readBuffer(33).toString("hex"); // 33=schnorr,34=ecdsa
 			vote = (vote[1] === "1" ? "+" : "-") + vote.slice(2);
 
 			if (data.asset && data.asset.votes) {

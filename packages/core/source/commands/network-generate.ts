@@ -1,3 +1,4 @@
+import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@arkecosystem/core-crypto-block";
@@ -41,7 +42,6 @@ import { generateMnemonic } from "bip39";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
-import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -200,14 +200,14 @@ export class Command extends Commands.Command {
 			description: "The name that is attributed to the token on the network.",
 			schema: Joi.string(),
 			promptType: "text",
-			default: "ark",
+			default: "ARK",
 		},
 		{
 			name: "symbol",
 			description: "The character that is attributed to the token on the network.",
 			schema: Joi.string(),
 			promptType: "text",
-			default: "A",
+			default: "TѦ",
 		},
 		{
 			name: "explorer",
@@ -468,8 +468,6 @@ export class Command extends Commands.Command {
 
 						this.app.get<IConfiguration>(BINDINGS.Configuration).setConfig({
 							// @ts-ignore
-							exceptions: {},
-							// @ts-ignore
 							genesisBlock: {},
 							milestones,
 							// @ts-ignore
@@ -495,17 +493,14 @@ export class Command extends Commands.Command {
 							spaces: 4,
 						});
 
-						writeJSONSync(resolve(cryptoConfigDestination, "exceptions.json"), {});
-
 						writeFileSync(
 							resolve(cryptoConfigDestination, "index.ts"),
 							[
-								'import exceptions from "./exceptions.json";',
 								'import genesisBlock from "./genesisBlock.json";',
 								'import milestones from "./milestones.json";',
 								'import network from "./network.json";',
 								"",
-								`export const ${flags.network} = { exceptions, genesisBlock, milestones, network };`,
+								`export const ${flags.network} = { genesisBlock, milestones, network };`,
 								"",
 							].join("\n"),
 						);
@@ -544,6 +539,7 @@ export class Command extends Commands.Command {
 		return {
 			address: {
 				base58: options.pubKeyHash,
+				bech32m: "ark",
 			},
 			aip20: 0,
 			bip32: {
@@ -693,7 +689,7 @@ export class Command extends Commands.Command {
 	}
 
 	private async createWallet(pubKeyHash: number): Promise<Wallet> {
-		const passphrase = generateMnemonic();
+		const passphrase = generateMnemonic(256);
 
 		const keys: Interfaces.IKeyPair = await this.app
 			.get<IKeyPairFactory>(BINDINGS.Identity.KeyPairFactory)
@@ -721,7 +717,6 @@ export class Command extends Commands.Command {
 				await this.app
 					.resolve(TransferBuilder)
 					.network(pubKeyHash)
-					.version(2)
 					.nonce(nonce.toFixed(0))
 					.recipientId(recipient.address)
 					.amount(amount)
@@ -757,7 +752,6 @@ export class Command extends Commands.Command {
 					await this.app
 						.resolve(DelegateRegistrationBuilder)
 						.network(pubKeyHash)
-						.version(2)
 						.nonce("1") // delegate registration tx is always the first one from sender
 						.usernameAsset(sender.username)
 						.fee(`${25 * 1e8}`)
@@ -779,7 +773,6 @@ export class Command extends Commands.Command {
 					await this.app
 						.resolve(VoteBuilder)
 						.network(pubKeyHash)
-						.version(2)
 						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is delegate registration)
 						.votesAsset([`+${sender.keys.publicKey}`])
 						.fee(`${1 * 1e8}`)
@@ -837,24 +830,14 @@ export class Command extends Commands.Command {
 
 		const block: any = {
 			blockSignature: undefined,
-
-			// @ts-ignore
-			generatorPublicKey: keys.publicKey.toString("hex"),
-
+			generatorPublicKey: keys.publicKey,
 			height: 1,
-
 			id: undefined,
-
 			numberOfTransactions: transactions.length,
-
 			payloadHash: payloadHash.toString("hex"),
-
 			payloadLength,
-
 			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-
 			reward: "0",
-
 			timestamp,
 			totalAmount: totalAmount.toString(),
 			totalFee: totalFee.toString(),
@@ -862,9 +845,9 @@ export class Command extends Commands.Command {
 			version: 0,
 		};
 
-		block.id = this.app.get<any>(BINDINGS.Block.IDFactory).make(block);
+		block.id = await this.app.get<any>(BINDINGS.Block.IDFactory).make(block);
 
-		block.blockSignature = this.signBlock(block, keys);
+		block.blockSignature = await this.signBlock(block, keys);
 
 		return block;
 	}

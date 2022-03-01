@@ -1,7 +1,6 @@
 import { IBlockJson } from "./block";
 
 export interface NetworkConfig {
-	exceptions: IExceptions;
 	genesisBlock: IBlockJson;
 	milestones: Array<Record<string, any>>;
 	network: Network;
@@ -24,11 +23,6 @@ export interface Network {
 		symbol: string;
 		explorer: string;
 	};
-}
-
-export interface IExceptions {
-	blocks?: string[];
-	transactions?: string[];
 }
 
 export interface MilestoneSearchResult {

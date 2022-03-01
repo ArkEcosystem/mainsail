@@ -5,7 +5,6 @@ import {
 	IBlockData,
 	IBlockFactory,
 	IBlockJson,
-	IConfiguration,
 	IHashFactory,
 	IKeyPair,
 	ITransaction,
@@ -14,7 +13,6 @@ import {
 } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Block } from "./block";
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
 import { Deserializer } from "./deserializer";
 import { BlockSchemaError } from "./errors";
@@ -23,9 +21,6 @@ import { Serializer } from "./serializer";
 
 @Container.injectable()
 export class BlockFactory implements IBlockFactory {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
-
 	@Container.inject(BINDINGS.Block.Serializer)
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer
 
@@ -90,18 +85,16 @@ export class BlockFactory implements IBlockFactory {
 		data: IBlockData,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): Promise<IBlock | undefined> {
-		if (await this.#applySchema(data)) {
-			const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
-			const block: IBlock = this.blockFactory({
-				...(await this.deserializer.deserialize(serialized, false, options)),
-				id: data.id,
-			});
-			block.serialized = serialized.toString("hex");
+		await this.#applySchema(data);
 
-			return block;
-		}
+		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
+		const block: IBlock = this.blockFactory({
+			...(await this.deserializer.deserialize(serialized, false, options)),
+			id: data.id,
+		});
+		block.serialized = serialized.toString("hex");
 
-		return undefined;
+		return block;
 	}
 
 	private async fromSerialized(serialized: Buffer): Promise<IBlock> {
@@ -115,7 +108,7 @@ export class BlockFactory implements IBlockFactory {
 			deserialized.data = validated;
 		}
 
-		const block: IBlock = new Block(this.configuration, deserialized);
+		const block: IBlock = this.blockFactory(deserialized);
 		block.serialized = serialized.toString("hex");
 
 		return block;

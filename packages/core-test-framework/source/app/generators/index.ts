@@ -10,7 +10,6 @@ export const generateCryptoConfigRaw = (opts?: SandboxOptions) => {
 	const config: CryptoConfigPaths = generateCryptoConfig(opts);
 
 	return {
-		exceptions: require(config.exceptions),
 		genesisBlock: require(config.genesisBlock),
 		milestones: require(config.milestones),
 		network: require(config.network),

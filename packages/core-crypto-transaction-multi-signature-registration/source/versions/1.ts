@@ -80,7 +80,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
-		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 33));
+		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 32));
 
 		buff.writeUInt8(min);
 		buff.writeUInt8(publicKeys.length);
@@ -100,7 +100,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 
 		const count = buf.readUInt8();
 		for (let index = 0; index < count; index++) {
-			const publicKey = buf.readBuffer(33).toString("hex");
+			const publicKey = buf.readBuffer(32).toString("hex");
 			multiSignature.publicKeys.push(publicKey);
 		}
 

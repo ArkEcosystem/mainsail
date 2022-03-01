@@ -1,4 +1,4 @@
-import { BINDINGS, IBlock, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { BINDINGS, IBlock } from "@arkecosystem/core-crypto-contracts";
 import { Container, Providers } from "@arkecosystem/core-kernel";
 
 import { Block } from "./block";
@@ -14,7 +14,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(INTERNAL_FACTORY)
 			.toFactory<IBlock>(
 				(context: Container.interfaces.Context) => (data) =>
-					new Block(context.container.get<IConfiguration>(BINDINGS.Configuration), data),
+					context.container.resolve(Block).init(data),
 			);
 
 		this.app.bind(BINDINGS.Block.Deserializer).to(Deserializer).inSingletonScope();

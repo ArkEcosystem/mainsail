@@ -10,7 +10,7 @@ export class CreateTransactionsTable20180305400000 implements MigrationInterface
                 "sequence" SMALLINT NOT NULL,
                 "timestamp" INTEGER NOT NULL,
                 "sender_public_key" VARCHAR(66) NOT NULL,
-                "recipient_id" VARCHAR(36),
+                "recipient_id" VARCHAR(255),
                 "type" SMALLINT NOT NULL,
                 "vendor_field_hex" bytea,
                 "amount" BIGINT NOT NULL,

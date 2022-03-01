@@ -1,8 +1,8 @@
+import assert from "assert";
 import { Container } from "@arkecosystem/core-container";
 import { BINDINGS, IBlock, IBlockData, IBlockSerializer, ITransactionData } from "@arkecosystem/core-crypto-contracts";
 import { PreviousBlockIdFormatError } from "@arkecosystem/core-crypto-errors";
 import { Utils } from "@arkecosystem/core-crypto-transaction";
-import assert from "assert";
 import ByteBuffer from "bytebuffer";
 
 @Container.injectable()

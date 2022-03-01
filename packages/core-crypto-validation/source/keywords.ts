@@ -159,5 +159,5 @@ export const registerKeywords = (configuration: IConfiguration) => {
 		});
 	};
 
-	return [bignum, blockId, maxBytes, network, transactionType];
+	return { bignum, blockId, maxBytes, network, transactionType };
 };

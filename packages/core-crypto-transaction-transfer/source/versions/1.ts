@@ -49,6 +49,6 @@ export class TransferTransaction extends Transaction {
 		const { data } = this;
 		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
 		data.expiration = buf.readUInt32LE();
-		data.recipientId = await this.addressFactory.fromBuffer(buf.readBuffer(21));
+		data.recipientId = await this.addressFactory.fromBuffer(buf.readBuffer(52)); // 52=bech32m, 21=base58
 	}
 }

@@ -14,7 +14,6 @@ export class Configuration implements IConfiguration {
 
 	public setConfig(config: NetworkConfig): void {
 		this.#config = {
-			exceptions: config.exceptions,
 			genesisBlock: config.genesisBlock,
 			milestones: config.milestones,
 			network: config.network,
@@ -31,8 +30,6 @@ export class Configuration implements IConfiguration {
 	public set<T = any>(key: string, value: T): void {
 		if (!this.#config) {
 			this.#config = {
-				// @ts-ignore
-				exceptions: {},
 				// @ts-ignore
 				genesisBlock: {},
 				// @ts-ignore

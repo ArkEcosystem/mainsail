@@ -72,13 +72,11 @@ export class Sandbox {
 		};
 
 		// Configure Crypto
-		const exceptions = require(this.paths.crypto.exceptions);
 		const genesisBlock = require(this.paths.crypto.genesisBlock);
 		const milestones = require(this.paths.crypto.milestones);
 		const network = require(this.paths.crypto.network);
 
 		// this.configuration.setConfig({
-		// 	exceptions,
 		// 	genesisBlock,
 		// 	milestones,
 		// 	network,
@@ -86,7 +84,6 @@ export class Sandbox {
 
 		this.app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).merge({
 			crypto: {
-				exceptions,
 				genesisBlock,
 				milestones,
 				network,

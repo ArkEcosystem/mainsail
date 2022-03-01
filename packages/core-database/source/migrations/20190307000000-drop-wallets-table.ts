@@ -8,7 +8,7 @@ export class DropWalletsTable20190307000000 implements MigrationInterface {
 	public async down(queryRunner: QueryRunner): Promise<any> {
 		await queryRunner.query(`
             CREATE TABLE wallets (
-                "address" VARCHAR(36) PRIMARY KEY NOT NULL,
+                "address" VARCHAR(255) PRIMARY KEY NOT NULL,
                 "public_key" VARCHAR(66) UNIQUE NOT NULL,
                 "vote" VARCHAR(66),
                 "username" VARCHAR(64) UNIQUE,

@@ -24,5 +24,5 @@ export const registerFormats = (configuration: IConfiguration) => {
 		});
 	};
 
-	return [vendorField, validPeer];
+	return { validPeer, vendorField };
 };

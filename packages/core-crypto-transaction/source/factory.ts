@@ -116,6 +116,7 @@ export class TransactionFactory implements ITransactionFactory {
 
 			return transaction;
 		} catch (error) {
+			console.log(error)
 			if (
 				error instanceof TransactionVersionError ||
 				error instanceof TransactionSchemaError ||
