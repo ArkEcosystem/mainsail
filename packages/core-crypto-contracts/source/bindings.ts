@@ -14,6 +14,7 @@ export const BINDINGS = {
 		KeyPairFactory: Symbol.for("Crypto<Identity.KeyPairFactory>"),
 		PrivateKeyFactory: Symbol.for("Crypto<Identity.PrivateKeyFactory>"),
 		PublicKeyFactory: Symbol.for("Crypto<Identity.PublicKeyFactory>"),
+		PublicKeySerializer: Symbol.for("Crypto<Identity.PublicKeySerializer>"),
 		WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
 	},
 	Signature: Symbol.for("Crypto<Signature>"),

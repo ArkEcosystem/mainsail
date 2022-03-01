@@ -17,7 +17,7 @@ export class Signature implements ISignature {
 		buffer.append(signature, "hex");
 	}
 
-	public deserialize(buffer: ByteBuffer): string {
-		return buffer.readBytes(64).toString("hex");
+	public deserialize(buffer: ByteBuffer): Buffer {
+		return buffer.readBytes(64);
 	}
 }

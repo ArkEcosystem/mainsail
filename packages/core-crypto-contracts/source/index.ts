@@ -8,6 +8,5 @@ export * from "./identities";
 export * from "./managers";
 export * from "./message";
 export * from "./networks";
-export * from "./signatory";
 export * from "./transactions";
 export * from "./validator";

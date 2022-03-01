@@ -51,7 +51,7 @@ export class Signature implements ISignature {
 		buffer.append(signature, "hex");
 	}
 
-	public deserialize(buffer: ByteBuffer): string {
+	public deserialize(buffer: ByteBuffer): Buffer {
 		const signatureLength = (): number => {
 			buffer.mark();
 
@@ -62,6 +62,6 @@ export class Signature implements ISignature {
 			return parseInt(lengthHex, 16) + 2;
 		};
 
-		return buffer.readBytes(signatureLength()).toString("hex");
+		return buffer.readBytes(signatureLength());
 	}
 }
