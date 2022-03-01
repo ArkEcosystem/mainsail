@@ -1,5 +1,5 @@
 import { Utils } from "@arkecosystem/core-kernel";
-import execa from "execa";
+import { execa } from "../../execa";
 
 import { AbstractSource } from "./abstract-source";
 

@@ -1,4 +1,4 @@
-import envPaths from "env-paths";
+import { envPaths } from "../env-paths";
 import { PackageJson } from "type-fest";
 
 import { ActionFactory } from "../action-factory";
@@ -162,7 +162,7 @@ export abstract class Command {
 			this.input.setFlag(
 				"network",
 				await this.app.resolve(DiscoverNetwork).discover(
-					envPaths(this.input.getFlag("token"), {
+					envPaths.get(this.input.getFlag("token"), {
 						suffix: "core",
 					}).config,
 				),

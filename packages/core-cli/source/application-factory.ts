@@ -1,4 +1,4 @@
-import envPaths from "env-paths";
+import { envPaths } from "./env-paths";
 import { PackageJson } from "type-fest";
 
 import { ActionFactory } from "./action-factory";
@@ -57,7 +57,7 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Package).toConstantValue(pkg);
 
 		// Paths
-		app.bind(Identifiers.ConsolePaths).toConstantValue(envPaths(pkg.name!));
+		app.bind(Identifiers.ConsolePaths).toConstantValue(envPaths.get(pkg.name!));
 
 		// Factories
 		app.bind(Identifiers.ActionFactory).to(ActionFactory).inSingletonScope();

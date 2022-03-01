@@ -1,4 +1,4 @@
-import execa from "execa";
+import { execa } from "../../execa";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra";
 import { join } from "path";
 

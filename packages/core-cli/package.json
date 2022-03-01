@@ -13,7 +13,9 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"test": "uvu -r tsm source .test.ts"
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 -r html pnpm run test",
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@arkecosystem/core-kernel": "workspace:*",
@@ -51,6 +53,7 @@
 		"@types/listr": "0.14.4",
 		"@types/semver": "6.2.3",
 		"@types/yargs-parser": "20.2.1",
+		"tmp": "0.2.1",
 		"uvu": "^0.5.3"
 	},
 	"engines": {
