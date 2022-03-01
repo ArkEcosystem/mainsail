@@ -9,6 +9,10 @@ export class PublicKeySerializer implements IPublicKeySerializer {
 	}
 
 	public deserialize(buffer: ByteBuffer): Buffer {
+		if (typeof buffer.readBytes === "function") {
+			return buffer.readBytes(32);
+		}
+
 		return buffer.readBuffer(32);
 	}
 }

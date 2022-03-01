@@ -57,7 +57,7 @@ export interface IWIFFactory {
 }
 
 export interface IAddressSerializer {
-	serialize(buffer: ByteBuffer, address: string): void;
+	serialize(buffer: ByteBuffer, address: Buffer): void;
 
 	deserialize(buffer: ByteBuffer): Buffer;
 }

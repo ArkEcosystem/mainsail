@@ -1,10 +1,19 @@
 import { Container } from "@arkecosystem/core-container";
-import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
+import {
+	BINDINGS,
+	IAddressSerializer,
+	ISerializeOptions,
+	TransactionType,
+	TransactionTypeGroup,
+} from "@arkecosystem/core-crypto-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class TransferTransaction extends Transaction {
+	@Container.inject(BINDINGS.Identity.AddressSerializer)
+	private readonly addressSerializer: IAddressSerializer;
+
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.Transfer;
 	public static key = "transfer";
@@ -39,7 +48,7 @@ export class TransferTransaction extends Transaction {
 		if (data.recipientId) {
 			const { addressBuffer } = await this.addressFactory.toBuffer(data.recipientId);
 
-			buff.writeBuffer(addressBuffer);
+			this.addressSerializer.serialize(buff, addressBuffer);
 		}
 
 		return buff;
@@ -49,6 +58,6 @@ export class TransferTransaction extends Transaction {
 		const { data } = this;
 		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
 		data.expiration = buf.readUInt32LE();
-		data.recipientId = await this.addressFactory.fromBuffer(buf.readBuffer(52)); // 52=bech32m, 21=base58
+		data.recipientId = await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf));
 	}
 }

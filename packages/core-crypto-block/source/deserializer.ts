@@ -1,5 +1,12 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IBlockData, IBlockDeserializer, ITransaction } from "@arkecosystem/core-crypto-contracts";
+import {
+	BINDINGS,
+	IBlockData,
+	IBlockDeserializer,
+	IPublicKeySerializer,
+	ISignature,
+	ITransaction,
+} from "@arkecosystem/core-crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 import ByteBuffer from "bytebuffer";
@@ -13,6 +20,12 @@ export class Deserializer implements IBlockDeserializer {
 
 	@Container.inject(BINDINGS.Transaction.Factory)
 	private readonly transactionFactory: TransactionFactory;
+
+	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: IPublicKeySerializer;
+
+	@Container.inject(BINDINGS.Signature)
+	private readonly signatureSerializer: ISignature;
 
 	public async deserialize(
 		serialized: Buffer,
@@ -53,21 +66,8 @@ export class Deserializer implements IBlockDeserializer {
 		block.reward = BigNumber.make(buf.readUint64().toString());
 		block.payloadLength = buf.readUint32();
 		block.payloadHash = buf.readBytes(32).toString("hex");
-		block.generatorPublicKey = buf.readBytes(32).toString("hex");
-		block.blockSignature = buf.readBytes(64).toString("hex");
-
-		// @TODO: this is non-constant length handling, schnorr is constant
-		// const signatureLength = (): number => {
-		// 	buf.mark();
-
-		// 	const lengthHex: string = buf.skip(1).readBytes(1).toString("hex");
-
-		// 	buf.reset();
-
-		// 	return Number.parseInt(lengthHex, 16) + 2;
-		// };
-
-		// block.blockSignature = buf.readBytes(signatureLength()).toString("hex");
+		block.generatorPublicKey = this.publicKeySerializer.deserialize(buf).toString("hex");
+		block.blockSignature = this.signatureSerializer.deserialize(buf).toString("hex");
 	}
 
 	private async deserializeTransactions(

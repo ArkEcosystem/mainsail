@@ -3,6 +3,8 @@ import {
 	BINDINGS,
 	IConfiguration,
 	IDeserializeOptions,
+	IPublicKeySerializer,
+	ISignature,
 	ITransaction,
 	ITransactionData,
 	ITransactionDeserializer,
@@ -19,6 +21,12 @@ export class Deserializer implements ITransactionDeserializer {
 
 	@Container.inject(BINDINGS.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+
+	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: IPublicKeySerializer;
+
+	@Container.inject(BINDINGS.Signature)
+	private readonly signatureSerializer: ISignature;
 
 	public async deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): Promise<ITransaction> {
 		const data = {} as ITransactionData;
@@ -54,13 +62,14 @@ export class Deserializer implements ITransactionDeserializer {
 			transaction.nonce = BigNumber.make(buf.readBigUInt64LE());
 		}
 
-		transaction.senderPublicKey = buf.readBuffer(32).toString("hex");
+		transaction.senderPublicKey = this.publicKeySerializer.deserialize(buf).toString("hex");
 		transaction.fee = BigNumber.make(buf.readBigUInt64LE().toString());
 		transaction.amount = BigNumber.ZERO;
 	}
 
 	private deserializeVendorField(transaction: ITransaction, buf: ByteBuffer): void {
 		const vendorFieldLength: number = buf.readUInt8();
+
 		if (vendorFieldLength > 0) {
 			if (transaction.hasVendorField()) {
 				const vendorFieldBuffer: Buffer = buf.readBuffer(vendorFieldLength);
@@ -72,11 +81,12 @@ export class Deserializer implements ITransactionDeserializer {
 	}
 
 	private deserializeSignatures(transaction: ITransactionData, buf: ByteBuffer): void {
+		// @TODO
 		const canReadNonMultiSignature = () =>
 			buf.getRemainderLength() && (buf.getRemainderLength() % 64 === 0 || buf.getRemainderLength() % 65 !== 0);
 
 		if (canReadNonMultiSignature()) {
-			transaction.signature = buf.readBuffer(64).toString("hex");
+			transaction.signature = this.signatureSerializer.deserialize(buf).toString("hex");
 		}
 
 		// @TODO: musig

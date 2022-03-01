@@ -1,7 +1,9 @@
 import { Container } from "@arkecosystem/core-container";
 import {
+	BINDINGS,
 	IConfiguration,
 	IMultiSignatureAsset,
+	IPublicKeySerializer,
 	ISerializeOptions,
 	ITransactionData,
 	TransactionType,
@@ -12,6 +14,9 @@ import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class MultiSignatureRegistrationTransaction extends Transaction {
+	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: IPublicKeySerializer;
+
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
@@ -80,6 +85,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
+		// @TODO
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 32));
 
 		buff.writeUInt8(min);
@@ -100,7 +106,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 
 		const count = buf.readUInt8();
 		for (let index = 0; index < count; index++) {
-			const publicKey = buf.readBuffer(32).toString("hex");
+			const publicKey = this.publicKeySerializer.deserialize(buf).toString("hex");
 			multiSignature.publicKeys.push(publicKey);
 		}
 

@@ -1,5 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
 import {
+	BINDINGS,
+	IAddressSerializer,
 	IMultiPaymentItem,
 	ISerializeOptions,
 	TransactionType,
@@ -10,6 +12,9 @@ import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class MultiPaymentTransaction extends Transaction {
+	@Container.inject(BINDINGS.Identity.AddressSerializer)
+	private readonly addressSerializer: IAddressSerializer;
+
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiPayment;
 	public static key = "multiPayment";
@@ -78,7 +83,7 @@ export class MultiPaymentTransaction extends Transaction {
 		for (let index = 0; index < total; index++) {
 			payments.push({
 				amount: BigNumber.make(buf.readBigUInt64LE().toString()),
-				recipientId: await this.addressFactory.fromBuffer(buf.readBuffer(21)),
+				recipientId: await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf)),
 			});
 		}
 

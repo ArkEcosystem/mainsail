@@ -62,6 +62,10 @@ export class Signature implements ISignature {
 			return parseInt(lengthHex, 16) + 2;
 		};
 
-		return buffer.readBytes(signatureLength());
+		if (typeof buffer.readBytes === "function") {
+			return buffer.readBytes(signatureLength());
+		}
+
+		return buffer.readBuffer(signatureLength());
 	}
 }

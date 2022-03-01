@@ -4,7 +4,7 @@ import ByteBuffer from "bytebuffer";
 
 @Container.injectable()
 export class AddressSerializer implements IAddressSerializer {
-	public serialize(buffer: ByteBuffer, address: ByteBuffer): void {
+	public serialize(buffer: ByteBuffer, address: Buffer): void {
 		buffer.writeBuffer(address);
 	}
 

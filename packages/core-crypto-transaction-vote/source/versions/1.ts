@@ -59,6 +59,7 @@ export class VoteTransaction extends Transaction {
 		data.asset = { votes: [] };
 
 		for (let index = 0; index < votelength; index++) {
+			// @TODO: deserialising votes requires length+1 unless we drop the prefix and use separate arrays
 			let vote: string = buf.readBuffer(33).toString("hex"); // 33=schnorr,34=ecdsa
 			vote = (vote[1] === "1" ? "+" : "-") + vote.slice(2);
 

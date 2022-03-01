@@ -1,14 +1,28 @@
-import assert from "assert";
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IBlock, IBlockData, IBlockSerializer, ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import {
+	BINDINGS,
+	IBlock,
+	IBlockData,
+	IBlockSerializer,
+	IPublicKeySerializer,
+	ISignature,
+	ITransactionData,
+} from "@arkecosystem/core-crypto-contracts";
 import { PreviousBlockIdFormatError } from "@arkecosystem/core-crypto-errors";
 import { Utils } from "@arkecosystem/core-crypto-transaction";
+import assert from "assert";
 import ByteBuffer from "bytebuffer";
 
 @Container.injectable()
 export class Serializer implements IBlockSerializer {
 	@Container.inject(BINDINGS.Transaction.Utils)
 	private readonly utils: Utils;
+
+	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: IPublicKeySerializer;
+
+	@Container.inject(BINDINGS.Signature)
+	private readonly signatureSerializer: ISignature;
 
 	public size(block: IBlock): number {
 		let size = this.headerSize(block.data) + block.data.blockSignature.length / 2;
@@ -87,14 +101,14 @@ export class Serializer implements IBlockSerializer {
 		buff.writeUint64(block.reward.toString());
 		buff.writeUint32(block.payloadLength);
 		buff.append(block.payloadHash, "hex");
-		buff.append(block.generatorPublicKey, "hex");
+		this.publicKeySerializer.serialize(buff, block.generatorPublicKey);
 
 		assert.strictEqual(buff.offset, this.headerSize(block));
 	}
 
 	private serializeSignature(block: IBlockData, buff: ByteBuffer): void {
 		if (block.blockSignature) {
-			buff.append(block.blockSignature, "hex");
+			this.signatureSerializer.serialize(buff, block.blockSignature);
 		}
 	}
 }
