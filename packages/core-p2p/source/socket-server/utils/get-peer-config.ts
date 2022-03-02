@@ -1,5 +1,5 @@
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Providers, Services, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Services, Utils } from "@arkecosystem/core-kernel";
 
 type PluginConfig = { package: string; options: any };
 
@@ -29,7 +29,7 @@ const transformPlugins = (plugins: PluginConfig[]): Contracts.P2P.PeerPlugins =>
 const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Application) =>
 	plugins.map((plugin) => {
 		const serviceProvider: Providers.ServiceProvider = app
-			.get<Providers.ServiceProviderRepository>(Container.Identifiers.ServiceProviderRepository)
+			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
 			.get(plugin.package);
 
 		const serviceProviderName: string | undefined = serviceProvider.name();
@@ -43,7 +43,7 @@ const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Applica
 	});
 
 export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.PeerConfig => {
-	const configuration: IConfiguration = app.get(BINDINGS.Configuration);
+	const configuration: Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
 
 	return {
 		network: {
@@ -58,7 +58,7 @@ export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.
 		},
 		plugins: transformPlugins(
 			getPluginsConfig(
-				app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).get("app.plugins"),
+				app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("app.plugins"),
 				app,
 			),
 		),

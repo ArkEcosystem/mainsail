@@ -1,12 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IBlockData,
-	IBlockDeserializer,
-	IPublicKeySerializer,
-	ISignature,
-	ITransaction,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 import ByteBuffer from "bytebuffer";
@@ -14,26 +7,26 @@ import ByteBuffer from "bytebuffer";
 import { IDFactory } from "./id.factory";
 
 @Container.injectable()
-export class Deserializer implements IBlockDeserializer {
-	@Container.inject(BINDINGS.Block.IDFactory)
+export class Deserializer implements Crypto.IBlockDeserializer {
+	@Container.inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: TransactionFactory;
 
-	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
-	private readonly publicKeySerializer: IPublicKeySerializer;
+	@Container.inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: Crypto.IPublicKeySerializer;
 
-	@Container.inject(BINDINGS.Signature)
-	private readonly signatureSerializer: ISignature;
+	@Container.inject(Identifiers.Cryptography.Signature)
+	private readonly signatureSerializer: Crypto.ISignature;
 
 	public async deserialize(
 		serialized: Buffer,
 		headerOnly = false,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
-	): Promise<{ data: IBlockData; transactions: ITransaction[] }> {
-		const block = {} as IBlockData;
-		let transactions: ITransaction[] = [];
+	): Promise<{ data: Crypto.IBlockData; transactions: Crypto.ITransaction[] }> {
+		const block = {} as Crypto.IBlockData;
+		let transactions: Crypto.ITransaction[] = [];
 
 		const buf: ByteBuffer = new ByteBuffer(serialized.length, true);
 		buf.append(serialized);
@@ -51,7 +44,7 @@ export class Deserializer implements IBlockDeserializer {
 		return { data: block, transactions };
 	}
 
-	private deserializeHeader(block: IBlockData, buf: ByteBuffer): void {
+	private deserializeHeader(block: Crypto.IBlockData, buf: ByteBuffer): void {
 		block.version = buf.readUint32();
 		block.timestamp = buf.readUint32();
 		block.height = buf.readUint32();
@@ -71,17 +64,17 @@ export class Deserializer implements IBlockDeserializer {
 	}
 
 	private async deserializeTransactions(
-		block: IBlockData,
+		block: Crypto.IBlockData,
 		buf: ByteBuffer,
 		deserializeTransactionsUnchecked = false,
-	): Promise<ITransaction[]> {
+	): Promise<Crypto.ITransaction[]> {
 		const transactionLengths: number[] = [];
 
 		for (let index = 0; index < block.numberOfTransactions; index++) {
 			transactionLengths.push(buf.readUint32());
 		}
 
-		const transactions: ITransaction[] = [];
+		const transactions: Crypto.ITransaction[] = [];
 		block.transactions = [];
 		for (const length of transactionLengths) {
 			const transactionBytes = buf.readBytes(length).toBuffer();

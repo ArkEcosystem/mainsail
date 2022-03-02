@@ -16,7 +16,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"ajv": "6.12.6",
 		"ajv-keywords": "3.4.1"

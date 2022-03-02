@@ -1,22 +1,12 @@
-import {
-	AndExpression,
-	BetweenExpression,
-	EqualExpression,
-	Expression,
-	GreaterThanEqualExpression,
-	LessThanEqualExpression,
-	NumericCriteria,
-	OrCriteria,
-	OrExpression,
-} from "../contracts/search";
+import { Search } from "@arkecosystem/core-contracts";
 
-export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Expression<TEntity> => {
+export const optimizeExpression = <TEntity>(expression: Search.Expression<TEntity>): Search.Expression<TEntity> => {
 	switch (expression.op) {
 		case "and": {
 			const optimized = expression.expressions.map(optimizeExpression);
 			const flattened = optimized.reduce(
 				(acc, e) => (e.op === "and" ? [...acc, ...e.expressions] : [...acc, e]),
-				[] as Expression<TEntity>[],
+				[] as Search.Expression<TEntity>[],
 			);
 
 			if (flattened.every((e) => e.op === "true")) {
@@ -34,7 +24,7 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 			const optimized = expression.expressions.map(optimizeExpression);
 			const flattened = optimized.reduce(
 				(acc, e) => (e.op === "or" ? [...acc, ...e.expressions] : [...acc, e]),
-				[] as Expression<TEntity>[],
+				[] as Search.Expression<TEntity>[],
 			);
 
 			if (flattened.every((e) => e.op === "false")) {
@@ -54,7 +44,7 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 };
 
 export const someOrCriteria = <TCriteria>(
-	criteria: OrCriteria<TCriteria>,
+	criteria: Search.OrCriteria<TCriteria>,
 	predicate: (c: TCriteria) => boolean,
 ): boolean => {
 	if (typeof criteria === "undefined") {
@@ -67,7 +57,7 @@ export const someOrCriteria = <TCriteria>(
 };
 
 export const everyOrCriteria = <TCriteria>(
-	criteria: OrCriteria<TCriteria>,
+	criteria: Search.OrCriteria<TCriteria>,
 	predicate: (c: TCriteria) => boolean,
 ): boolean => {
 	if (typeof criteria === "undefined") {
@@ -79,13 +69,13 @@ export const everyOrCriteria = <TCriteria>(
 	return predicate(criteria);
 };
 
-export const hasOrCriteria = <TCriteria>(criteria: OrCriteria<TCriteria>): boolean =>
+export const hasOrCriteria = <TCriteria>(criteria: Search.OrCriteria<TCriteria>): boolean =>
 	someOrCriteria(criteria, () => true);
 
 export const handleAndCriteria = async <TEntity, TCriteria>(
 	criteria: TCriteria,
-	cb: <K extends keyof TCriteria>(key: K) => Promise<Expression<TEntity>>,
-): Promise<AndExpression<TEntity>> => {
+	cb: <K extends keyof TCriteria>(key: K) => Promise<Search.Expression<TEntity>>,
+): Promise<Search.AndExpression<TEntity>> => {
 	const promises = Object.keys(criteria)
 		.filter((key) => typeof criteria[key] !== "undefined")
 		.map((key) => cb(key as keyof TCriteria));
@@ -94,9 +84,9 @@ export const handleAndCriteria = async <TEntity, TCriteria>(
 };
 
 export const handleOrCriteria = async <TEntity, TCriteria>(
-	criteria: OrCriteria<TCriteria>,
-	cb: (criteria: TCriteria) => Promise<Expression<TEntity>>,
-): Promise<OrExpression<TEntity>> => {
+	criteria: Search.OrCriteria<TCriteria>,
+	cb: (criteria: TCriteria) => Promise<Search.Expression<TEntity>>,
+): Promise<Search.OrExpression<TEntity>> => {
 	if (Array.isArray(criteria)) {
 		const promises = criteria.map((c) => cb(c));
 		const expressions = await Promise.all(promises);
@@ -109,12 +99,12 @@ export const handleOrCriteria = async <TEntity, TCriteria>(
 
 export const handleNumericCriteria = async <TEntity, TProperty extends keyof TEntity>(
 	property: TProperty,
-	criteria: NumericCriteria<NonNullable<TEntity[TProperty]>>,
+	criteria: Search.NumericCriteria<NonNullable<TEntity[TProperty]>>,
 ): Promise<
-	| EqualExpression<TEntity>
-	| BetweenExpression<TEntity>
-	| GreaterThanEqualExpression<TEntity>
-	| LessThanEqualExpression<TEntity>
+	| Search.EqualExpression<TEntity>
+	| Search.BetweenExpression<TEntity>
+	| Search.GreaterThanEqualExpression<TEntity>
+	| Search.LessThanEqualExpression<TEntity>
 > => {
 	if (typeof criteria === "object") {
 		if ("from" in criteria && "to" in criteria) {

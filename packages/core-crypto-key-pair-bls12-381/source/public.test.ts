@@ -1,7 +1,7 @@
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Application, Container } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Container } from "@arkecosystem/core-kernel";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
@@ -9,11 +9,11 @@ import { PublicKeyFactory } from "./public";
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
-describe<{ container: Container.Container }>("PrivateKeyFactory", ({ assert, beforeEach, it }) => {
+describe<{ container: Container.Container }>("PublicKeyFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.container = new Container.Container();
-		context.container.bind(BINDINGS.Configuration).to(Configuration).inSingletonScope();
-		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
+		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.container.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
 	});
 
 	it("should derive a key pair from an mnemonic", async (context) => {

@@ -1,4 +1,4 @@
-import { Application, Container, Contracts, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
+import { Application, Container, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, Mocks, passphrases } from "@arkecosystem/core-test-framework";
 import { Mempool } from "@arkecosystem/core-transaction-pool";
@@ -21,12 +21,12 @@ describe<{
 	walletRepository: Contracts.State.WalletRepository;
 	handler: TransactionHandler;
 	factoryBuilder: Factories.FactoryBuilder;
-	delegateRegistrationTransaction: Interfaces.ITransaction;
+	delegateRegistrationTransaction: Crypto.ITransaction;
 	store: any;
 	transactionHistoryService: any;
 }>("DelegateRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.delegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
@@ -45,11 +45,9 @@ describe<{
 		Managers.configManager.setConfig(config);
 
 		context.app = initApp();
-		context.app
-			.bind(Container.Identifiers.TransactionHistoryService)
-			.toConstantValue(context.transactionHistoryService);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(context.transactionHistoryService);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -64,7 +62,7 @@ describe<{
 		context.walletRepository.index(context.recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
@@ -221,7 +219,7 @@ describe<{
 
 	it("emitEvents should dispatch", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
+			Identifiers.EventDispatcherService,
 		);
 
 		const mock = spy(emitter, "dispatch");
@@ -242,7 +240,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet has a multi signature", async (context) => {
-		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+		const multiSignatureAsset: Crypto.IMultiSignatureAsset = {
 			min: 2,
 			publicKeys: [
 				Identities.PublicKey.fromPassphrase(passphrases[21]),
@@ -350,7 +348,7 @@ describe<{
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
 		await context.app
-			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPoolMempool)
 			.addTransaction(context.delegateRegistrationTransaction);
 
 		await assert.rejects(
@@ -379,7 +377,7 @@ describe<{
 			.build();
 
 		await context.app
-			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPoolMempool)
 			.addTransaction(anotherDelegateRegistrationTransaction);
 
 		await assert.rejects(

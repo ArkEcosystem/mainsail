@@ -1,16 +1,16 @@
-import Interfaces, { BINDINGS, IConfiguration, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 @Container.injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
-	@Container.inject(Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory)
+	@Container.inject(Identifiers.TransactionPoolWorkerIpcSubprocessFactory)
 	private readonly createWorkerSubprocess: Contracts.TransactionPool.WorkerIpcSubprocessFactory;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerIpcSubprocess;
 	private lastHeight = 0;
@@ -25,8 +25,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async getTransactionFromData(
-		transactionData: Interfaces.ITransactionData | Buffer,
-	): Promise<Interfaces.ITransaction> {
+		transactionData: Crypto.ITransactionData | Buffer,
+	): Promise<Crypto.ITransaction> {
 		const currentHeight = this.configuration.getHeight()!;
 		if (currentHeight !== this.lastHeight) {
 			this.lastHeight = currentHeight;

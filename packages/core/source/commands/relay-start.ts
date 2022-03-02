@@ -1,6 +1,6 @@
-import { resolve } from "path";
 import { Commands, Container, Contracts, Utils } from "@arkecosystem/core-cli";
 import Joi from "joi";
+import { resolve } from "path";
 
 @Container.injectable()
 export class Command extends Commands.Command {

@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IConfiguration, MilestoneSearchResult } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import dayjs from "dayjs";
 
 import { BlockTimeCalculator } from "./block-time-calculator";
@@ -16,10 +16,10 @@ export type GetBlockTimeStampLookup = (blockheight: number) => number;
 
 @Container.injectable()
 export class Slots {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Time.BlockTimeCalculator)
+	@Container.inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly calculator: BlockTimeCalculator;
 
 	public getTime(time?: number): number {
@@ -115,8 +115,8 @@ export class Slots {
 		};
 	}
 
-	public getMilestonesWhichAffectBlockTimes(): Array<MilestoneSearchResult> {
-		const milestones: Array<MilestoneSearchResult> = [
+	public getMilestonesWhichAffectBlockTimes(): Array<Crypto.MilestoneSearchResult> {
+		const milestones: Array<Crypto.MilestoneSearchResult> = [
 			{
 				data: this.configuration.getMilestone(1).blocktime,
 				found: true,

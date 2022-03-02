@@ -44,21 +44,21 @@ const handlerProvider = {
 
 beforeEach(() => {
 	sandbox = new Sandbox();
-	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-	sandbox.app.bind(Container.Identifiers.TransactionHandlerProvider).toConstantValue(handlerProvider);
+	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.TransactionHandlerProvider).toConstantValue(handlerProvider);
 
-	sandbox.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
 	sandbox.app
-		.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 		.bind("getActiveDelegates", new GetActiveDelegatesAction(sandbox.app));
 
 	sandbox.app
-		.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 		.bind("forgeNewBlock", new ForgeNewBlockAction());
 
 	sandbox.app
-		.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 		.bind("isForgingAllowed", new IsForgingAllowedAction());
 
 	const getTimeStampForBlock = (height: number) => {
@@ -588,7 +588,7 @@ describe("ForgerService", () => {
 			const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
 			slotSpy.mockReturnValue(0);
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -653,7 +653,7 @@ describe("ForgerService", () => {
 			const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
 			slotSpy.mockReturnValue(0);
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -715,7 +715,7 @@ describe("ForgerService", () => {
 			const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
 			slotSpy.mockReturnValue(0);
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -769,7 +769,7 @@ describe("ForgerService", () => {
 			const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
 			slotSpy.mockReturnValue(0);
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -830,7 +830,7 @@ describe("ForgerService", () => {
 			const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
 			slotSpy.mockReturnValue(0);
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -895,7 +895,7 @@ describe("ForgerService", () => {
 			const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
 			slotSpy.mockReturnValue(0);
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -965,7 +965,7 @@ describe("ForgerService", () => {
 			const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
 			slotSpy.mockReturnValue(0);
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -1024,7 +1024,7 @@ describe("ForgerService", () => {
 
 			const address = `Delegate-Wallet-${2}`;
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const mockPrevRound = { ...mockRound, timestamp: Slots.getTime() - 9 };
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
@@ -1056,7 +1056,7 @@ describe("ForgerService", () => {
 
 			const address = `Delegate-Wallet-${2}`;
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const mockEndingRound = { ...mockRound, timestamp: Slots.getTime() - 7 };
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
@@ -1092,7 +1092,7 @@ describe("ForgerService", () => {
 
 			const address = `Delegate-Wallet-${2}`;
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),
@@ -1144,7 +1144,7 @@ describe("ForgerService", () => {
 
 			const address = `Delegate-Wallet-${2}`;
 
-			const mockBlock = { data: {} } as Interfaces.IBlock;
+			const mockBlock = { data: {} } as Crypto.IBlock;
 			const nextDelegateToForge = {
 				publicKey: delegates[2].publicKey,
 				forge: jest.fn().mockReturnValue(mockBlock),

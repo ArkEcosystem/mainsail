@@ -5,7 +5,7 @@ import { Identities, Managers, Transactions } from "@packages/crypto";
 const createWorkerSubprocess = jest.fn();
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory).toConstantValue(createWorkerSubprocess);
+container.bind(Identifiers.TransactionPoolWorkerIpcSubprocessFactory).toConstantValue(createWorkerSubprocess);
 
 beforeEach(() => {
 	createWorkerSubprocess.mockReset();

@@ -5,7 +5,7 @@ import { Interfaces } from "@packages/crypto/source";
 import { Networks } from "@packages/crypto";
 
 interface Identity {
-	keys: Interfaces.IKeyPair;
+	keys: Crypto.IKeyPair;
 	publicKey: string;
 	privateKey: string;
 	address: string;

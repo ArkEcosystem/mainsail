@@ -1,9 +1,9 @@
 import { Container } from "@arkecosystem/core-container";
-import { IAddressSerializer } from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 import ByteBuffer from "bytebuffer";
 
 @Container.injectable()
-export class AddressSerializer implements IAddressSerializer {
+export class AddressSerializer implements Crypto.IAddressSerializer {
 	public serialize(buffer: ByteBuffer, address: Buffer): void {
 		buffer.writeBuffer(address);
 	}

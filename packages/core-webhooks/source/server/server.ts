@@ -1,11 +1,12 @@
-import { Container, Contracts, Types, Utils } from "@arkecosystem/core-kernel";
+import { randomBytes } from "crypto";
+import { Container, Types, Utils } from "@arkecosystem/core-kernel";
 import { badData } from "@hapi/boom";
 import Boom from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
-import { randomBytes } from "crypto";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
 
 import { Database } from "../database";
-import { Identifiers } from "../identifiers";
+import { InternalIdentifiers } from "../identifiers";
 import { Webhook } from "../interfaces";
 import { whitelist } from "./plugins/whitelist";
 import { destroy, show, store, update } from "./schema";
@@ -13,13 +14,13 @@ import { respondWithResource } from "./utils";
 
 @Container.injectable()
 export class Server {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.Database)
+	@Container.inject(InternalIdentifiers.Database)
 	private readonly database!: Database;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private server: HapiServer;
@@ -83,14 +84,14 @@ export class Server {
 			routes: {
 				/* c8 ignore next 3 */
 				payload: {
-					async failAction(request, h, err) {
-						return badData(err.message);
+					async failAction(request, h, error) {
+						return badData(error.message);
 					},
 				},
 				/* c8 ignore next 3 */
 				validate: {
-					async failAction(request, h, err) {
-						return badData(err.message);
+					async failAction(request, h, error) {
+						return badData(error.message);
 					},
 				},
 			},
@@ -137,7 +138,7 @@ export class Server {
 						respondWithResource({
 							...request.server.app.database.create({
 								...request.payload,
-								token: token.substring(0, 32),
+								token: token.slice(0, 32),
 							}),
 							token,
 						}),
@@ -190,7 +191,7 @@ export class Server {
 
 				request.server.app.database.update(request.params.id, request.payload as Webhook);
 
-				return h.response(undefined).code(204);
+				return h.response().code(204);
 			},
 			method: "PUT",
 			options: {
@@ -207,7 +208,7 @@ export class Server {
 
 				request.server.app.database.destroy(request.params.id);
 
-				return h.response(undefined).code(204);
+				return h.response().code(204);
 			},
 			method: "DELETE",
 			options: {

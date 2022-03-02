@@ -1,16 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IBlock,
-	IBlockData,
-	IBlockFactory,
-	IBlockJson,
-	IHashFactory,
-	IKeyPair,
-	ITransaction,
-	IValidator,
-	ISignature,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
@@ -20,30 +9,30 @@ import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
 
 @Container.injectable()
-export class BlockFactory implements IBlockFactory {
-	@Container.inject(BINDINGS.Block.Serializer)
+export class BlockFactory implements Crypto.IBlockFactory {
+	@Container.inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer
 
-	@Container.inject(BINDINGS.Block.Deserializer)
+	@Container.inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer: Deserializer; // @TODO: create contract for block deserializer
 
 	@Container.inject(INTERNAL_FACTORY)
 	private readonly blockFactory: InternalFactory; // @TODO: create contract for block deserializer
 
-	@Container.inject(BINDINGS.Block.IDFactory)
+	@Container.inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@Container.inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(BINDINGS.Signature)
-	private readonly signatureFactory: ISignature;
+	@Container.inject(Identifiers.Cryptography.Signature)
+	private readonly signatureFactory: Crypto.ISignature;
 
-	@Container.inject(BINDINGS.Validator)
-	private readonly validator: IValidator;
+	@Container.inject(Identifiers.Cryptography.Validator)
+	private readonly validator: Crypto.IValidator;
 
 	// @todo: add a proper type hint for data
-	public async make(data: any, keys: IKeyPair): Promise<IBlock | undefined> {
+	public async make(data: any, keys: Crypto.IKeyPair): Promise<Crypto.IBlock | undefined> {
 		data.generatorPublicKey = keys.publicKey;
 
 		const payloadHash: Buffer = this.serializer.serialize(data, false);
@@ -56,17 +45,17 @@ export class BlockFactory implements IBlockFactory {
 		return this.fromData(data);
 	}
 
-	public async fromHex(hex: string): Promise<IBlock> {
+	public async fromHex(hex: string): Promise<Crypto.IBlock> {
 		return this.fromSerialized(Buffer.from(hex, "hex"));
 	}
 
-	public async fromBytes(buff: Buffer): Promise<IBlock> {
+	public async fromBytes(buff: Buffer): Promise<Crypto.IBlock> {
 		return this.fromSerialized(buff);
 	}
 
-	public async fromJson(json: IBlockJson): Promise<IBlock | undefined> {
+	public async fromJson(json: Crypto.IBlockJson): Promise<Crypto.IBlock | undefined> {
 		// @ts-ignore
-		const data: IBlockData = { ...json };
+		const data: Crypto.IBlockData = { ...json };
 		data.totalAmount = BigNumber.make(data.totalAmount);
 		data.totalFee = BigNumber.make(data.totalFee);
 		data.reward = BigNumber.make(data.reward);
@@ -82,13 +71,13 @@ export class BlockFactory implements IBlockFactory {
 	}
 
 	public async fromData(
-		data: IBlockData,
+		data: Crypto.IBlockData,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
-	): Promise<IBlock | undefined> {
+	): Promise<Crypto.IBlock | undefined> {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
-		const block: IBlock = await this.blockFactory({
+		const block: Crypto.IBlock = await this.blockFactory({
 			...(await this.deserializer.deserialize(serialized, false, options)),
 			id: data.id,
 		});
@@ -97,24 +86,23 @@ export class BlockFactory implements IBlockFactory {
 		return block;
 	}
 
-	private async fromSerialized(serialized: Buffer): Promise<IBlock> {
-		const deserialized: { data: IBlockData; transactions: ITransaction[] } = await this.deserializer.deserialize(
-			serialized,
-		);
+	private async fromSerialized(serialized: Buffer): Promise<Crypto.IBlock> {
+		const deserialized: { data: Crypto.IBlockData; transactions: Crypto.ITransaction[] } =
+			await this.deserializer.deserialize(serialized);
 
-		const validated: IBlockData | undefined = await this.#applySchema(deserialized.data);
+		const validated: Crypto.IBlockData | undefined = await this.#applySchema(deserialized.data);
 
 		if (validated) {
 			deserialized.data = validated;
 		}
 
-		const block: IBlock = await this.blockFactory(deserialized);
+		const block: Crypto.IBlock = await this.blockFactory(deserialized);
 		block.serialized = serialized.toString("hex");
 
 		return block;
 	}
 
-	async #applySchema(data: IBlockData): Promise<IBlockData | undefined> {
+	async #applySchema(data: Crypto.IBlockData): Promise<Crypto.IBlockData | undefined> {
 		const result = await this.validator.validate("block", data);
 
 		if (!result.error) {

@@ -1,30 +1,30 @@
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Services, Utils } from "@arkecosystem/core-kernel";
 
 import { Delegate } from "./interfaces";
 
 @Container.injectable()
 export class DelegateTracker {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchainService: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.inject(Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
 	private readonly walletRepository: Contracts.State.WalletRepository;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	@Container.inject(BINDINGS.Time.BlockTimeCalculator)
+	@Container.inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeCalculator: any;
 
 	private delegates: Delegate[] = [];
@@ -43,7 +43,7 @@ export class DelegateTracker {
 		const round: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
 
 		const activeDelegates: any = await this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.call("getActiveDelegates", { roundInfo: round });
 
 		const activeDelegatesPublicKeys: (string | undefined)[] = activeDelegates.map(

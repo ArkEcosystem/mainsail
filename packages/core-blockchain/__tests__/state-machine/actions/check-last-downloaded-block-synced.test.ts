@@ -12,30 +12,30 @@ describe("CheckLastDownloadedBlockSynced", () => {
 		jest.resetAllMocks();
 
 		blockchain = {
-			isSynced: jest.fn(),
 			dispatch: jest.fn(),
-			getQueue: jest.fn().mockReturnValue({ size: jest.fn(), isRunning: jest.fn().mockReturnValue(true) }),
+			getQueue: jest.fn().mockReturnValue({ isRunning: jest.fn().mockReturnValue(true), size: jest.fn() }),
+			isSynced: jest.fn(),
 		};
 		stateStore = {
-			noBlockCounter: undefined,
-			p2pUpdateCounter: undefined,
-			numberOfBlocksToRollback: undefined,
 			getLastDownloadedBlock: jest.fn(),
-			getNoBlockCounter: jest.fn().mockReturnValue(0),
-			setNoBlockCounter: jest.fn(),
-			getP2pUpdateCounter: jest.fn().mockReturnValue(0),
-			setP2pUpdateCounter: jest.fn(),
-			setNumberOfBlocksToRollback: jest.fn(),
 			getNetworkStart: jest.fn().mockReturnValue(false),
+			getNoBlockCounter: jest.fn().mockReturnValue(0),
+			getP2pUpdateCounter: jest.fn().mockReturnValue(0),
+			noBlockCounter: undefined,
+			numberOfBlocksToRollback: undefined,
+			p2pUpdateCounter: undefined,
+			setNoBlockCounter: jest.fn(),
+			setNumberOfBlocksToRollback: jest.fn(),
+			setP2pUpdateCounter: jest.fn(),
 		};
 		peerNetworkMonitor = { checkNetworkHealth: jest.fn() };
-		logger = { warn: jest.fn(), debug: jest.fn(), info: jest.fn(), error: jest.fn() };
+		logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
 
 		container = new Container.Container();
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
 
 		process.env.CORE_ENV = "";
 	});

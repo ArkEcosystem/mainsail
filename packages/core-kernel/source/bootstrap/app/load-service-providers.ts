@@ -1,8 +1,8 @@
+import { join } from "path";
+import { Kernel } from "@arkecosystem/core-contracts";
 import { readJSONSync } from "fs-extra";
 import glob from "glob";
-import { join } from "path";
 
-import { Application } from "../../contracts/kernel";
 import { Identifiers, inject, injectable } from "../../ioc";
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../../providers";
 import { ConfigRepository } from "../../services/config";
@@ -24,7 +24,7 @@ interface Plugin {
 @injectable()
 export class LoadServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
@@ -89,8 +89,8 @@ export class LoadServiceProviders implements Bootstrapper {
 			const packageJson = readJSONSync(join(packagePath, "package.json"));
 
 			plugins.push({
-				path: packagePath,
 				name: packageJson.name,
+				path: packagePath,
 				version: packageJson.version,
 			});
 		}

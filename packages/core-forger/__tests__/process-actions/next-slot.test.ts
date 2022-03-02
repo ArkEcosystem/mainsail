@@ -14,7 +14,7 @@ const mockForgerService = {
 beforeEach(() => {
 	sandbox = new Sandbox();
 
-	sandbox.app.bind(Container.Identifiers.ForgerService).toConstantValue(mockForgerService);
+	sandbox.app.bind(Identifiers.ForgerService).toConstantValue(mockForgerService);
 
 	action = sandbox.app.resolve(NextSlotProcessAction);
 });

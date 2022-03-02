@@ -1,9 +1,10 @@
-import { Validator } from "../../contracts/kernel/validation";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { InstanceManager } from "../../support/instance-manager";
 import { JoiValidator } from "./drivers/joi";
 
-export class ValidationManager extends InstanceManager<Validator> {
-	protected createJoiDriver(): Validator {
+export class ValidationManager extends InstanceManager<Kernel.Validator> {
+	protected createJoiDriver(): Kernel.Validator {
 		return this.app.resolve(JoiValidator);
 	}
 

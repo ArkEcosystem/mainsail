@@ -1,4 +1,4 @@
-import { BINDINGS, IValidator } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { registerFormats } from "./formats";
@@ -15,22 +15,26 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	private async registerFormats(): Promise<void> {
-		for (const [name, format] of Object.entries(registerFormats(this.app.get(BINDINGS.Configuration)))) {
+		for (const [name, format] of Object.entries(
+			registerFormats(this.app.get(Identifiers.Cryptography.Configuration)),
+		)) {
 			// @ts-ignore
-			this.app.get<IValidator>(BINDINGS.Validator).addFormat(name, format);
+			this.app.get<Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}
 	}
 
 	private async registerKeywords(): Promise<void> {
-		for (const [name, format] of Object.entries(registerKeywords(this.app.get(BINDINGS.Configuration)))) {
+		for (const [name, format] of Object.entries(
+			registerKeywords(this.app.get(Identifiers.Cryptography.Configuration)),
+		)) {
 			// @ts-ignore
-			this.app.get<IValidator>(BINDINGS.Validator).addFormat(name, format);
+			this.app.get<Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}
 	}
 
 	private async registerSchemas(): Promise<void> {
 		for (const schema of Object.values(schemas)) {
-			this.app.get<IValidator>(BINDINGS.Validator).addSchema(schema);
+			this.app.get<Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
 }

@@ -23,7 +23,7 @@ export class Command extends Commands.Command {
 			(p: Contracts.ProcessDescription) => p.name.startsWith(this.getFlag("token")),
 		);
 
-		if (!processes || !Object.keys(processes).length) {
+		if (!processes || Object.keys(processes).length === 0) {
 			this.components.fatal("No processes are running.");
 		}
 

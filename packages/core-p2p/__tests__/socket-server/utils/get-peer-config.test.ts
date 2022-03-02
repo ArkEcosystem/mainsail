@@ -64,8 +64,8 @@ beforeEach(() => {
 	const configRepository = { get: () => appPlugins }; // get("app.plugins")
 	const serviceProviderRepository = { get: (plugin) => serviceProviders[plugin] };
 	const appGet = {
-		[Container.Identifiers.ConfigRepository]: configRepository,
-		[Container.Identifiers.ServiceProviderRepository]: serviceProviderRepository,
+		[Identifiers.ConfigRepository]: configRepository,
+		[Identifiers.ServiceProviderRepository]: serviceProviderRepository,
 	};
 
 	app = {

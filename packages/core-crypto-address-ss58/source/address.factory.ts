@@ -1,22 +1,15 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IAddressFactory,
-	IConfiguration,
-	IKeyPair,
-	IKeyPairFactory,
-	IMultiSignatureAsset,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { hexToU8a, isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
 
 @Container.injectable()
-export class AddressFactory implements IAddressFactory {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+export class AddressFactory implements Crypto.IAddressFactory {
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey);
@@ -30,11 +23,11 @@ export class AddressFactory implements IAddressFactory {
 		return "";
 	}
 
-	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
+	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
 		return "";
 	}
 
-	public async fromPrivateKey(privateKey: IKeyPair): Promise<string> {
+	public async fromPrivateKey(privateKey: Crypto.IKeyPair): Promise<string> {
 		return "";
 	}
 

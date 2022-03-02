@@ -1,8 +1,7 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { AbortUnknownProcess } from "@packages/core-cli/source/actions";
 
-const processName: string = "ark-core";
+const processName = "ark-core";
 
 let cli;
 let processManager;
@@ -10,11 +9,11 @@ let action;
 
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.AbortUnknownProcess).to(AbortUnknownProcess).inSingletonScope();
-	action = cli.app.get(Container.Identifiers.AbortUnknownProcess);
+	cli.app.rebind(Identifiers.AbortUnknownProcess).to(AbortUnknownProcess).inSingletonScope();
+	action = cli.app.get(Identifiers.AbortUnknownProcess);
 });
 
 describe("AbortUnknownProcess", () => {

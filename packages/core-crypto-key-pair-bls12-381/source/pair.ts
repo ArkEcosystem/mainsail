@@ -1,24 +1,24 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IConfiguration, IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { getPublicKey } from "@noble/bls12-381";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import WIF from "wif";
 
 @Container.injectable()
-export class KeyPairFactory implements Contract {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+export class KeyPairFactory implements Crypto.IKeyPairFactory {
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	public async fromMnemonic(mnemonic: string): Promise<IKeyPair> {
+	public async fromMnemonic(mnemonic: string): Promise<Crypto.IKeyPair> {
 		return this.#fromPrivateKey(deriveChild(deriveMaster(mnemonicToSeedSync(mnemonic)), 0));
 	}
 
-	public async fromPrivateKey(privateKey: Buffer): Promise<IKeyPair> {
+	public async fromPrivateKey(privateKey: Buffer): Promise<Crypto.IKeyPair> {
 		return this.#fromPrivateKey(privateKey);
 	}
 
-	public async fromWIF(wif: string): Promise<IKeyPair> {
+	public async fromWIF(wif: string): Promise<Crypto.IKeyPair> {
 		const decoded = WIF.decode(wif, this.configuration.get("network.wif"));
 
 		return {
@@ -28,7 +28,7 @@ export class KeyPairFactory implements Contract {
 		};
 	}
 
-	#fromPrivateKey(privateKey: Uint8Array): IKeyPair {
+	#fromPrivateKey(privateKey: Uint8Array): Crypto.IKeyPair {
 		return {
 			compressed: true,
 			privateKey: Buffer.from(privateKey).toString("hex"),

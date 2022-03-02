@@ -16,7 +16,7 @@ import { setUp, setUpDefaults } from "./setup";
 let blockState: BlockState;
 let stateStore: StateStore;
 let factory: FactoryBuilder;
-let blocks: Interfaces.IBlock[];
+let blocks: Crypto.IBlock[];
 let walletRepo: WalletRepository;
 let forgingWallet: Contracts.State.Wallet;
 let votingWallet: Contracts.State.Wallet;
@@ -401,7 +401,7 @@ describe("BlockState", () => {
 	});
 
 	describe("Multipayment", () => {
-		let multiPaymentTransaction: Interfaces.ITransaction;
+		let multiPaymentTransaction: Crypto.ITransaction;
 		let sendersDelegate: Contracts.State.Wallet;
 		let amount: Utils.BigNumber;
 
@@ -605,7 +605,7 @@ describe("BlockState", () => {
 				// @ts-ignore
 				delete voteTransaction.data.asset;
 
-				await expect(blockState.applyTransaction(voteTransaction as Interfaces.ITransaction)).toReject();
+				await expect(blockState.applyTransaction(voteTransaction as Crypto.ITransaction)).toReject();
 			});
 		});
 	});

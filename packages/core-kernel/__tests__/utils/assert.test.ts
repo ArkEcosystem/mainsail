@@ -2,7 +2,7 @@ import { Blocks, Interfaces, Managers } from "@arkecosystem/crypto";
 import { assert } from "@packages/core-kernel/source/utils/assert";
 import { Generators } from "@packages/core-test-framework/source";
 
-let block: Interfaces.IBlock;
+let block: Crypto.IBlock;
 beforeAll(() => {
 	// todo: completely wrap this into a function to hide the generation and setting of the config?
 	Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());

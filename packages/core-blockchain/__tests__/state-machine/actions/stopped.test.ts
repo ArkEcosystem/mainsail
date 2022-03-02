@@ -1,17 +1,18 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { Stopped } from "../../../../../packages/core-blockchain/source/state-machine/actions/stopped";
+
+import { Stopped } from "../../../source/state-machine/actions/stopped";
 
 describe("Stopped", () => {
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn() };
+	const logger = { debug: jest.fn(), info: jest.fn(), warning: jest.fn() };
 
 	const application = { get: jest.fn() };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
 	});
 
 	beforeEach(() => {

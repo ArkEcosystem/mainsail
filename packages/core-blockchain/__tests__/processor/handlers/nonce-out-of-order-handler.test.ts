@@ -1,7 +1,8 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { NonceOutOfOrderHandler } from "../../../../../packages/core-blockchain/source/processor/handlers/nonce-out-of-order-handler";
-import { BlockProcessorResult } from "../../../../../packages/core-blockchain/source/processor";
 import { Interfaces } from "@arkecosystem/crypto";
+
+import { BlockProcessorResult } from "../../../source/processor";
+import { NonceOutOfOrderHandler } from "../../../source/processor/handlers/nonce-out-of-order-handler";
 
 describe("NonceOutOfOrderHandler", () => {
 	const container = new Container.Container();
@@ -12,8 +13,8 @@ describe("NonceOutOfOrderHandler", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
 	});
 
 	beforeEach(() => {
@@ -25,7 +26,7 @@ describe("NonceOutOfOrderHandler", () => {
 			const nonceOutOfOrderHandler = container.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler);
 
 			const block = {};
-			const result = await nonceOutOfOrderHandler.execute(block as Interfaces.IBlock);
+			const result = await nonceOutOfOrderHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Rejected);
 			expect(blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);

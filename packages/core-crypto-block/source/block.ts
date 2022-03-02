@@ -1,44 +1,40 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IBlock,
-	IBlockData,
-	IBlockJson,
-	IBlockSerializer,
-	IBlockVerification,
-	IConfiguration,
-	IHashFactory,
-	ITransaction,
-	ITransactionData,
-	ISignature,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
 @Container.injectable()
-export class Block implements IBlock {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+export class Block implements Crypto.IBlock {
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Block.Serializer)
-	private readonly serializer: IBlockSerializer; // @TODO: create contract for block serializer
+	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly serializer: Crypto.IBlockSerializer; // @TODO: create contract for block serializer
 
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@Container.inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(BINDINGS.Signature)
-	private readonly signatureFactory: ISignature;
+	@Container.inject(Identifiers.Cryptography.Signature)
+	private readonly signatureFactory: Crypto.ISignature;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Slots;
 
 	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;
-	public data: IBlockData;
-	public transactions: ITransaction[];
-	public verification: IBlockVerification;
+	public data: Crypto.IBlockData;
+	public transactions: Crypto.ITransaction[];
+	public verification: Crypto.IBlockVerification;
 
-	public async init({ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string }) {
+	public async init({
+		data,
+		transactions,
+		id,
+	}: {
+		data: Crypto.IBlockData;
+		transactions: Crypto.ITransaction[];
+		id?: string;
+	}) {
 		this.data = data;
 
 		// fix on real timestamp, this is overloading transaction
@@ -59,8 +55,8 @@ export class Block implements IBlock {
 		return this;
 	}
 
-	public getHeader(): IBlockData {
-		const header: IBlockData = Object.assign({}, this.data);
+	public getHeader(): Crypto.IBlockData {
+		const header: Crypto.IBlockData = Object.assign({}, this.data);
 
 		delete header.transactions;
 
@@ -82,8 +78,8 @@ export class Block implements IBlock {
 		);
 	}
 
-	public toJson(): IBlockJson {
-		const data: IBlockJson = JSON.parse(JSON.stringify(this.data));
+	public toJson(): Crypto.IBlockJson {
+		const data: Crypto.IBlockJson = JSON.parse(JSON.stringify(this.data));
 		data.reward = this.data.reward.toString();
 		data.totalAmount = this.data.totalAmount.toString();
 		data.totalFee = this.data.totalFee.toString();
@@ -92,9 +88,9 @@ export class Block implements IBlock {
 		return data;
 	}
 
-	public async verify(): Promise<IBlockVerification> {
-		const block: IBlockData = this.data;
-		const result: IBlockVerification = {
+	public async verify(): Promise<Crypto.IBlockVerification> {
+		const block: Crypto.IBlockData = this.data;
+		const result: Crypto.IBlockVerification = {
 			containsMultiSignatures: false,
 			errors: [],
 			verified: false,
@@ -130,7 +126,7 @@ export class Block implements IBlock {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
 
-			const invalidTransactions: ITransaction[] = this.transactions.filter((tx) => !tx.verified);
+			const invalidTransactions: Crypto.ITransaction[] = this.transactions.filter((tx) => !tx.verified);
 			if (invalidTransactions.length > 0) {
 				result.errors.push("One or more transactions are not verified:");
 
@@ -150,7 +146,7 @@ export class Block implements IBlock {
 			}
 
 			// Checking if transactions of the block adds up to block values.
-			const appliedTransactions: Record<string, ITransactionData> = {};
+			const appliedTransactions: Record<string, Crypto.ITransactionData> = {};
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;

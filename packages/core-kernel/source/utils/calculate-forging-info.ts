@@ -1,5 +1,4 @@
-import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { ForgingInfo } from "../contracts/shared";
+import { Crypto, Shared } from "@arkecosystem/core-contracts";
 
 export interface MilestoneSearchResult {
 	found: boolean;
@@ -8,7 +7,7 @@ export interface MilestoneSearchResult {
 }
 
 export const getMilestonesWhichAffectActiveDelegateCount = (
-	configuration: IConfiguration,
+	configuration: Crypto.IConfiguration,
 ): Array<MilestoneSearchResult> => {
 	const milestones: Array<MilestoneSearchResult> = [
 		{
@@ -32,9 +31,9 @@ export const calculateForgingInfo = (
 	timestamp: number,
 	height: number,
 	getTimeStampForBlock: (blockheight: number) => number,
-	configuration: IConfiguration,
+	configuration: Crypto.IConfiguration,
 	slots,
-): ForgingInfo => {
+): Shared.ForgingInfo => {
 	const slotInfo = slots.getSlotInfo(getTimeStampForBlock, timestamp, height);
 
 	const [currentForger, nextForger] = findIndex(
@@ -53,7 +52,7 @@ const findIndex = (
 	height: number,
 	slotNumber: number,
 	getTimeStampForBlock: (blockheight: number) => number,
-	configuration: IConfiguration,
+	configuration: Crypto.IConfiguration,
 	slots,
 ): [number, number] => {
 	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeDelegates");

@@ -5,51 +5,51 @@ import { Managers } from "@packages/crypto";
 describe("Initialize", () => {
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn(), error: jest.fn(), notice: jest.fn() };
+	const logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), notice: jest.fn(), warning: jest.fn() };
 	const blockchain = { dispatch: jest.fn() };
 	const stateStore = {
 		getLastBlock: jest.fn(),
-		setLastBlock: jest.fn(),
 		getNetworkStart: jest.fn().mockReturnValue(false),
 		getRestoredDatabaseIntegrity: jest.fn().mockReturnValue(false),
+		setLastBlock: jest.fn(),
 	};
 	const transactionPool = { readdTransactions: jest.fn() };
 	const databaseService = {
-		verifyBlockchain: jest.fn(),
 		deleteRound: jest.fn(),
+		verifyBlockchain: jest.fn(),
 	};
 	const databaseInteractions = {
+		applyBlock: jest.fn(),
+		deleteRound: jest.fn(),
+		getActiveDelegates: jest.fn().mockReturnValue([]),
+		getLastBlock: jest.fn(),
+		getTopBlocks: jest.fn(),
+		loadBlocksFromCurrentRound: jest.fn(),
+		restoreCurrentRound: jest.fn(),
+		revertBlock: jest.fn(),
 		walletRepository: {
 			getNonce: jest.fn(),
 		},
-		restoreCurrentRound: jest.fn(),
-		applyBlock: jest.fn(),
-		getTopBlocks: jest.fn(),
-		getLastBlock: jest.fn(),
-		loadBlocksFromCurrentRound: jest.fn(),
-		revertBlock: jest.fn(),
-		deleteRound: jest.fn(),
-		getActiveDelegates: jest.fn().mockReturnValue([]),
 	};
 	const peerNetworkMonitor = { boot: jest.fn() };
 	const stateBuilder = { run: jest.fn() };
 
 	const appGet = {
-		[Container.Identifiers.PeerNetworkMonitor]: peerNetworkMonitor,
-		[Container.Identifiers.StateBuilder]: stateBuilder,
+		[Identifiers.PeerNetworkMonitor]: peerNetworkMonitor,
+		[Identifiers.StateBuilder]: stateBuilder,
 	};
 	const application = { get: (key) => appGet[key] };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
-		container.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
-		container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(transactionPool);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.DatabaseService).toConstantValue(databaseService);
+		container.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
+		container.bind(Identifiers.TransactionPoolService).toConstantValue(transactionPool);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
 	});
 
 	beforeEach(() => {
@@ -63,8 +63,8 @@ describe("Initialize", () => {
 
 				const lastBlock = {
 					data: {
-						id: "345",
 						height: 5554,
+						id: "345",
 					},
 				};
 				stateStore.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
@@ -88,8 +88,8 @@ describe("Initialize", () => {
 
 				const lastBlock = {
 					data: {
-						id: "345",
 						height: 5554,
+						id: "345",
 					},
 				};
 				stateStore.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
@@ -105,8 +105,8 @@ describe("Initialize", () => {
 
 				const lastBlock = {
 					data: {
-						id: "345",
 						height: 5554,
+						id: "345",
 					},
 				};
 				stateStore.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
@@ -124,8 +124,8 @@ describe("Initialize", () => {
 
 				const lastBlock = {
 					data: {
-						id: "345",
 						height: 1,
+						id: "345",
 						payloadHash: "6d84d08bd299ed97c212c886c98a57e36545c8f5d645ca7eeae63a8bd62d8988",
 					},
 				};
@@ -142,8 +142,8 @@ describe("Initialize", () => {
 
 				const lastBlock = {
 					data: {
-						id: "345",
 						height: 1,
+						id: "345",
 						payloadHash: Managers.configManager.get("network.nethash"),
 					},
 				};
@@ -163,8 +163,8 @@ describe("Initialize", () => {
 
 				const lastBlock = {
 					data: {
-						id: "345",
 						height: 334,
+						id: "345",
 						payloadHash: Managers.configManager.get("network.nethash"),
 					},
 				};
@@ -184,8 +184,8 @@ describe("Initialize", () => {
 
 				const lastBlock = {
 					data: {
-						id: "345",
 						height: 334,
+						id: "345",
 						payloadHash: Managers.configManager.get("network.nethash"),
 					},
 				};

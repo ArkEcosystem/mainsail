@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Success } from "@packages/core-cli/source/components";
 import { white } from "kleur";
@@ -10,13 +9,13 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.Success).to(Success).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.Success);
+	cli.app.rebind(Identifiers.Success).to(Success).inSingletonScope();
+	component = cli.app.get(Identifiers.Success);
 });
 
 describe("Success", () => {
 	it("should render the component", () => {
-		const spyLogger = jest.spyOn(cli.app.get(Container.Identifiers.Logger), "info");
+		const spyLogger = jest.spyOn(cli.app.get(Identifiers.Logger), "info");
 
 		component.render("Hello World");
 

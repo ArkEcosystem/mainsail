@@ -1,5 +1,6 @@
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
 import { isValidPeer } from "@arkecosystem/core-crypto-validation";
-import { Container, Contracts, Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
+import { Container, Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
 
 import { PeerFactory } from "./contracts";
 import { DisconnectInvalidPeers } from "./listeners";
@@ -7,26 +8,26 @@ import { DisconnectInvalidPeers } from "./listeners";
 // todo: review the implementation
 @Container.injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.PeerCommunicator)
+	@Container.inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@Container.inject(Container.Identifiers.PeerConnector)
+	@Container.inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@Container.inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public server: any;
@@ -91,7 +92,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return;
 		}
 
-		const newPeer: Contracts.P2P.Peer = this.app.get<PeerFactory>(Container.Identifiers.PeerFactory)(peer.ip);
+		const newPeer: Contracts.P2P.Peer = this.app.get<PeerFactory>(Identifiers.PeerFactory)(peer.ip);
 
 		try {
 			this.repository.setPendingPeer(peer);

@@ -1,11 +1,12 @@
-import { Pipeline, Stage } from "../../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { injectable } from "../../../ioc";
 
 @injectable()
-export class NullPipeline implements Pipeline {
-	public constructor(stages: Array<Function | Stage> = []) {}
+export class NullPipeline implements Kernel.Pipeline {
+	public constructor(stages: Array<Function | Kernel.Stage> = []) {}
 
-	public pipe(stage: Function | Stage): Pipeline {
+	public pipe(stage: Function | Kernel.Stage): Kernel.Pipeline {
 		return new NullPipeline([]);
 	}
 

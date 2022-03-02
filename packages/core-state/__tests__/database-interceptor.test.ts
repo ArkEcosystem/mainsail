@@ -97,23 +97,23 @@ const logger = {
 };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.Application).toConstantValue(app);
-container.bind(Container.Identifiers.DatabaseConnection).toConstantValue(connection);
-container.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(blockRepository);
-container.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue(transactionRepository);
-container.bind(Container.Identifiers.DatabaseRoundRepository).toConstantValue(roundRepository);
-container.bind(Container.Identifiers.DatabaseService).to(DatabaseService).inSingletonScope();
-container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-container.bind(Container.Identifiers.StateBlockStore).toConstantValue(stateBlockStore);
-container.bind(Container.Identifiers.StateTransactionStore).toConstantValue(stateTransactionStore);
-container.bind(Container.Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
-container.bind(Container.Identifiers.WalletRepository).toConstantValue(walletRepository);
-container.bind(Container.Identifiers.BlockState).toConstantValue(blockState);
-container.bind(Container.Identifiers.DposState).toConstantValue(dposState);
-container.bind(Container.Identifiers.DposPreviousRoundStateProvider).toConstantValue(getDposPreviousRoundState);
-container.bind(Container.Identifiers.TriggerService).toConstantValue(triggers);
-container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(events);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+container.bind(Identifiers.Application).toConstantValue(app);
+container.bind(Identifiers.DatabaseConnection).toConstantValue(connection);
+container.bind(Identifiers.DatabaseBlockRepository).toConstantValue(blockRepository);
+container.bind(Identifiers.DatabaseTransactionRepository).toConstantValue(transactionRepository);
+container.bind(Identifiers.DatabaseRoundRepository).toConstantValue(roundRepository);
+container.bind(Identifiers.DatabaseService).to(DatabaseService).inSingletonScope();
+container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+container.bind(Identifiers.StateBlockStore).toConstantValue(stateBlockStore);
+container.bind(Identifiers.StateTransactionStore).toConstantValue(stateTransactionStore);
+container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
+container.bind(Identifiers.WalletRepository).toConstantValue(walletRepository);
+container.bind(Identifiers.BlockState).toConstantValue(blockState);
+container.bind(Identifiers.DposState).toConstantValue(dposState);
+container.bind(Identifiers.DposPreviousRoundStateProvider).toConstantValue(getDposPreviousRoundState);
+container.bind(Identifiers.TriggerService).toConstantValue(triggers);
+container.bind(Identifiers.EventDispatcherService).toConstantValue(events);
+container.bind(Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
 	jest.resetAllMocks();
@@ -132,7 +132,7 @@ describe("DatabaseInterceptor.getBlock", () => {
 
 	it("should return block from database", async () => {
 		const databaseInterceptor: DatabaseInterceptor = container.resolve(DatabaseInterceptor);
-		const databaseService = container.get<DatabaseService>(Container.Identifiers.DatabaseService);
+		const databaseService = container.get<DatabaseService>(Identifiers.DatabaseService);
 
 		const block = { data: { id: "block_id", height: 100, transactions: [] } };
 

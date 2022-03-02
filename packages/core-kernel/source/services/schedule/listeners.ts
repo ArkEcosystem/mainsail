@@ -1,6 +1,6 @@
-import { EventListener } from "../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
 
-export class ExecuteCallbackWhenReady implements EventListener {
+export class ExecuteCallbackWhenReady implements Kernel.EventListener {
 	private blockCount!: number;
 
 	private callback!: Function;

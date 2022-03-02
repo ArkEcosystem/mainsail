@@ -19,12 +19,12 @@ export const setup = async (activeDelegates) => {
 	const warning: jest.SpyInstance = jest.fn();
 
 	const logger = {
-		error,
 		debug,
+		error,
 		warning,
 	};
 
-	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 
 	@Container.injectable()
 	class MockDatabaseService {
@@ -56,18 +56,18 @@ export const setup = async (activeDelegates) => {
 		}
 	}
 
-	sandbox.app.bind(Container.Identifiers.DatabaseService).to(MockDatabaseService);
+	sandbox.app.bind(Identifiers.DatabaseService).to(MockDatabaseService);
 
-	sandbox.app.bind(Container.Identifiers.RoundState).to(MockRoundState);
+	sandbox.app.bind(Identifiers.RoundState).to(MockRoundState);
 
-	sandbox.app.bind(Container.Identifiers.BlockchainService).to(MockBlockchainService);
+	sandbox.app.bind(Identifiers.BlockchainService).to(MockBlockchainService);
 
-	sandbox.app.bind(Container.Identifiers.WalletRepository).to(MockWalletRepository);
+	sandbox.app.bind(Identifiers.WalletRepository).to(MockWalletRepository);
 
-	sandbox.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
 	sandbox.app
-		.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 		.bind("getActiveDelegates", new GetActiveDelegatesAction(sandbox.app));
 
 	const delegateTracker = sandbox.app.resolve(DelegateTracker);
@@ -76,14 +76,14 @@ export const setup = async (activeDelegates) => {
 
 	// todo: get rid of the need for this, requires an instance based crypto package
 	Managers.configManager.setConfig(
-		sandbox.app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).get("crypto"),
+		sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("crypto"),
 	);
 
 	return {
+		delegateTracker,
 		sandbox,
 		spies: {
 			logger,
 		},
-		delegateTracker,
 	};
 };

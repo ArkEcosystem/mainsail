@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 import { Providers } from "@arkecosystem/core-kernel";
 
@@ -11,7 +11,7 @@ export * from "./versions";
 @Container.injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const registry: TransactionRegistry = this.app.get(BINDINGS.Transaction.Registry);
+		const registry: TransactionRegistry = this.app.get(Identifiers.Cryptography.Transaction.Registry);
 
 		registry.registerTransactionType(VoteTransaction);
 	}

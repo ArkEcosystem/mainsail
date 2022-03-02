@@ -1,28 +1,28 @@
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Container, Providers } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
 
 @Container.injectable()
 export class RollbackDatabase implements Action {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-blockchain")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
+	@Container.inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async handle(): Promise<void> {
@@ -31,7 +31,7 @@ export class RollbackDatabase implements Action {
 		let maxBlockRewind = this.configuration.getRequired<number>("databaseRollback.maxBlockRewind");
 		let steps = this.configuration.getRequired<number>("databaseRollback.steps");
 
-		let lastBlock: Interfaces.IBlock = await this.databaseService.getLastBlock();
+		let lastBlock: Crypto.IBlock = await this.databaseService.getLastBlock();
 		let lastBlockHeight = lastBlock.data.height;
 
 		let isVerified = false;

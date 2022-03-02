@@ -1,14 +1,14 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Identities, Interfaces } from "@arkecosystem/crypto";
 
-import { Mempool } from "../../../packages/core-transaction-pool/source/mempool";
+import { Mempool } from "../source/mempool";
 
 const createSenderMempool = jest.fn();
 const logger = { debug: jest.fn() };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.TransactionPoolSenderMempoolFactory).toConstantValue(createSenderMempool);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+container.bind(Identifiers.TransactionPoolSenderMempoolFactory).toConstantValue(createSenderMempool);
+container.bind(Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
 	createSenderMempool.mockReset();
@@ -36,14 +36,14 @@ describe("Mempool.getSize", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool2);
 
 		const transaction1 = {
-			id: "transaction1-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction1-id",
+		} as Crypto.ITransaction;
 
 		const transaction2 = {
-			id: "transaction2-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender2") },
-		} as Interfaces.ITransaction;
+			id: "transaction2-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction1);
@@ -64,9 +64,9 @@ describe("Mempool.hasSenderMempool", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction);
@@ -84,9 +84,9 @@ describe("Mempool.hasSenderMempool", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction);
@@ -106,9 +106,9 @@ describe("Mempool.getSenderMempool", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction);
@@ -125,15 +125,15 @@ describe("Mempool.getSenderMempool", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction);
-		const cb = () => memory.getSenderMempool(Identities.PublicKey.fromPassphrase("not sender"));
+		const callback = () => memory.getSenderMempool(Identities.PublicKey.fromPassphrase("not sender"));
 
-		expect(cb).toThrow();
+		expect(callback).toThrow();
 	});
 });
 
@@ -154,21 +154,21 @@ describe("Mempool.getSenderMempools", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool2);
 
 		const transaction1 = {
-			id: "transaction1-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction1-id",
+		} as Crypto.ITransaction;
 
 		const transaction2 = {
-			id: "transaction2-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender2") },
-		} as Interfaces.ITransaction;
+			id: "transaction2-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction1);
 		await memory.addTransaction(transaction2);
 		const senderMempools = memory.getSenderMempools();
 
-		expect(Array.from(senderMempools)).toEqual([senderMempool1, senderMempool2]);
+		expect([...senderMempools]).toEqual([senderMempool1, senderMempool2]);
 	});
 });
 
@@ -182,9 +182,9 @@ describe("Mempool.addTransaction", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction);
@@ -205,9 +205,9 @@ describe("Mempool.addTransaction", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		const promise = memory.addTransaction(transaction);
@@ -222,9 +222,9 @@ describe("Mempool.addTransaction", () => {
 describe("Mempool.removeTransaction", () => {
 	it("should return empty array when removing transaction of sender that wasn't previously added", async () => {
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		const removedTransactions = await memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
@@ -234,14 +234,14 @@ describe("Mempool.removeTransaction", () => {
 
 	it("should remove previously added transaction and return list of removed transactions", async () => {
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const senderMempool = {
 			addTransaction: jest.fn(),
-			removeTransaction: jest.fn(),
 			isDisposable: jest.fn(),
+			removeTransaction: jest.fn(),
 		};
 		senderMempool.removeTransaction.mockReturnValue([transaction]);
 		senderMempool.isDisposable.mockReturnValue(false);
@@ -259,14 +259,14 @@ describe("Mempool.removeTransaction", () => {
 	it("should forget sender state if it's empty even if error was thrown", async () => {
 		const error = new Error("Something went horribly wrong");
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const senderMempool = {
 			addTransaction: jest.fn(),
-			removeTransaction: jest.fn(),
 			isDisposable: jest.fn(),
+			removeTransaction: jest.fn(),
 		};
 		senderMempool.removeTransaction.mockRejectedValueOnce(error);
 		senderMempool.isDisposable.mockReturnValueOnce(false).mockReturnValueOnce(true);
@@ -296,14 +296,14 @@ describe("Mempool.removeForgedTransaction", () => {
 
 	it("should remove previously added transaction and return list of removed transactions", async () => {
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const senderMempool = {
 			addTransaction: jest.fn(),
-			removeForgedTransaction: jest.fn(),
 			isDisposable: jest.fn(),
+			removeForgedTransaction: jest.fn(),
 		};
 		senderMempool.removeForgedTransaction.mockReturnValue([transaction]);
 		senderMempool.isDisposable.mockReturnValue(false);
@@ -324,14 +324,14 @@ describe("Mempool.removeForgedTransaction", () => {
 	it("should forget sender state if it's empty even if error was thrown", async () => {
 		const error = new Error("Something went horribly wrong");
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const senderMempool = {
 			addTransaction: jest.fn(),
-			removeForgedTransaction: jest.fn(),
 			isDisposable: jest.fn(),
+			removeForgedTransaction: jest.fn(),
 		};
 		senderMempool.removeForgedTransaction.mockRejectedValueOnce(error);
 		senderMempool.isDisposable.mockReturnValueOnce(false).mockReturnValueOnce(true);
@@ -358,9 +358,9 @@ describe("Mempool.flush", () => {
 		createSenderMempool.mockReturnValueOnce(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: Identities.PublicKey.fromPassphrase("sender1") },
-		} as Interfaces.ITransaction;
+			id: "transaction-id",
+		} as Crypto.ITransaction;
 
 		const memory = container.resolve(Mempool);
 		await memory.addTransaction(transaction);

@@ -1,40 +1,40 @@
-import Interfaces, { BINDINGS, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { TransactionAlreadyInPoolError, TransactionPoolFullError } from "./errors";
 
 @Container.injectable()
 export class Service implements Contracts.TransactionPool.Service {
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.Fee.Matcher)
+	@Container.inject(Identifiers.Fee.Matcher)
 	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
 
-	@Container.inject(Container.Identifiers.TransactionPoolStorage)
+	@Container.inject(Identifiers.TransactionPoolStorage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
 
-	@Container.inject(Container.Identifiers.TransactionPoolMempool)
+	@Container.inject(Identifiers.TransactionPoolMempool)
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
-	@Container.inject(Container.Identifiers.TransactionPoolQuery)
+	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@Container.inject(Container.Identifiers.TransactionPoolExpirationService)
+	@Container.inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	private readonly lock: AppUtils.Lock = new AppUtils.Lock();
 
@@ -81,7 +81,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async addTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async addTransaction(transaction: Crypto.ITransaction): Promise<void> {
 		await this.lock.runNonExclusive(async () => {
 			if (this.disposed) {
 				return;
@@ -118,7 +118,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async readdTransactions(previouslyForgedTransactions: Interfaces.ITransaction[] = []): Promise<void> {
+	public async readdTransactions(previouslyForgedTransactions: Crypto.ITransaction[] = []): Promise<void> {
 		await this.lock.runExclusive(async () => {
 			if (this.disposed) {
 				return;
@@ -203,7 +203,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async removeTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async removeTransaction(transaction: Crypto.ITransaction): Promise<void> {
 		await this.lock.runNonExclusive(async () => {
 			if (this.disposed) {
 				return;
@@ -237,7 +237,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async removeForgedTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async removeForgedTransaction(transaction: Crypto.ITransaction): Promise<void> {
 		await this.lock.runNonExclusive(async () => {
 			if (this.disposed) {
 				return;
@@ -360,7 +360,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 	}
 
-	private async addTransactionToMempool(transaction: Interfaces.ITransaction): Promise<void> {
+	private async addTransactionToMempool(transaction: Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");

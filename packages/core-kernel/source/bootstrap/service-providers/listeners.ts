@@ -1,10 +1,11 @@
-import { EventListener } from "../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { BlockEvent, KernelEvent } from "../../enums";
 import { Identifiers, inject, injectable } from "../../ioc";
 import { ServiceProvider, ServiceProviderRepository } from "../../providers";
 
 @injectable()
-export class ChangeServiceProviderState implements EventListener {
+export class ChangeServiceProviderState implements Kernel.EventListener {
 	@inject(Identifiers.ServiceProviderRepository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 

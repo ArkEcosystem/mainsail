@@ -9,7 +9,7 @@ let config;
 
 beforeEach(() => {
 	cli = new Console();
-	config = cli.app.get(Container.Identifiers.Config);
+	config = cli.app.get(Identifiers.Config);
 });
 
 afterEach(() => jest.resetAllMocks());
@@ -30,7 +30,7 @@ describe("Command", () => {
 
 		const spyGetPaths = jest.spyOn(
 			// @ts-ignore
-			cli.app.get<Services.Environment>(Container.Identifiers.Environment),
+			cli.app.get<Services.Environment>(Identifiers.Environment),
 			"getPaths",
 		);
 
@@ -51,7 +51,7 @@ describe("Command", () => {
 		});
 
 		const install: jest.SpyInstance = jest
-			.spyOn(cli.app.get(Container.Identifiers.Installer), "install")
+			.spyOn(cli.app.get(Identifiers.Installer), "install")
 			.mockImplementation();
 
 		await cli.withFlags({ channel: "latest" }).execute(Command);

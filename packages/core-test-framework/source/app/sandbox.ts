@@ -1,3 +1,4 @@
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Container, Providers, Services, Types } from "@arkecosystem/core-kernel";
 import { removeSync } from "fs-extra";
 import { setGracefulCleanup } from "tmp";
@@ -82,7 +83,7 @@ export class Sandbox {
 		// 	network,
 		// });
 
-		this.app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).merge({
+		this.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).merge({
 			crypto: {
 				genesisBlock,
 				milestones,
@@ -144,7 +145,7 @@ export class Sandbox {
 		serviceProvider.setConfig(this.app.resolve(Providers.PluginConfiguration).discover(name, path));
 
 		this.app
-			.get<Providers.ServiceProviderRepository>(Container.Identifiers.ServiceProviderRepository)
+			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
 			.set(name, serviceProvider);
 
 		return this;

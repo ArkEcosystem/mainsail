@@ -1,71 +1,65 @@
-import Interfaces, {
-	BINDINGS,
-	IAddressFactory,
-	IBlockFactory,
-	IConfiguration,
-	IHashFactory,
-} from "@arkecosystem/core-crypto-contracts";
-import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
 import assert from "assert";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { DatabaseService } from "@arkecosystem/core-database";
+import { Container, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class RoundState {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
+	@Container.inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
-	@Container.inject(Container.Identifiers.DposState)
+	@Container.inject(Identifiers.DposState)
 	@Container.tagged("state", "blockchain")
 	private readonly dposState!: Contracts.State.DposState;
 
-	@Container.inject(Container.Identifiers.DposPreviousRoundStateProvider)
+	@Container.inject(Identifiers.DposPreviousRoundStateProvider)
 	private readonly getDposPreviousRoundState!: Contracts.State.DposPreviousRoundStateProvider;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.inject(Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@Container.inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Identity.AddressFactory)
-	private readonly addressFactory: IAddressFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@Container.inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(BINDINGS.Block.Factory)
-	private readonly blockFactory: IBlockFactory;
+	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	private blocksInCurrentRound: Interfaces.IBlock[] = [];
+	private blocksInCurrentRound: Crypto.IBlock[] = [];
 	private forgingDelegates: Contracts.State.Wallet[] = [];
 
-	public async applyBlock(block: Interfaces.IBlock): Promise<void> {
+	public async applyBlock(block: Crypto.IBlock): Promise<void> {
 		this.blocksInCurrentRound.push(block);
 
 		await this.applyRound(block.data.height);
 	}
 
-	public async revertBlock(block: Interfaces.IBlock): Promise<void> {
+	public async revertBlock(block: Crypto.IBlock): Promise<void> {
 		if (this.blocksInCurrentRound.length === 0) {
 			this.blocksInCurrentRound = await this.getBlocksForRound();
 		}
@@ -137,8 +131,8 @@ export class RoundState {
 		return this.shuffleDelegates(roundInfo, delegates ?? []);
 	}
 
-	public async detectMissedBlocks(block: Interfaces.IBlock): Promise<void> {
-		const lastBlock: Interfaces.IBlock = this.stateStore.getLastBlock();
+	public async detectMissedBlocks(block: Crypto.IBlock): Promise<void> {
+		const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
 
 		if (lastBlock.data.height === 1) {
 			return;
@@ -231,7 +225,7 @@ export class RoundState {
 		}
 	}
 
-	private async getBlocksForRound(): Promise<Interfaces.IBlock[]> {
+	private async getBlocksForRound(): Promise<Crypto.IBlock[]> {
 		const lastBlock = this.stateStore.getLastBlock();
 		const roundInfo = this.getRound(lastBlock.data.height);
 
@@ -305,7 +299,7 @@ export class RoundState {
 
 	private async calcPreviousActiveDelegates(
 		roundInfo: Contracts.Shared.RoundInfo,
-		blocks: Interfaces.IBlock[],
+		blocks: Crypto.IBlock[],
 	): Promise<Contracts.State.Wallet[]> {
 		const previousRoundState = await this.getDposPreviousRoundState(blocks, roundInfo);
 

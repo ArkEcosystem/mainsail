@@ -1,24 +1,23 @@
 import "jest-extended";
 
-import { Client } from "@packages/core-forger/source/client";
 import { Application, Container } from "@arkecosystem/core-kernel";
-import { NetworkStateStatus, Nes, Codecs } from "@arkecosystem/core-p2p";
+import { Codecs, Nes, NetworkStateStatus } from "@arkecosystem/core-p2p";
+import { Client } from "@packages/core-forger/source/client";
 
 import { forgedBlockWithTransactions } from "./__utils__/create-block-with-transactions";
-
 import { nesClient } from "./mocks/nes";
 
 jest.spyOn(Nes, "Client").mockImplementation((url) => nesClient as any);
 
 let app: Application;
 const logger = {
-	error: jest.fn(),
 	debug: jest.fn(),
+	error: jest.fn(),
 };
 
 beforeEach(() => {
 	app = new Application(new Container.Container());
-	app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	app.bind(Identifiers.LogService).toConstantValue(logger);
 });
 
 describe("Client", () => {
@@ -41,7 +40,7 @@ describe("Client", () => {
 			client.register(hosts);
 
 			const expectedUrl = `ws://${host.hostname}:${host.port}`;
-			const expectedOptions = { ws: { maxPayload: 20971520 } };
+			const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
 			expect(Nes.Client).toHaveBeenCalledWith(expectedUrl, expectedOptions);
 			expect(client.hosts).toEqual([{ ...host, socket: expect.anything() }]);
@@ -51,7 +50,7 @@ describe("Client", () => {
 			client.register(hostsIPv6);
 
 			const expectedUrl = `ws://[${hostIPv6.hostname}]:${hostIPv6.port}`;
-			const expectedOptions = { ws: { maxPayload: 20971520 } };
+			const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
 			expect(Nes.Client).toHaveBeenCalledWith(expectedUrl, expectedOptions);
 			expect(client.hosts).toEqual([{ ...hostIPv6, socket: expect.anything() }]);
@@ -104,7 +103,7 @@ describe("Client", () => {
 			client.register([host]);
 
 			nesClient.request.mockResolvedValueOnce({
-				payload: Codecs.postBlock.response.serialize({ status: true, height: 100 }),
+				payload: Codecs.postBlock.response.serialize({ height: 100, status: true }),
 			});
 
 			await expect(client.broadcastBlock(forgedBlockWithTransactions)).toResolve();
@@ -145,13 +144,13 @@ describe("Client", () => {
 		});
 
 		it("should log debug message when no sockets are open", async () => {
-			hosts.forEach((host) => {
+			for (const host of hosts) {
 				host.socket._isReady = () => false;
-			});
+			}
 
 			client.register(hosts);
 			await expect(client.selectHost()).rejects.toThrow(
-				`${hosts.map((host) => host.hostname).join()} didn't respond. Trying again later.`,
+				`${hosts.map((host) => host.hostname).join(",")} didn't respond. Trying again later.`,
 			);
 			expect(logger.debug).toHaveBeenCalledWith(
 				`No open socket connection to any host: ${JSON.stringify(
@@ -246,8 +245,8 @@ describe("Client", () => {
 				path: "p2p.internal.emitEvent",
 				payload: Buffer.from(
 					JSON.stringify({
-						event: "test-event",
 						body: data,
+						event: "test-event",
 					}),
 				),
 			});

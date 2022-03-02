@@ -1,9 +1,9 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 
 interface ChunkData {
 	key: string;
-	data: Interfaces.IBlockData[];
+	data: Crypto.IBlockData[];
 }
 
 @Container.injectable()
@@ -16,7 +16,7 @@ export class ChunkCache implements Contracts.P2P.ChunkCache {
 		return this.downloadedChunksCache.some((chunkData) => chunkData.key === key);
 	}
 
-	public get(key: string): Interfaces.IBlockData[] {
+	public get(key: string): Crypto.IBlockData[] {
 		const chunkData = this.downloadedChunksCache.find((chunkData) => chunkData.key === key);
 
 		if (!chunkData) {
@@ -26,7 +26,7 @@ export class ChunkCache implements Contracts.P2P.ChunkCache {
 		return chunkData.data;
 	}
 
-	public set(key: string, data: Interfaces.IBlockData[]): void {
+	public set(key: string, data: Crypto.IBlockData[]): void {
 		this.downloadedChunksCache.push({
 			data: data,
 			key: key,

@@ -1,4 +1,4 @@
-// import { IBlock, ITransaction } from "@arkecosystem/core-crypto-contracts";
+// import { IBlock, ITransaction } from "@arkecosystem/core-contracts";
 import { AssertionException } from "../exceptions/runtime";
 
 const assertType = (condition: boolean, description: string): asserts condition => {

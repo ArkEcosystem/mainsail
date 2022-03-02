@@ -1,4 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 
 import { getPeerIp } from "../../utils/get-peer-ip";
 import { BlocksRoute } from "../routes/blocks";
@@ -7,10 +8,10 @@ import { TransactionsRoute } from "../routes/transactions";
 
 @Container.injectable()
 export class AcceptPeerPlugin {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PeerProcessor)
+	@Container.inject(Identifiers.PeerProcessor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server) {
@@ -23,7 +24,6 @@ export class AcceptPeerPlugin {
 		const peerProcessor = this.peerProcessor;
 
 		server.ext({
-			type: "onPreHandler",
 			async method(request, h) {
 				if (routesConfigByPath[request.path]) {
 					const peerIp = request.socket ? getPeerIp(request.socket) : request.info.remoteAddress;
@@ -33,6 +33,7 @@ export class AcceptPeerPlugin {
 				}
 				return h.continue;
 			},
+			type: "onPreHandler",
 		});
 	}
 }

@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { AskHidden } from "@packages/core-cli/source/components";
 import prompts from "prompts";
@@ -10,8 +9,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.AskHidden).to(AskHidden).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.AskHidden);
+	cli.app.rebind(Identifiers.AskHidden).to(AskHidden).inSingletonScope();
+	component = cli.app.get(Identifiers.AskHidden);
 });
 
 describe("AskHidden", () => {

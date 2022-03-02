@@ -1,19 +1,20 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { SyncingComplete } from "../../../../../packages/core-blockchain/source/state-machine/actions/syncing-complete";
+
+import { SyncingComplete } from "../../../source/state-machine/actions/syncing-complete";
 
 describe("Stopped", () => {
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn() };
+	const logger = { debug: jest.fn(), info: jest.fn(), warning: jest.fn() };
 	const blockchain = { dispatch: jest.fn() };
 
 	const application = { get: jest.fn() };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
 	});
 
 	beforeEach(() => {

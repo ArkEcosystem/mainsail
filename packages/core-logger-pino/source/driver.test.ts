@@ -1,5 +1,5 @@
 import { Writable } from "stream";
-import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
+import { Application, Container } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test-framework";
 import { sleep } from "@arkecosystem/utils";
 import capcon from "capture-console";
@@ -25,8 +25,8 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 
 	beforeEach(async (context) => {
 		context.app = new Application(new Container.Container());
-		context.app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
-		context.app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+		context.app.bind(Identifiers.ConfigFlags).toConstantValue("core");
+		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.logger = await context.app.resolve<Contracts.Kernel.Logger>(PinoLogger).make({
@@ -157,8 +157,8 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 
 	it("should rotate the log 3 times", async (context) => {
 		const app = new Application(new Container.Container());
-		app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
-		app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+		app.bind(Identifiers.ConfigFlags).toConstantValue("core");
+		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.useLogPath(dirSync().name);
 
 		const ms = new Date().getMilliseconds();

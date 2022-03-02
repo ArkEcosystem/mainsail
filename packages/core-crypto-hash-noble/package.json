@@ -17,7 +17,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@noble/hashes": "^1.0.0"
 	},

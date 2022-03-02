@@ -1,0 +1,32 @@
+{
+	"name": "@arkecosystem/core-contracts",
+	"version": "0.0.1",
+	"description": "Kernel of ARK Core",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/core-errors": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
+		"ajv": "6.12.6",
+		"bytebuffer": "5.0.1",
+		"dayjs": "1.10.7",
+		"inversify": "5.1.1",
+		"joi": "17.4.2",
+		"reflect-metadata": "0.1.13",
+		"type-fest": "0.21.3"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}

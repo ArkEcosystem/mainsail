@@ -29,11 +29,11 @@ describe("PeerController", () => {
 	beforeEach(() => {
 		sandbox = new Sandbox();
 
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		sandbox.app.bind(Container.Identifiers.PeerRepository).toConstantValue(peerRepository);
-		sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(database);
-		sandbox.app.bind(Container.Identifiers.DatabaseInterceptor).toConstantValue(databaseInterceptor);
-		sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(peerRepository);
+		sandbox.app.bind(Identifiers.DatabaseService).toConstantValue(database);
+		sandbox.app.bind(Identifiers.DatabaseInterceptor).toConstantValue(databaseInterceptor);
+		sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
 
 		sandbox.app.version = jest.fn().mockReturnValue("3.0.9");
 

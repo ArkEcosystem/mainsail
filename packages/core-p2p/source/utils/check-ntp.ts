@@ -1,4 +1,5 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 import Sntp, { TimeOptions } from "@hapi/sntp";
 
 export const checkNTP = (
@@ -16,7 +17,7 @@ export const checkNTP = (
 
 				return resolve({ host, time });
 			} catch (error) {
-				app.get<Contracts.Kernel.Logger>(Container.Identifiers.LogService).error(
+				app.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(
 					`Host ${host} responded with: ${error.message}`,
 				);
 			}

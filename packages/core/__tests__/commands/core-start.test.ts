@@ -14,7 +14,7 @@ beforeEach(() => {
 	writeJSONSync(`${process.env.CORE_PATH_CONFIG}/delegates.json`, { secrets: ["bip39"] });
 
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 });
 
 afterAll(() => setGracefulCleanup());

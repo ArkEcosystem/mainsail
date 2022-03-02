@@ -1,4 +1,5 @@
-import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
@@ -11,7 +12,7 @@ import { CurrentDelegateProcessAction, LastForgedBlockRemoteAction, NextSlotProc
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Container.Identifiers.ForgerService).to(ForgerService).inSingletonScope();
+		this.app.bind(Identifiers.ForgerService).to(ForgerService).inSingletonScope();
 		this.app.bind(DELEGATE_FACTORY).to(DelegateFactory).inSingletonScope();
 
 		this.registerActions();
@@ -22,7 +23,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		const delegates: Delegate[] = await this.makeDelegates();
 
-		const forgerService = this.app.get<ForgerService>(Container.Identifiers.ForgerService);
+		const forgerService = this.app.get<ForgerService>(Identifiers.ForgerService);
 
 		forgerService.register(this.config().all());
 		await forgerService.boot(delegates);
@@ -35,13 +36,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<ForgerService>(Container.Identifiers.ForgerService).dispose();
+		await this.app.get<ForgerService>(Identifiers.ForgerService).dispose();
 	}
 
 	public async bootWhen(): Promise<boolean> {
 		const { secrets, bip38 }: { secrets: string[]; bip38: string } = this.app.config("delegates")!;
 
-		if (!bip38 && (!secrets || !secrets.length || !Array.isArray(secrets))) {
+		if (!bip38 && (!secrets || secrets.length === 0 || !Array.isArray(secrets))) {
 			return false;
 		}
 
@@ -50,6 +51,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): object {
 		return Joi.object({
+			bip38: Joi.string(),
 			hosts: Joi.array()
 				.items(
 					Joi.object({
@@ -58,48 +60,47 @@ export class ServiceProvider extends Providers.ServiceProvider {
 								version: ["ipv4", "ipv6"],
 							})
 							.required(),
-						port: Joi.number().integer().min(1).max(65535).required(),
+						port: Joi.number().integer().min(1).max(65_535).required(),
 					}),
 				)
 				.required(),
-			tracker: Joi.bool().required(),
-			bip38: Joi.string(),
 			password: Joi.string(),
+			tracker: Joi.bool().required(),
 		}).unknown(true);
 	}
 
 	private registerActions(): void {
 		this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("forgeNewBlock", new ForgeNewBlockAction());
 
 		this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("isForgingAllowed", new IsForgingAllowedAction());
 	}
 
 	private registerProcessActions(): void {
 		this.app
-			.get<Contracts.Kernel.ProcessActionsService>(Container.Identifiers.ProcessActionsService)
+			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
 			.register(this.app.resolve(CurrentDelegateProcessAction));
 
 		this.app
-			.get<Contracts.Kernel.ProcessActionsService>(Container.Identifiers.ProcessActionsService)
+			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
 			.register(this.app.resolve(NextSlotProcessAction));
 
 		this.app
-			.get<Contracts.Kernel.ProcessActionsService>(Container.Identifiers.ProcessActionsService)
+			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
 			.register(this.app.resolve(LastForgedBlockRemoteAction));
 	}
 
 	private startTracker(delegates: Delegate[]): void {
-		if (!Array.isArray(delegates) || !delegates.length) {
+		if (!Array.isArray(delegates) || delegates.length === 0) {
 			return;
 		}
 
 		if (this.config().get("tracker") === true) {
 			this.app
-				.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService)
+				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)
 				.listen(
 					Enums.BlockEvent.Applied,
 					this.app.resolve<DelegateTracker>(DelegateTracker).initialize(delegates),

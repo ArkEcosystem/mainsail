@@ -18,7 +18,7 @@
 		"@arkecosystem/core": "workspace:*",
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
 		"@arkecosystem/core-crypto-transaction-delegate-registration": "workspace:*",
 		"@arkecosystem/core-crypto-transaction-delegate-resignation": "workspace:*",

@@ -1,6 +1,6 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
-import Interfaces, { BINDINGS, IBlockSerializer } from "@arkecosystem/core-crypto-contracts";
 
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { RelayHost } from "./interfaces";
@@ -9,11 +9,11 @@ const MAX_PAYLOAD_CLIENT = 20 * 1024 * 1024; // allow large value of max payload
 
 @Container.injectable()
 export class Client {
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Block.Serializer)
-	private readonly serializer: IBlockSerializer;
+	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly serializer: Crypto.IBlockSerializer;
 
 	public hosts: RelayHost[] = [];
 
@@ -25,7 +25,7 @@ export class Client {
 			const url = `ws://${Utils.IpAddress.normalizeAddress(host.hostname)}:${host.port}`;
 			const options = { ws: { maxPayload: MAX_PAYLOAD_CLIENT } };
 			const connection = new Nes.Client(url, options);
-			connection.connect().catch((e) => {}); // connect promise can fail when p2p is not ready, it's fine it will retry
+			connection.connect().catch((error) => {}); // connect promise can fail when p2p is not ready, it's fine it will retry
 
 			connection.onError = (e) => {
 				this.logger.error(e.message);
@@ -49,7 +49,7 @@ export class Client {
 		}
 	}
 
-	public async broadcastBlock(block: Interfaces.IBlock): Promise<void> {
+	public async broadcastBlock(block: Crypto.IBlock): Promise<void> {
 		this.logger.debug(
 			`Broadcasting block ${block.data.height.toLocaleString()} (${block.data.id}) with ${
 				block.data.numberOfTransactions
@@ -91,7 +91,7 @@ export class Client {
 			return NetworkState.parse(
 				await this.emit<Contracts.P2P.NetworkState>("p2p.internal.getNetworkState", {}, 4000),
 			);
-		} catch (err) {
+		} catch {
 			return new NetworkState(NetworkStateStatus.Unknown);
 		}
 	}
@@ -102,7 +102,7 @@ export class Client {
 
 	public async emitEvent(
 		event: string,
-		body: { error: string } | { activeDelegates: string[] } | Interfaces.IBlockData | Interfaces.ITransactionData,
+		body: { error: string } | { activeDelegates: string[] } | Crypto.IBlockData | Crypto.ITransactionData,
 	): Promise<void> {
 		// NOTE: Events need to be emitted to the localhost. If you need to trigger
 		// actions on a remote host based on events you should be using webhooks
@@ -120,14 +120,14 @@ export class Client {
 		}
 
 		try {
-			await this.emit("p2p.internal.emitEvent", { event, body });
-		} catch (error) {
+			await this.emit("p2p.internal.emitEvent", { body, event });
+		} catch {
 			this.logger.error(`Failed to emit "${event}" to "${host.hostname}:${host.port}"`);
 		}
 	}
 
 	public async selectHost(): Promise<void> {
-		for (let i = 0; i < 10; i++) {
+		for (let index = 0; index < 10; index++) {
 			for (const host of this.hosts) {
 				if (host.socket && host.socket._isReady()) {
 					this.host = host;
@@ -144,7 +144,7 @@ export class Client {
 			)}.`,
 		);
 
-		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join());
+		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join(","));
 	}
 
 	private async emit<T = object>(event: string, payload: Record<string, any> = {}, timeout = 4000): Promise<T> {
@@ -168,12 +168,12 @@ export class Client {
 
 	private getCodec(event: string) {
 		const codecs = {
+			"p2p.blocks.postBlock": Codecs.postBlock,
 			"p2p.internal.emitEvent": Codecs.emitEvent,
-			"p2p.internal.getUnconfirmedTransactions": Codecs.getUnconfirmedTransactions,
 			"p2p.internal.getCurrentRound": Codecs.getCurrentRound,
 			"p2p.internal.getNetworkState": Codecs.getNetworkState,
+			"p2p.internal.getUnconfirmedTransactions": Codecs.getUnconfirmedTransactions,
 			"p2p.internal.syncBlockchain": Codecs.syncBlockchain,
-			"p2p.blocks.postBlock": Codecs.postBlock,
 		};
 
 		return codecs[event];

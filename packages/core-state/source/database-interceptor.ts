@@ -1,16 +1,16 @@
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 
 @Container.injectable()
 export class DatabaseInterceptor {
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
+	@Container.inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
-	public async getBlock(id: string): Promise<Interfaces.IBlock | undefined> {
+	public async getBlock(id: string): Promise<Crypto.IBlock | undefined> {
 		const block = this.stateStore.getLastBlocks().find((block) => block.data.id === id);
 
 		if (block) {
@@ -20,13 +20,13 @@ export class DatabaseInterceptor {
 		return this.databaseService.getBlock(id);
 	}
 
-	public async getCommonBlocks(ids: string[]): Promise<Interfaces.IBlockData[]> {
-		let commonBlocks: Interfaces.IBlockData[] = this.stateStore.getCommonBlocks(ids);
+	public async getCommonBlocks(ids: string[]): Promise<Crypto.IBlockData[]> {
+		let commonBlocks: Crypto.IBlockData[] = this.stateStore.getCommonBlocks(ids);
 
 		if (commonBlocks.length < ids.length) {
 			// ! do not query blocks that were found
 			// ! why method is called commonBlocks, but is just findByIds?
-			commonBlocks = (await this.databaseService.findBlockByID(ids)) as unknown as Interfaces.IBlockData[];
+			commonBlocks = (await this.databaseService.findBlockByID(ids)) as unknown as Crypto.IBlockData[];
 		}
 
 		return commonBlocks;
@@ -34,12 +34,12 @@ export class DatabaseInterceptor {
 
 	// ! three methods below (getBlocks, getBlocksForDownload, getBlocksByHeight) can be merged into one
 
-	public async getBlocks(offset: number, limit: number, headersOnly?: boolean): Promise<Interfaces.IBlockData[]> {
+	public async getBlocks(offset: number, limit: number, headersOnly?: boolean): Promise<Crypto.IBlockData[]> {
 		// The functions below return matches in the range [start, end], including both ends.
 		const start: number = offset;
 		const end: number = offset + limit - 1;
 
-		let blocks: Interfaces.IBlockData[] = this.stateStore.getLastBlocksByHeight(start, end, headersOnly);
+		let blocks: Crypto.IBlockData[] = this.stateStore.getLastBlocksByHeight(start, end, headersOnly);
 
 		if (blocks.length !== limit) {
 			// ! assumes that earlier blocks may be missing
@@ -50,8 +50,8 @@ export class DatabaseInterceptor {
 		return blocks;
 	}
 
-	public async getBlocksByHeight(heights: number[]): Promise<Interfaces.IBlockData[]> {
-		const blocks: Interfaces.IBlockData[] = [];
+	public async getBlocksByHeight(heights: number[]): Promise<Crypto.IBlockData[]> {
+		const blocks: Crypto.IBlockData[] = [];
 
 		// Map of height -> index in heights[], e.g. if
 		// heights[5] == 6000000, then
@@ -60,15 +60,15 @@ export class DatabaseInterceptor {
 		// from app/state and need to get from the database.
 		const toGetFromDB = {};
 
-		for (const [i, height] of heights.entries()) {
+		for (const [index, height] of heights.entries()) {
 			const stateBlocks = this.stateStore.getLastBlocksByHeight(height, height, true);
 
 			if (Array.isArray(stateBlocks) && stateBlocks.length > 0) {
-				blocks[i] = stateBlocks[0];
+				blocks[index] = stateBlocks[0];
 			}
 
-			if (blocks[i] === undefined) {
-				toGetFromDB[height] = i;
+			if (blocks[index] === undefined) {
+				toGetFromDB[height] = index;
 			}
 		}
 

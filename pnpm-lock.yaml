@@ -132,10 +132,10 @@ importers:
     specifiers:
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-address-bech32m': workspace:*
       '@arkecosystem/core-crypto-block': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-crypto-hash-bcrypto': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-crypto-signature-schnorr': workspace:*
@@ -182,10 +182,10 @@ importers:
     dependencies:
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
       '@arkecosystem/core-crypto-block': link:../core-crypto-block
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-crypto-hash-bcrypto': link:../core-crypto-hash-bcrypto
       '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
       '@arkecosystem/core-crypto-signature-schnorr': link:../core-crypto-signature-schnorr
@@ -232,7 +232,7 @@ importers:
 
   packages/core-blockchain:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -242,7 +242,7 @@ importers:
       joi: 17.4.2
       xstate: 4.23.4
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-state': link:../core-state
@@ -255,7 +255,7 @@ importers:
 
   packages/core-cli:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/fast-levenshtein': 0.0.2
@@ -290,7 +290,7 @@ importers:
       uvu: ^0.5.3
       yargs-parser: 20.2.9
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
       boxen: 4.2.0
@@ -340,11 +340,39 @@ importers:
       inversify: 5.1.1
       reflect-metadata: 0.1.13
 
+  packages/core-contracts:
+    specifiers:
+      '@arkecosystem/core-errors': workspace:*
+      '@arkecosystem/utils': workspace:*
+      ajv: 6.12.6
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      inversify: 5.1.1
+      joi: 17.4.2
+      reflect-metadata: 0.1.13
+      type-fest: 0.21.3
+    dependencies:
+      '@arkecosystem/core-errors': link:../core-errors
+      '@arkecosystem/utils': link:../utils
+      ajv: 6.12.6
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      inversify: 5.1.1
+      joi: 17.4.2
+      reflect-metadata: 0.1.13
+      type-fest: 0.21.3
+
+  packages/core-contracts/__tests__/__stubs__/stub-plugin:
+    specifiers: {}
+
+  packages/core-contracts/__tests__/__stubs__/stub-plugin-with-defaults:
+    specifiers: {}
+
   packages/core-crypto-address-base58:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
@@ -355,7 +383,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       bcrypto: 5.4.0
       bstring: 0.3.9
@@ -370,8 +398,8 @@ importers:
   packages/core-crypto-address-bech32:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
@@ -381,7 +409,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@scure/base': 1.0.0
       bytebuffer: 5.0.1
@@ -395,8 +423,8 @@ importers:
   packages/core-crypto-address-bech32m:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
@@ -406,7 +434,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@scure/base': 1.0.0
       bytebuffer: 5.0.1
@@ -420,8 +448,8 @@ importers:
   packages/core-crypto-address-keccak256:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
@@ -431,8 +459,8 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       bytebuffer: 5.0.1
       ethers: 5.5.4
@@ -445,8 +473,8 @@ importers:
   packages/core-crypto-address-ss58:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
@@ -457,7 +485,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@polkadot/util': 8.4.1
       '@polkadot/util-crypto': 8.4.1
@@ -472,12 +500,12 @@ importers:
   packages/core-crypto-block:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
       '@arkecosystem/core-crypto-networks': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
@@ -510,12 +538,12 @@ importers:
       util: 0.12.4
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
       '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
       '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/crypto-identities': 1.2.0
@@ -551,105 +579,32 @@ importers:
   packages/core-crypto-config:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       deepmerge: 4.2.2
       lodash.get: 4.4.2
       lodash.set: 4.3.2
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       deepmerge: 4.2.2
       lodash.get: 4.4.2
       lodash.set: 4.3.2
 
-  packages/core-crypto-contracts:
-    specifiers:
-      '@arkecosystem/utils': workspace:*
-      ajv: 6.12.6
-      bytebuffer: 5.0.1
-    dependencies:
-      '@arkecosystem/utils': link:../utils
-      ajv: 6.12.6
-      bytebuffer: 5.0.1
-
-  packages/core-crypto-errors:
-    specifiers:
-      '@arkecosystem/core-crypto-networks': workspace:*
-      '@arkecosystem/crypto-identities': ^1.0.0
-      '@arkecosystem/utils': 1.3.1
-      '@types/bip32': 2.0.0
-      '@types/bip39': 2.4.2
-      '@types/buffer-xor': 2.0.0
-      '@types/lodash.get': 4.4.6
-      '@types/lodash.set': 4.3.6
-      '@types/wif': 2.0.2
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1
-      bcrypto: 5.4.0
-      bip32: 2.0.6
-      bip39: 3.0.4
-      browserify-aes: 1.2.0
-      bstring: 0.3.9
-      buffer: 6.0.3
-      buffer-xor: 2.0.2
-      builtin-modules: 3.2.0
-      bytebuffer: 5.0.1
-      dayjs: 1.10.7
-      deepmerge: 4.2.2
-      fast-memoize: 2.5.2
-      ipaddr.js: 2.0.1
-      lodash.get: 4.4.2
-      lodash.set: 4.3.2
-      micro-bmark: ^0.1.3
-      process-es6: 0.11.6
-      util: 0.12.4
-    dependencies:
-      '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
-      '@arkecosystem/crypto-identities': 1.2.0
-      '@arkecosystem/utils': link:../utils
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1_ajv@6.12.6
-      bcrypto: 5.4.0
-      bip32: 2.0.6
-      bip39: 3.0.4
-      browserify-aes: 1.2.0
-      bstring: 0.3.9
-      buffer-xor: 2.0.2
-      builtin-modules: 3.2.0
-      bytebuffer: 5.0.1
-      dayjs: 1.10.7
-      deepmerge: 4.2.2
-      fast-memoize: 2.5.2
-      ipaddr.js: 2.0.1
-      lodash.get: 4.4.2
-      lodash.set: 4.3.2
-    devDependencies:
-      '@types/bip32': 2.0.0
-      '@types/bip39': 2.4.2
-      '@types/buffer-xor': 2.0.0
-      '@types/lodash.get': 4.4.6
-      '@types/lodash.set': 4.3.6
-      '@types/wif': 2.0.2
-      buffer: 6.0.3
-      micro-bmark: 0.1.3
-      process-es6: 0.11.6
-      util: 0.12.4
-
   packages/core-crypto-hash-bcrypto:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       bcrypto: 5.4.0
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       bcrypto: 5.4.0
     devDependencies:
@@ -659,14 +614,14 @@ importers:
   packages/core-crypto-hash-noble:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@noble/hashes': ^1.0.0
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@noble/hashes': 1.0.0
     devDependencies:
@@ -676,14 +631,14 @@ importers:
   packages/core-crypto-hash-wasm:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       hash-wasm: ^4.9.0
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       hash-wasm: 4.9.0
     devDependencies:
@@ -693,9 +648,9 @@ importers:
   packages/core-crypto-key-pair-bls12-381:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@noble/bls12-381': ^1.2.0
@@ -707,9 +662,9 @@ importers:
       wif: ^2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@noble/bls12-381': 1.2.0
       '@scure/bip39': 1.0.0
@@ -724,9 +679,9 @@ importers:
   packages/core-crypto-key-pair-ecdsa:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       bcrypto: 5.4.0
@@ -735,9 +690,9 @@ importers:
       wif: ^2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       bcrypto: 5.4.0
       bytebuffer: 5.0.1
@@ -749,9 +704,9 @@ importers:
   packages/core-crypto-key-pair-ed25519:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@noble/ed25519': ^1.6.0
@@ -762,9 +717,9 @@ importers:
       wif: ^2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@noble/ed25519': 1.6.0
       '@noble/hashes': 1.0.0
@@ -778,9 +733,9 @@ importers:
   packages/core-crypto-key-pair-schnorr:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       bcrypto: 5.4.0
@@ -789,9 +744,9 @@ importers:
       wif: ^2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       bcrypto: 5.4.0
       bytebuffer: 5.0.1
@@ -821,7 +776,7 @@ importers:
   packages/core-crypto-signature-bls12-381:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@noble/bls12-381': ^1.2.0
@@ -829,7 +784,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@noble/bls12-381': 1.2.0
       bytebuffer: 5.0.1
@@ -840,7 +795,7 @@ importers:
   packages/core-crypto-signature-ecdsa:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       bcrypto: 5.4.0
@@ -848,7 +803,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       bcrypto: 5.4.0
       bytebuffer: 5.0.1
@@ -859,7 +814,7 @@ importers:
   packages/core-crypto-signature-ed25519:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@noble/ed25519': ^1.6.0
@@ -867,7 +822,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@noble/ed25519': 1.6.0
       bytebuffer: 5.0.1
@@ -878,7 +833,7 @@ importers:
   packages/core-crypto-signature-schnorr:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       bcrypto: 5.4.0
@@ -886,7 +841,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       bcrypto: 5.4.0
       bytebuffer: 5.0.1
@@ -897,7 +852,7 @@ importers:
   packages/core-crypto-signature-schnorr-legacy:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       bcrypto: 5.4.0
@@ -905,7 +860,7 @@ importers:
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       bcrypto: 5.4.0
       bytebuffer: 5.0.1
@@ -916,24 +871,24 @@ importers:
   packages/core-crypto-time:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       dayjs: 1.10.7
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       dayjs: 1.10.7
 
   packages/core-crypto-transaction:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
       '@arkecosystem/core-crypto-networks': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/core-crypto-validation': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
@@ -966,12 +921,12 @@ importers:
       util: 0.12.4
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
       '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
       '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/crypto-identities': 1.2.0
@@ -1007,17 +962,17 @@ importers:
   packages/core-crypto-transaction-delegate-registration:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
@@ -1025,17 +980,17 @@ importers:
   packages/core-crypto-transaction-delegate-resignation:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
@@ -1043,19 +998,19 @@ importers:
   packages/core-crypto-transaction-multi-payment:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
@@ -1063,19 +1018,19 @@ importers:
   packages/core-crypto-transaction-multi-signature-registration:
     specifiers:
       '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
@@ -1083,14 +1038,14 @@ importers:
   packages/core-crypto-transaction-transfer:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto-identities': 1.2.0
@@ -1099,33 +1054,33 @@ importers:
   packages/core-crypto-transaction-vote:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
 
   packages/core-crypto-validation:
     specifiers:
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
       ajv: 6.12.6
       ajv-keywords: 3.4.1
       ipaddr.js: 2.0.1
     dependencies:
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
       ajv: 6.12.6
@@ -1135,7 +1090,7 @@ importers:
   packages/core-crypto-wif:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@types/tmp': ^0.2.0
       '@types/uuid': ^8.0.0
@@ -1147,7 +1102,7 @@ importers:
       wif: ^2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       wif: 2.0.6
     devDependencies:
@@ -1161,7 +1116,7 @@ importers:
 
   packages/core-database:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': 1.3.1
       dayjs: 1.10.7
@@ -1173,7 +1128,7 @@ importers:
       typeorm: 0.2.25
       uvu: ^0.5.3
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
       dayjs: 1.10.7
@@ -1186,43 +1141,46 @@ importers:
       import-fresh: 3.3.0
       uvu: 0.5.3
 
+  packages/core-errors:
+    specifiers: {}
+
   packages/core-fees:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
 
   packages/core-fees-managed:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
 
   packages/core-fees-static:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
 
   packages/core-forger:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/utils': workspace:*
@@ -1233,7 +1191,7 @@ importers:
       node-forge: 1.2.1
       wif: 2.0.6
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/utils': link:../utils
@@ -1247,8 +1205,8 @@ importers:
 
   packages/core-kernel:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
-      '@arkecosystem/core-crypto-errors': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-errors': workspace:*
       '@arkecosystem/utils': workspace:*
       '@pm2/io': 4.3.5
       '@types/cron': 1.7.3
@@ -1276,8 +1234,8 @@ importers:
       semver: 6.3.0
       type-fest: 0.21.3
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
-      '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-errors': link:../core-errors
       '@arkecosystem/utils': link:../utils
       '@pm2/io': 4.3.5
       chalk: 4.1.2
@@ -1314,6 +1272,7 @@ importers:
 
   packages/core-logger-pino:
     specifiers:
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/utils': workspace:*
@@ -1333,6 +1292,7 @@ importers:
       split2: 3.2.2
       uvu: ^0.5.3
     dependencies:
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       chalk: 4.1.2
       joi: 17.4.2
@@ -1355,17 +1315,19 @@ importers:
 
   packages/core-logger-winston:
     specifiers:
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       joi: 17.4.2
       winston: ^3.6.0
     dependencies:
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       joi: 17.4.2
       winston: 3.6.0
 
   packages/core-p2p:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
@@ -1394,7 +1356,7 @@ importers:
       semver: 6.3.0
       ws: 7.5.5
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
@@ -1426,7 +1388,7 @@ importers:
 
   packages/core-state:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
@@ -1434,7 +1396,7 @@ importers:
       immutable: 4.0.0-rc.14
       joi: 17.4.2
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
@@ -1448,7 +1410,7 @@ importers:
       '@arkecosystem/core': workspace:*
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-crypto-transaction-delegate-registration': workspace:*
       '@arkecosystem/core-crypto-transaction-delegate-resignation': workspace:*
@@ -1488,7 +1450,7 @@ importers:
       '@arkecosystem/core': link:../core
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
       '@arkecosystem/core-crypto-transaction-delegate-registration': link:../core-crypto-transaction-delegate-registration
       '@arkecosystem/core-crypto-transaction-delegate-resignation': link:../core-crypto-transaction-delegate-resignation
@@ -1528,7 +1490,7 @@ importers:
 
   packages/core-transaction-pool:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/better-sqlite3': 5.4.3
@@ -1537,7 +1499,7 @@ importers:
       fs-extra: 8.1.0
       joi: 17.4.2
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
       better-sqlite3: 7.4.3
@@ -1549,7 +1511,7 @@ importers:
 
   packages/core-transactions:
     specifiers:
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-crypto-transaction-delegate-registration': workspace:*
       '@arkecosystem/core-crypto-transaction-delegate-resignation': workspace:*
@@ -1566,7 +1528,7 @@ importers:
       bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
       '@arkecosystem/core-crypto-transaction-delegate-registration': link:../core-crypto-transaction-delegate-registration
       '@arkecosystem/core-crypto-transaction-delegate-resignation': link:../core-crypto-transaction-delegate-resignation
@@ -1587,19 +1549,20 @@ importers:
   packages/core-validation:
     specifiers:
       '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-crypto-contracts': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       ajv: 6.12.6
       ajv-keywords: 3.4.1
     dependencies:
       '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-crypto-contracts': link:../core-crypto-contracts
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       ajv: 6.12.6
       ajv-keywords: 3.4.1_ajv@6.12.6
 
   packages/core-webhooks:
     specifiers:
+      '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/utils': workspace:*
@@ -1617,6 +1580,7 @@ importers:
       uuid: 8.3.2
       uvu: ^0.5.3
     dependencies:
+      '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
       '@hapi/boom': 9.0.0

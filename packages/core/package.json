@@ -36,10 +36,10 @@
 	"dependencies": {
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
 		"@arkecosystem/core-crypto-block": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-hash-bcrypto": "workspace:*",
 		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
 		"@arkecosystem/core-crypto-signature-schnorr": "workspace:*",

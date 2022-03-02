@@ -1,4 +1,5 @@
-import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 
 export const getHeaders = (app: Contracts.Kernel.Application) => {
 	const headers: {
@@ -6,24 +7,18 @@ export const getHeaders = (app: Contracts.Kernel.Application) => {
 		port: number | undefined;
 		height: number | undefined;
 	} = {
-		version: app.version(),
+		height: undefined,
 		port: Number(
 			app
-				.getTagged<Providers.PluginConfiguration>(
-					Container.Identifiers.PluginConfiguration,
-					"plugin",
-					"core-p2p",
-				)
+				.getTagged<Providers.PluginConfiguration>(Identifiers.PluginConfiguration, "plugin", "core-p2p")
 				.get<number>("port"),
 		),
-		height: undefined,
+		version: app.version(),
 	};
 
-	const state: Contracts.State.StateStore = app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore);
+	const state: Contracts.State.StateStore = app.get<Contracts.State.StateStore>(Identifiers.StateStore);
 	if (state.isStarted()) {
-		headers.height = app
-			.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService)
-			.getLastHeight();
+		headers.height = app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService).getLastHeight();
 	}
 
 	return headers;

@@ -1,21 +1,15 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IAddressSerializer,
-	ISerializeOptions,
-	TransactionType,
-	TransactionTypeGroup,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class TransferTransaction extends Transaction {
-	@Container.inject(BINDINGS.Identity.AddressSerializer)
-	private readonly addressSerializer: IAddressSerializer;
+	@Container.inject(Identifiers.Cryptography.Identity.AddressSerializer)
+	private readonly addressSerializer: Crypto.IAddressSerializer;
 
-	public static typeGroup: number = TransactionTypeGroup.Core;
-	public static type: number = TransactionType.Transfer;
+	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
+	public static type: number = Crypto.TransactionType.Transfer;
 	public static key = "transfer";
 	public static version = 1;
 
@@ -28,7 +22,7 @@ export class TransferTransaction extends Transaction {
 				expiration: { minimum: 0, type: "integer" },
 				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
 				recipientId: { $ref: "address" },
-				type: { transactionType: TransactionType.Transfer },
+				type: { transactionType: Crypto.TransactionType.Transfer },
 				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
 			},
 			required: ["recipientId"],
@@ -39,7 +33,7 @@ export class TransferTransaction extends Transaction {
 		return true;
 	}
 
-	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(64));
 		buff.writeBigUInt64LE(data.amount.toBigInt());

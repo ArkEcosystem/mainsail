@@ -1,7 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { isRecipientOnActiveNetwork } from "../../utils";
@@ -37,7 +37,7 @@ export class TransferTransactionHandler extends TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Interfaces.ITransaction,
+		transaction: Crypto.ITransaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
 		return super.throwIfCannotBeApplied(transaction, sender);
@@ -47,7 +47,7 @@ export class TransferTransactionHandler extends TransactionHandler {
 		return true;
 	}
 
-	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
 
@@ -61,7 +61,7 @@ export class TransferTransactionHandler extends TransactionHandler {
 		}
 	}
 
-	public async applyToRecipient(transaction: Interfaces.ITransaction): Promise<void> {
+	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 
 		const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(transaction.data.recipientId);
@@ -69,7 +69,7 @@ export class TransferTransactionHandler extends TransactionHandler {
 		recipient.increaseBalance(transaction.data.amount);
 	}
 
-	public async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 
 		const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(transaction.data.recipientId);

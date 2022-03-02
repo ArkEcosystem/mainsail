@@ -14,10 +14,10 @@ describe("PeerRepository", () => {
 		const logger = { warning: jest.fn(), debug: jest.fn() };
 
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PeerRepository).to(PeerRepository);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PeerRepository).to(PeerRepository);
 
-		peerStorage = container.get<PeerRepository>(Container.Identifiers.PeerRepository);
+		peerStorage = container.get<PeerRepository>(Identifiers.PeerRepository);
 	});
 
 	describe("getPeers", () => {

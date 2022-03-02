@@ -4,7 +4,7 @@ import { Models } from "@arkecosystem/core-database";
 import { Interfaces, Utils } from "@arkecosystem/crypto";
 import { mapTransactionToModel } from "@packages/core-test-framework/source/utils/mapper";
 
-let transaction: Interfaces.ITransaction;
+let transaction: Crypto.ITransaction;
 let transactionModel: Models.Transaction;
 
 beforeEach(() => {

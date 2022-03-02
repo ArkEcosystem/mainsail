@@ -1,4 +1,4 @@
-import Interfaces, { BINDINGS, IAddressFactory, IKeyPairFactory } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Container } from "@arkecosystem/core-kernel";
 
 import { Delegate } from "../interfaces";
@@ -6,15 +6,15 @@ import { Method } from "./method";
 
 @Container.injectable()
 export class BIP39 extends Method implements Delegate {
-	@Container.inject(BINDINGS.Identity.AddressFactory)
-	private readonly addressFactory: IAddressFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	#passphrase: string;
 
-	public keys: Interfaces.IKeyPair | undefined;
+	public keys: Crypto.IKeyPair | undefined;
 
 	public publicKey: string;
 
@@ -29,10 +29,7 @@ export class BIP39 extends Method implements Delegate {
 		return this;
 	}
 
-	public async forge(
-		transactions: Interfaces.ITransactionData[],
-		options: Record<string, any>,
-	): Promise<Interfaces.IBlock> {
+	public async forge(transactions: Crypto.ITransactionData[], options: Record<string, any>): Promise<Crypto.IBlock> {
 		return this.createBlock(this.keys, transactions, options);
 	}
 }

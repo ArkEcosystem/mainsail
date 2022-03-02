@@ -1,6 +1,6 @@
 import { IBlock, ITransaction } from "@packages/crypto/distribution/interfaces";
 
-export const addTransactionsToBlock = (txs: ITransaction[], block: IBlock) => {
+export const addTransactionsToBlock = (txs: Crypto.ITransaction[], block: Crypto.IBlock) => {
 	const { data } = block;
 	data.transactions = [];
 	txs.forEach((tx) => data.transactions?.push(tx.data));

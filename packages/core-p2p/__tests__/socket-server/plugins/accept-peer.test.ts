@@ -1,8 +1,7 @@
-import { Server } from "@hapi/hapi";
-import Joi from "joi";
 import { Container } from "@arkecosystem/core-kernel";
-
+import { Server } from "@hapi/hapi";
 import { AcceptPeerPlugin } from "@packages/core-p2p/source/socket-server/plugins/accept-peer";
+import Joi from "joi";
 
 afterEach(() => {
 	jest.clearAllMocks();
@@ -13,32 +12,32 @@ describe("AcceptPeerPlugin", () => {
 
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn() };
+	const logger = { debug: jest.fn(), warning: jest.fn() };
 	const peerProcessor = { validateAndAcceptPeer: jest.fn() };
 
 	const responsePayload = { status: "ok" };
 	const mockRouteByPath = {
 		"/p2p/peer/mockroute": {
-			id: "p2p.peer.getPeers",
 			handler: () => responsePayload,
+			id: "p2p.peer.getPeers",
 			validation: Joi.object().max(0),
 		},
 	};
 	const mockRoute = {
+		config: {
+			handler: mockRouteByPath["/p2p/peer/mockroute"].handler,
+			id: mockRouteByPath["/p2p/peer/mockroute"].id,
+		},
 		method: "POST",
 		path: "/p2p/peer/mockroute",
-		config: {
-			id: mockRouteByPath["/p2p/peer/mockroute"].id,
-			handler: mockRouteByPath["/p2p/peer/mockroute"].handler,
-		},
 	};
 	const app = { resolve: jest.fn().mockReturnValue({ getRoutesConfigByPath: () => mockRouteByPath }) };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
-		container.bind(Container.Identifiers.PeerProcessor).toConstantValue(peerProcessor);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.PeerProcessor).toConstantValue(peerProcessor);
 	});
 
 	beforeEach(() => {
@@ -49,19 +48,19 @@ describe("AcceptPeerPlugin", () => {
 		const server = new Server({ port: 4100 });
 		server.route(mockRoute);
 
-		const spyExt = jest.spyOn(server, "ext");
+		const spyExtension = jest.spyOn(server, "ext");
 
 		acceptPeerPlugin.register(server);
 
-		expect(spyExt).toBeCalledWith(expect.objectContaining({ type: "onPreHandler" }));
+		expect(spyExtension).toBeCalledWith(expect.objectContaining({ type: "onPreHandler" }));
 
 		// try the route with a valid payload
 		const remoteAddress = "187.166.55.44";
 		const responseValid = await server.inject({
 			method: "POST",
-			url: "/p2p/peer/mockroute",
 			payload: {},
 			remoteAddress,
+			url: "/p2p/peer/mockroute",
 		});
 		expect(JSON.parse(responseValid.payload)).toEqual(responsePayload);
 		expect(responseValid.statusCode).toBe(200);
@@ -71,32 +70,30 @@ describe("AcceptPeerPlugin", () => {
 
 	it("should not be called on another route", async () => {
 		const testRoute = {
+			config: {
+				handler: () => ({ status: "ok" }),
+			},
 			method: "POST",
 			path: "/p2p/peer/testroute",
-			config: {
-				handler: () => {
-					return { status: "ok" };
-				},
-			},
 		};
 
 		const server = new Server({ port: 4100 });
 		server.route(testRoute);
 		server.route(mockRoute);
 
-		const spyExt = jest.spyOn(server, "ext");
+		const spyExtension = jest.spyOn(server, "ext");
 
 		acceptPeerPlugin.register(server);
 
-		expect(spyExt).toBeCalledWith(expect.objectContaining({ type: "onPreHandler" }));
+		expect(spyExtension).toBeCalledWith(expect.objectContaining({ type: "onPreHandler" }));
 
 		// try the route with a valid payload
 		const remoteAddress = "187.166.55.44";
 		const responseValid = await server.inject({
 			method: "POST",
-			url: "/p2p/peer/testroute",
 			payload: {},
 			remoteAddress,
+			url: "/p2p/peer/testroute",
 		});
 		expect(JSON.parse(responseValid.payload)).toEqual(responsePayload);
 		expect(responseValid.statusCode).toBe(200);

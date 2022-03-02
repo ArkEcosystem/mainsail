@@ -1,6 +1,7 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import chalk, { Chalk } from "chalk";
 import * as console from "console";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils } from "@arkecosystem/core-kernel";
+import chalk, { Chalk } from "chalk";
 import pino, { PrettyOptions } from "pino";
 import PinoPretty from "pino-pretty";
 import pump from "pump";
@@ -13,10 +14,10 @@ import { inspect } from "util";
 
 @Container.injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.ConfigFlags)
+	@Container.inject(Identifiers.ConfigFlags)
 	private readonly configFlags!: { processType: string };
 
 	private readonly levelStyles: Record<string, Chalk> = {
@@ -74,8 +75,8 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				this.createPrettyTransport(options.levels.console, { colorize: true }),
 				process.stdout,
 
-				(err) => {
-					console.error("Stdout stream closed due to an error:", err);
+				(error) => {
+					console.error("Stdout stream closed due to an error:", error);
 				},
 			);
 		}
@@ -88,8 +89,8 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				this.getFileStream(options.fileRotator),
 			);
 
-			this.combinedFileStream.on("error", (err) => {
-				console.error("File stream closed due to an error:", err);
+			this.combinedFileStream.on("error", (error) => {
+				console.error("File stream closed due to an error:", error);
 			});
 
 			this.stream.pipe(this.combinedFileStream);
@@ -177,7 +178,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		const formatLevel = (level: string): string => this.levelStyles[level](level.toUpperCase());
 
 		return new Transform({
-			transform(chunk, enc, cb) {
+			transform(chunk, enc, callback) {
 				try {
 					const json = JSON.parse(chunk);
 
@@ -185,12 +186,12 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 						const line: string | undefined = pinoPretty(json);
 
 						if (line !== undefined) {
-							return cb(undefined, line.replace("USERLVL", formatLevel(json.level)));
+							return callback(undefined, line.replace("USERLVL", formatLevel(json.level)));
 						}
 					}
 				} catch {}
 
-				return cb();
+				return callback();
 			},
 		});
 	}

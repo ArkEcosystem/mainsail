@@ -1,4 +1,4 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 
 export class ServerError extends Error {
 	public constructor(message: string) {
@@ -19,7 +19,7 @@ export class ServerError extends Error {
 }
 
 export class TooManyTransactionsError extends ServerError {
-	public constructor(block: Interfaces.IBlockData) {
+	public constructor(block: Crypto.IBlockData) {
 		super(
 			`Received block ${block.id} at height ${block.height} contained too many transactions (${block.numberOfTransactions}).`,
 		);

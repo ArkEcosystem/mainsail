@@ -1,11 +1,10 @@
-import { Contracts } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto } from "@arkecosystem/core-contracts";
 
 let accept: string[] = [];
 let broadcast: string[] = [];
 let invalid: string[] = [];
 let excess: string[] = [];
-let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined = undefined;
+let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
 export const setProcessorState = (state: any): void => {
 	accept = state.accept ? state.accept : [];
@@ -17,7 +16,7 @@ export const setProcessorState = (state: any): void => {
 };
 
 class TransactionPoolProcessorMock implements Partial<Contracts.TransactionPool.Processor> {
-	public async process(data: Interfaces.ITransactionData[] | Buffer[]): Promise<{
+	public async process(data: Crypto.ITransactionData[] | Buffer[]): Promise<{
 		accept: string[];
 		broadcast: string[];
 		invalid: string[];

@@ -1,36 +1,36 @@
-import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";
 
 import { Controller } from "./controller";
 
 export class InternalController extends Controller {
-	@Container.inject(Container.Identifiers.PeerProcessor)
+	@Container.inject(Identifiers.PeerProcessor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
-	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
+	@Container.inject(Identifiers.PeerNetworkMonitor)
 	private readonly peerNetworkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@Container.inject(Container.Identifiers.DatabaseInteraction)
+	@Container.inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@Container.inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Container.Identifiers.TransactionPoolCollator)
+	@Container.inject(Identifiers.TransactionPoolCollator)
 	private readonly collator!: Contracts.TransactionPool.Collator;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration!: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
 
 	public async acceptNewPeer(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<void> {
@@ -48,7 +48,7 @@ export class InternalController extends Controller {
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.UnconfirmedTransactions> {
-		const transactions: Interfaces.ITransaction[] = await this.collator.getBlockCandidateTransactions();
+		const transactions: Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
 
 		return {
 			poolSize: this.transactionPool.getPoolSize(),

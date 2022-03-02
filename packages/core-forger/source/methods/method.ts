@@ -1,20 +1,20 @@
-import Interfaces, { BINDINGS, IBlockFactory, IHashFactory } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 @Container.injectable()
 export abstract class Method {
-	@Container.inject(BINDINGS.Block.Factory)
-	private readonly blockFactory: IBlockFactory;
+	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@Container.inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Crypto.IHashFactory;
 
 	protected async createBlock(
-		keys: Interfaces.IKeyPair,
-		transactions: Interfaces.ITransactionData[],
+		keys: Crypto.IKeyPair,
+		transactions: Crypto.ITransactionData[],
 		options: Record<string, any>,
-	): Promise<Interfaces.IBlock> {
+	): Promise<Crypto.IBlock> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,

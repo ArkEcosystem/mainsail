@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Spinner } from "@packages/core-cli/source/components";
 
@@ -9,8 +8,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.Spinner).to(Spinner).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.Spinner);
+	cli.app.rebind(Identifiers.Spinner).to(Spinner).inSingletonScope();
+	component = cli.app.get(Identifiers.Spinner);
 });
 
 describe("Spinner", () => {

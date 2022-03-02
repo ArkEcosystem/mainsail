@@ -1,7 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { DelegateResignationTransaction } from "@arkecosystem/core-crypto-transaction-delegate-resignation";
-import { Container, Contracts, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Container, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { NotEnoughDelegatesError, WalletAlreadyResignedError, WalletNotADelegateError } from "../../errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
@@ -11,10 +11,10 @@ import { DelegateRegistrationTransactionHandler } from "./delegate-registration"
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @Container.injectable()
 export class DelegateResignationTransactionHandler extends TransactionHandler {
-	@Container.inject(Container.Identifiers.TransactionPoolQuery)
+	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@Container.inject(Container.Identifiers.TransactionHistoryService)
+	@Container.inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
 	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
@@ -50,7 +50,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Interfaces.ITransaction,
+		transaction: Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		if (!wallet.isDelegate()) {
@@ -73,11 +73,11 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public emitEvents(transaction: Interfaces.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		emitter.dispatch(AppEnums.DelegateEvent.Resigned, transaction.data);
 	}
 
-	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = this.poolQuery
@@ -96,7 +96,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 		}
 	}
 
-	public async applyToSender(transaction: Interfaces.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -108,7 +108,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 		this.walletRepository.index(senderWallet);
 	}
 
-	public async revertForSender(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -121,12 +121,12 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 	}
 
 	public async applyToRecipient(
-		transaction: Interfaces.ITransaction,
+		transaction: Crypto.ITransaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}
 
 	public async revertForRecipient(
-		transaction: Interfaces.ITransaction,
+		transaction: Crypto.ITransaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}
 }

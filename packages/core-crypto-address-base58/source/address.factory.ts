@@ -1,26 +1,18 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IAddressFactory,
-	IConfiguration,
-	IKeyPair,
-	IKeyPairFactory,
-	IMultiSignatureAsset,
-	IPublicKeyFactory,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { RIPEMD160, SHA256 } from "bcrypto";
 import { base58 } from "bstring";
 
 @Container.injectable()
-export class AddressFactory implements IAddressFactory {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+export class AddressFactory implements Crypto.IAddressFactory {
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
-	@Container.inject(BINDINGS.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: IPublicKeyFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
@@ -40,11 +32,11 @@ export class AddressFactory implements IAddressFactory {
 		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif));
 	}
 
-	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
+	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
 		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
 	}
 
-	public async fromPrivateKey(privateKey: IKeyPair): Promise<string> {
+	public async fromPrivateKey(privateKey: Crypto.IKeyPair): Promise<string> {
 		return this.fromPublicKey(privateKey.publicKey);
 	}
 

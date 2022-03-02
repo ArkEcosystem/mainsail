@@ -1,25 +1,25 @@
-import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 @Container.injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	public canExpire(transaction: Interfaces.ITransaction): boolean {
+	public canExpire(transaction: Crypto.ITransaction): boolean {
 		if (transaction.data.version && transaction.data.version >= 2) {
 			return !!transaction.data.expiration;
 		} else {
@@ -27,7 +27,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		}
 	}
 
-	public async isExpired(transaction: Interfaces.ITransaction): Promise<boolean> {
+	public async isExpired(transaction: Crypto.ITransaction): Promise<boolean> {
 		if (this.canExpire(transaction)) {
 			return (await this.getExpirationHeight(transaction)) <= this.stateStore.getLastHeight() + 1;
 		} else {
@@ -35,7 +35,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		}
 	}
 
-	public async getExpirationHeight(transaction: Interfaces.ITransaction): Promise<number> {
+	public async getExpirationHeight(transaction: Crypto.ITransaction): Promise<number> {
 		if (transaction.data.version && transaction.data.version >= 2) {
 			AppUtils.assert.defined<number>(transaction.data.expiration);
 			return transaction.data.expiration;

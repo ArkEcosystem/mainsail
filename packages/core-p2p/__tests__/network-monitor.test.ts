@@ -64,10 +64,10 @@ describe("NetworkMonitor", () => {
 	const stateStore = { getLastBlock: jest.fn() };
 	const blockchain = { getBlockPing: jest.fn(), getLastBlock: jest.fn() };
 	const appGet = {
-		[Container.Identifiers.TriggerService]: triggerService,
-		[Container.Identifiers.StateStore]: stateStore,
-		[Container.Identifiers.BlockchainService]: blockchain,
-		[Container.Identifiers.LogService]: logger,
+		[Identifiers.TriggerService]: triggerService,
+		[Identifiers.StateStore]: stateStore,
+		[Identifiers.BlockchainService]: blockchain,
+		[Identifiers.LogService]: logger,
 	};
 	const appConfigPeers = {
 		list: [],
@@ -84,18 +84,18 @@ describe("NetworkMonitor", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
-		container.bind(Container.Identifiers.PeerNetworkMonitor).to(NetworkMonitor);
-		container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(emitter);
-		container.bind(Container.Identifiers.PeerCommunicator).toConstantValue(communicator);
-		container.bind(Container.Identifiers.PeerRepository).toConstantValue(repository);
-		container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(pluginConfiguration);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
+		container.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor);
+		container.bind(Identifiers.EventDispatcherService).toConstantValue(emitter);
+		container.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
+		container.bind(Identifiers.PeerRepository).toConstantValue(repository);
+		container.bind(Identifiers.PluginConfiguration).toConstantValue(pluginConfiguration);
+		container.bind(Identifiers.Application).toConstantValue(app);
 	});
 
 	beforeEach(() => {
-		networkMonitor = container.get<NetworkMonitor>(Container.Identifiers.PeerNetworkMonitor);
+		networkMonitor = container.get<NetworkMonitor>(Identifiers.PeerNetworkMonitor);
 		networkMonitor.initialize();
 
 		jest.resetAllMocks();
@@ -995,7 +995,7 @@ describe("NetworkMonitor", () => {
 		});
 
 		it("should reduce download block chunk size after receiving no block", async () => {
-			const chunkCache = container.get<ChunkCache>(Container.Identifiers.PeerChunkCache);
+			const chunkCache = container.get<ChunkCache>(Identifiers.PeerChunkCache);
 			chunkCache.has = jest.fn().mockReturnValue(false);
 
 			communicator.getPeerBlocks = jest.fn().mockReturnValue([]);

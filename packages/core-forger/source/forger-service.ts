@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS, IConfiguration, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 
 import { Client } from "./client";
@@ -9,20 +9,20 @@ import { Delegate } from "./interfaces";
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
 @Container.injectable()
 export class ForgerService {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerProvider)
+	@Container.inject(Identifiers.TransactionHandlerProvider)
 	private readonly handlerProvider: Contracts.Transactions.ITransactionHandlerProvider;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	private client!: Client;
 
@@ -34,7 +34,7 @@ export class ForgerService {
 
 	private round: Contracts.P2P.CurrentRound | undefined;
 
-	private lastForgedBlock: Interfaces.IBlock | undefined;
+	private lastForgedBlock: Crypto.IBlock | undefined;
 
 	private initialized = false;
 
@@ -48,7 +48,7 @@ export class ForgerService {
 		return this.round ? this.getRoundRemainingSlotTime(this.round) : undefined;
 	}
 
-	public getLastForgedBlock(): Interfaces.IBlock | undefined {
+	public getLastForgedBlock(): Crypto.IBlock | undefined {
 		return this.lastForgedBlock;
 	}
 
@@ -129,11 +129,11 @@ export class ForgerService {
 
 			if (
 				await this.app
-					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 					.call("isForgingAllowed", { delegate, forgerService: this, networkState })
 			) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 					.call("forgeNewBlock", { delegate, forgerService: this, networkState, round: this.round });
 			}
 
@@ -175,9 +175,9 @@ export class ForgerService {
 		AppUtils.assert.defined<number>(networkState.getNodeHeight());
 		this.configuration.setHeight(networkState.getNodeHeight()!);
 
-		const transactions: Interfaces.ITransactionData[] = await this.getTransactionsForForging();
+		const transactions: Crypto.ITransactionData[] = await this.getTransactionsForForging();
 
-		const block: Interfaces.IBlock | undefined = await delegate.forge(transactions, {
+		const block: Crypto.IBlock | undefined = await delegate.forge(transactions, {
 			previousBlock: {
 				height: networkState.getNodeHeight(),
 				id: networkState.getLastBlockId(),
@@ -187,7 +187,7 @@ export class ForgerService {
 			timestamp: round.timestamp,
 		});
 
-		AppUtils.assert.defined<Interfaces.IBlock>(block);
+		AppUtils.assert.defined<Crypto.IBlock>(block);
 		AppUtils.assert.defined<string>(delegate.publicKey);
 
 		const minimumMs = 2000;
@@ -214,7 +214,7 @@ export class ForgerService {
 		}
 	}
 
-	public async getTransactionsForForging(): Promise<Interfaces.ITransactionData[]> {
+	public async getTransactionsForForging(): Promise<Crypto.ITransactionData[]> {
 		const response = await this.client.getTransactions();
 		if (AppUtils.isEmpty(response)) {
 			this.logger.error("Could not get unconfirmed transactions from transaction pool.");

@@ -1,7 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { MultiPaymentTransaction } from "@arkecosystem/core-crypto-transaction-multi-payment";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { InsufficientBalanceError } from "../../errors";
@@ -9,7 +9,7 @@ import { TransactionHandler, TransactionHandlerConstructor } from "../transactio
 
 @Container.injectable()
 export class MultiPaymentTransactionHandler extends TransactionHandler {
-	@Container.inject(Container.Identifiers.TransactionHistoryService)
+	@Container.inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
 	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
@@ -50,12 +50,12 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Interfaces.ITransaction,
+		transaction: Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
-		const payments: Interfaces.IMultiPaymentItem[] = transaction.data.asset.payments;
+		const payments: Crypto.IMultiPaymentItem[] = transaction.data.asset.payments;
 		const totalPaymentsAmount = payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
 		if (wallet.getBalance().minus(totalPaymentsAmount).minus(transaction.data.fee).isNegative()) {
@@ -65,10 +65,10 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public async applyToSender(transaction: Interfaces.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 
-		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		const totalPaymentsAmount = transaction.data.asset.payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
@@ -81,10 +81,10 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 		sender.decreaseBalance(totalPaymentsAmount);
 	}
 
-	public async revertForSender(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 
-		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		const totalPaymentsAmount = transaction.data.asset.payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
@@ -97,8 +97,8 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 		sender.increaseBalance(totalPaymentsAmount);
 	}
 
-	public async applyToRecipient(transaction: Interfaces.ITransaction): Promise<void> {
-		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {
+		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		for (const payment of transaction.data.asset.payments) {
 			const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(payment.recipientId);
@@ -107,8 +107,8 @@ export class MultiPaymentTransactionHandler extends TransactionHandler {
 		}
 	}
 
-	public async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {
-		AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {
+		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		for (const payment of transaction.data.asset.payments) {
 			const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(payment.recipientId);

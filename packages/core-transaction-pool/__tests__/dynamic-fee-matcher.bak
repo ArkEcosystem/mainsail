@@ -1,7 +1,7 @@
 import "jest-extended";
 
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Container } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/crypto";
 
 import { DynamicFeeMatcher } from "../../../packages/core-transaction-pool/source/dynamic-fee-matcher";
@@ -17,10 +17,10 @@ const stateStore = { getLastHeight: jest.fn() };
 const logger = { debug: jest.fn(), notice: jest.fn() };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
-container.bind(Container.Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
-container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
+container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+container.bind(Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
 	handler.dynamicFee.mockReset();
@@ -50,7 +50,7 @@ describe("when dynamic fees are enabled", () => {
 			const transaction = {
 				key: "transfer",
 				data: { fee: new BigNumber(1000) },
-			} as Interfaces.ITransaction;
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			const dynamicFeeContext: Contracts.Shared.DynamicFeeContext = {
@@ -72,7 +72,7 @@ describe("when dynamic fees are enabled", () => {
 			const transaction = {
 				key: "transfer",
 				data: { fee: new BigNumber(999) },
-			} as Interfaces.ITransaction;
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			const dynamicFeeContext: Contracts.Shared.DynamicFeeContext = {
@@ -98,7 +98,7 @@ describe("when dynamic fees are enabled", () => {
 			const transaction = {
 				key: "transfer",
 				data: { fee: new BigNumber(1000) },
-			} as Interfaces.ITransaction;
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			const dynamicFeeContext: Contracts.Shared.DynamicFeeContext = {
@@ -120,7 +120,7 @@ describe("when dynamic fees are enabled", () => {
 			const transaction = {
 				key: "transfer",
 				data: { fee: new BigNumber(999) },
-			} as Interfaces.ITransaction;
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(dynamicFeeMatcher.throwIfCannotBroadcast(transaction)).rejects.toThrowError(
@@ -155,7 +155,7 @@ describe("when dynamic fees are disabled", () => {
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
-			await expect(dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Interfaces.ITransaction)).toResolve();
+			await expect(dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Crypto.ITransaction)).toResolve();
 
 			expect(logger.debug).toBeCalled();
 		});
@@ -169,7 +169,7 @@ describe("when dynamic fees are disabled", () => {
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToLowError);
 
 			expect(logger.notice).toBeCalled();
@@ -184,7 +184,7 @@ describe("when dynamic fees are disabled", () => {
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToHighError);
 
 			expect(logger.notice).toBeCalled();
@@ -200,7 +200,7 @@ describe("when dynamic fees are disabled", () => {
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
-			await expect(dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Interfaces.ITransaction)).toResolve();
+			await expect(dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Crypto.ITransaction)).toResolve();
 
 			expect(logger.debug).toBeCalled();
 		});
@@ -214,7 +214,7 @@ describe("when dynamic fees are disabled", () => {
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToLowError);
 
 			expect(logger.notice).toBeCalled();
@@ -229,7 +229,7 @@ describe("when dynamic fees are disabled", () => {
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToHighError);
 
 			expect(logger.notice).toBeCalled();

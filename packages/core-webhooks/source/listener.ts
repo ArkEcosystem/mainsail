@@ -1,21 +1,22 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions";
 import { Database } from "./database";
 import { WebhookEvent } from "./events";
-import { Identifiers } from "./identifiers";
+import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
 
 @Container.injectable()
 export class Listener {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async handle({ name, data }): Promise<void> {
@@ -82,7 +83,7 @@ export class Listener {
 
 	private getWebhooks(event: string, payload: object): Webhook[] {
 		return this.app
-			.get<Database>(Identifiers.Database)
+			.get<Database>(InternalIdentifiers.Database)
 			.findByEvent(event)
 			.filter((webhook: Webhook) => {
 				if (!webhook.enabled) {

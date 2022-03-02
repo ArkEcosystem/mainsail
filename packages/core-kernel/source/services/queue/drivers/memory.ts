@@ -1,26 +1,24 @@
+import { Kernel } from "@arkecosystem/core-contracts";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
-import { EventDispatcher } from "../../../contracts/kernel/events";
-import { Logger } from "../../../contracts/kernel/log";
-import { Queue, QueueJob } from "../../../contracts/kernel/queue";
 import { QueueEvent } from "../../../enums";
 import { decorateInjectable, Identifiers, inject, injectable } from "../../../ioc";
 
 decorateInjectable(EventEmitter);
 
 @injectable()
-export class MemoryQueue extends EventEmitter implements Queue {
+export class MemoryQueue extends EventEmitter implements Kernel.Queue {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: EventDispatcher;
+	private readonly events!: Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
-	private readonly logger!: Logger;
+	private readonly logger!: Kernel.Logger;
 
-	private jobs: QueueJob[] = [];
+	private jobs: Kernel.QueueJob[] = [];
 
-	private running: boolean = false;
-	private started: boolean = false;
+	private running = false;
+	private started = false;
 
 	private onProcessedCallbacks: (() => void)[] = [];
 
@@ -29,7 +27,7 @@ export class MemoryQueue extends EventEmitter implements Queue {
 		this.setMaxListeners(0);
 	}
 
-	public async make(): Promise<Queue> {
+	public async make(): Promise<Kernel.Queue> {
 		return this;
 	}
 
@@ -63,17 +61,17 @@ export class MemoryQueue extends EventEmitter implements Queue {
 		this.jobs = [];
 	}
 
-	public async push(job: QueueJob): Promise<void> {
+	public async push(job: Kernel.QueueJob): Promise<void> {
 		this.jobs.push(job);
 
 		this.processJobs();
 	}
 
-	public async later(delay: number, job: QueueJob): Promise<void> {
+	public async later(delay: number, job: Kernel.QueueJob): Promise<void> {
 		setTimeout(() => this.push(job), delay);
 	}
 
-	public async bulk(jobs: QueueJob[]): Promise<void> {
+	public async bulk(jobs: Kernel.QueueJob[]): Promise<void> {
 		for (const job of jobs) {
 			this.jobs.push(job);
 		}
@@ -106,7 +104,7 @@ export class MemoryQueue extends EventEmitter implements Queue {
 	}
 
 	private resolveOnProcessed(): void {
-		while (this.onProcessedCallbacks.length) {
+		while (this.onProcessedCallbacks.length > 0) {
 			const onProcessed = this.onProcessedCallbacks.shift()!;
 
 			onProcessed();
@@ -119,7 +117,7 @@ export class MemoryQueue extends EventEmitter implements Queue {
 			return;
 		}
 
-		while (this.jobs.length) {
+		while (this.jobs.length > 0) {
 			if (!this.started) {
 				break;
 			}
@@ -133,17 +131,17 @@ export class MemoryQueue extends EventEmitter implements Queue {
 				const data = await job.handle();
 
 				await this.events.dispatch(QueueEvent.Finished, {
+					data: data,
 					driver: "memory",
 					executionTime: performance.now() - start,
-					data: data,
 				});
 
 				this.emit("jobDone", job, data);
 			} catch (error) {
 				await this.events.dispatch(QueueEvent.Failed, {
 					driver: "memory",
-					executionTime: performance.now() - start,
 					error: error,
+					executionTime: performance.now() - start,
 				});
 
 				this.logger.warning(`Queue error occurs when handling job: ${job}`);
@@ -156,7 +154,7 @@ export class MemoryQueue extends EventEmitter implements Queue {
 
 		this.resolveOnProcessed();
 
-		if (!this.jobs.length) {
+		if (this.jobs.length === 0) {
 			this.emit("drain");
 		}
 	}

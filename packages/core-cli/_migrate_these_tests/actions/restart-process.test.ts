@@ -10,11 +10,11 @@ let action;
 
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.RestartProcess).to(RestartProcess).inSingletonScope();
-	action = cli.app.get(Container.Identifiers.RestartProcess);
+	cli.app.rebind(Identifiers.RestartProcess).to(RestartProcess).inSingletonScope();
+	action = cli.app.get(Identifiers.RestartProcess);
 });
 
 describe("RestartProcess", () => {

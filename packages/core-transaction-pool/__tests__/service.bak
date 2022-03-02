@@ -1,4 +1,4 @@
-import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
+import { Container, Enums } from "@arkecosystem/core-kernel";
 import { Identities, Managers, Transactions } from "@arkecosystem/crypto";
 
 import { Service } from "../source/service";
@@ -47,15 +47,15 @@ const logger = {
 };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
-container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-container.bind(Container.Identifiers.TransactionPoolDynamicFeeMatcher).toConstantValue(dynamicFeeMatcher);
-container.bind(Container.Identifiers.TransactionPoolStorage).toConstantValue(storage);
-container.bind(Container.Identifiers.TransactionPoolMempool).toConstantValue(mempool);
-container.bind(Container.Identifiers.TransactionPoolQuery).toConstantValue(poolQuery);
-container.bind(Container.Identifiers.TransactionPoolExpirationService).toConstantValue(expirationService);
-container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(events);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+container.bind(Identifiers.TransactionPoolDynamicFeeMatcher).toConstantValue(dynamicFeeMatcher);
+container.bind(Identifiers.TransactionPoolStorage).toConstantValue(storage);
+container.bind(Identifiers.TransactionPoolMempool).toConstantValue(mempool);
+container.bind(Identifiers.TransactionPoolQuery).toConstantValue(poolQuery);
+container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(expirationService);
+container.bind(Identifiers.EventDispatcherService).toConstantValue(events);
+container.bind(Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
 	jest.resetAllMocks();

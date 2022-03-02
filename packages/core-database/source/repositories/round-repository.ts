@@ -1,6 +1,6 @@
-import { Contracts } from "@arkecosystem/core-kernel";
-import { EntityRepository, Repository } from "typeorm";
+import Contracts from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
+import { EntityRepository, Repository } from "typeorm";
 
 import { Round } from "../models";
 

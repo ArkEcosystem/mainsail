@@ -80,7 +80,7 @@ describe("PublishCommand", () => {
 		const spyEnsure = jest.spyOn(fs, "ensureDirSync");
 		const spyCopy = jest.spyOn(fs, "copySync");
 
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			network: "mainnet",
 			confirm: true,
@@ -98,7 +98,7 @@ describe("PublishCommand", () => {
 		const spyEnsure = jest.spyOn(fs, "ensureDirSync");
 		const spyCopy = jest.spyOn(fs, "copySync");
 
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			network: undefined,
 			confirm: true,
@@ -118,7 +118,7 @@ describe("PublishCommand", () => {
 		const spyEnsure = jest.spyOn(fs, "ensureDirSync");
 		const spyCopy = jest.spyOn(fs, "copySync");
 
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			network: "mainnet",
 			confirm: false,
@@ -138,7 +138,7 @@ describe("PublishCommand", () => {
 		const spyEnsure = jest.spyOn(fs, "ensureDirSync");
 		const spyCopy = jest.spyOn(fs, "copySync");
 
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			network: "mainnet",
 			confirm: true,

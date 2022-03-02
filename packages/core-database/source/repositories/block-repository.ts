@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS, IConfiguration, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import { EntityRepository, In } from "typeorm";
 
 import { Block, Round, Transaction } from "../models";
@@ -7,16 +7,16 @@ import { AbstractRepository } from "./abstract-repository";
 
 @EntityRepository(Block)
 export class BlockRepository extends AbstractRepository<Block> {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
-	public async findLatest(): Promise<Interfaces.IBlockData | undefined> {
+	public async findLatest(): Promise<Crypto.IBlockData | undefined> {
 		return this.findOne({
 			order: { height: "DESC" },
-		}) as unknown as Interfaces.IBlockData; // TODO: refactor
+		}) as unknown as Crypto.IBlockData; // TODO: refactor
 	}
 
 	public async findRecent(limit: number): Promise<{ id: string }[]> {
@@ -77,18 +77,14 @@ export class BlockRepository extends AbstractRepository<Block> {
 		) as Contracts.Shared.DownloadBlock[];
 	}
 
-	public async findByHeightRangeWithTransactions(start: number, end: number): Promise<Interfaces.IBlockData[]> {
+	public async findByHeightRangeWithTransactions(start: number, end: number): Promise<Crypto.IBlockData[]> {
 		const blocks = await this.findByHeightRangeWithTransactionsRaw(start, end);
 
 		for (const block of blocks) {
 			this.rawToEntity(
 				block,
 				// @ts-ignore
-				async (
-					entity: Block & { transactions: Interfaces.ITransactionData[] },
-					_,
-					value: Buffer[] | undefined,
-				) => {
+				async (entity: Block & { transactions: Crypto.ITransactionData[] }, _, value: Buffer[] | undefined) => {
 					if (value && value.length > 0) {
 						entity.transactions = [];
 
@@ -167,7 +163,7 @@ export class BlockRepository extends AbstractRepository<Block> {
 		//     .getRawMany();
 	}
 
-	public async saveBlocks(blocks: Interfaces.IBlock[]): Promise<void> {
+	public async saveBlocks(blocks: Crypto.IBlock[]): Promise<void> {
 		return this.manager.transaction(async (manager) => {
 			const blockEntities: Block[] = [];
 			const transactionEntities: Transaction[] = [];
@@ -199,7 +195,7 @@ export class BlockRepository extends AbstractRepository<Block> {
 		});
 	}
 
-	public async deleteBlocks(blocks: Interfaces.IBlockData[]): Promise<void> {
+	public async deleteBlocks(blocks: Crypto.IBlockData[]): Promise<void> {
 		const continuousChunk = blocks.every((block, index, array) =>
 			index === 0 ? true : block.height - array[index - 1].height === 1,
 		);
@@ -302,7 +298,7 @@ export class BlockRepository extends AbstractRepository<Block> {
 		});
 	}
 
-	private async findByHeightRangeWithTransactionsRaw(start: number, end: number): Promise<Interfaces.IBlockData[]> {
+	private async findByHeightRangeWithTransactionsRaw(start: number, end: number): Promise<Crypto.IBlockData[]> {
 		const [query, parameters] = this.manager.connection.driver.escapeQueryWithParameters(
 			`
                 SELECT *,

@@ -1,5 +1,5 @@
-import { Application } from "../contracts/kernel";
-import { EventDispatcher } from "../contracts/kernel/events";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { KernelEvent } from "../enums";
 import { InvalidArgumentException } from "../exceptions/logic";
 import { Identifiers, inject, injectable } from "../ioc";
@@ -9,10 +9,10 @@ import { ServiceProvider } from "./service-provider";
 @injectable()
 export class ServiceProviderRepository {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	@inject(Identifiers.EventDispatcherService)
-	private readonly eventDispatcher!: EventDispatcher;
+	private readonly eventDispatcher!: Kernel.EventDispatcher;
 
 	private readonly serviceProviders: Map<string, ServiceProvider> = new Map<string, ServiceProvider>();
 

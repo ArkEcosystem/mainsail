@@ -1,11 +1,11 @@
+import { Crypto } from "@arkecosystem/core-contracts";
 import { Application, Container, Types } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
 import { Paths } from "env-paths";
 
 export interface Wallet {
 	address: string;
 	passphrase: string;
-	keys: Interfaces.IKeyPair;
+	keys: Crypto.IKeyPair;
 	username: string | undefined;
 }
 

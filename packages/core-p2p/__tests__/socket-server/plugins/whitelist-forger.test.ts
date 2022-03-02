@@ -41,9 +41,9 @@ describe("WhitelistForgerPlugin", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
-		container.bind(Container.Identifiers.PeerProcessor).toConstantValue(peerProcessor);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.PeerProcessor).toConstantValue(peerProcessor);
 	});
 
 	beforeEach(() => {

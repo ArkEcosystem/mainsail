@@ -1,9 +1,10 @@
-import { Contracts, Container } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import { Connection } from "typeorm";
 
 @Container.injectable()
 export class WalletsTableService implements Contracts.Database.WalletsTableService {
-	@Container.inject(Container.Identifiers.DatabaseConnection)
+	@Container.inject(Identifiers.DatabaseConnection)
 	private readonly connection!: Connection;
 
 	public async flush(): Promise<void> {
@@ -34,18 +35,16 @@ export class WalletsTableService implements Contracts.Database.WalletsTableServi
 			await queryRunner.startTransaction("SERIALIZABLE");
 
 			try {
-				for (let i = 0; i < wallets.length; i += batchSize) {
-					const batchWallets = wallets.slice(i, i + batchSize);
+				for (let index = 0; index < wallets.length; index += batchSize) {
+					const batchWallets = wallets.slice(index, index + batchSize);
 
-					const params = batchWallets
-						.map((w) => [
-							w.getAddress(),
-							w.getPublicKey(),
-							w.getBalance().toFixed(),
-							w.getNonce().toFixed(),
-							w.getAttributes(),
-						])
-						.flat();
+					const parameters = batchWallets.flatMap((w) => [
+						w.getAddress(),
+						w.getPublicKey(),
+						w.getBalance().toFixed(),
+						w.getNonce().toFixed(),
+						w.getAttributes(),
+					]);
 
 					const values = batchWallets
 						.map((_, y) => `($${y * 5 + 1}, $${y * 5 + 2}, $${y * 5 + 3}, $${y * 5 + 4}, $${y * 5 + 5})`)
@@ -61,7 +60,7 @@ export class WalletsTableService implements Contracts.Database.WalletsTableServi
                             attributes = EXCLUDED.attributes
                     `;
 
-					await queryRunner.query(query, params);
+					await queryRunner.query(query, parameters);
 				}
 
 				await queryRunner.commitTransaction();

@@ -1,9 +1,9 @@
-import { IBlock, IBlockData, ITransaction } from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 
 export const INTERNAL_FACTORY = Symbol.for("Internal<BlockFactory>");
 
 export type InternalFactory = (data: {
-	data: IBlockData;
-	transactions: ITransaction[];
+	data: Crypto.IBlockData;
+	transactions: Crypto.ITransaction[];
 	id?: string;
-}) => Promise<IBlock>;
+}) => Promise<Crypto.IBlock>;

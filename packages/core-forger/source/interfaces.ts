@@ -1,4 +1,4 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 import { Nes } from "@arkecosystem/core-p2p";
 
 export interface RelayHost {
@@ -10,11 +10,11 @@ export interface RelayHost {
 }
 
 export interface Delegate {
-	keys: Interfaces.IKeyPair | undefined;
+	keys: Crypto.IKeyPair | undefined;
 
 	publicKey: string;
 
 	address: string;
 
-	forge(transactions: Interfaces.ITransactionData[], options: Record<string, any>): Promise<Interfaces.IBlock>;
+	forge(transactions: Crypto.ITransactionData[], options: Record<string, any>): Promise<Crypto.IBlock>;
 }

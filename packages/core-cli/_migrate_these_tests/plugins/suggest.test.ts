@@ -21,7 +21,7 @@ describe("SuggestCommand", () => {
 	});
 
 	it("should update the bin help if a topic is found", async () => {
-		const spyWarning = jest.spyOn(cli.app.get(Container.Identifiers.Warning), "render");
+		const spyWarning = jest.spyOn(cli.app.get(Identifiers.Warning), "render");
 
 		prompts.inject([true]);
 
@@ -31,7 +31,7 @@ describe("SuggestCommand", () => {
 	});
 
 	it("should throw if suggestion is not confirmed", async () => {
-		const spyInfo = jest.spyOn(cli.app.get(Container.Identifiers.Info), "render");
+		const spyInfo = jest.spyOn(cli.app.get(Identifiers.Info), "render");
 
 		prompts.inject([false]);
 

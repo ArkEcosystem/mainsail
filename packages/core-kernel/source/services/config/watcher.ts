@@ -1,12 +1,12 @@
 import nsfw, { ActionType, NSFW } from "nsfw";
 
-import { Application } from "../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
 import { Identifiers, inject, injectable } from "../../ioc";
 
 @injectable()
 export class Watcher {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	private watcher!: NSFW;
 

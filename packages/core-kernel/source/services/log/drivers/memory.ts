@@ -1,34 +1,34 @@
+import { inspect } from "util";
+import { Kernel } from "@arkecosystem/core-contracts";
 import { isEmpty, prettyTime } from "@arkecosystem/utils";
 import chalk, { Chalk } from "chalk";
 import dayjs, { Dayjs } from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import utc from "dayjs/plugin/utc";
-import { inspect } from "util";
 
-import { Logger } from "../../../contracts/kernel/log";
 import { injectable } from "../../../ioc";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(utc);
 
 @injectable()
-export class MemoryLogger implements Logger {
+export class MemoryLogger implements Kernel.Logger {
 	private readonly levelStyles: Record<string, Chalk> = {
-		emergency: chalk.bgRed,
 		alert: chalk.red,
 		critical: chalk.red,
-		error: chalk.red,
-		warning: chalk.yellow,
-		notice: chalk.green,
-		info: chalk.blue,
 		debug: chalk.magenta,
+		emergency: chalk.bgRed,
+		error: chalk.red,
+		info: chalk.blue,
+		notice: chalk.green,
+		warning: chalk.yellow,
 	};
 
-	private silentConsole: boolean = false;
+	private silentConsole = false;
 
 	private lastTimestamp: Dayjs = dayjs().utc();
 
-	public async make(options?: any): Promise<Logger> {
+	public async make(options?: any): Promise<Kernel.Logger> {
 		return this;
 	}
 

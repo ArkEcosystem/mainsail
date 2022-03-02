@@ -1,7 +1,6 @@
+import { Kernel } from "@arkecosystem/core-contracts";
 import semver from "semver";
 
-import { Kernel } from "../../contracts";
-import { Application } from "../../contracts/kernel";
 import {
 	DependencyVersionOutOfRange,
 	InvalidPluginConfiguration,
@@ -20,7 +19,7 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class RegisterServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Kernel.Logger;

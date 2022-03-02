@@ -18,14 +18,14 @@ describe("ServiceProvider", () => {
 	beforeEach(() => {
 		app = new Application(new Container.Container());
 
-		app.bind(Container.Identifiers.LogService).toConstantValue({});
-		app.bind(Container.Identifiers.EventDispatcherService).toConstantValue({ listen: jest.fn() });
-		app.bind(Container.Identifiers.BlockchainService).toConstantValue({});
-		app.bind(Container.Identifiers.WalletRepository).toConstantValue({});
-		app.bind(Container.Identifiers.TransactionHandlerProvider).toConstantValue({});
-		app.bind(Container.Identifiers.TriggerService).toConstantValue(triggerService);
-		app.bind(Container.Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
-		app.bind(Container.Identifiers.ProcessActionsService).to(Pm2ProcessActionsService).inSingletonScope();
+		app.bind(Identifiers.LogService).toConstantValue({});
+		app.bind(Identifiers.EventDispatcherService).toConstantValue({ listen: jest.fn() });
+		app.bind(Identifiers.BlockchainService).toConstantValue({});
+		app.bind(Identifiers.WalletRepository).toConstantValue({});
+		app.bind(Identifiers.TransactionHandlerProvider).toConstantValue({});
+		app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+		app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
+		app.bind(Identifiers.ProcessActionsService).to(Pm2ProcessActionsService).inSingletonScope();
 
 		app.config("delegates", { secrets: [], bip38: "dummy bip 38" });
 		app.config("app", { flags: { bip38: "dummy bip 38", password: "dummy pwd" } });
@@ -46,11 +46,11 @@ describe("ServiceProvider", () => {
 
 	describe("register", () => {
 		it("should bind ForgerService, ForgeNewBlockAction, IsForgingAllowedAction", async () => {
-			expect(app.isBound(Container.Identifiers.ForgerService)).toBeFalse();
+			expect(app.isBound(Identifiers.ForgerService)).toBeFalse();
 
 			await serviceProvider.register();
 
-			expect(app.isBound(Container.Identifiers.ForgerService)).toBeTrue();
+			expect(app.isBound(Identifiers.ForgerService)).toBeTrue();
 			expect(triggerService.bind).toBeCalledTimes(2);
 			expect(triggerService.bind).toBeCalledWith("forgeNewBlock", expect.anything());
 			expect(triggerService.bind).toBeCalledWith("isForgingAllowed", expect.anything());
@@ -62,7 +62,7 @@ describe("ServiceProvider", () => {
 			app.config("delegates", { secrets: ["this is a super secret passphrase"], bip38: "dummy bip 38" });
 
 			const forgerService = { boot: jest.fn(), register: jest.fn() };
-			app.bind(Container.Identifiers.ForgerService).toConstantValue(forgerService);
+			app.bind(Identifiers.ForgerService).toConstantValue(forgerService);
 
 			await serviceProvider.boot();
 
@@ -78,7 +78,7 @@ describe("ServiceProvider", () => {
 			app.config("app.flags", flagsConfig);
 
 			const forgerService = { boot: jest.fn(), register: jest.fn() };
-			app.bind(Container.Identifiers.ForgerService).toConstantValue(forgerService);
+			app.bind(Identifiers.ForgerService).toConstantValue(forgerService);
 
 			const anotherBip39DelegateMock = { address: "D6Z26L69gdk8qYmTv5uzk3uGepigtHY4fe" } as any;
 			jest.spyOn(DelegateFactory, "fromBIP39").mockReturnValueOnce(anotherBip39DelegateMock);
@@ -95,7 +95,7 @@ describe("ServiceProvider", () => {
 			app.config("app", { flags: { bip38: undefined, password: undefined } });
 
 			const forgerService = { boot: jest.fn(), register: jest.fn() };
-			app.bind(Container.Identifiers.ForgerService).toConstantValue(forgerService);
+			app.bind(Identifiers.ForgerService).toConstantValue(forgerService);
 
 			await serviceProvider.boot();
 
@@ -108,7 +108,7 @@ describe("ServiceProvider", () => {
 	describe("dispose", () => {
 		it("should call dispose on forger service", async () => {
 			const forgerService = { dispose: jest.fn() };
-			app.bind(Container.Identifiers.ForgerService).toConstantValue(forgerService);
+			app.bind(Identifiers.ForgerService).toConstantValue(forgerService);
 
 			await serviceProvider.dispose();
 

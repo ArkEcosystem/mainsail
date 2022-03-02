@@ -6,16 +6,16 @@ describe("DownloadFinished", () => {
 
 	const blockchain = { dispatch: jest.fn(), getQueue: jest.fn() };
 	const stateStore = { getNetworkStart: jest.fn().mockReturnValue(false), setNetworkStart: jest.fn() };
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn(), error: jest.fn() };
+	const logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() };
 
 	const application = { resolve: jest.fn() };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
 	});
 
 	beforeEach(() => {

@@ -28,12 +28,12 @@ beforeEach(async () => {
 
 	sandbox = new Sandbox();
 
-	sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(Mocks.StateStore.instance);
+	sandbox.app.bind(Identifiers.StateStore).toConstantValue(Mocks.StateStore.instance);
 
-	sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(Mocks.Blockchain.instance);
+	sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(Mocks.Blockchain.instance);
 
 	sandbox.app
-		.bind(Container.Identifiers.WalletRepository)
+		.bind(Identifiers.WalletRepository)
 		.toConstantValue(Mocks.WalletRepository.instance)
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 });
@@ -106,7 +106,7 @@ describe("Generic", () => {
 				generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
 			};
 
-			Mocks.Blockchain.setBlock({ data: mockBlock } as Partial<Interfaces.IBlock>);
+			Mocks.Blockchain.setBlock({ data: mockBlock } as Partial<Crypto.IBlock>);
 
 			let spyOnRemoveBlocks = jest.spyOn(Mocks.Blockchain.instance, "removeBlocks");
 

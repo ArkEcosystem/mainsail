@@ -15,7 +15,7 @@ beforeEach(() => {
 describe("TransactionFactory", () => {
 	describe("Transfer", () => {
 		it("should create a builder", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
+			const transaction: Crypto.ITransaction = factory.get("Transfer").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -32,7 +32,7 @@ describe("TransactionFactory", () => {
 				vendorField: "Dummy Field",
 			};
 
-			const transaction: Interfaces.ITransaction = factory
+			const transaction: Crypto.ITransaction = factory
 				.get("Transfer")
 				.withOptions(options)
 				.withStates("vendorField")
@@ -45,7 +45,7 @@ describe("TransactionFactory", () => {
 		});
 
 		it("should create a builder with vendor field", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("vendorField").make();
+			const transaction: Crypto.ITransaction = factory.get("Transfer").withStates("vendorField").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -54,7 +54,7 @@ describe("TransactionFactory", () => {
 		});
 
 		it("should sign it with a single passphrase", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("sign").make();
+			const transaction: Crypto.ITransaction = factory.get("Transfer").withStates("sign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -62,7 +62,7 @@ describe("TransactionFactory", () => {
 		});
 
 		it("should sign it with multiple passphrases", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("sign", "multiSign").make();
+			const transaction: Crypto.ITransaction = factory.get("Transfer").withStates("sign", "multiSign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).not.toBeUndefined();
@@ -73,14 +73,14 @@ describe("TransactionFactory", () => {
 
 	describe("DelegateRegistration", () => {
 		it("should create a signature builder", () => {
-			const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").make();
+			const transaction: Crypto.ITransaction = factory.get("DelegateRegistration").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
 		});
 
 		it("should sign it with a single passphrase", () => {
-			const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").withStates("sign").make();
+			const transaction: Crypto.ITransaction = factory.get("DelegateRegistration").withStates("sign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -90,14 +90,14 @@ describe("TransactionFactory", () => {
 
 	describe("DelegateResignation", () => {
 		it("should create a signature builder", () => {
-			const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").make();
+			const transaction: Crypto.ITransaction = factory.get("DelegateResignation").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
 		});
 
 		it("should sign it with a single passphrase", () => {
-			const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").withStates("sign").make();
+			const transaction: Crypto.ITransaction = factory.get("DelegateResignation").withStates("sign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -107,14 +107,14 @@ describe("TransactionFactory", () => {
 
 	describe("Vote", () => {
 		it("should create a builder", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Vote").make();
+			const transaction: Crypto.ITransaction = factory.get("Vote").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
 		});
 
 		it("should sign it with a single passphrase", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign").make();
+			const transaction: Crypto.ITransaction = factory.get("Vote").withStates("sign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -122,7 +122,7 @@ describe("TransactionFactory", () => {
 		});
 
 		it("should sign it with multiple passphrases", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign", "multiSign").make();
+			const transaction: Crypto.ITransaction = factory.get("Vote").withStates("sign", "multiSign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).not.toBeUndefined();
@@ -131,14 +131,14 @@ describe("TransactionFactory", () => {
 
 	describe("Unvote", () => {
 		it("should create a builder", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Unvote").make();
+			const transaction: Crypto.ITransaction = factory.get("Unvote").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
 		});
 
 		it("should sign it with a single passphrase", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign").make();
+			const transaction: Crypto.ITransaction = factory.get("Unvote").withStates("sign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -146,7 +146,7 @@ describe("TransactionFactory", () => {
 		});
 
 		it("should sign it with multiple passphrases", () => {
-			const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign", "multiSign").make();
+			const transaction: Crypto.ITransaction = factory.get("Unvote").withStates("sign", "multiSign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).not.toBeUndefined();
@@ -155,14 +155,14 @@ describe("TransactionFactory", () => {
 
 	describe("MultiSignature", () => {
 		it("should create a builder", () => {
-			const transaction: Interfaces.ITransaction = factory.get("MultiSignature").make();
+			const transaction: Crypto.ITransaction = factory.get("MultiSignature").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
 		});
 
 		it("should sign it with multiple passphrases", () => {
-			const transaction: Interfaces.ITransaction = factory
+			const transaction: Crypto.ITransaction = factory
 				.get("MultiSignature")
 				.withStates("multiSign", "sign")
 				.make();
@@ -175,14 +175,14 @@ describe("TransactionFactory", () => {
 
 	describe("MultiPayment", () => {
 		it("should create a builder", () => {
-			const transaction: Interfaces.ITransaction = factory.get("MultiPayment").make();
+			const transaction: Crypto.ITransaction = factory.get("MultiPayment").make();
 
 			expect(transaction.data.signature).toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
 		});
 
 		it("should sign it with a single passphrase", () => {
-			const transaction: Interfaces.ITransaction = factory.get("MultiPayment").withStates("sign").make();
+			const transaction: Crypto.ITransaction = factory.get("MultiPayment").withStates("sign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).toBeUndefined();
@@ -190,10 +190,7 @@ describe("TransactionFactory", () => {
 		});
 
 		it("should sign it with multiple passphrases", () => {
-			const transaction: Interfaces.ITransaction = factory
-				.get("MultiPayment")
-				.withStates("sign", "multiSign")
-				.make();
+			const transaction: Crypto.ITransaction = factory.get("MultiPayment").withStates("sign", "multiSign").make();
 
 			expect(transaction.data.signature).not.toBeUndefined();
 			expect(transaction.data.signatures).not.toBeUndefined();

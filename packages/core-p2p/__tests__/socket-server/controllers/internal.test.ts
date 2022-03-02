@@ -23,15 +23,15 @@ describe("InternalController", () => {
 	beforeEach(() => {
 		sandbox = new Sandbox();
 
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		sandbox.app.bind(Container.Identifiers.PeerProcessor).toConstantValue(peerProcessor);
-		sandbox.app.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(networkMonitor);
-		sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(emitter);
-		sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(database);
-		sandbox.app.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
-		sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		sandbox.app.bind(Container.Identifiers.TransactionPoolService).toConstantValue(poolService);
-		sandbox.app.bind(Container.Identifiers.TransactionPoolCollator).toConstantValue(poolCollator);
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue(peerProcessor);
+		sandbox.app.bind(Identifiers.PeerNetworkMonitor).toConstantValue(networkMonitor);
+		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(emitter);
+		sandbox.app.bind(Identifiers.DatabaseService).toConstantValue(database);
+		sandbox.app.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
+		sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		sandbox.app.bind(Identifiers.TransactionPoolService).toConstantValue(poolService);
+		sandbox.app.bind(Identifiers.TransactionPoolCollator).toConstantValue(poolCollator);
 
 		internalController = sandbox.app.resolve<InternalController>(InternalController);
 	});

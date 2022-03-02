@@ -103,7 +103,7 @@ describe("Sandbox", () => {
 	it("should register service provider", async () => {
 		const sandbox = new Sandbox();
 
-		sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue({});
+		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
 
 		const serviceProviderOptions = {
 			name: "@arkecosystem/core-state",

@@ -1,25 +1,25 @@
-import { ITransaction } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { FeeRegistry, TransactionFeeToHighError, TransactionFeeToLowError } from "@arkecosystem/core-fees";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.Fee.Registry)
+	@Container.inject(Identifiers.Fee.Registry)
 	private readonly feeRegistry: FeeRegistry;
 
-	public async throwIfCannotEnterPool(transaction: ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
 		this.#throwIfCannot("pool", transaction);
 	}
 
-	public async throwIfCannotBroadcast(transaction: ITransaction): Promise<void> {
+	public async throwIfCannotBroadcast(transaction: Crypto.ITransaction): Promise<void> {
 		this.#throwIfCannot("broadcast", transaction);
 	}
 
-	#throwIfCannot(action: string, transaction: ITransaction): void {
+	#throwIfCannot(action: string, transaction: Crypto.ITransaction): void {
 		const feeString = transaction.data.fee; // @TODO: formatSatoshi
 
 		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);

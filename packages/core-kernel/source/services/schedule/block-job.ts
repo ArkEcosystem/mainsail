@@ -1,7 +1,6 @@
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Kernel } from "@arkecosystem/core-contracts";
 import { performance } from "perf_hooks";
 
-import { EventDispatcher } from "../../contracts/kernel/events";
 import { BlockEvent, ScheduleEvent } from "../../enums";
 import { Identifiers, inject, injectable } from "../../ioc";
 import { Job } from "./interfaces";
@@ -10,10 +9,10 @@ import { ExecuteCallbackWhenReady } from "./listeners";
 @injectable()
 export class BlockJob implements Job {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events: EventDispatcher;
+	private readonly events: Kernel.EventDispatcher;
 
-	@inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
 	protected blockCount = 1;
 

@@ -16,7 +16,7 @@ const dynamicFeeMatcher = {
 };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.TransactionPoolDynamicFeeMatcher).toConstantValue(dynamicFeeMatcher);
+container.bind(Identifiers.TransactionPoolDynamicFeeMatcher).toConstantValue(dynamicFeeMatcher);
 
 describe("ProcessorDynamicFeeExtension.throwIfCannotBroadcast", () => {
 	it("should call dynamicFeeMatcher.throwIfCannotBroadcast", async () => {

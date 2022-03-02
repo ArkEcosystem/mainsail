@@ -1,20 +1,9 @@
 import { join, resolve } from "path";
-import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { Commands, Container, Services, Contracts } from "@arkecosystem/core-cli";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@arkecosystem/core-crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@arkecosystem/core-crypto-config";
-import Interfaces, {
-	BINDINGS,
-	IAddressFactory,
-	IBlockSerializer,
-	IConfiguration,
-	IHashFactory,
-	IKeyPairFactory,
-	ITransactionSerializer,
-	ITransactionSigner,
-	ITransactionUtils,
-	ISignature,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@arkecosystem/core-crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
@@ -47,7 +36,7 @@ import prompts from "prompts";
 interface Wallet {
 	address: string;
 	passphrase: string;
-	keys: Interfaces.IKeyPair;
+	keys: Crypto.IKeyPair;
 	username: string | undefined;
 }
 
@@ -417,9 +406,13 @@ export class Command extends Commands.Command {
 	private async generateNetwork(flags: Options): Promise<void> {
 		try {
 			// @TODO
-			this.app.get<IConfiguration>(BINDINGS.Configuration).set("network.address.base58", flags.pubKeyHash);
+			this.app
+				.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+				.set("network.address.base58", flags.pubKeyHash);
 			// @TODO
-			this.app.get<IConfiguration>(BINDINGS.Configuration).set("network.address.bech32m", "ark");
+			this.app
+				.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+				.set("network.address.bech32m", "ark");
 
 			const paths = envPaths(flags.token, { suffix: "core" });
 			const configPath = flags.configPath ? flags.configPath : paths.config;
@@ -466,7 +459,7 @@ export class Command extends Commands.Command {
 							spaces: 4,
 						});
 
-						this.app.get<IConfiguration>(BINDINGS.Configuration).setConfig({
+						this.app.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
 							// @ts-ignore
 							genesisBlock: {},
 							milestones,
@@ -691,13 +684,13 @@ export class Command extends Commands.Command {
 	private async createWallet(pubKeyHash: number): Promise<Wallet> {
 		const passphrase = generateMnemonic(256);
 
-		const keys: Interfaces.IKeyPair = await this.app
-			.get<IKeyPairFactory>(BINDINGS.Identity.KeyPairFactory)
+		const keys: Crypto.IKeyPair = await this.app
+			.get<Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
 			.fromMnemonic(passphrase);
 
 		return {
 			address: await this.app
-				.get<IAddressFactory>(BINDINGS.Identity.AddressFactory)
+				.get<Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
 				.fromPublicKey(keys.publicKey),
 			keys,
 			passphrase,
@@ -791,14 +784,16 @@ export class Command extends Commands.Command {
 			timestamp: 0,
 		});
 		transaction.signature = await this.app
-			.get<ITransactionSigner>(BINDINGS.Transaction.Signer)
+			.get<Crypto.ITransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
 			.sign(transaction, wallet.keys);
-		transaction.id = await this.app.get<ITransactionUtils>(BINDINGS.Transaction.Utils).getId(transaction);
+		transaction.id = await this.app
+			.get<Crypto.ITransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
+			.getId(transaction);
 
 		return transaction;
 	}
 
-	private async createGenesisBlock(keys: Interfaces.IKeyPair, transactions, timestamp: number) {
+	private async createGenesisBlock(keys: Crypto.IKeyPair, transactions, timestamp: number) {
 		transactions = transactions.sort((a, b) => {
 			if (a.type === b.type) {
 				return a.amount - b.amount;
@@ -814,7 +809,7 @@ export class Command extends Commands.Command {
 
 		for (const transaction of transactions) {
 			const bytes: Buffer = await this.app
-				.get<ITransactionSerializer>(BINDINGS.Transaction.Serializer)
+				.get<Crypto.ITransactionSerializer>(Identifiers.Cryptography.Transaction.Serializer)
 				.getBytes(transaction);
 
 			allBytes.push(bytes);
@@ -825,7 +820,7 @@ export class Command extends Commands.Command {
 		}
 
 		const payloadHash: Buffer = await this.app
-			.get<IHashFactory>(BINDINGS.HashFactory)
+			.get<Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
 			.sha256(Buffer.concat(allBytes));
 
 		const block: any = {
@@ -845,20 +840,24 @@ export class Command extends Commands.Command {
 			version: 0,
 		};
 
-		block.id = await this.app.get<any>(BINDINGS.Block.IDFactory).make(block);
+		block.id = await this.app.get<any>(Identifiers.Cryptography.Block.IDFactory).make(block);
 
 		block.blockSignature = await this.signBlock(block, keys);
 
 		return block;
 	}
 
-	private async signBlock(block, keys: Interfaces.IKeyPair): Promise<string> {
+	private async signBlock(block, keys: Crypto.IKeyPair): Promise<string> {
 		return this.app
-			.get<ISignature>(BINDINGS.Signature)
+			.get<Crypto.ISignature>(Identifiers.Cryptography.Signature)
 			.sign(
 				await this.app
-					.get<IHashFactory>(BINDINGS.HashFactory)
-					.sha256(this.app.get<IBlockSerializer>(BINDINGS.Block.Serializer).serialize(block, false)),
+					.get<Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+					.sha256(
+						this.app
+							.get<Crypto.IBlockSerializer>(Identifiers.Cryptography.Block.Serializer)
+							.serialize(block, false),
+					),
 				Buffer.from(keys.privateKey, "hex"),
 			);
 	}

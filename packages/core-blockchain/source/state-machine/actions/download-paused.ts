@@ -1,10 +1,11 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
 
 @Container.injectable()
 export class DownloadPaused implements Action {
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async handle(): Promise<void> {

@@ -16,7 +16,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"dayjs": "1.10.7"
 	},

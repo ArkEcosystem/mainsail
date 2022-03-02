@@ -1,23 +1,23 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Interfaces, Transactions } from "@arkecosystem/crypto";
 
-import { TransactionBroadcaster } from "../../../packages/core-p2p/source/transaction-broadcaster";
+import { TransactionBroadcaster } from "../source/transaction-broadcaster";
 
 describe("TransactionBroadcaster", () => {
 	const container = new Container.Container();
 
 	describe("broadcastTransactions", () => {
-		const logger = { warning: jest.fn(), debug: jest.fn() };
+		const logger = { debug: jest.fn(), warning: jest.fn() };
 		const configuration = { getRequired: jest.fn() };
 		const repository = { getPeers: jest.fn() };
 		const communicator = { postTransactions: jest.fn() };
 
 		beforeAll(() => {
 			container.unbindAll();
-			container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-			container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
-			container.bind(Container.Identifiers.PeerRepository).toConstantValue(repository);
-			container.bind(Container.Identifiers.PeerCommunicator).toConstantValue(communicator);
+			container.bind(Identifiers.LogService).toConstantValue(logger);
+			container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+			container.bind(Identifiers.PeerRepository).toConstantValue(repository);
+			container.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
 		});
 
 		beforeEach(() => {
@@ -49,7 +49,7 @@ describe("TransactionBroadcaster", () => {
 			const spySerialize = jest.spyOn(Transactions.Serializer, "serialize").mockReturnValue(serializedTx);
 
 			const broadcaster = container.resolve(TransactionBroadcaster);
-			await broadcaster.broadcastTransactions(transactions as Interfaces.ITransaction[]);
+			await broadcaster.broadcastTransactions(transactions as Crypto.ITransaction[]);
 
 			expect(configuration.getRequired).toBeCalledWith("maxPeersBroadcast");
 			expect(repository.getPeers).toBeCalled();

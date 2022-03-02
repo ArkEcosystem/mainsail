@@ -3,7 +3,7 @@ import "jest-extended";
 import { StateStore } from "@packages/core-test-framework/source/mocks";
 import { Interfaces } from "@packages/crypto";
 
-let blockData: Partial<Interfaces.IBlockData> = {
+let blockData: Partial<Crypto.IBlockData> = {
 	id: "717093ac984e1a82a2de1fb334e92bda648547955417bc830d7825c515b5f2f9",
 	version: 2,
 	timestamp: 123132,
@@ -12,7 +12,7 @@ let blockData: Partial<Interfaces.IBlockData> = {
 
 let block = {
 	data: blockData,
-} as Partial<Interfaces.IBlock>;
+} as Partial<Crypto.IBlock>;
 
 const clear = () => {
 	StateStore.setBlock(undefined);

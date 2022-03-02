@@ -1,12 +1,12 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Providers } from "@arkecosystem/core-kernel";
 
 @Container.injectable()
 export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
-	@Container.inject(Container.Identifiers.TransactionPoolWorkerFactory)
+	@Container.inject(Identifiers.TransactionPoolWorkerFactory)
 	private readonly createWorker!: Contracts.TransactionPool.WorkerFactory;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
@@ -22,8 +22,8 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 	}
 
 	public async getTransactionFromData(
-		transactionData: Interfaces.ITransactionData | Buffer,
-	): Promise<Interfaces.ITransaction> {
+		transactionData: Crypto.ITransactionData | Buffer,
+	): Promise<Crypto.ITransaction> {
 		const worker: Contracts.TransactionPool.Worker = this.workers.reduce((previous, next) => {
 			if (previous.getQueueSize() < next.getQueueSize()) {
 				return previous;

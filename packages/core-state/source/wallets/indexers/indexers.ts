@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
 
 export const addressesIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.Wallet) => {
 	if (wallet.getAddress()) {

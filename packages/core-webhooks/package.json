@@ -17,6 +17,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"@hapi/boom": "9.0.0",

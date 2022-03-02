@@ -1,10 +1,4 @@
-import Interfaces, {
-	BINDINGS,
-	IAddressFactory,
-	IConfiguration,
-	IKeyPairFactory,
-	IWIFFactory,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import bip38 from "bip38";
 import forge from "node-forge";
@@ -15,19 +9,19 @@ import { Method } from "./method";
 
 @Container.injectable()
 export class BIP38 extends Method implements Delegate {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly addressFactory: IAddressFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly keyPairFactory: IKeyPairFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
-	@Container.inject(BINDINGS.Identity.WifFactory)
-	private readonly wifFactory: IWIFFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.WifFactory)
+	private readonly wifFactory: Crypto.IWIFFactory;
 
-	public keys: Interfaces.IKeyPair | undefined;
+	public keys: Crypto.IKeyPair | undefined;
 
 	public publicKey: string;
 
@@ -54,15 +48,12 @@ export class BIP38 extends Method implements Delegate {
 		return this;
 	}
 
-	public async forge(
-		transactions: Interfaces.ITransactionData[],
-		options: Record<string, any>,
-	): Promise<Interfaces.IBlock> {
+	public async forge(transactions: Crypto.ITransactionData[], options: Record<string, any>): Promise<Crypto.IBlock> {
 		await this.decryptKeysWithOtp();
 
-		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
+		AppUtils.assert.defined<Crypto.IKeyPair>(this.keys);
 
-		const block: Interfaces.IBlock = await this.createBlock(this.keys, transactions, options);
+		const block: Crypto.IBlock = await this.createBlock(this.keys, transactions, options);
 
 		await this.encryptKeysWithOtp();
 
@@ -70,7 +61,7 @@ export class BIP38 extends Method implements Delegate {
 	}
 
 	private async encryptKeysWithOtp(): Promise<void> {
-		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
+		AppUtils.assert.defined<Crypto.IKeyPair>(this.keys);
 
 		const wifKey: string = await this.wifFactory.fromKeys(this.keys);
 
@@ -90,8 +81,8 @@ export class BIP38 extends Method implements Delegate {
 		this.encryptedKeys = undefined;
 	}
 
-	private async decryptPassphrase(passphrase: string, password: string): Promise<Interfaces.IKeyPair> {
-		const decryptedWif: Interfaces.IDecryptResult = bip38.decrypt(passphrase, password);
+	private async decryptPassphrase(passphrase: string, password: string): Promise<Crypto.IKeyPair> {
+		const decryptedWif: Crypto.IDecryptResult = bip38.decrypt(passphrase, password);
 		const wifKey: string = wif.encode(
 			this.configuration.get("network.wif"),
 			decryptedWif.privateKey,

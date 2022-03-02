@@ -1,4 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { WalletIndexNotFoundError } from "./errors";
@@ -7,7 +8,7 @@ import { WalletRepository } from "./wallet-repository";
 
 @Container.injectable()
 export class WalletRepositoryClone extends WalletRepository {
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.inject(Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
 	private readonly blockchainWalletRepository!: Contracts.State.WalletRepository;
 

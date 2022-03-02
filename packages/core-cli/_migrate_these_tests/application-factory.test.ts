@@ -18,6 +18,6 @@ describe("ApplicationFactory", () => {
 			version: "3.0.0-next.0",
 		});
 
-		expect(app.get<any>(Container.Identifiers.ProcessFactory)("ark", "core")).toBeInstanceOf(Utils.Process);
+		expect(app.get<any>(Identifiers.ProcessFactory)("ark", "core")).toBeInstanceOf(Utils.Process);
 	});
 });

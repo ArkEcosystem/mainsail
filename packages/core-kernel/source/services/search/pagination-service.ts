@@ -1,17 +1,21 @@
 import { BigNumber } from "@arkecosystem/utils";
 import createTree from "functional-red-black-tree";
+import { Search } from "@arkecosystem/core-contracts";
 
-import { Pagination, ResultsPage, Sorting } from "../../contracts/search";
 import { injectable } from "../../ioc";
 import { get } from "../../utils";
 
 @injectable()
 export class PaginationService {
-	public getEmptyPage(): ResultsPage<any> {
+	public getEmptyPage(): Search.ResultsPage<any> {
 		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
 	}
 
-	public getPage<T>(pagination: Pagination, sorting: Sorting, items: Iterable<T>): ResultsPage<T> {
+	public getPage<T>(
+		pagination: Search.Pagination,
+		sorting: Search.Sorting,
+		items: Iterable<T>,
+	): Search.ResultsPage<T> {
 		const all = [...items];
 
 		const results =
@@ -26,7 +30,7 @@ export class PaginationService {
 		};
 	}
 
-	public getTop<T>(sorting: Sorting, count: number, items: Iterable<T>): T[] {
+	public getTop<T>(sorting: Search.Sorting, count: number, items: Iterable<T>): T[] {
 		if (count < 0) {
 			throw new RangeError(`Count should be greater or equal than zero.`);
 		}
@@ -51,7 +55,7 @@ export class PaginationService {
 		return tree.keys;
 	}
 
-	public compare<T>(a: T, b: T, sorting: Sorting): number {
+	public compare<T>(a: T, b: T, sorting: Search.Sorting): number {
 		for (const { property, direction } of sorting) {
 			let valueA = get(a, property);
 			let valueB = get(b, property);

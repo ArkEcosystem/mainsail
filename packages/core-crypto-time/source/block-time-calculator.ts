@@ -1,10 +1,10 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 @Container.injectable()
 export class BlockTimeCalculator {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
 	public isNewBlockTime(height: number): boolean {
 		if (height === 1) {

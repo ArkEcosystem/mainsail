@@ -10,15 +10,15 @@ describe("ActionFactory", () => {
 	});
 
 	describe.each([
-		["abortErroredProcess", Container.Identifiers.AbortErroredProcess],
-		["abortMissingProcess", Container.Identifiers.AbortMissingProcess],
-		["abortRunningProcess", Container.Identifiers.AbortRunningProcess],
-		["abortStoppedProcess", Container.Identifiers.AbortStoppedProcess],
-		["abortUnknownProcess", Container.Identifiers.AbortUnknownProcess],
-		["daemonizeProcess", Container.Identifiers.DaemonizeProcess],
-		["restartProcess", Container.Identifiers.RestartProcess],
-		["restartRunningProcess", Container.Identifiers.RestartRunningProcess],
-		["restartRunningProcessWithPrompt", Container.Identifiers.RestartRunningProcessWithPrompt],
+		["abortErroredProcess", Identifiers.AbortErroredProcess],
+		["abortMissingProcess", Identifiers.AbortMissingProcess],
+		["abortRunningProcess", Identifiers.AbortRunningProcess],
+		["abortStoppedProcess", Identifiers.AbortStoppedProcess],
+		["abortUnknownProcess", Identifiers.AbortUnknownProcess],
+		["daemonizeProcess", Identifiers.DaemonizeProcess],
+		["restartProcess", Identifiers.RestartProcess],
+		["restartRunningProcess", Identifiers.RestartRunningProcess],
+		["restartRunningProcessWithPrompt", Identifiers.RestartRunningProcessWithPrompt],
 	])("%s", (method, binding) => {
 		it("should call be called", async () => {
 			const spy = jest.spyOn(cli.app.get(binding), "execute").mockImplementation();

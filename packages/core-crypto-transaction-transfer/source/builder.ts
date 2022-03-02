@@ -1,4 +1,4 @@
-import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
@@ -26,8 +26,8 @@ export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 		return this.instance();
 	}
 
-	public async getStruct(): Promise<ITransactionData> {
-		const struct: ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Crypto.ITransactionData> {
+		const struct: Crypto.ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;

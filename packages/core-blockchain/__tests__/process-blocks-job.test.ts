@@ -1,7 +1,7 @@
 import { ProcessBlockAction } from "@packages/core-blockchain/source/actions";
 import { ProcessBlocksJob } from "@packages/core-blockchain/source/process-blocks-job";
 import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
-import { Container, Services } from "@packages/core-kernel";
+import { Services } from "@packages/core-kernel";
 import { Sandbox } from "@packages/core-test-framework";
 import { Crypto, Interfaces, Networks } from "@packages/crypto";
 
@@ -23,27 +23,27 @@ describe("Blockchain", () => {
 	const peerNetworkMonitor: any = {};
 	const logService: any = {
 		debug: jest.fn(),
-		warning: jest.fn(),
 		error: jest.fn(),
 		info: jest.fn(),
+		warning: jest.fn(),
 	};
 
 	beforeEach(() => {
 		sandbox = new Sandbox();
 
-		sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchainService);
-		sandbox.app.bind(Container.Identifiers.StateMachine).toConstantValue(stateMachine);
-		sandbox.app.bind(Container.Identifiers.BlockProcessor).toConstantValue(blockProcessor);
-		sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
-		sandbox.app.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(databaseBlockRepository);
-		sandbox.app.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteraction);
-		sandbox.app.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logService);
+		sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchainService);
+		sandbox.app.bind(Identifiers.StateMachine).toConstantValue(stateMachine);
+		sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(blockProcessor);
+		sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		sandbox.app.bind(Identifiers.DatabaseService).toConstantValue(databaseService);
+		sandbox.app.bind(Identifiers.DatabaseBlockRepository).toConstantValue(databaseBlockRepository);
+		sandbox.app.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteraction);
+		sandbox.app.bind(Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(logService);
 
-		sandbox.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 		sandbox.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("processBlock", new ProcessBlockAction());
 
 		processBlocksJob = sandbox.app.resolve(ProcessBlocksJob);
@@ -59,7 +59,7 @@ describe("Blockchain", () => {
 			const blocks = [
 				{ ...Blocks.block2.data, transactions: [] },
 				{ ...Blocks.block3.data, transactions: [] },
-			] as Interfaces.IBlockData[];
+			] as Crypto.IBlockData[];
 
 			processBlocksJob.setBlocks(blocks);
 
@@ -69,9 +69,9 @@ describe("Blockchain", () => {
 
 	describe("processBlocks", () => {
 		// @ts-ignore
-		const lastBlock: Interfaces.IBlockData = { ...Blocks.block2.data, transactions: [] };
+		const lastBlock: Crypto.IBlockData = { ...Blocks.block2.data, transactions: [] };
 		// @ts-ignore
-		const currentBlock: Interfaces.IBlockData = { ...Blocks.block3.data, transactions: [] };
+		const currentBlock: Crypto.IBlockData = { ...Blocks.block3.data, transactions: [] };
 
 		it("should skip processing if blocks are not set", async () => {
 			await processBlocksJob.handle();

@@ -1,6 +1,6 @@
-import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
-import { Container, Contracts, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import { Container, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
@@ -10,50 +10,50 @@ import { blockchainMachine } from "./state-machine/machine";
 // todo: reduce the overall complexity of this class and remove all helpers and getters that just serve as proxies
 @Container.injectable()
 export class Blockchain implements Contracts.Blockchain.Blockchain {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-blockchain")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.DatabaseInteraction)
+	@Container.inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
+	@Container.inject(Identifiers.DatabaseService)
 	private readonly database!: DatabaseService;
 
-	@Container.inject(Container.Identifiers.DatabaseBlockRepository)
+	@Container.inject(Identifiers.DatabaseBlockRepository)
 	private readonly blockRepository!: Repositories.BlockRepository;
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@Container.inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Container.Identifiers.StateMachine)
+	@Container.inject(Identifiers.StateMachine)
 	private readonly stateMachine!: StateMachine;
 
-	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
+	@Container.inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@Container.inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Block.Factory)
-	private readonly blockFactory: IBlockFactory;
+	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	private queue!: Contracts.Kernel.Queue;
@@ -76,7 +76,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			);
 		}
 
-		this.queue = await this.app.get<Types.QueueFactory>(Container.Identifiers.QueueFactory)();
+		this.queue = await this.app.get<Types.QueueFactory>(Identifiers.QueueFactory)();
 
 		this.queue.on("drain", () => {
 			this.dispatch("PROCESSFINISHED");
@@ -175,7 +175,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.queue.clear();
 	}
 
-	public async handleIncomingBlock(block: Interfaces.IBlockData, fromForger = false): Promise<void> {
+	public async handleIncomingBlock(block: Crypto.IBlockData, fromForger = false): Promise<void> {
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
 			this.app,
 			block.height,
@@ -213,12 +213,12 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		}
 	}
 
-	public enqueueBlocks(blocks: Interfaces.IBlockData[]): void {
+	public enqueueBlocks(blocks: Crypto.IBlockData[]): void {
 		if (blocks.length === 0) {
 			return;
 		}
 
-		const __createQueueJob = (blocks: Interfaces.IBlockData[]) => {
+		const __createQueueJob = (blocks: Crypto.IBlockData[]) => {
 			const processBlocksJob = this.app.resolve<ProcessBlocksJob>(ProcessBlocksJob);
 			processBlocksJob.setBlocks(blocks);
 
@@ -238,7 +238,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		let currentBlocksChunk: any[] = [];
 		let currentTransactionsCount = 0;
 		for (const block of blocks) {
-			Utils.assert.defined<Interfaces.IBlockData>(block);
+			Utils.assert.defined<Crypto.IBlockData>(block);
 
 			currentBlocksChunk.push(block);
 			currentTransactionsCount += block.numberOfTransactions;
@@ -265,44 +265,44 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		try {
 			this.clearAndStopQueue();
 
-			const lastBlock: Interfaces.IBlock = this.stateStore.getLastBlock();
+			const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
 
 			// If the current chain height is H and we will be removing blocks [N, H],
 			// then blocksToRemove[] will contain blocks [N - 1, H - 1].
-			const blocksToRemove: Interfaces.IBlockData[] = await this.database.getBlocks(
+			const blocksToRemove: Crypto.IBlockData[] = await this.database.getBlocks(
 				lastBlock.data.height - nblocks,
 				lastBlock.data.height,
 			);
 
-			const removedBlocks: Interfaces.IBlockData[] = [];
-			const removedTransactions: Interfaces.ITransaction[] = [];
+			const removedBlocks: Crypto.IBlockData[] = [];
+			const removedTransactions: Crypto.ITransaction[] = [];
 
 			const revertLastBlock = async () => {
-				const lastBlock: Interfaces.IBlock = this.stateStore.getLastBlock();
+				const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
 
 				await this.databaseInteraction.revertBlock(lastBlock);
 				removedBlocks.push(lastBlock.data);
 				removedTransactions.push(...[...lastBlock.transactions].reverse());
 				blocksToRemove.pop();
 
-				let newLastBlock: Interfaces.IBlock;
+				let newLastBlock: Crypto.IBlock;
 				// eslint-disable-next-line unicorn/prefer-at
 				if (blocksToRemove[blocksToRemove.length - 1].height === 1) {
 					newLastBlock = this.stateStore.getGenesisBlock();
 				} else {
 					// eslint-disable-next-line unicorn/prefer-at
-					const temporaryNewLastBlockData: Interfaces.IBlockData = blocksToRemove[blocksToRemove.length - 1];
+					const temporaryNewLastBlockData: Crypto.IBlockData = blocksToRemove[blocksToRemove.length - 1];
 
-					Utils.assert.defined<Interfaces.IBlockData>(temporaryNewLastBlockData);
+					Utils.assert.defined<Crypto.IBlockData>(temporaryNewLastBlockData);
 
-					const temporaryNewLastBlock: Interfaces.IBlock | undefined = await this.blockFactory.fromData(
+					const temporaryNewLastBlock: Crypto.IBlock | undefined = await this.blockFactory.fromData(
 						temporaryNewLastBlockData,
 						{
 							deserializeTransactionsUnchecked: true,
 						},
 					);
 
-					Utils.assert.defined<Interfaces.IBlockData>(temporaryNewLastBlock);
+					Utils.assert.defined<Crypto.IBlockData>(temporaryNewLastBlock);
 
 					newLastBlock = temporaryNewLastBlock;
 				}
@@ -316,7 +316,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 					return;
 				}
 
-				const lastBlock: Interfaces.IBlock = this.stateStore.getLastBlock();
+				const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
 
 				this.logger.info(`Undoing block ${lastBlock.data.height.toLocaleString()}`);
 
@@ -375,7 +375,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.dispatch("WAKEUP");
 	}
 
-	public forkBlock(block: Interfaces.IBlock, numberOfBlockToRollback?: number): void {
+	public forkBlock(block: Crypto.IBlock, numberOfBlockToRollback?: number): void {
 		this.stateStore.setForkedBlock(block);
 
 		this.clearAndStopQueue();
@@ -387,7 +387,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.dispatch("FORK");
 	}
 
-	public isSynced(block?: Interfaces.IBlockData): boolean {
+	public isSynced(block?: Crypto.IBlockData): boolean {
 		if (!this.peerRepository.hasPeers()) {
 			return true;
 		}
@@ -397,7 +397,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.slots.getTime() - block.timestamp < 3 * this.configuration.getMilestone(block.height).blocktime;
 	}
 
-	public getLastBlock(): Interfaces.IBlock {
+	public getLastBlock(): Crypto.IBlock {
 		return this.stateStore.getLastBlock();
 	}
 
@@ -405,7 +405,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.getLastBlock().data.height;
 	}
 
-	public getLastDownloadedBlock(): Interfaces.IBlockData {
+	public getLastDownloadedBlock(): Crypto.IBlockData {
 		return this.stateStore.getLastDownloadedBlock() || this.getLastBlock().data;
 	}
 
@@ -413,11 +413,11 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.stateStore.getBlockPing();
 	}
 
-	public pingBlock(incomingBlock: Interfaces.IBlockData): boolean {
+	public pingBlock(incomingBlock: Crypto.IBlockData): boolean {
 		return this.stateStore.pingBlock(incomingBlock);
 	}
 
-	public pushPingBlock(block: Interfaces.IBlockData, fromForger = false): void {
+	public pushPingBlock(block: Crypto.IBlockData, fromForger = false): void {
 		this.stateStore.pushPingBlock(block, fromForger);
 	}
 

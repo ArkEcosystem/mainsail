@@ -1,16 +1,11 @@
-import Interfaces, {
-	BINDINGS,
-	IAddressFactory,
-	IConfiguration,
-	IPublicKeyFactory,
-} from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DelegateRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-delegate-registration";
 import { DelegateResignationBuilder } from "@arkecosystem/core-crypto-transaction-delegate-resignation";
 import { MultiPaymentBuilder } from "@arkecosystem/core-crypto-transaction-multi-payment";
 import { MultiSignatureBuilder } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
 import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import secrets from "../internal/passphrases.json";
@@ -24,21 +19,21 @@ interface IPassphrasePair {
 
 // todo: replace this by the use of real factories
 export class TransactionFactory {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Identity.AddressFactory)
-	private readonly addressFactory: IAddressFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(BINDINGS.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: IPublicKeyFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
 
 	protected builder: any;
 	protected app: Contracts.Kernel.Application;
 
 	// @ts-ignore
 	private network = "testnet";
-	private networkConfig: Interfaces.NetworkConfig | undefined;
+	private networkConfig: Crypto.NetworkConfig | undefined;
 	private nonce: BigNumber | undefined;
 	private fee: BigNumber | undefined;
 	private timestamp: number | undefined;
@@ -168,7 +163,7 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public withNetworkConfig(networkConfig: Interfaces.NetworkConfig): TransactionFactory {
+	public withNetworkConfig(networkConfig: Crypto.NetworkConfig): TransactionFactory {
 		this.networkConfig = networkConfig;
 
 		return this;
@@ -234,16 +229,16 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public async create(quantity = 1): Promise<Interfaces.ITransactionData[]> {
-		return this.make<Interfaces.ITransactionData>(quantity, "getStruct");
+	public async create(quantity = 1): Promise<Crypto.ITransactionData[]> {
+		return this.make<Crypto.ITransactionData>(quantity, "getStruct");
 	}
 
-	public async createOne(): Promise<Interfaces.ITransactionData> {
+	public async createOne(): Promise<Crypto.ITransactionData> {
 		return (await this.create(1))[0];
 	}
 
-	public async build(quantity = 1): Promise<Interfaces.ITransaction[]> {
-		return this.make<Interfaces.ITransaction>(quantity, "build");
+	public async build(quantity = 1): Promise<Crypto.ITransaction[]> {
+		return this.make<Crypto.ITransaction>(quantity, "build");
 	}
 
 	public async getNonce(): Promise<BigNumber> {

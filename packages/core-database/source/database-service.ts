@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS, IBlockFactory, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Enums } from "@arkecosystem/core-kernel";
 import { Connection } from "typeorm";
 
 import { DatabaseEvent } from "./events";
@@ -11,32 +11,32 @@ import { TransactionRepository } from "./repositories/transaction-repository";
 // TODO: maybe we should introduce `BlockLike`, `TransactionLike`, `RoundLke` interfaces to remove the need to cast
 @Container.injectable()
 export class DatabaseService {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.DatabaseConnection)
+	@Container.inject(Identifiers.DatabaseConnection)
 	private readonly connection!: Connection;
 
-	@Container.inject(Container.Identifiers.DatabaseBlockRepository)
+	@Container.inject(Identifiers.DatabaseBlockRepository)
 	private readonly blockRepository!: BlockRepository;
 
-	@Container.inject(Container.Identifiers.DatabaseTransactionRepository)
+	@Container.inject(Identifiers.DatabaseTransactionRepository)
 	private readonly transactionRepository!: TransactionRepository;
 
-	@Container.inject(Container.Identifiers.DatabaseRoundRepository)
+	@Container.inject(Identifiers.DatabaseRoundRepository)
 	private readonly roundRepository!: RoundRepository;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(BINDINGS.Block.Factory)
-	private readonly blockFactory: IBlockFactory;
+	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	public async initialize(): Promise<void> {
 		try {
@@ -64,11 +64,9 @@ export class DatabaseService {
 		await this.connection.query("TRUNCATE TABLE blocks, rounds, transactions RESTART IDENTITY;");
 	}
 
-	public async getBlock(id: string): Promise<Interfaces.IBlock | undefined> {
+	public async getBlock(id: string): Promise<Crypto.IBlock | undefined> {
 		// TODO: caching the last 1000 blocks, in combination with `saveBlock` could help to optimise
-		const block: Interfaces.IBlockData = (await this.blockRepository.findOne(
-			id,
-		)) as unknown as Interfaces.IBlockData;
+		const block: Crypto.IBlockData = (await this.blockRepository.findOne(id)) as unknown as Crypto.IBlockData;
 
 		if (!block) {
 			return undefined;
@@ -94,7 +92,7 @@ export class DatabaseService {
 
 	// ! three methods below (getBlocks, getBlocksForDownload, getBlocksByHeight) can be merged into one
 
-	public async getBlocks(start: number, end: number, headersOnly?: boolean): Promise<Interfaces.IBlockData[]> {
+	public async getBlocks(start: number, end: number, headersOnly?: boolean): Promise<Crypto.IBlockData[]> {
 		// ! assumes that earlier blocks may be missing
 		// ! but querying database is unnecessary when later blocks are missing too (aren't forged yet)
 		return headersOnly
@@ -127,8 +125,8 @@ export class DatabaseService {
 		return await this.blockRepository.findByHeights(heights);
 	}
 
-	public async getLastBlock(): Promise<Interfaces.IBlock> {
-		const block: Interfaces.IBlockData | undefined = await this.blockRepository.findLatest();
+	public async getLastBlock(): Promise<Crypto.IBlock> {
+		const block: Crypto.IBlockData | undefined = await this.blockRepository.findLatest();
 
 		if (!block) {
 			// @ts-ignore Technically, this cannot happen
@@ -150,19 +148,19 @@ export class DatabaseService {
 			).data;
 		}
 
-		const lastBlock: Interfaces.IBlock = await this.blockFactory.fromData(block, {
+		const lastBlock: Crypto.IBlock = await this.blockFactory.fromData(block, {
 			deserializeTransactionsUnchecked: true,
 		})!;
 
 		return lastBlock;
 	}
 
-	public async getTopBlocks(count: number): Promise<Interfaces.IBlockData[]> {
+	public async getTopBlocks(count: number): Promise<Crypto.IBlockData[]> {
 		// ! blockRepository.findTop returns blocks in reverse order
 		// ! where recent block is first in array
-		const blocks: Interfaces.IBlockData[] = (await this.blockRepository.findTop(
+		const blocks: Crypto.IBlockData[] = (await this.blockRepository.findTop(
 			count,
-		)) as unknown as Interfaces.IBlockData[];
+		)) as unknown as Crypto.IBlockData[];
 
 		await this.loadTransactionsForBlocks(blocks);
 
@@ -173,20 +171,20 @@ export class DatabaseService {
 		return this.transactionRepository.findOne(id);
 	}
 
-	public async deleteBlocks(blocks: Interfaces.IBlockData[]): Promise<void> {
+	public async deleteBlocks(blocks: Crypto.IBlockData[]): Promise<void> {
 		return await this.blockRepository.deleteBlocks(blocks);
 	}
 
-	public async saveBlocks(blocks: Interfaces.IBlock[]): Promise<void> {
+	public async saveBlocks(blocks: Crypto.IBlock[]): Promise<void> {
 		return await this.blockRepository.saveBlocks(blocks);
 	}
 
-	public async findLatestBlock(): Promise<Interfaces.IBlockData | undefined> {
+	public async findLatestBlock(): Promise<Crypto.IBlockData | undefined> {
 		return await this.blockRepository.findLatest();
 	}
 
-	public async findBlockByID(ids: any[]): Promise<Interfaces.IBlockData[] | undefined> {
-		return (await this.blockRepository.findByIds(ids)) as unknown as Interfaces.IBlockData[];
+	public async findBlockByID(ids: any[]): Promise<Crypto.IBlockData[] | undefined> {
+		return (await this.blockRepository.findByIds(ids)) as unknown as Crypto.IBlockData[];
 	}
 
 	public async findRecentBlocks(limit: number): Promise<{ id: string }[]> {
@@ -209,10 +207,10 @@ export class DatabaseService {
 		await this.roundRepository.deleteFrom(round);
 	}
 
-	public async verifyBlockchain(lastBlock?: Interfaces.IBlock): Promise<boolean> {
+	public async verifyBlockchain(lastBlock?: Crypto.IBlock): Promise<boolean> {
 		const errors: string[] = [];
 
-		const block: Interfaces.IBlock = lastBlock ? lastBlock : await this.getLastBlock();
+		const block: Crypto.IBlock = lastBlock ? lastBlock : await this.getLastBlock();
 
 		// Last block is available
 		if (!block) {
@@ -273,7 +271,7 @@ export class DatabaseService {
 		return !hasErrors;
 	}
 
-	private async loadTransactionsForBlocks(blocks: Interfaces.IBlockData[]): Promise<void> {
+	private async loadTransactionsForBlocks(blocks: Crypto.IBlockData[]): Promise<void> {
 		const databaseTransactions: Array<{
 			id: string;
 			blockId: string;
@@ -295,7 +293,7 @@ export class DatabaseService {
 		}
 	}
 
-	private async getTransactionsForBlocks(blocks: Interfaces.IBlockData[]): Promise<
+	private async getTransactionsForBlocks(blocks: Crypto.IBlockData[]): Promise<
 		Array<{
 			id: string;
 			blockId: string;
@@ -306,7 +304,7 @@ export class DatabaseService {
 			return [];
 		}
 
-		const ids: string[] = blocks.map((block: Interfaces.IBlockData) => block.id);
+		const ids: string[] = blocks.map((block: Crypto.IBlockData) => block.id);
 		return this.transactionRepository.findByBlockIds(ids);
 	}
 }

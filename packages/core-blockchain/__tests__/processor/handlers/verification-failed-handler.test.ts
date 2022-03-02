@@ -1,7 +1,8 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { VerificationFailedHandler } from "../../../../../packages/core-blockchain/source/processor/handlers/verification-failed-handler";
-import { BlockProcessorResult } from "../../../../../packages/core-blockchain/source/processor";
 import { Interfaces } from "@arkecosystem/crypto";
+
+import { BlockProcessorResult } from "../../../source/processor";
+import { VerificationFailedHandler } from "../../../source/processor/handlers/verification-failed-handler";
 
 describe("VerificationFailedHandler", () => {
 	const container = new Container.Container();
@@ -12,8 +13,8 @@ describe("VerificationFailedHandler", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
 	});
 
 	beforeEach(() => {
@@ -25,7 +26,7 @@ describe("VerificationFailedHandler", () => {
 			const verificationFailedHandler = container.resolve<VerificationFailedHandler>(VerificationFailedHandler);
 
 			const block = {};
-			const result = await verificationFailedHandler.execute(block as Interfaces.IBlock);
+			const result = await verificationFailedHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Rejected);
 			expect(blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);

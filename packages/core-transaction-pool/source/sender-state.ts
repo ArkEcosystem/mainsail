@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Enums, Providers, Services } from "@arkecosystem/core-kernel";
 
 import {
 	RetryTransactionError,
@@ -13,29 +13,29 @@ import {
 
 @Container.injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
+	@Container.inject(Identifiers.TransactionHandlerRegistry)
 	@Container.tagged("state", "copy-on-write")
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Container.Identifiers.TransactionPoolExpirationService)
+	@Container.inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@Container.inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(BINDINGS.Configuration)
+	@Container.inject(Identifiers.Cryptography.Configuration)
 	private readonly slots: any;
 
 	private corrupt = false;
 
-	public async apply(transaction: Interfaces.ITransaction): Promise<void> {
+	public async apply(transaction: Crypto.ITransaction): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {
 			throw new TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
@@ -77,7 +77,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		}
 	}
 
-	public async revert(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revert(transaction: Crypto.ITransaction): Promise<void> {
 		try {
 			const handler: Contracts.Transactions.ITransactionHandler =
 				await this.handlerRegistry.getActivatedHandlerForData(transaction.data);

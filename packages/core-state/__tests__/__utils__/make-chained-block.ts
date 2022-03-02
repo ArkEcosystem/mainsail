@@ -1,7 +1,7 @@
 import { Interfaces } from "@packages/crypto";
 
-export const makeChainedBlocks = (length: number, blockFactory): Interfaces.IBlock[] => {
-	const entitites: Interfaces.IBlock[] = [];
+export const makeChainedBlocks = (length: number, blockFactory): Crypto.IBlock[] => {
+	const entitites: Crypto.IBlock[] = [];
 	let previousBlock; // first case uses genesis IBlockData
 	const getPreviousBlock = () => previousBlock;
 
@@ -9,7 +9,7 @@ export const makeChainedBlocks = (length: number, blockFactory): Interfaces.IBlo
 		if (previousBlock) {
 			blockFactory.withOptions({ getPreviousBlock });
 		}
-		const entity: Interfaces.IBlock = blockFactory.make();
+		const entity: Crypto.IBlock = blockFactory.make();
 		entitites.push(entity);
 		previousBlock = entity.data;
 	}

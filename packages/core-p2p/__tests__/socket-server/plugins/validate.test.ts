@@ -33,8 +33,8 @@ describe("ValidatePlugin", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(app);
 	});
 
 	beforeEach(() => {

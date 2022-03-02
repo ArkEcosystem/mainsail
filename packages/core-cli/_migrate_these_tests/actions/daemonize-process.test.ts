@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { DaemonizeProcess } from "@packages/core-cli/source/actions";
 import os from "os";
@@ -9,11 +8,11 @@ let action;
 
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.DaemonizeProcess).to(DaemonizeProcess).inSingletonScope();
-	action = cli.app.get(Container.Identifiers.DaemonizeProcess);
+	cli.app.rebind(Identifiers.DaemonizeProcess).to(DaemonizeProcess).inSingletonScope();
+	action = cli.app.get(Identifiers.DaemonizeProcess);
 });
 
 describe("DaemonizeProcess", () => {
@@ -24,9 +23,9 @@ describe("DaemonizeProcess", () => {
 		expect(() =>
 			action.execute(
 				{
+					args: "core:run --daemon",
 					name: "ark-core",
 					script: "script",
-					args: "core:run --daemon",
 				},
 				{},
 			),
@@ -47,9 +46,9 @@ describe("DaemonizeProcess", () => {
 		expect(() =>
 			action.execute(
 				{
+					args: "core:run --daemon",
 					name: "ark-core",
 					script: "script",
-					args: "core:run --daemon",
 				},
 				{},
 			),
@@ -71,9 +70,9 @@ describe("DaemonizeProcess", () => {
 
 		action.execute(
 			{
+				args: "core:run --daemon",
 				name: "ark-core",
 				script: "script",
-				args: "core:run --daemon",
 			},
 			{},
 		);
@@ -91,14 +90,14 @@ describe("DaemonizeProcess", () => {
 		const has = jest.spyOn(processManager, "has").mockReturnValue(true);
 		const isUnknown = jest.spyOn(processManager, "isUnknown").mockReturnValue(false);
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(false);
-		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99999999999);
-		const start = jest.spyOn(processManager, "start").mockImplementation(undefined);
+		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99_999_999_999);
+		const start = jest.spyOn(processManager, "start").mockImplementation();
 
 		action.execute(
 			{
+				args: "core:run --daemon",
 				name: "ark-core",
 				script: "script",
-				args: "core:run --daemon",
 			},
 			{},
 		);
@@ -115,7 +114,7 @@ describe("DaemonizeProcess", () => {
 				node_args: undefined,
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
 
 		has.mockClear();
@@ -129,14 +128,14 @@ describe("DaemonizeProcess", () => {
 		const has = jest.spyOn(processManager, "has").mockReturnValue(true);
 		const isUnknown = jest.spyOn(processManager, "isUnknown").mockReturnValue(false);
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(false);
-		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99999999999);
-		const start = jest.spyOn(processManager, "start").mockImplementation(undefined);
+		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99_999_999_999);
+		const start = jest.spyOn(processManager, "start").mockImplementation();
 
 		action.execute(
 			{
+				args: "core:run --daemon",
 				name: "ark-core",
 				script: "script",
-				args: "core:run --daemon",
 			},
 			{ daemon: false },
 		);
@@ -153,7 +152,7 @@ describe("DaemonizeProcess", () => {
 				node_args: undefined,
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
 
 		has.mockClear();
@@ -167,14 +166,14 @@ describe("DaemonizeProcess", () => {
 		const has = jest.spyOn(processManager, "has").mockReturnValue(true);
 		const isUnknown = jest.spyOn(processManager, "isUnknown").mockReturnValue(false);
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(false);
-		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99999999999);
-		const start = jest.spyOn(processManager, "start").mockImplementation(undefined);
+		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99_999_999_999);
+		const start = jest.spyOn(processManager, "start").mockImplementation();
 
 		action.execute(
 			{
+				args: "core:run --daemon",
 				name: "ark-core",
 				script: "script",
-				args: "core:run --daemon",
 			},
 			{ daemon: true },
 		);
@@ -191,7 +190,7 @@ describe("DaemonizeProcess", () => {
 				node_args: undefined,
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core" },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core" },
 		);
 
 		has.mockClear();
@@ -206,13 +205,13 @@ describe("DaemonizeProcess", () => {
 		const isUnknown = jest.spyOn(processManager, "isUnknown").mockReturnValue(false);
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(false);
 		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(2 * 1024 ** 3 - 1);
-		const start = jest.spyOn(processManager, "start").mockImplementation(undefined);
+		const start = jest.spyOn(processManager, "start").mockImplementation();
 
 		action.execute(
 			{
+				args: "core:run --daemon",
 				name: "ark-core",
 				script: "script",
-				args: "core:run --daemon",
 			},
 			{},
 		);
@@ -234,7 +233,7 @@ describe("DaemonizeProcess", () => {
 				},
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
 
 		has.mockClear();
@@ -248,7 +247,7 @@ describe("DaemonizeProcess", () => {
 		const has = jest.spyOn(processManager, "has").mockReturnValue(true);
 		const isUnknown = jest.spyOn(processManager, "isUnknown").mockReturnValue(false);
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(false);
-		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99999999999);
+		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99_999_999_999);
 		const start = jest.spyOn(processManager, "start").mockImplementation(() => {
 			throw new Error("unexpected error");
 		});
@@ -256,9 +255,9 @@ describe("DaemonizeProcess", () => {
 		expect(() =>
 			action.execute(
 				{
+					args: "core:run --daemon",
 					name: "ark-core",
 					script: "script",
-					args: "core:run --daemon",
 				},
 				{},
 			),
@@ -276,7 +275,7 @@ describe("DaemonizeProcess", () => {
 				node_args: undefined,
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
 
 		has.mockClear();
@@ -290,7 +289,7 @@ describe("DaemonizeProcess", () => {
 		const has = jest.spyOn(processManager, "has").mockReturnValue(true);
 		const isUnknown = jest.spyOn(processManager, "isUnknown").mockReturnValue(false);
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(false);
-		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99999999999);
+		const totalmem = jest.spyOn(os, "totalmem").mockReturnValue(99_999_999_999);
 		const start = jest.spyOn(processManager, "start").mockImplementation(() => {
 			const error: Error = new Error("hello world");
 			// @ts-ignore
@@ -302,9 +301,9 @@ describe("DaemonizeProcess", () => {
 		expect(() =>
 			action.execute(
 				{
+					args: "core:run --daemon",
 					name: "ark-core",
 					script: "script",
-					args: "core:run --daemon",
 				},
 				{},
 			),
@@ -322,7 +321,7 @@ describe("DaemonizeProcess", () => {
 				node_args: undefined,
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
 
 		has.mockClear();

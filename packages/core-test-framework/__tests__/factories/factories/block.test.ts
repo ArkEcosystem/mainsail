@@ -74,7 +74,7 @@ describe("BlockFactory", () => {
 		const previousBlock: Blocks.Block = factory.get("Block").make();
 
 		const options = {
-			getPreviousBlock(): Interfaces.IBlockData {
+			getPreviousBlock(): Crypto.IBlockData {
 				return previousBlock.data;
 			},
 		};

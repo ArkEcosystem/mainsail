@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Box } from "@packages/core-cli/source/components";
 
@@ -9,13 +8,13 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.Box).to(Box).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.Box);
+	cli.app.rebind(Identifiers.Box).to(Box).inSingletonScope();
+	component = cli.app.get(Identifiers.Box);
 });
 
 describe("Box", () => {
 	it("should render the component", () => {
-		const spyLogger = jest.spyOn(cli.app.get(Container.Identifiers.Logger), "log");
+		const spyLogger = jest.spyOn(cli.app.get(Identifiers.Logger), "log");
 
 		component.render("Hello World");
 

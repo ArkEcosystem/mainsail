@@ -1,19 +1,19 @@
-import Interfaces, { BINDINGS, ITransactionFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { Block } from "./models/block";
 import { Transaction } from "./models/transaction";
 
 @Container.injectable()
 export class ModelConverter implements Contracts.Database.ModelConverter {
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
-	public async getBlockModels(blocks: Interfaces.IBlock[]): Promise<Contracts.Database.BlockModel[]> {
+	public async getBlockModels(blocks: Crypto.IBlock[]): Promise<Contracts.Database.BlockModel[]> {
 		return blocks.map((b) => Object.assign(new Block(), b.data));
 	}
 
-	public async getBlockData(models: Contracts.Database.BlockModel[]): Promise<Interfaces.IBlockData[]> {
+	public async getBlockData(models: Contracts.Database.BlockModel[]): Promise<Crypto.IBlockData[]> {
 		return models;
 	}
 
@@ -31,7 +31,7 @@ export class ModelConverter implements Contracts.Database.ModelConverter {
 	}
 
 	public async getTransactionModels(
-		transactions: Interfaces.ITransaction[],
+		transactions: Crypto.ITransaction[],
 	): Promise<Contracts.Database.TransactionModel[]> {
 		return transactions.map((t) =>
 			Object.assign(new Transaction(), t.data, {
@@ -41,9 +41,7 @@ export class ModelConverter implements Contracts.Database.ModelConverter {
 		);
 	}
 
-	public async getTransactionData(
-		models: Contracts.Database.TransactionModel[],
-	): Promise<Interfaces.ITransactionData[]> {
+	public async getTransactionData(models: Contracts.Database.TransactionModel[]): Promise<Crypto.ITransactionData[]> {
 		for (let index = 0; index < models.length; index++) {
 			const model = models[index];
 			const { data } = await this.transactionFactory.fromBytesUnsafe(model.serialized, model.id);
@@ -72,7 +70,7 @@ export class ModelConverter implements Contracts.Database.ModelConverter {
 
 		return transactionData.map((data) => {
 			const block = blockData.find((b) => b.id === data.blockId);
-			AppUtils.assert.defined<Interfaces.IBlockData>(block);
+			AppUtils.assert.defined<Crypto.IBlockData>(block);
 			return { block, data };
 		});
 	}

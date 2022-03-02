@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { MultiSelect } from "@packages/core-cli/source/components";
 import prompts from "prompts";
@@ -10,8 +9,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.MultiSelect).to(MultiSelect).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.MultiSelect);
+	cli.app.rebind(Identifiers.MultiSelect).to(MultiSelect).inSingletonScope();
+	component = cli.app.get(Identifiers.MultiSelect);
 });
 
 describe("MultiSelect", () => {
@@ -21,8 +20,8 @@ describe("MultiSelect", () => {
 		await expect(
 			component.render("Pick Colors", [
 				{ title: "Red", value: "#ff0000" },
-				{ title: "Green", value: "#00ff00", disabled: true },
-				{ title: "Blue", value: "#0000ff", selected: true },
+				{ disabled: true, title: "Green", value: "#00ff00" },
+				{ selected: true, title: "Blue", value: "#0000ff" },
 			]),
 		).resolves.toEqual(["#ff0000", "#0000ff"]);
 	});

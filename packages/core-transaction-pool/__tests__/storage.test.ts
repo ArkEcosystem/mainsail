@@ -9,7 +9,7 @@ jest.mock("fs-extra");
 const configuration = { getRequired: jest.fn() };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
+container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
 
 beforeEach(() => {
 	configuration.getRequired.mockReset();

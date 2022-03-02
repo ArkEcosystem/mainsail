@@ -1,20 +1,20 @@
-import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
+import { Container, Enums } from "@arkecosystem/core-kernel";
 import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
 
-import { SenderState } from "../../../packages/core-transaction-pool/source/sender-state";
+import { SenderState } from "../source/sender-state";
 
 jest.mock("@packages/crypto");
 
 const configuration = {
-	getRequired: jest.fn(),
 	getOptional: jest.fn(),
+	getRequired: jest.fn(),
 };
 const handlerRegistry = {
 	getActivatedHandlerForData: jest.fn(),
 };
 const expirationService = {
-	isExpired: jest.fn(),
 	getExpirationHeight: jest.fn(),
+	isExpired: jest.fn(),
 };
 const triggers = {
 	call: jest.fn(),
@@ -24,11 +24,11 @@ const emitter = {
 };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
-container.bind(Container.Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
-container.bind(Container.Identifiers.TransactionPoolExpirationService).toConstantValue(expirationService);
-container.bind(Container.Identifiers.TriggerService).toConstantValue(triggers);
-container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(emitter);
+container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
+container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(expirationService);
+container.bind(Identifiers.TriggerService).toConstantValue(triggers);
+container.bind(Identifiers.EventDispatcherService).toConstantValue(emitter);
 
 beforeEach(() => {
 	(Managers.configManager.get as jest.Mock).mockReset();
@@ -44,11 +44,11 @@ beforeEach(() => {
 });
 
 const transaction = {
+	data: { network: 123, senderPublicKey: "sender's public key" },
 	id: "tx1",
-	timestamp: 13600,
-	data: { senderPublicKey: "sender's public key", network: 123 },
 	serialized: Buffer.alloc(10),
-} as Interfaces.ITransaction;
+	timestamp: 13_600,
+} as Crypto.ITransaction;
 
 describe("SenderState.apply", () => {
 	it("should throw when transaction exceeds maximum byte size", async () => {
@@ -91,7 +91,7 @@ describe("SenderState.apply", () => {
 		const senderState = container.resolve(SenderState);
 
 		(Managers.configManager.get as jest.Mock).mockReturnValue(123); // network.pubKeyHash
-		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13600);
+		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13_600);
 		configuration.getRequired.mockReturnValueOnce(1024); // maxTransactionBytes
 		expirationService.isExpired.mockReturnValueOnce(true);
 		expirationService.getExpirationHeight.mockReturnValueOnce(10);
@@ -110,7 +110,7 @@ describe("SenderState.apply", () => {
 		const handler = {};
 
 		(Managers.configManager.get as jest.Mock).mockReturnValue(123); // network.pubKeyHash
-		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13600);
+		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13_600);
 		configuration.getRequired.mockReturnValueOnce(1024); // maxTransactionBytes
 		expirationService.isExpired.mockReturnValueOnce(false);
 		handlerRegistry.getActivatedHandlerForData.mockResolvedValueOnce(handler);
@@ -130,7 +130,7 @@ describe("SenderState.apply", () => {
 		const handler = {};
 
 		(Managers.configManager.get as jest.Mock).mockReturnValue(123); // network.pubKeyHash
-		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13600);
+		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13_600);
 		configuration.getRequired.mockReturnValueOnce(1024); // maxTransactionBytes
 		expirationService.isExpired.mockReturnValueOnce(false);
 
@@ -142,7 +142,7 @@ describe("SenderState.apply", () => {
 		handlerRegistry.getActivatedHandlerForData.mockResolvedValueOnce(handler);
 		triggers.call.mockResolvedValueOnce(true); // verifyTransaction
 
-		await senderState.revert(transaction).catch(() => undefined);
+		await senderState.revert(transaction).catch(() => {});
 		const promise = senderState.apply(transaction);
 
 		await expect(promise).rejects.toBeInstanceOf(Contracts.TransactionPool.PoolError);
@@ -160,12 +160,12 @@ describe("SenderState.apply", () => {
 		const handler = {};
 
 		(Managers.configManager.get as jest.Mock).mockReturnValue(123); // network.pubKeyHash
-		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13600);
+		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13_600);
 		configuration.getRequired.mockReturnValueOnce(1024); // maxTransactionBytes
 		expirationService.isExpired.mockReturnValueOnce(false);
 		handlerRegistry.getActivatedHandlerForData.mockResolvedValueOnce(handler);
 		triggers.call.mockResolvedValueOnce(true); // verifyTransaction
-		triggers.call.mockResolvedValueOnce(undefined); // throwIfCannotEnterPool
+		triggers.call.mockResolvedValueOnce(); // throwIfCannotEnterPool
 		triggers.call.mockRejectedValueOnce(new Error("Some apply error")); // applyTransaction
 
 		const promise = senderState.apply(transaction);
@@ -184,13 +184,13 @@ describe("SenderState.apply", () => {
 		const handler = {};
 
 		(Managers.configManager.get as jest.Mock).mockReturnValue(123); // network.pubKeyHash
-		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13600);
+		(Crypto.Slots.getTime as jest.Mock).mockReturnValue(13_600);
 		configuration.getRequired.mockReturnValueOnce(1024); // maxTransactionBytes
 		expirationService.isExpired.mockReturnValueOnce(false);
 		handlerRegistry.getActivatedHandlerForData.mockResolvedValueOnce(handler);
 		triggers.call.mockResolvedValueOnce(true); // verifyTransaction
-		triggers.call.mockResolvedValueOnce(undefined); // throwIfCannotEnterPool
-		triggers.call.mockResolvedValueOnce(undefined); // applyTransaction
+		triggers.call.mockResolvedValueOnce(); // throwIfCannotEnterPool
+		triggers.call.mockResolvedValueOnce(); // applyTransaction
 
 		await senderState.apply(transaction);
 
@@ -207,7 +207,7 @@ describe("SenderState.revert", () => {
 		const handler = {};
 
 		handlerRegistry.getActivatedHandlerForData.mockResolvedValueOnce(handler);
-		triggers.call.mockResolvedValueOnce(undefined); // revertTransaction
+		triggers.call.mockResolvedValueOnce(); // revertTransaction
 
 		await senderState.revert(transaction);
 

@@ -1,6 +1,6 @@
+import { Kernel } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 
-import { Application } from "../../contracts/kernel";
 import { Identifiers, inject, injectable } from "../../ioc";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
@@ -8,7 +8,7 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");

@@ -1,6 +1,5 @@
 import "jest-extended";
 
-import { walletFactory } from "@packages/core-state/source/wallets/wallet-factory";
 import { Container, Providers, Services } from "@packages/core-kernel";
 import { DposPreviousRoundStateProvider } from "@packages/core-kernel/source/contracts/state";
 import { PluginConfiguration } from "@packages/core-kernel/source/providers";
@@ -18,9 +17,9 @@ import {
 	WalletRepositoryCopyOnWrite,
 } from "@packages/core-state/source/wallets";
 import { registerIndexers } from "@packages/core-state/source/wallets/indexers";
+import { walletFactory } from "@packages/core-state/source/wallets/wallet-factory";
 import { Sandbox } from "@packages/core-test-framework/source";
 import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
-import { Managers, Utils } from "@packages/crypto/source";
 
 export interface Spies {
 	applySpy: jest.SpyInstance;
@@ -55,84 +54,78 @@ export interface Setup {
 }
 
 export const setUpDefaults = {
-	getSentTransaction: [
-		{
-			senderPublicKey: "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece",
-			amount: BigNumber.make(22222),
-			fee: BigNumber.make(33333),
-			nonce: BigNumber.ONE,
-		},
-	],
 	getBlockRewards: [
 		{
 			generatorPublicKey: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
-			rewards: BigNumber.make(10000),
+			rewards: BigNumber.make(10_000),
 		},
 	],
 	getRegisteredHandlers: [],
+	getSentTransaction: [
+		{
+			amount: BigNumber.make(22_222),
+			fee: BigNumber.make(33_333),
+			nonce: BigNumber.ONE,
+			senderPublicKey: "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece",
+		},
+	],
 };
 
 export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Promise<Setup> => {
 	const sandbox = new Sandbox();
 
 	const logger = {
+		debug: jest.fn(),
 		error: jest.fn(),
 		info: jest.fn(),
 		notice: jest.fn(),
-		debug: jest.fn(),
 		warning: jest.fn(),
 	};
 
-	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 
-	sandbox.app.bind(Container.Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
+	sandbox.app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
 
-	sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate");
 
-	sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate.username");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.username");
 
-	sandbox.app
-		.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
-		.set("delegate.voteBalance");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.voteBalance");
 
-	sandbox.app
-		.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
-		.set("delegate.producedBlocks");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.producedBlocks");
 
-	sandbox.app
-		.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
-		.set("delegate.forgedTotal");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.forgedTotal");
 
-	sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate.approval");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.approval");
 
-	sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("vote");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("vote");
 
-	sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate.resigned");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.resigned");
 
-	sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate.rank");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.rank");
 
-	sandbox.app.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes).set("delegate.round");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.round");
 
 	registerIndexers(sandbox.app);
 
-	sandbox.app.bind(Container.Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
+	sandbox.app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 
 	sandbox.app
-		.get<PluginConfiguration>(Container.Identifiers.PluginConfiguration)
+		.get<PluginConfiguration>(Identifiers.PluginConfiguration)
 		.set("storage.maxLastBlocks", defaults.storage.maxLastBlocks);
 
 	sandbox.app
-		.get<PluginConfiguration>(Container.Identifiers.PluginConfiguration)
+		.get<PluginConfiguration>(Identifiers.PluginConfiguration)
 		.set("storage.maxLastTransactionIds", defaults.storage.maxLastTransactionIds);
 
-	sandbox.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 	sandbox.app
-		.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 		.bind("buildDelegateRanking", new BuildDelegateRankingAction());
 
-	sandbox.app.bind(Container.Identifiers.StateStore).to(StateStore).inSingletonScope();
+	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
 
-	const stateStore: StateStore = sandbox.app.get(Container.Identifiers.StateStore);
+	const stateStore: StateStore = sandbox.app.get(Identifiers.StateStore);
 
 	const applySpy: jest.SpyInstance = jest.fn();
 	const revertSpy: jest.SpyInstance = jest.fn();
@@ -153,7 +146,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	sandbox.app.bind(Container.Identifiers.TransactionHandlerRegistry).to(MockHandler);
+	sandbox.app.bind(Identifiers.TransactionHandlerRegistry).to(MockHandler);
 
 	const getBlockRewardsSpy = jest.fn();
 
@@ -189,99 +182,91 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	sandbox.app.container.bind(Container.Identifiers.DatabaseBlockRepository).to(MockBlockRepository);
-	sandbox.app.container.bind(Container.Identifiers.DatabaseTransactionRepository).to(MockTransactionRepository);
-	sandbox.app.container.bind(Container.Identifiers.EventDispatcherService).to(MockEventDispatcher);
+	sandbox.app.container.bind(Identifiers.DatabaseBlockRepository).to(MockBlockRepository);
+	sandbox.app.container.bind(Identifiers.DatabaseTransactionRepository).to(MockTransactionRepository);
+	sandbox.app.container.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
 
 	sandbox.app
-		.bind(Container.Identifiers.WalletRepository)
+		.bind(Identifiers.WalletRepository)
 		.to(WalletRepository)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 	sandbox.app
-		.bind(Container.Identifiers.WalletFactory)
-		.toFactory(({ container }) => {
-			return walletFactory(
-				container.get(Container.Identifiers.WalletAttributes),
-				container.get(Container.Identifiers.EventDispatcherService),
-			);
-		})
+		.bind(Identifiers.WalletFactory)
+		.toFactory(({ container }) =>
+			walletFactory(
+				container.get(Identifiers.WalletAttributes),
+				container.get(Identifiers.EventDispatcherService),
+			),
+		)
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 	sandbox.app
-		.bind(Container.Identifiers.WalletRepository)
+		.bind(Identifiers.WalletRepository)
 		.to(WalletRepositoryClone)
 		.inRequestScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 	sandbox.app
-		.bind(Container.Identifiers.WalletFactory)
-		.toFactory(({ container }) => {
-			return walletFactory(container.get(Container.Identifiers.WalletAttributes));
-		})
+		.bind(Identifiers.WalletFactory)
+		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 	sandbox.app
-		.bind(Container.Identifiers.WalletRepository)
+		.bind(Identifiers.WalletRepository)
 		.to(WalletRepositoryCopyOnWrite)
 		.inRequestScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
 	sandbox.app
-		.bind(Container.Identifiers.WalletFactory)
-		.toFactory(({ container }) => {
-			return walletFactory(container.get(Container.Identifiers.WalletAttributes));
-		})
+		.bind(Identifiers.WalletFactory)
+		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
 	const walletRepoClone: WalletRepositoryClone = sandbox.app.getTagged(
-		Container.Identifiers.WalletRepository,
+		Identifiers.WalletRepository,
 		"state",
 		"clone",
 	);
 
-	const walletRepo: WalletRepository = sandbox.app.getTagged(
-		Container.Identifiers.WalletRepository,
-		"state",
-		"blockchain",
-	);
+	const walletRepo: WalletRepository = sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 
 	const walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite = sandbox.app.getTagged(
-		Container.Identifiers.WalletRepository,
+		Identifiers.WalletRepository,
 		"state",
 		"copy-on-write",
 	);
 
-	sandbox.app.bind(Container.Identifiers.BlockState).to(BlockState);
+	sandbox.app.bind(Identifiers.BlockState).to(BlockState);
 
 	sandbox.app
-		.bind(Container.Identifiers.DposState)
+		.bind(Identifiers.DposState)
 		.to(DposState)
 		.inSingletonScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 	sandbox.app
-		.bind(Container.Identifiers.DposState)
+		.bind(Identifiers.DposState)
 		.to(DposState)
 		.inRequestScope()
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 	sandbox.app
-		.bind<DposPreviousRoundStateProvider>(Container.Identifiers.DposPreviousRoundStateProvider)
+		.bind<DposPreviousRoundStateProvider>(Identifiers.DposPreviousRoundStateProvider)
 		.toProvider(dposPreviousRoundStateProvider);
 
 	const dposPreviousRound = sandbox.app.get<DposPreviousRoundStateProvider>(
-		Container.Identifiers.DposPreviousRoundStateProvider,
+		Identifiers.DposPreviousRoundStateProvider,
 	);
 
-	const blockState = sandbox.app.getTagged<BlockState>(Container.Identifiers.BlockState, "state", "blockchain");
+	const blockState = sandbox.app.getTagged<BlockState>(Identifiers.BlockState, "state", "blockchain");
 
-	const dPosState = sandbox.app.getTagged<DposState>(Container.Identifiers.DposState, "state", "blockchain");
+	const dPosState = sandbox.app.getTagged<DposState>(Identifiers.DposState, "state", "blockchain");
 
-	sandbox.app.bind(Container.Identifiers.TransactionValidator).to(TransactionValidator);
+	sandbox.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
 
-	const transactionValidator: TransactionValidator = sandbox.app.get(Container.Identifiers.TransactionValidator);
+	const transactionValidator: TransactionValidator = sandbox.app.get(Identifiers.TransactionValidator);
 
 	const stateBuilder = sandbox.app.resolve<StateBuilder>(StateBuilder);
 
@@ -290,7 +275,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 		// todo: get rid of the need for this, requires an instance based crypto package
 		this.configuration.setConfig(
-			sandbox.app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).get("crypto"),
+			sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("crypto"),
 		);
 	}
 
@@ -301,26 +286,26 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	Factories.registerWalletFactory(factory);
 
 	return {
+		blockState,
+		dPosState,
+		dposPreviousRound,
+		factory,
 		sandbox,
+		spies: {
+			applySpy,
+			getBlockRewardsSpy,
+			getRegisteredHandlersSpy,
+			dispatchSpy,
+			logger,
+			dispatchSyncSpy,
+			revertSpy,
+			getSentTransactionSpy,
+		},
+		stateBuilder,
+		stateStore,
+		transactionValidator,
 		walletRepo,
 		walletRepoClone,
 		walletRepoCopyOnWrite,
-		factory,
-		blockState,
-		stateStore,
-		dPosState,
-		dposPreviousRound,
-		stateBuilder,
-		transactionValidator,
-		spies: {
-			applySpy,
-			revertSpy,
-			logger,
-			getBlockRewardsSpy,
-			getSentTransactionSpy,
-			getRegisteredHandlersSpy,
-			dispatchSpy,
-			dispatchSyncSpy,
-		},
 	};
 };

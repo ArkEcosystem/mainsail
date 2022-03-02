@@ -1,8 +1,7 @@
 import "jest-extended";
 
-import { Container } from "@arkecosystem/core-cli";
-import { Console } from "@packages/core-test-framework";
 import { Command } from "@packages/core/source/commands/update";
+import { Console } from "@packages/core-test-framework";
 import nock from "nock";
 import prompts from "prompts";
 
@@ -16,7 +15,7 @@ beforeEach(() => {
 	nock.cleanAll();
 
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 });
 
 afterEach(() => jest.resetAllMocks());
@@ -29,7 +28,7 @@ describe("UpdateCommand", () => {
 	it("should throw if the latest version is already installed", async () => {
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, versionNext);
 
-		const spySuccess = jest.spyOn(cli.app.get(Container.Identifiers.Success), "render");
+		const spySuccess = jest.spyOn(cli.app.get(Identifiers.Success), "render");
 
 		await cli.withFlags({ force: true }).execute(Command);
 
@@ -40,13 +39,13 @@ describe("UpdateCommand", () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: "stdout",
 			stderr: undefined,
+			stdout: "stdout",
 		});
 
 		prompts.inject([false]);
@@ -60,14 +59,14 @@ describe("UpdateCommand", () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
 
 		await cli.withFlags({ force: true, updateProcessManager: true }).execute(Command);
@@ -82,14 +81,14 @@ describe("UpdateCommand", () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
 
 		await cli.withFlags({ force: true, reset: true, updateProcessManager: true }).execute(Command);
@@ -107,14 +106,14 @@ describe("UpdateCommand", () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
 
 		prompts.inject([true]);
@@ -129,16 +128,16 @@ describe("UpdateCommand", () => {
 	it("should update and restart all processes if the [--restart] flag is present", async () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
-		jest.spyOn(processManager, "restart").mockImplementation(undefined);
+		jest.spyOn(processManager, "restart").mockImplementation();
 
 		await cli.withFlags({ force: true, restart: true, updateProcessManager: true }).execute(Command);
 
@@ -154,17 +153,17 @@ describe("UpdateCommand", () => {
 	it("should update and restart the core process if the [--restartCore] flag is present", async () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(true);
-		const restart = jest.spyOn(processManager, "restart").mockImplementation(undefined);
+		const restart = jest.spyOn(processManager, "restart").mockImplementation();
 
 		await cli.withFlags({ force: true, restartCore: true, updateProcessManager: true }).execute(Command);
 
@@ -177,17 +176,17 @@ describe("UpdateCommand", () => {
 	it("should update and restart the core process if the [--restartRelay] flag is present", async () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(true);
-		const restart = jest.spyOn(processManager, "restart").mockImplementation(undefined);
+		const restart = jest.spyOn(processManager, "restart").mockImplementation();
 
 		await cli.withFlags({ force: true, restartRelay: true, updateProcessManager: true }).execute(Command);
 
@@ -200,17 +199,17 @@ describe("UpdateCommand", () => {
 	it("should update and restart the core process if the [--restartForger] flag is present", async () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(true);
-		const restart = jest.spyOn(processManager, "restart").mockImplementation(undefined);
+		const restart = jest.spyOn(processManager, "restart").mockImplementation();
 
 		await cli.withFlags({ force: true, restartForger: true, updateProcessManager: true }).execute(Command);
 
@@ -224,17 +223,17 @@ describe("UpdateCommand", () => {
 		const response = { ...versionNext };
 		response["dist-tags"].next = "4.0.0-next.0";
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], ...{ version: "4.0.0-next.0" } };
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"], version: "4.0.0-next.0" };
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 		const sync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-			stdout: '"null"',
-			stderr: undefined,
 			exitCode: 0,
+			stderr: undefined,
+			stdout: '"null"',
 		});
 		const isOnline = jest.spyOn(processManager, "isOnline").mockReturnValue(true);
-		const restart = jest.spyOn(processManager, "restart").mockImplementation(undefined);
+		const restart = jest.spyOn(processManager, "restart").mockImplementation();
 
 		prompts.inject([true]); // update
 		prompts.inject([true]); // restart core

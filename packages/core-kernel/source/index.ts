@@ -1,5 +1,4 @@
 import { Application } from "./application";
-export * as Contracts from "./contracts";
 export * as Enums from "./enums";
 export * as Exceptions from "./exceptions";
 export * as Container from "./ioc";

@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { AppHeader } from "@packages/core-cli/source/components";
 import { red, white } from "kleur";
@@ -11,8 +10,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.AppHeader).to(AppHeader).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.AppHeader);
+	cli.app.rebind(Identifiers.AppHeader).to(AppHeader).inSingletonScope();
+	component = cli.app.get(Identifiers.AppHeader);
 });
 
 describe("AppHeader", () => {

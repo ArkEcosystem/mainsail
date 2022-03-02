@@ -1,19 +1,19 @@
-import { BINDINGS, ITransactionRegistry, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
+import { Container, Services, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "../errors";
 import { TransactionHandlerConstructor } from "./transaction";
 
 @Container.injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
-	@Container.inject(Container.Identifiers.WalletAttributes)
+	@Container.inject(Identifiers.WalletAttributes)
 	private readonly attributeSet: Services.Attributes.AttributeSet;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerConstructors)
+	@Container.inject(Identifiers.TransactionHandlerConstructors)
 	private readonly handlerConstructors: TransactionHandlerConstructor[];
 
-	@Container.inject(BINDINGS.Transaction.Registry)
-	private readonly transactionRegistry: ITransactionRegistry;
+	@Container.inject(Identifiers.Cryptography.Transaction.Registry)
+	private readonly transactionRegistry: Crypto.ITransactionRegistry;
 
 	private registered = false;
 
@@ -57,7 +57,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 			}
 		}
 
-		if (transactionConstructor.typeGroup !== TransactionTypeGroup.Core) {
+		if (transactionConstructor.typeGroup !== Crypto.TransactionTypeGroup.Core) {
 			this.transactionRegistry.registerTransactionType(transactionConstructor);
 		}
 	}

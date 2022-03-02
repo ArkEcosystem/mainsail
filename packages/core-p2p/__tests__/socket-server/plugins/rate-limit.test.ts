@@ -41,8 +41,8 @@ describe("RateLimitPlugin", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
-		container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(pluginConfiguration);
+		container.bind(Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.PluginConfiguration).toConstantValue(pluginConfiguration);
 
 		jest.spyOn(utils, "buildRateLimiter").mockReturnValue(rateLimiter as any);
 	});

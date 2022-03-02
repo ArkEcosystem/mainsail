@@ -14,12 +14,12 @@ const poolQuery = { getFromHighestPriority: jest.fn() };
 const logger = { warning: jest.fn(), error: jest.fn() };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.TransactionValidatorFactory).toConstantValue(createTransactionValidator);
-container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(pool);
-container.bind(Container.Identifiers.TransactionPoolQuery).toConstantValue(poolQuery);
-container.bind(Container.Identifiers.TransactionPoolExpirationService).toConstantValue(expirationService);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+container.bind(Identifiers.TransactionValidatorFactory).toConstantValue(createTransactionValidator);
+container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+container.bind(Identifiers.TransactionPoolService).toConstantValue(pool);
+container.bind(Identifiers.TransactionPoolQuery).toConstantValue(poolQuery);
+container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(expirationService);
+container.bind(Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
 	jest.resetAllMocks();

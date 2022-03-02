@@ -1,9 +1,10 @@
-import { CacheStore } from "../../../contracts/kernel/cache";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { injectable } from "../../../ioc";
 
 @injectable()
-export class NullCacheStore<K, T> implements CacheStore<K, T> {
-	public async make(): Promise<CacheStore<K, T>> {
+export class NullCacheStore<K, T> implements Kernel.CacheStore<K, T> {
+	public async make(): Promise<Kernel.CacheStore<K, T>> {
 		return this;
 	}
 
@@ -24,7 +25,8 @@ export class NullCacheStore<K, T> implements CacheStore<K, T> {
 	}
 
 	public async getMany(keys: K[]): Promise<Array<T | undefined>> {
-		return new Array(keys.length).fill(undefined);
+		// @ts-ignore
+		return new Array(keys.length).fill();
 	}
 
 	public async put(key: K, value: T, seconds?: number): Promise<boolean> {

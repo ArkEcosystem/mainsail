@@ -1,4 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
 
 import { BlocksRoute } from "../routes/blocks";
@@ -8,10 +9,10 @@ import { TransactionsRoute } from "../routes/transactions";
 
 @Container.injectable()
 export class CodecPlugin {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public register(server) {
@@ -23,19 +24,18 @@ export class CodecPlugin {
 		};
 
 		server.ext({
-			type: "onPostAuth",
 			async method(request, h) {
 				try {
 					request.payload = allRoutesConfigByPath[request.path].codec.request.deserialize(request.payload);
-				} catch (e) {
-					return Boom.badRequest(`Payload deserializing failed: ${e}`);
+				} catch (error) {
+					return Boom.badRequest(`Payload deserializing failed: ${error}`);
 				}
 				return h.continue;
 			},
+			type: "onPostAuth",
 		});
 
 		server.ext({
-			type: "onPreResponse",
 			method: async (request, h) => {
 				try {
 					if (typeof request.response.source !== "undefined") {
@@ -51,18 +51,19 @@ export class CodecPlugin {
 							"Error";
 						request.response.output.payload = Buffer.from(errorMessage, "utf-8");
 					}
-				} catch (e) {
+				} catch (error) {
 					request.response.statusCode = 500; // Internal server error (serializing failed)
 					request.response.output = {
-						statusCode: 500,
-						payload: Buffer.from("Internal server error"),
 						headers: {},
+						payload: Buffer.from("Internal server error"),
+						statusCode: 500,
 					};
 
-					this.logger.error(`Response serializing failed: ${e}`);
+					this.logger.error(`Response serializing failed: ${error}`);
 				}
 				return h.continue;
 			},
+			type: "onPreResponse",
 		});
 	}
 }

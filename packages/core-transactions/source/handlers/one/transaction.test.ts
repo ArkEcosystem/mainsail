@@ -1,4 +1,4 @@
-import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
+import { Application, Container } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import {
@@ -56,9 +56,9 @@ class TestTransactionHandler extends TransactionHandler {
 
 	public async bootstrap(): Promise<void> {}
 
-	public async applyToRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
+	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
 
-	public async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
+	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
 }
 
 describe<{
@@ -68,14 +68,14 @@ describe<{
 	recipientWallet: Wallets.Wallet;
 	walletRepository: Contracts.State.WalletRepository;
 	factoryBuilder: Factories.FactoryBuilder;
-	transferTransaction: Interfaces.ITransaction;
-	multiSignatureTransferTransaction: Interfaces.ITransaction;
+	transferTransaction: Crypto.ITransaction;
+	multiSignatureTransferTransaction: Crypto.ITransaction;
 	handler: TestTransactionHandler;
 	pubKeyHash: number;
 	store: any;
 }>("General Transaction Tests", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		const config = Generators.generateCryptoConfigRaw();
@@ -85,10 +85,10 @@ describe<{
 
 		context.app = initApp();
 
-		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
+		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -103,7 +103,7 @@ describe<{
 		context.walletRepository.index(context.recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(TestTransaction.type, Enums.TransactionTypeGroup.Test),
@@ -187,7 +187,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should throw if sender has legacy multi signature", async (context) => {
-		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+		const multiSignatureAsset: Crypto.IMultiSignatureAsset = {
 			publicKeys: [
 				Identities.PublicKey.fromPassphrase(passphrases[0]),
 				Identities.PublicKey.fromPassphrase(passphrases[1]),
@@ -207,7 +207,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should throw if sender has multi signature, but indexed wallet has not", async (context) => {
-		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+		const multiSignatureAsset: Crypto.IMultiSignatureAsset = {
 			publicKeys: [
 				Identities.PublicKey.fromPassphrase(passphrases[0]),
 				Identities.PublicKey.fromPassphrase(passphrases[1]),
@@ -226,7 +226,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should throw if sender and transaction multi signatures does not match", async (context) => {
-		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+		const multiSignatureAsset: Crypto.IMultiSignatureAsset = {
 			publicKeys: [
 				Identities.PublicKey.fromPassphrase(passphrases[1]),
 				Identities.PublicKey.fromPassphrase(passphrases[0]),
@@ -276,7 +276,7 @@ describe<{
 			context.transferTransaction.data.senderPublicKey!.toUpperCase();
 		context.senderWallet.setPublicKey(context.senderWallet.getPublicKey()!.toLowerCase());
 
-		const instance: Interfaces.ITransaction = Transactions.TransactionFactory.fromData(
+		const instance: Crypto.ITransaction = Transactions.TransactionFactory.fromData(
 			context.transferTransaction.data,
 		);
 		await assert.resolves(() => context.handler.throwIfCannotBeApplied(instance, context.senderWallet));
@@ -287,7 +287,7 @@ describe<{
 	});
 
 	it("apply should not fail due to case mismatch", async (context) => {
-		const transactionData: Interfaces.ITransactionData = context.transferTransaction.data;
+		const transactionData: Crypto.ITransactionData = context.transferTransaction.data;
 		transactionData.senderPublicKey = transactionData.senderPublicKey?.toUpperCase();
 		const instance = Transactions.TransactionFactory.fromData(transactionData);
 
@@ -357,7 +357,7 @@ describe<{
 	it("revert should not fail due to case mismatch", async (context) => {
 		context.senderWallet.setNonce(Utils.BigNumber.make(1));
 
-		const transactionData: Interfaces.ITransactionData = context.transferTransaction.data;
+		const transactionData: Crypto.ITransactionData = context.transferTransaction.data;
 		transactionData.senderPublicKey = transactionData.senderPublicKey?.toUpperCase();
 		const instance = Transactions.TransactionFactory.fromData(transactionData);
 
@@ -389,12 +389,12 @@ describe<{
 	recipientWallet: Wallets.Wallet;
 	walletRepository: Contracts.State.WalletRepository;
 	factoryBuilder: Factories.FactoryBuilder;
-	transferTransaction: Interfaces.ITransaction;
+	transferTransaction: Crypto.ITransaction;
 	handler: TestTransactionHandler;
 	store: any;
 }>("Special Transaction Tests", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		const config = Generators.generateCryptoConfigRaw();
@@ -402,10 +402,10 @@ describe<{
 
 		context.app = initApp();
 
-		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
+		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -420,7 +420,7 @@ describe<{
 		context.walletRepository.index(context.recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(

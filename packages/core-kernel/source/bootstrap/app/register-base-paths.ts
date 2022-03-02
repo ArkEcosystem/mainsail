@@ -3,7 +3,7 @@ import envPaths from "env-paths";
 import { ensureDirSync } from "fs-extra";
 import { resolve } from "path";
 
-import { Application } from "../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
 import { Identifiers, inject, injectable } from "../../ioc";
 import { ConfigRepository } from "../../services/config";
 import { assert } from "../../utils";
@@ -12,7 +12,7 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class RegisterBasePaths implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;

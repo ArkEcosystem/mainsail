@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import assert from "assert";
 import pluralize from "pluralize";
@@ -22,27 +22,27 @@ export class PeerVerificationResult {
 // todo: review the implementation
 @Container.injectable()
 export class PeerVerifier implements Contracts.P2P.PeerVerifier {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.DposState)
+	@Container.inject(Identifiers.DposState)
 	@Container.tagged("state", "blockchain")
 	private readonly dposState!: Contracts.State.DposState;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.DatabaseInterceptor)
+	@Container.inject(Identifiers.DatabaseInterceptor)
 	private readonly databaseInterceptor!: DatabaseInterceptor;
 
-	@Container.inject(Container.Identifiers.PeerCommunicator)
+	@Container.inject(Identifiers.PeerCommunicator)
 	private communicator!: Contracts.P2P.PeerCommunicator;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration!: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Block.Factory)
-	private readonly blockFactory!: IBlockFactory;
+	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Crypto.IBlockFactory;
 
 	private logPrefix!: string;
 
@@ -86,7 +86,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	private async checkStateHeader(claimedState: Contracts.P2P.PeerState): Promise<boolean> {
-		const blockHeader: Interfaces.IBlockData = claimedState.header as Interfaces.IBlockData;
+		const blockHeader: Crypto.IBlockData = claimedState.header as Crypto.IBlockData;
 		const claimedHeight = Number(blockHeader.height);
 		if (claimedHeight !== claimedState.height) {
 			this.log(
@@ -98,8 +98,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		}
 
 		try {
-			const ownBlock: Interfaces.IBlock | undefined = this.app
-				.get<Contracts.State.StateStore>(Container.Identifiers.StateStore)
+			const ownBlock: Crypto.IBlock | undefined = this.app
+				.get<Contracts.State.StateStore>(Identifiers.StateStore)
 				.getLastBlocks()
 				.find((block) => block.data.height === blockHeader.height);
 
@@ -115,7 +115,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 					return true;
 				}
 			} else {
-				const claimedBlock: Interfaces.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
+				const claimedBlock: Crypto.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
 				if (claimedBlock?.verifySignature()) {
 					return true;
 				}
@@ -139,7 +139,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		let height: number | undefined;
 
 		try {
-			height = this.app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore).getLastHeight();
+			height = this.app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
 
 			assert(Number.isInteger(height));
 		} catch {
@@ -337,7 +337,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		roundInfo: Contracts.Shared.RoundInfo,
 	): Promise<Record<string, Contracts.State.Wallet>> {
 		let delegates: any = await this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.call("getActiveDelegates", { roundInfo });
 
 		if (delegates.length === 0) {
@@ -406,13 +406,13 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	private async verifyPeerBlock(
-		blockData: Interfaces.IBlockData,
+		blockData: Crypto.IBlockData,
 		expectedHeight: number,
 		delegatesByPublicKey: Record<string, Contracts.State.Wallet>,
 	): Promise<boolean> {
-		const block: Interfaces.IBlock | undefined = await this.blockFactory.fromData(blockData);
+		const block: Crypto.IBlock | undefined = await this.blockFactory.fromData(blockData);
 
-		Utils.assert.defined<Interfaces.IBlock>(block);
+		Utils.assert.defined<Crypto.IBlock>(block);
 
 		if (!block.verifySignature()) {
 			this.log(

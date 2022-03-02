@@ -6,8 +6,8 @@ export const executeCommand = async (command): Promise<void> => {
 		version: "3.0.0-next.0",
 	});
 
-	app.rebind(Container.Identifiers.ApplicationPaths).toConstantValue(
-		app.get<Services.Environment>(Container.Identifiers.Environment).getPaths("ark", "testnet"),
+	app.rebind(Identifiers.ApplicationPaths).toConstantValue(
+		app.get<Services.Environment>(Identifiers.Environment).getPaths("ark", "testnet"),
 	);
 
 	const cmd = app.resolve<Commands.Command>(command);

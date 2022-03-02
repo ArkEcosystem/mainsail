@@ -13,7 +13,7 @@ const network = "testnet";
 beforeEach(() => {
 	cli = new Console();
 
-	const pluginManager = cli.app.get(Container.Identifiers.PluginManager);
+	const pluginManager = cli.app.get(Identifiers.PluginManager);
 	spyOnUpdate = jest.spyOn(pluginManager, "update").mockImplementation(async () => {});
 });
 

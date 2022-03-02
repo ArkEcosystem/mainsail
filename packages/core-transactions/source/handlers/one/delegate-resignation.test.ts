@@ -1,4 +1,4 @@
-import { Application, Container, Contracts, Enums as KernelEnums } from "@arkecosystem/core-kernel";
+import { Application, Container, Enums as KernelEnums } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import { Mempool } from "@arkecosystem/core-transaction-pool";
@@ -26,14 +26,14 @@ describe<{
 	factoryBuilder: Factories.FactoryBuilder;
 	allDelegates: Wallets.Wallet[];
 	delegateWallet: Wallets.Wallet;
-	delegateResignationTransaction: Interfaces.ITransaction;
+	delegateResignationTransaction: Crypto.ITransaction;
 	handler: TransactionHandler;
 	voteHandler: TransactionHandler;
 	store: any;
 	transactionHistoryService: any;
 }>("DelegateResignationTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.delegateResignationTransaction = Transactions.BuilderFactory.delegateResignation()
@@ -51,11 +51,9 @@ describe<{
 		Managers.configManager.setConfig(config);
 
 		context.app = initApp();
-		context.app
-			.bind(Container.Identifiers.TransactionHistoryService)
-			.toConstantValue(context.transactionHistoryService);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(context.transactionHistoryService);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -70,7 +68,7 @@ describe<{
 		context.walletRepository.index(context.recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
@@ -136,7 +134,7 @@ describe<{
 
 	it("emitEvents should dispatch", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
+			Identifiers.EventDispatcherService,
 		);
 
 		const mock = spy(emitter, "dispatch");
@@ -237,7 +235,7 @@ describe<{
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
 		await context.app
-			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPoolMempool)
 			.addTransaction(context.delegateResignationTransaction);
 
 		await assert.rejects(

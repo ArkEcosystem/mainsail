@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Services, Utils } from "@arkecosystem/core-kernel";
 
 import { BlockProcessorResult } from "../block-processor";
 import { BlockHandler } from "../contracts";
@@ -15,17 +15,17 @@ enum UnchainedBlockStatus {
 
 @Container.injectable()
 export class UnchainedHandler implements BlockHandler {
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@Container.inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
 	private isValidGenerator = false;
 
@@ -36,7 +36,7 @@ export class UnchainedHandler implements BlockHandler {
 		return this;
 	}
 
-	public async execute(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Crypto.IBlock): Promise<BlockProcessorResult> {
 		this.blockchain.resetLastDownloadedBlock();
 
 		this.blockchain.clearQueue();
@@ -73,8 +73,8 @@ export class UnchainedHandler implements BlockHandler {
 		}
 	}
 
-	private checkUnchainedBlock(block: Interfaces.IBlock): UnchainedBlockStatus {
-		const lastBlock: Interfaces.IBlock = this.blockchain.getLastBlock();
+	private checkUnchainedBlock(block: Crypto.IBlock): UnchainedBlockStatus {
+		const lastBlock: Crypto.IBlock = this.blockchain.getLastBlock();
 
 		// todo: clean up this if-else-if-else-if-else mess
 		if (block.data.height > lastBlock.data.height + 1) {

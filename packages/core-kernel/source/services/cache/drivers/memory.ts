@@ -1,17 +1,17 @@
-import { EventDispatcher } from "../../../contracts/kernel";
-import { CacheStore } from "../../../contracts/kernel/cache";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { CacheEvent } from "../../../enums";
 import { NotImplemented } from "../../../exceptions/runtime";
 import { Identifiers, inject, injectable } from "../../../ioc";
 
 @injectable()
-export class MemoryCacheStore<K, T> implements CacheStore<K, T> {
+export class MemoryCacheStore<K, T> implements Kernel.CacheStore<K, T> {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly eventDispatcher!: EventDispatcher;
+	private readonly eventDispatcher!: Kernel.EventDispatcher;
 
 	private readonly store: Map<K, T> = new Map<K, T>();
 
-	public async make(): Promise<CacheStore<K, T>> {
+	public async make(): Promise<Kernel.CacheStore<K, T>> {
 		return this;
 	}
 

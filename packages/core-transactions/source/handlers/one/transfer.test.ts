@@ -1,4 +1,4 @@
-import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
+import { Application, Container } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
@@ -16,21 +16,21 @@ describe<{
 	walletRepository: Contracts.State.WalletRepository;
 	factoryBuilder: Factories.FactoryBuilder;
 	store: any;
-	transferTransaction: Interfaces.ITransaction;
-	multiSignatureTransferTransaction: Interfaces.ITransaction;
+	transferTransaction: Crypto.ITransaction;
+	multiSignatureTransferTransaction: Crypto.ITransaction;
 	handler: TransactionHandler;
 	pubKeyHash: number;
 }>("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());
 
 		context.app = initApp();
-		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -46,7 +46,7 @@ describe<{
 
 		context.pubKeyHash = Managers.configManager.get("network.pubKeyHash");
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(Enums.TransactionType.Transfer, Enums.TransactionTypeGroup.Core),

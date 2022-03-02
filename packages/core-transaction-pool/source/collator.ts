@@ -1,32 +1,32 @@
-import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 
 import { TransactionHasExpiredError } from "./errors";
 
 @Container.injectable()
 export class Collator implements Contracts.TransactionPool.Collator {
-	@Container.inject(Container.Identifiers.TransactionValidatorFactory)
+	@Container.inject(Identifiers.TransactionValidatorFactory)
 	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@Container.inject(Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Container.Identifiers.TransactionPoolExpirationService)
+	@Container.inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@Container.inject(Container.Identifiers.TransactionPoolQuery)
+	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	public async getBlockCandidateTransactions(): Promise<Interfaces.ITransaction[]> {
+	public async getBlockCandidateTransactions(): Promise<Crypto.ITransaction[]> {
 		const height: number = this.blockchain.getLastBlock().data.height;
 		const milestone = this.configuration.getMilestone(height);
 		const blockHeaderSize =
@@ -44,9 +44,9 @@ export class Collator implements Contracts.TransactionPool.Collator {
 
 		let bytesLeft: number = milestone.block.maxPayload - blockHeaderSize;
 
-		const candidateTransactions: Interfaces.ITransaction[] = [];
+		const candidateTransactions: Crypto.ITransaction[] = [];
 		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
-		const failedTransactions: Interfaces.ITransaction[] = [];
+		const failedTransactions: Crypto.ITransaction[] = [];
 
 		for (const transaction of this.poolQuery.getFromHighestPriority()) {
 			if (candidateTransactions.length === milestone.block.maxTransactions) {

@@ -1,24 +1,24 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import { Server } from "@hapi/hapi";
 
 import { InternalRoute } from "../routes/internal";
 
 @Container.injectable()
 export class AwaitBlockPlugin {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public register(server: Server): void {
 		const peerRoutesConfigByPath = this.app.resolve(InternalRoute).getRoutesConfigByPath();
 
 		server.ext({
-			type: "onPreAuth",
 			method: async (request, h) => {
 				if (peerRoutesConfigByPath[request.path]) {
 					return h.continue;
@@ -41,6 +41,7 @@ export class AwaitBlockPlugin {
 
 				return h.continue;
 			},
+			type: "onPreAuth",
 		});
 	}
 }

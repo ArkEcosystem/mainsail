@@ -1,16 +1,11 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IKeyPairFactory,
-	IMultiSignatureAsset,
-	IPublicKeyFactory,
-} from "@arkecosystem/core-crypto-contracts";
-import { NotImplemented } from "@arkecosystem/core-crypto-errors";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { NotImplemented } from "@arkecosystem/core-errors";
 
 @Container.injectable()
-export class PublicKeyFactory implements IPublicKeyFactory {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
+	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
@@ -20,7 +15,7 @@ export class PublicKeyFactory implements IPublicKeyFactory {
 		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
-	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
+	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
 		throw new NotImplemented();
 	}
 

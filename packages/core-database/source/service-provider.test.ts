@@ -25,8 +25,8 @@ describe<{
 		};
 
 		context.app = new Application(new Container.Container());
-		context.app.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.events);
+		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.events);
 	});
 
 	it("register should connect to database, bind triggers, and bind services", async (context) => {
@@ -45,23 +45,23 @@ describe<{
 		mockGetCustomRepository.calledTimes(3);
 		assert.true(context.events.dispatch.calledWith());
 
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseConnection));
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseRoundRepository));
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseBlockRepository));
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseBlockFilter));
-		assert.true(context.app.isBound(Container.Identifiers.BlockHistoryService));
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseTransactionRepository));
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseTransactionFilter));
-		assert.true(context.app.isBound(Container.Identifiers.TransactionHistoryService));
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseModelConverter));
-		assert.true(context.app.isBound(Container.Identifiers.DatabaseService));
+		assert.true(context.app.isBound(Identifiers.DatabaseConnection));
+		assert.true(context.app.isBound(Identifiers.DatabaseRoundRepository));
+		assert.true(context.app.isBound(Identifiers.DatabaseBlockRepository));
+		assert.true(context.app.isBound(Identifiers.DatabaseBlockFilter));
+		assert.true(context.app.isBound(Identifiers.BlockHistoryService));
+		assert.true(context.app.isBound(Identifiers.DatabaseTransactionRepository));
+		assert.true(context.app.isBound(Identifiers.DatabaseTransactionFilter));
+		assert.true(context.app.isBound(Identifiers.TransactionHistoryService));
+		assert.true(context.app.isBound(Identifiers.DatabaseModelConverter));
+		assert.true(context.app.isBound(Identifiers.DatabaseService));
 	});
 
 	it("boot should call DatabaseService.initialize method", async (context) => {
 		const serviceProvider = context.app.resolve(ServiceProvider);
 
 		const databaseService = { initialize: spyFn() };
-		context.app.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
+		context.app.bind(Identifiers.DatabaseService).toConstantValue(databaseService);
 
 		await serviceProvider.boot();
 
@@ -72,7 +72,7 @@ describe<{
 		const serviceProvider = context.app.resolve(ServiceProvider);
 
 		const databaseService = { disconnect: spyFn() };
-		context.app.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
+		context.app.bind(Identifiers.DatabaseService).toConstantValue(databaseService);
 
 		await serviceProvider.dispose();
 

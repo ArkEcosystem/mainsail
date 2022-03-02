@@ -1,9 +1,10 @@
-import { Application, Container, Contracts, Enums as AppEnums, Exceptions } from "@arkecosystem/core-kernel";
+import { Application, Enums as AppEnums, Exceptions } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import { Mempool } from "@arkecosystem/core-transaction-pool";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import {
 	AlreadyVotedError,
 	InsufficientBalanceError,
@@ -11,7 +12,6 @@ import {
 	UnvoteMismatchError,
 	VotedForNonDelegateError,
 } from "../../errors";
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";
 
@@ -22,14 +22,14 @@ describe<{
 	recipientWallet: Wallets.Wallet;
 	walletRepository: Contracts.State.WalletRepository;
 	factoryBuilder: Factories.FactoryBuilder;
-	voteTransaction: Interfaces.ITransaction;
-	multiSignatureVoteTransaction: Interfaces.ITransaction;
-	unvoteTransaction: Interfaces.ITransaction;
-	multiSignatureUnvoteTransaction: Interfaces.ITransaction;
-	voteUnvoteTransaction: Interfaces.ITransaction;
-	unvoteVoteTransaction: Interfaces.ITransaction;
-	voteVoteTransaction: Interfaces.ITransaction;
-	unvoteUnvoteTransaction: Interfaces.ITransaction;
+	voteTransaction: Crypto.ITransaction;
+	multiSignatureVoteTransaction: Crypto.ITransaction;
+	unvoteTransaction: Crypto.ITransaction;
+	multiSignatureUnvoteTransaction: Crypto.ITransaction;
+	voteUnvoteTransaction: Crypto.ITransaction;
+	unvoteVoteTransaction: Crypto.ITransaction;
+	voteVoteTransaction: Crypto.ITransaction;
+	unvoteUnvoteTransaction: Crypto.ITransaction;
 	delegateWallet1: Wallets.Wallet;
 	delegateWallet2: Wallets.Wallet;
 	handler: TransactionHandler;
@@ -37,22 +37,20 @@ describe<{
 	transactionHistoryService: any;
 }>("VoteTransaction", ({ assert, afterEach, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.transactionHistoryService = {
-			streamByCriteria: () => undefined,
+			streamByCriteria: () => {},
 		};
 
 		const config = Generators.generateCryptoConfigRaw();
 		Managers.configManager.setConfig(config);
 
 		context.app = initApp();
-		context.app
-			.bind(Container.Identifiers.TransactionHistoryService)
-			.toConstantValue(context.transactionHistoryService);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(context.transactionHistoryService);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -67,7 +65,7 @@ describe<{
 		context.walletRepository.index(context.recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(Enums.TransactionType.Vote, Enums.TransactionTypeGroup.Core),
@@ -200,7 +198,7 @@ describe<{
 
 	it("emitEvents should dispatch for vote", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
+			Identifiers.EventDispatcherService,
 		);
 		const mock = spy(emitter, "dispatch");
 
@@ -212,7 +210,7 @@ describe<{
 
 	it("emitEvents should dispatch for unvote", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
+			Identifiers.EventDispatcherService,
 		);
 		const mock = spy(emitter, "dispatch");
 
@@ -224,7 +222,7 @@ describe<{
 
 	it("emitEvents should dispatch for vote-unvote", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
+			Identifiers.EventDispatcherService,
 		);
 		const mock = spy(emitter, "dispatch");
 
@@ -236,7 +234,7 @@ describe<{
 
 	it("emitEvents should throw if asset.votes is undefined", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
+			Identifiers.EventDispatcherService,
 		);
 		context.voteTransaction.data.asset.votes = undefined;
 
@@ -248,7 +246,7 @@ describe<{
 
 	it("emitEvents should throw if asset is undefined", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
+			Identifiers.EventDispatcherService,
 		);
 
 		context.voteTransaction.data.asset = undefined;
@@ -409,9 +407,7 @@ describe<{
 	});
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
-		await context.app
-			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
-			.addTransaction(context.voteTransaction);
+		await context.app.get<Mempool>(Identifiers.TransactionPoolMempool).addTransaction(context.voteTransaction);
 
 		assert.rejects(
 			() => context.handler.throwIfCannotEnterPool(context.voteTransaction),

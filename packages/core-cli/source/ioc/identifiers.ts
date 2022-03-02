@@ -1,57 +1,77 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Identifiers as ID } from "@arkecosystem/core-contracts";
 
 export const Identifiers = {
-	// @TODO
-	Application: Container.Identifiers.Application,
-	ApplicationPaths: Symbol.for("Paths<Application>"),
-	Commands: Symbol.for("Commands"),
-	Config: Symbol.for("Config"),
-	ConsolePaths: Symbol.for("Paths<Console>"),
-	Environment: Symbol.for("Environment"),
-	// Factories
-	ActionFactory: Symbol.for("Factory<Action>"),
-	Input: Symbol.for("Input"),
-	ComponentFactory: Symbol.for("Factory<Component>"),
-	// Input
-	InputValidator: Symbol.for("Input<Validator>"),
 	// Actions
 	AbortMissingProcess: Symbol.for("Action<AbortMissingProcess>"),
-	Installer: Symbol.for("Installer"),
+
 	AbortErroredProcess: Symbol.for("Action<AbortErroredProcess>"),
-	Logger: Symbol.for("Logger"),
+
+	// Factories
+	ActionFactory: Symbol.for("Factory<Action>"),
+
 	AbortRunningProcess: Symbol.for("Action<AbortRunningProcess>"),
-	Output: Symbol.for("Output"),
+
+	// @TODO
+	Application: ID.Application,
+
 	AbortStoppedProcess: Symbol.for("Action<AbortStoppedProcess>"),
-	Package: Symbol.for("Package"),
+
+	ApplicationPaths: Symbol.for("Paths<Application>"),
+
 	AbortUnknownProcess: Symbol.for("Action<AbortUnknownProcess>"),
-	PluginManager: Symbol.for("PluginManager"),
+
+	Commands: Symbol.for("Commands"),
+
 	// Components
 	AppHeader: Symbol.for("Component<AppHeader>"),
-	ProcessManager: Symbol.for("ProcessManager"),
+
+	ComponentFactory: Symbol.for("Factory<Component>"),
+
 	Ask: Symbol.for("Component<Ask>"),
-	Updater: Symbol.for("Updater"),
+
+	Config: Symbol.for("Config"),
+
 	AskDate: Symbol.for("Component<AskDate>"),
+
+	ConsolePaths: Symbol.for("Paths<Console>"),
+
 	AskHidden: Symbol.for("Component<AskHidden>"),
-	InputFactory: Symbol.for("Factory<Input>"),
+
+	Environment: Symbol.for("Environment"),
+
 	AskNumber: Symbol.for("Component<AskNumber>"),
-	ProcessFactory: Symbol.for("Factory<Process>"),
+
+	Input: Symbol.for("Input"),
+
 	AskPassword: Symbol.for("Component<AskPassword>"),
-	DaemonizeProcess: Symbol.for("Action<DaemonizeProcess>"),
+
+	// Input
+	InputValidator: Symbol.for("Input<Validator>"),
 	AutoComplete: Symbol.for("Component<AutoComplete>"),
-	RestartProcess: Symbol.for("Action<RestartProcess>"),
+	Installer: Symbol.for("Installer"),
 	Box: Symbol.for("Component<Box>"),
-	RestartRunningProcess: Symbol.for("Action<RestartRunningProcess>"),
+	Logger: Symbol.for("Logger"),
 	Clear: Symbol.for("Component<Clear>"),
-	RestartRunningProcessWithPrompt: Symbol.for("Action<RestartRunningProcessWithPrompt>"),
+	Output: Symbol.for("Output"),
 	Confirm: Symbol.for("Component<Confirm>"),
+	Package: Symbol.for("Package"),
+	DaemonizeProcess: Symbol.for("Action<DaemonizeProcess>"),
+	PluginManager: Symbol.for("PluginManager"),
 	Error: Symbol.for("Component<Error>"),
+	ProcessManager: Symbol.for("ProcessManager"),
 	Fatal: Symbol.for("Component<Fatal>"),
+	Updater: Symbol.for("Updater"),
 	Info: Symbol.for("Component<Info>"),
+	InputFactory: Symbol.for("Factory<Input>"),
 	Listing: Symbol.for("Component<Listing>"),
 	Log: Symbol.for("Component<Log>"),
+	ProcessFactory: Symbol.for("Factory<Process>"),
 	MultiSelect: Symbol.for("Component<MultiSelect>"),
 	NewLine: Symbol.for("Component<NewLine>"),
 	Prompt: Symbol.for("Component<Prompt>"),
+	RestartProcess: Symbol.for("Action<RestartProcess>"),
+	RestartRunningProcess: Symbol.for("Action<RestartRunningProcess>"),
+	RestartRunningProcessWithPrompt: Symbol.for("Action<RestartRunningProcessWithPrompt>"),
 	Select: Symbol.for("Component<Select>"),
 	Spinner: Symbol.for("Component<Spinner>"),
 	Success: Symbol.for("Component<Success>"),

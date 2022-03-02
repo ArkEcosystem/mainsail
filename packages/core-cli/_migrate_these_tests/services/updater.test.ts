@@ -1,6 +1,5 @@
 import "jest-extended";
 
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Updater } from "@packages/core-cli/source/services/updater";
 import nock from "nock";
@@ -18,9 +17,9 @@ beforeEach(() => {
 	nock.cleanAll();
 
 	cli = new Console();
-	// processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	// processManager = cli.app.get(Identifiers.ProcessManager);
 	updater = cli.app.resolve(Updater);
-	config = cli.app.get(Container.Identifiers.Config);
+	config = cli.app.get(Identifiers.Config);
 });
 
 afterEach(() => jest.resetAllMocks());
@@ -45,7 +44,7 @@ describe("Updater", () => {
 		it("should return false if the latest version cannot be retrieved", async () => {
 			nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, {});
 
-			const spyWarning = jest.spyOn(cli.app.get(Container.Identifiers.Warning), "render");
+			const spyWarning = jest.spyOn(cli.app.get(Identifiers.Warning), "render");
 
 			await expect(updater.check()).resolves.toBeFalse();
 			expect(spyWarning).toHaveBeenCalledWith('We were unable to find any releases for the "next" channel.');
@@ -71,7 +70,7 @@ describe("Updater", () => {
 			response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 			response.versions["4.0.0-next.0"] = {
 				...response.versions["2.5.0-next.10"],
-				...{ version: "4.0.0-next.0" },
+				version: "4.0.0-next.0",
 			};
 
 			nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
@@ -97,19 +96,19 @@ describe("Updater", () => {
 			response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 			response.versions["4.0.0-next.0"] = {
 				...response.versions["2.5.0-next.10"],
-				...{ version: "4.0.0-next.0" },
+				version: "4.0.0-next.0",
 			};
 
 			nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 			const spySync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-				stdout: '"null"',
-				stderr: undefined,
 				exitCode: 0,
+				stderr: undefined,
+				stdout: '"null"',
 			});
-			const spySpinner = jest.spyOn(cli.app.get(Container.Identifiers.Spinner), "render");
-			const spyInstaller = jest.spyOn(cli.app.get(Container.Identifiers.Installer), "install");
-			const spyProcessManager = jest.spyOn(cli.app.get(Container.Identifiers.ProcessManager), "update");
+			const spySpinner = jest.spyOn(cli.app.get(Identifiers.Spinner), "render");
+			const spyInstaller = jest.spyOn(cli.app.get(Identifiers.Installer), "install");
+			const spyProcessManager = jest.spyOn(cli.app.get(Identifiers.ProcessManager), "update");
 
 			// Act...
 			await updater.check();
@@ -131,18 +130,18 @@ describe("Updater", () => {
 			response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 			response.versions["4.0.0-next.0"] = {
 				...response.versions["2.5.0-next.10"],
-				...{ version: "4.0.0-next.0" },
+				version: "4.0.0-next.0",
 			};
 
 			nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 			const spySync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-				stdout: '"null"',
-				stderr: undefined,
 				exitCode: 0,
+				stderr: undefined,
+				stdout: '"null"',
 			});
-			const spySpinner = jest.spyOn(cli.app.get(Container.Identifiers.Spinner), "render");
-			const spyInstaller = jest.spyOn(cli.app.get(Container.Identifiers.Installer), "install");
+			const spySpinner = jest.spyOn(cli.app.get(Identifiers.Spinner), "render");
+			const spyInstaller = jest.spyOn(cli.app.get(Identifiers.Installer), "install");
 
 			prompts.inject([true]);
 
@@ -165,18 +164,18 @@ describe("Updater", () => {
 			response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 			response.versions["4.0.0-next.0"] = {
 				...response.versions["2.5.0-next.10"],
-				...{ version: "4.0.0-next.0" },
+				version: "4.0.0-next.0",
 			};
 
 			nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
 			const spySync: jest.SpyInstance = jest.spyOn(execa, "sync").mockReturnValue({
-				stdout: '"null"',
-				stderr: undefined,
 				exitCode: 0,
+				stderr: undefined,
+				stdout: '"null"',
 			});
-			const spySpinner = jest.spyOn(cli.app.get(Container.Identifiers.Spinner), "render");
-			const spyInstaller = jest.spyOn(cli.app.get(Container.Identifiers.Installer), "install");
+			const spySpinner = jest.spyOn(cli.app.get(Identifiers.Spinner), "render");
+			const spyInstaller = jest.spyOn(cli.app.get(Identifiers.Installer), "install");
 
 			prompts.inject([false]);
 

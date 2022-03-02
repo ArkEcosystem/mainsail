@@ -1,14 +1,15 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-kernel";
 import { ensureFileSync, existsSync } from "fs-extra";
 import lowdb from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import { v4 as uuidv4 } from "uuid";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
 
 import { Webhook } from "./interfaces";
 
 @Container.injectable()
 export class Database {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
 	private database: lowdb.LowdbSync<any>;

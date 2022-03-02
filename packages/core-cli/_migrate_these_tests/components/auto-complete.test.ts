@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { AutoComplete } from "@packages/core-cli/source/components";
 import prompts from "prompts";
@@ -10,8 +9,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.AutoComplete).to(AutoComplete).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.AutoComplete);
+	cli.app.rebind(Identifiers.AutoComplete).to(AutoComplete).inSingletonScope();
+	component = cli.app.get(Identifiers.AutoComplete);
 });
 
 describe("AutoComplete", () => {

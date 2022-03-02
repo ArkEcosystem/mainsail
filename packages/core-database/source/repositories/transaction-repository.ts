@@ -1,4 +1,4 @@
-import { BINDINGS, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import dayjs from "dayjs";
@@ -18,7 +18,7 @@ type FeeStatistics = {
 };
 @EntityRepository(Transaction)
 export class TransactionRepository extends AbstractRepository<Transaction> {
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	public async findByBlockIds(blockIds: string[]): Promise<
@@ -148,8 +148,8 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 			.select([])
 			.addSelect("recipient_id", "recipientId")
 			.addSelect("SUM(amount)", "amount")
-			.where(`type_group = ${TransactionTypeGroup.Core}`)
-			.andWhere(`type = ${TransactionType.Transfer}`)
+			.where(`type_group = ${Crypto.TransactionTypeGroup.Core}`)
+			.andWhere(`type = ${Crypto.TransactionType.Transfer}`)
 			.groupBy("recipient_id")
 			.getRawMany();
 	}

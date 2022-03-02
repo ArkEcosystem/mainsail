@@ -13,7 +13,7 @@ describe<{
 		};
 
 		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+		context.container.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 	});
 
 	it("should return true expression for TransactionCriteria.unknown", async (context) => {

@@ -7,7 +7,7 @@ describe("DisconnectInvalidPeers", () => {
 
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn() };
+	const logger = { debug: jest.fn(), warning: jest.fn() };
 	const repository = { getPeers: jest.fn() };
 	const app = {
 		getTagged: () => ({
@@ -18,10 +18,10 @@ describe("DisconnectInvalidPeers", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PeerRepository).toConstantValue(repository);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
-		container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(emitter);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PeerRepository).toConstantValue(repository);
+		container.bind(Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.EventDispatcherService).toConstantValue(emitter);
 	});
 
 	const peers = [
@@ -58,15 +58,15 @@ describe("DisconnectPeer", () => {
 
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn() };
+	const logger = { debug: jest.fn(), warning: jest.fn() };
 	const repository = { forgetPeer: jest.fn() };
 	const connector = { disconnect: jest.fn() };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PeerRepository).toConstantValue(repository);
-		container.bind(Container.Identifiers.PeerConnector).toConstantValue(connector);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PeerRepository).toConstantValue(repository);
+		container.bind(Identifiers.PeerConnector).toConstantValue(connector);
 	});
 
 	beforeEach(() => {

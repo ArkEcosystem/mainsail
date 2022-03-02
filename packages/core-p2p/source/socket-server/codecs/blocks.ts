@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { blocks } from "./proto/protos";

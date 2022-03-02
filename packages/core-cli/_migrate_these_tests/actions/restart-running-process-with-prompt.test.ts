@@ -11,14 +11,11 @@ let action;
 
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app
-		.rebind(Container.Identifiers.RestartRunningProcessWithPrompt)
-		.to(RestartRunningProcessWithPrompt)
-		.inSingletonScope();
-	action = cli.app.get(Container.Identifiers.RestartRunningProcessWithPrompt);
+	cli.app.rebind(Identifiers.RestartRunningProcessWithPrompt).to(RestartRunningProcessWithPrompt).inSingletonScope();
+	action = cli.app.get(Identifiers.RestartRunningProcessWithPrompt);
 });
 
 describe("RestartRunningProcessWithPrompt", () => {

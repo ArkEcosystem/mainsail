@@ -21,7 +21,7 @@ describe("HelpCommand", () => {
 			"grouped:again": { description: "I'm also grouped" },
 		};
 
-		cli.app.bind(Container.Identifiers.Commands).toConstantValue(mockCommands);
+		cli.app.bind(Identifiers.Commands).toConstantValue(mockCommands);
 
 		await cli.execute(Command);
 

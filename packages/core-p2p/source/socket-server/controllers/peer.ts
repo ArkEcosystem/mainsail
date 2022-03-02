@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";
 
@@ -10,19 +10,19 @@ import { getPeerConfig } from "../utils/get-peer-config";
 import { Controller } from "./controller";
 
 export class PeerController extends Controller {
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@Container.inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Container.Identifiers.DatabaseInterceptor)
+	@Container.inject(Identifiers.DatabaseInterceptor)
 	private readonly databaseInterceptor!: DatabaseInterceptor;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration!: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
 
 	public getPeers(request: Hapi.Request, h: Hapi.ResponseToolkit): Contracts.P2P.PeerBroadcast[] {
@@ -46,10 +46,10 @@ export class PeerController extends Controller {
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<{
-		common: Interfaces.IBlockData;
+		common: Crypto.IBlockData;
 		lastBlockHeight: number;
 	}> {
-		const commonBlocks: Interfaces.IBlockData[] = await this.databaseInterceptor.getCommonBlocks(
+		const commonBlocks: Crypto.IBlockData[] = await this.databaseInterceptor.getCommonBlocks(
 			(request.payload as any).ids,
 		);
 
@@ -64,7 +64,7 @@ export class PeerController extends Controller {
 	}
 
 	public async getStatus(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerPingResponse> {
-		const lastBlock: Interfaces.IBlock = this.blockchain.getLastBlock();
+		const lastBlock: Crypto.IBlock = this.blockchain.getLastBlock();
 
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
 			this.app,

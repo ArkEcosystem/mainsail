@@ -4,19 +4,19 @@ import { RollbackDatabase } from "@packages/core-blockchain/source/state-machine
 describe("RollbackDatabase", () => {
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn() };
+	const logger = { debug: jest.fn(), info: jest.fn(), warning: jest.fn() };
 	const blockchain = {
 		dispatch: jest.fn(),
 		removeTopBlocks: jest.fn(),
 	};
 	const stateStore = {
-		setRestoredDatabaseIntegrity: jest.fn(),
 		setLastBlock: jest.fn(),
 		setLastStoredBlockHeight: jest.fn(),
+		setRestoredDatabaseIntegrity: jest.fn(),
 	};
 	const databaseService = {
-		verifyBlockchain: jest.fn(),
 		getLastBlock: jest.fn(),
+		verifyBlockchain: jest.fn(),
 	};
 	const mapConfiguration = {
 		"databaseRollback.maxBlockRewind": 20,
@@ -28,12 +28,12 @@ describe("RollbackDatabase", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		container.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.DatabaseService).toConstantValue(databaseService);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
 	});
 
 	beforeEach(() => {
@@ -46,14 +46,14 @@ describe("RollbackDatabase", () => {
 
 			const lastBlock = {
 				data: {
-					id: "123",
 					height: 5556,
+					id: "123",
 				},
 			};
 			const lastBlockAfterRollback = {
 				data: {
-					id: "122",
 					height: 5536,
+					id: "122",
 				},
 			};
 			databaseService.getLastBlock = jest
@@ -81,8 +81,8 @@ describe("RollbackDatabase", () => {
 
 			const lastBlock = {
 				data: {
-					id: "123",
 					height: 5556,
+					id: "123",
 				},
 			};
 			databaseService.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
@@ -102,8 +102,8 @@ describe("RollbackDatabase", () => {
 
 			const lastBlock = {
 				data: {
-					id: "123",
 					height: 3,
+					id: "123",
 				},
 			};
 			databaseService.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);

@@ -1,4 +1,5 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { Block } from "./models/block";
 
@@ -13,7 +14,7 @@ export class BlockFilter implements Contracts.Database.BlockFilter {
 			criteria.map((c) => handleOrCriteria(c, (c) => this.handleBlockCriteria(c))),
 		);
 
-		return optimizeExpression({ op: "and", expressions });
+		return optimizeExpression({ expressions, op: "and" });
 	}
 
 	private async handleBlockCriteria(
@@ -22,57 +23,55 @@ export class BlockFilter implements Contracts.Database.BlockFilter {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
 				case "id":
-					return handleOrCriteria(criteria.id!, async (c) => {
-						return { property: "id", op: "equal", value: c };
-					});
+					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "id", value: c }));
 				case "version":
-					return handleOrCriteria(criteria.version!, async (c) => {
-						return { property: "version", op: "equal", value: c };
-					});
+					return handleOrCriteria(criteria.version, async (c) => ({
+						op: "equal",
+						property: "version",
+						value: c,
+					}));
 				case "timestamp":
-					return handleOrCriteria(criteria.timestamp!, async (c) => {
-						return handleNumericCriteria("timestamp", c);
-					});
+					return handleOrCriteria(criteria.timestamp, async (c) => handleNumericCriteria("timestamp", c));
 				case "previousBlock":
-					return handleOrCriteria(criteria.previousBlock!, async (c) => {
-						return { property: "previousBlock", op: "equal", value: c };
-					});
+					return handleOrCriteria(criteria.previousBlock, async (c) => ({
+						op: "equal",
+						property: "previousBlock",
+						value: c,
+					}));
 				case "height":
-					return handleOrCriteria(criteria.height!, async (c) => {
-						return handleNumericCriteria("height", c);
-					});
+					return handleOrCriteria(criteria.height, async (c) => handleNumericCriteria("height", c));
 				case "numberOfTransactions":
-					return handleOrCriteria(criteria.numberOfTransactions!, async (c) => {
-						return handleNumericCriteria("numberOfTransactions", c);
-					});
+					return handleOrCriteria(criteria.numberOfTransactions, async (c) =>
+						handleNumericCriteria("numberOfTransactions", c),
+					);
 				case "totalAmount":
-					return handleOrCriteria(criteria.totalAmount!, async (c) => {
-						return handleNumericCriteria("totalAmount", c);
-					});
+					return handleOrCriteria(criteria.totalAmount, async (c) => handleNumericCriteria("totalAmount", c));
 				case "totalFee":
-					return handleOrCriteria(criteria.totalFee!, async (c) => {
-						return handleNumericCriteria("totalFee", c);
-					});
+					return handleOrCriteria(criteria.totalFee, async (c) => handleNumericCriteria("totalFee", c));
 				case "reward":
-					return handleOrCriteria(criteria.reward!, async (c) => {
-						return handleNumericCriteria("reward", c);
-					});
+					return handleOrCriteria(criteria.reward, async (c) => handleNumericCriteria("reward", c));
 				case "payloadLength":
-					return handleOrCriteria(criteria.payloadLength!, async (c) => {
-						return handleNumericCriteria("payloadLength", c);
-					});
+					return handleOrCriteria(criteria.payloadLength, async (c) =>
+						handleNumericCriteria("payloadLength", c),
+					);
 				case "payloadHash":
-					return handleOrCriteria(criteria.payloadHash!, async (c) => {
-						return { property: "payloadHash", op: "equal", value: c };
-					});
+					return handleOrCriteria(criteria.payloadHash, async (c) => ({
+						op: "equal",
+						property: "payloadHash",
+						value: c,
+					}));
 				case "generatorPublicKey":
-					return handleOrCriteria(criteria.generatorPublicKey!, async (c) => {
-						return { property: "generatorPublicKey", op: "equal", value: c };
-					});
+					return handleOrCriteria(criteria.generatorPublicKey, async (c) => ({
+						op: "equal",
+						property: "generatorPublicKey",
+						value: c,
+					}));
 				case "blockSignature":
-					return handleOrCriteria(criteria.blockSignature!, async (c) => {
-						return { property: "blockSignature", op: "equal", value: c };
-					});
+					return handleOrCriteria(criteria.blockSignature, async (c) => ({
+						op: "equal",
+						property: "blockSignature",
+						value: c,
+					}));
 				default:
 					return { op: "true" };
 			}

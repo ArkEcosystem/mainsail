@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Clear } from "@packages/core-cli/source/components";
 
@@ -9,8 +8,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.Clear).to(Clear).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.Clear);
+	cli.app.rebind(Identifiers.Clear).to(Clear).inSingletonScope();
+	component = cli.app.get(Identifiers.Clear);
 });
 
 describe("Clear", () => {
@@ -19,7 +18,7 @@ describe("Clear", () => {
 
 		component.render();
 
-		expect(spyWrite).toHaveBeenCalledWith("\x1b[2J");
-		expect(spyWrite).toHaveBeenCalledWith("\x1b[0f");
+		expect(spyWrite).toHaveBeenCalledWith("\u001B[2J");
+		expect(spyWrite).toHaveBeenCalledWith("\u001B[0f");
 	});
 });

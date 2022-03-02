@@ -1,37 +1,33 @@
-import Interfaces, {
-	BINDINGS,
-	ITransactionDeserializer,
-	ITransactionFactory,
-} from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 import { InvalidTransactionDataError } from "./errors";
 
 @Container.injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
-	@Container.multiInject(Container.Identifiers.TransactionPoolProcessorExtension)
+	@Container.multiInject(Identifiers.TransactionPoolProcessorExtension)
 	@Container.optional()
 	private readonly extensions: Contracts.TransactionPool.ProcessorExtension[] = [];
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@Container.inject(Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Container.Identifiers.PeerTransactionBroadcaster)
+	@Container.inject(Identifiers.PeerTransactionBroadcaster)
 	@Container.optional()
 	private readonly transactionBroadcaster!: Contracts.P2P.TransactionBroadcaster | undefined;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
-	@Container.inject(BINDINGS.Transaction.Deserializer)
-	private readonly deserializer: ITransactionDeserializer;
+	@Container.inject(Identifiers.Cryptography.Transaction.Deserializer)
+	private readonly deserializer: Crypto.ITransactionDeserializer;
 
 	public async process(
-		data: Interfaces.ITransactionData[] | Buffer[],
+		data: Crypto.ITransactionData[] | Buffer[],
 	): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: string[] = [];
 		const broadcast: string[] = [];
@@ -39,7 +35,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		const excess: string[] = [];
 		let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
-		const broadcastTransactions: Interfaces.ITransaction[] = [];
+		const broadcastTransactions: Crypto.ITransaction[] = [];
 
 		try {
 			for (const [index, transactionData] of data.entries()) {
@@ -95,9 +91,9 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		};
 	}
 
-	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Interfaces.ITransaction> {
+	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Crypto.ITransaction> {
 		try {
-			const transactionCommon = {} as Interfaces.ITransactionData;
+			const transactionCommon = {} as Crypto.ITransactionData;
 			const txByteBuffer = new ByteBuffer(transactionData);
 			this.deserializer.deserializeCommon(transactionCommon, txByteBuffer);
 
@@ -107,9 +103,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		}
 	}
 
-	private async getTransactionFromData(
-		transactionData: Interfaces.ITransactionData,
-	): Promise<Interfaces.ITransaction> {
+	private async getTransactionFromData(transactionData: Crypto.ITransactionData): Promise<Crypto.ITransaction> {
 		try {
 			return this.transactionFactory.fromData(transactionData);
 		} catch (error) {

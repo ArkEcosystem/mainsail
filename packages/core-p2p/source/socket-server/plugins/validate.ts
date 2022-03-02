@@ -1,7 +1,8 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
-import { isValidVersion } from "../../utils";
 
+import { isValidVersion } from "../../utils";
 import { BlocksRoute } from "../routes/blocks";
 import { InternalRoute } from "../routes/internal";
 import { PeerRoute } from "../routes/peer";
@@ -9,7 +10,7 @@ import { TransactionsRoute } from "../routes/transactions";
 
 @Container.injectable()
 export class ValidatePlugin {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public register(server) {
@@ -21,7 +22,6 @@ export class ValidatePlugin {
 		};
 
 		server.ext({
-			type: "onPostAuth",
 			method: async (request, h) => {
 				const version = request.payload?.headers?.version;
 				if (version && !isValidVersion(this.app, { version } as Contracts.P2P.Peer)) {
@@ -34,6 +34,7 @@ export class ValidatePlugin {
 				}
 				return h.continue;
 			},
+			type: "onPostAuth",
 		});
 	}
 }

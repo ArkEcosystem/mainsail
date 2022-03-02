@@ -1,5 +1,5 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
+import { Container } from "@packages/core-cli";
 import { Process } from "@packages/core-cli/source/utils";
 import { fileSync, setGracefulCleanup } from "tmp";
 
@@ -10,10 +10,10 @@ let proc;
 let processManager;
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 
 	cli.app
-		.rebind(Container.Identifiers.ProcessFactory)
+		.rebind(Identifiers.ProcessFactory)
 		.toFactory((context: Container.interfaces.Context) => (token: string, type: string): Process => {
 			const process: Process = context.container.resolve(Process);
 			process.initialize(token, type);
@@ -21,7 +21,7 @@ beforeEach(() => {
 			return process;
 		});
 
-	proc = cli.app.get(Container.Identifiers.ProcessFactory)("ark", "core");
+	proc = cli.app.get(Identifiers.ProcessFactory)("ark", "core");
 });
 
 afterEach(() => jest.restoreAllMocks());
@@ -143,14 +143,14 @@ describe("Process", () => {
 		it("should render a table with the process information", async () => {
 			jest.spyOn(processManager, "missing").mockReturnValue(false);
 			jest.spyOn(processManager, "describe").mockReturnValue({
-				pid: 1,
-				name: "ark-core",
-				pm2_env: {
-					version: "1.0.0",
-					status: "online",
-					pm_uptime: 1387045673686,
-				},
 				monit: { cpu: 2, memory: 2048 },
+				name: "ark-core",
+				pid: 1,
+				pm2_env: {
+					pm_uptime: 1_387_045_673_686,
+					status: "online",
+					version: "1.0.0",
+				},
 			});
 
 			let message: string;
@@ -177,18 +177,18 @@ describe("Process", () => {
 		});
 
 		it("should log to pm_out_log_path", async () => {
-			jest.spyOn(cli.app.get(Container.Identifiers.AbortMissingProcess), "execute").mockImplementation();
+			jest.spyOn(cli.app.get(Identifiers.AbortMissingProcess), "execute").mockImplementation();
 			jest.spyOn(processManager, "describe").mockReturnValue({
-				pid: 1,
+				monit: { cpu: 2, memory: 2048 },
 				name: "ark-core",
+				pid: 1,
 				pm2_env: {
-					version: "1.0.0",
-					status: "online",
-					pm_uptime: 1387045673686,
 					pm_err_log_path: fileSync().name,
 					pm_out_log_path: fileSync().name,
+					pm_uptime: 1_387_045_673_686,
+					status: "online",
+					version: "1.0.0",
 				},
-				monit: { cpu: 2, memory: 2048 },
 			});
 
 			const spyLog = jest.spyOn(console, "log");
@@ -201,18 +201,18 @@ describe("Process", () => {
 		});
 
 		it("should log to pm_err_log_path", async () => {
-			jest.spyOn(cli.app.get(Container.Identifiers.AbortMissingProcess), "execute").mockImplementation();
+			jest.spyOn(cli.app.get(Identifiers.AbortMissingProcess), "execute").mockImplementation();
 			jest.spyOn(processManager, "describe").mockReturnValue({
-				pid: 1,
+				monit: { cpu: 2, memory: 2048 },
 				name: "ark-core",
+				pid: 1,
 				pm2_env: {
-					version: "1.0.0",
-					status: "online",
-					pm_uptime: 1387045673686,
 					pm_err_log_path: fileSync().name,
 					pm_out_log_path: fileSync().name,
+					pm_uptime: 1_387_045_673_686,
+					status: "online",
+					version: "1.0.0",
 				},
-				monit: { cpu: 2, memory: 2048 },
 			});
 
 			const spyLog = jest.spyOn(console, "log");

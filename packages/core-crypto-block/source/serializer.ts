@@ -1,30 +1,22 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IBlock,
-	IBlockData,
-	IBlockSerializer,
-	IPublicKeySerializer,
-	ISignature,
-	ITransactionData,
-} from "@arkecosystem/core-crypto-contracts";
-import { PreviousBlockIdFormatError } from "@arkecosystem/core-crypto-errors";
-import { Utils } from "@arkecosystem/core-crypto-transaction";
 import assert from "assert";
+import { Container } from "@arkecosystem/core-container";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-crypto-transaction";
+import { PreviousBlockIdFormatError } from "@arkecosystem/core-errors";
 import ByteBuffer from "bytebuffer";
 
 @Container.injectable()
-export class Serializer implements IBlockSerializer {
-	@Container.inject(BINDINGS.Transaction.Utils)
+export class Serializer implements Crypto.IBlockSerializer {
+	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils: Utils;
 
-	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
-	private readonly publicKeySerializer: IPublicKeySerializer;
+	@Container.inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: Crypto.IPublicKeySerializer;
 
-	@Container.inject(BINDINGS.Signature)
-	private readonly signatureSerializer: ISignature;
+	@Container.inject(Identifiers.Cryptography.Signature)
+	private readonly signatureSerializer: Crypto.ISignature;
 
-	public size(block: IBlock): number {
+	public size(block: Crypto.IBlock): number {
 		let size = this.headerSize(block.data) + block.data.blockSignature.length / 2;
 
 		for (const transaction of block.transactions) {
@@ -34,8 +26,8 @@ export class Serializer implements IBlockSerializer {
 		return size;
 	}
 
-	public async serializeWithTransactions(block: IBlockData): Promise<Buffer> {
-		const transactions: ITransactionData[] = block.transactions || [];
+	public async serializeWithTransactions(block: Crypto.IBlockData): Promise<Buffer> {
+		const transactions: Crypto.ITransactionData[] = block.transactions || [];
 		block.numberOfTransactions = block.numberOfTransactions || transactions.length;
 
 		const serializedHeader: Buffer = this.serialize(block);
@@ -53,7 +45,7 @@ export class Serializer implements IBlockSerializer {
 		return buff.flip().toBuffer();
 	}
 
-	public serialize(block: IBlockData, includeSignature = true): Buffer {
+	public serialize(block: Crypto.IBlockData, includeSignature = true): Buffer {
 		const buff: ByteBuffer = new ByteBuffer(512, true);
 
 		this.serializeHeader(block, buff);
@@ -65,7 +57,7 @@ export class Serializer implements IBlockSerializer {
 		return buff.flip().toBuffer();
 	}
 
-	private headerSize(block: IBlockData): number {
+	private headerSize(block: Crypto.IBlockData): number {
 		return (
 			4 + // version
 			4 + // timestamp
@@ -81,7 +73,7 @@ export class Serializer implements IBlockSerializer {
 		);
 	}
 
-	private serializeHeader(block: IBlockData, buff: ByteBuffer): void {
+	private serializeHeader(block: Crypto.IBlockData, buff: ByteBuffer): void {
 		if (block.previousBlock.length !== 64) {
 			throw new PreviousBlockIdFormatError(block.height, block.previousBlock);
 		}
@@ -106,7 +98,7 @@ export class Serializer implements IBlockSerializer {
 		assert.strictEqual(buff.offset, this.headerSize(block));
 	}
 
-	private serializeSignature(block: IBlockData, buff: ByteBuffer): void {
+	private serializeSignature(block: Crypto.IBlockData, buff: ByteBuffer): void {
 		if (block.blockSignature) {
 			this.signatureSerializer.serialize(buff, block.blockSignature);
 		}

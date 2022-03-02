@@ -8,7 +8,7 @@ let app: Application;
 
 beforeEach(() => {
 	app = new Application(new Container.Container());
-	app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+	app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 });
 
 afterAll(() => jest.clearAllMocks());

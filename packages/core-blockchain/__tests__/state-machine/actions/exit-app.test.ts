@@ -1,5 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { ExitApp } from "../../../../../packages/core-blockchain/source/state-machine/actions/exit-app";
+
+import { ExitApp } from "../../../source/state-machine/actions/exit-app";
 
 describe("ExitApp", () => {
 	const container = new Container.Container();
@@ -8,7 +9,7 @@ describe("ExitApp", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.Application).toConstantValue(application);
 	});
 
 	beforeEach(() => {

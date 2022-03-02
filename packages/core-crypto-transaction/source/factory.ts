@@ -1,19 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IConfiguration,
-	IDeserializeOptions,
-	ISerializeOptions,
-	ITransaction,
-	ITransactionData,
-	ITransactionDeserializer,
-	ITransactionFactory,
-	ITransactionJson,
-	ITransactionSerializer,
-	ITransactionUtils,
-	ITransactionVerifier,
-} from "@arkecosystem/core-crypto-contracts";
-import { Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import {
@@ -24,30 +10,34 @@ import {
 } from "./errors";
 
 @Container.injectable()
-export class TransactionFactory implements ITransactionFactory {
-	@Container.inject(BINDINGS.Configuration)
-	protected readonly configuration: IConfiguration;
+export class TransactionFactory implements Crypto.ITransactionFactory {
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Transaction.Deserializer)
-	private readonly deserializer: ITransactionDeserializer;
+	@Container.inject(Identifiers.Cryptography.Transaction.Deserializer)
+	private readonly deserializer: Crypto.ITransactionDeserializer;
 
-	@Container.inject(BINDINGS.Transaction.Serializer)
-	private readonly serializer: ITransactionSerializer;
+	@Container.inject(Identifiers.Cryptography.Transaction.Serializer)
+	private readonly serializer: Crypto.ITransactionSerializer;
 
-	@Container.inject(BINDINGS.Transaction.Utils)
-	private readonly utils: ITransactionUtils;
+	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
+	private readonly utils: Crypto.ITransactionUtils;
 
-	@Container.inject(BINDINGS.Transaction.Verifier)
-	private readonly verifier: ITransactionVerifier;
+	@Container.inject(Identifiers.Cryptography.Transaction.Verifier)
+	private readonly verifier: Crypto.ITransactionVerifier;
 
-	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
-	public async fromHex(hex: string): Promise<ITransaction> {
+	public async fromHex(hex: string): Promise<Crypto.ITransaction> {
 		return this.fromSerialized(hex);
 	}
 
-	public async fromBytes(buff: Buffer, strict = true, options: IDeserializeOptions = {}): Promise<ITransaction> {
+	public async fromBytes(
+		buff: Buffer,
+		strict = true,
+		options: Crypto.IDeserializeOptions = {},
+	): Promise<Crypto.ITransaction> {
 		return this.fromSerialized(buff.toString("hex"), strict, options);
 	}
 
@@ -58,9 +48,9 @@ export class TransactionFactory implements ITransactionFactory {
 	 * NOTE: Only use this internally when it is safe to assume the buffer has already been
 	 * verified.
 	 */
-	public async fromBytesUnsafe(buff: Buffer, id?: string): Promise<ITransaction> {
+	public async fromBytesUnsafe(buff: Buffer, id?: string): Promise<Crypto.ITransaction> {
 		try {
-			const options: IDeserializeOptions | ISerializeOptions = { acceptLegacyVersion: true };
+			const options: Crypto.IDeserializeOptions | Crypto.ISerializeOptions = { acceptLegacyVersion: true };
 			const transaction = await this.deserializer.deserialize(buff, options);
 			transaction.data.id = id || (await this.utils.getId(transaction.data, options));
 			transaction.isVerified = true;
@@ -71,8 +61,8 @@ export class TransactionFactory implements ITransactionFactory {
 		}
 	}
 
-	public async fromJson(json: ITransactionJson): Promise<ITransaction> {
-		const data: ITransactionData = { ...json } as unknown as ITransactionData;
+	public async fromJson(json: Crypto.ITransactionJson): Promise<Crypto.ITransaction> {
+		const data: Crypto.ITransactionData = { ...json } as unknown as Crypto.ITransactionData;
 		data.amount = BigNumber.make(data.amount);
 		data.fee = BigNumber.make(data.fee);
 
@@ -80,17 +70,17 @@ export class TransactionFactory implements ITransactionFactory {
 	}
 
 	public async fromData(
-		data: ITransactionData,
+		data: Crypto.ITransactionData,
 		strict = true,
-		options: IDeserializeOptions = {},
-	): Promise<ITransaction> {
+		options: Crypto.IDeserializeOptions = {},
+	): Promise<Crypto.ITransaction> {
 		const { value, error } = this.verifier.verifySchema(data, strict);
 
 		if (error) {
 			throw new TransactionSchemaError(error);
 		}
 
-		const transaction: ITransaction = this.transactionTypeFactory.create(value);
+		const transaction: Crypto.ITransaction = this.transactionTypeFactory.create(value);
 
 		await this.serializer.serialize(transaction);
 
@@ -100,8 +90,8 @@ export class TransactionFactory implements ITransactionFactory {
 	private async fromSerialized(
 		serialized: string,
 		strict = true,
-		options: IDeserializeOptions = {},
-	): Promise<ITransaction> {
+		options: Crypto.IDeserializeOptions = {},
+	): Promise<Crypto.ITransaction> {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized, options);
 			transaction.data.id = await this.utils.getId(transaction.data, options);

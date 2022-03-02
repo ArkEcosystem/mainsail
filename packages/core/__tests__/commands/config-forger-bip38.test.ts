@@ -52,7 +52,7 @@ describe("BIP38Command", () => {
 			secrets: [],
 		});
 
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValueOnce({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValueOnce({
 			// @ts-ignore
 			bip39: "random-string",
 			password,
@@ -70,7 +70,7 @@ describe("BIP38Command", () => {
 			secrets: [],
 		});
 
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValueOnce({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValueOnce({
 			// @ts-ignore
 			bip39: "random-string",
 			password,
@@ -81,7 +81,7 @@ describe("BIP38Command", () => {
 	});
 
 	it("should fail to configure from a prompt if it doesn't receive a bip39", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			bip39: null,
 			password,
@@ -92,7 +92,7 @@ describe("BIP38Command", () => {
 	});
 
 	it("should fail to configure from a prompt if it doesn't receive a password", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			bip39,
 			password: null,

@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Application, Container, Contracts, Services } from "@arkecosystem/core-kernel";
+import { Application, Container, Services } from "@arkecosystem/core-kernel";
 import { ServiceProvider } from "@packages/core-transaction-pool/source";
 import { fork } from "child_process";
 import { AnySchema } from "joi";
@@ -11,7 +11,7 @@ let app: Application;
 
 beforeEach(() => {
 	app = new Application(new Container.Container());
-	app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+	app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 });
 
 describe("ServiceProvider", () => {
@@ -24,12 +24,12 @@ describe("ServiceProvider", () => {
 	it("should register, boot and dispose", async () => {
 		await expect(serviceProvider.register()).toResolve();
 
-		app.rebind(Container.Identifiers.TransactionPoolStorage).toConstantValue({
+		app.rebind(Identifiers.TransactionPoolStorage).toConstantValue({
 			boot: jest.fn(),
 			dispose: jest.fn(),
 		});
 
-		app.rebind(Container.Identifiers.TransactionPoolService).toConstantValue({
+		app.rebind(Identifiers.TransactionPoolService).toConstantValue({
 			boot: jest.fn(),
 			dispose: jest.fn(),
 		});
@@ -46,7 +46,7 @@ describe("ServiceProvider", () => {
 	it("should provide TransactionPoolWorkerIpcSubprocessFactory", async () => {
 		await expect(serviceProvider.register()).toResolve();
 		const subprocessFactory = app.get<Contracts.TransactionPool.WorkerIpcSubprocessFactory>(
-			Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory,
+			Identifiers.TransactionPoolWorkerIpcSubprocessFactory,
 		);
 		(fork as jest.Mock).mockReturnValueOnce({ on: jest.fn() });
 		subprocessFactory();

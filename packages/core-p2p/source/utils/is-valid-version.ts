@@ -1,5 +1,5 @@
-import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 import semver from "semver";
 
 // todo: review the implementation
@@ -12,7 +12,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 		return false;
 	}
 
-	const configuration: IConfiguration = app.get(BINDINGS.Configuration);
+	const configuration: Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
 
 	let minimumVersions: string[];
 	const milestones: Record<string, any> = configuration.getMilestone();
@@ -23,7 +23,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 		minimumVersions = p2p.minimumVersions;
 	} else {
 		const configuration = app.getTagged<Providers.PluginConfiguration>(
-			Container.Identifiers.PluginConfiguration,
+			Identifiers.PluginConfiguration,
 			"plugin",
 			"core-p2p",
 		);

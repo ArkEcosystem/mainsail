@@ -1,4 +1,4 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 
 type BlockChainedDetails = {
 	followsPrevious: boolean;
@@ -10,8 +10,8 @@ type BlockChainedDetails = {
 };
 
 const getBlockChainedDetails = (
-	previousBlock: Interfaces.IBlockData,
-	nextBlock: Interfaces.IBlockData,
+	previousBlock: Crypto.IBlockData,
+	nextBlock: Crypto.IBlockData,
 	getTimeStampForBlock: (blockheight: number) => number,
 	slots,
 ): BlockChainedDetails => {
@@ -28,8 +28,8 @@ const getBlockChainedDetails = (
 };
 
 export const isBlockChained = (
-	previousBlock: Interfaces.IBlockData,
-	nextBlock: Interfaces.IBlockData,
+	previousBlock: Crypto.IBlockData,
+	nextBlock: Crypto.IBlockData,
 	getTimeStampForBlock: (blockheight: number) => number,
 	slots,
 ): boolean => {
@@ -38,8 +38,8 @@ export const isBlockChained = (
 };
 
 export const getBlockNotChainedErrorMessage = (
-	previousBlock: Interfaces.IBlockData,
-	nextBlock: Interfaces.IBlockData,
+	previousBlock: Crypto.IBlockData,
+	nextBlock: Crypto.IBlockData,
 	getTimeStampForBlock: (blockheight: number) => number,
 	slots,
 ): string => {

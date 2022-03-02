@@ -1,5 +1,5 @@
-import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
 import prettyMs from "pretty-ms";
 
@@ -13,32 +13,32 @@ const defaultDownloadChunkSize = 400;
 // todo: review the implementation
 @Container.injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.PeerCommunicator)
+	@Container.inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@Container.inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Container.Identifiers.PeerChunkCache)
+	@Container.inject(Identifiers.PeerChunkCache)
 	private readonly chunkCache!: Contracts.P2P.ChunkCache;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly cryptoConfiguration!: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
 
 	public config: any;
@@ -225,7 +225,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			await Promise.all(
 				theirPeers.map((p) =>
 					this.app
-						.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 						.call("validateAndAcceptPeer", { options: { lessVerbose: true }, peer: p }),
 				),
 			);
@@ -278,14 +278,14 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		await this.discoverPeers(true);
 		await this.cleansePeers({ forcePing: true });
 
-		const lastBlock: Interfaces.IBlock = this.app
-			.get<Contracts.State.StateStore>(Container.Identifiers.StateStore)
+		const lastBlock: Crypto.IBlock = this.app
+			.get<Contracts.State.StateStore>(Identifiers.StateStore)
 			.getLastBlock();
 
 		const verificationResults: Contracts.P2P.PeerVerificationResult[] = this.repository
 			.getPeers()
 			.filter((peer) => peer.verificationResult)
-			.map((peer) => peer.verificationResult!);
+			.map((peer) => peer.verificationResult);
 
 		if (verificationResults.length === 0) {
 			this.logger.info("No verified peers available.");
@@ -334,7 +334,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async downloadBlocksFromHeight(
 		fromBlockHeight: number,
 		maxParallelDownloads = 10,
-	): Promise<Interfaces.IBlockData[]> {
+	): Promise<Crypto.IBlockData[]> {
 		const peersAll: Contracts.P2P.Peer[] = this.repository.getPeers();
 
 		if (peersAll.length === 0) {
@@ -389,7 +389,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 					return;
 				}
 
-				let blocks!: Interfaces.IBlockData[];
+				let blocks!: Crypto.IBlockData[];
 				let peer: Contracts.P2P.Peer;
 				let peerPrint!: string;
 
@@ -458,7 +458,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			firstFailureMessage = error.message;
 		}
 
-		let downloadedBlocks: Interfaces.IBlockData[] = [];
+		let downloadedBlocks: Crypto.IBlockData[] = [];
 
 		let index;
 
@@ -488,8 +488,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		return downloadedBlocks;
 	}
 
-	public async broadcastBlock(block: Interfaces.IBlock): Promise<void> {
-		const blockchain = this.app.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService);
+	public async broadcastBlock(block: Crypto.IBlock): Promise<void> {
+		const blockchain = this.app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService);
 
 		let blockPing = blockchain.getBlockPing();
 		let peers: Contracts.P2P.Peer[] = this.repository.getPeers();
@@ -616,7 +616,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 				this.repository.forgetPeer(peer);
 
 				return this.app
-					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 					.call("validateAndAcceptPeer", { options: { lessVerbose: true, seed: true }, peer });
 			}),
 		);

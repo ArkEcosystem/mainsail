@@ -1,6 +1,6 @@
-import Interfaces, { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
-import { Container, Contracts, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Container, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import {
@@ -24,35 +24,35 @@ export enum BlockProcessorResult {
 
 @Container.injectable()
 export class BlockProcessor {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.DatabaseTransactionRepository)
+	@Container.inject(Identifiers.DatabaseTransactionRepository)
 	private readonly transactionRepository!: Repositories.TransactionRepository;
 
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.inject(Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@Container.inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	public async process(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
+	public async process(block: Crypto.IBlock): Promise<BlockProcessorResult> {
 		if (!(await this.verifyBlock(block))) {
 			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
 		}
@@ -94,12 +94,12 @@ export class BlockProcessor {
 		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(block);
 	}
 
-	private async verifyBlock(block: Interfaces.IBlock): Promise<boolean> {
+	private async verifyBlock(block: Crypto.IBlock): Promise<boolean> {
 		if (block.verification.containsMultiSignatures) {
 			try {
 				for (const transaction of block.transactions) {
 					const registry = this.app.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
-						Container.Identifiers.TransactionHandlerRegistry,
+						Identifiers.TransactionHandlerRegistry,
 						"state",
 						"blockchain",
 					);
@@ -130,7 +130,7 @@ export class BlockProcessor {
 		return true;
 	}
 
-	private async checkBlockContainsForgedTransactions(block: Interfaces.IBlock): Promise<boolean> {
+	private async checkBlockContainsForgedTransactions(block: Crypto.IBlock): Promise<boolean> {
 		if (block.transactions.length > 0) {
 			const transactionIds = block.transactions.map((tx) => {
 				AppUtils.assert.defined<string>(tx.id);
@@ -170,7 +170,7 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private blockContainsIncompatibleTransactions(block: Interfaces.IBlock): boolean {
+	private blockContainsIncompatibleTransactions(block: Crypto.IBlock): boolean {
 		for (let index = 1; index < block.transactions.length; index++) {
 			if (block.transactions[index].data.version !== block.transactions[0].data.version) {
 				return true;
@@ -180,7 +180,7 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private blockContainsOutOfOrderNonce(block: Interfaces.IBlock): boolean {
+	private blockContainsOutOfOrderNonce(block: Crypto.IBlock): boolean {
 		const nonceBySender = {};
 
 		for (const transaction of block.transactions) {
@@ -218,7 +218,7 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private async validateGenerator(block: Interfaces.IBlock): Promise<boolean> {
+	private async validateGenerator(block: Crypto.IBlock): Promise<boolean> {
 		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
 			this.app,
 			block.data.height,
@@ -244,7 +244,7 @@ export class BlockProcessor {
 		const forgingDelegate: Contracts.State.Wallet = delegates[forgingInfo.currentForger];
 
 		const walletRepository = this.app.getTagged<Contracts.State.WalletRepository>(
-			Container.Identifiers.WalletRepository,
+			Identifiers.WalletRepository,
 			"state",
 			"blockchain",
 		);

@@ -1,7 +1,8 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { InvalidGeneratorHandler } from "../../../../../packages/core-blockchain/source/processor/handlers/invalid-generator-handler";
-import { BlockProcessorResult } from "../../../../../packages/core-blockchain/source/processor";
 import { Interfaces } from "@arkecosystem/crypto";
+
+import { BlockProcessorResult } from "../../../source/processor";
+import { InvalidGeneratorHandler } from "../../../source/processor/handlers/invalid-generator-handler";
 
 describe("InvalidGeneratorHandler", () => {
 	const container = new Container.Container();
@@ -12,8 +13,8 @@ describe("InvalidGeneratorHandler", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
 	});
 
 	beforeEach(() => {
@@ -25,7 +26,7 @@ describe("InvalidGeneratorHandler", () => {
 			const invalidGeneratorHandler = container.resolve<InvalidGeneratorHandler>(InvalidGeneratorHandler);
 
 			const block = {};
-			const result = await invalidGeneratorHandler.execute(block as Interfaces.IBlock);
+			const result = await invalidGeneratorHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Rejected);
 			expect(blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);

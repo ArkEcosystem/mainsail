@@ -3,7 +3,7 @@ import "jest-extended";
 import { TransactionPoolQuery } from "@packages/core-test-framework/source/mocks";
 import { Interfaces } from "@packages/crypto";
 
-let tranasction: Partial<Interfaces.ITransaction> = {
+let tranasction: Partial<Crypto.ITransaction> = {
 	id: "f0880e972206698bf48e43325ec03045a3b2ab215b8f716a51742a909b718177",
 	type: 2,
 	typeGroup: 1,

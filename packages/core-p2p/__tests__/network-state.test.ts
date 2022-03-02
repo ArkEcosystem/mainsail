@@ -28,7 +28,7 @@ describe("NetworkState", () => {
 	} as Blocks.Block;
 	const blockchainService = { getLastBlock: () => lastBlock };
 	const appGet = {
-		[Container.Identifiers.BlockchainService]: blockchainService,
+		[Identifiers.BlockchainService]: blockchainService,
 	};
 	const configuration = { getOptional: () => 2 }; // minimumNetworkReach
 	const app = {

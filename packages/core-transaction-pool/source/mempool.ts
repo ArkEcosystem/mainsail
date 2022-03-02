@@ -1,16 +1,16 @@
-import Interfaces, { BINDINGS, IAddressFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 @Container.injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.TransactionPoolSenderMempoolFactory)
+	@Container.inject(Identifiers.TransactionPoolSenderMempoolFactory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly addressFactory: IAddressFactory;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly addressFactory: Crypto.IAddressFactory;
 
 	private readonly senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 
@@ -34,7 +34,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return this.senderMempools.values();
 	}
 
-	public async addTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async addTransaction(transaction: Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		let senderMempool = this.senderMempools.get(transaction.data.senderPublicKey);
@@ -58,7 +58,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeTransaction(senderPublicKey: string, id: string): Promise<Interfaces.ITransaction[]> {
+	public async removeTransaction(senderPublicKey: string, id: string): Promise<Crypto.ITransaction[]> {
 		const senderMempool = this.senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];
@@ -74,7 +74,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeForgedTransaction(senderPublicKey: string, id: string): Promise<Interfaces.ITransaction[]> {
+	public async removeForgedTransaction(senderPublicKey: string, id: string): Promise<Crypto.ITransaction[]> {
 		const senderMempool = this.senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];

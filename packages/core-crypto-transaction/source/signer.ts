@@ -1,24 +1,21 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IKeyPair,
-	ISerializeOptions,
-	ITransactionData,
-	ITransactionUtils,
-	ISignature,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 import { numberToHex } from "./helpers";
 
 @Container.injectable()
 export class Signer {
-	@Container.inject(BINDINGS.Signature)
-	private readonly signatureFactory: ISignature;
+	@Container.inject(Identifiers.Cryptography.Signature)
+	private readonly signatureFactory: Crypto.ISignature;
 
-	@Container.inject(BINDINGS.Transaction.Utils)
-	private readonly utils: ITransactionUtils;
+	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
+	private readonly utils: Crypto.ITransactionUtils;
 
-	public async sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): Promise<string> {
+	public async sign(
+		transaction: Crypto.ITransactionData,
+		keys: Crypto.IKeyPair,
+		options?: Crypto.ISerializeOptions,
+	): Promise<string> {
 		if (!options || options.excludeSignature === undefined) {
 			options = { excludeSignature: true, ...options };
 		}
@@ -33,7 +30,7 @@ export class Signer {
 		return signature;
 	}
 
-	public async multiSign(transaction: ITransactionData, keys: IKeyPair, index = -1): Promise<string> {
+	public async multiSign(transaction: Crypto.ITransactionData, keys: Crypto.IKeyPair, index = -1): Promise<string> {
 		if (!transaction.signatures) {
 			transaction.signatures = [];
 		}

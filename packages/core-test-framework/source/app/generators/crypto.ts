@@ -1,4 +1,4 @@
-// import Interfaces from "@arkecosystem/core-crypto-contracts";
+// import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 // import { Types } from "@arkecosystem/core-kernel";
 // import { BigNumber } from "@arkecosystem/utils";
 // import ByteBuffer from "bytebuffer";
@@ -211,7 +211,7 @@ export class CryptoGenerator extends Generator {
 	// 	return transaction;
 	// }
 
-	// private createGenesisBlock(keys: Interfaces.IKeyPair, transactions, timestamp: number) {
+	// private createGenesisBlock(keys: Crypto.IKeyPair, transactions, timestamp: number) {
 	// 	transactions = transactions.sort((a, b) => {
 	// 		if (a.type === b.type) {
 	// 			return a.amount - b.amount;
@@ -282,7 +282,7 @@ export class CryptoGenerator extends Generator {
 	// 	return BigNumber.make(`0x${blockBuffer.toString("hex")}`).toString();
 	// }
 
-	// private signBlock(block, keys: Interfaces.IKeyPair): string {
+	// private signBlock(block, keys: Crypto.IKeyPair): string {
 	// 	return Crypto.Hash.signECDSA(this.getHash(block), keys);
 	// }
 

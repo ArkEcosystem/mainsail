@@ -36,7 +36,7 @@ afterEach(() => jest.clearAllMocks());
 
 describe("dposPreviousRound", () => {
 	let round: RoundInfo;
-	let blocks: Interfaces.IBlock[];
+	let blocks: Crypto.IBlock[];
 
 	beforeEach(async () => {
 		walletRepo.reset();
@@ -82,9 +82,9 @@ describe("dposPreviousRound", () => {
 				},
 			});
 
-			initialEnv.sandbox.app.rebind(Container.Identifiers.DposState).toConstantValue(dposState);
-			initialEnv.sandbox.app.rebind(Container.Identifiers.BlockState).toConstantValue(blockState);
-			initialEnv.sandbox.app.rebind(Container.Identifiers.StateStore).toConstantValue(stateStore);
+			initialEnv.sandbox.app.rebind(Identifiers.DposState).toConstantValue(dposState);
+			initialEnv.sandbox.app.rebind(Identifiers.BlockState).toConstantValue(blockState);
+			initialEnv.sandbox.app.rebind(Identifiers.StateStore).toConstantValue(stateStore);
 
 			const generatorWallet = walletRepo.findByPublicKey(blocks[0].data.generatorPublicKey);
 
@@ -119,8 +119,8 @@ describe("dposPreviousRound", () => {
 			const spySetDelegatesRound = jest.spyOn(dposState, "setDelegatesRound");
 			const spyRevertBlock = jest.spyOn(blockState, "revertBlock");
 
-			initialEnv.sandbox.app.rebind(Container.Identifiers.DposState).toConstantValue(dposState);
-			initialEnv.sandbox.app.rebind(Container.Identifiers.BlockState).toConstantValue(blockState);
+			initialEnv.sandbox.app.rebind(Identifiers.DposState).toConstantValue(dposState);
+			initialEnv.sandbox.app.rebind(Identifiers.BlockState).toConstantValue(blockState);
 
 			blocks[0].data.height = 1;
 

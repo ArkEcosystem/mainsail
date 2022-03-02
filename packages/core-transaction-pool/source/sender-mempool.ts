@@ -1,22 +1,22 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { SenderExceededMaximumTransactionCountError } from "./errors";
 
 @Container.injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.TransactionPoolSenderState)
+	@Container.inject(Identifiers.TransactionPoolSenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
 	private concurrency = 0;
 
 	private readonly lock: AppUtils.Lock = new AppUtils.Lock();
 
-	private readonly transactions: Interfaces.ITransaction[] = [];
+	private readonly transactions: Crypto.ITransaction[] = [];
 
 	public isDisposable(): boolean {
 		return this.transactions.length === 0 && this.concurrency === 0;
@@ -26,15 +26,15 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		return this.transactions.length;
 	}
 
-	public getFromEarliest(): Iterable<Interfaces.ITransaction> {
+	public getFromEarliest(): Iterable<Crypto.ITransaction> {
 		return [...this.transactions];
 	}
 
-	public getFromLatest(): Iterable<Interfaces.ITransaction> {
+	public getFromLatest(): Iterable<Crypto.ITransaction> {
 		return [...this.transactions].reverse();
 	}
 
-	public async addTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async addTransaction(transaction: Crypto.ITransaction): Promise<void> {
 		try {
 			this.concurrency++;
 
@@ -58,7 +58,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 	}
 
-	public async removeTransaction(id: string): Promise<Interfaces.ITransaction[]> {
+	public async removeTransaction(id: string): Promise<Crypto.ITransaction[]> {
 		try {
 			this.concurrency++;
 
@@ -68,7 +68,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 					return [];
 				}
 
-				const removedTransactions: Interfaces.ITransaction[] = this.transactions
+				const removedTransactions: Crypto.ITransaction[] = this.transactions
 					.splice(index, this.transactions.length - index)
 					.reverse();
 
@@ -87,7 +87,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 	}
 
-	public async removeForgedTransaction(id: string): Promise<Interfaces.ITransaction[]> {
+	public async removeForgedTransaction(id: string): Promise<Crypto.ITransaction[]> {
 		try {
 			this.concurrency++;
 

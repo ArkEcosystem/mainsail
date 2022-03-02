@@ -1,10 +1,10 @@
 import "jest-extended";
 
+import { EventEmitter } from "events";
 import { sleep } from "@arkecosystem/utils";
-import { Container, Contracts, Enums } from "@packages/core-kernel";
+import { Container, Enums } from "@packages/core-kernel";
 import { MemoryQueue } from "@packages/core-kernel/source/services/queue/drivers/memory";
 import { Sandbox } from "@packages/core-test-framework";
-import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
@@ -31,8 +31,8 @@ const logger = {
 beforeEach(() => {
 	sandbox = new Sandbox();
 
-	sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
-	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
+	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 	driver = sandbox.app.resolve<MemoryQueue>(MemoryQueue);
 });
 
@@ -526,21 +526,19 @@ describe("MemoryQueue", () => {
 	describe("DispatchEvents", () => {
 		const error = new Error("dummy_error");
 
-		const expectEventData = () => {
-			return expect.objectContaining({
-				driver: "memory",
-				executionTime: expect.toBeNumber(),
+		const expectEventData = () =>
+			expect.objectContaining({
 				data: "dummy_data",
-			});
-		};
-
-		const expectEventErrorData = () => {
-			return expect.objectContaining({
 				driver: "memory",
 				executionTime: expect.toBeNumber(),
-				error: expect.toBeOneOf([error]),
 			});
-		};
+
+		const expectEventErrorData = () =>
+			expect.objectContaining({
+				driver: "memory",
+				error: expect.toBeOneOf([error]),
+				executionTime: expect.toBeNumber(),
+			});
 
 		it("should dispatch 'queue.finished' after every processed job", async () => {
 			jobMethod.mockResolvedValue("dummy_data");

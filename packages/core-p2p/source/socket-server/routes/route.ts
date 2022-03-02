@@ -1,4 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
@@ -25,7 +26,7 @@ export type RouteConfig = {
 
 @Container.injectable()
 export abstract class Route {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public register(server: Hapi.Server): void {
@@ -34,16 +35,16 @@ export abstract class Route {
 
 		for (const [path, config] of Object.entries(this.getRoutesConfigByPath())) {
 			server.route({
-				method: "POST",
-				path,
 				config: {
-					id: config.id,
 					handler: config.handler,
+					id: config.id,
+					isInternal: true,
 					payload: {
 						maxBytes: config.maxBytes,
 					},
-					isInternal: true,
 				},
+				method: "POST",
+				path,
 			});
 		}
 	}

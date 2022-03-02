@@ -15,31 +15,31 @@ describe("DownloadBlocks", () => {
 		jest.resetAllMocks();
 
 		blockchain = {
-			isStopped: jest.fn().mockReturnValue(false),
-			dispatch: jest.fn(),
-			getQueue: jest.fn().mockReturnValue({ size: jest.fn().mockReturnValue(0) }),
 			clearQueue: jest.fn(),
+			dispatch: jest.fn(),
 			enqueueBlocks: jest.fn(),
+			getQueue: jest.fn().mockReturnValue({ size: jest.fn().mockReturnValue(0) }),
+			isStopped: jest.fn().mockReturnValue(false),
 		};
-		lastBlock = { data: { id: "1234", height: 3333, timestamp: 11111 } };
+		lastBlock = { data: { height: 3333, id: "1234", timestamp: 11_111 } };
 		stateStore = {
 			getLastBlock: () => lastBlock,
 			getLastDownloadedBlock: jest.fn(),
-			setLastDownloadedBlock: jest.fn(),
 			getNoBlockCounter: jest.fn().mockReturnValue(0),
+			setLastDownloadedBlock: jest.fn(),
 			setNoBlockCounter: jest.fn(),
 		};
-		logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn(), error: jest.fn() };
+		logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() };
 		peerNetworkMonitor = { downloadBlocksFromHeight: jest.fn() };
 
 		application = {};
 
 		container = new Container.Container();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
 
 		const getTimeStampForBlock = (height: number) => {
 			switch (height) {
@@ -74,7 +74,7 @@ describe("DownloadBlocks", () => {
 			const handlePromise = downloadBlocks.handle();
 			stateStore.getLastDownloadedBlock = jest
 				.fn()
-				.mockReturnValue({ data: { id: "987", height: 233, timestamp: 111 } });
+				.mockReturnValue({ data: { height: 233, id: "987", timestamp: 111 } });
 			await handlePromise;
 
 			expect(blockchain.dispatch).toHaveBeenCalledTimes(0);

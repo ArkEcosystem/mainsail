@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Logger } from "@packages/core-cli/source/services";
 
@@ -87,7 +86,7 @@ describe("Logger", () => {
 	});
 
 	it("should not log a message if the output is quiet", () => {
-		cli.app.get(Container.Identifiers.Output).setVerbosity(0);
+		cli.app.get(Identifiers.Output).setVerbosity(0);
 
 		const spyConsole = jest.spyOn(console, "log");
 

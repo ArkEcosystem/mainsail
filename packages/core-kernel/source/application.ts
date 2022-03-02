@@ -3,7 +3,6 @@ import { join } from "path";
 
 import * as Bootstrappers from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
-import * as Contracts from "./contracts";
 import { KernelEvent } from "./enums";
 import { DirectoryCannotBeFound } from "./exceptions/filesystem";
 import { Identifiers } from "./ioc";
@@ -13,15 +12,16 @@ import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
 import { JsonObject, KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
+import { Kernel } from "@arkecosystem/core-contracts";
 
-export class Application implements Contracts.Kernel.Application {
+export class Application implements Kernel.Application {
 	private booted: boolean = false;
 
-	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
+	public constructor(public readonly container: Kernel.Container.Container) {
 		// todo: enable this after solving the event emitter limit issues
 		// this.listenToShutdownSignals();
 
-		this.bind<Contracts.Kernel.Application>(Identifiers.Application).toConstantValue(this);
+		this.bind<Kernel.Application>(Identifiers.Application).toConstantValue(this);
 
 		this.bind<ConfigRepository>(Identifiers.ConfigRepository).to(ConfigRepository).inSingletonScope();
 
@@ -156,23 +156,17 @@ export class Application implements Contracts.Kernel.Application {
 	public enableMaintenance(): void {
 		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: +new Date() }));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
+		this.get<Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
 
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
-			"kernel.maintenance",
-			true,
-		);
+		this.get<Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch("kernel.maintenance", true);
 	}
 
 	public disableMaintenance(): void {
 		removeSync(this.tempPath("maintenance"));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
+		this.get<Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
 
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
-			"kernel.maintenance",
-			false,
-		);
+		this.get<Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch("kernel.maintenance", false);
 	}
 
 	public isDownForMaintenance(): boolean {
@@ -183,25 +177,21 @@ export class Application implements Contracts.Kernel.Application {
 		this.booted = false;
 
 		if (reason) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice(reason);
+			this.get<Kernel.Logger>(Identifiers.LogService).notice(reason);
 		}
 
 		if (error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack);
+			this.get<Kernel.Logger>(Identifiers.LogService).error(error.stack);
 		}
 
 		await this.disposeServiceProviders();
 	}
 
-	public bind<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindingToSyntax<T> {
+	public bind<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): Kernel.Container.BindingToSyntax<T> {
 		return this.container.bind(serviceIdentifier);
 	}
 
-	public rebind<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
-	): Contracts.Kernel.Container.BindingToSyntax<T> {
+	public rebind<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): Kernel.Container.BindingToSyntax<T> {
 		if (this.container.isBound(serviceIdentifier)) {
 			this.container.unbind(serviceIdentifier);
 		}
@@ -209,33 +199,33 @@ export class Application implements Contracts.Kernel.Application {
 		return this.container.bind(serviceIdentifier);
 	}
 
-	public unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void {
+	public unbind<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): void {
 		return this.container.unbind(serviceIdentifier);
 	}
 
-	public get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T {
+	public get<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): T {
 		return this.container.get(serviceIdentifier);
 	}
 
 	public getTagged<T>(
-		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+		serviceIdentifier: Kernel.Container.ServiceIdentifier<T>,
 		key: string | number | symbol,
 		value: any,
 	): T {
 		return this.container.getTagged(serviceIdentifier, key, value);
 	}
 
-	public isBound<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): boolean {
+	public isBound<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): boolean {
 		return this.container.isBound(serviceIdentifier);
 	}
 
-	public resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T {
+	public resolve<T>(constructorFunction: Kernel.Container.Newable<T>): T {
 		return this.container.resolve(constructorFunction);
 	}
 
 	private async bootstrapWith(type: string): Promise<void> {
 		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers[type]);
-		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
+		const events: Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
 
 		for (const bootstrapper of bootstrappers) {
 			events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
@@ -256,7 +246,7 @@ export class Application implements Contracts.Kernel.Application {
 		).allLoadedProviders();
 
 		for (const serviceProvider of serviceProviders.reverse()) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).debug(`Disposing ${serviceProvider.name()}...`);
+			this.get<Kernel.Logger>(Identifiers.LogService).debug(`Disposing ${serviceProvider.name()}...`);
 
 			try {
 				await serviceProvider.dispose();

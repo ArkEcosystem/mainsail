@@ -20,10 +20,10 @@ describe("PeerConnector", () => {
 
 		const container = new Container.Container();
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PeerConnector).to(PeerConnector);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PeerConnector).to(PeerConnector);
 
-		peerConnector = container.get<PeerConnector>(Container.Identifiers.PeerConnector);
+		peerConnector = container.get<PeerConnector>(Identifiers.PeerConnector);
 	});
 
 	afterEach(() => {

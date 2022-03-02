@@ -17,8 +17,8 @@ describe("TransactionsController", () => {
 	beforeEach(() => {
 		sandbox = new Sandbox();
 
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		sandbox.app.bind(Container.Identifiers.TransactionPoolProcessor).toConstantValue(processor);
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue(processor);
 
 		transactionsController = sandbox.app.resolve<TransactionsController>(TransactionsController);
 	});

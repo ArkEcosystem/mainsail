@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-kernel";
 import { Utils } from "@arkecosystem/crypto";
 import { Services } from "@packages/core-kernel";
 import { Wallet, WalletEvent } from "@packages/core-state/source/wallets";
@@ -169,9 +169,7 @@ describe("Original", () => {
 
 	beforeEach(() => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
-		);
+		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService);
 		wallet = new Wallet("Abcde", attributeMap, events);
 
 		jest.resetAllMocks();
@@ -309,9 +307,7 @@ describe("Clone", () => {
 
 	beforeEach(() => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
-		);
+		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService);
 		const wallet = new Wallet("Abcde", attributeMap, events);
 		clone = wallet.clone();
 

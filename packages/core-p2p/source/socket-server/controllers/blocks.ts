@@ -1,6 +1,6 @@
-import Interfaces, { BINDINGS, IBlockDeserializer, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Contracts, Providers, Utils } from "@arkecosystem/core-kernel";
+import { Container, Providers, Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
@@ -9,23 +9,23 @@ import { mapAddr } from "../utils/map-addr";
 import { Controller } from "./controller";
 
 export class BlocksController extends Controller {
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-p2p")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
+	@Container.inject(Identifiers.DatabaseService)
 	private readonly database!: DatabaseService;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration!: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Block.Deserializer)
-	private readonly deserializer!: IBlockDeserializer;
+	@Container.inject(Identifiers.Cryptography.Block.Deserializer)
+	private readonly deserializer!: Crypto.IBlockDeserializer;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	public async postBlock(
@@ -41,11 +41,11 @@ export class BlocksController extends Controller {
 		}
 
 		const deserialized: {
-			data: Interfaces.IBlockData;
-			transactions: Interfaces.ITransaction[];
+			data: Crypto.IBlockData;
+			transactions: Crypto.ITransaction[];
 		} = await this.deserializer.deserialize(blockBuffer);
 
-		const block: Interfaces.IBlockData = {
+		const block: Crypto.IBlockData = {
 			...deserialized.data,
 			transactions: deserialized.transactions.map((tx) => tx.data),
 		};
@@ -60,7 +60,7 @@ export class BlocksController extends Controller {
 				return { height: this.blockchain.getLastHeight(), status: true };
 			}
 
-			const lastDownloadedBlock: Interfaces.IBlockData = this.blockchain.getLastDownloadedBlock();
+			const lastDownloadedBlock: Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
 
 			const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
 				this.app,
@@ -89,7 +89,7 @@ export class BlocksController extends Controller {
 	public async getBlocks(
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
-	): Promise<Interfaces.IBlockData[] | Contracts.Shared.DownloadBlock[]> {
+	): Promise<Crypto.IBlockData[] | Contracts.Shared.DownloadBlock[]> {
 		const requestBlockHeight: number = +(request.payload as any).lastBlockHeight + 1;
 		const requestBlockLimit: number = +(request.payload as any).blockLimit || 400;
 		const requestHeadersOnly = !!(request.payload as any).headersOnly;

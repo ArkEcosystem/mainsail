@@ -1,6 +1,5 @@
 import "jest-extended";
 
-import { Container } from "@packages/core-kernel/source";
 import { StateStore } from "@packages/core-state/source/stores/state";
 import { FactoryBuilder } from "@packages/core-test-framework/source/factories";
 import { IBlock, IBlockData, ITransactionData } from "@packages/crypto/distribution/interfaces";
@@ -9,18 +8,18 @@ import delay from "delay";
 import { makeChainedBlocks } from "../__utils__/make-chained-block";
 import { setUp } from "../setup";
 
-let blocks: IBlock[];
+let blocks: Crypto.IBlock[];
 let stateStorage: StateStore;
 let factory: FactoryBuilder;
 let logger: jest.SpyInstance;
 let dispatchSpy: jest.SpyInstance;
 
 beforeEach(async () => {
-	const initialEnv = await setUp();
-	factory = initialEnv.factory;
-	logger = initialEnv.spies.logger.info;
-	dispatchSpy = initialEnv.spies.dispatchSpy;
-	stateStorage = initialEnv.sandbox.app.get(Container.Identifiers.StateStore);
+	const initialEnvironment = await setUp();
+	factory = initialEnvironment.factory;
+	logger = initialEnvironment.spies.logger.info;
+	dispatchSpy = initialEnvironment.spies.dispatchSpy;
+	stateStorage = initialEnvironment.sandbox.app.get(Identifiers.StateStore);
 	blocks = makeChainedBlocks(101, factory.get("Block"));
 });
 
@@ -189,27 +188,27 @@ describe("State Storage", () => {
 		});
 
 		it("should not exceed the max last blocks", () => {
-			for (let i = 0; i < 100; i++) {
+			for (let index = 0; index < 100; index++) {
 				// 100 is default
-				stateStorage.setLastBlock(blocks[i]);
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
 			expect(stateStorage.getLastBlocks()).toHaveLength(100);
 			expect(stateStorage.getLastBlock()).toBe(blocks[99]);
-			expect(stateStorage.getLastBlocks().slice(-1)[0]).toBe(blocks[0]);
+			expect(stateStorage.getLastBlocks().at(-1)).toBe(blocks[0]);
 
 			// Push one more to remove the first last block.
 			stateStorage.setLastBlock(blocks[100]);
 
 			expect(stateStorage.getLastBlocks()).toHaveLength(100);
 			expect(stateStorage.getLastBlock()).toBe(blocks[100]);
-			expect(stateStorage.getLastBlocks().slice(-1)[0]).toBe(blocks[1]);
+			expect(stateStorage.getLastBlocks().at(-1)).toBe(blocks[1]);
 		});
 
 		it("should remove last blocks when going to lower height", () => {
-			for (let i = 0; i < 100; i++) {
+			for (let index = 0; index < 100; index++) {
 				// 100 is default
-				stateStorage.setLastBlock(blocks[i]);
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
 			expect(stateStorage.getLastBlocks()).toHaveLength(100);
@@ -230,60 +229,60 @@ describe("State Storage", () => {
 
 	describe("getLastBlocks", () => {
 		it("should return the last blocks", () => {
-			for (let i = 0; i < 5; i++) {
-				stateStorage.setLastBlock(blocks[i]);
+			for (let index = 0; index < 5; index++) {
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
 			const lastBlocks = stateStorage.getLastBlocks();
 			expect(lastBlocks).toHaveLength(5);
 
-			for (let i = 0; i < 5; i++) {
-				expect(lastBlocks[i].data.height).toBe(6 - i); // Height started at 2
-				expect(lastBlocks[i]).toBe(blocks[4 - i]);
+			for (let index = 0; index < 5; index++) {
+				expect(lastBlocks[index].data.height).toBe(6 - index); // Height started at 2
+				expect(lastBlocks[index]).toBe(blocks[4 - index]);
 			}
 		});
 	});
 
 	describe("getLastBlocksData", () => {
 		it("should return the last blocks data", () => {
-			for (let i = 0; i < 5; i++) {
-				stateStorage.setLastBlock(blocks[i]);
+			for (let index = 0; index < 5; index++) {
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
-			const lastBlocksData = stateStorage.getLastBlocksData().toArray() as IBlockData[];
+			const lastBlocksData = stateStorage.getLastBlocksData().toArray() as Crypto.IBlockData[];
 			expect(lastBlocksData).toHaveLength(5);
 
-			for (let i = 0; i < 5; i++) {
-				expect(lastBlocksData[i].height).toBe(6 - i); // Height started at 2
-				expect(lastBlocksData[i]).toHaveProperty("transactions");
-				delete lastBlocksData[i].transactions;
-				expect(lastBlocksData[i]).toEqual(blocks[4 - i].data);
+			for (let index = 0; index < 5; index++) {
+				expect(lastBlocksData[index].height).toBe(6 - index); // Height started at 2
+				expect(lastBlocksData[index]).toHaveProperty("transactions");
+				delete lastBlocksData[index].transactions;
+				expect(lastBlocksData[index]).toEqual(blocks[4 - index].data);
 			}
 		});
 
 		it("should return last blocks data with headers only", () => {
-			for (let i = 0; i < 5; i++) {
-				stateStorage.setLastBlock(blocks[i]);
+			for (let index = 0; index < 5; index++) {
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
-			const lastBlocksData = stateStorage.getLastBlocksData(true).toArray() as IBlockData[];
+			const lastBlocksData = stateStorage.getLastBlocksData(true).toArray() as Crypto.IBlockData[];
 
 			expect(lastBlocksData).toHaveLength(5);
 		});
 
 		it("should return last blocks which have transactions", () => {
-			for (let i = 0; i < 5; i++) {
+			for (let index = 0; index < 5; index++) {
 				// @ts-ignore
-				blocks[i].transactions = [
+				blocks[index].transactions = [
 					// @ts-ignore
 					{
 						id: "test",
 					},
 				];
-				stateStorage.setLastBlock(blocks[i]);
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
-			const lastBlocksData = stateStorage.getLastBlocksData().toArray() as IBlockData[];
+			const lastBlocksData = stateStorage.getLastBlocksData().toArray() as Crypto.IBlockData[];
 
 			expect(lastBlocksData).toHaveLength(5);
 		});
@@ -297,15 +296,15 @@ describe("State Storage", () => {
 
 	describe("getLastBlockIds", () => {
 		it("should return the last blocks data", () => {
-			for (let i = 0; i < 5; i++) {
-				stateStorage.setLastBlock(blocks[i]);
+			for (let index = 0; index < 5; index++) {
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
 			const lastBlockIds = stateStorage.getLastBlockIds();
 			expect(lastBlockIds).toHaveLength(5);
 
-			for (let i = 0; i < 5; i++) {
-				expect(lastBlockIds[i]).toBe(blocks[4 - i].data.id);
+			for (let index = 0; index < 5; index++) {
+				expect(lastBlockIds[index]).toBe(blocks[4 - index].data.id);
 			}
 		});
 	});
@@ -320,8 +319,8 @@ describe("State Storage", () => {
 
 	describe("getLastBlocksByHeight", () => {
 		it("should return the last blocks data", () => {
-			for (let i = 0; i < 100; i++) {
-				stateStorage.setLastBlock(blocks[i]);
+			for (let index = 0; index < 100; index++) {
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
 			const lastBlocksByHeight = stateStorage.getLastBlocksByHeight(0, 101);
@@ -330,8 +329,8 @@ describe("State Storage", () => {
 		});
 
 		it("should return one last block if no end height", () => {
-			for (let i = 0; i < 100; i++) {
-				stateStorage.setLastBlock(blocks[i]);
+			for (let index = 0; index < 100; index++) {
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
 			const lastBlocksByHeight = stateStorage.getLastBlocksByHeight(50);
@@ -380,8 +379,8 @@ describe("State Storage", () => {
 
 	describe("getCommonBlocks", () => {
 		it("should get common blocks", () => {
-			for (let i = 0; i < 100; i++) {
-				stateStorage.setLastBlock(blocks[i]);
+			for (let index = 0; index < 100; index++) {
+				stateStorage.setLastBlock(blocks[index]);
 			}
 
 			// Heights 90 - 100
@@ -390,8 +389,8 @@ describe("State Storage", () => {
 			expect(ids).toHaveLength(10);
 			expect(commonBlocks).toHaveLength(10);
 
-			for (let i = 0; i < commonBlocks.length; i++) {
-				expect(commonBlocks[i].height).toBe(blocks[98 - i].data.height);
+			for (const [index, commonBlock] of commonBlocks.entries()) {
+				expect(commonBlock.height).toBe(blocks[98 - index].data.height);
 			}
 		});
 	});
@@ -419,8 +418,8 @@ describe("State Storage", () => {
 
 		it("should not add more than 10000 unique transaction ids", () => {
 			const transactions = [];
-			for (let i = 0; i < 10000; i++) {
-				transactions.push({ id: i.toString() });
+			for (let index = 0; index < 10_000; index++) {
+				transactions.push({ id: index.toString() });
 			}
 
 			expect(stateStorage.cacheTransactions(transactions)).toEqual({
@@ -428,14 +427,14 @@ describe("State Storage", () => {
 				notAdded: [],
 			});
 
-			expect(stateStorage.getCachedTransactionIds()).toHaveLength(10000);
+			expect(stateStorage.getCachedTransactionIds()).toHaveLength(10_000);
 			expect(stateStorage.getCachedTransactionIds()[0]).toEqual("0");
 
 			expect(stateStorage.cacheTransactions([{ id: "10000" } as any])).toEqual({
 				added: [{ id: "10000" }],
 				notAdded: [],
 			});
-			expect(stateStorage.getCachedTransactionIds()).toHaveLength(10000);
+			expect(stateStorage.getCachedTransactionIds()).toHaveLength(10_000);
 			expect(stateStorage.getCachedTransactionIds()[0]).toEqual("1");
 		});
 	});
@@ -443,8 +442,8 @@ describe("State Storage", () => {
 	describe("clearCachedTransactionIds", () => {
 		it("should remove cached transaction ids", () => {
 			const transactions = [];
-			for (let i = 0; i < 10; i++) {
-				transactions.push({ id: i.toString() });
+			for (let index = 0; index < 10; index++) {
+				transactions.push({ id: index.toString() });
 			}
 
 			expect(stateStorage.cacheTransactions(transactions)).toEqual({
@@ -477,13 +476,13 @@ describe("State Storage", () => {
 		});
 
 		it("should return true if block pinged == current blockPing and should update stats", async () => {
-			const currentTime = new Date().getTime();
+			const currentTime = Date.now();
 			// @ts-ignore
 			stateStorage.blockPing = {
+				block: blocks[5].data,
 				count: 1,
 				first: currentTime,
 				last: currentTime,
-				block: blocks[5].data,
 			};
 			await delay(20);
 
@@ -497,13 +496,13 @@ describe("State Storage", () => {
 		});
 
 		it("should return false if block pinged != current blockPing", () => {
-			const currentTime = new Date().getTime();
+			const currentTime = Date.now();
 			// @ts-ignore
 			stateStorage.blockPing = {
+				block: blocks[3].data,
 				count: 1,
 				first: currentTime,
 				last: currentTime,
-				block: blocks[3].data,
 			};
 			expect(stateStorage.pingBlock(blocks[5].data)).toBeFalse();
 
@@ -531,10 +530,10 @@ describe("State Storage", () => {
 		it("should log info message if there is already a blockPing", async () => {
 			// @ts-ignore
 			stateStorage.blockPing = {
-				count: 1,
-				first: new Date().getTime(),
-				last: new Date().getTime(),
 				block: blocks[3].data,
+				count: 1,
+				first: Date.now(),
+				last: Date.now(),
 			};
 
 			stateStorage.pushPingBlock(blocks[5].data);
@@ -551,10 +550,10 @@ describe("State Storage", () => {
 		it("should log info message if there is already a blockPing when pushed fromForger", async () => {
 			// @ts-ignore
 			stateStorage.blockPing = {
-				count: 0,
-				first: new Date().getTime(),
-				last: new Date().getTime(),
 				block: blocks[3].data,
+				count: 0,
+				first: Date.now(),
+				last: Date.now(),
 			};
 
 			stateStorage.pushPingBlock(blocks[5].data, true);
@@ -587,14 +586,14 @@ describe("State Storage", () => {
 
 	describe("setWakeUpTimeout", () => {
 		it("should call callback and clear timeout", async () => {
-			const callbackFn = jest.fn();
+			const callbackFunction = jest.fn();
 			const spyOnClearWakeUpTimeout = jest.spyOn(stateStorage, "clearWakeUpTimeout");
 
-			stateStorage.setWakeUpTimeout(callbackFn, 100);
+			stateStorage.setWakeUpTimeout(callbackFunction, 100);
 
 			await delay(200);
 
-			expect(callbackFn).toHaveBeenCalled();
+			expect(callbackFunction).toHaveBeenCalled();
 			expect(spyOnClearWakeUpTimeout).toHaveBeenCalled();
 		});
 	});

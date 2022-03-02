@@ -1,14 +1,15 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
 
 import { InternalRoute } from "../routes/internal";
 
 @Container.injectable()
 export class WhitelistForgerPlugin {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PeerProcessor)
+	@Container.inject(Identifiers.PeerProcessor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server) {
@@ -16,7 +17,6 @@ export class WhitelistForgerPlugin {
 		const peerProcessor = this.peerProcessor;
 
 		server.ext({
-			type: "onPreAuth",
 			async method(request, h) {
 				if (peerRoutesConfigByPath[request.path]) {
 					if (peerProcessor.isWhitelisted({ ip: request.info.remoteAddress } as Contracts.P2P.Peer)) {
@@ -28,6 +28,7 @@ export class WhitelistForgerPlugin {
 					return h.continue;
 				}
 			},
+			type: "onPreAuth",
 		});
 	}
 }

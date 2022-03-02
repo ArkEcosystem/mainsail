@@ -1,4 +1,4 @@
-import { Application, Container, Contracts, Exceptions } from "@arkecosystem/core-kernel";
+import { Application, Container, Exceptions } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
@@ -15,14 +15,14 @@ describe<{
 	recipientWallet: Wallets.Wallet;
 	walletRepository: Contracts.State.WalletRepository;
 	factoryBuilder: Factories.FactoryBuilder;
-	multiPaymentTransaction: Interfaces.ITransaction;
-	multiSignatureMultiPaymentTransaction: Interfaces.ITransaction;
+	multiPaymentTransaction: Crypto.ITransaction;
+	multiSignatureMultiPaymentTransaction: Crypto.ITransaction;
 	handler: TransactionHandler;
 	store: any;
 	transactionHistoryService: any;
 }>("MultiPaymentTransaction", ({ assert, beforeEach, it, spyFn, stub }) => {
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.transactionHistoryService = {
@@ -35,11 +35,9 @@ describe<{
 		Managers.configManager.setConfig(config);
 
 		context.app = initApp();
-		context.app
-			.bind(Container.Identifiers.TransactionHistoryService)
-			.toConstantValue(context.transactionHistoryService);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(context.transactionHistoryService);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -54,7 +52,7 @@ describe<{
 		context.walletRepository.index(context.recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(

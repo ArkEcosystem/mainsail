@@ -1,4 +1,5 @@
-import { Application } from "../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { Identifiers, inject, injectable } from "../../ioc";
 import {
 	Cache,
@@ -17,7 +18,7 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class RegisterBaseServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
 		await this.app.resolve(Log.ServiceProvider).register();

@@ -1,11 +1,11 @@
-import { Contracts } from "../..";
-import { Application } from "../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 // @ts-ignore
-import { BlockEvent, KernelEvent, StateEvent } from "../../enums";
+import { BlockEvent, KernelEvent } from "../../enums";
 import { ServiceProviderCannotBeBooted } from "../../exceptions/plugins";
 import { Identifiers, inject, injectable } from "../../ioc";
 // @ts-ignore
-import { ServiceProvider, ServiceProviderRepository } from "../../providers";
+import { ServiceProviderRepository } from "../../providers";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
 import { ChangeServiceProviderState } from "./listeners";
@@ -15,16 +15,16 @@ import { ChangeServiceProviderState } from "./listeners";
 @injectable()
 export class BootServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Kernel.Application;
 
 	@inject(Identifiers.ServiceProviderRepository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
+	private readonly events!: Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	private readonly logger!: Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
 		for (const [name, serviceProvider] of this.serviceProviders.all()) {
@@ -49,7 +49,7 @@ export class BootServiceProviders implements Bootstrapper {
 				this.serviceProviders.defer(name);
 			}
 
-			const eventListener: Contracts.Kernel.EventListener = this.app
+			const eventListener: Kernel.EventListener = this.app
 				.resolve(ChangeServiceProviderState)
 				.initialize(serviceProviderName, serviceProvider);
 

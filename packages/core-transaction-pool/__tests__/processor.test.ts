@@ -34,12 +34,12 @@ const workerPool = { getTransactionFromData: jest.fn() };
 const logger = { error: jest.fn() };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.TransactionPoolProcessorExtension).toConstantValue(extensions[0]);
-container.bind(Container.Identifiers.TransactionPoolProcessorExtension).toConstantValue(extensions[1]);
-container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(pool);
-container.bind(Container.Identifiers.PeerTransactionBroadcaster).toConstantValue(transactionBroadcaster);
-container.bind(Container.Identifiers.TransactionPoolWorkerPool).toConstantValue(workerPool);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(extensions[0]);
+container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(extensions[1]);
+container.bind(Identifiers.TransactionPoolService).toConstantValue(pool);
+container.bind(Identifiers.PeerTransactionBroadcaster).toConstantValue(transactionBroadcaster);
+container.bind(Identifiers.TransactionPoolWorkerPool).toConstantValue(workerPool);
+container.bind(Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
 	jest.resetAllMocks();
@@ -84,8 +84,8 @@ describe("Processor.process", () => {
 		expect(result.invalid).toEqual([transaction1.id]);
 		expect(result.errors).toEqual({
 			[transaction1.data.id]: {
-				type: "ERR_BAD_DATA",
 				message: "Invalid transaction data: Version 1 not supported",
+				type: "ERR_BAD_DATA",
 			},
 		});
 	});

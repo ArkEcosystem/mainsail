@@ -1,4 +1,5 @@
-import { Kernel } from "../contracts";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { Identifiers, inject, injectable } from "../ioc";
 // todo: revisit the implementation of the class and see if it can be removed
 // import { Class } from "../types";

@@ -1,12 +1,13 @@
-import { Pipeline, Stage } from "../../../contracts/kernel";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { injectable } from "../../../ioc";
 
 @injectable()
-export class MemoryPipeline implements Pipeline {
-	public constructor(private readonly stages: Array<Function | Stage> = []) {}
+export class MemoryPipeline implements Kernel.Pipeline {
+	public constructor(private readonly stages: Array<Function | Kernel.Stage> = []) {}
 
-	public pipe(stage: Function | Stage): Pipeline {
-		const stages: Array<Function | Stage> = [...this.stages];
+	public pipe(stage: Function | Kernel.Stage): Kernel.Pipeline {
+		const stages: Array<Function | Kernel.Stage> = [...this.stages];
 
 		stages.push(stage);
 

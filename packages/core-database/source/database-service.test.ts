@@ -67,15 +67,15 @@ describe<{
 		};
 
 		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.app);
-		context.container.bind(Container.Identifiers.DatabaseConnection).toConstantValue(context.connection);
-		context.container.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);
+		context.container.bind(Identifiers.Application).toConstantValue(context.app);
+		context.container.bind(Identifiers.DatabaseConnection).toConstantValue(context.connection);
+		context.container.bind(Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);
 		context.container
-			.bind(Container.Identifiers.DatabaseTransactionRepository)
+			.bind(Identifiers.DatabaseTransactionRepository)
 			.toConstantValue(context.transactionRepository);
-		context.container.bind(Container.Identifiers.DatabaseRoundRepository).toConstantValue(context.roundRepository);
-		context.container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.events);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.DatabaseRoundRepository).toConstantValue(context.roundRepository);
+		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.events);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 	});
 
 	afterEach(() => {

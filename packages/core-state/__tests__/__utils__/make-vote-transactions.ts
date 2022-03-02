@@ -1,10 +1,9 @@
 import { Transactions } from "@packages/crypto";
-import { ITransaction } from "@packages/crypto/distribution/interfaces";
 
-export const makeVoteTransactions = (length: number, voteAssets: string[]): ITransaction[] => {
-	const txs: ITransaction[] = [];
-	for (let i = 0; i < length; i++) {
-		txs[i] = Transactions.BuilderFactory.vote().sign(Math.random().toString(36)).votesAsset(voteAssets).build();
+export const makeVoteTransactions = (length: number, voteAssets: string[]): Crypto.ITransaction[] => {
+	const txs: Crypto.ITransaction[] = [];
+	for (let index = 0; index < length; index++) {
+		txs[index] = Transactions.BuilderFactory.vote().sign(Math.random().toString(36)).votesAsset(voteAssets).build();
 	}
 	return txs;
 };

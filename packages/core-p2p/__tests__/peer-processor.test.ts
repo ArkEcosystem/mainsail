@@ -30,26 +30,26 @@ describe("PeerProcessor", () => {
 		forgetPendingPeer: jest.fn(),
 	};
 	const peerFactory = (ip) => new Peer(ip, 4000);
-	const appGet = { [Container.Identifiers.PeerFactory]: peerFactory };
+	const appGet = { [Identifiers.PeerFactory]: peerFactory };
 	const app = { get: (key) => appGet[key], resolve: jest.fn() };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(pluginConfiguration);
-		container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
-		container.bind(Container.Identifiers.PeerCommunicator).toConstantValue(peerCommunicator);
-		container.bind(Container.Identifiers.PeerConnector).toConstantValue(peerConnector);
-		container.bind(Container.Identifiers.PeerRepository).toConstantValue(peerRepository);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.PluginConfiguration).toConstantValue(pluginConfiguration);
+		container.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
+		container.bind(Identifiers.PeerCommunicator).toConstantValue(peerCommunicator);
+		container.bind(Identifiers.PeerConnector).toConstantValue(peerConnector);
+		container.bind(Identifiers.PeerRepository).toConstantValue(peerRepository);
+		container.bind(Identifiers.Application).toConstantValue(app);
 
-		container.bind(Container.Identifiers.PeerProcessor).to(PeerProcessor);
+		container.bind(Identifiers.PeerProcessor).to(PeerProcessor);
 
 		process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA = "true";
 	});
 
 	beforeEach(() => {
-		peerProcessor = container.get<PeerProcessor>(Container.Identifiers.PeerProcessor);
+		peerProcessor = container.get<PeerProcessor>(Identifiers.PeerProcessor);
 
 		jest.resetAllMocks();
 	});

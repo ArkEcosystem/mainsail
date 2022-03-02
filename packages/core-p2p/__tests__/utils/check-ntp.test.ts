@@ -14,7 +14,7 @@ jest.mock("@hapi/sntp", () => {
 
 const logger = { error: jest.fn() };
 const appGet = {
-	[Container.Identifiers.LogService]: logger,
+	[Identifiers.LogService]: logger,
 };
 const app = {
 	get: (id: any) => appGet[id],

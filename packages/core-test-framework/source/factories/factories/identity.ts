@@ -1,4 +1,4 @@
-// import Interfaces from "@arkecosystem/core-crypto-contracts";
+// import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 // import { generateMnemonic } from "bip39";
 
 import { FactoryBuilder } from "../factory-builder";
@@ -6,7 +6,7 @@ import { FactoryBuilder } from "../factory-builder";
 export const registerIdentityFactory = (factory: FactoryBuilder): void => {
 	// factory.set("Identity", ({ options }) => {
 	// 	const passphrase: string = options.passphrase || generateMnemonic();
-	// 	const keys: Interfaces.IKeyPair = Identities.Keys.fromMnemonic(passphrase);
+	// 	const keys: Crypto.IKeyPair = Identities.Keys.fromMnemonic(passphrase);
 	// 	return {
 	// 		address: this.addressFactory.fromMnemonic(passphrase, options.network?.pubKeyHash),
 	// 		keys,

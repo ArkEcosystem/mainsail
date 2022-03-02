@@ -1,4 +1,4 @@
-import { Application, Container, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
+import { Application, Container, Exceptions, Services } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, getWalletAttributeSet, passphrases } from "@arkecosystem/core-test-framework";
 import { Mempool } from "@arkecosystem/core-transaction-pool";
@@ -22,14 +22,14 @@ describe<{
 	recipientWallet: Wallets.Wallet;
 	walletRepository: Contracts.State.WalletRepository;
 	factoryBuilder: Factories.FactoryBuilder;
-	multiSignatureTransaction: Interfaces.ITransaction;
-	multiSignatureAsset: Interfaces.IMultiSignatureAsset;
+	multiSignatureTransaction: Crypto.ITransaction;
+	multiSignatureAsset: Crypto.IMultiSignatureAsset;
 	handler: TransactionHandler;
 	store: any;
 	transactionHistoryService: any;
 }>("MultiSignatureRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spyFn, stub }) => {
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.transactionHistoryService = {
@@ -42,11 +42,9 @@ describe<{
 		Managers.configManager.setConfig(config);
 
 		context.app = initApp();
-		context.app
-			.bind(Container.Identifiers.TransactionHistoryService)
-			.toConstantValue(context.transactionHistoryService);
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(context.transactionHistoryService);
 
-		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
 		context.factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(context.factoryBuilder);
@@ -58,7 +56,7 @@ describe<{
 		context.walletRepository.index(context.senderWallet);
 		context.walletRepository.index(context.recipientWallet);
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
+			Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
@@ -168,7 +166,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should throw with aip11 set to false and transaction is legacy", async (context) => {
-		const legacyAssset: Interfaces.IMultiSignatureLegacyAsset = {
+		const legacyAssset: Crypto.IMultiSignatureLegacyAsset = {
 			keysgroup: [
 				"+039180ea4a8a803ee11ecb462bb8f9613fcdb5fe917e292dbcc73409f0e98f8f22",
 				"+028d3611c4f32feca3e6713992ae9387e18a0e01954046511878fe078703324dc0",
@@ -334,7 +332,7 @@ describe<{
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
 		await context.app
-			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPoolMempool)
 			.addTransaction(context.multiSignatureTransaction);
 
 		await assert.rejects(
@@ -359,7 +357,7 @@ describe<{
 			.build();
 
 		await context.app
-			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPoolMempool)
 			.addTransaction(context.multiSignatureTransaction);
 
 		await assert.rejects(

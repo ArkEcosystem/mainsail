@@ -1,17 +1,11 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IAddressFactory,
-	IKeyPair,
-	IKeyPairFactory,
-	IMultiSignatureAsset,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { ethers } from "ethers";
 
 @Container.injectable()
-export class AddressFactory implements IAddressFactory {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+export class AddressFactory implements Crypto.IAddressFactory {
+	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
@@ -25,11 +19,11 @@ export class AddressFactory implements IAddressFactory {
 		return "";
 	}
 
-	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
+	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
 		return "";
 	}
 
-	public async fromPrivateKey(privateKey: IKeyPair): Promise<string> {
+	public async fromPrivateKey(privateKey: Crypto.IKeyPair): Promise<string> {
 		return "";
 	}
 

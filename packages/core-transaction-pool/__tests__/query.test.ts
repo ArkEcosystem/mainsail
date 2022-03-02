@@ -10,7 +10,7 @@ const mempool = {
 };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.TransactionPoolMempool).toConstantValue(mempool);
+container.bind(Identifiers.TransactionPoolMempool).toConstantValue(mempool);
 
 beforeEach(() => {
 	mempool.getSenderMempools.mockReset();

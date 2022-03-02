@@ -1,12 +1,10 @@
+import { Kernel } from "@arkecosystem/core-contracts";
 import { dotenv, get, set } from "@arkecosystem/utils";
 import { existsSync, readFileSync } from "fs";
 import importFresh from "import-fresh";
 import Joi from "joi";
 import { extname } from "path";
 
-import { Application } from "../../../contracts/kernel";
-import { ConfigLoader } from "../../../contracts/kernel/config";
-import { Validator } from "../../../contracts/kernel/validation";
 import {
 	ApplicationConfigurationCannotBeLoaded,
 	EnvironmentConfigurationCannotBeLoaded,
@@ -19,22 +17,22 @@ import { ConfigRepository } from "../repository";
 
 const processSchema = {
 	flags: Joi.array().items(Joi.string()).optional(),
-	services: Joi.object().optional(),
 	plugins: Joi.array()
-		.items(Joi.object().keys({ package: Joi.string(), options: Joi.object().optional() }))
+		.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
 		.required(),
+	services: Joi.object().optional(),
 };
 
 @injectable()
-export class LocalConfigLoader implements ConfigLoader {
+export class LocalConfigLoader implements Kernel.ConfigLoader {
 	@inject(Identifiers.Application)
-	protected readonly app!: Application;
+	protected readonly app!: Kernel.Application;
 
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
 	@inject(Identifiers.ValidationService)
-	private readonly validationService!: Validator;
+	private readonly validationService!: Kernel.Validator;
 
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
@@ -71,8 +69,8 @@ export class LocalConfigLoader implements ConfigLoader {
 			this.loadFromLocation(["app.json", "app.js"]),
 			Joi.object({
 				core: Joi.object().keys(processSchema).required(),
-				relay: Joi.object().keys(processSchema).required(),
 				forger: Joi.object().keys(processSchema).required(),
+				relay: Joi.object().keys(processSchema).required(),
 			}).unknown(true),
 		);
 
@@ -117,8 +115,8 @@ export class LocalConfigLoader implements ConfigLoader {
 		this.validationService.validate(
 			this.loadFromLocation(["delegates.json"]),
 			Joi.object({
-				secrets: Joi.array().items(Joi.string()).optional(),
 				bip38: Joi.string().optional(),
+				secrets: Joi.array().items(Joi.string()).optional(),
 			}),
 		);
 

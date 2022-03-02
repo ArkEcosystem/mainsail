@@ -1,5 +1,7 @@
-import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Providers } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
+
 import { RateLimiter } from "../../rate-limiter";
 import { buildRateLimiter } from "../../utils/build-rate-limiter";
 import { BlocksRoute } from "../routes/blocks";
@@ -9,10 +11,10 @@ import { TransactionsRoute } from "../routes/transactions";
 
 @Container.injectable()
 export class RateLimitPlugin {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
@@ -20,10 +22,10 @@ export class RateLimitPlugin {
 
 	public register(server) {
 		this.rateLimiter = buildRateLimiter({
-			whitelist: [],
-			remoteAccess: this.configuration.getOptional<Array<string>>("remoteAccess", []),
 			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
 			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
+			remoteAccess: this.configuration.getOptional<Array<string>>("remoteAccess", []),
+			whitelist: [],
 		});
 
 		const allRoutesConfigByPath = {
@@ -34,7 +36,6 @@ export class RateLimitPlugin {
 		};
 
 		server.ext({
-			type: "onPreAuth",
 			method: async (request, h) => {
 				const endpoint = allRoutesConfigByPath[request.path].id;
 
@@ -43,6 +44,7 @@ export class RateLimitPlugin {
 				}
 				return h.continue;
 			},
+			type: "onPreAuth",
 		});
 	}
 }

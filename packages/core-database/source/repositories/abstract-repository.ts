@@ -1,4 +1,5 @@
-import { Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import { ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";

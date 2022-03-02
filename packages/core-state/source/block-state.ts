@@ -1,31 +1,26 @@
-import Interfaces, {
-	BINDINGS,
-	IAddressFactory,
-	TransactionType,
-	TransactionTypeGroup,
-} from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 // todo: review the implementation
 @Container.injectable()
 export class BlockState implements Contracts.State.BlockState {
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.inject(Identifiers.WalletRepository)
 	private walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
+	@Container.inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Block.Factory)
-	private readonly addressFactory: IAddressFactory;
+	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	private readonly addressFactory: Crypto.IAddressFactory;
 
-	public async applyBlock(block: Interfaces.IBlock): Promise<void> {
+	public async applyBlock(block: Crypto.IBlock): Promise<void> {
 		if (block.data.height === 1) {
 			await this.initGenesisForgerWallet(block.data.generatorPublicKey);
 		}
@@ -37,7 +32,7 @@ export class BlockState implements Contracts.State.BlockState {
 		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
 		//     this.app.terminate(msg);
 		// }
-		const appliedTransactions: Interfaces.ITransaction[] = [];
+		const appliedTransactions: Crypto.ITransaction[] = [];
 		try {
 			for (const transaction of block.transactions) {
 				await this.applyTransaction(transaction);
@@ -59,7 +54,7 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 	}
 
-	public async revertBlock(block: Interfaces.IBlock): Promise<void> {
+	public async revertBlock(block: Crypto.IBlock): Promise<void> {
 		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
 		// if (!forgerWallet) {
@@ -67,7 +62,7 @@ export class BlockState implements Contracts.State.BlockState {
 		//     this.app.terminate(msg);
 		// }
 
-		const revertedTransactions: Interfaces.ITransaction[] = [];
+		const revertedTransactions: Crypto.ITransaction[] = [];
 		try {
 			this.revertBlockFromForger(forgerWallet, block.data);
 
@@ -85,7 +80,7 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 	}
 
-	public async applyTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async applyTransaction(transaction: Crypto.ITransaction): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		await transactionHandler.apply(transaction);
@@ -107,7 +102,7 @@ export class BlockState implements Contracts.State.BlockState {
 		await this.applyVoteBalances(sender, recipient, transaction.data);
 	}
 
-	public async revertTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revertTransaction(transaction: Crypto.ITransaction): Promise<void> {
 		const { data } = transaction;
 
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
@@ -155,7 +150,7 @@ export class BlockState implements Contracts.State.BlockState {
 	private async applyVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
-		transaction: Interfaces.ITransactionData,
+		transaction: Crypto.ITransactionData,
 	): Promise<void> {
 		return this.updateVoteBalances(sender, recipient, transaction, false);
 	}
@@ -163,12 +158,12 @@ export class BlockState implements Contracts.State.BlockState {
 	private async revertVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
-		transaction: Interfaces.ITransactionData,
+		transaction: Crypto.ITransactionData,
 	): Promise<void> {
 		return this.updateVoteBalances(sender, recipient, transaction, true);
 	}
 
-	private applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Interfaces.IBlockData) {
+	private applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Crypto.IBlockData) {
 		const delegateAttribute = forgerWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
 		delegateAttribute.producedBlocks++;
 		delegateAttribute.forgedFees = delegateAttribute.forgedFees.plus(blockData.totalFee);
@@ -180,7 +175,7 @@ export class BlockState implements Contracts.State.BlockState {
 		forgerWallet.increaseBalance(balanceIncrease);
 	}
 
-	private revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Interfaces.IBlockData) {
+	private revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Crypto.IBlockData) {
 		const delegateAttribute = forgerWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
 		delegateAttribute.producedBlocks--;
 		delegateAttribute.forgedFees = delegateAttribute.forgedFees.minus(blockData.totalFee);
@@ -195,11 +190,14 @@ export class BlockState implements Contracts.State.BlockState {
 	private async updateVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
-		transaction: Interfaces.ITransactionData,
+		transaction: Crypto.ITransactionData,
 		revert: boolean,
 	): Promise<void> {
-		if (transaction.type === TransactionType.Vote && transaction.typeGroup === TransactionTypeGroup.Core) {
-			AppUtils.assert.defined<Interfaces.ITransactionAsset>(transaction.asset?.votes);
+		if (
+			transaction.type === Crypto.TransactionType.Vote &&
+			transaction.typeGroup === Crypto.TransactionTypeGroup.Core
+		) {
+			AppUtils.assert.defined<Crypto.ITransactionAsset>(transaction.asset?.votes);
 
 			const senderDelegatedAmount = sender
 				.getBalance()
@@ -235,10 +233,10 @@ export class BlockState implements Contracts.State.BlockState {
 
 				let amount: BigNumber = transaction.amount;
 				if (
-					transaction.type === TransactionType.MultiPayment &&
-					transaction.typeGroup === TransactionTypeGroup.Core
+					transaction.type === Crypto.TransactionType.MultiPayment &&
+					transaction.typeGroup === Crypto.TransactionTypeGroup.Core
 				) {
-					AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.asset?.payments);
+					AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.asset?.payments);
 
 					amount = transaction.asset.payments.reduce(
 						(previous, current) => previous.plus(current.amount),
@@ -258,10 +256,10 @@ export class BlockState implements Contracts.State.BlockState {
 			}
 
 			if (
-				transaction.type === TransactionType.MultiPayment &&
-				transaction.typeGroup === TransactionTypeGroup.Core
+				transaction.type === Crypto.TransactionType.MultiPayment &&
+				transaction.typeGroup === Crypto.TransactionTypeGroup.Core
 			) {
-				AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.asset?.payments);
+				AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.asset?.payments);
 
 				// go through all payments and update recipients delegates vote balance
 				for (const { recipientId, amount } of transaction.asset.payments) {

@@ -1,4 +1,5 @@
-import { Container, Contracts, Types } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Types } from "@arkecosystem/core-kernel";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 
 import { plugin as hapiNesPlugin } from "../hapi-nes";
@@ -17,10 +18,10 @@ import { TransactionsRoute } from "./routes/transactions";
 // todo: review the implementation
 @Container.injectable()
 export class Server {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private server!: HapiServer;

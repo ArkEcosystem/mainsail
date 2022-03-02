@@ -19,14 +19,14 @@ describe("isBlockChained", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 2,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeTrue();
 	});
@@ -37,14 +37,14 @@ describe("isBlockChained", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 2,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 3,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
 	});
@@ -55,14 +55,14 @@ describe("isBlockChained", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 3,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
 	});
@@ -73,14 +73,14 @@ describe("isBlockChained", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 2,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
 	});
@@ -91,14 +91,14 @@ describe("isBlockChained", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 2,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
 	});
@@ -111,14 +111,14 @@ describe("getBlockNotChainedErrorMessage", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 2,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const check = () => getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
@@ -131,14 +131,14 @@ describe("getBlockNotChainedErrorMessage", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 2,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 3,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
@@ -153,14 +153,14 @@ describe("getBlockNotChainedErrorMessage", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 3,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
@@ -175,14 +175,14 @@ describe("getBlockNotChainedErrorMessage", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 2,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
@@ -197,14 +197,14 @@ describe("getBlockNotChainedErrorMessage", () => {
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 1,
 			previousBlock: null,
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const nextBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
 			height: 2,
 			previousBlock: "1",
-		} as Interfaces.IBlockData;
+		} as Crypto.IBlockData;
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 

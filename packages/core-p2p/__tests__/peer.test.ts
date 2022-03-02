@@ -1,9 +1,9 @@
 import "jest-extended";
 
+import Contracts from "@arkecosystem/core-contracts";
 import { Peer } from "@packages/core-p2p/source/peer";
 import { PeerVerificationResult } from "@packages/core-p2p/source/peer-verifier";
 import dayjs from "dayjs";
-import { Contracts } from "@arkecosystem/core-kernel";
 
 describe("Peer", () => {
 	let peer: Peer;

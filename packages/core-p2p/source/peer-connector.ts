@@ -1,13 +1,14 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
 
 import { Client } from "./hapi-nes";
 
-const TEN_SECONDS_IN_MILLISECONDS = 10000;
+const TEN_SECONDS_IN_MILLISECONDS = 10_000;
 
 @Container.injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
@@ -15,7 +16,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	private readonly lastConnectionCreate: Map<string, number> = new Map<string, number>();
 
 	public all(): Client[] {
-		return Array.from(this.connections, ([key, value]) => value);
+		return [...this.connections].map(([key, value]) => value);
 	}
 
 	public connection(peer: Contracts.P2P.Peer): Client | undefined {
@@ -69,9 +70,9 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		}
 
 		const options = {
-			path: event,
 			headers: {},
 			method: "POST",
+			path: event,
 			payload,
 		};
 
@@ -96,7 +97,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 
 	private async create(peer: Contracts.P2P.Peer): Promise<Client> {
 		const connection = new Client(`ws://${Utils.IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
-			timeout: 10000,
+			timeout: 10_000,
 		});
 		this.connections.set(peer.ip, connection);
 		this.lastConnectionCreate.set(peer.ip, Date.now());

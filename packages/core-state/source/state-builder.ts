@@ -1,46 +1,46 @@
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
-import { Application, Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Application, Container, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 // todo: review the implementation
 @Container.injectable()
 export class StateBuilder {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	@Container.inject(Container.Identifiers.DatabaseBlockRepository)
+	@Container.inject(Identifiers.DatabaseBlockRepository)
 	private blockRepository!: Repositories.BlockRepository;
 
-	@Container.inject(Container.Identifiers.DatabaseTransactionRepository)
+	@Container.inject(Identifiers.DatabaseTransactionRepository)
 	private transactionRepository!: Repositories.TransactionRepository;
 
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.inject(Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
 	private walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.DposState)
+	@Container.inject(Identifiers.DposState)
 	@Container.tagged("state", "blockchain")
 	private dposState!: Contracts.State.DposState;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.ConfigRepository)
+	@Container.inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: Services.Config.ConfigRepository;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration!: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Crypto.IConfiguration;
 
 	public async run(): Promise<void> {
-		this.events = this.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
+		this.events = this.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService);
 
 		const registeredHandlers = this.app
 			.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
-				Container.Identifiers.TransactionHandlerRegistry,
+				Identifiers.TransactionHandlerRegistry,
 				"state",
 				"blockchain",
 			)

@@ -61,14 +61,14 @@ beforeEach(() => {
 
 	sandbox = new Sandbox();
 
-	sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
-	sandbox.app.bind(Container.Identifiers.DposState).toConstantValue(dposState);
-	sandbox.app.bind(Container.Identifiers.DposPreviousRoundStateProvider).toConstantValue(getDposPreviousRoundState);
-	sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-	sandbox.app.bind(Container.Identifiers.WalletRepository).toConstantValue(walletRepository);
-	sandbox.app.bind(Container.Identifiers.TriggerService).toConstantValue(triggerService);
-	sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
-	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.DatabaseService).toConstantValue(databaseService);
+	sandbox.app.bind(Identifiers.DposState).toConstantValue(dposState);
+	sandbox.app.bind(Identifiers.DposPreviousRoundStateProvider).toConstantValue(getDposPreviousRoundState);
+	sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+	sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(walletRepository);
+	sandbox.app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+	sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
+	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 
 	roundState = sandbox.app.resolve<RoundState>(RoundState);
 });

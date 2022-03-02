@@ -1,4 +1,5 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
+import { Container, Utils } from "@arkecosystem/core-kernel";
 import { cidr } from "ip";
 
 // todo: review the implementation
@@ -12,7 +13,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	}
 
 	public hasPeers(): boolean {
-		return this.peers.size !== 0;
+		return this.peers.size > 0;
 	}
 
 	public getPeer(ip: string): Contracts.P2P.Peer {
@@ -40,7 +41,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	}
 
 	public hasPendingPeers(): boolean {
-		return this.peersPending.size !== 0;
+		return this.peersPending.size > 0;
 	}
 
 	public getPendingPeer(ip: string): Contracts.P2P.Peer {

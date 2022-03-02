@@ -1,4 +1,3 @@
-import { Container } from "@arkecosystem/core-kernel";
 import { blockchainMachine } from "@packages/core-blockchain/source/state-machine/machine";
 import { StateMachine } from "@packages/core-blockchain/source/state-machine/state-machine";
 import { Sandbox } from "@packages/core-test-framework";
@@ -11,15 +10,15 @@ describe("State machine", () => {
 	let stateStore;
 
 	beforeEach(() => {
-		logService = { warning: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest.fn() };
+		logService = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() };
 		stateStore = {
 			getBlockchain: jest.fn().mockReturnValue({ value: undefined }),
 			setBlockchain: jest.fn(),
 		};
 
 		sandbox = new Sandbox();
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logService);
-		sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(logService);
+		sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 	});
 
 	afterEach(() => {
@@ -30,7 +29,7 @@ describe("State machine", () => {
 		it("should use blockchainMachine.transition to get next state and return it", () => {
 			const stateMachine = sandbox.app.resolve<StateMachine>(StateMachine);
 
-			const mockNextState = { state: "next", actions: [] };
+			const mockNextState = { actions: [], state: "next" };
 			jest.spyOn(blockchainMachine, "transition").mockReturnValueOnce(mockNextState);
 			const nextState = stateMachine.transition("EVENT");
 
@@ -44,7 +43,7 @@ describe("State machine", () => {
 				const nextAction = {
 					type: "dothis",
 				};
-				const mockNextState = { state: "next", actions: [nextAction] };
+				const mockNextState = { actions: [nextAction], state: "next" };
 				jest.spyOn(blockchainMachine, "transition").mockReturnValueOnce(mockNextState);
 				const nextState = stateMachine.transition("EVENT");
 
@@ -59,7 +58,7 @@ describe("State machine", () => {
 				const nextAction = {
 					type: "dothis",
 				};
-				const mockNextState = { state: "next", actions: [nextAction] };
+				const mockNextState = { actions: [nextAction], state: "next" };
 				jest.spyOn(blockchainMachine, "transition").mockReturnValueOnce(mockNextState);
 				const handle = jest.fn();
 				sandbox.app.resolve = jest.fn().mockReturnValue({ handle });

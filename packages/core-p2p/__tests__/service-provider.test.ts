@@ -13,12 +13,12 @@ describe("ServiceProvider", () => {
 	const triggerService = { bind: jest.fn() };
 	const mockServer = { boot: jest.fn(), dispose: jest.fn(), initialize: jest.fn() };
 	const appGet = {
-		[Container.Identifiers.PeerNetworkMonitor]: { initialize: jest.fn() },
-		[Container.Identifiers.PeerProcessor]: { initialize: jest.fn() },
-		[Container.Identifiers.PeerCommunicator]: { initialize: jest.fn() },
-		[Container.Identifiers.PeerEventListener]: { initialize: jest.fn() },
-		[Container.Identifiers.P2PServer]: mockServer,
-		[Container.Identifiers.TriggerService]: triggerService,
+		[Identifiers.PeerNetworkMonitor]: { initialize: jest.fn() },
+		[Identifiers.PeerProcessor]: { initialize: jest.fn() },
+		[Identifiers.PeerCommunicator]: { initialize: jest.fn() },
+		[Identifiers.PeerEventListener]: { initialize: jest.fn() },
+		[Identifiers.P2PServer]: mockServer,
+		[Identifiers.TriggerService]: triggerService,
 	};
 	let factoryBound;
 	const appBind = {
@@ -41,11 +41,11 @@ describe("ServiceProvider", () => {
 		app = new Application(new Container.Container());
 
 		app.container.unbindAll();
-		app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		app.bind(Container.Identifiers.TriggerService).toConstantValue(triggerService);
-		app.bind(Container.Identifiers.Application).toConstantValue(application);
-		app.bind(Container.Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
-		app.bind(Container.Identifiers.ConfigRepository).to(Services.Config.ConfigRepository).inSingletonScope();
+		app.bind(Identifiers.LogService).toConstantValue(logger);
+		app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+		app.bind(Identifiers.Application).toConstantValue(application);
+		app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
+		app.bind(Identifiers.ConfigRepository).to(Services.Config.ConfigRepository).inSingletonScope();
 
 		serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
 
@@ -67,7 +67,7 @@ describe("ServiceProvider", () => {
 
 			await serviceProvider.register();
 
-			const Identifiers = Container.Identifiers;
+			const Identifiers = Identifiers;
 			for (const identifier of [
 				Identifiers.PeerFactory,
 				Identifiers.PeerRepository,
@@ -83,7 +83,7 @@ describe("ServiceProvider", () => {
 
 			expect(triggerService.bind).toBeCalledWith("validateAndAcceptPeer", expect.anything());
 
-			expect(spyBind).toBeCalledWith(Container.Identifiers.P2PServer);
+			expect(spyBind).toBeCalledWith(Identifiers.P2PServer);
 
 			// factory bound should be peer factory, testing it
 			const ip = "188.133.1.2";

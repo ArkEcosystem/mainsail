@@ -9,7 +9,7 @@ let cli;
 let processManager;
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 });
 
 afterEach(() => jest.restoreAllMocks());
@@ -22,7 +22,7 @@ describe("LogCommand", () => {
 	});
 
 	it("should log to pm_out_log_path", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.AbortMissingProcess), "execute").mockImplementation();
+		jest.spyOn(cli.app.get(Identifiers.AbortMissingProcess), "execute").mockImplementation();
 		jest.spyOn(processManager, "describe").mockReturnValue({
 			pid: 1,
 			name: "ark-relay",
@@ -46,7 +46,7 @@ describe("LogCommand", () => {
 	});
 
 	it("should log to pm_err_log_path", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.AbortMissingProcess), "execute").mockImplementation();
+		jest.spyOn(cli.app.get(Identifiers.AbortMissingProcess), "execute").mockImplementation();
 		jest.spyOn(processManager, "describe").mockReturnValue({
 			pid: 1,
 			name: "ark-relay",

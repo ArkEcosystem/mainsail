@@ -26,7 +26,7 @@ afterEach(() => {
 
 describe("ForgerCommand", () => {
 	it("should throw if no method is set", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			notMethod: "incorrect key",
 		});
@@ -37,7 +37,7 @@ describe("ForgerCommand", () => {
 	});
 
 	it("should do nothing if the method is netierr bip39 or bip 38", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			method: "neither bip 38 or bip 39",
 		});
@@ -46,7 +46,7 @@ describe("ForgerCommand", () => {
 	});
 
 	it("should configure from flags", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			method: "neither bip 38 or bip 39",
 		});
@@ -55,7 +55,7 @@ describe("ForgerCommand", () => {
 	});
 
 	it("should configure bip38 from flags", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			bip39: bip39Prompt,
 			password,
@@ -66,7 +66,7 @@ describe("ForgerCommand", () => {
 	});
 
 	it("should configure bip39 from flags", async () => {
-		jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+		jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 			// @ts-ignore
 			bip39: bip39Prompt,
 			confirm: true,
@@ -149,7 +149,7 @@ describe("ForgerCommand", () => {
 				secrets: [],
 			});
 
-			jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+			jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 				// @ts-ignore
 				method: "bip38",
 				bip39: "random-string",
@@ -163,7 +163,7 @@ describe("ForgerCommand", () => {
 		});
 
 		it("should fail to configure from a prompt if it doesn't receive a bip39", async () => {
-			jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+			jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 				// @ts-ignore
 				method: "bip38",
 				bip39: null,
@@ -177,7 +177,7 @@ describe("ForgerCommand", () => {
 		});
 
 		it("should fail to configure from a prompt if it doesn't receive a password", async () => {
-			jest.spyOn(cli.app.get(Container.Identifiers.Prompt), "render").mockReturnValue({
+			jest.spyOn(cli.app.get(Identifiers.Prompt), "render").mockReturnValue({
 				// @ts-ignore
 				method: "bip38",
 				bip39,

@@ -6,7 +6,7 @@ import { RevertBlockHandler } from "@packages/core-blockchain/source/processor/h
 describe("AcceptBlockHandler", () => {
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn(), error: jest.fn() };
+	const logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() };
 	const state = {
 		getLastBlocks: jest.fn(),
 		setLastBlock: jest.fn(),
@@ -21,11 +21,11 @@ describe("AcceptBlockHandler", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(state);
-		container.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
-		container.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
-		container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(transactionPool);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.StateStore).toConstantValue(state);
+		container.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
+		container.bind(Identifiers.DatabaseService).toConstantValue(databaseService);
+		container.bind(Identifiers.TransactionPoolService).toConstantValue(transactionPool);
 	});
 
 	beforeEach(() => {
@@ -34,16 +34,16 @@ describe("AcceptBlockHandler", () => {
 
 	describe("execute", () => {
 		const block = {
-			data: { id: "1222", height: 5544 },
+			data: { height: 5544, id: "1222" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 		const previousBlock = {
-			data: { id: "1221", height: 5543 },
+			data: { height: 5543, id: "1221" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 
 		const randomBlock = {
-			data: { id: "123", height: 5540 },
+			data: { height: 5540, id: "123" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 
@@ -52,7 +52,7 @@ describe("AcceptBlockHandler", () => {
 
 			const acceptBlockHandler = container.resolve<RevertBlockHandler>(RevertBlockHandler);
 
-			const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+			const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Reverted);
 
@@ -73,7 +73,7 @@ describe("AcceptBlockHandler", () => {
 
 			const acceptBlockHandler = container.resolve<RevertBlockHandler>(RevertBlockHandler);
 
-			const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+			const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Reverted);
 
@@ -96,7 +96,7 @@ describe("AcceptBlockHandler", () => {
 
 			const acceptBlockHandler = container.resolve<RevertBlockHandler>(RevertBlockHandler);
 
-			const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+			const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Corrupted);
 		});
@@ -107,7 +107,7 @@ describe("AcceptBlockHandler", () => {
 
 			const acceptBlockHandler = container.resolve<RevertBlockHandler>(RevertBlockHandler);
 
-			const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+			const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Corrupted);
 

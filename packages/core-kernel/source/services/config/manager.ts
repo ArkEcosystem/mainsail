@@ -1,11 +1,11 @@
-import { ConfigLoader } from "../../contracts/kernel/config";
+import { Kernel } from "@arkecosystem/core-contracts";
 import { injectable } from "../../ioc";
 import { InstanceManager } from "../../support/instance-manager";
 import { LocalConfigLoader } from "./drivers";
 
 @injectable()
-export class ConfigManager extends InstanceManager<ConfigLoader> {
-	protected async createLocalDriver(): Promise<ConfigLoader> {
+export class ConfigManager extends InstanceManager<Kernel.ConfigLoader> {
+	protected async createLocalDriver(): Promise<Kernel.ConfigLoader> {
 		return this.app.resolve(LocalConfigLoader);
 	}
 

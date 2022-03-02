@@ -62,14 +62,14 @@ describe("PeerVerifier", () => {
 		app = new Application(new Container.Container());
 
 		app.container.unbindAll();
-		app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		app.bind(Container.Identifiers.TriggerService).toConstantValue(trigger);
-		app.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		app.bind(Container.Identifiers.DatabaseInterceptor).toConstantValue(databaseInterceptor);
-		app.bind(Container.Identifiers.DatabaseService).toConstantValue(database);
-		app.bind(Container.Identifiers.Application).toConstantValue(app);
-		app.bind(Container.Identifiers.DposState).toConstantValue(dposState);
-		app.bind(Container.Identifiers.PeerCommunicator).toConstantValue(peerCommunicator);
+		app.bind(Identifiers.LogService).toConstantValue(logger);
+		app.bind(Identifiers.TriggerService).toConstantValue(trigger);
+		app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		app.bind(Identifiers.DatabaseInterceptor).toConstantValue(databaseInterceptor);
+		app.bind(Identifiers.DatabaseService).toConstantValue(database);
+		app.bind(Identifiers.Application).toConstantValue(app);
+		app.bind(Identifiers.DposState).toConstantValue(dposState);
+		app.bind(Identifiers.PeerCommunicator).toConstantValue(peerCommunicator);
 	});
 
 	beforeEach(() => {

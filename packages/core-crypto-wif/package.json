@@ -16,7 +16,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"wif": "^2.0.6"
 	},

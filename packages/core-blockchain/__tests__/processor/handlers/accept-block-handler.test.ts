@@ -6,30 +6,30 @@ import { Interfaces } from "@packages/crypto";
 describe("AcceptBlockHandler", () => {
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn() };
+	const logger = { debug: jest.fn(), info: jest.fn(), warning: jest.fn() };
 	const blockchain = { resetLastDownloadedBlock: jest.fn(), resetWakeUp: jest.fn() };
 	const state = {
-		setLastBlock: jest.fn(),
+		clearForkedBlock: jest.fn(),
+		getForkedBlock: jest.fn(),
 		getLastBlock: jest.fn(),
 		getLastDownloadedBlock: jest.fn(),
-		setLastDownloadedBlock: jest.fn(),
 		isStarted: jest.fn().mockReturnValue(false),
-		getForkedBlock: jest.fn(),
 		setForkedBlock: jest.fn(),
-		clearForkedBlock: jest.fn(),
+		setLastBlock: jest.fn(),
+		setLastDownloadedBlock: jest.fn(),
 	};
 	const transactionPool = { removeForgedTransaction: jest.fn() };
 	const databaseInteractions = {
+		applyBlock: jest.fn(),
+		deleteRound: jest.fn(),
+		getActiveDelegates: jest.fn().mockReturnValue([]),
+		getLastBlock: jest.fn(),
+		getTopBlocks: jest.fn(),
+		loadBlocksFromCurrentRound: jest.fn(),
+		revertBlock: jest.fn(),
 		walletRepository: {
 			getNonce: jest.fn(),
 		},
-		applyBlock: jest.fn(),
-		getTopBlocks: jest.fn(),
-		getLastBlock: jest.fn(),
-		loadBlocksFromCurrentRound: jest.fn(),
-		revertBlock: jest.fn(),
-		deleteRound: jest.fn(),
-		getActiveDelegates: jest.fn().mockReturnValue([]),
 	};
 	const revertBlockHandler = {
 		execute: jest.fn(),
@@ -38,12 +38,12 @@ describe("AcceptBlockHandler", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(state);
-		container.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
-		container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(transactionPool);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.StateStore).toConstantValue(state);
+		container.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
+		container.bind(Identifiers.TransactionPoolService).toConstantValue(transactionPool);
 	});
 
 	beforeEach(() => {
@@ -52,7 +52,7 @@ describe("AcceptBlockHandler", () => {
 
 	describe("execute", () => {
 		const block = {
-			data: { id: "1222", height: 5544 },
+			data: { height: 5544, id: "1222" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 
@@ -60,7 +60,7 @@ describe("AcceptBlockHandler", () => {
 			const acceptBlockHandler = container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 			state.isStarted = jest.fn().mockReturnValue(true);
-			const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+			const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Accepted);
 
@@ -78,7 +78,7 @@ describe("AcceptBlockHandler", () => {
 			const acceptBlockHandler = container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 			state.getForkedBlock = jest.fn().mockReturnValue({ data: { height: block.data.height } });
-			const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+			const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Accepted);
 
@@ -89,7 +89,7 @@ describe("AcceptBlockHandler", () => {
 			const acceptBlockHandler = container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 			state.getLastDownloadedBlock = jest.fn().mockReturnValue({ height: block.data.height - 1 });
-			const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+			const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.Accepted);
 
@@ -106,7 +106,7 @@ describe("AcceptBlockHandler", () => {
 				const acceptBlockHandler = container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 				databaseInteractions.applyBlock = jest.fn().mockRejectedValueOnce(new Error("oops"));
-				const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+				const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.Rejected);
 
@@ -121,7 +121,7 @@ describe("AcceptBlockHandler", () => {
 				const acceptBlockHandler = container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 				databaseInteractions.applyBlock = jest.fn().mockRejectedValueOnce(new Error("oops"));
-				const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+				const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.Rejected);
 
@@ -137,7 +137,7 @@ describe("AcceptBlockHandler", () => {
 				const acceptBlockHandler = container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 				databaseInteractions.applyBlock = jest.fn().mockRejectedValueOnce(new Error("oops"));
-				const result = await acceptBlockHandler.execute(block as Interfaces.IBlock);
+				const result = await acceptBlockHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.Corrupted);
 

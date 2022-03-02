@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { AskPassword } from "@packages/core-cli/source/components";
 import prompts from "prompts";
@@ -10,8 +9,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.AskPassword).to(AskPassword).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.AskPassword);
+	cli.app.rebind(Identifiers.AskPassword).to(AskPassword).inSingletonScope();
+	component = cli.app.get(Identifiers.AskPassword);
 });
 
 describe("AskPassword", () => {

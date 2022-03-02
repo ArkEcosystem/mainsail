@@ -16,8 +16,8 @@
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
-		"@arkecosystem/core-crypto-errors": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
+		"@arkecosystem/core-errors": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"@pm2/io": "4.3.5",
 		"chalk": "4.1.2",

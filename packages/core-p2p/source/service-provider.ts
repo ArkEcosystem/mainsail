@@ -1,4 +1,5 @@
-import { Container, Providers, Services, Types, Utils } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Services, Types, Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
@@ -27,16 +28,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		this.app.get<EventListener>(Container.Identifiers.PeerEventListener).initialize();
+		this.app.get<EventListener>(Identifiers.PeerEventListener).initialize();
 
 		await this.buildServer();
 
-		return this.app.get<Server>(Container.Identifiers.P2PServer).boot();
+		return this.app.get<Server>(Identifiers.P2PServer).boot();
 	}
 
 	public async dispose(): Promise<void> {
 		if (!process.env.DISABLE_P2P_SERVER) {
-			this.app.get<Server>(Container.Identifiers.P2PServer).dispose();
+			this.app.get<Server>(Identifiers.P2PServer).dispose();
 		}
 	}
 
@@ -46,66 +47,66 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): object {
 		return Joi.object({
+			blacklist: Joi.array().items(Joi.string()).required(),
+			disableDiscovery: Joi.bool(),
+			dns: Joi.array()
+				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
+				.required(),
+			getBlocksTimeout: Joi.number().integer().min(0).required(),
+			ignoreMinimumNetworkReach: Joi.bool(),
+			maxPeerSequentialErrors: Joi.number().integer().min(0).required(),
+			maxPeersBroadcast: Joi.number().integer().min(0).required(),
+			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
+			minimumNetworkReach: Joi.number().integer().min(0).required(),
+			minimumVersions: Joi.array().items(Joi.string()).required(),
+			networkStart: Joi.bool(),
+			ntp: Joi.array().items(Joi.string()).required(),
+			rateLimit: Joi.number().integer().min(1).required(),
+			rateLimitPostTransactions: Joi.number().integer().min(1).required(),
+			remoteAccess: Joi.array()
+				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
+				.required(),
 			server: Joi.object({
 				hostname: Joi.string()
 					.ip({ version: ["ipv4", "ipv6"] })
 					.required(),
-				port: Joi.number().integer().min(1).max(65535).required(),
-				logLevel: Joi.number().integer().min(0).required(), // TODO: Check
+				logLevel: Joi.number().integer().min(0).required(),
+				port: Joi.number().integer().min(1).max(65_535).required(), // TODO: Check
 			}).required(),
-			minimumVersions: Joi.array().items(Joi.string()).required(),
-			minimumNetworkReach: Joi.number().integer().min(0).required(),
-			verifyTimeout: Joi.number().integer().min(0).required(),
-			getBlocksTimeout: Joi.number().integer().min(0).required(),
-			maxPeersBroadcast: Joi.number().integer().min(0).required(),
-			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
-			maxPeerSequentialErrors: Joi.number().integer().min(0).required(),
-			whitelist: Joi.array().items(Joi.string()).required(),
-			blacklist: Joi.array().items(Joi.string()).required(),
-			remoteAccess: Joi.array()
-				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
-				.required(),
-			dns: Joi.array()
-				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
-				.required(),
-			ntp: Joi.array().items(Joi.string()).required(),
-			rateLimit: Joi.number().integer().min(1).required(),
-			rateLimitPostTransactions: Joi.number().integer().min(1).required(),
-			networkStart: Joi.bool(),
-			disableDiscovery: Joi.bool(),
 			skipDiscovery: Joi.bool(),
-			ignoreMinimumNetworkReach: Joi.bool(),
+			verifyTimeout: Joi.number().integer().min(0).required(),
+			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
 	}
 
 	private registerFactories(): void {
 		this.app
-			.bind(Container.Identifiers.PeerFactory)
+			.bind(Identifiers.PeerFactory)
 			.toFactory<Peer>(() => (ip: string) => new Peer(ip, Number(this.config().get<number>("server.port"))!));
 	}
 
 	private registerServices(): void {
-		this.app.bind(Container.Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
+		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
 
-		this.app.bind(Container.Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
+		this.app.bind(Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
 
-		this.app.bind(Container.Identifiers.PeerCommunicator).to(PeerCommunicator).inSingletonScope();
+		this.app.bind(Identifiers.PeerCommunicator).to(PeerCommunicator).inSingletonScope();
 
-		this.app.bind(Container.Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
+		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
 
-		this.app.bind(Container.Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
+		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
 
-		this.app.bind(Container.Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
+		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 
-		this.app.bind(Container.Identifiers.PeerEventListener).to(EventListener).inSingletonScope();
+		this.app.bind(Identifiers.PeerEventListener).to(EventListener).inSingletonScope();
 
-		this.app.bind(Container.Identifiers.PeerTransactionBroadcaster).to(TransactionBroadcaster);
+		this.app.bind(Identifiers.PeerTransactionBroadcaster).to(TransactionBroadcaster);
 
-		this.app.bind<Server>(Container.Identifiers.P2PServer).to(Server).inSingletonScope();
+		this.app.bind<Server>(Identifiers.P2PServer).to(Server).inSingletonScope();
 	}
 
 	private async buildServer(): Promise<void> {
-		const server: Server = this.app.get<Server>(Container.Identifiers.P2PServer);
+		const server: Server = this.app.get<Server>(Identifiers.P2PServer);
 		const serverConfig = this.config().get<Types.JsonObject>("server");
 		Utils.assert.defined<Types.JsonObject>(serverConfig);
 
@@ -114,7 +115,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	private registerActions(): void {
 		this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
 	}
 }

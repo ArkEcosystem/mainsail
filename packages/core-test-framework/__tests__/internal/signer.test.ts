@@ -22,7 +22,7 @@ describe("Signer", () => {
 			vendorField: "dummy",
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeTransfer(options);
+		const entity: Crypto.ITransactionData = signer.makeTransfer(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.vendorField).toBeDefined();
@@ -37,7 +37,7 @@ describe("Signer", () => {
 			vendorField: "dummy",
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeTransfer(options);
+		const entity: Crypto.ITransactionData = signer.makeTransfer(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.vendorField).toBeDefined();
@@ -50,7 +50,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeDelegate(options);
+		const entity: Crypto.ITransactionData = signer.makeDelegate(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.asset?.delegate?.username).toBeString();
@@ -63,7 +63,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeDelegate(options);
+		const entity: Crypto.ITransactionData = signer.makeDelegate(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.asset?.delegate?.username).toBeString();
@@ -76,7 +76,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeVote(options);
+		const entity: Crypto.ITransactionData = signer.makeVote(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.asset?.votes).toBeArray();
@@ -89,7 +89,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeVote(options);
+		const entity: Crypto.ITransactionData = signer.makeVote(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.asset?.votes).toBeArray();
@@ -105,7 +105,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeMultiSignatureRegistration(options);
+		const entity: Crypto.ITransactionData = signer.makeMultiSignatureRegistration(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.signatures).toBeArray();
@@ -123,7 +123,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeMultiSignatureRegistration(options);
+		const entity: Crypto.ITransactionData = signer.makeMultiSignatureRegistration(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.signatures).toBeArray();
@@ -147,7 +147,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeMultipayment(options);
+		const entity: Crypto.ITransactionData = signer.makeMultipayment(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.asset?.payments).toBeArray();
@@ -169,7 +169,7 @@ describe("Signer", () => {
 			passphrase: passphrases[0],
 		};
 
-		const entity: Interfaces.ITransactionData = signer.makeMultipayment(options);
+		const entity: Crypto.ITransactionData = signer.makeMultipayment(options);
 
 		expect(entity.signature).toBeDefined();
 		expect(entity.asset?.payments).toBeArray();

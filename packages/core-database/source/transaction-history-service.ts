@@ -1,5 +1,5 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 import assert from "assert";
 
 import { BlockRepository } from "./repositories/block-repository";
@@ -7,24 +7,24 @@ import { TransactionRepository } from "./repositories/transaction-repository";
 
 @Container.injectable()
 export class TransactionHistoryService implements Contracts.Shared.TransactionHistoryService {
-	@Container.inject(Container.Identifiers.DatabaseBlockRepository)
+	@Container.inject(Identifiers.DatabaseBlockRepository)
 	private readonly blockRepository!: BlockRepository;
 
-	@Container.inject(Container.Identifiers.DatabaseTransactionRepository)
+	@Container.inject(Identifiers.DatabaseTransactionRepository)
 	private readonly transactionRepository!: TransactionRepository;
 
-	@Container.inject(Container.Identifiers.DatabaseTransactionFilter)
+	@Container.inject(Identifiers.DatabaseTransactionFilter)
 	private readonly transactionFilter!: Contracts.Database.TransactionFilter;
 
-	@Container.inject(Container.Identifiers.DatabaseBlockFilter)
+	@Container.inject(Identifiers.DatabaseBlockFilter)
 	private readonly blockFilter!: Contracts.Database.BlockFilter;
 
-	@Container.inject(Container.Identifiers.DatabaseModelConverter)
+	@Container.inject(Identifiers.DatabaseModelConverter)
 	private readonly modelConverter!: Contracts.Database.ModelConverter;
 
 	public async findOneByCriteria(
 		criteria: Contracts.Shared.OrTransactionCriteria,
-	): Promise<Interfaces.ITransactionData | undefined> {
+	): Promise<Crypto.ITransactionData | undefined> {
 		const data = await this.findManyByCriteria(criteria);
 		assert(data.length <= 1);
 		return data[0];
@@ -32,7 +32,7 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 
 	public async findManyByCriteria(
 		criteria: Contracts.Shared.OrTransactionCriteria,
-	): Promise<Interfaces.ITransactionData[]> {
+	): Promise<Crypto.ITransactionData[]> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [
 			{ direction: "asc", property: "blockHeight" },
@@ -44,7 +44,7 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 
 	public async *streamByCriteria(
 		criteria: Contracts.Search.OrCriteria<Contracts.Shared.TransactionCriteria>,
-	): AsyncIterable<Interfaces.ITransactionData> {
+	): AsyncIterable<Crypto.ITransactionData> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [
 			{ direction: "asc", property: "blockHeight" },
@@ -61,7 +61,7 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 		sorting: Contracts.Search.Sorting,
 		pagination: Contracts.Search.Pagination,
 		options?: Contracts.Search.Options,
-	): Promise<Contracts.Search.ResultsPage<Interfaces.ITransactionData>> {
+	): Promise<Contracts.Search.ResultsPage<Crypto.ITransactionData>> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const resultsPage = await this.transactionRepository.listByExpression(expression, sorting, pagination, options);
 		const models = resultsPage.results;

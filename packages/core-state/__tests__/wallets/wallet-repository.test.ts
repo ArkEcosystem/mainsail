@@ -20,8 +20,8 @@ beforeAll(async () => {
 	const initialEnv = await setUp();
 
 	// TODO: why does this have to be rebound here?
-	initialEnv.sandbox.app.rebind(Container.Identifiers.WalletRepository).to(WalletRepository);
-	walletRepo = initialEnv.sandbox.app.getTagged(Container.Identifiers.WalletRepository, "state", "blockchain");
+	initialEnv.sandbox.app.rebind(Identifiers.WalletRepository).to(WalletRepository);
+	walletRepo = initialEnv.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 });
 
 beforeEach(() => {

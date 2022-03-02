@@ -1,6 +1,6 @@
-import Interfaces, { BINDINGS, IBlockFactory, IConfiguration } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
+import { Container, Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
@@ -9,52 +9,52 @@ import { StateMachine } from "./state-machine/state-machine";
 
 @Container.injectable()
 export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@Container.inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.StateMachine)
+	@Container.inject(Identifiers.StateMachine)
 	private readonly stateMachine!: StateMachine;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
+	@Container.inject(Identifiers.DatabaseService)
 	private readonly database!: DatabaseService;
 
-	@Container.inject(Container.Identifiers.DatabaseBlockRepository)
+	@Container.inject(Identifiers.DatabaseBlockRepository)
 	private readonly blockRepository!: Repositories.BlockRepository;
 
-	@Container.inject(Container.Identifiers.DatabaseInteraction)
+	@Container.inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
+	@Container.inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@Container.inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Block.Factory)
-	private readonly blockFactory: IBlockFactory;
+	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(BINDINGS.Time.Slots)
+	@Container.inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	private blocks: Interfaces.IBlockData[] = [];
+	private blocks: Crypto.IBlockData[] = [];
 
-	public getBlocks(): Interfaces.IBlockData[] {
+	public getBlocks(): Crypto.IBlockData[] {
 		return this.blocks;
 	}
 
-	public setBlocks(blocks: Interfaces.IBlockData[]): void {
+	public setBlocks(blocks: Crypto.IBlockData[]): void {
 		this.blocks = blocks;
 	}
 
@@ -92,10 +92,10 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			return;
 		}
 
-		const acceptedBlocks: Interfaces.IBlock[] = [];
-		let forkBlock: Interfaces.IBlock | undefined;
+		const acceptedBlocks: Crypto.IBlock[] = [];
+		let forkBlock: Crypto.IBlock | undefined;
 		let lastProcessResult: BlockProcessorResult | undefined;
-		let lastProcessedBlock: Interfaces.IBlock | undefined;
+		let lastProcessedBlock: Crypto.IBlock | undefined;
 
 		const acceptedBlockTimeLookup = (height: number) =>
 			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
@@ -113,11 +113,11 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 				}
 
 				const blockInstance = await this.blockFactory.fromData(block);
-				Utils.assert.defined<Interfaces.IBlock>(blockInstance);
+				Utils.assert.defined<Crypto.IBlock>(blockInstance);
 
 				lastProcessResult = await this.triggers.call("processBlock", {
 					block: blockInstance,
-					blockProcessor: this.app.get<BlockProcessor>(Container.Identifiers.BlockProcessor),
+					blockProcessor: this.app.get<BlockProcessor>(Identifiers.BlockProcessor),
 				});
 
 				lastProcessedBlock = blockInstance;
@@ -180,7 +180,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		return;
 	}
 
-	private async revertBlocks(blocksToRevert: Interfaces.IBlock[]): Promise<void> {
+	private async revertBlocks(blocksToRevert: Crypto.IBlock[]): Promise<void> {
 		// Rounds are saved while blocks are being processed and may now be out of sync with the last
 		// block that was written into the database.
 

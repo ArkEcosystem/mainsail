@@ -16,6 +16,7 @@
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"chalk": "4.1.2",
 		"joi": "17.4.2",

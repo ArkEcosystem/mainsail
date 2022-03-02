@@ -1,10 +1,10 @@
 import { Container } from "@arkecosystem/core-container";
-import { ISignature } from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 import { sign, verify } from "@noble/bls12-381";
 import ByteBuffer from "bytebuffer";
 
 @Container.injectable()
-export class Signature implements ISignature {
+export class Signature implements Crypto.ISignature {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return Buffer.from(await sign(message, privateKey)).toString("hex");
 	}

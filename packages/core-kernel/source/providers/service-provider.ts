@@ -1,4 +1,5 @@
-import { Kernel } from "../contracts";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { Identifiers, inject, injectable } from "../ioc";
 import { JsonObject } from "../types";
 import { PluginConfiguration } from "./plugin-configuration";

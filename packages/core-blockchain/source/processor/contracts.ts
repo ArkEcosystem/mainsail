@@ -1,7 +1,7 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 
 import { BlockProcessorResult } from "./block-processor";
 
 export interface BlockHandler {
-	execute(block?: Interfaces.IBlock): Promise<BlockProcessorResult>;
+	execute(block?: Crypto.IBlock): Promise<BlockProcessorResult>;
 }

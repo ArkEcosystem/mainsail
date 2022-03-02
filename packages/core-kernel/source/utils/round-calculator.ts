@@ -1,10 +1,9 @@
-import { IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-crypto-errors";
+import { Crypto, Shared } from "@arkecosystem/core-contracts";
+import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-errors";
 
-import { RoundInfo } from "../contracts/shared";
 import { getMilestonesWhichAffectActiveDelegateCount } from "./calculate-forging-info";
 
-export const isNewRound = (height: number, configuration: IConfiguration): boolean => {
+export const isNewRound = (height: number, configuration: Crypto.IConfiguration): boolean => {
 	const milestones = configuration.get("milestones");
 
 	// Since milestones are merged, find the first milestone to introduce the delegate count.
@@ -25,8 +24,8 @@ export const isNewRound = (height: number, configuration: IConfiguration): boole
 	return height === 1 || (height - milestone.height) % milestone.activeDelegates === 0;
 };
 
-export const calculateRound = (height: number, configuration: IConfiguration): RoundInfo => {
-	const result: RoundInfo = {
+export const calculateRound = (height: number, configuration: Crypto.IConfiguration): Shared.RoundInfo => {
+	const result: Shared.RoundInfo = {
 		maxDelegates: 0,
 		nextRound: 0,
 		round: 1,

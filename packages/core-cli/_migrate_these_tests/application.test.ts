@@ -56,7 +56,7 @@ describe("ActionFactory", () => {
 	it("should get core paths", () => {
 		const paths = envPaths("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
+		app.bind(Identifiers.ApplicationPaths).toConstantValue(paths);
 
 		expect(app.getCorePath("data")).toEqual(paths.data);
 		expect(app.getCorePath("config")).toEqual(paths.config);
@@ -68,7 +68,7 @@ describe("ActionFactory", () => {
 	it("should get console paths with a file", () => {
 		const paths = envPaths("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
+		app.bind(Identifiers.ApplicationPaths).toConstantValue(paths);
 
 		expect(app.getCorePath("data", "file")).toEqual(`${paths.data}/file`);
 		expect(app.getCorePath("config", "file")).toEqual(`${paths.config}/file`);
@@ -80,7 +80,7 @@ describe("ActionFactory", () => {
 	it("should get console paths", () => {
 		const paths = envPaths("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);
+		app.bind(Identifiers.ConsolePaths).toConstantValue(paths);
 
 		expect(app.getConsolePath("data")).toEqual(paths.data);
 		expect(app.getConsolePath("config")).toEqual(paths.config);
@@ -92,7 +92,7 @@ describe("ActionFactory", () => {
 	it("should get console paths with a file", () => {
 		const paths = envPaths("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);
+		app.bind(Identifiers.ConsolePaths).toConstantValue(paths);
 
 		expect(app.getConsolePath("data", "file")).toEqual(`${paths.data}/file`);
 		expect(app.getConsolePath("config", "file")).toEqual(`${paths.config}/file`);

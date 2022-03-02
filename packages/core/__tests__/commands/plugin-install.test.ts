@@ -14,7 +14,7 @@ beforeEach(() => {
 	process.argv = ["", "test"];
 
 	cli = new Console();
-	const pluginManager = cli.app.get(Container.Identifiers.PluginManager);
+	const pluginManager = cli.app.get(Identifiers.PluginManager);
 	spyOnInstall = jest.spyOn(pluginManager, "install").mockImplementation(async () => {});
 });
 

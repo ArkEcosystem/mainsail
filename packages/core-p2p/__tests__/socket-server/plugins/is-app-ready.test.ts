@@ -16,18 +16,18 @@ describe("IsAppReadyPlugin", () => {
 	const responsePayload = { status: "ok" };
 	const mockRouteByPath = {
 		"/p2p/peer/mockroute": {
-			id: "p2p.peer.getPeers",
 			handler: () => responsePayload,
+			id: "p2p.peer.getPeers",
 			validation: Joi.object().max(0),
 		},
 	};
 	const mockRoute = {
+		config: {
+			handler: mockRouteByPath["/p2p/peer/mockroute"].handler,
+			id: mockRouteByPath["/p2p/peer/mockroute"].id,
+		},
 		method: "POST",
 		path: "/p2p/peer/mockroute",
-		config: {
-			id: mockRouteByPath["/p2p/peer/mockroute"].id,
-			handler: mockRouteByPath["/p2p/peer/mockroute"].handler,
-		},
 	};
 
 	const blockchainService = { isBooted: jest.fn().mockReturnValue(true) };
@@ -37,8 +37,8 @@ describe("IsAppReadyPlugin", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchainService);
+		container.bind(Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchainService);
 	});
 
 	beforeEach(() => {
@@ -49,19 +49,19 @@ describe("IsAppReadyPlugin", () => {
 		const server = new Server({ port: 4100 });
 		server.route(mockRoute);
 
-		const spyExt = jest.spyOn(server, "ext");
+		const spyExtension = jest.spyOn(server, "ext");
 
 		isAppReadyPlugin.register(server);
 
-		expect(spyExt).toBeCalledWith(expect.objectContaining({ type: "onPostAuth" }));
+		expect(spyExtension).toBeCalledWith(expect.objectContaining({ type: "onPostAuth" }));
 
 		// try the route with a valid payload
 		const remoteAddress = "187.166.55.44";
 		const responseValid = await server.inject({
 			method: "POST",
-			url: "/p2p/peer/mockroute",
 			payload: {},
 			remoteAddress,
+			url: "/p2p/peer/mockroute",
 		});
 		expect(JSON.parse(responseValid.payload)).toEqual(responsePayload);
 		expect(responseValid.statusCode).toBe(200);
@@ -79,9 +79,9 @@ describe("IsAppReadyPlugin", () => {
 		const remoteAddress = "187.166.55.44";
 		const response = await server.inject({
 			method: "POST",
-			url: "/p2p/peer/mockroute",
 			payload: {},
 			remoteAddress,
+			url: "/p2p/peer/mockroute",
 		});
 		expect(response.statusCode).toBe(protocol.gracefulErrorStatusCode);
 		expect(blockchainService.isBooted).toBeCalledTimes(1);
@@ -89,32 +89,30 @@ describe("IsAppReadyPlugin", () => {
 
 	it("should not be called on another route", async () => {
 		const testRoute = {
+			config: {
+				handler: () => ({ status: "ok" }),
+			},
 			method: "POST",
 			path: "/p2p/peer/testroute",
-			config: {
-				handler: () => {
-					return { status: "ok" };
-				},
-			},
 		};
 
 		const server = new Server({ port: 4100 });
 		server.route(testRoute);
 		server.route(mockRoute);
 
-		const spyExt = jest.spyOn(server, "ext");
+		const spyExtension = jest.spyOn(server, "ext");
 
 		isAppReadyPlugin.register(server);
 
-		expect(spyExt).toBeCalledWith(expect.objectContaining({ type: "onPostAuth" }));
+		expect(spyExtension).toBeCalledWith(expect.objectContaining({ type: "onPostAuth" }));
 
 		// try the route with a valid payload
 		const remoteAddress = "187.166.55.44";
 		const responseValid = await server.inject({
 			method: "POST",
-			url: "/p2p/peer/testroute",
 			payload: {},
 			remoteAddress,
+			url: "/p2p/peer/testroute",
 		});
 		expect(JSON.parse(responseValid.payload)).toEqual(responsePayload);
 		expect(responseValid.statusCode).toBe(200);

@@ -4,7 +4,7 @@ import { BlockchainReady } from "@packages/core-blockchain/source/state-machine/
 describe("BlockchainReady", () => {
 	const container = new Container.Container();
 
-	const logService = { warning: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest.fn() };
+	const logService = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() };
 	const stateStore = {
 		isStarted: jest.fn().mockReturnValue(false),
 		setStarted: jest.fn(),
@@ -15,10 +15,10 @@ describe("BlockchainReady", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logService);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logService);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
 	});
 
 	beforeEach(() => {

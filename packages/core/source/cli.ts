@@ -1,7 +1,7 @@
-import { platform } from "os";
-import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@arkecosystem/core-cli";
+import { ApplicationFactory, Commands, Contracts, Container, InputParser, Plugins } from "@arkecosystem/core-cli";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
+import { platform } from "os";
 import { join, resolve } from "path";
 import { PackageJson } from "type-fest";
 

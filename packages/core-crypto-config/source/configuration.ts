@@ -1,18 +1,18 @@
 import { Container } from "@arkecosystem/core-container";
-import { IConfiguration, IMilestone, MilestoneSearchResult, NetworkConfig } from "@arkecosystem/core-crypto-contracts";
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-crypto-errors";
+import { Crypto } from "@arkecosystem/core-contracts";
+import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-errors";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
 
 @Container.injectable()
-export class Configuration implements IConfiguration {
-	#config: NetworkConfig | undefined;
+export class Configuration implements Crypto.IConfiguration {
+	#config: Crypto.NetworkConfig | undefined;
 	#height: number | undefined;
-	#milestone: IMilestone | undefined;
+	#milestone: Crypto.IMilestone | undefined;
 	#milestones: Record<string, any> | undefined;
 
-	public setConfig(config: NetworkConfig): void {
+	public setConfig(config: Crypto.NetworkConfig): void {
 		this.#config = {
 			genesisBlock: config.genesisBlock,
 			milestones: config.milestones,
@@ -23,7 +23,7 @@ export class Configuration implements IConfiguration {
 		this.buildConstants();
 	}
 
-	public all(): NetworkConfig | undefined {
+	public all(): Crypto.NetworkConfig | undefined {
 		return this.#config;
 	}
 
@@ -93,7 +93,7 @@ export class Configuration implements IConfiguration {
 		return this.#milestone.data;
 	}
 
-	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): MilestoneSearchResult {
+	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): Crypto.MilestoneSearchResult {
 		if (!this.#milestones || this.#milestones.length === 0) {
 			throw new Error(`Attempted to get next milestone but none were set`);
 		}

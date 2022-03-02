@@ -12,12 +12,12 @@ describe("StartForkRecovery", () => {
 	beforeEach(() => {
 		jest.resetAllMocks();
 
-		logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn() };
+		logger = { debug: jest.fn(), info: jest.fn(), warning: jest.fn() };
 		blockchain = {
-			dispatch: jest.fn(),
 			clearAndStopQueue: jest.fn(),
-			removeBlocks: jest.fn(),
+			dispatch: jest.fn(),
 			getQueue: jest.fn().mockReturnValue({ resume: jest.fn() }),
+			removeBlocks: jest.fn(),
 		};
 		stateStore = {
 			getNumberOfBlocksToRollback: jest.fn().mockReturnValue(0),
@@ -28,11 +28,11 @@ describe("StartForkRecovery", () => {
 		application = {};
 
 		container = new Container.Container();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
 	});
 
 	describe("handle", () => {

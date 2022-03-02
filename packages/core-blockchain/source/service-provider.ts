@@ -1,4 +1,5 @@
-import { Container, Contracts, Providers, Services } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { ProcessBlockAction } from "./actions";
@@ -8,19 +9,19 @@ import { StateMachine } from "./state-machine";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Container.Identifiers.StateMachine).to(StateMachine).inSingletonScope();
-		this.app.bind(Container.Identifiers.BlockchainService).to(Blockchain).inSingletonScope();
-		this.app.bind(Container.Identifiers.BlockProcessor).to(BlockProcessor).inSingletonScope();
+		this.app.bind(Identifiers.StateMachine).to(StateMachine).inSingletonScope();
+		this.app.bind(Identifiers.BlockchainService).to(Blockchain).inSingletonScope();
+		this.app.bind(Identifiers.BlockProcessor).to(BlockProcessor).inSingletonScope();
 
 		this.registerActions();
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService).boot();
+		await this.app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService).dispose();
+		await this.app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService).dispose();
 	}
 
 	public async required(): Promise<boolean> {
@@ -41,7 +42,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	private registerActions(): void {
 		this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("processBlock", new ProcessBlockAction());
 	}
 }

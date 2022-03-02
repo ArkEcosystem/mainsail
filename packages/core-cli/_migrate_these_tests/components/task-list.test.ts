@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { TaskList } from "@packages/core-cli/source/components";
 
@@ -9,8 +8,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.TaskList).to(TaskList).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.TaskList);
+	cli.app.rebind(Identifiers.TaskList).to(TaskList).inSingletonScope();
+	component = cli.app.get(Identifiers.TaskList);
 });
 
 describe("TaskList", () => {
@@ -19,8 +18,8 @@ describe("TaskList", () => {
 
 		await component.render([
 			{
-				title: "description",
 				task: fakeTask,
+				title: "description",
 			},
 		]);
 

@@ -1,7 +1,6 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, ITransactionRegistry, IValidator } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas } from "@arkecosystem/core-crypto-validation";
-import { Contracts } from "@arkecosystem/core-kernel";
 
 import {
 	TransactionAlreadyRegisteredError,
@@ -15,11 +14,11 @@ import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 export type TransactionConstructor = typeof Transaction;
 
 @Container.injectable()
-export class TransactionRegistry implements ITransactionRegistry {
-	@Container.inject(BINDINGS.Validator)
-	private readonly validator: IValidator;
+export class TransactionRegistry implements Crypto.ITransactionRegistry {
+	@Container.inject(Identifiers.Cryptography.Validator)
+	private readonly validator: Crypto.IValidator;
 
-	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	private readonly transactionTypes: Map<
@@ -34,7 +33,7 @@ export class TransactionRegistry implements ITransactionRegistry {
 		this.transactionTypeFactory.initialize(this.transactionTypes);
 	}
 
-	public registerTransactionType(constructor: TransactionConstructor): void {
+	public registerTransactionType(constructor: Crypto.TransactionConstructor): void {
 		const { typeGroup, type } = constructor;
 
 		if (typeof type === "undefined" || typeof typeGroup === "undefined") {
@@ -72,7 +71,7 @@ export class TransactionRegistry implements ITransactionRegistry {
 		this.#updateSchemas(constructor.getSchema());
 	}
 
-	public deregisterTransactionType(constructor: TransactionConstructor): void {
+	public deregisterTransactionType(constructor: Crypto.TransactionConstructor): void {
 		const { typeGroup, type, version } = constructor;
 
 		if (typeof type === "undefined" || typeof typeGroup === "undefined") {

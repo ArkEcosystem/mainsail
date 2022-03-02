@@ -1,27 +1,27 @@
-import { EventDispatcher as EventDispatcherContract, EventListener, EventName } from "../../../contracts/kernel/events";
+import { Kernel } from "@arkecosystem/core-contracts";
 import { injectable } from "../../../ioc";
 
 @injectable()
-export class NullEventDispatcher implements EventDispatcherContract {
-	public listen(event: EventName, listener: EventListener): () => void {
+export class NullEventDispatcher implements Kernel.EventDispatcher {
+	public listen(event: Kernel.EventName, listener: Kernel.EventListener): () => void {
 		return () => {};
 	}
 
-	public listenMany(events: Array<[EventName, EventListener]>): Map<EventName, () => void> {
-		const map: Map<EventName, () => void> = new Map<EventName, () => void>();
+	public listenMany(events: Array<[Kernel.EventName, Kernel.EventListener]>): Map<Kernel.EventName, () => void> {
+		const map: Map<Kernel.EventName, () => void> = new Map<Kernel.EventName, () => void>();
 		for (const [name] of events) {
 			map.set(name, () => {});
 		}
 		return map;
 	}
 
-	public listenOnce(name: EventName, listener: EventListener): void {
+	public listenOnce(name: Kernel.EventName, listener: Kernel.EventListener): void {
 		//
 	}
 
-	public forget(event: EventName, listener?: EventListener): void {}
+	public forget(event: Kernel.EventName, listener?: Kernel.EventListener): void {}
 
-	public forgetMany(events: EventName[] | Array<[EventName, EventListener]>): void {
+	public forgetMany(events: Kernel.EventName[] | Array<[Kernel.EventName, Kernel.EventListener]>): void {
 		//
 	}
 
@@ -29,39 +29,39 @@ export class NullEventDispatcher implements EventDispatcherContract {
 		//
 	}
 
-	public getListeners(event?: EventName): EventListener[] {
+	public getListeners(event?: Kernel.EventName): Kernel.EventListener[] {
 		return [];
 	}
 
-	public hasListeners(event: EventName): boolean {
+	public hasListeners(event: Kernel.EventName): boolean {
 		return false;
 	}
 
-	public countListeners(event?: EventName): number {
+	public countListeners(event?: Kernel.EventName): number {
 		return 0;
 	}
 
-	public async dispatch<T = any>(event: EventName, data?: T): Promise<void> {
+	public async dispatch<T = any>(event: Kernel.EventName, data?: T): Promise<void> {
 		//
 	}
 
-	public async dispatchSeq<T = any>(event: EventName, data?: T): Promise<void> {
+	public async dispatchSeq<T = any>(event: Kernel.EventName, data?: T): Promise<void> {
 		//
 	}
 
-	public dispatchSync<T = any>(event: EventName, data?: T): void {
+	public dispatchSync<T = any>(event: Kernel.EventName, data?: T): void {
 		//
 	}
 
-	public async dispatchMany<T = any>(events: Array<[EventName, T]>): Promise<void> {
+	public async dispatchMany<T = any>(events: Array<[Kernel.EventName, T]>): Promise<void> {
 		//
 	}
 
-	public async dispatchManySeq<T = any>(events: Array<[EventName, T]>): Promise<void> {
+	public async dispatchManySeq<T = any>(events: Array<[Kernel.EventName, T]>): Promise<void> {
 		//
 	}
 
-	public dispatchManySync<T = any>(events: Array<[EventName, T]>): void {
+	public dispatchManySync<T = any>(events: Array<[Kernel.EventName, T]>): void {
 		//
 	}
 }

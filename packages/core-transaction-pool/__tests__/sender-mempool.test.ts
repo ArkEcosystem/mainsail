@@ -1,14 +1,14 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-kernel";
 import { Identities, Managers, Transactions } from "@arkecosystem/crypto";
 
-import { SenderMempool } from "../../../packages/core-transaction-pool/source/sender-mempool";
+import { SenderMempool } from "../source/sender-mempool";
 
-const configuration = { getRequired: jest.fn(), getOptional: jest.fn() };
+const configuration = { getOptional: jest.fn(), getRequired: jest.fn() };
 const senderState = { apply: jest.fn(), revert: jest.fn() };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
-container.bind(Container.Identifiers.TransactionPoolSenderState).toConstantValue(senderState);
+container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+container.bind(Identifiers.TransactionPoolSenderState).toConstantValue(senderState);
 
 beforeEach(() => {
 	configuration.getRequired.mockReset();

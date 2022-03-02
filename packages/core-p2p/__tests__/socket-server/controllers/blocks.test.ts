@@ -26,15 +26,13 @@ describe("BlocksController", () => {
 	beforeEach(() => {
 		sandbox = new Sandbox();
 
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		sandbox.app.bind(Container.Identifiers.PeerRepository).toConstantValue(peerRepository);
-		sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(database);
-		sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		sandbox.app.bind(Container.Identifiers.PluginConfiguration).to(PluginConfiguration).inSingletonScope();
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(peerRepository);
+		sandbox.app.bind(Identifiers.DatabaseService).toConstantValue(database);
+		sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		sandbox.app.bind(Identifiers.PluginConfiguration).to(PluginConfiguration).inSingletonScope();
 
-		sandbox.app
-			.get<PluginConfiguration>(Container.Identifiers.PluginConfiguration)
-			.set("remoteAccess", ["127.0.0.1"]);
+		sandbox.app.get<PluginConfiguration>(Identifiers.PluginConfiguration).set("remoteAccess", ["127.0.0.1"]);
 
 		blocksController = sandbox.app.resolve<BlocksController>(BlocksController);
 	});
@@ -124,9 +122,7 @@ describe("BlocksController", () => {
 			it("should call handleIncomingBlock with the block and fromForger=true", async () => {
 				blockchain.handleIncomingBlock = jest.fn();
 				const ip = "187.55.33.22";
-				sandbox.app
-					.get<PluginConfiguration>(Container.Identifiers.PluginConfiguration)
-					.set("remoteAccess", [ip]);
+				sandbox.app.get<PluginConfiguration>(Identifiers.PluginConfiguration).set("remoteAccess", [ip]);
 
 				const blockSerialized = Blocks.Serializer.serializeWithTransactions({
 					...block.data,
@@ -151,7 +147,7 @@ describe("BlocksController", () => {
 				blockchain.handleIncomingBlock = jest.fn();
 				const ip = "187.55.33.22";
 				sandbox.app
-					.get<PluginConfiguration>(Container.Identifiers.PluginConfiguration)
+					.get<PluginConfiguration>(Identifiers.PluginConfiguration)
 					.set("remoteAccess", ["188.66.55.44"]);
 
 				const blockSerialized = Blocks.Serializer.serializeWithTransactions({

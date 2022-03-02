@@ -11,22 +11,22 @@ const loadDefaults = () => importFresh("./defaults").defaults;
 describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container.Container());
-		context.app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
+		context.app.bind(Identifiers.ConfigFlags).toConstantValue("core");
 
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
 
 	it("should register", async (context) => {
 		context.app
-			.bind<Services.Log.LogManager>(Container.Identifiers.LogManager)
+			.bind<Services.Log.LogManager>(Identifiers.LogManager)
 			.to(Services.Log.LogManager)
 			.inSingletonScope();
 
-		await context.app.get<Services.Log.LogManager>(Container.Identifiers.LogManager).boot();
+		await context.app.get<Services.Log.LogManager>(Identifiers.LogManager).boot();
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
-		context.app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("token-network");
+		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("token-network");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		await assert.resolves(() => context.serviceProvider.register());
@@ -34,21 +34,21 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 	it("should be disposable", async (context) => {
 		context.app
-			.bind<Services.Log.LogManager>(Container.Identifiers.LogManager)
+			.bind<Services.Log.LogManager>(Identifiers.LogManager)
 			.to(Services.Log.LogManager)
 			.inSingletonScope();
 
-		await context.app.get<Services.Log.LogManager>(Container.Identifiers.LogManager).boot();
+		await context.app.get<Services.Log.LogManager>(Identifiers.LogManager).boot();
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
-		context.app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("token-network");
+		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("token-network");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.app
-			.bind(Container.Identifiers.LogService)
+			.bind(Identifiers.LogService)
 			.toDynamicValue((context: Container.interfaces.Context) =>
-				context.container.get<Services.Log.LogManager>(Container.Identifiers.LogManager).driver(),
+				context.container.get<Services.Log.LogManager>(Identifiers.LogManager).driver(),
 			);
 
 		await assert.resolves(() => context.serviceProvider.register());

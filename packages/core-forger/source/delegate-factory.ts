@@ -1,4 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 
 import { Delegate } from "./interfaces";
 import { BIP38 } from "./methods/bip38";
@@ -6,7 +7,7 @@ import { BIP39 } from "./methods/bip39";
 
 @Container.injectable()
 export class DelegateFactory {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
 	public async fromBIP38(bip38: string, password: string): Promise<Delegate> {

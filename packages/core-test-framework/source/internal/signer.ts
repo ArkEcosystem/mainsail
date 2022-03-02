@@ -1,4 +1,4 @@
-import { BINDINGS, IConfiguration, IPublicKeyFactory } from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DelegateRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-delegate-registration";
 import { MultiPaymentBuilder } from "@arkecosystem/core-crypto-transaction-multi-payment";
 import { MultiSignatureBuilder } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
@@ -8,11 +8,11 @@ import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 export class Signer {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: IPublicKeyFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
 
 	private nonce: BigNumber;
 

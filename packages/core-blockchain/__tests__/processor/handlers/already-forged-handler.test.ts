@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { AlreadyForgedHandler } from "@packages/core-blockchain/source/processor/handlers/already-forged-handler";
-import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
 import { Interfaces } from "@arkecosystem/crypto";
+import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
+import { AlreadyForgedHandler } from "@packages/core-blockchain/source/processor/handlers/already-forged-handler";
 
 describe("AlreadyForgedHandler", () => {
 	const container = new Container.Container();
@@ -12,8 +12,8 @@ describe("AlreadyForgedHandler", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
 	});
 
 	beforeEach(() => {
@@ -25,7 +25,7 @@ describe("AlreadyForgedHandler", () => {
 			const alreadyForgedHandler = container.resolve<AlreadyForgedHandler>(AlreadyForgedHandler);
 
 			const block = {};
-			const result = await alreadyForgedHandler.execute(block as Interfaces.IBlock);
+			const result = await alreadyForgedHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.DiscardedButCanBeBroadcasted);
 			expect(blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);

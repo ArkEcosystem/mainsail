@@ -1,5 +1,5 @@
-import { BINDINGS, IAddressFactory } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "./errors";
@@ -8,14 +8,14 @@ import { WalletIndex } from "./wallet-index";
 // todo: review the implementation
 @Container.injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
-	@Container.multiInject(Container.Identifiers.WalletRepositoryIndexerIndex)
+	@Container.multiInject(Identifiers.WalletRepositoryIndexerIndex)
 	protected readonly indexerIndexes!: Contracts.State.WalletIndexerIndex[];
 
-	@Container.inject(Container.Identifiers.WalletFactory)
+	@Container.inject(Identifiers.WalletFactory)
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
 
-	@Container.inject(BINDINGS.Identity.AddressFactory)
-	protected readonly addressFactory: IAddressFactory;
+	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	protected readonly addressFactory: Crypto.IAddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};
 

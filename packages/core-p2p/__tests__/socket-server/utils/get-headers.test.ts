@@ -8,8 +8,8 @@ describe("getHeaders", () => {
 	const stateStore = { isStarted: jest.fn().mockReturnValue(true) };
 	const blockchain = { getLastHeight: () => height };
 	const appGet = {
-		[Container.Identifiers.StateStore]: stateStore,
-		[Container.Identifiers.BlockchainService]: blockchain,
+		[Identifiers.StateStore]: stateStore,
+		[Identifiers.BlockchainService]: blockchain,
 	};
 	const app = {
 		version: () => version,
@@ -36,8 +36,8 @@ describe("getHeaders", () => {
 		const height = 387;
 		const blockchain = { getLastHeight: () => height };
 		const appGet = {
-			[Container.Identifiers.StateStore]: stateStore,
-			[Container.Identifiers.BlockchainService]: blockchain,
+			[Identifiers.StateStore]: stateStore,
+			[Identifiers.BlockchainService]: blockchain,
 		};
 		const app = {
 			version: () => version,

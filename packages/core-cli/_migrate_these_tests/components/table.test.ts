@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Table } from "@packages/core-cli/source/components";
 
@@ -9,8 +8,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.Table).to(Table).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.Table);
+	cli.app.rebind(Identifiers.Table).to(Table).inSingletonScope();
+	component = cli.app.get(Identifiers.Table);
 });
 
 describe("Table", () => {
@@ -19,8 +18,7 @@ describe("Table", () => {
 		jest.spyOn(console, "log").mockImplementationOnce((m) => (message = m));
 
 		component.render(["ID", "Name"], (table) => {
-			table.push([1, "John Doe"]);
-			table.push([2, "Jane Doe"]);
+			table.push([1, "John Doe"], [2, "Jane Doe"]);
 		});
 
 		expect(message).toContain("ID");

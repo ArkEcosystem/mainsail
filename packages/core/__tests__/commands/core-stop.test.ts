@@ -1,12 +1,11 @@
-import { Container } from "@arkecosystem/core-cli";
-import { Console } from "@packages/core-test-framework";
 import { Command } from "@packages/core/source/commands/core-stop";
+import { Console } from "@packages/core-test-framework";
 
 let cli;
 let processManager;
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 });
 
 describe("StopCommand", () => {

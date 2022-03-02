@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Column, Entity, Index } from "typeorm";
 
@@ -67,8 +67,8 @@ export class Transaction implements Contracts.Database.TransactionModel {
 	public senderPublicKey!: string;
 
 	@Column({
-		length: 36,
 		default: undefined,
+		length: 36,
 		type: "varchar",
 	})
 	public recipientId!: string;

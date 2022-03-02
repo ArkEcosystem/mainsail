@@ -1,4 +1,4 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-kernel";
 import { describe } from "../../core-test-framework";
 
 import { BlockHistoryService } from "./block-history-service";
@@ -36,15 +36,13 @@ describe<{
 		};
 
 		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);
+		context.container.bind(Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);
 		context.container
-			.bind(Container.Identifiers.DatabaseTransactionRepository)
+			.bind(Identifiers.DatabaseTransactionRepository)
 			.toConstantValue(context.transactionRepository);
-		context.container.bind(Container.Identifiers.DatabaseBlockFilter).toConstantValue(context.blockFilter);
-		context.container
-			.bind(Container.Identifiers.DatabaseTransactionFilter)
-			.toConstantValue(context.transactionFilter);
-		context.container.bind(Container.Identifiers.DatabaseModelConverter).toConstantValue(context.modelConverter);
+		context.container.bind(Identifiers.DatabaseBlockFilter).toConstantValue(context.blockFilter);
+		context.container.bind(Identifiers.DatabaseTransactionFilter).toConstantValue(context.transactionFilter);
+		context.container.bind(Identifiers.DatabaseModelConverter).toConstantValue(context.modelConverter);
 	});
 
 	it("findOneByCriteria should return undefined when model wasn't found in repository", async (context) => {

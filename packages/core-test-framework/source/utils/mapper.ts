@@ -1,10 +1,10 @@
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { Models } from "../../../core-database";
 
 export const mapTransactionToModel = (
-	transaction: Interfaces.ITransaction,
+	transaction: Crypto.ITransaction,
 	blockHeight?: number,
 	sequence?: number,
 ): Models.Transaction => ({

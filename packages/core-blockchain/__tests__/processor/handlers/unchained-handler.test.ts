@@ -1,4 +1,4 @@
-import { Container, Services } from "@arkecosystem/core-kernel";
+import { Services } from "@arkecosystem/core-kernel";
 import { BlockProcessorResult } from "@packages/core-blockchain/source/processor";
 import { UnchainedHandler } from "@packages/core-blockchain/source/processor/handlers/unchained-handler";
 import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
@@ -7,12 +7,12 @@ import { Interfaces } from "@packages/crypto";
 
 let sandbox: Sandbox;
 
-const logger = { warning: jest.fn(), debug: console.log, info: jest.fn() };
+const logger = { debug: console.log, info: jest.fn(), warning: jest.fn() };
 const blockchain = {
-	resetLastDownloadedBlock: jest.fn(),
 	clearQueue: jest.fn(),
 	getLastBlock: jest.fn(),
 	getQueue: jest.fn().mockReturnValue({ size: jest.fn() }),
+	resetLastDownloadedBlock: jest.fn(),
 };
 const stateStore = {
 	getNumberOfBlocksToRollback: jest.fn().mockReturnValue(0),
@@ -20,14 +20,14 @@ const stateStore = {
 };
 const database = {};
 const databaseInteractions = {
+	deleteRound: jest.fn(),
+	getLastBlock: jest.fn(),
+	getTopBlocks: jest.fn(),
+	loadBlocksFromCurrentRound: jest.fn(),
+	revertBlock: jest.fn(),
 	walletRepository: {
 		getNonce: jest.fn(),
 	},
-	getTopBlocks: jest.fn(),
-	getLastBlock: jest.fn(),
-	loadBlocksFromCurrentRound: jest.fn(),
-	revertBlock: jest.fn(),
-	deleteRound: jest.fn(),
 };
 
 const roundState = {
@@ -37,16 +37,16 @@ const roundState = {
 beforeEach(() => {
 	sandbox = new Sandbox();
 
-	sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-	sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
-	sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(database);
-	sandbox.app.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
-	sandbox.app.bind(Container.Identifiers.RoundState).toConstantValue(roundState);
+	sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+	sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.DatabaseService).toConstantValue(database);
+	sandbox.app.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
+	sandbox.app.bind(Identifiers.RoundState).toConstantValue(roundState);
 
-	sandbox.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 	sandbox.app
-		.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 		.bind("getActiveDelegates", new GetActiveDelegatesAction(sandbox.app));
 });
 
@@ -61,13 +61,13 @@ describe("UnchainedHandler", () => {
 				const unchainedHandler = sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 				unchainedHandler.initialize(true);
 
-				const lastBlock = { data: { id: "123", height: 443, timestamp: 111112 } };
+				const lastBlock = { data: { height: 443, id: "123", timestamp: 111_112 } };
 				const block = {
 					data: {
-						id: "987",
-						height: 443,
-						timestamp: 111122,
 						generatorPublicKey: "03ea97a59522c4cb4bb3420fc94555f6223813d9817dd421bf533b390a7ea140db",
+						height: 443,
+						id: "987",
+						timestamp: 111_122,
 					},
 				};
 				blockchain.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
@@ -77,13 +77,11 @@ describe("UnchainedHandler", () => {
 						"02aea83a44f1d6b073e5bcffb4176bbe3c51dcd0e96a793a88f3a6135600224adf",
 						"03a3c6fd74a23fbe1e02f08d9c626ebb255b48de7ba8c283ee27c9303be81a2933",
 					].map((publicKey) => ({
-						getPublicKey: () => {
-							return publicKey;
-						},
+						getPublicKey: () => publicKey,
 					})),
 				);
 
-				const result = await unchainedHandler.execute(block as Interfaces.IBlock);
+				const result = await unchainedHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.Rollback);
 			});
@@ -92,13 +90,13 @@ describe("UnchainedHandler", () => {
 				const unchainedHandler = sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 				unchainedHandler.initialize(true);
 
-				const lastBlock = { data: { id: "123", height: 443, timestamp: 111112 } };
+				const lastBlock = { data: { height: 443, id: "123", timestamp: 111_112 } };
 				const block = {
 					data: {
-						id: "987",
-						height: 443,
-						timestamp: 111122,
 						generatorPublicKey: "03ea97a59522c4cb4bb3420fc94555f6223813d9817dd421bf533b390a7ea140db",
+						height: 443,
+						id: "987",
+						timestamp: 111_122,
 					},
 				};
 				blockchain.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
@@ -107,13 +105,11 @@ describe("UnchainedHandler", () => {
 						"02aea83a44f1d6b073e5bcffb4176bbe3c51dcd0e96a793a88f3a6135600224adf",
 						"03a3c6fd74a23fbe1e02f08d9c626ebb255b48de7ba8c283ee27c9303be81a2933",
 					].map((publicKey) => ({
-						getPublicKey: () => {
-							return publicKey;
-						},
+						getPublicKey: () => publicKey,
 					})),
 				);
 
-				const result = await unchainedHandler.execute(block as Interfaces.IBlock);
+				const result = await unchainedHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.Rejected);
 			});
@@ -124,19 +120,19 @@ describe("UnchainedHandler", () => {
 				const unchainedHandler = sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 				unchainedHandler.initialize(true);
 
-				const lastBlock = { data: { id: "123", height: 443, timestamp: 111112 } };
+				const lastBlock = { data: { height: 443, id: "123", timestamp: 111_112 } };
 				const block = {
 					data: {
-						id: "987",
-						height: lastBlock.data.height + 2,
-						timestamp: 111122,
 						generatorPublicKey: "03ea97a59522c4cb4bb3420fc94555f6223813d9817dd421bf533b390a7ea140db",
+						height: lastBlock.data.height + 2,
+						id: "987",
+						timestamp: 111_122,
 					},
 				};
 				blockchain.getLastBlock = jest.fn().mockReturnValue(lastBlock);
 				blockchain.getQueue = jest.fn().mockReturnValue({ size: jest.fn().mockReturnValueOnce(1) });
 
-				expect(await unchainedHandler.execute(block as Interfaces.IBlock)).toBe(BlockProcessorResult.Rejected);
+				expect(await unchainedHandler.execute(block as Crypto.IBlock)).toBe(BlockProcessorResult.Rejected);
 			});
 		});
 
@@ -144,18 +140,18 @@ describe("UnchainedHandler", () => {
 			it("should return DiscardedButCanBeBroadcasted", async () => {
 				const unchainedHandler = sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 
-				const lastBlock = { data: { id: "123", height: 443, timestamp: 111112 } };
+				const lastBlock = { data: { height: 443, id: "123", timestamp: 111_112 } };
 				const block = {
 					data: {
-						id: "987",
-						height: 442,
-						timestamp: 111102,
 						generatorPublicKey: "03ea97a59522c4cb4bb3420fc94555f6223813d9817dd421bf533b390a7ea140db",
+						height: 442,
+						id: "987",
+						timestamp: 111_102,
 					},
 				};
 				blockchain.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
 
-				const result = await unchainedHandler.execute(block as Interfaces.IBlock);
+				const result = await unchainedHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.DiscardedButCanBeBroadcasted);
 			});
@@ -165,18 +161,18 @@ describe("UnchainedHandler", () => {
 			it("should return Rejected", async () => {
 				const unchainedHandler = sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 
-				const lastBlock = { data: { id: "123", height: 443, timestamp: 111112 } };
+				const lastBlock = { data: { height: 443, id: "123", timestamp: 111_112 } };
 				const block = {
 					data: {
-						id: "987",
-						height: 443,
-						timestamp: 111122,
 						generatorPublicKey: "03ea97a59522c4cb4bb3420fc94555f6223813d9817dd421bf533b390a7ea140db",
+						height: 443,
+						id: "987",
+						timestamp: 111_122,
 					},
 				};
 				blockchain.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
 
-				const result = await unchainedHandler.execute(block as Interfaces.IBlock);
+				const result = await unchainedHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.Rejected);
 			});
@@ -186,18 +182,18 @@ describe("UnchainedHandler", () => {
 			it("should return Rejected", async () => {
 				const unchainedHandler = sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 
-				const lastBlock = { data: { id: "123", height: 443, timestamp: 111112 } };
+				const lastBlock = { data: { height: 443, id: "123", timestamp: 111_112 } };
 				const block = {
 					data: {
-						id: "987",
-						height: lastBlock.data.height + 1,
-						timestamp: lastBlock.data.timestamp - 20,
 						generatorPublicKey: "03ea97a59522c4cb4bb3420fc94555f6223813d9817dd421bf533b390a7ea140db",
+						height: lastBlock.data.height + 1,
+						id: "987",
+						timestamp: lastBlock.data.timestamp - 20,
 					},
 				};
 				blockchain.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
 
-				const result = await unchainedHandler.execute(block as Interfaces.IBlock);
+				const result = await unchainedHandler.execute(block as Crypto.IBlock);
 
 				expect(result).toBe(BlockProcessorResult.Rejected);
 			});
@@ -206,10 +202,10 @@ describe("UnchainedHandler", () => {
 		it("should return DiscardedButCanBeBroadcasted when does not match above cases", async () => {
 			const unchainedHandler = sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 
-			const lastBlock = { data: { id: "123", height: 443, timestamp: 111112 } };
+			const lastBlock = { data: { height: 443, id: "123", timestamp: 111_112 } };
 			const block = lastBlock;
 			blockchain.getLastBlock = jest.fn().mockReturnValueOnce(lastBlock);
-			const result = await unchainedHandler.execute(block as Interfaces.IBlock);
+			const result = await unchainedHandler.execute(block as Crypto.IBlock);
 
 			expect(result).toBe(BlockProcessorResult.DiscardedButCanBeBroadcasted);
 		});

@@ -1,4 +1,5 @@
-import { Kernel } from "../contracts";
+import { Kernel } from "@arkecosystem/core-contracts";
+
 import { DriverCannotBeResolved } from "../exceptions/container";
 import { Identifiers, inject, injectable } from "../ioc";
 import { pascalCase } from "../utils";
@@ -41,7 +42,7 @@ export abstract class InstanceManager<T> {
 	}
 
 	public getDrivers(): T[] {
-		return Array.from(this.drivers.values());
+		return [...this.drivers.values()];
 	}
 
 	private async createDriver(name: string): Promise<void> {

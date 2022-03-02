@@ -1,4 +1,5 @@
-import { Container, Contracts, Services, Types } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Services, Types } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "../round-state";
 
@@ -10,10 +11,10 @@ export class GetActiveDelegatesAction extends Services.Triggers.Action {
 		this.app = app;
 	}
 
-	public async execute(args: Types.ActionArguments): Promise<Contracts.State.Wallet[]> {
-		const roundInfo: Contracts.Shared.RoundInfo = args.roundInfo;
-		const delegates: Contracts.State.Wallet[] = args.delegates;
+	public async execute(arguments_: Types.ActionArguments): Promise<Contracts.State.Wallet[]> {
+		const roundInfo: Contracts.Shared.RoundInfo = arguments_.roundInfo;
+		const delegates: Contracts.State.Wallet[] = arguments_.delegates;
 
-		return this.app.get<RoundState>(Container.Identifiers.RoundState).getActiveDelegates(roundInfo, delegates);
+		return this.app.get<RoundState>(Identifiers.RoundState).getActiveDelegates(roundInfo, delegates);
 	}
 }

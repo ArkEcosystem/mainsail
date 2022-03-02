@@ -67,9 +67,9 @@ describe("AwaitBlockPlugin", () => {
 		};
 
 		container = new Container.Container();
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
-		container.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
-		container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
+		container.bind(Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		container.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
 		awaitBlockPlugin = container.resolve<AwaitBlockPlugin>(AwaitBlockPlugin);
 	});

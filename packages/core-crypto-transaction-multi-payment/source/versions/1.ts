@@ -1,22 +1,15 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IAddressSerializer,
-	IMultiPaymentItem,
-	ISerializeOptions,
-	TransactionType,
-	TransactionTypeGroup,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class MultiPaymentTransaction extends Transaction {
-	@Container.inject(BINDINGS.Identity.AddressSerializer)
-	private readonly addressSerializer: IAddressSerializer;
+	@Container.inject(Identifiers.Cryptography.Identity.AddressSerializer)
+	private readonly addressSerializer: Crypto.IAddressSerializer;
 
-	public static typeGroup: number = TransactionTypeGroup.Core;
-	public static type: number = TransactionType.MultiPayment;
+	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
+	public static type: number = Crypto.TransactionType.MultiPayment;
 	public static key = "multiPayment";
 	public static version = 1;
 
@@ -48,13 +41,13 @@ export class MultiPaymentTransaction extends Transaction {
 					type: "object",
 				},
 				fee: { bignumber: { minimum: 1 } },
-				type: { transactionType: TransactionType.MultiPayment },
+				type: { transactionType: Crypto.TransactionType.MultiPayment },
 				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
 			},
 		});
 	}
 
-	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
 		if (data.asset && data.asset.payments) {
@@ -77,7 +70,7 @@ export class MultiPaymentTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		const payments: IMultiPaymentItem[] = [];
+		const payments: Crypto.IMultiPaymentItem[] = [];
 		const total: number = buf.readUInt16LE();
 
 		for (let index = 0; index < total; index++) {

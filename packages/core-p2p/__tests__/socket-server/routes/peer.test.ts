@@ -1,5 +1,4 @@
 import { Container } from "@arkecosystem/core-kernel";
-
 import { PeerRoute } from "@packages/core-p2p/source/socket-server/routes/peer";
 
 describe("PeerRoute", () => {
@@ -7,15 +6,15 @@ describe("PeerRoute", () => {
 
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn() };
+	const logger = { debug: jest.fn(), warning: jest.fn() };
 	const controller = { getPeers: jest.fn() }; // a mock peer controller
 	const app = { resolve: jest.fn().mockReturnValue(controller) };
 	const server = { bind: jest.fn(), route: jest.fn() };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(app);
 	});
 
 	beforeEach(() => {
@@ -25,16 +24,16 @@ describe("PeerRoute", () => {
 	it("should bind the controller to the server and register the routes", () => {
 		const routes = peerRoute.getRoutesConfigByPath();
 		const routesExpected = Object.entries(routes).map(([path, config]) => ({
-			method: "POST",
-			path,
 			config: {
-				id: config.id,
 				handler: config.handler,
+				id: config.id,
+				isInternal: true,
 				payload: {
 					maxBytes: config.maxBytes,
 				},
-				isInternal: true,
 			},
+			method: "POST",
+			path,
 		}));
 
 		peerRoute.register(server);

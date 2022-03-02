@@ -8,7 +8,7 @@ let cli;
 let processManager;
 beforeEach(() => {
 	cli = new Console();
-	processManager = cli.app.get(Container.Identifiers.ProcessManager);
+	processManager = cli.app.get(Identifiers.ProcessManager);
 });
 
 describe("StatusCommand", () => {

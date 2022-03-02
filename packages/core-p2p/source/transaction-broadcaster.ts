@@ -1,27 +1,27 @@
-import Interfaces, { BINDINGS, ITransactionSerializer } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Providers, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Providers, Utils } from "@arkecosystem/core-kernel";
 
 import { PeerCommunicator } from "./peer-communicator";
 
 @Container.injectable()
 export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcaster {
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@Container.inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Container.Identifiers.PeerCommunicator)
+	@Container.inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
-	@Container.inject(BINDINGS.Transaction.Serializer)
-	private readonly serializer!: ITransactionSerializer;
+	@Container.inject(Identifiers.Cryptography.Transaction.Serializer)
+	private readonly serializer!: Crypto.ITransactionSerializer;
 
-	public async broadcastTransactions(transactions: Interfaces.ITransaction[]): Promise<void> {
+	public async broadcastTransactions(transactions: Crypto.ITransaction[]): Promise<void> {
 		if (transactions.length === 0) {
 			this.logger.warning("Broadcasting 0 transactions");
 			return;

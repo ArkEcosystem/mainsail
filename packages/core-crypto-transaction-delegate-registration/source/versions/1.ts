@@ -1,12 +1,12 @@
 import { Container } from "@arkecosystem/core-container";
-import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export abstract class DelegateRegistrationTransaction extends Transaction {
-	public static typeGroup: number = TransactionTypeGroup.Core;
-	public static type: number = TransactionType.DelegateRegistration;
+	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
+	public static type: number = Crypto.TransactionType.DelegateRegistration;
 	public static key = "delegateRegistration";
 	public static version = 1;
 
@@ -31,13 +31,13 @@ export abstract class DelegateRegistrationTransaction extends Transaction {
 					type: "object",
 				},
 				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
-				type: { transactionType: TransactionType.DelegateRegistration },
+				type: { transactionType: Crypto.TransactionType.DelegateRegistration },
 			},
 			required: ["asset"],
 		});
 	}
 
-	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
 		if (data.asset && data.asset.delegate) {

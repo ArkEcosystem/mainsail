@@ -1,23 +1,23 @@
-import { BINDINGS, IBlockJson, IConfiguration, Network, NetworkConfig } from "@arkecosystem/core-crypto-contracts";
-import { Container, Providers } from "@arkecosystem/core-kernel";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 
 import { Configuration } from "./configuration";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(BINDINGS.Configuration).to(Configuration).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		// if (this.app.isBound(Container.Identifiers.Crypto)) {
-		const config: NetworkConfig = this.fromConfigRepository();
+		// if (this.app.isBound(Identifiers.Crypto)) {
+		const config: Crypto.NetworkConfig = this.fromConfigRepository();
 
-		this.app.get<IConfiguration>(BINDINGS.Configuration).setConfig(config);
+		this.app.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
-		this.app.bind<NetworkConfig>(Container.Identifiers.Crypto).toConstantValue(config);
+		this.app.bind<Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
 		// }
 	}
 
-	private fromConfigRepository(): NetworkConfig {
-		const configRepository: any = this.app.get(Container.Identifiers.ConfigRepository);
+	private fromConfigRepository(): Crypto.NetworkConfig {
+		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
 
 		return {
 			// @ts-ignore

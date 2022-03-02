@@ -1,24 +1,15 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IConfiguration,
-	IMultiSignatureAsset,
-	IPublicKeySerializer,
-	ISerializeOptions,
-	ITransactionData,
-	TransactionType,
-	TransactionTypeGroup,
-} from "@arkecosystem/core-crypto-contracts";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class MultiSignatureRegistrationTransaction extends Transaction {
-	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
-	private readonly publicKeySerializer: IPublicKeySerializer;
+	@Container.inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: Crypto.IPublicKeySerializer;
 
-	public static typeGroup: number = TransactionTypeGroup.Core;
-	public static type: number = TransactionType.MultiSignature;
+	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
+	public static type: number = Crypto.TransactionType.MultiSignature;
 	public static key = "multiSignature";
 	public static version = 1;
 
@@ -63,15 +54,15 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 					type: "array",
 					uniqueItems: true,
 				},
-				type: { transactionType: TransactionType.MultiSignature },
+				type: { transactionType: Crypto.TransactionType.MultiSignature },
 			},
 			required: ["asset", "signatures"],
 		});
 	}
 
 	public static staticFee(
-		configuration: IConfiguration,
-		feeContext: { height?: number; data?: ITransactionData } = {},
+		configuration: Crypto.IConfiguration,
+		feeContext: { height?: number; data?: Crypto.ITransactionData } = {},
 	): BigNumber {
 		if (feeContext.data?.asset?.multiSignature) {
 			return super
@@ -82,7 +73,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		return super.staticFee(configuration, feeContext);
 	}
 
-	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
 		// @TODO
@@ -101,7 +92,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 
-		const multiSignature: IMultiSignatureAsset = { min: 0, publicKeys: [] };
+		const multiSignature: Crypto.IMultiSignatureAsset = { min: 0, publicKeys: [] };
 		multiSignature.min = buf.readUInt8();
 
 		const count = buf.readUInt8();

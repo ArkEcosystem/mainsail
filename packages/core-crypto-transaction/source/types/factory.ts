@@ -1,5 +1,5 @@
-import { ITransaction, ITransactionData } from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-kernel";
 
 import { UnkownTransactionError } from "../errors";
 import { Transaction } from "./transaction";
@@ -8,7 +8,7 @@ type TransactionConstructor = typeof Transaction;
 
 @Container.injectable()
 export class TransactionTypeFactory implements Contracts.Transactions.ITransactionTypeFactory {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
 	private transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;
@@ -19,15 +19,15 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		this.transactionTypes = transactionTypes;
 	}
 
-	public create(data: ITransactionData): ITransaction {
-		const instance: ITransaction = this.app.resolve(this.get(data.type, data.typeGroup, data.version) as any);
+	public create(data: Crypto.ITransactionData): Crypto.ITransaction {
+		const instance: Crypto.ITransaction = this.app.resolve(this.get(data.type, data.typeGroup, data.version));
 		instance.data = data;
 		instance.data.version = data.version || 1;
 
 		return instance;
 	}
 
-	public get(type: number, typeGroup?: number, version?: number): TransactionConstructor | undefined {
+	public get(type: number, typeGroup?: number, version?: number): Crypto.TransactionConstructor | undefined {
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 
@@ -36,7 +36,7 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		}
 
 		// Either there is a match for the provided version or use the first available constructor as a fallback
-		const constructor: TransactionConstructor | undefined = this.transactionTypes
+		const constructor: Crypto.TransactionConstructor | undefined = this.transactionTypes
 			.get(internalType)
 			?.get(version || 1);
 

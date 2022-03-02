@@ -1,13 +1,13 @@
 import mm from "nanomatch";
 
-import { EventDispatcher as EventDispatcherContract, EventListener, EventName } from "../../../contracts/kernel/events";
+import { Kernel } from "@arkecosystem/core-contracts";
 import { injectable } from "../../../ioc";
 import { assert } from "../../../utils";
 
-class OnceListener implements EventListener {
+class OnceListener implements Kernel.EventListener {
 	public constructor(
-		private readonly dispatcher: EventDispatcherContract,
-		private readonly listener: EventListener,
+		private readonly dispatcher: Kernel.EventDispatcher,
+		private readonly listener: Kernel.EventListener,
 	) {}
 
 	public async handle({ name }): Promise<void> {
@@ -16,17 +16,20 @@ class OnceListener implements EventListener {
 }
 
 @injectable()
-export class MemoryEventDispatcher implements EventDispatcherContract {
-	private readonly listeners: Map<EventName, Set<EventListener>> = new Map<EventName, Set<EventListener>>();
+export class MemoryEventDispatcher implements Kernel.EventDispatcher {
+	private readonly listeners: Map<Kernel.EventName, Set<Kernel.EventListener>> = new Map<
+		Kernel.EventName,
+		Set<Kernel.EventListener>
+	>();
 
-	public listen(event: EventName, listener: EventListener): () => void {
+	public listen(event: Kernel.EventName, listener: Kernel.EventListener): () => void {
 		this.getListenersByEvent(event).add(listener);
 
 		return this.forget.bind(this, event, listener);
 	}
 
-	public listenMany(events: Array<[EventName, EventListener]>): Map<EventName, () => void> {
-		const listeners: Map<EventName, () => void> = new Map<EventName, () => void>();
+	public listenMany(events: Array<[Kernel.EventName, Kernel.EventListener]>): Map<Kernel.EventName, () => void> {
+		const listeners: Map<Kernel.EventName, () => void> = new Map<Kernel.EventName, () => void>();
 
 		for (const [event, listener] of events) {
 			listeners.set(event, this.listen(event, listener));
@@ -35,13 +38,13 @@ export class MemoryEventDispatcher implements EventDispatcherContract {
 		return listeners;
 	}
 
-	public listenOnce(name: EventName, listener: EventListener): void {
+	public listenOnce(name: Kernel.EventName, listener: Kernel.EventListener): void {
 		this.listen(name, listener);
 
 		this.listen(name, new OnceListener(this, listener));
 	}
 
-	public forget(event: EventName, listener?: EventListener): boolean {
+	public forget(event: Kernel.EventName, listener?: Kernel.EventListener): boolean {
 		if (event && listener) {
 			return this.getListenersByEvent(event).delete(listener);
 		}
@@ -49,7 +52,7 @@ export class MemoryEventDispatcher implements EventDispatcherContract {
 		return this.listeners.delete(event);
 	}
 
-	public forgetMany(events: EventName[] | Array<[EventName, EventListener]>): void {
+	public forgetMany(events: Kernel.EventName[] | Array<[Kernel.EventName, Kernel.EventListener]>): void {
 		for (const event of events) {
 			Array.isArray(event) ? this.forget(event[0], event[1]) : this.forget(event);
 		}
@@ -59,15 +62,15 @@ export class MemoryEventDispatcher implements EventDispatcherContract {
 		this.listeners.clear();
 	}
 
-	public getListeners(event?: EventName): EventListener[] {
+	public getListeners(event?: Kernel.EventName): Kernel.EventListener[] {
 		return [...this.getListenersByPattern(event || "*").values()];
 	}
 
-	public hasListeners(event: EventName): boolean {
+	public hasListeners(event: Kernel.EventName): boolean {
 		return this.getListenersByPattern(event).length > 0;
 	}
 
-	public countListeners(event?: EventName): number {
+	public countListeners(event?: Kernel.EventName): number {
 		if (event) {
 			return this.getListenersByPattern(event).length;
 		}
@@ -80,7 +83,7 @@ export class MemoryEventDispatcher implements EventDispatcherContract {
 		return totalCount;
 	}
 
-	public async dispatch<T = any>(event: EventName, data?: T): Promise<void> {
+	public async dispatch<T = any>(event: Kernel.EventName, data?: T): Promise<void> {
 		await Promise.resolve();
 
 		const resolvers: Array<Promise<void>> = [];
@@ -92,7 +95,7 @@ export class MemoryEventDispatcher implements EventDispatcherContract {
 		await Promise.all(resolvers);
 	}
 
-	public async dispatchSeq<T = any>(event: EventName, data?: T): Promise<void> {
+	public async dispatchSeq<T = any>(event: Kernel.EventName, data?: T): Promise<void> {
 		await Promise.resolve();
 
 		for (const listener of this.getListenersByPattern(event)) {
@@ -100,51 +103,53 @@ export class MemoryEventDispatcher implements EventDispatcherContract {
 		}
 	}
 
-	public dispatchSync<T = any>(event: EventName, data?: T): void {
+	public dispatchSync<T = any>(event: Kernel.EventName, data?: T): void {
 		for (const listener of this.getListenersByPattern(event)) {
 			listener.handle({ name: event, data });
 		}
 	}
 
-	public async dispatchMany<T = any>(events: Array<[EventName, T]>): Promise<void> {
-		await Promise.all(Object.values(events).map((value: [EventName, T]) => this.dispatch(value[0], value[1])));
+	public async dispatchMany<T = any>(events: Array<[Kernel.EventName, T]>): Promise<void> {
+		await Promise.all(
+			Object.values(events).map((value: [Kernel.EventName, T]) => this.dispatch(value[0], value[1])),
+		);
 	}
 
-	public async dispatchManySeq<T = any>(events: Array<[EventName, T]>): Promise<void> {
+	public async dispatchManySeq<T = any>(events: Array<[Kernel.EventName, T]>): Promise<void> {
 		for (const value of Object.values(events)) {
 			await this.dispatchSeq(value[0], value[1]);
 		}
 	}
 
-	public dispatchManySync<T = any>(events: Array<[EventName, T]>): void {
+	public dispatchManySync<T = any>(events: Array<[Kernel.EventName, T]>): void {
 		for (const value of Object.values(events)) {
 			this.dispatchSync(value[0], value[1]);
 		}
 	}
 
-	private getListenersByEvent(name: EventName): Set<EventListener> {
+	private getListenersByEvent(name: Kernel.EventName): Set<Kernel.EventListener> {
 		if (!this.listeners.has(name)) {
-			this.listeners.set(name, new Set<EventListener>());
+			this.listeners.set(name, new Set<Kernel.EventListener>());
 		}
 
-		const listener: Set<EventListener> | undefined = this.listeners.get(name);
+		const listener: Set<Kernel.EventListener> | undefined = this.listeners.get(name);
 
-		assert.defined<Set<EventListener>>(listener);
+		assert.defined<Set<Kernel.EventListener>>(listener);
 
 		return listener;
 	}
 
-	private getListenersByPattern(event: EventName): EventListener[] {
+	private getListenersByPattern(event: Kernel.EventName): Kernel.EventListener[] {
 		// @ts-ignore
-		const matches: EventName[] = mm([...this.listeners.keys()], event);
+		const matches: Kernel.EventName[] = mm([...this.listeners.keys()], event);
 
-		let eventListeners: EventListener[] = [];
+		let eventListeners: Kernel.EventListener[] = [];
 		if (this.listeners.has("*")) {
 			eventListeners = eventListeners.concat([...this.getListenersByEvent("*")]);
 		}
 
 		for (const match of matches) {
-			const matchListeners: Set<EventListener> | undefined = this.getListenersByEvent(match);
+			const matchListeners: Set<Kernel.EventListener> | undefined = this.getListenersByEvent(match);
 
 			if (matchListeners && matchListeners.size > 0) {
 				eventListeners = eventListeners.concat([...matchListeners]);

@@ -1,40 +1,33 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IConfiguration,
-	IDeserializeOptions,
-	IPublicKeySerializer,
-	ISignature,
-	ITransaction,
-	ITransactionData,
-	ITransactionDeserializer,
-} from "@arkecosystem/core-crypto-contracts";
-import { Contracts } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 // import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "./errors";
 
 @Container.injectable()
-export class Deserializer implements ITransactionDeserializer {
-	@Container.inject(BINDINGS.Configuration)
-	protected readonly configuration: IConfiguration;
+export class Deserializer implements Crypto.ITransactionDeserializer {
+	@Container.inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Transaction.TypeFactory)
+	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
-	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
-	private readonly publicKeySerializer: IPublicKeySerializer;
+	@Container.inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: Crypto.IPublicKeySerializer;
 
-	@Container.inject(BINDINGS.Signature)
-	private readonly signatureSerializer: ISignature;
+	@Container.inject(Identifiers.Cryptography.Signature)
+	private readonly signatureSerializer: Crypto.ISignature;
 
-	public async deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): Promise<ITransaction> {
-		const data = {} as ITransactionData;
+	public async deserialize(
+		serialized: string | Buffer,
+		options: Crypto.IDeserializeOptions = {},
+	): Promise<Crypto.ITransaction> {
+		const data = {} as Crypto.ITransactionData;
 
 		const buff: ByteBuffer = this.getByteBuffer(serialized);
 		this.deserializeCommon(data, buff);
 
-		const instance: ITransaction = this.transactionTypeFactory.create(data);
+		const instance: Crypto.ITransaction = this.transactionTypeFactory.create(data);
 		this.deserializeVendorField(instance, buff);
 
 		// Deserialize type specific parts
@@ -47,7 +40,7 @@ export class Deserializer implements ITransactionDeserializer {
 		return instance;
 	}
 
-	public deserializeCommon(transaction: ITransactionData, buf: ByteBuffer): void {
+	public deserializeCommon(transaction: Crypto.ITransactionData, buf: ByteBuffer): void {
 		// buf.skip(1); // Skip 0xFF marker
 		buf.jump(1); // Skip 0xFF marker
 		transaction.version = buf.readUInt8();
@@ -67,7 +60,7 @@ export class Deserializer implements ITransactionDeserializer {
 		transaction.amount = BigNumber.ZERO;
 	}
 
-	private deserializeVendorField(transaction: ITransaction, buf: ByteBuffer): void {
+	private deserializeVendorField(transaction: Crypto.ITransaction, buf: ByteBuffer): void {
 		const vendorFieldLength: number = buf.readUInt8();
 
 		if (vendorFieldLength > 0) {
@@ -80,7 +73,7 @@ export class Deserializer implements ITransactionDeserializer {
 		}
 	}
 
-	private deserializeSignatures(transaction: ITransactionData, buf: ByteBuffer): void {
+	private deserializeSignatures(transaction: Crypto.ITransactionData, buf: ByteBuffer): void {
 		// @TODO
 		const canReadNonMultiSignature = () =>
 			buf.getRemainderLength() && (buf.getRemainderLength() % 64 === 0 || buf.getRemainderLength() % 65 !== 0);

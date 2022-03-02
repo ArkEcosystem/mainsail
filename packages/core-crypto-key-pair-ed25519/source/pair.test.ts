@@ -1,7 +1,7 @@
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
-import { Application, Container } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Container } from "@arkecosystem/core-kernel";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { KeyPairFactory } from "./pair";
 
@@ -11,14 +11,14 @@ const mnemonic =
 describe<{ container: Container.Container }>("KeyPairFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.container = new Container.Container();
-		context.container.bind(BINDINGS.Configuration).to(Configuration).inSingletonScope();
+		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	});
 
 	it("should derive a key pair from an mnemonic", async (context) => {
 		assert.equal(await context.container.resolve(KeyPairFactory).fromMnemonic(mnemonic), {
-			publicKey: "b313202405b98459929b5dab9f46ce980dc2fdf0fad985aef7de848e0d2b5c97",
-			privateKey: "aff34fe73a14920579944fcac68fe57a97bc9498fa530ab2411338b93a1244c5",
 			compressed: true,
+			privateKey: "aff34fe73a14920579944fcac68fe57a97bc9498fa530ab2411338b93a1244c5",
+			publicKey: "b313202405b98459929b5dab9f46ce980dc2fdf0fad985aef7de848e0d2b5c97",
 		});
 	});
 
@@ -28,9 +28,9 @@ describe<{ container: Container.Container }>("KeyPairFactory", ({ assert, before
 				.resolve(KeyPairFactory)
 				.fromPrivateKey(Buffer.from("aff34fe73a14920579944fcac68fe57a97bc9498fa530ab2411338b93a1244c5", "hex")),
 			{
-				publicKey: "b313202405b98459929b5dab9f46ce980dc2fdf0fad985aef7de848e0d2b5c97",
-				privateKey: "aff34fe73a14920579944fcac68fe57a97bc9498fa530ab2411338b93a1244c5",
 				compressed: true,
+				privateKey: "aff34fe73a14920579944fcac68fe57a97bc9498fa530ab2411338b93a1244c5",
+				publicKey: "b313202405b98459929b5dab9f46ce980dc2fdf0fad985aef7de848e0d2b5c97",
 			},
 		);
 	});

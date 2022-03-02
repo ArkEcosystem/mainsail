@@ -1,12 +1,12 @@
+import { Search } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { StandardCriteriaOf, StandardCriteriaOfItem } from "../../contracts/search";
 import { injectable } from "../../ioc";
 import { InvalidCriteria, UnexpectedError, UnsupportedValue } from "./errors";
 
 @injectable()
 export class StandardCriteriaService {
-	public testStandardCriterias<T>(value: T, ...criterias: StandardCriteriaOf<T>[]): boolean {
+	public testStandardCriterias<T>(value: T, ...criterias: Search.StandardCriteriaOf<T>[]): boolean {
 		return criterias.every((criteria) => {
 			// Criteria is either single criteria item or array of criteria items.
 
@@ -40,34 +40,37 @@ export class StandardCriteriaService {
 		});
 	}
 
-	private testStandardCriteriaItem<T>(value: T, criteriaItem: StandardCriteriaOfItem<T>): boolean {
+	private testStandardCriteriaItem<T>(value: T, criteriaItem: Search.StandardCriteriaOfItem<T>): boolean {
 		if (typeof value === "undefined" || value === null) {
 			return false;
 		}
 
 		if (typeof value === "boolean") {
 			// narrowing `value` to `boolean` doesn't narrow `criteriaItem` to `StandardCriteriaOfItem<boolean>` :-(
-			return this.testBooleanValueCriteriaItem(value, criteriaItem as StandardCriteriaOfItem<boolean>);
+			return this.testBooleanValueCriteriaItem(value, criteriaItem as Search.StandardCriteriaOfItem<boolean>);
 		}
 
 		if (typeof value === "string") {
-			return this.testStringValueCriteriaItem(value, criteriaItem as StandardCriteriaOfItem<string>);
+			return this.testStringValueCriteriaItem(value, criteriaItem as Search.StandardCriteriaOfItem<string>);
 		}
 
 		if (typeof value === "number") {
-			return this.testNumberValueCriteriaItem(value, criteriaItem as StandardCriteriaOfItem<number>);
+			return this.testNumberValueCriteriaItem(value, criteriaItem as Search.StandardCriteriaOfItem<number>);
 		}
 
 		if (typeof value === "bigint" || value instanceof BigNumber) {
 			return this.testBigNumberValueCriteriaItem(
 				value,
-				criteriaItem as StandardCriteriaOfItem<BigInt | BigNumber>,
+				criteriaItem as Search.StandardCriteriaOfItem<BigInt | BigNumber>,
 			);
 		}
 
 		if (typeof value === "object" && !Array.isArray(value)) {
 			// doesn't narrow to `object`, nor excluding `symbol` does :-(
-			return this.testObjectValueCriteriaItem(value as any, criteriaItem as StandardCriteriaOfItem<object>);
+			return this.testObjectValueCriteriaItem(
+				value as any,
+				criteriaItem as Search.StandardCriteriaOfItem<object>,
+			);
 		}
 
 		// The only two other types left are:
@@ -90,7 +93,10 @@ export class StandardCriteriaService {
 		throw new UnsupportedValue(value, []);
 	}
 
-	private testBooleanValueCriteriaItem(value: boolean, criteriaItem: StandardCriteriaOfItem<boolean>): boolean {
+	private testBooleanValueCriteriaItem(
+		value: boolean,
+		criteriaItem: Search.StandardCriteriaOfItem<boolean>,
+	): boolean {
 		// In most cases criteria is cast to the same type as value during validation (by joi).
 		// Wallet's attributes property is an exception. There is currently now way to know what types may be there.
 		// To test properties within it string values are also checked.
@@ -107,7 +113,7 @@ export class StandardCriteriaService {
 		}
 	}
 
-	private testStringValueCriteriaItem(value: string, criteriaItem: StandardCriteriaOfItem<string>): boolean {
+	private testStringValueCriteriaItem(value: string, criteriaItem: Search.StandardCriteriaOfItem<string>): boolean {
 		if (typeof criteriaItem !== "string") {
 			throw new InvalidCriteria(value, criteriaItem, []);
 		}
@@ -129,7 +135,7 @@ export class StandardCriteriaService {
 		return true;
 	}
 
-	private testNumberValueCriteriaItem(value: number, criteriaItem: StandardCriteriaOfItem<number>): boolean {
+	private testNumberValueCriteriaItem(value: number, criteriaItem: Search.StandardCriteriaOfItem<number>): boolean {
 		if (typeof criteriaItem === "string" || typeof criteriaItem === "number") {
 			if (isNaN(Number(criteriaItem))) {
 				throw new InvalidCriteria(value, criteriaItem, []);
@@ -165,7 +171,7 @@ export class StandardCriteriaService {
 
 	private testBigNumberValueCriteriaItem(
 		value: BigInt | BigNumber,
-		criteriaItem: StandardCriteriaOfItem<BigInt | BigNumber>,
+		criteriaItem: Search.StandardCriteriaOfItem<BigInt | BigNumber>,
 	): boolean {
 		// BigNumber.make doesn't perform instanceof check
 		const bnValue = value instanceof BigNumber ? value : BigNumber.make(value);
@@ -222,7 +228,7 @@ export class StandardCriteriaService {
 		throw new InvalidCriteria(value, criteriaItem, []);
 	}
 
-	private testObjectValueCriteriaItem(value: object, criteriaItem: StandardCriteriaOfItem<object>): boolean {
+	private testObjectValueCriteriaItem(value: object, criteriaItem: Search.StandardCriteriaOfItem<object>): boolean {
 		const criteriaKeys = Object.keys(criteriaItem);
 
 		if (criteriaKeys.length === 1 && criteriaKeys[0] === "*") {

@@ -70,7 +70,7 @@ describe("Command", () => {
 		});
 
 		it("should register the command and encounter an error", () => {
-			jest.spyOn(cli.app.get(Container.Identifiers.Output), "setVerbosity").mockImplementation(() => {
+			jest.spyOn(cli.app.get(Identifiers.Output), "setVerbosity").mockImplementation(() => {
 				throw new Error("I am an error");
 			});
 
@@ -172,7 +172,7 @@ describe("Command", () => {
 	describe("#showHelp", () => {
 		it("should display the help", () => {
 			let output;
-			jest.spyOn(cli.app.get(Container.Identifiers.Box), "render").mockImplementation(
+			jest.spyOn(cli.app.get(Identifiers.Box), "render").mockImplementation(
 				// @ts-ignore
 				(message: string) => (output = message),
 			);

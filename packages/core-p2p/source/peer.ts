@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
 import dayjs, { Dayjs } from "dayjs";
 
 import { PeerVerificationResult } from "./peer-verifier";
@@ -12,15 +12,15 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public lastPinged: Dayjs | undefined;
 
-	public sequentialErrorCounter: number = 0;
+	public sequentialErrorCounter = 0;
 
 	public verificationResult: PeerVerificationResult | undefined;
 
 	public state: Contracts.P2P.PeerState = {
-		height: undefined,
-		forgingAllowed: undefined,
 		currentSlot: undefined,
+		forgingAllowed: undefined,
 		header: {},
+		height: undefined,
 	};
 
 	public plugins: Contracts.P2P.PeerPlugins = {};

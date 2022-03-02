@@ -50,19 +50,19 @@ describe("PeerCommunicator", () => {
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-		container.bind(Container.Identifiers.Application).toConstantValue(app);
-		container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
-		container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(emitter);
-		container.bind(Container.Identifiers.PeerConnector).toConstantValue(connector);
-		container.bind(Container.Identifiers.QueueFactory).toConstantValue(createQueue);
-		container.bind(Container.Identifiers.PeerCommunicator).to(PeerCommunicator);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(app);
+		container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+		container.bind(Identifiers.EventDispatcherService).toConstantValue(emitter);
+		container.bind(Identifiers.PeerConnector).toConstantValue(connector);
+		container.bind(Identifiers.QueueFactory).toConstantValue(createQueue);
+		container.bind(Identifiers.PeerCommunicator).to(PeerCommunicator);
 
 		process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA = "true";
 	});
 
 	beforeEach(() => {
-		peerCommunicator = container.get<PeerCommunicator>(Container.Identifiers.PeerCommunicator);
+		peerCommunicator = container.get<PeerCommunicator>(Identifiers.PeerCommunicator);
 		peerCommunicator.initialize();
 
 		jest.resetAllMocks();

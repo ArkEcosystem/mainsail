@@ -1,10 +1,10 @@
 import { Container } from "@arkecosystem/core-container";
-import { ISchemaValidationResult, IValidator } from "@arkecosystem/core-crypto-contracts";
+import { Crypto } from "@arkecosystem/core-contracts";
 import Ajv from "ajv";
 import keywords from "ajv-keywords";
 
 @Container.injectable()
-export class Validator implements IValidator {
+export class Validator implements Crypto.IValidator {
 	#ajv: Ajv.Ajv;
 
 	@Container.postConstruct()
@@ -21,7 +21,7 @@ export class Validator implements IValidator {
 	public async validate<T = any>(
 		schemaKeyReference: string | boolean | object,
 		data: T,
-	): Promise<ISchemaValidationResult<T>> {
+	): Promise<Crypto.ISchemaValidationResult<T>> {
 		try {
 			await this.#ajv.validate(schemaKeyReference, data);
 

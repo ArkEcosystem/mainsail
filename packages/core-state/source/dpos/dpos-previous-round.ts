@@ -1,21 +1,21 @@
-import { Container, Contracts, Services } from "@arkecosystem/core-kernel";
-import Interfaces from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Services } from "@arkecosystem/core-kernel";
 
 @Container.injectable()
 export class DposPreviousRoundState implements Contracts.State.DposPreviousRoundState {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.BlockState)
+	@Container.inject(Identifiers.BlockState)
 	@Container.tagged("state", "clone")
 	private readonly blockState!: Contracts.State.BlockState;
 
-	@Container.inject(Container.Identifiers.DposState)
+	@Container.inject(Identifiers.DposState)
 	@Container.tagged("state", "clone")
 	private readonly dposState!: Contracts.State.DposState;
 
-	public async revert(blocks: Interfaces.IBlock[], roundInfo: Contracts.Shared.RoundInfo): Promise<void> {
-		for (const block of blocks.slice().reverse()) {
+	public async revert(blocks: Crypto.IBlock[], roundInfo: Contracts.Shared.RoundInfo): Promise<void> {
+		for (const block of [...blocks].reverse()) {
 			if (block.data.height === 1) {
 				break;
 			}
@@ -23,7 +23,7 @@ export class DposPreviousRoundState implements Contracts.State.DposPreviousRound
 		}
 
 		await this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.call("buildDelegateRanking", { dposState: this.dposState });
 
 		this.dposState.setDelegatesRound(roundInfo);

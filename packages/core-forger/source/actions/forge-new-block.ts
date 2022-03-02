@@ -1,14 +1,15 @@
-import { Contracts, Services, Types } from "@arkecosystem/core-kernel";
+import Contracts from "@arkecosystem/core-contracts";
+import { Services, Types } from "@arkecosystem/core-kernel";
 
 import { ForgerService } from "../forger-service";
 import { Delegate } from "../interfaces";
 
 export class ForgeNewBlockAction extends Services.Triggers.Action {
-	public async execute(args: Types.ActionArguments): Promise<void> {
-		const forgerService: ForgerService = args.forgerService;
-		const delegate: Delegate = args.delegate;
-		const round: Contracts.P2P.CurrentRound = args.round;
-		const networkState: Contracts.P2P.NetworkState = args.networkState;
+	public async execute(arguments_: Types.ActionArguments): Promise<void> {
+		const forgerService: ForgerService = arguments_.forgerService;
+		const delegate: Delegate = arguments_.delegate;
+		const round: Contracts.P2P.CurrentRound = arguments_.round;
+		const networkState: Contracts.P2P.NetworkState = arguments_.networkState;
 
 		return forgerService.forgeNewBlock(delegate, round, networkState);
 	}

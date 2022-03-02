@@ -1,17 +1,18 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { DownloadPaused } from "../../../../../packages/core-blockchain/source/state-machine/actions/download-paused";
+
+import { DownloadPaused } from "../../../source/state-machine/actions/download-paused";
 
 describe("DownloadPaused", () => {
 	const container = new Container.Container();
 
-	const logger = { warning: jest.fn(), debug: jest.fn(), info: jest.fn(), error: jest.fn() };
+	const logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warning: jest.fn() };
 
 	const application = { resolve: jest.fn() };
 
 	beforeAll(() => {
 		container.unbindAll();
-		container.bind(Container.Identifiers.Application).toConstantValue(application);
-		container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+		container.bind(Identifiers.Application).toConstantValue(application);
+		container.bind(Identifiers.LogService).toConstantValue(logger);
 	});
 
 	beforeEach(() => {

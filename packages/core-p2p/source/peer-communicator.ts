@@ -1,10 +1,5 @@
-import Interfaces, {
-	BINDINGS,
-	IBlockSerializer,
-	ITransactionFactory,
-	IValidator,
-} from "@arkecosystem/core-crypto-contracts";
-import { Container, Contracts, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -20,33 +15,33 @@ import { buildRateLimiter, isValidVersion } from "./utils";
 // todo: review the implementation
 @Container.injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.PeerConnector)
+	@Container.inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.QueueFactory)
+	@Container.inject(Identifiers.QueueFactory)
 	private readonly createQueue!: Types.QueueFactory;
 
-	@Container.inject(BINDINGS.Block.Serializer)
-	private readonly serializer: IBlockSerializer;
+	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly serializer: Crypto.IBlockSerializer;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
-	private readonly transactionFactory: ITransactionFactory;
+	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Crypto.ITransactionFactory;
 
-	@Container.inject(BINDINGS.Validator)
-	private readonly validator!: IValidator;
+	@Container.inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Crypto.IValidator;
 
 	private outgoingRateLimiter!: RateLimiter;
 
@@ -70,7 +65,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		});
 	}
 
-	public async postBlock(peer: Contracts.P2P.Peer, block: Interfaces.IBlock) {
+	public async postBlock(peer: Contracts.P2P.Peer, block: Crypto.IBlock) {
 		const postBlockTimeout = 10_000;
 
 		const response = await this.emit(
@@ -197,7 +192,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			blockLimit = constants.MAX_DOWNLOAD_BLOCKS,
 			headersOnly,
 		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
-	): Promise<Interfaces.IBlockData[]> {
+	): Promise<Crypto.IBlockData[]> {
 		const maxPayload = headersOnly ? blockLimit * constants.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
 
 		const peerBlocks = await this.emit(

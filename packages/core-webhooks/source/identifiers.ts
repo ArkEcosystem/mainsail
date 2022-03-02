@@ -1,4 +1,4 @@
-export const Identifiers = {
+export const InternalIdentifiers = {
 	Broadcaster: Symbol.for("Webhook<Broadcaster>"),
 	Database: Symbol.for("Webhook<Database>"),
 	Listener: Symbol.for("Webhook<Listener>"),

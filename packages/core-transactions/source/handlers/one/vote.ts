@@ -1,7 +1,7 @@
-import Interfaces, { TransactionType } from "@arkecosystem/core-crypto-contracts";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
-import { Container, Contracts, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
+import { Container, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
 
 import {
 	AlreadyVotedError,
@@ -17,10 +17,10 @@ import { DelegateRegistrationTransactionHandler } from "./delegate-registration"
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @Container.injectable()
 export class VoteTransactionHandler extends TransactionHandler {
-	@Container.inject(Container.Identifiers.TransactionPoolQuery)
+	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@Container.inject(Container.Identifiers.TransactionHistoryService)
+	@Container.inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
 	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
@@ -74,7 +74,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Interfaces.ITransaction,
+		transaction: Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
@@ -118,7 +118,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public emitEvents(transaction: Interfaces.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 
 		for (const vote of transaction.data.asset.votes) {
@@ -129,7 +129,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 		}
 	}
 
-	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = this.poolQuery
@@ -139,13 +139,13 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 		if (hasSender) {
 			throw new Contracts.TransactionPool.PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${TransactionType.Vote}' in the pool`,
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.Vote}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
 	}
 
-	public async applyToSender(transaction: Interfaces.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -165,7 +165,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 		}
 	}
 
-	public async revertForSender(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -174,7 +174,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 			transaction.data.senderPublicKey,
 		);
 
-		Utils.assert.defined<Interfaces.ITransactionAsset>(transaction.data.asset?.votes);
+		Utils.assert.defined<Crypto.ITransactionAsset>(transaction.data.asset?.votes);
 
 		for (const vote of [...transaction.data.asset.votes].reverse()) {
 			if (vote.startsWith("+")) {
@@ -185,7 +185,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 		}
 	}
 
-	public async applyToRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
+	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
 
-	public async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
+	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
 }

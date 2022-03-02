@@ -1,4 +1,3 @@
-import { Container } from "@packages/core-cli";
 import { Console } from "@arkecosystem/core-test-framework";
 import { Toggle } from "@packages/core-cli/source/components";
 import prompts from "prompts";
@@ -10,8 +9,8 @@ beforeEach(() => {
 	cli = new Console();
 
 	// Bind from src instead of dist to collect coverage.
-	cli.app.rebind(Container.Identifiers.Toggle).to(Toggle).inSingletonScope();
-	component = cli.app.get(Container.Identifiers.Toggle);
+	cli.app.rebind(Identifiers.Toggle).to(Toggle).inSingletonScope();
+	component = cli.app.get(Identifiers.Toggle);
 });
 
 describe("Toggle", () => {

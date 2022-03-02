@@ -1,30 +1,31 @@
-import { Container, Contracts, Enums, Providers, Utils } from "@arkecosystem/core-kernel";
+import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Enums, Providers, Utils } from "@arkecosystem/core-kernel";
 
 import { WalletEvent } from "./wallet-event";
 
 @Container.injectable()
 export class WalletSyncService implements Contracts.Kernel.EventListener {
-	@Container.inject(Container.Identifiers.PluginConfiguration)
+	@Container.inject(Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.Application)
+	@Container.inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@Container.inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@Container.inject(Identifiers.WalletRepository)
 	@Container.tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@Container.inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.DatabaseWalletsTableService)
+	@Container.inject(Identifiers.DatabaseWalletsTableService)
 	private readonly walletsTableService!: Contracts.Database.WalletsTableService;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@Container.inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private readonly lock = new Utils.Lock();
@@ -104,7 +105,7 @@ export class WalletSyncService implements Contracts.Kernel.EventListener {
 			try {
 				this.logger.debug(`Synchronizing wallets table at height ${blockHeight.toLocaleString()}`);
 
-				const updatedWallets = Array.from(this.updatedAddresses.values()).map((address) =>
+				const updatedWallets = [...this.updatedAddresses.values()].map((address) =>
 					this.walletRepository.findByAddress(address),
 				);
 
