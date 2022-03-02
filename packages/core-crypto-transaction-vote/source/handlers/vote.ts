@@ -1,29 +1,22 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
 import { Container, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
 
-import {
-	AlreadyVotedError,
-	NoVoteError,
-	UnvoteMismatchError,
-	VotedForNonDelegateError,
-	VotedForResignedDelegateError,
-} from "../../errors";
-import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
-import { DelegateRegistrationTransactionHandler } from "./delegate-registration";
+import { Errors, Handlers } from "@arkecosystem/core-transactions";
+import { VoteTransaction } from "../versions";
+import { DelegateRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-delegate-registration";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @Container.injectable()
-export class VoteTransactionHandler extends TransactionHandler {
+export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	@Container.inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
-	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
+	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [DelegateRegistrationTransactionHandler];
 	}
 
@@ -52,15 +45,15 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 				if (vote.startsWith("+")) {
 					if (hasVoted) {
-						throw new AlreadyVotedError();
+						throw new Errors.AlreadyVotedError();
 					}
 
 					wallet.setAttribute("vote", vote.slice(1));
 				} else {
 					if (!hasVoted) {
-						throw new NoVoteError();
+						throw new Errors.NoVoteError();
 					} else if (wallet.getAttribute("vote") !== vote.slice(1)) {
-						throw new UnvoteMismatchError();
+						throw new Errors.UnvoteMismatchError();
 					}
 
 					wallet.forgetAttribute("vote");
@@ -92,26 +85,26 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 			if (vote.startsWith("+")) {
 				if (walletVote) {
-					throw new AlreadyVotedError();
+					throw new Errors.AlreadyVotedError();
 				}
 
 				if (delegateWallet.hasAttribute("delegate.resigned")) {
-					throw new VotedForResignedDelegateError(vote);
+					throw new Errors.VotedForResignedDelegateError(vote);
 				}
 
 				walletVote = vote.slice(1);
 			} else {
 				if (!walletVote) {
-					throw new NoVoteError();
+					throw new Errors.NoVoteError();
 				} else if (walletVote !== vote.slice(1)) {
-					throw new UnvoteMismatchError();
+					throw new Errors.UnvoteMismatchError();
 				}
 
 				walletVote = undefined;
 			}
 
 			if (!delegateWallet.isDelegate()) {
-				throw new VotedForNonDelegateError(vote);
+				throw new Errors.VotedForNonDelegateError(vote);
 			}
 		}
 

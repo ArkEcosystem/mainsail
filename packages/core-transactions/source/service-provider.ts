@@ -1,7 +1,7 @@
-import { Container, Providers, Services } from "@arkecosystem/core-kernel";
 import { Identifiers } from "@arkecosystem/core-contracts";
+import { Container, Providers, Services } from "@arkecosystem/core-kernel";
 
-import { One, TransactionHandlerConstructor } from "./handlers";
+import { TransactionHandlerConstructor } from "./handlers";
 import { TransactionHandlerProvider } from "./handlers/handler-provider";
 import { TransactionHandlerRegistry } from "./handlers/handler-registry";
 
@@ -43,13 +43,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.WalletRepository)
 			.toConstantValue(null)
 			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "null"));
-
-		this.app.bind(Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
-		this.app.bind(Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
-		this.app.bind(Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
-		this.app.bind(Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
-		this.app.bind(Identifiers.TransactionHandler).to(One.MultiPaymentTransactionHandler);
-		this.app.bind(Identifiers.TransactionHandler).to(One.DelegateResignationTransactionHandler);
 
 		this.app
 			.bind(Identifiers.TransactionHandlerConstructors)

@@ -1,18 +1,12 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { MultiSignatureRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
-import {
-	InvalidMultiSignatureError,
-	MultiSignatureAlreadyRegisteredError,
-	MultiSignatureKeyCountMismatchError,
-	MultiSignatureMinimumKeysError,
-} from "../../errors";
-import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
+import { Errors, Handlers } from "@arkecosystem/core-transactions";
+import { MultiSignatureRegistrationTransaction } from "../versions";
 
 @Container.injectable()
-export class MultiSignatureRegistrationTransactionHandler extends TransactionHandler {
+export class MultiSignatureRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery: Contracts.TransactionPool.Query;
 
@@ -25,7 +19,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 	@Container.inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
 
-	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
+	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
 
@@ -53,7 +47,7 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 			);
 
 			if (wallet.hasMultiSignature()) {
-				throw new MultiSignatureAlreadyRegisteredError();
+				throw new Errors.MultiSignatureAlreadyRegisteredError();
 			}
 
 			wallet.setAttribute("multiSignature", multiSignature);
@@ -75,13 +69,13 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 
 		const { publicKeys, min } = data.asset.multiSignature;
 		if (min < 1 || min > publicKeys.length || min > 16) {
-			throw new MultiSignatureMinimumKeysError();
+			throw new Errors.MultiSignatureMinimumKeysError();
 		}
 
 		AppUtils.assert.defined<string[]>(data.signatures);
 
 		if (publicKeys.length !== data.signatures.length) {
-			throw new MultiSignatureKeyCountMismatchError();
+			throw new Errors.MultiSignatureKeyCountMismatchError();
 		}
 
 		AppUtils.assert.defined<Crypto.IMultiSignatureAsset>(data.asset.multiSignature);
@@ -92,11 +86,11 @@ export class MultiSignatureRegistrationTransactionHandler extends TransactionHan
 		const recipientWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(multiSigPublicKey);
 
 		if (recipientWallet.hasMultiSignature()) {
-			throw new MultiSignatureAlreadyRegisteredError();
+			throw new Errors.MultiSignatureAlreadyRegisteredError();
 		}
 
 		if (!this.verifySignatures(wallet, data, data.asset.multiSignature)) {
-			throw new InvalidMultiSignatureError();
+			throw new Errors.InvalidMultiSignatureError();
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);

@@ -19,20 +19,11 @@
 	"dependencies": {
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-delegate-registration": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-delegate-resignation": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-multi-payment": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-multi-signature-registration": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-transfer": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-vote": "workspace:*",
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
-		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"bytebuffer": "5.0.1",
 		"uvu": "^0.5.3"
 	},

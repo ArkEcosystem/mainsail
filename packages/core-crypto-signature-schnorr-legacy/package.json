@@ -22,7 +22,6 @@
 		"bytebuffer": "5.0.1"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }

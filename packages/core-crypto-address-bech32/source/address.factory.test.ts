@@ -1,10 +1,10 @@
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { Application, Container } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
 
+import { describe } from "../../core-test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =

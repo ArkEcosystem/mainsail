@@ -15,18 +15,9 @@
 		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
-		"@arkecosystem/core": "workspace:*",
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-crypto-transaction": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-delegate-registration": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-delegate-resignation": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-multi-payment": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-multi-signature-registration": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-transfer": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-vote": "workspace:*",
-		"@arkecosystem/core-forger": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",

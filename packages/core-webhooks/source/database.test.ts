@@ -1,8 +1,8 @@
 import { Application } from "@arkecosystem/core-kernel/source/application";
 import { Container } from "@arkecosystem/core-kernel/source/ioc";
-import { describe } from "@arkecosystem/core-test-framework";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { describe } from "../../core-test-framework/source";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { Database } from "./database";
 import { Identifiers } from "./identifiers";

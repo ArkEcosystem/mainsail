@@ -28,7 +28,6 @@
 		"uuid": "8.3.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"@types/fs-extra": "8.1.2",
 		"@types/hapi__boom": "7.4.1",
 		"@types/hapi__joi": "17.1.7",

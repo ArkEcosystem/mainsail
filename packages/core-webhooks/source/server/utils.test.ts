@@ -1,7 +1,7 @@
 import { Enums } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
 import { notFound } from "@hapi/boom";
 
+import { describe } from "../../core-test-framework/source";
 import { Webhook } from "../interfaces";
 import { respondWithResource } from "./utils";
 
@@ -31,6 +31,6 @@ describe("Utils", ({ it, assert }) => {
 	});
 
 	it("respondWithResource should return not found", () => {
-		assert.equal(respondWithResource(undefined), notFound());
+		assert.equal(respondWithResource(), notFound());
 	});
 });

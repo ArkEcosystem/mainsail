@@ -1,11 +1,12 @@
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { DelegateRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-delegate-registration";
-import { MultiPaymentBuilder } from "@arkecosystem/core-crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
-import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+
+import { DelegateRegistrationBuilder } from "../../../core-crypto-transaction-delegate-registration/source";
+import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment/source";
+import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration/source";
+import { TransferBuilder } from "../../../core-crypto-transaction-transfer/source";
+import { VoteBuilder } from "../../../core-crypto-transaction-vote/source";
 
 export class Signer {
 	@Container.inject(Identifiers.Cryptography.Configuration)

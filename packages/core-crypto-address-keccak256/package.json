@@ -26,7 +26,6 @@
 	"devDependencies": {
 		"@arkecosystem/core-crypto-key-pair-ecdsa": "workspace:*",
 		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }

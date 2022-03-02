@@ -1,23 +1,22 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { DelegateResignationTransaction } from "@arkecosystem/core-crypto-transaction-delegate-resignation";
+import { DelegateRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-delegate-registration";
 import { Container, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Errors, Handlers } from "@arkecosystem/core-transactions";
 
-import { NotEnoughDelegatesError, WalletAlreadyResignedError, WalletNotADelegateError } from "../../errors";
-import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
-import { DelegateRegistrationTransactionHandler } from "./delegate-registration";
+import { DelegateResignationTransaction } from "../versions";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @Container.injectable()
-export class DelegateResignationTransactionHandler extends TransactionHandler {
+export class DelegateResignationTransactionHandler extends Handlers.TransactionHandler {
 	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	@Container.inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
-	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
+	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [DelegateRegistrationTransactionHandler];
 	}
 
@@ -54,11 +53,11 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		if (!wallet.isDelegate()) {
-			throw new WalletNotADelegateError();
+			throw new Errors.WalletNotADelegateError();
 		}
 
 		if (wallet.hasAttribute("delegate.resigned")) {
-			throw new WalletAlreadyResignedError();
+			throw new Errors.WalletAlreadyResignedError();
 		}
 
 		const requiredDelegatesCount: number = this.configuration.getMilestone().activeDelegates;
@@ -67,7 +66,7 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 			.filter((w) => w.hasAttribute("delegate.resigned") === false).length;
 
 		if (currentDelegatesCount - 1 < requiredDelegatesCount) {
-			throw new NotEnoughDelegatesError();
+			throw new Errors.NotEnoughDelegatesError();
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);

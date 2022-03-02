@@ -1,27 +1,22 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { DelegateRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-delegate-registration";
 import { Container, Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Errors, Handlers } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
-import {
-	NotSupportedForMultiSignatureWalletError,
-	WalletIsAlreadyDelegateError,
-	WalletUsernameAlreadyRegisteredError,
-} from "../../errors";
-import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
+import { DelegateRegistrationTransaction } from "../versions";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @Container.injectable()
-export class DelegateRegistrationTransactionHandler extends TransactionHandler {
+export class DelegateRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@Container.inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	@Container.inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
-	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
+	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
 
@@ -116,7 +111,7 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(data.senderPublicKey);
 
 		if (sender.hasMultiSignature()) {
-			throw new NotSupportedForMultiSignatureWalletError();
+			throw new Errors.NotSupportedForMultiSignatureWalletError();
 		}
 
 		AppUtils.assert.defined<string>(data.asset?.delegate?.username);
@@ -124,11 +119,11 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 		const username: string = data.asset.delegate.username;
 
 		if (wallet.isDelegate()) {
-			throw new WalletIsAlreadyDelegateError();
+			throw new Errors.WalletIsAlreadyDelegateError();
 		}
 
 		if (this.walletRepository.hasByUsername(username)) {
-			throw new WalletUsernameAlreadyRegisteredError(username);
+			throw new Errors.WalletUsernameAlreadyRegisteredError(username);
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);

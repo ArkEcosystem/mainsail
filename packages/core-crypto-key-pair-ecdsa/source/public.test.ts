@@ -1,8 +1,8 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Container } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
 
+import { describe } from "../../core-test-framework/source";
 import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
 

@@ -1,17 +1,16 @@
 import Contracts, { Crypto } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
 import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Handlers, Utils as TransactionUtils } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { isRecipientOnActiveNetwork } from "../../utils";
-import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
+import { TransferTransaction } from "../versions";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @Container.injectable()
-export class TransferTransactionHandler extends TransactionHandler {
-	public dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
+export class TransferTransactionHandler extends Handlers.TransactionHandler {
+	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
 
@@ -52,7 +51,7 @@ export class TransferTransactionHandler extends TransactionHandler {
 		const recipientId: string = transaction.data.recipientId;
 
 		// @TODO
-		if (!isRecipientOnActiveNetwork(recipientId, undefined, this.configuration)) {
+		if (!TransactionUtils.isRecipientOnActiveNetwork(recipientId, undefined, this.configuration)) {
 			const network: string = this.configuration.get<string>("network.pubKeyHash");
 			throw new Contracts.TransactionPool.PoolError(
 				`Recipient ${recipientId} is not on the same network: ${network} `,
