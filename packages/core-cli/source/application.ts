@@ -1,4 +1,4 @@
-import { Paths } from "env-paths";
+import { Paths } from "./env-paths";
 import { resolve } from "path";
 
 import { Identifiers, interfaces } from "./ioc";

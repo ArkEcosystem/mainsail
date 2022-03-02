@@ -1,4 +1,4 @@
-import envPaths from "env-paths";
+import { envPaths } from "../env-paths";
 import { readJSON } from "fs-extra";
 import { join } from "path";
 
@@ -17,7 +17,7 @@ export class DiscoverConfig {
 		} catch {}
 
 		try {
-			return await readJSON(join(envPaths(token, { suffix: "core" }).config, network, "config.json"));
+			return await readJSON(join(envPaths.get(token, { suffix: "core" }).config, network, "config.json"));
 		} catch {}
 
 		return undefined;

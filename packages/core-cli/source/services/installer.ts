@@ -1,4 +1,4 @@
-import { sync } from "execa";
+import { execa } from "../execa";
 import { rcompare, satisfies } from "semver";
 
 import { injectable } from "../ioc";
@@ -8,7 +8,7 @@ export class Installer {
 	public install(pkg: string, tag = "latest"): void {
 		this.installPeerDependencies(pkg, tag);
 
-		const { stdout, stderr, exitCode } = sync(`yarn global add ${pkg}@${tag} --force`, { shell: true });
+		const { stdout, stderr, exitCode } = execa.sync(`yarn global add ${pkg}@${tag} --force`, { shell: true });
 
 		if (exitCode !== 0) {
 			throw new Error(`"yarn global add ${pkg}@${tag} --force" exited with code ${exitCode}\n${stderr}`);
@@ -18,7 +18,9 @@ export class Installer {
 	}
 
 	public installPeerDependencies(pkg: string, tag = "latest"): void {
-		const { stdout, stderr, exitCode } = sync(`yarn info ${pkg}@${tag} peerDependencies --json`, { shell: true });
+		const { stdout, stderr, exitCode } = execa.sync(`yarn info ${pkg}@${tag} peerDependencies --json`, {
+			shell: true,
+		});
 
 		if (exitCode !== 0) {
 			throw new Error(
@@ -32,7 +34,7 @@ export class Installer {
 	}
 
 	public installRangeLatest(pkg: string, range: string): void {
-		const { stdout, stderr, exitCode } = sync(`yarn info ${pkg} versions --json`, { shell: true });
+		const { stdout, stderr, exitCode } = execa.sync(`yarn info ${pkg} versions --json`, { shell: true });
 
 		if (exitCode !== 0) {
 			throw new Error(`"yarn info ${pkg} versions --json" exited with code ${exitCode}\n${stderr}`);

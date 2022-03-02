@@ -1,4 +1,3 @@
-import envPaths from "env-paths";
 import { PackageJson } from "type-fest";
 
 import { ActionFactory } from "./action-factory";
@@ -43,6 +42,7 @@ import {
 	Toggle,
 	Warning,
 } from "./components";
+import { envPaths as environmentPaths } from "./env-paths";
 import { Input, InputValidator } from "./input";
 import { Container, Identifiers, interfaces } from "./ioc";
 import { Output } from "./output";
@@ -57,7 +57,7 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Package).toConstantValue(package_);
 
 		// Paths
-		app.bind(Identifiers.ConsolePaths).toConstantValue(envPaths(package_.name));
+		app.bind(Identifiers.ConsolePaths).toConstantValue(environmentPaths.get(package_.name));
 
 		// Factories
 		app.bind(Identifiers.ActionFactory).to(ActionFactory).inSingletonScope();

@@ -1,4 +1,4 @@
-import envPaths, { Paths } from "env-paths";
+import { envPaths, Paths } from "../env-paths";
 import { parseFileSync, stringifySync } from "envfile";
 import { existsSync, writeFileSync } from "fs-extra";
 import { resolve } from "path";
@@ -8,7 +8,7 @@ import { injectable } from "../ioc";
 @injectable()
 export class Environment {
 	public getPaths(token: string, network: string): Paths {
-		let paths: Paths = envPaths(token, { suffix: "core" });
+		let paths: Paths = envPaths.get(token, { suffix: "core" });
 
 		for (const [key, value] of Object.entries(paths)) {
 			paths[key] = `${value}/${network}`;

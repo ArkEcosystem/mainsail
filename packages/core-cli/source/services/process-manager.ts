@@ -1,4 +1,4 @@
-import execa, { ExecaReturnValue, ExecaSyncReturnValue, sync } from "execa";
+import { execa, ExecaSyncReturnValue, ExecaReturnValue } from "../execa";
 
 import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts";
 import { injectable } from "../ioc";
@@ -165,10 +165,10 @@ export class ProcessManager {
 	}
 
 	private async shell(command: string): Promise<ExecaReturnValue> {
-		return execa(command, { shell: true });
+		return execa.run(command, { shell: true });
 	}
 
 	private shellSync(command: string): ExecaSyncReturnValue {
-		return sync(command, { shell: true });
+		return execa.sync(command, { shell: true });
 	}
 }

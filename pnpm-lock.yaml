@@ -286,6 +286,7 @@ importers:
       reflect-metadata: 0.1.13
       semver: 6.3.0
       tar: 6.1.11
+      tmp: 0.2.1
       type-fest: 0.21.3
       uvu: ^0.5.3
       yargs-parser: 20.2.9
@@ -324,6 +325,7 @@ importers:
       '@types/listr': 0.14.4
       '@types/semver': 6.2.3
       '@types/yargs-parser': 20.2.1
+      tmp: 0.2.1
       uvu: 0.5.3
 
   packages/core-cli/_migrate_these_tests/services/plugins/@namespace/package2:
