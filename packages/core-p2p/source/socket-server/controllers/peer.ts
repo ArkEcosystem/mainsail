@@ -1,5 +1,6 @@
+import { inject } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";
 
@@ -10,19 +11,19 @@ import { getPeerConfig } from "../utils/get-peer-config";
 import { Controller } from "./controller";
 
 export class PeerController extends Controller {
-	@Container.inject(Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Identifiers.DatabaseInterceptor)
+	@inject(Identifiers.DatabaseInterceptor)
 	private readonly databaseInterceptor!: DatabaseInterceptor;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
 
 	public getPeers(request: Hapi.Request, h: Hapi.ResponseToolkit): Contracts.P2P.PeerBroadcast[] {

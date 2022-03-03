@@ -15,6 +15,7 @@
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",

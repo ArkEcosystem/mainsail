@@ -1,26 +1,26 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { BlockProcessorResult } from "../block-processor";
 import { BlockHandler } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class RevertBlockHandler implements BlockHandler {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.DatabaseInteraction)
+	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly database!: DatabaseService;
 
-	@Container.inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	public async execute(block: Crypto.IBlock): Promise<BlockProcessorResult> {

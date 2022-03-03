@@ -1,14 +1,14 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { hexToU8a, isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
 
-@Container.injectable()
+@injectable()
 export class AddressFactory implements Crypto.IAddressFactory {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {

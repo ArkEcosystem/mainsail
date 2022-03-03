@@ -1,11 +1,11 @@
-import { Container } from "@arkecosystem/core-container";
+import { injectable } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-errors";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
 
-@Container.injectable()
+@injectable()
 export class Configuration implements Crypto.IConfiguration {
 	#config: Crypto.NetworkConfig | undefined;
 	#height: number | undefined;

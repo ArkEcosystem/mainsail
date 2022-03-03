@@ -1,11 +1,10 @@
-import { Container } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { Application } from "@arkecosystem/core-kernel";
-import { describe } from "../../core-test-framework/source";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 
+import { describe } from "../../core-test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =
@@ -13,7 +12,7 @@ const mnemonic =
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	});
 

@@ -1,6 +1,6 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
-import { Identifiers, inject, injectable } from "../../ioc";
 import {
 	Cache,
 	Filesystem,

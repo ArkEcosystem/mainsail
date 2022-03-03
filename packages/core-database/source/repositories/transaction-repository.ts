@@ -1,5 +1,5 @@
+import { inject } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import dayjs from "dayjs";
 import { EntityRepository, In } from "typeorm";
@@ -18,7 +18,7 @@ type FeeStatistics = {
 };
 @EntityRepository(Transaction)
 export class TransactionRepository extends AbstractRepository<Transaction> {
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	public async findByBlockIds(blockIds: string[]): Promise<

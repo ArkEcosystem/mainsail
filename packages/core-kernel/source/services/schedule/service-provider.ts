@@ -1,4 +1,5 @@
-import { Identifiers } from "../../ioc";
+import { Identifiers } from "@arkecosystem/core-contracts";
+
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { Schedule } from "./schedule";
 

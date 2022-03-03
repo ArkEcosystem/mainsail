@@ -26,21 +26,21 @@ export const setup = async (activeDelegates) => {
 
 	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 
-	@Container.injectable()
+	@injectable()
 	class MockDatabaseService {
 		public async getActiveDelegates(): Promise<Wallet[]> {
 			return activeDelegates;
 		}
 	}
 
-	@Container.injectable()
+	@injectable()
 	class MockRoundState {
 		public async getActiveDelegates(): Promise<Wallet[]> {
 			return activeDelegates;
 		}
 	}
 
-	@Container.injectable()
+	@injectable()
 	class MockWalletRepository {
 		public findByPublicKey(publicKey: string) {
 			return {
@@ -49,7 +49,7 @@ export const setup = async (activeDelegates) => {
 		}
 	}
 
-	@Container.injectable()
+	@injectable()
 	class MockBlockchainService {
 		public getLastBlock() {
 			return mockLastBlock;

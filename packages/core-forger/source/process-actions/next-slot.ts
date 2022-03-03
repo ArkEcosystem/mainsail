@@ -1,11 +1,11 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 
 import { ForgerService } from "../forger-service";
 
-@Container.injectable()
+@injectable()
 export class NextSlotProcessAction implements Contracts.Kernel.ProcessAction {
-	@Container.inject(Identifiers.ForgerService)
+	@inject(Identifiers.ForgerService)
 	private readonly forger!: ForgerService;
 
 	public name = "forger.nextSlot";

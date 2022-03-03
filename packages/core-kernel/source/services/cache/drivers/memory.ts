@@ -1,8 +1,8 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
 import { CacheEvent } from "../../../enums";
 import { NotImplemented } from "../../../exceptions/runtime";
-import { Identifiers, inject, injectable } from "../../../ioc";
 
 @injectable()
 export class MemoryCacheStore<K, T> implements Kernel.CacheStore<K, T> {
@@ -44,7 +44,7 @@ export class MemoryCacheStore<K, T> implements Kernel.CacheStore<K, T> {
 	public async put(key: K, value: T, seconds?: number): Promise<boolean> {
 		this.store.set(key, value);
 
-		this.eventDispatcher.dispatch(CacheEvent.Written, { key, value, seconds });
+		this.eventDispatcher.dispatch(CacheEvent.Written, { key, seconds, value });
 
 		return this.has(key);
 	}

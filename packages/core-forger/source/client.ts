@@ -1,18 +1,19 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { RelayHost } from "./interfaces";
 
 const MAX_PAYLOAD_CLIENT = 20 * 1024 * 1024; // allow large value of max payload communicating with relay
 
-@Container.injectable()
+@injectable()
 export class Client {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Crypto.IBlockSerializer;
 
 	public hosts: RelayHost[] = [];

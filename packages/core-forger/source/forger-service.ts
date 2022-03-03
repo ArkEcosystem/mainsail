@@ -1,27 +1,28 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Client } from "./client";
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { Delegate } from "./interfaces";
 
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
-@Container.injectable()
+@injectable()
 export class ForgerService {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.TransactionHandlerProvider)
+	@inject(Identifiers.TransactionHandlerProvider)
 	private readonly handlerProvider: Contracts.Transactions.ITransactionHandlerProvider;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	private client!: Client;

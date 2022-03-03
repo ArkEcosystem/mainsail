@@ -1,9 +1,10 @@
 import { Commands, Container, Services } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Installer)
+	@inject(Container.Identifiers.Installer)
 	private readonly installer!: Services.Installer;
 
 	public signature = "config:cli";

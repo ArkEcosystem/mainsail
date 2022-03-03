@@ -1,17 +1,17 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 
 import { getPeerIp } from "../../utils/get-peer-ip";
 import { BlocksRoute } from "../routes/blocks";
 import { PeerRoute } from "../routes/peer";
 import { TransactionsRoute } from "../routes/transactions";
 
-@Container.injectable()
+@injectable()
 export class AcceptPeerPlugin {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PeerProcessor)
+	@inject(Identifiers.PeerProcessor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server) {

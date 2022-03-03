@@ -9,7 +9,7 @@ const spyOnGetFlagToken = jest.fn();
 const spyOnGetFlagNetwork = jest.fn();
 const spyOnGetArgument = jest.fn();
 
-@Container.injectable()
+@injectable()
 class Command extends Commands.Command {
 	public signature: string = "core:test";
 

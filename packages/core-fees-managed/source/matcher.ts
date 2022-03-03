@@ -1,14 +1,14 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { FeeRegistry, TransactionFeeToLowError } from "@arkecosystem/core-fees";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
 
-@Container.injectable()
+@injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Fee.Registry)
+	@inject(Identifiers.Fee.Registry)
 	private readonly feeRegistry: FeeRegistry;
 
 	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {

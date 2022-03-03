@@ -1,10 +1,8 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
-// @ts-ignore
 import { BlockEvent, KernelEvent } from "../../enums";
 import { ServiceProviderCannotBeBooted } from "../../exceptions/plugins";
-import { Identifiers, inject, injectable } from "../../ioc";
-// @ts-ignore
 import { ServiceProviderRepository } from "../../providers";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";

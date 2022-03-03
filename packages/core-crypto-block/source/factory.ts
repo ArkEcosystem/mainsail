@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -8,27 +8,27 @@ import { BlockSchemaError } from "./errors";
 import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
 
-@Container.injectable()
+@injectable()
 export class BlockFactory implements Crypto.IBlockFactory {
-	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer
 
-	@Container.inject(Identifiers.Cryptography.Block.Deserializer)
+	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer: Deserializer; // @TODO: create contract for block deserializer
 
-	@Container.inject(INTERNAL_FACTORY)
+	@inject(INTERNAL_FACTORY)
 	private readonly blockFactory: InternalFactory; // @TODO: create contract for block deserializer
 
-	@Container.inject(Identifiers.Cryptography.Block.IDFactory)
+	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
-	@Container.inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureFactory: Crypto.ISignature;
 
-	@Container.inject(Identifiers.Cryptography.Validator)
+	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: Crypto.IValidator;
 
 	// @todo: add a proper type hint for data

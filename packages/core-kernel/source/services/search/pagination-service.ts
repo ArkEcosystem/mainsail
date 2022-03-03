@@ -1,8 +1,8 @@
+import { injectable } from "@arkecosystem/core-container";
+import { Search } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import createTree from "functional-red-black-tree";
-import { Search } from "@arkecosystem/core-contracts";
 
-import { injectable } from "../../ioc";
 import { get } from "../../utils";
 
 @injectable()

@@ -1,19 +1,19 @@
-import assert from "assert";
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-crypto-transaction";
 import { PreviousBlockIdFormatError } from "@arkecosystem/core-errors";
+import assert from "assert";
 import ByteBuffer from "bytebuffer";
 
-@Container.injectable()
+@injectable()
 export class Serializer implements Crypto.IBlockSerializer {
-	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
+	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils: Utils;
 
-	@Container.inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
 	private readonly publicKeySerializer: Crypto.IPublicKeySerializer;
 
-	@Container.inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureSerializer: Crypto.ISignature;
 
 	public size(block: Crypto.IBlock): number {

@@ -1,7 +1,7 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
 import { BlockEvent, KernelEvent } from "../../enums";
-import { Identifiers, inject, injectable } from "../../ioc";
 import { ServiceProvider, ServiceProviderRepository } from "../../providers";
 
 @injectable()

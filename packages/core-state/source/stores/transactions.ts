@@ -1,8 +1,9 @@
+import { injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 
 // todo: review its implementation and finally integrate it as planned in v2
-@Container.injectable()
+@injectable()
 export class TransactionStore
 	extends Utils.CappedMap<string, Crypto.ITransactionData>
 	implements Contracts.State.TransactionStore

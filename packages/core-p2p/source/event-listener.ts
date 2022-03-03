@@ -1,15 +1,16 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums } from "@arkecosystem/core-kernel";
+import { Enums } from "@arkecosystem/core-kernel";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { DisconnectPeer } from "./listeners";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class EventListener {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	public initialize(): void {

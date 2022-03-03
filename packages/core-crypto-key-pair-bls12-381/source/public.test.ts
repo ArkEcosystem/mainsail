@@ -1,8 +1,8 @@
+import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Container } from "@arkecosystem/core-kernel";
-import { describe } from "../../core-test-framework/source";
 
+import { describe } from "../../core-test-framework/source";
 import { KeyPairFactory } from "./pair";
 import { PublicKeyFactory } from "./public";
 
@@ -11,7 +11,7 @@ const mnemonic =
 
 describe<{ container: Container.Container }>("PublicKeyFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.container = new Container.Container();
+		context.container = new Container();
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
 	});

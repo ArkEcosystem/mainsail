@@ -1,10 +1,10 @@
 import "jest-extended";
 
+import { resolve } from "path";
 import { Application } from "@packages/core-kernel/source/application";
 import { Container, Identifiers, interfaces } from "@packages/core-kernel/source/ioc";
 import { PluginManifest } from "@packages/core-kernel/source/providers/plugin-manifest";
 import { ConfigRepository } from "@packages/core-kernel/source/services/config";
-import { resolve } from "path";
 
 let app: Application;
 let container: interfaces.Container;

@@ -1,28 +1,29 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Providers } from "@arkecosystem/core-kernel";
+import { Providers } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class RollbackDatabase implements Action {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-blockchain")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-blockchain")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async handle(): Promise<void> {

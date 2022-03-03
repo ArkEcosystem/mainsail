@@ -1,6 +1,6 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
 
-import { Identifiers, inject, injectable } from "../ioc";
 // todo: revisit the implementation of the class and see if it can be removed
 // import { Class } from "../types";
 import { pascalCase } from "../utils";

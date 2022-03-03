@@ -1,29 +1,29 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 
 import { TransactionHasExpiredError } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class Collator implements Contracts.TransactionPool.Collator {
-	@Container.inject(Identifiers.TransactionValidatorFactory)
+	@inject(Identifiers.TransactionValidatorFactory)
 	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@Container.inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
 	public async getBlockCandidateTransactions(): Promise<Crypto.ITransaction[]> {

@@ -1,22 +1,23 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
-@Container.injectable()
+@injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	public canExpire(transaction: Crypto.ITransaction): boolean {

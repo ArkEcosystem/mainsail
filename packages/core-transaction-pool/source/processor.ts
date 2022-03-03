@@ -1,29 +1,29 @@
+import { inject, injectable, multiInject, optional } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 import { InvalidTransactionDataError } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
-	@Container.multiInject(Identifiers.TransactionPoolProcessorExtension)
-	@Container.optional()
+	@multiInject(Identifiers.TransactionPoolProcessorExtension)
+	@optional()
 	private readonly extensions: Contracts.TransactionPool.ProcessorExtension[] = [];
 
-	@Container.inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Identifiers.PeerTransactionBroadcaster)
-	@Container.optional()
+	@inject(Identifiers.PeerTransactionBroadcaster)
+	@optional()
 	private readonly transactionBroadcaster!: Contracts.P2P.TransactionBroadcaster | undefined;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Deserializer)
+	@inject(Identifiers.Cryptography.Transaction.Deserializer)
 	private readonly deserializer: Crypto.ITransactionDeserializer;
 
 	public async process(

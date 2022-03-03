@@ -1,6 +1,7 @@
+import { injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import { Handlers, Utils as TransactionUtils } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -8,7 +9,7 @@ import { TransferTransaction } from "../versions";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
-@Container.injectable()
+@injectable()
 export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];

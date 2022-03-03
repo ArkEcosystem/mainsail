@@ -1,16 +1,17 @@
-import { Application, Container, Providers, Services } from "@arkecosystem/core-kernel";
-import { describe } from "../../core-test-framework/source";
+import { Application, Providers, Services } from "@arkecosystem/core-kernel";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
+import { Container } from "@arkecosystem/core-container";
 
+import { describe } from "../../core-test-framework/source";
 import { ServiceProvider } from "./service-provider";
 
 const loadDefaults = () => importFresh("./defaults").defaults;
 
 describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.app.bind(Identifiers.ConfigFlags).toConstantValue("core");
 
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);

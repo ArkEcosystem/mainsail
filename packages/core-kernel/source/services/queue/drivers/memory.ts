@@ -1,9 +1,9 @@
-import { Kernel } from "@arkecosystem/core-contracts";
 import { EventEmitter } from "events";
+import { decorateInjectable, inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import { performance } from "perf_hooks";
 
 import { QueueEvent } from "../../../enums";
-import { decorateInjectable, Identifiers, inject, injectable } from "../../../ioc";
 
 decorateInjectable(EventEmitter);
 

@@ -15,6 +15,7 @@
 		"clean": "del distribution"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-fees": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",

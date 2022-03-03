@@ -1,20 +1,20 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class CheckLastDownloadedBlockSynced implements Action {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.PeerNetworkMonitor)
+	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
 	public async handle(): Promise<void> {

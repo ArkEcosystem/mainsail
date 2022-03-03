@@ -1,11 +1,11 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/core-errors";
 import { schnorr } from "bcrypto";
 
-@Container.injectable()
+@injectable()
 export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
-	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {

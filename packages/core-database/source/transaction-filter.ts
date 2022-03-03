@@ -1,15 +1,16 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { injectable, inject, tagged } from "@arkecosystem/core-container";
 
 import { Transaction } from "./models/transaction";
 
 const { handleAndCriteria, handleOrCriteria, handleNumericCriteria, optimizeExpression, hasOrCriteria } =
 	AppUtils.Search;
 
-@Container.injectable()
+@injectable()
 export class TransactionFilter implements Contracts.Database.TransactionFilter {
-	@Container.inject(Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
 	public async getExpression(

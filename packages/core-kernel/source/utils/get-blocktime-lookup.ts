@@ -1,6 +1,4 @@
-import { Crypto, Kernel } from "@arkecosystem/core-contracts";
-
-import { Identifiers } from "../ioc/identifiers";
+import { Crypto, Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
 const mapHeightToMilestoneSpanTimestamp = async (
 	height: number,

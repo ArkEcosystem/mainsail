@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 import { Interfaces } from "@arkecosystem/crypto";
 import { describe } from "../../core-test-framework";
 
@@ -33,7 +33,7 @@ describe<{
 			getTransactionData: () => {},
 		};
 
-		context.container = new Container.Container();
+		context.container = new Container();
 		context.container.bind(Identifiers.DatabaseBlockRepository).toConstantValue({});
 		context.container
 			.bind(Identifiers.DatabaseTransactionRepository)

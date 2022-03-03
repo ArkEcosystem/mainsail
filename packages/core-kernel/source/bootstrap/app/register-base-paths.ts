@@ -1,10 +1,10 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import { camelCase, expandTilde, set } from "@arkecosystem/utils";
 import envPaths from "env-paths";
 import { ensureDirSync } from "fs-extra";
 import { resolve } from "path";
 
-import { Kernel } from "@arkecosystem/core-contracts";
-import { Identifiers, inject, injectable } from "../../ioc";
 import { ConfigRepository } from "../../services/config";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";

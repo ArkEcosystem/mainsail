@@ -1,6 +1,6 @@
+import { injectable } from "@arkecosystem/core-container";
 import { get, has } from "@arkecosystem/utils";
 
-import { injectable } from "../ioc";
 import { PackageJson } from "../types";
 
 @injectable()

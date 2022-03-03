@@ -1,6 +1,7 @@
-import { Commands, Container } from "@arkecosystem/core-cli";
+import { Commands } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "uninstall";
 

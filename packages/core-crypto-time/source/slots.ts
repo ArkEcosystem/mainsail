@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import dayjs from "dayjs";
 
@@ -14,12 +14,12 @@ export interface SlotInfo {
 
 export type GetBlockTimeStampLookup = (blockheight: number) => number;
 
-@Container.injectable()
+@injectable()
 export class Slots {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
+	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly calculator: BlockTimeCalculator;
 
 	public getTime(time?: number): number {

@@ -1,5 +1,5 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Boom from "@hapi/boom";
 
 import { isValidVersion } from "../../utils";
@@ -8,9 +8,9 @@ import { InternalRoute } from "../routes/internal";
 import { PeerRoute } from "../routes/peer";
 import { TransactionsRoute } from "../routes/transactions";
 
-@Container.injectable()
+@injectable()
 export class ValidatePlugin {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public register(server) {

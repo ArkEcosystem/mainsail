@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Container } from "@arkecosystem/core-kernel";
+import { inject,injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/crypto";
 

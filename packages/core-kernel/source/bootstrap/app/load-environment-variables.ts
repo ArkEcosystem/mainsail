@@ -1,5 +1,6 @@
-import { Kernel } from "@arkecosystem/core-contracts";
-import { Identifiers, inject, injectable } from "../../ioc";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+
 import { ConfigManager, ConfigRepository } from "../../services/config";
 import { Bootstrapper } from "../interfaces";
 

@@ -1,4 +1,6 @@
-import { Application, Container, Services } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application, Services } from "@arkecosystem/core-kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Database } from "../../source/database";
@@ -17,7 +19,7 @@ const initApp = (context: Context) => {
 		notice: () => {},
 	};
 
-	context.app = new Application(new Container.Container());
+	context.app = new Application(new Container());
 	context.app.bind(Identifiers.EventDispatcherService).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 	context.app.bind(Identifiers.LogService).toConstantValue(logger);
 	context.app.bind("path.cache").toConstantValue(dirSync().name);

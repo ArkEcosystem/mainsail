@@ -1,11 +1,12 @@
+import { resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import Joi from "joi";
-import { resolve } from "path";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Environment)
+	@inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
 	public signature = "config:publish";

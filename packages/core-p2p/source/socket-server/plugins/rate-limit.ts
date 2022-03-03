@@ -1,5 +1,6 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers } from "@arkecosystem/core-kernel";
+import { Providers } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
 
 import { RateLimiter } from "../../rate-limiter";
@@ -9,13 +10,13 @@ import { InternalRoute } from "../routes/internal";
 import { PeerRoute } from "../routes/peer";
 import { TransactionsRoute } from "../routes/transactions";
 
-@Container.injectable()
+@injectable()
 export class RateLimitPlugin {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	private rateLimiter!: RateLimiter;

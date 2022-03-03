@@ -1,12 +1,11 @@
 import { inspect } from "util";
+import { injectable } from "@arkecosystem/core-container";
 import { Kernel } from "@arkecosystem/core-contracts";
 import { isEmpty, prettyTime } from "@arkecosystem/utils";
 import chalk, { Chalk } from "chalk";
 import dayjs, { Dayjs } from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import utc from "dayjs/plugin/utc";
-
-import { injectable } from "../../../ioc";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(utc);

@@ -1,8 +1,8 @@
-import { Crypto, Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Crypto, Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import { performance } from "perf_hooks";
 
 import { BlockEvent, ScheduleEvent } from "../../enums";
-import { Identifiers, inject, injectable } from "../../ioc";
 import { Job } from "./interfaces";
 import { ExecuteCallbackWhenReady } from "./listeners";
 

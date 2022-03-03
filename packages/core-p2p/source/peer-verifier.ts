@@ -1,5 +1,6 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Services, Utils } from "@arkecosystem/core-kernel";
+import { Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import assert from "assert";
 import pluralize from "pluralize";
@@ -20,28 +21,28 @@ export class PeerVerificationResult {
 }
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class PeerVerifier implements Contracts.P2P.PeerVerifier {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.DposState)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.DposState)
+	@tagged("state", "blockchain")
 	private readonly dposState!: Contracts.State.DposState;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.DatabaseInterceptor)
+	@inject(Identifiers.DatabaseInterceptor)
 	private readonly databaseInterceptor!: DatabaseInterceptor;
 
-	@Container.inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.PeerCommunicator)
 	private communicator!: Contracts.P2P.PeerCommunicator;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Crypto.IBlockFactory;
 
 	private logPrefix!: string;

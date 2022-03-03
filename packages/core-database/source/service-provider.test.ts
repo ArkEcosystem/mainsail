@@ -1,4 +1,5 @@
-import { Application, Container, Providers } from "@arkecosystem/core-kernel";
+import { Application, Providers } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 
@@ -24,7 +25,7 @@ describe<{
 			dispatch: spyFn(),
 		};
 
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.events);
 	});
@@ -93,7 +94,7 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider.configSchema", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 
 		for (const key of Object.keys(process.env)) {
@@ -187,7 +188,7 @@ describe<{
 	defaults: Record<string, any>;
 }>("schema restrictions", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 
 		for (const key of Object.keys(process.env)) {

@@ -1,7 +1,7 @@
+import { injectable } from "@arkecosystem/core-container";
+import { Kernel } from "@arkecosystem/core-contracts";
 import mm from "nanomatch";
 
-import { Kernel } from "@arkecosystem/core-contracts";
-import { injectable } from "../../../ioc";
 import { assert } from "../../../utils";
 
 class OnceListener implements Kernel.EventListener {
@@ -89,7 +89,7 @@ export class MemoryEventDispatcher implements Kernel.EventDispatcher {
 		const resolvers: Array<Promise<void>> = [];
 
 		for (const listener of this.getListenersByPattern(event)) {
-			resolvers.push(new Promise((resolve) => resolve(listener.handle({ name: event, data }))));
+			resolvers.push(new Promise((resolve) => resolve(listener.handle({ data, name: event }))));
 		}
 
 		await Promise.all(resolvers);
@@ -99,13 +99,13 @@ export class MemoryEventDispatcher implements Kernel.EventDispatcher {
 		await Promise.resolve();
 
 		for (const listener of this.getListenersByPattern(event)) {
-			await listener.handle({ name: event, data });
+			await listener.handle({ data, name: event });
 		}
 	}
 
 	public dispatchSync<T = any>(event: Kernel.EventName, data?: T): void {
 		for (const listener of this.getListenersByPattern(event)) {
-			listener.handle({ name: event, data });
+			listener.handle({ data, name: event });
 		}
 	}
 
@@ -145,14 +145,14 @@ export class MemoryEventDispatcher implements Kernel.EventDispatcher {
 
 		let eventListeners: Kernel.EventListener[] = [];
 		if (this.listeners.has("*")) {
-			eventListeners = eventListeners.concat([...this.getListenersByEvent("*")]);
+			eventListeners = [...eventListeners, ...this.getListenersByEvent("*")];
 		}
 
 		for (const match of matches) {
 			const matchListeners: Set<Kernel.EventListener> | undefined = this.getListenersByEvent(match);
 
 			if (matchListeners && matchListeners.size > 0) {
-				eventListeners = eventListeners.concat([...matchListeners]);
+				eventListeners = [...eventListeners, ...matchListeners];
 			}
 		}
 

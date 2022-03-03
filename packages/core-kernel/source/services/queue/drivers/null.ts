@@ -1,7 +1,6 @@
-import { Kernel } from "@arkecosystem/core-contracts";
 import { EventEmitter } from "events";
-
-import { decorateInjectable, injectable } from "../../../ioc";
+import { decorateInjectable, injectable } from "@arkecosystem/core-container";
+import { Kernel } from "@arkecosystem/core-contracts";
 
 decorateInjectable(EventEmitter);
 

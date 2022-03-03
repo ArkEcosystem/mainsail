@@ -1,5 +1,6 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers, Services } from "@arkecosystem/core-kernel";
+import { Providers, Services } from "@arkecosystem/core-kernel";
+import { interfaces, Selectors } from "@arkecosystem/core-container";
 
 import { TransactionHandlerConstructor } from "./handlers";
 import { TransactionHandlerProvider } from "./handlers/handler-provider";
@@ -7,12 +8,12 @@ import { TransactionHandlerRegistry } from "./handlers/handler-registry";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public static getTransactionHandlerConstructorsBinding(): (
-		context: Container.interfaces.Context,
+		context: interfaces.Context,
 	) => TransactionHandlerConstructor[] {
-		return (context: Container.interfaces.Context) => {
-			type BindingDictionary = Container.interfaces.Lookup<Container.interfaces.Binding<unknown>>;
+		return (context: interfaces.Context) => {
+			type BindingDictionary = interfaces.Lookup<interfaces.Binding<unknown>>;
 			const handlerConstructors: TransactionHandlerConstructor[] = [];
-			let container: Container.interfaces.Container | null = context.container;
+			let container: interfaces.Container | null = context.container;
 
 			do {
 				const bindingDictionary = container["_bindingDictionary"] as BindingDictionary;
@@ -42,7 +43,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.WalletRepository)
 			.toConstantValue(null)
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "null"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "null"));
 
 		this.app
 			.bind(Identifiers.TransactionHandlerConstructors)

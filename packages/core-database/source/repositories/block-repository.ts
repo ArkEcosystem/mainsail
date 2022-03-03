@@ -1,5 +1,6 @@
+import { inject } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import { EntityRepository, In } from "typeorm";
 
 import { Block, Round, Transaction } from "../models";
@@ -7,10 +8,10 @@ import { AbstractRepository } from "./abstract-repository";
 
 @EntityRepository(Block)
 export class BlockRepository extends AbstractRepository<Block> {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	public async findLatest(): Promise<Crypto.IBlockData | undefined> {

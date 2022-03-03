@@ -1,19 +1,20 @@
+import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 
 import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandler } from "./transaction";
 
-@Container.injectable()
+@injectable()
 export class TransactionHandlerRegistry implements Contracts.Transactions.ITransactionHandlerRegistry {
-	@Container.inject(Identifiers.TransactionHandlerProvider)
+	@inject(Identifiers.TransactionHandlerProvider)
 	private readonly provider!: TransactionHandlerProvider;
 
-	@Container.multiInject(Identifiers.TransactionHandler)
+	@multiInject(Identifiers.TransactionHandler)
 	private readonly handlers!: TransactionHandler[];
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		if (this.provider.isRegistrationRequired()) {
 			this.provider.registerHandlers();

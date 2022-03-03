@@ -1,9 +1,9 @@
-import { Kernel } from "@arkecosystem/core-contracts";
-import { CronCommand, CronJob as Cron } from "cron";
 import { performance } from "perf_hooks";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { CronCommand, CronJob as Cron } from "cron";
 
 import { ScheduleEvent } from "../../enums";
-import { Identifiers, inject, injectable } from "../../ioc";
 import { Job } from "./interfaces";
 
 @injectable()

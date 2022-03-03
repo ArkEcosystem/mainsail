@@ -1,5 +1,5 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
@@ -24,9 +24,9 @@ export type RouteConfig = {
 	maxBytes?: number;
 };
 
-@Container.injectable()
+@injectable()
 export abstract class Route {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public register(server: Hapi.Server): void {

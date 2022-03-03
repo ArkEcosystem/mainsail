@@ -1,18 +1,19 @@
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers } from "@arkecosystem/core-kernel";
+import { Providers } from "@arkecosystem/core-kernel";
 
-@Container.injectable()
+@injectable()
 export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
-	@Container.inject(Identifiers.TransactionPoolWorkerFactory)
+	@inject(Identifiers.TransactionPoolWorkerFactory)
 	private readonly createWorker!: Contracts.TransactionPool.WorkerFactory;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	private workers: Contracts.TransactionPool.Worker[] = [];
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize() {
 		const workerCount: number = this.pluginConfiguration.getRequired("workerPool.workerCount");
 

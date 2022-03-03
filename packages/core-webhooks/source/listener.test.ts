@@ -1,5 +1,6 @@
-import { Application, Container, Utils } from "@arkecosystem/core-kernel";
+import { Application, Utils } from "@arkecosystem/core-kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
+import { Container } from "@arkecosystem/core-container";
 
 import { describe } from "../../core-test-framework/source";
 import { dummyWebhook } from "../test/fixtures/assets";
@@ -39,7 +40,7 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		const app = new Application(new Container.Container());
+		const app = new Application(new Container());
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);

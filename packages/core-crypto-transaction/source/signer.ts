@@ -1,14 +1,14 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 import { numberToHex } from "./helpers";
 
-@Container.injectable()
+@injectable()
 export class Signer {
-	@Container.inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureFactory: Crypto.ISignature;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
+	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils: Crypto.ITransactionUtils;
 
 	public async sign(

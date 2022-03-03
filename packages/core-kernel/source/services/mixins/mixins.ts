@@ -1,4 +1,5 @@
-import { injectable } from "../../ioc";
+import { injectable } from "@arkecosystem/core-container";
+
 import { Constructor } from "../../types/container";
 import { assert } from "../../utils";
 

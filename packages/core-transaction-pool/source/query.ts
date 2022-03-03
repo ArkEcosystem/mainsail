@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Comparator, IteratorMany } from "./utils";
@@ -62,9 +62,9 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	}
 }
 
-@Container.injectable()
+@injectable()
 export class Query implements Contracts.TransactionPool.Query {
-	@Container.inject(Identifiers.TransactionPoolMempool)
+	@inject(Identifiers.TransactionPoolMempool)
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
 	public getAll(): QueryIterable {

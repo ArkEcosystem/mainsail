@@ -1,6 +1,7 @@
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
-import { Container, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
@@ -8,52 +9,52 @@ import { StateMachine } from "./state-machine";
 import { blockchainMachine } from "./state-machine/machine";
 
 // todo: reduce the overall complexity of this class and remove all helpers and getters that just serve as proxies
-@Container.injectable()
+@injectable()
 export class Blockchain implements Contracts.Blockchain.Blockchain {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-blockchain")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-blockchain")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.DatabaseInteraction)
+	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly database!: DatabaseService;
 
-	@Container.inject(Identifiers.DatabaseBlockRepository)
+	@inject(Identifiers.DatabaseBlockRepository)
 	private readonly blockRepository!: Repositories.BlockRepository;
 
-	@Container.inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Identifiers.StateMachine)
+	@inject(Identifiers.StateMachine)
 	private readonly stateMachine!: StateMachine;
 
-	@Container.inject(Identifiers.PeerNetworkMonitor)
+	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@Container.inject(Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	private queue!: Contracts.Kernel.Queue;
@@ -63,7 +64,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	private missedBlocks = 0;
 	private lastCheckNetworkHealthTs = 0;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public async initialize(): Promise<void> {
 		this.stopped = false;
 

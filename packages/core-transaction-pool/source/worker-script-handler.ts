@@ -1,12 +1,12 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	public setConfig(networkConfig: any): void {

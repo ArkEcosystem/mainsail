@@ -1,9 +1,10 @@
 import { randomBytes } from "crypto";
-import { Container, Types, Utils } from "@arkecosystem/core-kernel";
+import { Types, Utils } from "@arkecosystem/core-kernel";
 import { badData } from "@hapi/boom";
 import Boom from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Database } from "../database";
 import { InternalIdentifiers } from "../identifiers";
@@ -12,15 +13,15 @@ import { whitelist } from "./plugins/whitelist";
 import { destroy, show, store, update } from "./schema";
 import { respondWithResource } from "./utils";
 
-@Container.injectable()
+@injectable()
 export class Server {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(InternalIdentifiers.Database)
+	@inject(InternalIdentifiers.Database)
 	private readonly database!: Database;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private server: HapiServer;

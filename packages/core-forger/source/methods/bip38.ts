@@ -1,24 +1,25 @@
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import bip38 from "bip38";
 import forge from "node-forge";
 import wif from "wif";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Delegate } from "../interfaces";
 import { Method } from "./method";
 
-@Container.injectable()
+@injectable()
 export class BIP38 extends Method implements Delegate {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
-	@Container.inject(Identifiers.Cryptography.Identity.WifFactory)
+	@inject(Identifiers.Cryptography.Identity.WifFactory)
 	private readonly wifFactory: Crypto.IWIFFactory;
 
 	public keys: Crypto.IKeyPair | undefined;

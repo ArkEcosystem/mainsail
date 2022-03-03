@@ -1,9 +1,9 @@
-import { Container } from "@arkecosystem/core-container";
+import { injectable } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-@Container.injectable()
+@injectable()
 export class DelegateResignationTransaction extends Transaction {
 	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
 	public static type: number = Crypto.TransactionType.DelegateResignation;

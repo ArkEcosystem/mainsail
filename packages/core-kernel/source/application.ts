@@ -5,14 +5,13 @@ import * as Bootstrappers from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
 import { KernelEvent } from "./enums";
 import { DirectoryCannotBeFound } from "./exceptions/filesystem";
-import { Identifiers } from "./ioc";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 // import { ShutdownSignal } from "./enums/process";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
 import { JsonObject, KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
 export class Application implements Kernel.Application {
 	private booted: boolean = false;

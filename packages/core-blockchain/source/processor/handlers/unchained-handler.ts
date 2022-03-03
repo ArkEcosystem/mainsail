@@ -1,5 +1,6 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Services, Utils } from "@arkecosystem/core-kernel";
+import { Services, Utils } from "@arkecosystem/core-kernel";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { BlockProcessorResult } from "../block-processor";
 import { BlockHandler } from "../contracts";
@@ -13,18 +14,18 @@ enum UnchainedBlockStatus {
 	InvalidTimestamp,
 }
 
-@Container.injectable()
+@injectable()
 export class UnchainedHandler implements BlockHandler {
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.TriggerService)
+	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
 	private isValidGenerator = false;

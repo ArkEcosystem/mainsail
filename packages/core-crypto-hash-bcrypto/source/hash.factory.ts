@@ -1,8 +1,8 @@
-import { Container } from "@arkecosystem/core-container";
+import { injectable } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import { Hash256, RIPEMD160, SHA256 } from "bcrypto";
 
-@Container.injectable()
+@injectable()
 export class HashFactory implements Crypto.IHashFactory {
 	public async ripemd160(data: Crypto.HashInput): Promise<Buffer> {
 		return RIPEMD160.digest(Array.isArray(data) ? Buffer.concat(data) : data);

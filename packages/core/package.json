@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
+		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
 		"@arkecosystem/core-crypto-block": "workspace:*",

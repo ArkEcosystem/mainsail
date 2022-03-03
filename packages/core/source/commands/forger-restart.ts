@@ -1,7 +1,8 @@
 import { Commands, Container } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "forger:restart";
 

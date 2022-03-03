@@ -1,53 +1,54 @@
 import assert from "assert";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject, tagged } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class RoundState {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
-	@Container.inject(Identifiers.DposState)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.DposState)
+	@tagged("state", "blockchain")
 	private readonly dposState!: Contracts.State.DposState;
 
-	@Container.inject(Identifiers.DposPreviousRoundStateProvider)
+	@inject(Identifiers.DposPreviousRoundStateProvider)
 	private readonly getDposPreviousRoundState!: Contracts.State.DposPreviousRoundStateProvider;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Identifiers.TriggerService)
+	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	private blocksInCurrentRound: Crypto.IBlock[] = [];

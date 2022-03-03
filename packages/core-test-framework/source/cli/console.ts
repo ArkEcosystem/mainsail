@@ -1,5 +1,5 @@
-import { Application, ApplicationFactory, Commands, Container, Services, Utils } from "@arkecosystem/core-cli";
-import { Container as CLI } from "@arkecosystem/core-cli";
+import { Application, ApplicationFactory, Commands, Container as CLI, Services, Utils } from "@arkecosystem/core-cli";
+import { Container } from "@arkecosystem/core-container";
 
 export class Console {
 	public app: Application;
@@ -60,7 +60,7 @@ export class Console {
 	}
 
 	private createApplication(): Application {
-		const app = ApplicationFactory.make(new Container.Container(), this.pkg);
+		const app = ApplicationFactory.make(new Container(), this.pkg);
 
 		this.flags = this.useDefaultFlags ? { network: "testnet", token: "ark" } : {};
 

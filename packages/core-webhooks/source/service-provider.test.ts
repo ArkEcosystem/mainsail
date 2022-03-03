@@ -1,8 +1,9 @@
-import { Application, Container, Providers } from "@arkecosystem/core-kernel";
+import { Application, Providers } from "@arkecosystem/core-kernel";
 import { NullEventDispatcher } from "@arkecosystem/core-kernel/source/services/events/drivers/null";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
+import { Container } from "@arkecosystem/core-container";
 
 import { describe } from "../../core-test-framework/source";
 import { defaults } from "./defaults";
@@ -20,7 +21,7 @@ const init = (context: Context) => {
 		notice: () => {},
 	};
 
-	const app = new Application(new Container.Container());
+	const app = new Application(new Container());
 	app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.StateStore).toConstantValue({});
 	app.bind(Identifiers.BlockchainService).toConstantValue({});

@@ -132,7 +132,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	const getRegisteredHandlersSpy = jest.fn();
 
-	@Container.injectable()
+	@injectable()
 	class MockHandler {
 		public getActivatedHandlerForData() {
 			return {
@@ -150,7 +150,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	const getBlockRewardsSpy = jest.fn();
 
-	@Container.injectable()
+	@injectable()
 	class MockBlockRepository {
 		public getBlockRewards() {
 			getBlockRewardsSpy();
@@ -160,7 +160,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	const getSentTransactionSpy = jest.fn();
 
-	@Container.injectable()
+	@injectable()
 	class MockTransactionRepository {
 		public getSentTransactions() {
 			getSentTransactionSpy();
@@ -171,7 +171,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	const dispatchSpy = jest.fn();
 	const dispatchSyncSpy = jest.fn();
 
-	@Container.injectable()
+	@injectable()
 	class MockEventDispatcher {
 		public dispatch(data) {
 			return dispatchSpy(data);

@@ -1,7 +1,7 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Search } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { injectable } from "../../ioc";
 import { InvalidCriteria, UnexpectedError, UnsupportedValue } from "./errors";
 
 @injectable()

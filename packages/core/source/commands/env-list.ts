@@ -1,9 +1,10 @@
-import { Commands, Container } from "@arkecosystem/core-cli";
+import { Commands } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import { parseFileSync } from "envfile";
 import { existsSync } from "fs-extra";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "env:list";
 

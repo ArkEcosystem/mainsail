@@ -1,5 +1,6 @@
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -13,41 +14,41 @@ import { getCodec } from "./socket-server/utils/get-codec";
 import { buildRateLimiter, isValidVersion } from "./utils";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.PeerConnector)
+	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.QueueFactory)
+	@inject(Identifiers.QueueFactory)
 	private readonly createQueue!: Types.QueueFactory;
 
-	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Crypto.IBlockSerializer;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
-	@Container.inject(Identifiers.Cryptography.Validator)
+	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Crypto.IValidator;
 
 	private outgoingRateLimiter!: RateLimiter;
 
 	private postTransactionsQueueByIp: Map<string, Contracts.Kernel.Queue> = new Map();
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		this.outgoingRateLimiter = buildRateLimiter({
 			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),

@@ -1,17 +1,17 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { RIPEMD160, SHA256 } from "bcrypto";
 import { base58 } from "bstring";
 
-@Container.injectable()
+@injectable()
 export class AddressFactory implements Crypto.IAddressFactory {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
-	@Container.inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {

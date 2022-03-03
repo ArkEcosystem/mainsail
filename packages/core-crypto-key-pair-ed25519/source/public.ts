@@ -1,10 +1,10 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { NotImplemented } from "@arkecosystem/core-errors";
 
-@Container.injectable()
+@injectable()
 export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
-	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {

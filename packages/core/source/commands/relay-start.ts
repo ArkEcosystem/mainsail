@@ -1,8 +1,9 @@
-import { Commands, Container, Contracts, Utils } from "@arkecosystem/core-cli";
-import Joi from "joi";
 import { resolve } from "path";
+import { Commands, Contracts, Utils } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
+import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "relay:start";
 

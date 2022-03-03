@@ -1,11 +1,12 @@
-import { ApplicationFactory, Commands, Contracts, Container, InputParser, Plugins } from "@arkecosystem/core-cli";
+import { platform } from "os";
+import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
-import { platform } from "os";
 import { join, resolve } from "path";
 import { PackageJson } from "type-fest";
 
-@Container.injectable()
+@injectable()
 export class CommandLineInterface {
 	private app!: Contracts.Application;
 

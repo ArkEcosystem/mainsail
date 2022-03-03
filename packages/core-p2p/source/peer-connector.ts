@@ -1,14 +1,15 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Client } from "./hapi-nes";
 
 const TEN_SECONDS_IN_MILLISECONDS = 10_000;
 
-@Container.injectable()
+@injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();

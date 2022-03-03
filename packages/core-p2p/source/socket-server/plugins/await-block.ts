@@ -1,18 +1,18 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Server } from "@hapi/hapi";
 
 import { InternalRoute } from "../routes/internal";
 
-@Container.injectable()
+@injectable()
 export class AwaitBlockPlugin {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public register(server: Server): void {

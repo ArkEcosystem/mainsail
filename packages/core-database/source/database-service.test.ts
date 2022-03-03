@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 import { Blocks } from "@arkecosystem/crypto";
 import { describe } from "../../core-test-framework";
 
@@ -66,7 +66,7 @@ describe<{
 			debug: () => undefined,
 		};
 
-		context.container = new Container.Container();
+		context.container = new Container();
 		context.container.bind(Identifiers.Application).toConstantValue(context.app);
 		context.container.bind(Identifiers.DatabaseConnection).toConstantValue(context.connection);
 		context.container.bind(Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);

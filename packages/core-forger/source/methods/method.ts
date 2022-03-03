@@ -1,13 +1,14 @@
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export abstract class Method {
-	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Crypto.IHashFactory;
 
 	protected async createBlock(

@@ -1,5 +1,5 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Kernel } from "@arkecosystem/core-contracts";
-import { injectable } from "../../../ioc";
 
 @injectable()
 export class Pm2ProcessActionsService implements Kernel.ProcessActionsService {
@@ -16,8 +16,8 @@ export class Pm2ProcessActionsService implements Kernel.ProcessActionsService {
 				.then((response) => {
 					reply({ response: response });
 				})
-				.catch((err) => {
-					reply({ error: err.stack });
+				.catch((error) => {
+					reply({ error: error.stack });
 				});
 		});
 	}

@@ -1,29 +1,30 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class DownloadBlocks implements Action {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.PeerNetworkMonitor)
+	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	public async handle(): Promise<void> {

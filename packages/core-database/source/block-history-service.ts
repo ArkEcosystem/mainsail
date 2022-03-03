@@ -1,25 +1,25 @@
 import assert from "assert";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 
 import { BlockRepository } from "./repositories/block-repository";
 import { TransactionRepository } from "./repositories/transaction-repository";
 
-@Container.injectable()
+@injectable()
 export class BlockHistoryService implements Contracts.Shared.BlockHistoryService {
-	@Container.inject(Identifiers.DatabaseBlockRepository)
+	@inject(Identifiers.DatabaseBlockRepository)
 	private readonly blockRepository!: BlockRepository;
 
-	@Container.inject(Identifiers.DatabaseTransactionRepository)
+	@inject(Identifiers.DatabaseTransactionRepository)
 	private readonly transactionRepository!: TransactionRepository;
 
-	@Container.inject(Identifiers.DatabaseBlockFilter)
+	@inject(Identifiers.DatabaseBlockFilter)
 	private readonly blockFilter!: Contracts.Database.BlockFilter;
 
-	@Container.inject(Identifiers.DatabaseTransactionFilter)
+	@inject(Identifiers.DatabaseTransactionFilter)
 	private readonly transactionFilter!: Contracts.Database.TransactionFilter;
 
-	@Container.inject(Identifiers.DatabaseModelConverter)
+	@inject(Identifiers.DatabaseModelConverter)
 	private readonly modelConverter!: Contracts.Database.ModelConverter;
 
 	public async findOneByCriteria(criteria: Contracts.Shared.OrBlockCriteria): Promise<Crypto.IBlockData | undefined> {

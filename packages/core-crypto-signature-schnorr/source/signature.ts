@@ -1,9 +1,9 @@
-import { Container } from "@arkecosystem/core-container";
+import { injectable } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import { schnorr } from "bcrypto";
 import ByteBuffer from "bytebuffer";
 
-@Container.injectable()
+@injectable()
 export class Signature implements Crypto.ISignature {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return schnorr.sign(message, privateKey).toString("hex");

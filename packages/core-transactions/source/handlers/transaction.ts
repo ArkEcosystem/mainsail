@@ -1,7 +1,8 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import {
 	ColdWalletError,
@@ -16,27 +17,27 @@ import {
 } from "../errors";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
-@Container.injectable()
+@injectable()
 export abstract class TransactionHandler {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.DatabaseBlockRepository)
+	@inject(Identifiers.DatabaseBlockRepository)
 	protected readonly blockRepository!: Repositories.BlockRepository;
 
-	@Container.inject(Identifiers.DatabaseTransactionRepository)
+	@inject(Identifiers.DatabaseTransactionRepository)
 	protected readonly transactionRepository!: Repositories.TransactionRepository;
 
-	@Container.inject(Identifiers.WalletRepository)
+	@inject(Identifiers.WalletRepository)
 	protected readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Verifier)
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier: Crypto.ITransactionVerifier;
 
 	public async verify(transaction: Crypto.ITransaction): Promise<boolean> {

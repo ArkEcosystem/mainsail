@@ -1,5 +1,6 @@
-import { Kernel } from "@arkecosystem/core-contracts";
-import { Identifiers, interfaces } from "../../ioc";
+import { interfaces } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { CacheManager } from "./manager";
 

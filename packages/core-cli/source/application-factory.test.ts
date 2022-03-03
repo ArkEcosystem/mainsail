@@ -4,7 +4,7 @@ import { Application, ApplicationFactory, Container, Utils } from "./index";
 describe("ApplicationFactory", ({ it, stub, assert }) => {
 	it("should create an application instance with the given container", () => {
 		assert.instance(
-			ApplicationFactory.make(new Container.Container(), {
+			ApplicationFactory.make(new Container(), {
 				description: "Core of the ARK Blockchain",
 				name: "@arkecosystem/core",
 				version: "3.0.0-next.0",
@@ -14,7 +14,7 @@ describe("ApplicationFactory", ({ it, stub, assert }) => {
 	});
 
 	it("should expose the ProcessFactory", () => {
-		const app = ApplicationFactory.make(new Container.Container(), {
+		const app = ApplicationFactory.make(new Container(), {
 			description: "Core of the ARK Blockchain",
 			name: "@arkecosystem/core",
 			version: "3.0.0-next.0",

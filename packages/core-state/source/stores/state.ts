@@ -1,23 +1,24 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums, Providers, Utils } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
 import assert from "assert";
 import { OrderedMap, OrderedSet, Seq } from "immutable";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 
 // todo: extract block and transaction behaviours into their respective stores
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class StateStore implements Contracts.State.StateStore {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-state")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-state")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Crypto.IConfiguration;
 
 	private blockchain: any = {};

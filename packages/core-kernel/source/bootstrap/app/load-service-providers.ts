@@ -1,9 +1,9 @@
 import { join } from "path";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import { readJSONSync } from "fs-extra";
 import glob from "glob";
 
-import { Identifiers, inject, injectable } from "../../ioc";
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../../providers";
 import { ConfigRepository } from "../../services/config";
 import { JsonObject } from "../../types";

@@ -1,15 +1,16 @@
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { injectable, inject } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.TransactionPoolSenderMempoolFactory)
+	@inject(Identifiers.TransactionPoolSenderMempoolFactory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly addressFactory: Crypto.IAddressFactory;
 
 	private readonly senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();

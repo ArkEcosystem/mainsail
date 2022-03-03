@@ -1,12 +1,12 @@
+import { injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 
 interface ChunkData {
 	key: string;
 	data: Crypto.IBlockData[];
 }
 
-@Container.injectable()
+@injectable()
 export class ChunkCache implements Contracts.P2P.ChunkCache {
 	private downloadedChunksCache: ChunkData[] = [];
 

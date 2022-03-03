@@ -1,3 +1,3 @@
-export * as Exceptions from "./exceptions";
-export * as Container from "./ioc";
 export * from "./container";
+export * from "./exceptions";
+export * from "./ioc";

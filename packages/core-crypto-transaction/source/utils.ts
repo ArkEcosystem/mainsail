@@ -1,15 +1,15 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
-@Container.injectable()
+@injectable()
 export class Utils implements Crypto.ITransactionUtils {
-	@Container.inject(Identifiers.Cryptography.Transaction.Serializer)
+	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer: Crypto.ITransactionSerializer;
 
-	@Container.inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async toBytes(data: Crypto.ITransactionData): Promise<Buffer> {

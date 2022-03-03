@@ -1,7 +1,8 @@
-import { TransactionFilter } from "./transaction-filter";
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 import { Enums, Utils } from "@arkecosystem/crypto";
+
 import { describe } from "../../core-test-framework";
+import { TransactionFilter } from "./transaction-filter";
 
 describe<{
 	container: Container.Container;
@@ -9,10 +10,10 @@ describe<{
 }>("TransactionFilter.getExpression", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		context.walletRepository = {
-			findByAddress: () => undefined,
+			findByAddress: () => {},
 		};
 
-		context.container = new Container.Container();
+		context.container = new Container();
 		context.container.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 	});
 
@@ -33,33 +34,33 @@ describe<{
 
 		context.walletRepository.findByAddress.calledWith("123");
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
-				{ property: "senderPublicKey", op: "equal", value: "456" },
-				{ property: "recipientId", op: "equal", value: "123" },
+				{ op: "equal", property: "senderPublicKey", value: "456" },
+				{ op: "equal", property: "recipientId", value: "123" },
 				{
-					op: "and",
 					expressions: [
-						{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Core },
-						{ property: "type", op: "equal", value: Enums.TransactionType.MultiPayment },
-						{ property: "asset", op: "contains", value: { payments: [{ recipientId: "123" }] } },
+						{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
+						{ op: "equal", property: "type", value: Enums.TransactionType.MultiPayment },
+						{ op: "contains", property: "asset", value: { payments: [{ recipientId: "123" }] } },
 					],
+					op: "and",
 				},
 				{
-					op: "and",
 					expressions: [
-						{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Core },
-						{ property: "type", op: "equal", value: Enums.TransactionType.DelegateRegistration },
-						{ property: "senderPublicKey", op: "equal", value: "456" },
+						{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
+						{ op: "equal", property: "type", value: Enums.TransactionType.DelegateRegistration },
+						{ op: "equal", property: "senderPublicKey", value: "456" },
 					],
+					op: "and",
 				},
 			],
+			op: "or",
 		});
 	});
 
 	it("should compare recipientId, multipayment recipientId when wallet not found for TransactionCriteria.address", async (context) => {
 		stub(context.walletRepository, "findByAddress").returnValue({
-			getPublicKey: () => undefined,
+			getPublicKey: () => {},
 		});
 
 		const transactionFilter = context.container.resolve(TransactionFilter);
@@ -67,18 +68,18 @@ describe<{
 
 		context.walletRepository.findByAddress.calledWith("123");
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
-				{ property: "recipientId", op: "equal", value: "123" },
+				{ op: "equal", property: "recipientId", value: "123" },
 				{
-					op: "and",
 					expressions: [
-						{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Core },
-						{ property: "type", op: "equal", value: Enums.TransactionType.MultiPayment },
-						{ property: "asset", op: "contains", value: { payments: [{ recipientId: "123" }] } },
+						{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
+						{ op: "equal", property: "type", value: Enums.TransactionType.MultiPayment },
+						{ op: "contains", property: "asset", value: { payments: [{ recipientId: "123" }] } },
 					],
+					op: "and",
 				},
 			],
+			op: "or",
 		});
 	});
 
@@ -91,12 +92,12 @@ describe<{
 		const expression = await transactionFilter.getExpression({ senderId: "123" });
 
 		context.walletRepository.findByAddress.calledWith("123");
-		assert.equal(expression, { property: "senderPublicKey", op: "equal", value: "456" });
+		assert.equal(expression, { op: "equal", property: "senderPublicKey", value: "456" });
 	});
 
 	it("should produce false expression when wallet not found for TransactionCriteria.senderId", async (context) => {
 		stub(context.walletRepository, "findByAddress").returnValue({
-			getPublicKey: () => undefined,
+			getPublicKey: () => {},
 		});
 
 		const transactionFilter = context.container.resolve(TransactionFilter);
@@ -116,32 +117,32 @@ describe<{
 
 		context.walletRepository.findByAddress.calledWith("123");
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
-				{ property: "recipientId", op: "equal", value: "123" },
+				{ op: "equal", property: "recipientId", value: "123" },
 				{
-					op: "and",
 					expressions: [
-						{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Core },
-						{ property: "type", op: "equal", value: Enums.TransactionType.MultiPayment },
-						{ property: "asset", op: "contains", value: { payments: [{ recipientId: "123" }] } },
+						{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
+						{ op: "equal", property: "type", value: Enums.TransactionType.MultiPayment },
+						{ op: "contains", property: "asset", value: { payments: [{ recipientId: "123" }] } },
 					],
+					op: "and",
 				},
 				{
-					op: "and",
 					expressions: [
-						{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Core },
-						{ property: "type", op: "equal", value: Enums.TransactionType.DelegateRegistration },
-						{ property: "senderPublicKey", op: "equal", value: "456" },
+						{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
+						{ op: "equal", property: "type", value: Enums.TransactionType.DelegateRegistration },
+						{ op: "equal", property: "senderPublicKey", value: "456" },
 					],
+					op: "and",
 				},
 			],
+			op: "or",
 		});
 	});
 
 	it("should compare using equal expression and include multipayment when wallet not found for TransactionCriteria.recipientId", async (context) => {
 		stub(context.walletRepository, "findByAddress").returnValue({
-			getPublicKey: () => undefined,
+			getPublicKey: () => {},
 		});
 
 		const transactionFilter = context.container.resolve(TransactionFilter);
@@ -149,18 +150,18 @@ describe<{
 
 		context.walletRepository.findByAddress.calledWith("123");
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
-				{ property: "recipientId", op: "equal", value: "123" },
+				{ op: "equal", property: "recipientId", value: "123" },
 				{
-					op: "and",
 					expressions: [
-						{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Core },
-						{ property: "type", op: "equal", value: Enums.TransactionType.MultiPayment },
-						{ property: "asset", op: "contains", value: { payments: [{ recipientId: "123" }] } },
+						{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
+						{ op: "equal", property: "type", value: Enums.TransactionType.MultiPayment },
+						{ op: "contains", property: "asset", value: { payments: [{ recipientId: "123" }] } },
 					],
+					op: "and",
 				},
 			],
+			op: "or",
 		});
 	});
 
@@ -168,84 +169,84 @@ describe<{
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ id: "123" });
 
-		assert.equal(expression, { property: "id", op: "equal", value: "123" });
+		assert.equal(expression, { op: "equal", property: "id", value: "123" });
 	});
 
 	it("should compare using equal expression for TransactionCriteria.version", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ version: 2 });
 
-		assert.equal(expression, { property: "version", op: "equal", value: 2 });
+		assert.equal(expression, { op: "equal", property: "version", value: 2 });
 	});
 
 	it("should compare using equal expression for TransactionCriteria.blockId", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ blockId: "123" });
 
-		assert.equal(expression, { property: "blockId", op: "equal", value: "123" });
+		assert.equal(expression, { op: "equal", property: "blockId", value: "123" });
 	});
 
 	it("should compare using equal expression for TransactionCriteria.sequence", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ sequence: 5 });
 
-		assert.equal(expression, { property: "sequence", op: "equal", value: 5 });
+		assert.equal(expression, { op: "equal", property: "sequence", value: 5 });
 	});
 
 	it("should compare using between expression for TransactionCriteria.sequence", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ sequence: { from: 5, to: 10 } });
 
-		assert.equal(expression, { property: "sequence", op: "between", from: 5, to: 10 });
+		assert.equal(expression, { from: 5, op: "between", property: "sequence", to: 10 });
 	});
 
 	it("should compare using greater than equal expression for TransactionCriteria.sequence", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ sequence: { from: 5 } });
 
-		assert.equal(expression, { property: "sequence", op: "greaterThanEqual", value: 5 });
+		assert.equal(expression, { op: "greaterThanEqual", property: "sequence", value: 5 });
 	});
 
 	it("should compare using less than equal expression for TransactionCriteria.sequence", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ sequence: { to: 5 } });
 
-		assert.equal(expression, { property: "sequence", op: "lessThanEqual", value: 5 });
+		assert.equal(expression, { op: "lessThanEqual", property: "sequence", value: 5 });
 	});
 
 	it("should compare using equal expression for TransactionCriteria.timestamp", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ timestamp: 3600 });
 
-		assert.equal(expression, { property: "timestamp", op: "equal", value: 3600 });
+		assert.equal(expression, { op: "equal", property: "timestamp", value: 3600 });
 	});
 
 	it("should compare using between expression for TransactionCriteria.timestamp", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ timestamp: { from: 3600, to: 7200 } });
 
-		assert.equal(expression, { property: "timestamp", op: "between", from: 3600, to: 7200 });
+		assert.equal(expression, { from: 3600, op: "between", property: "timestamp", to: 7200 });
 	});
 
 	it("should compare using greater than equal expression for TransactionCriteria.timestamp", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ timestamp: { from: 3600 } });
 
-		assert.equal(expression, { property: "timestamp", op: "greaterThanEqual", value: 3600 });
+		assert.equal(expression, { op: "greaterThanEqual", property: "timestamp", value: 3600 });
 	});
 
 	it("should compare using less than equal expression for TransactionCriteria.timestamp", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ timestamp: { to: 3600 } });
 
-		assert.equal(expression, { property: "timestamp", op: "lessThanEqual", value: 3600 });
+		assert.equal(expression, { op: "lessThanEqual", property: "timestamp", value: 3600 });
 	});
 
 	it("should compare using equal expression for TransactionCriteria.nonce", async (context) => {
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ nonce: Utils.BigNumber.make("5") });
 
-		assert.equal(expression, { property: "nonce", op: "equal", value: Utils.BigNumber.make("5") });
+		assert.equal(expression, { op: "equal", property: "nonce", value: Utils.BigNumber.make("5") });
 	});
 
 	it("should compare using between expression for TransactionCriteria.nonce", async (context) => {
@@ -258,9 +259,9 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "nonce",
-			op: "between",
 			from: Utils.BigNumber.make("5"),
+			op: "between",
+			property: "nonce",
 			to: Utils.BigNumber.make("10"),
 		});
 	});
@@ -274,8 +275,8 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "nonce",
 			op: "greaterThanEqual",
+			property: "nonce",
 			value: Utils.BigNumber.make("5"),
 		});
 	});
@@ -289,8 +290,8 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "nonce",
 			op: "lessThanEqual",
+			property: "nonce",
 			value: Utils.BigNumber.make("5"),
 		});
 	});
@@ -299,7 +300,7 @@ describe<{
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ senderPublicKey: "123" });
 
-		assert.equal(expression, { property: "senderPublicKey", op: "equal", value: "123" });
+		assert.equal(expression, { op: "equal", property: "senderPublicKey", value: "123" });
 	});
 
 	it("should compare using equal expression and add core type group expression for TransactionCriteria.type", async (context) => {
@@ -307,11 +308,11 @@ describe<{
 		const expression = await transactionFilter.getExpression({ type: Enums.TransactionType.Vote });
 
 		assert.equal(expression, {
-			op: "and",
 			expressions: [
-				{ property: "type", op: "equal", value: Enums.TransactionType.Vote },
-				{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Core },
+				{ op: "equal", property: "type", value: Enums.TransactionType.Vote },
+				{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Core },
 			],
+			op: "and",
 		});
 	});
 
@@ -323,11 +324,11 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			op: "and",
 			expressions: [
-				{ property: "type", op: "equal", value: Enums.TransactionType.Vote },
-				{ property: "typeGroup", op: "equal", value: Enums.TransactionTypeGroup.Test },
+				{ op: "equal", property: "type", value: Enums.TransactionType.Vote },
+				{ op: "equal", property: "typeGroup", value: Enums.TransactionTypeGroup.Test },
 			],
+			op: "and",
 		});
 	});
 
@@ -336,8 +337,8 @@ describe<{
 		const expression = await transactionFilter.getExpression({ typeGroup: Enums.TransactionTypeGroup.Core });
 
 		assert.equal(expression, {
-			property: "typeGroup",
 			op: "equal",
+			property: "typeGroup",
 			value: Enums.TransactionTypeGroup.Core,
 		});
 	});
@@ -347,9 +348,9 @@ describe<{
 		const expression = await transactionFilter.getExpression({ vendorField: "%pattern%" });
 
 		assert.equal(expression, {
-			property: "vendorField",
 			op: "like",
 			pattern: "%pattern%",
+			property: "vendorField",
 		});
 	});
 
@@ -357,7 +358,7 @@ describe<{
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ amount: Utils.BigNumber.make("5000") });
 
-		assert.equal(expression, { property: "amount", op: "equal", value: Utils.BigNumber.make("5000") });
+		assert.equal(expression, { op: "equal", property: "amount", value: Utils.BigNumber.make("5000") });
 	});
 
 	it("should compare using between expression for TransactionCriteria.amount", async (context) => {
@@ -370,9 +371,9 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "amount",
-			op: "between",
 			from: Utils.BigNumber.make("5000"),
+			op: "between",
+			property: "amount",
 			to: Utils.BigNumber.make("10000"),
 		});
 	});
@@ -386,8 +387,8 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "amount",
 			op: "greaterThanEqual",
+			property: "amount",
 			value: Utils.BigNumber.make("5000"),
 		});
 	});
@@ -401,8 +402,8 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "amount",
 			op: "lessThanEqual",
+			property: "amount",
 			value: Utils.BigNumber.make("5000"),
 		});
 	});
@@ -411,7 +412,7 @@ describe<{
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({ fee: Utils.BigNumber.make("500") });
 
-		assert.equal(expression, { property: "fee", op: "equal", value: Utils.BigNumber.make("500") });
+		assert.equal(expression, { op: "equal", property: "fee", value: Utils.BigNumber.make("500") });
 	});
 
 	it("should compare using between expression for TransactionCriteria.fee", async (context) => {
@@ -424,9 +425,9 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "fee",
-			op: "between",
 			from: Utils.BigNumber.make("500"),
+			op: "between",
+			property: "fee",
 			to: Utils.BigNumber.make("1000"),
 		});
 	});
@@ -440,8 +441,8 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "fee",
 			op: "greaterThanEqual",
+			property: "fee",
 			value: Utils.BigNumber.make("500"),
 		});
 	});
@@ -455,8 +456,8 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "fee",
 			op: "lessThanEqual",
+			property: "fee",
 			value: Utils.BigNumber.make("500"),
 		});
 	});
@@ -468,8 +469,8 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			property: "asset",
 			op: "contains",
+			property: "asset",
 			value: { payments: [{ recipientId: "123a" }] },
 		});
 	});
@@ -481,19 +482,19 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: { payments: [{ recipientId: "123" }] },
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: { payments: [{ recipientId: 123 }] },
 				},
 			],
+			op: "or",
 		});
 	});
 
@@ -504,19 +505,19 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: { flags: ["true"] },
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: { flags: [true] },
 				},
 			],
+			op: "or",
 		});
 	});
 
@@ -524,79 +525,79 @@ describe<{
 		const transactionFilter = context.container.resolve(TransactionFilter);
 		const expression = await transactionFilter.getExpression({
 			asset: {
-				recipientId: "123",
 				flags: ["true", "false"],
+				recipientId: "123",
 			},
 		});
 
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: {
-						recipientId: "123",
 						flags: ["true", "false"],
+						recipientId: "123",
 					},
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: {
-						recipientId: "123",
 						flags: ["true", false],
+						recipientId: "123",
 					},
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: {
-						recipientId: "123",
 						flags: [true, "false"],
-					},
-				},
-				{
-					property: "asset",
-					op: "contains",
-					value: {
 						recipientId: "123",
-						flags: [true, false],
 					},
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: {
-						recipientId: 123,
+						flags: [true, false],
+						recipientId: "123",
+					},
+				},
+				{
+					op: "contains",
+					property: "asset",
+					value: {
 						flags: ["true", "false"],
+						recipientId: 123,
 					},
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: {
-						recipientId: 123,
 						flags: ["true", false],
+						recipientId: 123,
 					},
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: {
-						recipientId: 123,
 						flags: [true, "false"],
+						recipientId: 123,
 					},
 				},
 				{
-					property: "asset",
 					op: "contains",
+					property: "asset",
 					value: {
-						recipientId: 123,
 						flags: [true, false],
+						recipientId: 123,
 					},
 				},
 			],
+			op: "or",
 		});
 	});
 
@@ -635,11 +636,11 @@ describe<{
 		});
 
 		assert.equal(expression, {
-			op: "and",
 			expressions: [
-				{ property: "amount", op: "greaterThanEqual", value: Utils.BigNumber.make("10000") },
-				{ property: "senderPublicKey", op: "equal", value: "123" },
+				{ op: "greaterThanEqual", property: "amount", value: Utils.BigNumber.make("10000") },
+				{ op: "equal", property: "senderPublicKey", value: "123" },
 			],
+			op: "and",
 		});
 	});
 
@@ -651,23 +652,23 @@ describe<{
 		]);
 
 		assert.equal(expression, {
-			op: "or",
 			expressions: [
 				{
-					op: "and",
 					expressions: [
-						{ property: "amount", op: "greaterThanEqual", value: Utils.BigNumber.make("10000") },
-						{ property: "senderPublicKey", op: "equal", value: "123" },
+						{ op: "greaterThanEqual", property: "amount", value: Utils.BigNumber.make("10000") },
+						{ op: "equal", property: "senderPublicKey", value: "123" },
 					],
+					op: "and",
 				},
 				{
-					op: "and",
 					expressions: [
-						{ property: "amount", op: "greaterThanEqual", value: Utils.BigNumber.make("30000") },
-						{ property: "senderPublicKey", op: "equal", value: "456" },
+						{ op: "greaterThanEqual", property: "amount", value: Utils.BigNumber.make("30000") },
+						{ op: "equal", property: "senderPublicKey", value: "456" },
 					],
+					op: "and",
 				},
 			],
+			op: "or",
 		});
 	});
 });

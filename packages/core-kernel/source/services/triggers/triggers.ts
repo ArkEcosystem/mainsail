@@ -1,5 +1,6 @@
+import { injectable } from "@arkecosystem/core-container";
+
 import { InvalidArgumentException } from "../../exceptions/logic";
-import { injectable } from "../../ioc";
 import { ActionArguments } from "../../types";
 import { assert } from "../../utils";
 import { Action } from "./action";
@@ -53,58 +54,58 @@ export class Triggers {
 	// TODO: Check implementation
 	// TODO: Add in documentation: how errors are handled, which data can each hook type expect.
 
-	public async call<T>(name: string, args: ActionArguments = {}): Promise<T | undefined> {
+	public async call<T>(name: string, arguments_: ActionArguments = {}): Promise<T | undefined> {
 		this.throwIfActionIsMissing(name);
 
-		let stage: string = "before";
+		let stage = "before";
 		let result: T | undefined;
 		try {
-			await this.callBeforeHooks(name, args);
+			await this.callBeforeHooks(name, arguments_);
 
 			stage = "execute";
-			result = await this.get(name).execute<T>(args);
+			result = await this.get(name).execute<T>(arguments_);
 
 			stage = "after";
-			await this.callAfterHooks<T>(name, args, result);
-		} catch (err) {
+			await this.callAfterHooks<T>(name, arguments_, result);
+		} catch (error) {
 			// Handle errors inside error hooks. Rethrow error if there are no error hooks.
-			if (this.get(name).hooks("error").size) {
-				await this.callErrorHooks(name, args, result, err, stage);
+			if (this.get(name).hooks("error").size > 0) {
+				await this.callErrorHooks(name, arguments_, result, error, stage);
 			} else {
-				throw err;
+				throw error;
 			}
 		}
 
 		return result;
 	}
 
-	private async callBeforeHooks<T>(trigger: string, args: ActionArguments): Promise<void> {
+	private async callBeforeHooks<T>(trigger: string, arguments_: ActionArguments): Promise<void> {
 		const hooks: Set<Function> = this.get(trigger).hooks("before");
 
-		for (const hook of [...hooks]) {
-			await hook(args);
+		for (const hook of hooks) {
+			await hook(arguments_);
 		}
 	}
 
-	private async callAfterHooks<T>(trigger: string, args: ActionArguments, result: T): Promise<void> {
+	private async callAfterHooks<T>(trigger: string, arguments_: ActionArguments, result: T): Promise<void> {
 		const hooks: Set<Function> = this.get(trigger).hooks("after");
 
-		for (const hook of [...hooks]) {
-			await hook(args, result);
+		for (const hook of hooks) {
+			await hook(arguments_, result);
 		}
 	}
 
 	private async callErrorHooks<T>(
 		trigger: string,
-		args: ActionArguments,
+		arguments_: ActionArguments,
 		result: T | undefined,
-		err: Error,
+		error: Error,
 		stage: string,
 	): Promise<void> {
 		const hooks: Set<Function> = this.get(trigger).hooks("error");
 
-		for (const hook of [...hooks]) {
-			await hook(args, result, err, stage);
+		for (const hook of hooks) {
+			await hook(arguments_, result, error, stage);
 		}
 	}
 

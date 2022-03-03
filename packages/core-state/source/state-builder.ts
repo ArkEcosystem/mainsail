@@ -1,38 +1,39 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
-import { Application, Container, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Application, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject, tagged } from "@arkecosystem/core-container";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class StateBuilder {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	@Container.inject(Identifiers.DatabaseBlockRepository)
+	@inject(Identifiers.DatabaseBlockRepository)
 	private blockRepository!: Repositories.BlockRepository;
 
-	@Container.inject(Identifiers.DatabaseTransactionRepository)
+	@inject(Identifiers.DatabaseTransactionRepository)
 	private transactionRepository!: Repositories.TransactionRepository;
 
-	@Container.inject(Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Identifiers.DposState)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.DposState)
+	@tagged("state", "blockchain")
 	private dposState!: Contracts.State.DposState;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.ConfigRepository)
+	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: Services.Config.ConfigRepository;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Crypto.IConfiguration;
 
 	public async run(): Promise<void> {

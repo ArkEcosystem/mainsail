@@ -1,15 +1,15 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 import { Blocks, Utils } from "@arkecosystem/crypto";
-import { describe } from "../../core-test-framework";
 
-import { ModelConverter } from "./model-converter";
+import { describe } from "../../core-test-framework";
 import block1760000 from "../test/fixtures/block1760000";
+import { ModelConverter } from "./model-converter";
 
 describe<{
 	container: Container.Container;
 }>("ModelConverter", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.container = new Container.Container();
+		context.container = new Container();
 	});
 
 	it("getTransactionData should convert transaction to model and back to data", (context) => {

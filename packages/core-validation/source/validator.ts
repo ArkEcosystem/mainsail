@@ -1,13 +1,13 @@
-import { Container } from "@arkecosystem/core-container";
+import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import Ajv from "ajv";
 import keywords from "ajv-keywords";
 
-@Container.injectable()
+@injectable()
 export class Validator implements Crypto.IValidator {
 	#ajv: Ajv.Ajv;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public postConstruct(): void {
 		this.#ajv = new Ajv({
 			$data: true,

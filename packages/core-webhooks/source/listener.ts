@@ -1,5 +1,6 @@
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import { performance } from "perf_hooks";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { conditions } from "./conditions";
 import { Database } from "./database";
@@ -8,15 +9,15 @@ import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
 
-@Container.injectable()
+@injectable()
 export class Listener {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async handle({ name, data }): Promise<void> {

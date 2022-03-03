@@ -1,6 +1,7 @@
-import { Kernel } from "@arkecosystem/core-contracts";
-import { dotenv, get, set } from "@arkecosystem/utils";
 import { existsSync, readFileSync } from "fs";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { dotenv, get, set } from "@arkecosystem/utils";
 import importFresh from "import-fresh";
 import Joi from "joi";
 import { extname } from "path";
@@ -10,7 +11,6 @@ import {
 	EnvironmentConfigurationCannotBeLoaded,
 } from "../../../exceptions/config";
 import { FileException } from "../../../exceptions/filesystem";
-import { Identifiers, inject, injectable } from "../../../ioc";
 import { JsonObject, KeyValuePair, Primitive } from "../../../types";
 import { assert } from "../../../utils";
 import { ConfigRepository } from "../repository";

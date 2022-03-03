@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { Commands, Container } from "../../source";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "config:cli";
 	public description = "Update the CLI configuration.";

@@ -1,37 +1,38 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class Initialize implements Action {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
-	@Container.inject(Identifiers.DatabaseInteraction)
+	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Identifiers.PeerNetworkMonitor)
+	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
 	public async handle(): Promise<void> {

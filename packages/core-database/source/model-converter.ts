@@ -1,12 +1,13 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Block } from "./models/block";
 import { Transaction } from "./models/transaction";
 
-@Container.injectable()
+@injectable()
 export class ModelConverter implements Contracts.Database.ModelConverter {
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	public async getBlockModels(blocks: Crypto.IBlock[]): Promise<Contracts.Database.BlockModel[]> {

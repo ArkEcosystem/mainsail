@@ -1,13 +1,13 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 
 import { Delegate } from "./interfaces";
 import { BIP38 } from "./methods/bip38";
 import { BIP39 } from "./methods/bip39";
 
-@Container.injectable()
+@injectable()
 export class DelegateFactory {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
 	public async fromBIP38(bip38: string, password: string): Promise<Delegate> {

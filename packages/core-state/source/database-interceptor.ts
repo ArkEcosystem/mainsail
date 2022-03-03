@@ -1,13 +1,13 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class DatabaseInterceptor {
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
 	public async getBlock(id: string): Promise<Crypto.IBlock | undefined> {

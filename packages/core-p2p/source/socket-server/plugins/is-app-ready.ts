@@ -1,16 +1,16 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Boom from "@hapi/boom";
 import { Server } from "@hapi/hapi";
 
 import { protocol } from "../../hapi-nes/utils";
 
-@Container.injectable()
+@injectable()
 export class IsAppReadyPlugin {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	public register(server: Server): void {

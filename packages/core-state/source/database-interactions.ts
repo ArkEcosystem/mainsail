@@ -1,47 +1,48 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Enums } from "@arkecosystem/core-kernel";
+import { Enums } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "./round-state";
 
-@Container.injectable()
+@injectable()
 export class DatabaseInteraction {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly databaseService!: DatabaseService;
 
-	@Container.inject(Identifiers.BlockState)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.BlockState)
+	@tagged("state", "blockchain")
 	private readonly blockState!: Contracts.State.BlockState;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.StateTransactionStore)
+	@inject(Identifiers.StateTransactionStore)
 	private readonly stateTransactionStore!: Contracts.State.TransactionStore;
 
-	@Container.inject(Identifiers.StateBlockStore)
+	@inject(Identifiers.StateBlockStore)
 	private readonly stateBlockStore!: Contracts.State.BlockStore;
 
-	@Container.inject(Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.TransactionHandlerRegistry)
+	@tagged("state", "blockchain")
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.RoundState)
+	@inject(Identifiers.RoundState)
 	private readonly roundState!: RoundState;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Crypto.IBlockFactory;
 
 	public async initialize(): Promise<void> {

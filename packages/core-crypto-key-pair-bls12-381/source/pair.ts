@@ -1,13 +1,13 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { getPublicKey } from "@noble/bls12-381";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import WIF from "wif";
 
-@Container.injectable()
+@injectable()
 export class KeyPairFactory implements Crypto.IKeyPairFactory {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
 	public async fromMnemonic(mnemonic: string): Promise<Crypto.IKeyPair> {

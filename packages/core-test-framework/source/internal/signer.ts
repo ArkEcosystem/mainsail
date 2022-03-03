@@ -1,5 +1,5 @@
+import { inject } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { DelegateRegistrationBuilder } from "../../../core-crypto-transaction-delegate-registration/source";
@@ -9,10 +9,10 @@ import { TransferBuilder } from "../../../core-crypto-transaction-transfer/sourc
 import { VoteBuilder } from "../../../core-crypto-transaction-vote/source";
 
 export class Signer {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
 
 	private nonce: BigNumber;

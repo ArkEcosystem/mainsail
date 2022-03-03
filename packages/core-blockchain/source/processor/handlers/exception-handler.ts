@@ -1,23 +1,24 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { BlockProcessorResult } from "../block-processor";
 import { BlockHandler } from "../contracts";
 import { AcceptBlockHandler } from "./accept-block-handler";
 
-@Container.injectable()
+@injectable()
 export class ExceptionHandler implements BlockHandler {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.DatabaseInterceptor)
+	@inject(Identifiers.DatabaseInterceptor)
 	private readonly databaseInterceptor!: DatabaseInterceptor;
 
 	public async execute(block: Crypto.IBlock): Promise<BlockProcessorResult> {

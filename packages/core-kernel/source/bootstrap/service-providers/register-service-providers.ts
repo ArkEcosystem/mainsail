@@ -1,4 +1,5 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import semver from "semver";
 
 import {
@@ -8,7 +9,6 @@ import {
 	RequiredDependencyCannotBeFound,
 	ServiceProviderCannotBeRegistered,
 } from "../../exceptions/plugins";
-import { Identifiers, inject, injectable } from "../../ioc";
 import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../../providers";
 import { ValidationManager } from "../../services/validation";
 import { assert } from "../../utils";

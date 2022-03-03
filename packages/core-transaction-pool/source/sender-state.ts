@@ -1,5 +1,6 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums, Providers, Services } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
 
 import {
 	RetryTransactionError,
@@ -11,26 +12,26 @@ import {
 	TransactionHasExpiredError,
 } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "copy-on-write")
+	@inject(Identifiers.TransactionHandlerRegistry)
+	@tagged("state", "copy-on-write")
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@Container.inject(Identifiers.TriggerService)
+	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly slots: any;
 
 	private corrupt = false;

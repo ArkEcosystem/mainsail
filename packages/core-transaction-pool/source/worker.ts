@@ -1,21 +1,21 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
-@Container.injectable()
+@injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
-	@Container.inject(Identifiers.TransactionPoolWorkerIpcSubprocessFactory)
+	@inject(Identifiers.TransactionPoolWorkerIpcSubprocessFactory)
 	private readonly createWorkerSubprocess: Contracts.TransactionPool.WorkerIpcSubprocessFactory;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerIpcSubprocess;
 	private lastHeight = 0;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		this.ipcSubprocess = this.createWorkerSubprocess();
 	}

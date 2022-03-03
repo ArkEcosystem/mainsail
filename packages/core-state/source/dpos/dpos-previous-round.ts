@@ -1,17 +1,18 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Services } from "@arkecosystem/core-kernel";
+import { Services } from "@arkecosystem/core-kernel";
+import { injectable, inject, tagged } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class DposPreviousRoundState implements Contracts.State.DposPreviousRoundState {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.BlockState)
-	@Container.tagged("state", "clone")
+	@inject(Identifiers.BlockState)
+	@tagged("state", "clone")
 	private readonly blockState!: Contracts.State.BlockState;
 
-	@Container.inject(Identifiers.DposState)
-	@Container.tagged("state", "clone")
+	@inject(Identifiers.DposState)
+	@tagged("state", "clone")
 	private readonly dposState!: Contracts.State.DposState;
 
 	public async revert(blocks: Crypto.IBlock[], roundInfo: Contracts.Shared.RoundInfo): Promise<void> {

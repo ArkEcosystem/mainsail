@@ -1,5 +1,6 @@
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
 import prettyMs from "pretty-ms";
 
@@ -11,34 +12,34 @@ import { checkDNS, checkNTP } from "./utils";
 const defaultDownloadChunkSize = 400;
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
-	@Container.inject(Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Identifiers.PeerChunkCache)
+	@inject(Identifiers.PeerChunkCache)
 	private readonly chunkCache!: Contracts.P2P.ChunkCache;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
 
 	public config: any;
@@ -49,7 +50,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	private initializing = true;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		this.config = this.configuration.all(); // >_<
 	}

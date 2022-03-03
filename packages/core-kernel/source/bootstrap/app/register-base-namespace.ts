@@ -1,7 +1,7 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
 import { NetworkCannotBeDetermined } from "../../exceptions/config";
-import { Identifiers, inject, injectable } from "../../ioc";
 import { Bootstrapper } from "../interfaces";
 
 @injectable()

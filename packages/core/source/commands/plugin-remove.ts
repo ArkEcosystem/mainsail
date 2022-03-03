@@ -1,9 +1,10 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.PluginManager)
+	@inject(Container.Identifiers.PluginManager)
 	private readonly pluginManager!: Contracts.PluginManager;
 
 	public signature = "plugin:remove";

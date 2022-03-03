@@ -1,13 +1,14 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class DposState implements Contracts.State.DposState {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.WalletRepository)
+	@inject(Identifiers.WalletRepository)
 	private walletRepository!: Contracts.State.WalletRepository;
 
 	private roundInfo: Contracts.Shared.RoundInfo | null = null;

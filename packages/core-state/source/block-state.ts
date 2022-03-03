@@ -1,23 +1,24 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class BlockState implements Contracts.State.BlockState {
-	@Container.inject(Identifiers.WalletRepository)
+	@inject(Identifiers.WalletRepository)
 	private walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly addressFactory: Crypto.IAddressFactory;
 
 	public async applyBlock(block: Crypto.IBlock): Promise<void> {

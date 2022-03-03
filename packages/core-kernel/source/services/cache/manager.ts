@@ -1,6 +1,6 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Kernel } from "@arkecosystem/core-contracts";
 
-import { injectable } from "../../ioc";
 import { ClassManager } from "../../support/class-manager";
 import { MemoryCacheStore } from "./drivers/memory";
 

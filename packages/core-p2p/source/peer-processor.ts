@@ -1,39 +1,40 @@
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
 import { isValidPeer } from "@arkecosystem/core-crypto-validation";
-import { Container, Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
 
 import { PeerFactory } from "./contracts";
 import { DisconnectInvalidPeers } from "./listeners";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@Container.inject(Identifiers.PeerConnector)
+	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@Container.inject(Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public server: any;
 	public nextUpdateNetworkStatusScheduled = false;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		this.events.listen(Enums.CryptoEvent.MilestoneChanged, this.app.resolve(DisconnectInvalidPeers));
 	}

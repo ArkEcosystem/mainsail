@@ -1,11 +1,12 @@
-import { Writable } from "stream";
-import { Application, Container } from "@arkecosystem/core-kernel";
-import { describe } from "../../core-test-framework/source";
+import { Application } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 import { sleep } from "@arkecosystem/utils";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
+import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { describe } from "../../core-test-framework/source";
 import { PinoLogger } from "./driver";
 
 describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {
@@ -24,7 +25,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	afterAll(() => setGracefulCleanup());
 
 	beforeEach(async (context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.app.bind(Identifiers.ConfigFlags).toConstantValue("core");
 		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
@@ -156,7 +157,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	});
 
 	it("should rotate the log 3 times", async (context) => {
-		const app = new Application(new Container.Container());
+		const app = new Application(new Container());
 		app.bind(Identifiers.ConfigFlags).toConstantValue("core");
 		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.useLogPath(dirSync().name);

@@ -1,6 +1,6 @@
+import { injectable } from "@arkecosystem/core-container";
 import { get, has, set, unset } from "@arkecosystem/utils";
 
-import { injectable } from "../../ioc";
 import { JsonObject, KeyValuePair } from "../../types";
 import { assert } from "../../utils";
 

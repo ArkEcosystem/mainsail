@@ -1,18 +1,19 @@
-import { Container, Services, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Services, Utils } from "@arkecosystem/core-kernel";
 
 import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "../errors";
 import { TransactionHandlerConstructor } from "./transaction";
 
-@Container.injectable()
+@injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
-	@Container.inject(Identifiers.WalletAttributes)
+	@inject(Identifiers.WalletAttributes)
 	private readonly attributeSet: Services.Attributes.AttributeSet;
 
-	@Container.inject(Identifiers.TransactionHandlerConstructors)
+	@inject(Identifiers.TransactionHandlerConstructors)
 	private readonly handlerConstructors: TransactionHandlerConstructor[];
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Registry)
+	@inject(Identifiers.Cryptography.Transaction.Registry)
 	private readonly transactionRegistry: Crypto.ITransactionRegistry;
 
 	private registered = false;

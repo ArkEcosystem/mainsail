@@ -1,4 +1,5 @@
-import { Application, Container } from "@arkecosystem/core-kernel";
+import { Application } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 import { describe } from "../../core-test-framework/source";
 
 import { ServiceProvider } from "./service-provider";
@@ -8,7 +9,7 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
 

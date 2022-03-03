@@ -1,14 +1,15 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
 import { MultiPaymentTransaction } from "../versions";
 
-@Container.injectable()
+@injectable()
 export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler {
-	@Container.inject(Identifiers.TransactionHistoryService)
+	@inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {

@@ -1,5 +1,6 @@
+import { interfaces, Selectors } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers, Services } from "@arkecosystem/core-kernel";
+import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { BuildDelegateRankingAction, GetActiveDelegatesAction } from "./actions";
@@ -19,7 +20,7 @@ import { walletFactory } from "./wallets/wallet-factory";
 import { WalletSyncService } from "./wallets/wallet-sync-service";
 
 export const dposPreviousRoundStateProvider =
-	(context: Container.interfaces.Context) =>
+	(context: interfaces.Context) =>
 	async (
 		blocks: Crypto.IBlock[],
 		roundInfo: Contracts.Shared.RoundInfo,
@@ -37,7 +38,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.WalletRepository)
 			.to(WalletRepository)
 			.inSingletonScope()
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 		this.app
 			.bind(Identifiers.WalletFactory)
@@ -47,29 +48,29 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					container.get(Identifiers.EventDispatcherService),
 				),
 			)
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 		this.app
 			.bind(Identifiers.WalletRepository)
 			.to(WalletRepositoryClone)
 			.inRequestScope()
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 		this.app
 			.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 		this.app
 			.bind(Identifiers.WalletRepository)
 			.to(WalletRepositoryCopyOnWrite)
 			.inRequestScope()
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
 		this.app
 			.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
 		this.app.bind(Identifiers.DposState).to(DposState);
 		this.app.bind(Identifiers.BlockState).to(BlockState);

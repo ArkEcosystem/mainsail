@@ -1,6 +1,6 @@
 import * as console from "console";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import chalk, { Chalk } from "chalk";
 import pino, { PrettyOptions } from "pino";
 import PinoPretty from "pino-pretty";
@@ -11,13 +11,14 @@ import { createStream } from "rotating-file-stream";
 import split from "split2";
 import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
+import { injectable, inject } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.ConfigFlags)
+	@inject(Identifiers.ConfigFlags)
 	private readonly configFlags!: { processType: string };
 
 	private readonly levelStyles: Record<string, Chalk> = {

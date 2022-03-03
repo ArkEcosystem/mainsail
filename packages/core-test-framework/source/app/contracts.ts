@@ -1,6 +1,7 @@
 import { Crypto } from "@arkecosystem/core-contracts";
-import { Application, Container, Types } from "@arkecosystem/core-kernel";
+import { Application, Types } from "@arkecosystem/core-kernel";
 import { Paths } from "env-paths";
+import { interfaces } from "@arkecosystem/core-container";
 
 export interface Wallet {
 	address: string;
@@ -69,4 +70,4 @@ export interface CryptoConfigPaths {
 	network: string;
 }
 
-export type SandboxCallback = (context: { app: Application; container: Container.interfaces.Container }) => void;
+export type SandboxCallback = (context: { app: Application; container: interfaces.Container }) => void;

@@ -1,18 +1,19 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums } from "@arkecosystem/core-kernel";
+import { Enums } from "@arkecosystem/core-kernel";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { PeerConnector } from "./peer-connector";
 import { isValidVersion } from "./utils";
 
-@Container.injectable()
+@injectable()
 export class DisconnectInvalidPeers implements Contracts.Kernel.EventListener {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	public async handle(): Promise<void> {
@@ -26,12 +27,12 @@ export class DisconnectInvalidPeers implements Contracts.Kernel.EventListener {
 	}
 }
 
-@Container.injectable()
+@injectable()
 export class DisconnectPeer implements Contracts.Kernel.EventListener {
-	@Container.inject(Identifiers.PeerConnector)
+	@inject(Identifiers.PeerConnector)
 	private readonly connector!: PeerConnector;
 
-	@Container.inject(Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	public async handle({ data }): Promise<void> {

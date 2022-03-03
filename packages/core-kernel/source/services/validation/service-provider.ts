@@ -1,4 +1,6 @@
-import { Identifiers, interfaces } from "../../ioc";
+import { interfaces } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { ValidationManager } from "./manager";
 

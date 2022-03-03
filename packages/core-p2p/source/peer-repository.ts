@@ -1,9 +1,10 @@
+import { injectable } from "@arkecosystem/core-container";
 import Contracts from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import { cidr } from "ip";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class PeerRepository implements Contracts.P2P.PeerRepository {
 	private readonly peers: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
 	private readonly peersPending: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();

@@ -1,9 +1,9 @@
-import { join, resolve } from "path";
-import { Commands, Container, Services, Contracts } from "@arkecosystem/core-cli";
+import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@arkecosystem/core-crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@arkecosystem/core-crypto-config";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@arkecosystem/core-crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
@@ -31,6 +31,7 @@ import { generateMnemonic } from "bip39";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
+import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -101,9 +102,9 @@ interface Options {
 	force: boolean;
 }
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Logger)
+	@inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
 	public signature = "network:generate";

@@ -1,19 +1,19 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import { NotImplemented } from "../errors";
 import { TransactionSchema } from "./schemas";
 
-@Container.injectable()
+@injectable()
 export abstract class Transaction implements Crypto.ITransaction {
-	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	protected readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Verifier)
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier: Crypto.ITransactionVerifier;
 
 	public static type: number | undefined = undefined;

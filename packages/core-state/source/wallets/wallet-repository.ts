@@ -1,25 +1,26 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject, multiInject, postConstruct } from "@arkecosystem/core-container";
 
 import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "./errors";
 import { WalletIndex } from "./wallet-index";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
-	@Container.multiInject(Identifiers.WalletRepositoryIndexerIndex)
+	@multiInject(Identifiers.WalletRepositoryIndexerIndex)
 	protected readonly indexerIndexes!: Contracts.State.WalletIndexerIndex[];
 
-	@Container.inject(Identifiers.WalletFactory)
+	@inject(Identifiers.WalletFactory)
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
 
-	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	protected readonly addressFactory: Crypto.IAddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		for (const { name, indexer, autoIndex } of this.indexerIndexes) {
 			if (this.indexes[name]) {

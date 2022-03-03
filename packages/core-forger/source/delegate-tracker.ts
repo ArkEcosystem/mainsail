@@ -1,30 +1,31 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Services, Utils } from "@arkecosystem/core-kernel";
+import { Services, Utils } from "@arkecosystem/core-kernel";
 
 import { Delegate } from "./interfaces";
 
-@Container.injectable()
+@injectable()
 export class DelegateTracker {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchainService: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly walletRepository: Contracts.State.WalletRepository;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	@Container.inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
+	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeCalculator: any;
 
 	private delegates: Delegate[] = [];

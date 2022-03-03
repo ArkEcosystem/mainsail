@@ -2,14 +2,14 @@ import { describe } from "../../core-test-framework";
 import { envPaths as environmentPaths } from "./env-paths";
 import { Application, Container } from "./index";
 
-@Container.injectable()
+@injectable()
 class StubClass {}
 
 describe<{
 	app: Application;
 }>("ActionFactory", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 	});
 
 	it("should bind a value to the IoC container", ({ app }) => {

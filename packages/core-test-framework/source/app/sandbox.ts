@@ -1,5 +1,6 @@
+import { Container, interfaces } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Container, Providers, Services, Types } from "@arkecosystem/core-kernel";
+import { Application, Providers, Services, Types } from "@arkecosystem/core-kernel";
 import { removeSync } from "fs-extra";
 import { setGracefulCleanup } from "tmp";
 
@@ -16,7 +17,7 @@ import { generateCoreConfig, generateCryptoConfig } from "./generators";
 export class Sandbox {
 	public readonly app: Application;
 
-	private readonly container: Container.interfaces.Container;
+	private readonly container: interfaces.Container;
 
 	private paths!: {
 		core: CoreConfigPaths;
@@ -48,7 +49,7 @@ export class Sandbox {
 	public constructor() {
 		setGracefulCleanup();
 
-		this.container = new Container.Container();
+		this.container = new Container();
 
 		this.app = new Application(this.container);
 	}

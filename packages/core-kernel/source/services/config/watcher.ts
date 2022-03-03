@@ -1,7 +1,6 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import nsfw, { ActionType, NSFW } from "nsfw";
-
-import { Kernel } from "@arkecosystem/core-contracts";
-import { Identifiers, inject, injectable } from "../../ioc";
 
 @injectable()
 export class Watcher {

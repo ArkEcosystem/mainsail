@@ -1,31 +1,32 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums, Providers, Utils } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
+import { injectable, inject, tagged } from "@arkecosystem/core-container";
 
 import { WalletEvent } from "./wallet-event";
 
-@Container.injectable()
+@injectable()
 export class WalletSyncService implements Contracts.Kernel.EventListener {
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-state")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.DatabaseWalletsTableService)
+	@inject(Identifiers.DatabaseWalletsTableService)
 	private readonly walletsTableService!: Contracts.Database.WalletsTableService;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private readonly lock = new Utils.Lock();

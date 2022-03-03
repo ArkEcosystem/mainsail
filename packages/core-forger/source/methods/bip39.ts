@@ -1,15 +1,15 @@
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 
 import { Delegate } from "../interfaces";
 import { Method } from "./method";
 
-@Container.injectable()
+@injectable()
 export class BIP39 extends Method implements Delegate {
-	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
 	#passphrase: string;

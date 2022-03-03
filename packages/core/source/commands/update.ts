@@ -1,10 +1,11 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Updater)
+	@inject(Container.Identifiers.Updater)
 	private readonly updater!: Contracts.Updater;
 
 	public signature = "update";

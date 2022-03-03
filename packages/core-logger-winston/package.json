@@ -14,6 +14,7 @@
 		"clean": "del distribution"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"joi": "17.4.2",

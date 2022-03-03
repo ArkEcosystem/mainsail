@@ -1,8 +1,8 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
 import { KernelEvent } from "../enums";
 import { InvalidArgumentException } from "../exceptions/logic";
-import { Identifiers, inject, injectable } from "../ioc";
 import { assert } from "../utils";
 import { ServiceProvider } from "./service-provider";
 

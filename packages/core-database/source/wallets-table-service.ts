@@ -1,10 +1,10 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Connection } from "typeorm";
 
-@Container.injectable()
+@injectable()
 export class WalletsTableService implements Contracts.Database.WalletsTableService {
-	@Container.inject(Identifiers.DatabaseConnection)
+	@inject(Identifiers.DatabaseConnection)
 	private readonly connection!: Connection;
 
 	public async flush(): Promise<void> {

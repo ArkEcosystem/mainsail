@@ -1,9 +1,9 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { describe } from "../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
 
+import { describe } from "../../core-test-framework";
 import { BlockHistoryService } from "./block-history-service";
 
-const defaultBlockSorting: Contracts.Search.Sorting = [{ property: "height", direction: "asc" }];
+const defaultBlockSorting: Contracts.Search.Sorting = [{ direction: "asc", property: "height" }];
 describe<{
 	container: Container.Container;
 	blockRepository: any;
@@ -14,28 +14,28 @@ describe<{
 }>("BlockHistoryService", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		context.blockRepository = {
-			findManyByExpression: () => undefined,
-			listByExpression: () => undefined,
+			findManyByExpression: () => {},
+			listByExpression: () => {},
 		};
 
 		context.transactionRepository = {
-			findManyByExpression: () => undefined,
-			listByExpression: () => undefined,
+			findManyByExpression: () => {},
+			listByExpression: () => {},
 		};
 
 		context.blockFilter = {
-			getExpression: () => undefined,
+			getExpression: () => {},
 		};
 
 		context.transactionFilter = {
-			getExpression: () => undefined,
+			getExpression: () => {},
 		};
 
 		context.modelConverter = {
-			getBlockData: () => undefined,
+			getBlockData: () => {},
 		};
 
-		context.container = new Container.Container();
+		context.container = new Container();
 		context.container.bind(Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);
 		context.container
 			.bind(Identifiers.DatabaseTransactionRepository)
@@ -113,13 +113,13 @@ describe<{
 			data1 = {},
 			data2 = {},
 			order = [],
-			page = { offset: 0, limit: 100 };
+			page = { limit: 100, offset: 0 };
 
 		stub(context.blockFilter, "getExpression").returnValueOnce(expression);
 		stub(context.blockRepository, "listByExpression").returnValueOnce({
+			meta: { totalCountIsEstimate: false },
 			results: [model1, model2],
 			totalCount: 2,
-			meta: { totalCountIsEstimate: false },
 		});
 		stub(context.modelConverter, "getBlockData").returnValueOnce([data1, data2]);
 
@@ -127,12 +127,12 @@ describe<{
 		const result = await blockHistoryService.listByCriteria(criteria, order, page);
 
 		context.blockFilter.getExpression.calledWith(criteria);
-		context.blockRepository.listByExpression.calledWith(expression, order, page, undefined);
+		context.blockRepository.listByExpression.calledWith(expression, order, page);
 		context.modelConverter.getBlockData.calledWith([model1, model2]);
 		assert.equal(result, {
+			meta: { totalCountIsEstimate: false },
 			results: [data1, data2],
 			totalCount: 2,
-			meta: { totalCountIsEstimate: false },
 		});
 	});
 });

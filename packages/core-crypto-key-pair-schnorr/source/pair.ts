@@ -1,11 +1,11 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schnorr, SHA256 } from "bcrypto";
 import WIF from "wif";
 
-@Container.injectable()
+@injectable()
 export class KeyPairFactory implements Crypto.IKeyPairFactory {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
 	public async fromMnemonic(mnemonic: string): Promise<Crypto.IKeyPair> {

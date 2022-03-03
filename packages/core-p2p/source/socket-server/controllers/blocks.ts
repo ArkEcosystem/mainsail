@@ -1,6 +1,7 @@
+import { inject, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Providers, Utils } from "@arkecosystem/core-kernel";
+import { Providers, Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
@@ -9,23 +10,23 @@ import { mapAddr } from "../utils/map-addr";
 import { Controller } from "./controller";
 
 export class BlocksController extends Controller {
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Identifiers.DatabaseService)
+	@inject(Identifiers.DatabaseService)
 	private readonly database!: DatabaseService;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Block.Deserializer)
+	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer!: Crypto.IBlockDeserializer;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	public async postBlock(

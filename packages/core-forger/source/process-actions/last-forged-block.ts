@@ -1,11 +1,12 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { ForgerService } from "../forger-service";
 
-@Container.injectable()
+@injectable()
 export class LastForgedBlockRemoteAction implements Contracts.Kernel.ProcessAction {
-	@Container.inject(Identifiers.ForgerService)
+	@inject(Identifiers.ForgerService)
 	private readonly forger!: ForgerService;
 
 	public name = "forger.lastForgedBlock";

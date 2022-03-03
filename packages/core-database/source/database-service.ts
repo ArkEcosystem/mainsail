@@ -1,6 +1,7 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums } from "@arkecosystem/core-kernel";
+import { Enums } from "@arkecosystem/core-kernel";
 import { Connection } from "typeorm";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { DatabaseEvent } from "./events";
 import { Round } from "./models";
@@ -9,33 +10,33 @@ import { RoundRepository } from "./repositories/round-repository";
 import { TransactionRepository } from "./repositories/transaction-repository";
 
 // TODO: maybe we should introduce `BlockLike`, `TransactionLike`, `RoundLke` interfaces to remove the need to cast
-@Container.injectable()
+@injectable()
 export class DatabaseService {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.DatabaseConnection)
+	@inject(Identifiers.DatabaseConnection)
 	private readonly connection!: Connection;
 
-	@Container.inject(Identifiers.DatabaseBlockRepository)
+	@inject(Identifiers.DatabaseBlockRepository)
 	private readonly blockRepository!: BlockRepository;
 
-	@Container.inject(Identifiers.DatabaseTransactionRepository)
+	@inject(Identifiers.DatabaseTransactionRepository)
 	private readonly transactionRepository!: TransactionRepository;
 
-	@Container.inject(Identifiers.DatabaseRoundRepository)
+	@inject(Identifiers.DatabaseRoundRepository)
 	private readonly roundRepository!: RoundRepository;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Crypto.IBlockFactory;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	public async initialize(): Promise<void> {

@@ -1,11 +1,12 @@
+import { injectable } from "@arkecosystem/core-container";
 import Contracts from "@arkecosystem/core-contracts";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { Block } from "./models/block";
 
 const { handleAndCriteria, handleOrCriteria, handleNumericCriteria, optimizeExpression } = AppUtils.Search;
 
-@Container.injectable()
+@injectable()
 export class BlockFilter implements Contracts.Database.BlockFilter {
 	public async getExpression(
 		...criteria: Contracts.Shared.OrBlockCriteria[]

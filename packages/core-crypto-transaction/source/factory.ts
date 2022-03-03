@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -9,24 +9,24 @@ import {
 	TransactionVersionError,
 } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class TransactionFactory implements Crypto.ITransactionFactory {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Deserializer)
+	@inject(Identifiers.Cryptography.Transaction.Deserializer)
 	private readonly deserializer: Crypto.ITransactionDeserializer;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Serializer)
+	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer: Crypto.ITransactionSerializer;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
+	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils: Crypto.ITransactionUtils;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Verifier)
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier: Crypto.ITransactionVerifier;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async fromHex(hex: string): Promise<Crypto.ITransaction> {

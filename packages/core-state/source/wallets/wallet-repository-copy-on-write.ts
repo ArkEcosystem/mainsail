@@ -1,5 +1,5 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 
 import { WalletRepository } from "./wallet-repository";
 
@@ -7,10 +7,10 @@ import { WalletRepository } from "./wallet-repository";
 // ! It only covers current pool use-cases.
 // ! It should be replaced with proper implementation eventually.
 
-@Container.injectable()
+@injectable()
 export class WalletRepositoryCopyOnWrite extends WalletRepository {
-	@Container.inject(Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly blockchainWalletRepository!: Contracts.State.WalletRepository;
 
 	public findByAddress(address: string): Contracts.State.Wallet {

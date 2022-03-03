@@ -1,20 +1,20 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class Verifier implements Crypto.ITransactionVerifier {
-	@Container.inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureFactory: Crypto.ISignature;
 
-	@Container.inject(Identifiers.Cryptography.Validator)
+	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: any;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
+	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils: Crypto.ITransactionUtils;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async verifySignatures(

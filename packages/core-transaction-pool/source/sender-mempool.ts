@@ -1,15 +1,16 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { SenderExceededMaximumTransactionCountError } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.TransactionPoolSenderState)
+	@inject(Identifiers.TransactionPoolSenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
 	private concurrency = 0;

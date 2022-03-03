@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
@@ -7,30 +7,30 @@ import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from
 import { TransactionFactory } from "./factory";
 import { maxVendorFieldLength } from "./helpers";
 
-@Container.injectable()
+@injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
-	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	protected readonly factory: TransactionFactory;
 
-	@Container.inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	private readonly keyPairFactory: Crypto.IKeyPairFactory;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Signer)
+	@inject(Identifiers.Cryptography.Transaction.Signer)
 	protected readonly signer: Crypto.ITransactionSigner;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Utils)
+	@inject(Identifiers.Cryptography.Transaction.Utils)
 	protected readonly utils: Crypto.ITransactionUtils;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Verifier)
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier: Crypto.ITransactionVerifier;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	protected readonly slots: Slots;
 
 	public data: Crypto.ITransactionData;

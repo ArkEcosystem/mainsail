@@ -1,5 +1,5 @@
+import { Container, tagged } from "@packages/core-kernel/source/ioc";
 import { anyAncestorOrTargetTaggedFirst } from "@packages/core-kernel/source/ioc/selectors";
-import { Container, inject, injectable, tagged } from "@packages/core-kernel/source/ioc";
 
 interface WalletRepository {}
 

@@ -1,7 +1,7 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { injectable } from "@arkecosystem/core-container";
 import { get, set } from "@arkecosystem/utils";
 
-@Container.injectable()
+@injectable()
 export class FeeRegistry {
 	readonly #registry: Record<number, number> = {};
 

@@ -1,10 +1,11 @@
-import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
+import { Commands, Contracts } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import { validateMnemonic } from "bip39";
 // import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
 import wif from "wif";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "config:forger:bip38";
 

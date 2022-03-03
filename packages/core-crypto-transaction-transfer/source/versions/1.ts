@@ -1,11 +1,11 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-@Container.injectable()
+@injectable()
 export class TransferTransaction extends Transaction {
-	@Container.inject(Identifiers.Cryptography.Identity.AddressSerializer)
+	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
 	private readonly addressSerializer: Crypto.IAddressSerializer;
 
 	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;

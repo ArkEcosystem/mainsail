@@ -1,9 +1,10 @@
-import { inspect } from "util";
+import { injectable } from "@arkecosystem/core-container";
 import Contracts from "@arkecosystem/core-contracts";
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
+import { inspect } from "util";
 import winston from "winston";
 
-@Container.injectable()
+@injectable()
 export class Logger implements Contracts.Kernel.Logger {
 	#logger: winston.Logger;
 

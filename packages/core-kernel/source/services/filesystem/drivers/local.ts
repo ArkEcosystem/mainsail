@@ -1,4 +1,5 @@
 import { resolve } from "path";
+import { injectable } from "@arkecosystem/core-container";
 import { Kernel } from "@arkecosystem/core-contracts";
 import {
 	copyFile,
@@ -13,8 +14,6 @@ import {
 	stat,
 	writeFile,
 } from "fs-extra";
-
-import { injectable } from "../../../ioc";
 
 @injectable()
 export class LocalFilesystem implements Kernel.Filesystem {

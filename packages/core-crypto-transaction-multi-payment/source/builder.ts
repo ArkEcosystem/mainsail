@@ -1,14 +1,14 @@
+import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/core-errors";
-import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { MultiPaymentTransaction } from "./versions/1";
 
-@Container.injectable()
+@injectable()
 export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder> {
-	@Container.postConstruct()
+	@postConstruct()
 	public postConstruct() {
 		this.initializeData();
 

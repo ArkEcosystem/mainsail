@@ -1,14 +1,14 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Serializer } from "./serializer";
 
-@Container.injectable()
+@injectable()
 export class IDFactory {
-	@Container.inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer
 
 	public async make(data: Crypto.IBlockData): Promise<string> {

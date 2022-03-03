@@ -1,5 +1,6 @@
+import { Container } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Container, Providers, Services } from "@arkecosystem/core-kernel";
+import { Application, Providers, Services } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { Factories, getWalletAttributeSet, Mocks, passphrases } from "@arkecosystem/core-test-framework";
 import {
@@ -36,7 +37,7 @@ const logger = {
 };
 
 export const initApp = (): Application => {
-	const app: Application = new Application(new Container.Container());
+	const app: Application = new Application(new Container());
 	app.bind(Identifiers.ApplicationNamespace).toConstantValue("testnet");
 
 	app.bind(Identifiers.LogService).toConstantValue(logger);

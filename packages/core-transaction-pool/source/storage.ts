@@ -1,12 +1,13 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers } from "@arkecosystem/core-kernel";
+import { Providers } from "@arkecosystem/core-kernel";
 import BetterSqlite3 from "better-sqlite3";
 import { ensureFileSync } from "fs-extra";
 
-@Container.injectable()
+@injectable()
 export class Storage implements Contracts.TransactionPool.Storage {
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	private database!: BetterSqlite3.Database;

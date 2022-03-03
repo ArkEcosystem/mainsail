@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
@@ -6,18 +6,18 @@ import ByteBuffer from "bytebuffer";
 
 import { IDFactory } from "./id.factory";
 
-@Container.injectable()
+@injectable()
 export class Deserializer implements Crypto.IBlockDeserializer {
-	@Container.inject(Identifiers.Cryptography.Block.IDFactory)
+	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: TransactionFactory;
 
-	@Container.inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
 	private readonly publicKeySerializer: Crypto.IPublicKeySerializer;
 
-	@Container.inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureSerializer: Crypto.ISignature;
 
 	public async deserialize(

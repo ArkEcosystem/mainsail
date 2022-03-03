@@ -1,10 +1,11 @@
-import { resolve } from "path";
-import { Commands, Container, Contracts, Utils } from "@arkecosystem/core-cli";
+import { Commands, Contracts, Utils } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
+import { resolve } from "path";
 
 import { buildBIP38 } from "../internal/crypto";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "core:start";
 

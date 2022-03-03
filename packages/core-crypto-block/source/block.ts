@@ -1,23 +1,23 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
-@Container.injectable()
+@injectable()
 export class Block implements Crypto.IBlock {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Block.Serializer)
+	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Crypto.IBlockSerializer; // @TODO: create contract for block serializer
 
-	@Container.inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Crypto.IHashFactory;
 
-	@Container.inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureFactory: Crypto.ISignature;
 
-	@Container.inject(Identifiers.Cryptography.Time.Slots)
+	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Slots;
 
 	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined

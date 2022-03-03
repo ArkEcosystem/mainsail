@@ -1,22 +1,23 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { Container, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
 import { MultiSignatureRegistrationTransaction } from "../versions";
 
-@Container.injectable()
+@injectable()
 export class MultiSignatureRegistrationTransactionHandler extends Handlers.TransactionHandler {
-	@Container.inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery: Contracts.TransactionPool.Query;
 
-	@Container.inject(Identifiers.TransactionHistoryService)
+	@inject(Identifiers.TransactionHistoryService)
 	private readonly transactionHistoryService: Contracts.Shared.TransactionHistoryService;
 
-	@Container.inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Crypto.IAddressFactory;
 
-	@Container.inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {

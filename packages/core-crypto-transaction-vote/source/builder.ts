@@ -1,13 +1,13 @@
+import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
-import { Container } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { VoteTransaction } from "./versions/1";
 
-@Container.injectable()
+@injectable()
 export class VoteBuilder extends TransactionBuilder<VoteBuilder> {
-	@Container.postConstruct()
+	@postConstruct()
 	public postConstruct() {
 		this.initializeData();
 

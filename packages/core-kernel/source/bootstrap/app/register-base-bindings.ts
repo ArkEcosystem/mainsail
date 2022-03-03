@@ -1,7 +1,7 @@
-import { Kernel } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 
-import { Identifiers, inject, injectable } from "../../ioc";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
 

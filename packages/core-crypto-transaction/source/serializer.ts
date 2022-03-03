@@ -1,15 +1,15 @@
-import { Container } from "@arkecosystem/core-container";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionVersionError } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class Serializer implements Crypto.ITransactionSerializer {
-	@Container.inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async getBytes(

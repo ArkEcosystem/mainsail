@@ -1,14 +1,14 @@
 import { strictEqual } from "assert";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class TransactionValidator implements Contracts.State.TransactionValidator {
-	@Container.inject(Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "clone")
+	@inject(Identifiers.TransactionHandlerRegistry)
+	@tagged("state", "clone")
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	public async validate(transaction: Crypto.ITransaction): Promise<void> {

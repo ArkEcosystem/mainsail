@@ -1,11 +1,12 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { prettyBytes, prettyTime } from "@arkecosystem/utils";
 import dayjs from "dayjs";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.ProcessManager)
+	@inject(Container.Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
 	public signature = "top";

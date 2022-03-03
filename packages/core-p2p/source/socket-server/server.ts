@@ -1,6 +1,7 @@
 import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Types } from "@arkecosystem/core-kernel";
+import { Types } from "@arkecosystem/core-kernel";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
+import { injectable, inject } from "@arkecosystem/core-container";
 
 import { plugin as hapiNesPlugin } from "../hapi-nes";
 import { AcceptPeerPlugin } from "./plugins/accept-peer";
@@ -16,12 +17,12 @@ import { PeerRoute } from "./routes/peer";
 import { TransactionsRoute } from "./routes/transactions";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class Server {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private server!: HapiServer;

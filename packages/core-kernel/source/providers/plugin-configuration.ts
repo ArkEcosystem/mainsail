@@ -1,7 +1,8 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { get, has, set, unset } from "@arkecosystem/utils";
 import deepmerge from "deepmerge";
 
-import { Identifiers, inject, injectable } from "../ioc";
 import { ConfigRepository } from "../services/config";
 import { JsonObject } from "../types";
 

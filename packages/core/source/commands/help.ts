@@ -1,8 +1,9 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import boxen from "boxen";
 import { blue, cyan } from "kleur";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "help";
 

@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas } from "@arkecosystem/core-crypto-validation";
 
@@ -13,12 +13,12 @@ import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 
 export type TransactionConstructor = typeof Transaction;
 
-@Container.injectable()
+@injectable()
 export class TransactionRegistry implements Crypto.ITransactionRegistry {
-	@Container.inject(Identifiers.Cryptography.Validator)
+	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: Crypto.IValidator;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	private readonly transactionTypes: Map<
@@ -28,7 +28,7 @@ export class TransactionRegistry implements Crypto.ITransactionRegistry {
 
 	readonly #transactionSchemas = new Map<string, TransactionSchema>();
 
-	@Container.postConstruct()
+	@postConstruct()
 	public postConstruct() {
 		this.transactionTypeFactory.initialize(this.transactionTypes);
 	}

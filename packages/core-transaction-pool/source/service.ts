@@ -1,39 +1,40 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { TransactionAlreadyInPoolError, TransactionPoolFullError } from "./errors";
 
-@Container.injectable()
+@injectable()
 export class Service implements Contracts.TransactionPool.Service {
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Identifiers.Fee.Matcher)
+	@inject(Identifiers.Fee.Matcher)
 	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
 
-	@Container.inject(Identifiers.TransactionPoolStorage)
+	@inject(Identifiers.TransactionPoolStorage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
 
-	@Container.inject(Identifiers.TransactionPoolMempool)
+	@inject(Identifiers.TransactionPoolMempool)
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
-	@Container.inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@Container.inject(Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@Container.inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Crypto.ITransactionFactory;
 
 	private readonly lock: AppUtils.Lock = new AppUtils.Lock();

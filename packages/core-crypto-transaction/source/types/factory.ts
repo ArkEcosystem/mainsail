@@ -1,14 +1,14 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container } from "@arkecosystem/core-kernel";
 
 import { UnkownTransactionError } from "../errors";
 import { Transaction } from "./transaction";
 
 type TransactionConstructor = typeof Transaction;
 
-@Container.injectable()
+@injectable()
 export class TransactionTypeFactory implements Contracts.Transactions.ITransactionTypeFactory {
-	@Container.inject(Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
 	private transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;

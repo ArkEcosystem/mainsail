@@ -1,7 +1,7 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Kernel } from "@arkecosystem/core-contracts";
 import { AnySchema, ValidationErrorItem } from "joi";
 
-import { injectable } from "../../../ioc";
 import { JsonObject } from "../../../types";
 
 @injectable()

@@ -1,4 +1,5 @@
-import { Identifiers } from "../../ioc";
+import { Identifiers } from "@arkecosystem/core-contracts";
+
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { PaginationService } from "./pagination-service";
 import { StandardCriteriaService } from "./standard-criteria-service";

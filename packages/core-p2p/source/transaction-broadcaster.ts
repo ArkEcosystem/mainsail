@@ -1,24 +1,25 @@
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Providers, Utils } from "@arkecosystem/core-kernel";
+import { Providers, Utils } from "@arkecosystem/core-kernel";
 
 import { PeerCommunicator } from "./peer-communicator";
 
-@Container.injectable()
+@injectable()
 export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcaster {
-	@Container.inject(Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
-	@Container.inject(Identifiers.Cryptography.Transaction.Serializer)
+	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Crypto.ITransactionSerializer;
 
 	public async broadcastTransactions(transactions: Crypto.ITransaction[]): Promise<void> {
