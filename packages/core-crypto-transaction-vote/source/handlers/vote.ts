@@ -1,11 +1,12 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
-import { injectable, inject } from "@arkecosystem/core-container";
-
-import { Errors, Handlers } from "@arkecosystem/core-transactions";
-import { VoteTransaction } from "../versions";
 import { DelegateRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-delegate-registration";
+import { PoolError } from "@arkecosystem/core-contracts";
+import { Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
+import { Errors, Handlers } from "@arkecosystem/core-transactions";
+
+import { VoteTransaction } from "../versions";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
@@ -132,7 +133,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 			.has();
 
 		if (hasSender) {
-			throw new Contracts.TransactionPool.PoolError(
+			throw new PoolError(
 				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.Vote}' in the pool`,
 				"ERR_PENDING",
 			);

@@ -1,9 +1,9 @@
-import { execa } from "../../execa";
+import { InvalidPackageJson } from "@arkecosystem/core-contracts";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra";
 import { join } from "path";
 
+import { execa } from "../../execa";
 import { Source } from "./contracts";
-import { InvalidPackageJson } from "./errors";
 
 export abstract class AbstractSource implements Source {
 	protected readonly dataPath: string;

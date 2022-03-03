@@ -2,7 +2,7 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 
-import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "../errors";
+import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "@arkecosystem/core-contracts";
 import { TransactionHandlerConstructor } from "./transaction";
 
 @injectable()

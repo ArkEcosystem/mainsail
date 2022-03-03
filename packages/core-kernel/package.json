@@ -18,7 +18,6 @@
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-errors": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"@pm2/io": "4.3.5",
 		"chalk": "4.1.2",

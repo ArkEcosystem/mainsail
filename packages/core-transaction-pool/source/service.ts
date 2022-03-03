@@ -1,8 +1,7 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-
-import { TransactionAlreadyInPoolError, TransactionPoolFullError } from "./errors";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -112,9 +111,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.warning(`${transaction} failed to enter pool: ${error.message}`);
 				this.events.dispatch(Enums.TransactionEvent.RejectedByPool, transaction.data);
 
-				throw error instanceof Contracts.TransactionPool.PoolError
-					? error
-					: new Contracts.TransactionPool.PoolError(error.message, "ERR_OTHER");
+				throw error instanceof PoolError ? error : new PoolError(error.message, "ERR_OTHER");
 			}
 		});
 	}

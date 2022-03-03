@@ -1,8 +1,7 @@
 import { inject, injectable, multiInject, optional } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { InvalidTransactionDataError, PoolError } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
-
-import { InvalidTransactionDataError } from "./errors";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
@@ -57,7 +56,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				} catch (error) {
 					invalid.push(entryId);
 
-					if (error instanceof Contracts.TransactionPool.PoolError) {
+					if (error instanceof PoolError) {
 						if (error.type === "ERR_EXCEEDS_MAX_COUNT") {
 							excess.push(entryId);
 						}

@@ -19,7 +19,6 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
-		"@arkecosystem/core-errors": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"bcrypto": "5.4.0",
 		"bytebuffer": "5.0.1",

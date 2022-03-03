@@ -1,8 +1,7 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { SenderExceededMaximumTransactionCountError } from "@arkecosystem/core-contracts";
 import { Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-
-import { SenderExceededMaximumTransactionCountError } from "./errors";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {

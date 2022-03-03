@@ -2,7 +2,7 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-// import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "./errors";
+// import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Deserializer implements Crypto.ITransactionDeserializer {

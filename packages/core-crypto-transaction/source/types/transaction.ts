@@ -2,7 +2,7 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-import { NotImplemented } from "../errors";
+import { NotImplemented } from "@arkecosystem/core-contracts";
 import { TransactionSchema } from "./schemas";
 
 @injectable()
@@ -32,7 +32,7 @@ export abstract class Transaction implements Crypto.ITransaction {
 	public timestamp: number;
 
 	public static getSchema(): TransactionSchema {
-		throw new NotImplemented();
+		throw new NotImplemented(this.constructor.name, "getSchema");
 	}
 
 	public static staticFee(

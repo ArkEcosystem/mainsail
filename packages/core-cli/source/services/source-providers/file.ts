@@ -1,8 +1,8 @@
+import { MissingPackageFolder } from "@arkecosystem/core-contracts";
 import { existsSync } from "fs-extra";
 import { extract } from "tar";
 
 import { AbstractSource } from "./abstract-source";
-import { MissingPackageFolder } from "./errors";
 
 export class File extends AbstractSource {
 	public constructor(paths: { data: string; temp: string }) {
@@ -20,9 +20,9 @@ export class File extends AbstractSource {
 	protected async preparePackage(value: string): Promise<void> {
 		await extract(
 			{
-				gzip: true,
-				file: value,
 				cwd: this.tempPath,
+				file: value,
+				gzip: true,
 			},
 			["package"],
 		);

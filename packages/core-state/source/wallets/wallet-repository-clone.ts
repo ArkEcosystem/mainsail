@@ -2,7 +2,7 @@ import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable, tagged, postConstruct } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { WalletIndexNotFoundError } from "./errors";
+import { WalletIndexNotFoundError } from "@arkecosystem/core-contracts";
 import { WalletIndex } from "./wallet-index";
 import { WalletRepository } from "./wallet-repository";
 

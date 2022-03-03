@@ -11,7 +11,7 @@ import {
 	MultiSignatureAlreadyRegisteredError,
 	MultiSignatureKeyCountMismatchError,
 	MultiSignatureMinimumKeysError,
-} from "../../errors";
+} from "@arkecosystem/core-errors";
 import { buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";

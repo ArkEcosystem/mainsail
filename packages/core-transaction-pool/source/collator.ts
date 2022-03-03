@@ -1,7 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-
-import { TransactionHasExpiredError } from "./errors";
+import { TransactionHasExpiredError } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Collator implements Contracts.TransactionPool.Collator {

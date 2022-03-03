@@ -1,9 +1,9 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { HostNoResponseError, RelayCommunicationError } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
-import { injectable, inject } from "@arkecosystem/core-container";
 
-import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { RelayHost } from "./interfaces";
 
 const MAX_PAYLOAD_CLIENT = 20 * 1024 * 1024; // allow large value of max payload communicating with relay

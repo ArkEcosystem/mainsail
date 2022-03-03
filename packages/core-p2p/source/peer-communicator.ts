@@ -1,12 +1,16 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import {
+	PeerPingTimeoutError,
+	PeerStatusResponseError,
+	PeerVerificationFailedError,
+} from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
 
 import { constants } from "./constants";
 import { SocketErrors } from "./enums";
-import { PeerPingTimeoutError, PeerStatusResponseError, PeerVerificationFailedError } from "./errors";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 import { replySchemas } from "./schemas";

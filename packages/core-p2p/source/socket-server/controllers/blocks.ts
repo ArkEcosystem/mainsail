@@ -5,7 +5,7 @@ import { Providers, Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
-import { TooManyTransactionsError } from "../errors";
+import { TooManyTransactionsError } from "@arkecosystem/core-contracts";
 import { mapAddr } from "../utils/map-addr";
 import { Controller } from "./controller";
 

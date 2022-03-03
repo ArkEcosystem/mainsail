@@ -1,9 +1,10 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { DelegateRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-delegate-registration";
+import { PoolError } from "@arkecosystem/core-contracts";
 import { Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { DelegateResignationTransaction } from "../versions";
 
@@ -89,7 +90,7 @@ export class DelegateResignationTransactionHandler extends Handlers.TransactionH
 			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
-			throw new Contracts.TransactionPool.PoolError(
+			throw new PoolError(
 				`Delegate resignation for "${wallet.getAttribute("delegate.username")}" already in the pool`,
 				"ERR_PENDING",
 			);

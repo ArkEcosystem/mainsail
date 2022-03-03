@@ -3,7 +3,7 @@ import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import { injectable, inject, multiInject, postConstruct } from "@arkecosystem/core-container";
 
-import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "./errors";
+import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "@arkecosystem/core-contracts";
 import { WalletIndex } from "./wallet-index";
 
 // todo: review the implementation

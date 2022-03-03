@@ -11,7 +11,7 @@ import {
 	NoVoteError,
 	UnvoteMismatchError,
 	VotedForNonDelegateError,
-} from "../../errors";
+} from "@arkecosystem/core-errors";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";
 

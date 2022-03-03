@@ -14,7 +14,7 @@ import {
 	SenderWalletMismatchError,
 	UnexpectedNonceError,
 	UnsupportedMultiSignatureRegistrationTransactionError,
-} from "../errors";
+} from "@arkecosystem/core-contracts";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 @injectable()

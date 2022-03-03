@@ -1,13 +1,12 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { BigNumber } from "@arkecosystem/utils";
-
 import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 	TransactionVersionError,
-} from "./errors";
+} from "@arkecosystem/core-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
 export class TransactionFactory implements Crypto.ITransactionFactory {

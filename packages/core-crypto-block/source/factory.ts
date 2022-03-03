@@ -4,7 +4,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
 import { Deserializer } from "./deserializer";
-import { BlockSchemaError } from "./errors";
+import { BlockSchemaError } from "@arkecosystem/core-contracts";
 import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
 

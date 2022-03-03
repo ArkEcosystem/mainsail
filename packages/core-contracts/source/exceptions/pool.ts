@@ -1,31 +1,42 @@
-import Contracts, { Crypto } from "@arkecosystem/core-contracts";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import pluralize from "plur";
 
-export class RetryTransactionError extends Contracts.TransactionPool.PoolError {
+import { Crypto } from "../contracts";
+import { Exception } from "./base";
+
+export class PoolError extends Exception {
+	public readonly type: string;
+
+	public constructor(message: string, type: string) {
+		super(message);
+		this.type = type;
+	}
+}
+
+export class RetryTransactionError extends PoolError {
 	public constructor(transaction: Crypto.ITransaction) {
 		super(`${transaction} cannot be added to pool, please retry`, "ERR_RETRY");
 	}
 }
 
-export class TransactionAlreadyInPoolError extends Contracts.TransactionPool.PoolError {
+export class TransactionAlreadyInPoolError extends PoolError {
 	public constructor(transaction: Crypto.ITransaction) {
 		super(`${transaction} is already in pool`, "ERR_DUPLICATE");
 	}
 }
 
-export class TransactionExceedsMaximumByteSizeError extends Contracts.TransactionPool.PoolError {
+export class TransactionExceedsMaximumByteSizeError extends PoolError {
 	public readonly maxSize: number;
 
 	public constructor(transaction: Crypto.ITransaction, maxSize: number) {
 		super(
-			`${transaction} exceeds size limit of ${AppUtils.pluralize("byte", maxSize, true)}`,
+			`${transaction} exceeds size limit of ${pluralize("byte", maxSize)}`,
 			"ERR_TOO_LARGE", // ! should be "ERR_TO_LARGE" instead of "ERR_TOO_LARGE"
 		);
 		this.maxSize = maxSize;
 	}
 }
 
-export class TransactionHasExpiredError extends Contracts.TransactionPool.PoolError {
+export class TransactionHasExpiredError extends PoolError {
 	public readonly expirationHeight: number;
 
 	public constructor(transaction: Crypto.ITransaction, expirationHeight: number) {
@@ -34,31 +45,45 @@ export class TransactionHasExpiredError extends Contracts.TransactionPool.PoolEr
 	}
 }
 
-export class TransactionFeeToLowError extends Contracts.TransactionPool.PoolError {
+export class TransactionFeeToLowError extends PoolError {
 	public constructor(transaction: Crypto.ITransaction) {
 		super(`${transaction} fee is to low to enter the pool`, "ERR_LOW_FEE");
 	}
 }
 
-export class TransactionFeeToHighError extends Contracts.TransactionPool.PoolError {
+export class TransactionFeeToHighError extends PoolError {
 	public constructor(transaction: Crypto.ITransaction) {
 		super(`${transaction} fee is to high to enter the pool`, "ERR_HIGH_FEE");
 	}
 }
 
-export class SenderExceededMaximumTransactionCountError extends Contracts.TransactionPool.PoolError {
+export class SenderExceededMaximumTransactionCountError extends PoolError {
 	public readonly maxCount: number;
 
 	public constructor(transaction: Crypto.ITransaction, maxCount: number) {
 		super(
-			`${transaction} exceeds sender's ${AppUtils.pluralize("transaction", maxCount, true)} count limit`,
+			`${transaction} exceeds sender's ${pluralize("transaction", maxCount)} count limit`,
 			"ERR_EXCEEDS_MAX_COUNT",
 		);
 		this.maxCount = maxCount;
 	}
 }
 
-export class TransactionFailedToApplyError extends Contracts.TransactionPool.PoolError {
+export class TransactionPoolFullError extends PoolError {
+	public readonly required: any; // @TODO: BigNumber
+
+	public constructor(transaction: Crypto.ITransaction, required: any) {
+		const formatSatoshi = (value) => value.toString();
+
+		const message =
+			`${transaction} fee ${formatSatoshi(transaction.data.fee)} ` +
+			`is lower than ${formatSatoshi(required)} already in pool`;
+		super(message, "ERR_POOL_FULL");
+		this.required = required;
+	}
+}
+
+export class TransactionFailedToApplyError extends PoolError {
 	public readonly error: Error;
 
 	public constructor(transaction: Crypto.ITransaction, error: Error) {
@@ -67,22 +92,22 @@ export class TransactionFailedToApplyError extends Contracts.TransactionPool.Poo
 	}
 }
 
-export class TransactionFailedToVerifyError extends Contracts.TransactionPool.PoolError {
+export class TransactionFailedToVerifyError extends PoolError {
 	public constructor(transaction: Crypto.ITransaction) {
 		super(`${transaction} didn't passed verification`, "ERR_BAD_DATA");
 	}
 }
 
-export class TransactionFromFutureError extends Contracts.TransactionPool.PoolError {
+export class TransactionFromFutureError extends PoolError {
 	public secondsInFuture: number;
 
 	public constructor(transaction: Crypto.ITransaction, secondsInFuture: number) {
-		super(`${transaction} is ${AppUtils.pluralize("second", secondsInFuture, true)} in future`, "ERR_FROM_FUTURE");
+		super(`${transaction} is ${pluralize("second", secondsInFuture)} in future`, "ERR_FROM_FUTURE");
 		this.secondsInFuture = secondsInFuture;
 	}
 }
 
-export class TransactionFromWrongNetworkError extends Contracts.TransactionPool.PoolError {
+export class TransactionFromWrongNetworkError extends PoolError {
 	public currentNetwork: number;
 
 	public constructor(transaction: Crypto.ITransaction, currentNetwork: number) {
@@ -94,7 +119,7 @@ export class TransactionFromWrongNetworkError extends Contracts.TransactionPool.
 	}
 }
 
-export class InvalidTransactionDataError extends Contracts.TransactionPool.PoolError {
+export class InvalidTransactionDataError extends PoolError {
 	public constructor(reason: string) {
 		super(`Invalid transaction data: ${reason}`, "ERR_BAD_DATA");
 	}

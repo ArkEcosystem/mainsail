@@ -1,5 +1,5 @@
 import { Crypto, Shared } from "@arkecosystem/core-contracts";
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-errors";
+import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-contracts";
 
 import { getMilestonesWhichAffectActiveDelegateCount } from "./calculate-forging-info";
 

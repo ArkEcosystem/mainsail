@@ -1,7 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 
-import { UnkownTransactionError } from "../errors";
+import { UnkownTransactionError } from "@arkecosystem/core-contracts";
 import { Transaction } from "./transaction";
 
 type TransactionConstructor = typeof Transaction;

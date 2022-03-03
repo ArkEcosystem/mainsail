@@ -1,9 +1,10 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
+import { PoolError } from "@arkecosystem/core-contracts";
 import { Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { DelegateRegistrationTransaction } from "../versions";
 
@@ -143,7 +144,7 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 			.has();
 
 		if (hasSender) {
-			throw new Contracts.TransactionPool.PoolError(
+			throw new PoolError(
 				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.DelegateRegistration}' in the pool`,
 				"ERR_PENDING",
 			);
@@ -158,10 +159,7 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 			.has();
 
 		if (hasUsername) {
-			throw new Contracts.TransactionPool.PoolError(
-				`Delegate registration for "${username}" already in the pool`,
-				"ERR_PENDING",
-			);
+			throw new PoolError(`Delegate registration for "${username}" already in the pool`, "ERR_PENDING");
 		}
 	}
 

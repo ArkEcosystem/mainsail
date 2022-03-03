@@ -1,9 +1,9 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Slots } from "@arkecosystem/core-crypto-time";
+import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "./errors";
 import { TransactionFactory } from "./factory";
 import { maxVendorFieldLength } from "./helpers";
 

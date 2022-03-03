@@ -2,7 +2,7 @@ import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/co
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 
-import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
+import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "@arkecosystem/core-contracts";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandler } from "./transaction";
 

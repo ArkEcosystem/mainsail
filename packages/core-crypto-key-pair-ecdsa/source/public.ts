@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/core-errors";
+import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/core-contracts";
 import { secp256k1 } from "bcrypto";
 
 @injectable()

@@ -1,6 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
+import { PoolError } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { Handlers, Utils as TransactionUtils } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
@@ -54,7 +55,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		// @TODO
 		if (!TransactionUtils.isRecipientOnActiveNetwork(recipientId, undefined, this.configuration)) {
 			const network: string = this.configuration.get<string>("network.pubKeyHash");
-			throw new Contracts.TransactionPool.PoolError(
+			throw new PoolError(
 				`Recipient ${recipientId} is not on the same network: ${network} `,
 				"ERR_INVALID_RECIPIENT",
 			);

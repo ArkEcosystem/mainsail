@@ -1,7 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-crypto-transaction";
-import { PreviousBlockIdFormatError } from "@arkecosystem/core-errors";
+import { PreviousBlockIdFormatError } from "@arkecosystem/core-contracts";
 import assert from "assert";
 import ByteBuffer from "bytebuffer";
 

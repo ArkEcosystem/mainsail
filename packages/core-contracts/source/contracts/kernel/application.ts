@@ -1,4 +1,4 @@
-import { Exception } from "@arkecosystem/core-errors";
+// import { Exception } from "@arkecosystem/core-contracts";
 
 import { JsonObject } from "../types";
 import { Container } from "./container";
@@ -91,7 +91,7 @@ export interface PluginDependency {
 }
 
 export interface ExceptionHandler {
-	report(exception: Exception);
+	report(exception: any); // @TODO: exception
 
-	shouldReport(exception: Exception);
+	shouldReport(exception: any); // @TODO: exception
 }

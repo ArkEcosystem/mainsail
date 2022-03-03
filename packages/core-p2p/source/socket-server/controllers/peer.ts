@@ -5,7 +5,7 @@ import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
-import { MissingCommonBlockError } from "../../errors";
+import { MissingCommonBlockError } from "@arkecosystem/core-contracts";
 import { getPeerIp } from "../../utils/get-peer-ip";
 import { getPeerConfig } from "../utils/get-peer-config";
 import { Controller } from "./controller";

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { NotImplemented } from "@arkecosystem/core-errors";
+import { NotImplemented } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
@@ -16,10 +16,10 @@ export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
 	}
 
 	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
-		throw new NotImplemented();
+		throw new NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
-		throw new NotImplemented();
+		throw new NotImplemented(this.constructor.name, "verify");
 	}
 }

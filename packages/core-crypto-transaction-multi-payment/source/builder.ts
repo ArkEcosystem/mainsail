@@ -1,7 +1,7 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
-import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/core-errors";
+import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { MultiPaymentTransaction } from "./versions/1";

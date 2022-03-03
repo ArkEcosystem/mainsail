@@ -1,4 +1,6 @@
-export class InvalidCriteria extends Error {
+import { Exception } from "./base";
+
+export class InvalidCriteria extends Exception {
 	public constructor(
 		public readonly value: unknown,
 		public readonly criteria: unknown,
@@ -32,7 +34,7 @@ export class InvalidCriteria extends Error {
 			v = typeof value;
 		}
 
-		if (path.length) {
+		if (path.length > 0) {
 			return `Invalid criteria ${c} at '${path.join(".")}' for ${v} value`;
 		} else {
 			return `Invalid criteria ${c} for ${v} value`;
@@ -40,7 +42,7 @@ export class InvalidCriteria extends Error {
 	}
 }
 
-export class UnsupportedValue extends Error {
+export class UnsupportedValue extends Exception {
 	public constructor(public readonly value: unknown, public readonly path: string[]) {
 		super(UnsupportedValue.getMessage(value, path));
 	}
@@ -60,20 +62,10 @@ export class UnsupportedValue extends Error {
 			v = `'${value}' (${typeof value})`;
 		}
 
-		if (path.length) {
+		if (path.length > 0) {
 			return `Unsupported value ${v} at '${path.join(".")}'`;
 		} else {
 			return `Unsupported value ${v}`;
 		}
-	}
-}
-
-export class UnexpectedError extends Error {
-	public constructor(public readonly error: Error, public readonly path: string[]) {
-		super(
-			path.length
-				? `Unexpected error '${error.message}' (${error.constructor.name}) at '${path.join(".")}'`
-				: `Unexpected error '${error.message}' (${error.constructor.name})`,
-		);
 	}
 }

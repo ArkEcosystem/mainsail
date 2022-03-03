@@ -1,7 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
-
 import {
 	RetryTransactionError,
 	TransactionExceedsMaximumByteSizeError,
@@ -10,7 +8,8 @@ import {
 	TransactionFromFutureError,
 	TransactionFromWrongNetworkError,
 	TransactionHasExpiredError,
-} from "./errors";
+} from "@arkecosystem/core-contracts";
+import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {

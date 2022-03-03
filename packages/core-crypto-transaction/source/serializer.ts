@@ -1,8 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { TransactionVersionError } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
-
-import { TransactionVersionError } from "./errors";
 
 @injectable()
 export class Serializer implements Crypto.ITransactionSerializer {

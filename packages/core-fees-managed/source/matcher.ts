@@ -1,5 +1,6 @@
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { FeeRegistry, TransactionFeeToLowError } from "@arkecosystem/core-fees";
+import { FeeRegistry } from "@arkecosystem/core-fees";
+import { TransactionFeeToLowError } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
 

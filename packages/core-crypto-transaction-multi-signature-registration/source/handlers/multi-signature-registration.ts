@@ -1,9 +1,10 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
+import { PoolError } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { injectable, inject } from "@arkecosystem/core-container";
-
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
+
 import { MultiSignatureRegistrationTransaction } from "../versions";
 
 @injectable()
@@ -107,7 +108,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			.has();
 
 		if (hasSender) {
-			throw new Contracts.TransactionPool.PoolError(
+			throw new PoolError(
 				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.MultiSignature}' in the pool`,
 				"ERR_PENDING",
 			);
@@ -124,10 +125,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			.has();
 
 		if (hasAddress) {
-			throw new Contracts.TransactionPool.PoolError(
-				`MultiSignatureRegistration for address ${address} already in the pool`,
-				"ERR_PENDING",
-			);
+			throw new PoolError(`MultiSignatureRegistration for address ${address} already in the pool`, "ERR_PENDING");
 		}
 	}
 

@@ -1,6 +1,6 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Crypto } from "@arkecosystem/core-contracts";
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-errors";
+import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-contracts";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";

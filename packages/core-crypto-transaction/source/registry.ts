@@ -1,13 +1,13 @@
 import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas } from "@arkecosystem/core-crypto-validation";
-
 import {
 	TransactionAlreadyRegisteredError,
 	TransactionKeyAlreadyRegisteredError,
 	TransactionVersionAlreadyRegisteredError,
 	UnkownTransactionError,
-} from "./errors";
+} from "@arkecosystem/core-contracts";
+
 import { Transaction } from "./types";
 import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 

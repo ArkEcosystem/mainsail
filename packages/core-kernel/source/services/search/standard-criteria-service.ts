@@ -1,8 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Search } from "@arkecosystem/core-contracts";
+import { InvalidCriteria, UnexpectedError, UnsupportedValue } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-
-import { InvalidCriteria, UnexpectedError, UnsupportedValue } from "./errors";
 
 @injectable()
 export class StandardCriteriaService {

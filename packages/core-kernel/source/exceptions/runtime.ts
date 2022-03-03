@@ -11,7 +11,7 @@ export class UnderflowException extends RuntimeException {}
 export class UnexpectedValueException extends RuntimeException {}
 
 export class NotImplemented extends RuntimeException {
-	public constructor(method: string, klass: string) {
+	public constructor(klass: string, method: string) {
 		super(`Method [${method}] is not implemented in [${klass}].`);
 	}
 }

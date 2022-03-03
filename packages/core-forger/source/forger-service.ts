@@ -4,7 +4,7 @@ import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Client } from "./client";
-import { HostNoResponseError, RelayCommunicationError } from "./errors";
+import { HostNoResponseError, RelayCommunicationError } from "@arkecosystem/core-contracts";
 import { Delegate } from "./interfaces";
 
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
