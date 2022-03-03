@@ -30,6 +30,7 @@ interface CallbackArguments<T> {
 	spy: (owner?: object, method?: string) => Spy;
 	spyFn: sinon.SinonSpyStatic;
 	stub: (owner: object, method: string) => Stub;
+	stubFn: sinon.SinonStubStatic;
 }
 
 type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
@@ -90,6 +91,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 
 			return result;
 		},
+		stubFn: sinon.stub,
 	});
 
 	suite.run();
