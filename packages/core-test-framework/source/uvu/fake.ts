@@ -3,12 +3,24 @@ import assert from "uvu/assert";
 export class Fake<T> {
 	protected subject;
 
+	public called(): void {
+		assert.ok(this.subject.called);
+	}
+
 	public calledWith(...arguments_: any[]): void {
 		assert.ok(this.subject.calledWith(...arguments_));
 	}
 
 	public notCalledWith(...arguments_: any[]): void {
 		assert.not.ok(this.subject.calledWith(...arguments_));
+	}
+
+	public calledNthWith(index: number, ...arguments_: any[]): void {
+		if (this.subject.callCount <= index) {
+			throw new Error(`Failed to get arguments for call#${index}`);
+		}
+
+		assert.ok(this.subject.getCall(index).calledWith(...arguments_));
 	}
 
 	public calledOnce(): void {
