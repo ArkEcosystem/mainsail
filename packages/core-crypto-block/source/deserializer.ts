@@ -46,7 +46,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 
 	private deserializeHeader(block: Contracts.Crypto.IBlockData, buf: ByteBuffer): void {
 		block.version = buf.readUint32();
-		block.timestamp = buf.readUint32();
+		block.timestamp = +buf.readUint64().toString();
 		block.height = buf.readUint32();
 
 		const previousBlockFullSha256 = buf.readBytes(32).toString("hex");
@@ -81,6 +81,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 			const transaction = deserializeTransactionsUnchecked
 				? await this.transactionFactory.fromBytesUnsafe(transactionBytes)
 				: await this.transactionFactory.fromBytes(transactionBytes);
+
 			transactions.push(transaction);
 			block.transactions.push(transaction.data);
 		}

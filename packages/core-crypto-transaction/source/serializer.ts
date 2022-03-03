@@ -59,17 +59,11 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		buff.writeUInt8(0xff);
 		buff.writeUInt8(transaction.version);
 		buff.writeUInt8(transaction.network || this.configuration.get("network.pubKeyHash"));
+		buff.writeUInt32LE(transaction.typeGroup);
+		buff.writeUInt16LE(transaction.type);
 
-		if (transaction.version === 1) {
-			buff.writeUInt8(transaction.type);
-			buff.writeUInt32LE(transaction.timestamp);
-		} else {
-			buff.writeUInt32LE(transaction.typeGroup);
-			buff.writeUInt16LE(transaction.type);
-
-			if (transaction.nonce) {
-				buff.writeBigInt64LE(transaction.nonce.toBigInt());
-			}
+		if (transaction.nonce) {
+			buff.writeBigInt64LE(transaction.nonce.toBigInt());
 		}
 
 		if (transaction.senderPublicKey) {
@@ -100,13 +94,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 			buff.writeBuffer(Buffer.from(transaction.signature, "hex"));
 		}
 
-		if (transaction.signatures) {
-			if (transaction.version === 1) {
-				buff.writeUInt8(0xff); // 0xff separator to signal start of multi-signature transactions
-				buff.writeBuffer(Buffer.from(transaction.signatures.join(""), "hex"));
-			} else if (!options.excludeMultiSignature) {
-				buff.writeBuffer(Buffer.from(transaction.signatures.join(""), "hex"));
-			}
+		if (transaction.signatures && !options.excludeMultiSignature) {
+			buff.writeBuffer(Buffer.from(transaction.signatures.join(""), "hex"));
 		}
 	}
 }

@@ -6,7 +6,7 @@ export class CreateBlocksTable20180305300000 implements MigrationInterface {
             CREATE TABLE blocks (
                 "id" VARCHAR(64) PRIMARY KEY,
                 "version" SMALLINT NOT NULL,
-                "timestamp" INTEGER UNIQUE NOT NULL,
+                "timestamp" BIGINT UNIQUE NOT NULL,
                 "previous_block" VARCHAR(64) UNIQUE,
                 "height" INTEGER UNIQUE NOT NULL,
                 "number_of_transactions" INTEGER NOT NULL,

@@ -8,7 +8,7 @@ export class CreateTransactionsTable20180305400000 implements MigrationInterface
                 "version" SMALLINT NOT NULL,
                 "block_id" VARCHAR(64) NOT NULL,
                 "sequence" SMALLINT NOT NULL,
-                "timestamp" INTEGER NOT NULL,
+                "timestamp" BIGINT NOT NULL,
                 "sender_public_key" VARCHAR(66) NOT NULL,
                 "recipient_id" VARCHAR(255),
                 "type" SMALLINT NOT NULL,

@@ -64,6 +64,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			for (const transaction of data.transactions) {
 				transaction.amount = BigNumber.make(transaction.amount);
 				transaction.fee = BigNumber.make(transaction.fee);
+				transaction.nonce = BigNumber.make(transaction.nonce);
 			}
 		}
 

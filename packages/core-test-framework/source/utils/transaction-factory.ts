@@ -37,7 +37,6 @@ export class TransactionFactory {
 	private networkConfig: Contracts.Crypto.NetworkConfig | undefined;
 	private nonce: BigNumber | undefined;
 	private fee: BigNumber | undefined;
-	private timestamp: number | undefined;
 	private passphrase: string = defaultPassphrase;
 	private passphraseList: string[] | undefined;
 	private passphrasePairs: IPassphrasePair[] | undefined;
@@ -148,12 +147,6 @@ export class TransactionFactory {
 
 	public withFee(fee: number): TransactionFactory {
 		this.fee = BigNumber.make(fee);
-
-		return this;
-	}
-
-	public withTimestamp(timestamp: number): TransactionFactory {
-		this.timestamp = timestamp;
 
 		return this;
 	}
@@ -303,10 +296,6 @@ export class TransactionFactory {
 
 			if (this.fee) {
 				this.builder.fee(this.fee.toFixed());
-			}
-
-			if (this.timestamp) {
-				this.builder.data.timestamp = this.timestamp;
 			}
 
 			if (this.expiration) {

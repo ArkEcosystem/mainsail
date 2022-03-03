@@ -24,12 +24,10 @@ export class Slots {
 
 	public getTime(time?: number): number {
 		if (time === undefined) {
-			time = dayjs().valueOf();
+			return dayjs().valueOf();
 		}
 
-		const start: number = dayjs(this.configuration.getMilestone(1).epoch).valueOf();
-
-		return Math.floor((time - start) / 1000);
+		return time;
 	}
 
 	public getTimeInMsUntilNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
@@ -44,15 +42,11 @@ export class Slots {
 			timestamp = this.getTime();
 		}
 
-		const latestHeight = this.getLatestHeight(height);
-
-		return this.getSlotInfo(getTimeStampForBlock, timestamp, latestHeight).slotNumber;
+		return this.getSlotInfo(getTimeStampForBlock, timestamp, this.getLatestHeight(height)).slotNumber;
 	}
 
 	public getSlotTime(getTimeStampForBlock: GetBlockTimeStampLookup, slot: number, height?: number): number {
-		const latestHeight = this.getLatestHeight(height);
-
-		return this.calculateSlotTime(slot, latestHeight, getTimeStampForBlock);
+		return this.calculateSlotTime(slot, this.getLatestHeight(height), getTimeStampForBlock);
 	}
 
 	public getNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
@@ -68,9 +62,7 @@ export class Slots {
 			timestamp = this.getTime();
 		}
 
-		const latestHeight = this.getLatestHeight(height);
-
-		return this.getSlotInfo(getTimeStampForBlock, timestamp, latestHeight).forgingStatus;
+		return this.getSlotInfo(getTimeStampForBlock, timestamp, this.getLatestHeight(height)).forgingStatus;
 	}
 
 	public getSlotInfo(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): SlotInfo {
@@ -168,11 +160,12 @@ export class Slots {
 			// TODO: is the config manager the best way to retrieve most recent height?
 			// Or should this class maintain its own cache?
 			const configConfiguredHeight = this.configuration.getHeight();
+
 			if (configConfiguredHeight) {
 				return configConfiguredHeight;
-			} else {
-				return 1;
 			}
+
+			return 1;
 		}
 
 		return height;

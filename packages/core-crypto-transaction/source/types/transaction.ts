@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionSchema } from "./schemas";
@@ -66,11 +66,7 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 			delete data.typeGroup;
 		}
 
-		if (data.version === 1) {
-			delete data.nonce;
-		} else {
-			delete data.timestamp;
-		}
+		delete data.timestamp;
 
 		return data;
 	}

@@ -60,7 +60,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	private headerSize(block: Contracts.Crypto.IBlockData): number {
 		return (
 			4 + // version
-			4 + // timestamp
+			8 + // timestamp
 			4 + // height
 			32 + // previousBlock
 			4 + // numberOfTransactions
@@ -81,15 +81,12 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		block.previousBlockHex = block.previousBlock;
 
 		buff.writeUint32(block.version);
-		buff.writeUint32(block.timestamp);
+		buff.writeUint64(block.timestamp);
 		buff.writeUint32(block.height);
 		buff.append(block.previousBlockHex, "hex");
 		buff.writeUint32(block.numberOfTransactions);
-		// The ByteBuffer types say we can't use strings but the code actually handles them.
 		buff.writeUint64(block.totalAmount.toString());
-		// The ByteBuffer types say we can't use strings but the code actually handles them.
 		buff.writeUint64(block.totalFee.toString());
-		// The ByteBuffer types say we can't use strings but the code actually handles them.
 		buff.writeUint64(block.reward.toString());
 		buff.writeUint32(block.payloadLength);
 		buff.append(block.payloadHash, "hex");

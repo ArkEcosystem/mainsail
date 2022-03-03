@@ -1,4 +1,3 @@
-import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as BaseContracts, Identifiers } from "@arkecosystem/core-contracts";
@@ -32,6 +31,7 @@ import { generateMnemonic } from "bip39";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
+import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -587,7 +587,7 @@ export class Command extends Commands.Command {
 			...(await this.buildVoteTransactions(validators, options.pubKeyHash)),
 		);
 
-		return this.createGenesisBlock(premineWallet.keys, transactions, 0);
+		return this.createGenesisBlock(premineWallet.keys, transactions, options);
 	}
 
 	private generateEnvironmentVariables(options: Options): string {
@@ -778,7 +778,7 @@ export class Command extends Commands.Command {
 		return transaction;
 	}
 
-	private async createGenesisBlock(keys: BaseContracts.Crypto.IKeyPair, transactions, timestamp: number) {
+	private async createGenesisBlock(keys: BaseContracts.Crypto.IKeyPair, transactions, options: Options) {
 		transactions = transactions.sort((a, b) => {
 			if (a.type === b.type) {
 				return a.amount - b.amount;
@@ -818,7 +818,7 @@ export class Command extends Commands.Command {
 			payloadLength,
 			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 			reward: "0",
-			timestamp,
+			timestamp: new Date(options.epoch).getTime(),
 			totalAmount: totalAmount.toString(),
 			totalFee: totalFee.toString(),
 			transactions,

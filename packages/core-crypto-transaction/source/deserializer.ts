@@ -41,20 +41,12 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 	}
 
 	public deserializeCommon(transaction: Contracts.Crypto.ITransactionData, buf: ByteBuffer): void {
-		// buf.skip(1); // Skip 0xFF marker
 		buf.jump(1); // Skip 0xFF marker
 		transaction.version = buf.readUInt8();
 		transaction.network = buf.readUInt8();
-
-		if (transaction.version === 1) {
-			transaction.type = buf.readUInt8();
-			transaction.timestamp = buf.readUInt32LE();
-		} else {
-			transaction.typeGroup = buf.readUInt32LE();
-			transaction.type = buf.readUInt16LE();
-			transaction.nonce = BigNumber.make(buf.readBigUInt64LE());
-		}
-
+		transaction.typeGroup = buf.readUInt32LE();
+		transaction.type = buf.readUInt16LE();
+		transaction.nonce = BigNumber.make(buf.readBigUInt64LE());
 		transaction.senderPublicKey = this.publicKeySerializer.deserialize(buf).toString("hex");
 		transaction.fee = BigNumber.make(buf.readBigUInt64LE().toString());
 		transaction.amount = BigNumber.ZERO;

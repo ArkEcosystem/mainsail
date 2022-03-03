@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -110,12 +110,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	public timestamp(timestamp: number): TBuilder {
-		this.data.timestamp = timestamp;
-
-		return this.instance();
-	}
-
 	public async sign(passphrase: string): Promise<TBuilder> {
 		const keys: Contracts.Crypto.IKeyPair = await this.keyPairFactory.fromMnemonic(passphrase);
 		return this.signWithKeyPair(keys);
@@ -151,18 +145,13 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			fee: this.data.fee,
 			id: await this.utils.getId(this.data),
 			network: this.data.network,
+			nonce: this.data.nonce,
 			senderPublicKey: this.data.senderPublicKey,
 			signature: this.data.signature,
 			type: this.data.type,
+			typeGroup: this.data.typeGroup,
 			version: this.data.version,
 		} as Contracts.Crypto.ITransactionData;
-
-		if (this.data.version === 1) {
-			struct.timestamp = this.data.timestamp;
-		} else {
-			struct.typeGroup = this.data.typeGroup;
-			struct.nonce = this.data.nonce;
-		}
 
 		if (Array.isArray(this.data.signatures)) {
 			struct.signatures = this.data.signatures;
@@ -213,7 +202,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		this.data = {
 			id: undefined,
 			nonce: BigNumber.ZERO,
-			timestamp: this.slots.getTime(),
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 0x01,
 		} as Contracts.Crypto.ITransactionData;

@@ -32,7 +32,6 @@ export const transactionBaseSchema: Record<string, any> = {
 			type: "array",
 			uniqueItems: true,
 		},
-		timestamp: { minimum: 0, type: "integer" },
 		typeGroup: { minimum: 0, type: "integer" },
 		version: { enum: [1, 2] },
 	},
