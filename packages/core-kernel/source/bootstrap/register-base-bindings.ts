@@ -2,8 +2,8 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 
-import { assert } from "../../utils";
-import { Bootstrapper } from "../interfaces";
+import { assert } from "../utils";
+import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {
@@ -12,7 +12,7 @@ export class RegisterBaseBindings implements Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
-		const { version } = require(resolve(__dirname, "../../../package.json"));
+		const { version } = require(resolve(__dirname, "../../package.json"));
 
 		assert.defined<Record<string, string>>(flags);
 

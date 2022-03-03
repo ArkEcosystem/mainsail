@@ -5,9 +5,9 @@ import envPaths from "env-paths";
 import { ensureDirSync } from "fs-extra";
 import { resolve } from "path";
 
-import { ConfigRepository } from "../../services/config";
-import { assert } from "../../utils";
-import { Bootstrapper } from "../interfaces";
+import { ConfigRepository } from "../services/config";
+import { assert } from "../utils";
+import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBasePaths implements Bootstrapper {

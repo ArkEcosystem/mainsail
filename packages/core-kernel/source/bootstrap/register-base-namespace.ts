@@ -1,7 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
 
-import { Bootstrapper } from "../interfaces";
+import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBaseNamespace implements Bootstrapper {

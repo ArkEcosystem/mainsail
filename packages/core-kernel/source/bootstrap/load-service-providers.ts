@@ -4,11 +4,11 @@ import { readJSONSync } from "fs-extra";
 import glob from "glob";
 import { join } from "path";
 
-import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../../providers";
-import { ConfigRepository } from "../../services/config";
-import { JsonObject } from "../../types";
-import { assert } from "../../utils";
-import { Bootstrapper } from "../interfaces";
+import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers";
+import { ConfigRepository } from "../services/config";
+import { JsonObject } from "../types";
+import { assert } from "../utils";
+import { Bootstrapper } from "./interfaces";
 
 interface PluginEntry {
 	package: string;

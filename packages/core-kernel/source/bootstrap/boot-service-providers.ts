@@ -1,10 +1,10 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
-import { BlockEvent, KernelEvent } from "../../enums";
-import { ServiceProviderRepository } from "../../providers";
-import { assert } from "../../utils";
-import { Bootstrapper } from "../interfaces";
+import { BlockEvent, KernelEvent } from "../enums";
+import { ServiceProviderRepository } from "../providers";
+import { assert } from "../utils";
+import { Bootstrapper } from "./interfaces";
 import { ChangeServiceProviderState } from "./listeners";
 
 // todo: review the implementation

@@ -1,7 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 import logProcessErrors from "log-process-errors";
 
-import { Bootstrapper } from "../interfaces";
+import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterErrorHandler implements Bootstrapper {

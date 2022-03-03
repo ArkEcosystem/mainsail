@@ -1,3 +1,4 @@
+import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as BaseContracts, Identifiers } from "@arkecosystem/core-contracts";
@@ -9,17 +10,17 @@ import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTime } from "@arkecosystem/core-crypto-time";
 import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
-import {
-	ValidatorRegistrationBuilder,
-	ServiceProvider as CoreCryptoTransactionValidatorRegistration,
-} from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@arkecosystem/core-crypto-transaction-validator-resignation";
 import { ServiceProvider as CoreCryptoTransactionMultiPayment } from "@arkecosystem/core-crypto-transaction-multi-payment";
 import { ServiceProvider as CoreCryptoTransactionMultiSignatureRegistration } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import {
 	ServiceProvider as CoreCryptoTransactionTransfer,
 	TransferBuilder,
 } from "@arkecosystem/core-crypto-transaction-transfer";
+import {
+	ServiceProvider as CoreCryptoTransactionValidatorRegistration,
+	ValidatorRegistrationBuilder,
+} from "@arkecosystem/core-crypto-transaction-validator-registration";
+import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@arkecosystem/core-crypto-transaction-validator-resignation";
 import { ServiceProvider as CoreCryptoTransactionVote, VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@arkecosystem/core-crypto-wif";
@@ -31,7 +32,6 @@ import { generateMnemonic } from "bip39";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
-import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -419,7 +419,6 @@ export class Command extends Commands.Command {
 			const configPath = flags.configPath ? flags.configPath : paths.config;
 
 			const coreConfigDestination = join(configPath, flags.network);
-			const cryptoConfigDestination = join(coreConfigDestination, "crypto");
 
 			const validators: any[] = await this.generateCoreValidators(flags.validators, flags.pubKeyHash);
 
@@ -428,18 +427,11 @@ export class Command extends Commands.Command {
 			await this.components.taskList([
 				{
 					task: async () => {
-						if (!flags.overwriteConfig) {
-							if (existsSync(coreConfigDestination)) {
-								throw new Error(`${coreConfigDestination} already exists.`);
-							}
-
-							if (existsSync(cryptoConfigDestination)) {
-								throw new Error(`${cryptoConfigDestination} already exists.`);
-							}
+						if (!flags.overwriteConfig && existsSync(coreConfigDestination)) {
+							throw new Error(`${coreConfigDestination} already exists.`);
 						}
 
 						ensureDirSync(coreConfigDestination);
-						ensureDirSync(cryptoConfigDestination);
 					},
 					title: `Prepare directories.`,
 				},
@@ -456,7 +448,7 @@ export class Command extends Commands.Command {
 						// Milestones
 						const milestones = this.generateCryptoMilestones(flags);
 
-						writeJSONSync(resolve(cryptoConfigDestination, "milestones.json"), milestones, {
+						writeJSONSync(resolve(coreConfigDestination, "milestones.json"), milestones, {
 							spaces: 4,
 						});
 
@@ -480,25 +472,15 @@ export class Command extends Commands.Command {
 						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, validators, flags);
 
 						writeJSONSync(
-							resolve(cryptoConfigDestination, "network.json"),
-							this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
-							{ spaces: 4 },
-						);
-
-						writeJSONSync(resolve(cryptoConfigDestination, "genesisBlock.json"), genesisBlock, {
-							spaces: 4,
-						});
-
-						writeFileSync(
-							resolve(cryptoConfigDestination, "index.ts"),
-							[
-								'import genesisBlock from "./genesisBlock.json";',
-								'import milestones from "./milestones.json";',
-								'import network from "./network.json";',
-								"",
-								`export const ${flags.network} = { genesisBlock, milestones, network };`,
-								"",
-							].join("\n"),
+							resolve(coreConfigDestination, "crypto.json"),
+							{
+								genesisBlock,
+								milestones,
+								network: this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
+							},
+							{
+								spaces: 4,
+							},
 						);
 					},
 					title: "Generate crypto network configuration.",

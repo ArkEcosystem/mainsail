@@ -27,7 +27,7 @@
 		"forger:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark forger:run",
 		"forger:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark forger:run",
 		"forger:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark forger:run -- --env=test",
-		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test",
+		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test --token=ark",
 		"relay:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark relay:run",
 		"relay:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark relay:run",
 		"relay:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark relay:run -- --env=test",

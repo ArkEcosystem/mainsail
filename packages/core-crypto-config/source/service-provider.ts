@@ -7,6 +7,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
+		// @TODO: this breaks during network config generation
 		// if (this.app.isBound(Identifiers.Crypto)) {
 		const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
 

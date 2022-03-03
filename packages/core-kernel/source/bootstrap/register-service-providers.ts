@@ -2,10 +2,10 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import semver from "semver";
 
-import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../../providers";
-import { ValidationManager } from "../../services/validation";
-import { assert } from "../../utils";
-import { Bootstrapper } from "../interfaces";
+import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../providers";
+import { ValidationManager } from "../services/validation";
+import { assert } from "../utils";
+import { Bootstrapper } from "./interfaces";
 
 // todo: review the implementation
 

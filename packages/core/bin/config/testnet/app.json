@@ -41,10 +41,10 @@
 				"package": "@arkecosystem/core-crypto-transaction"
 			},
 			{
-				"package": "@arkecosystem/core-crypto-transaction-delegate-registration"
+				"package": "@arkecosystem/core-crypto-transaction-validator-registration"
 			},
 			{
-				"package": "@arkecosystem/core-crypto-transaction-delegate-resignation"
+				"package": "@arkecosystem/core-crypto-transaction-validator-resignation"
 			},
 			{
 				"package": "@arkecosystem/core-crypto-transaction-multi-payment"

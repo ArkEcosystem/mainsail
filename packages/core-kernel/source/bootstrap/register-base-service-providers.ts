@@ -12,8 +12,8 @@ import {
 	Search,
 	Triggers,
 	Validation,
-} from "../../services";
-import { Bootstrapper } from "../interfaces";
+} from "../services";
+import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBaseServiceProviders implements Bootstrapper {

@@ -123,17 +123,11 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	private loadCryptography(): void {
-		const files: string[] = ["genesisBlock", "milestones", "network"];
-
-		for (const file of files) {
-			if (!existsSync(this.app.configPath(`crypto/${file}.json`))) {
-				return;
-			}
+		if (!existsSync(this.app.configPath("crypto.json"))) {
+			return;
 		}
 
-		for (const file of files) {
-			this.configRepository.set(`crypto.${file}`, this.loadFromLocation([`crypto/${file}.json`]));
-		}
+		this.configRepository.set("crypto", this.loadFromLocation(["crypto.json"]));
 	}
 
 	private loadFromLocation(files: string[]): KeyValuePair {
