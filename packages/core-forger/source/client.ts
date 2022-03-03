@@ -1,9 +1,10 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
+import { Codecs, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { Blocks, Interfaces } from "@arkecosystem/crypto";
 
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { RelayHost } from "./interfaces";
+import { nes } from "./nes";
 
 const MAX_PAYLOAD_CLIENT = 20 * 1024 * 1024; // allow large value of max payload communicating with relay
 
@@ -14,15 +15,14 @@ export class Client {
 
 	public hosts: RelayHost[] = [];
 
-	// @ts-ignore
 	private host: RelayHost;
 
 	public register(hosts: RelayHost[]) {
 		this.hosts = hosts.map((host: RelayHost) => {
 			const url = `ws://${Utils.IpAddress.normalizeAddress(host.hostname)}:${host.port}`;
 			const options = { ws: { maxPayload: MAX_PAYLOAD_CLIENT } };
-			const connection = new Nes.Client(url, options);
-			connection.connect().catch((e) => {}); // connect promise can fail when p2p is not ready, it's fine it will retry
+			const connection = new nes.Client(url, options);
+			connection.connect().catch((error) => {}); // connect promise can fail when p2p is not ready, it's fine it will retry
 
 			connection.onError = (e) => {
 				this.logger.error(e.message);
@@ -38,7 +38,7 @@ export class Client {
 
 	public dispose(): void {
 		for (const host of this.hosts) {
-			const socket: Nes.Client | undefined = host.socket;
+			const socket: any | undefined = host.socket;
 
 			if (socket) {
 				socket.disconnect();
@@ -88,7 +88,7 @@ export class Client {
 			return NetworkState.parse(
 				await this.emit<Contracts.P2P.NetworkState>("p2p.internal.getNetworkState", {}, 4000),
 			);
-		} catch (err) {
+		} catch {
 			return new NetworkState(NetworkStateStatus.Unknown);
 		}
 	}
@@ -117,14 +117,14 @@ export class Client {
 		}
 
 		try {
-			await this.emit("p2p.internal.emitEvent", { event, body });
-		} catch (error) {
+			await this.emit("p2p.internal.emitEvent", { body, event });
+		} catch {
 			this.logger.error(`Failed to emit "${event}" to "${host.hostname}:${host.port}"`);
 		}
 	}
 
 	public async selectHost(): Promise<void> {
-		for (let i = 0; i < 10; i++) {
+		for (let index = 0; index < 10; index++) {
 			for (const host of this.hosts) {
 				if (host.socket && host.socket._isReady()) {
 					this.host = host;
@@ -141,12 +141,12 @@ export class Client {
 			)}.`,
 		);
 
-		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join());
+		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join(","));
 	}
 
 	private async emit<T = object>(event: string, payload: Record<string, any> = {}, timeout = 4000): Promise<T> {
 		try {
-			Utils.assert.defined<Nes.Client>(this.host.socket);
+			Utils.assert.defined<any>(this.host.socket);
 
 			const codec = this.getCodec(event);
 
@@ -165,12 +165,12 @@ export class Client {
 
 	private getCodec(event: string) {
 		const codecs = {
+			"p2p.blocks.postBlock": Codecs.postBlock,
 			"p2p.internal.emitEvent": Codecs.emitEvent,
-			"p2p.internal.getUnconfirmedTransactions": Codecs.getUnconfirmedTransactions,
 			"p2p.internal.getCurrentRound": Codecs.getCurrentRound,
 			"p2p.internal.getNetworkState": Codecs.getNetworkState,
+			"p2p.internal.getUnconfirmedTransactions": Codecs.getUnconfirmedTransactions,
 			"p2p.internal.syncBlockchain": Codecs.syncBlockchain,
-			"p2p.blocks.postBlock": Codecs.postBlock,
 		};
 
 		return codecs[event];
