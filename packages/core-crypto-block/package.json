@@ -18,7 +18,6 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
-		"@arkecosystem/core-crypto-networks": "workspace:*",
 		"@arkecosystem/core-crypto-time": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
 		"@arkecosystem/core-errors": "workspace:*",
