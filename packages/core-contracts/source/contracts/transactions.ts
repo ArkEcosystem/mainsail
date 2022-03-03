@@ -95,11 +95,11 @@ export class InternalTransactionType {
 
 export enum TransactionType {
 	Transfer = 0,
-	DelegateRegistration = 2,
+	ValidatorRegistration = 2,
 	Vote = 3,
 	MultiSignature = 4,
 	MultiPayment = 6,
-	DelegateResignation = 7,
+	ValidatorResignation = 7,
 }
 
 export enum TransactionTypeGroup {

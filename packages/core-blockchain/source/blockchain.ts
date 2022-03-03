@@ -424,7 +424,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 	public async checkMissingBlocks(): Promise<void> {
 		this.missedBlocks++;
-		if (this.missedBlocks >= this.configuration.getMilestone().activeDelegates / 3 - 1 && Math.random() <= 0.8) {
+		if (this.missedBlocks >= this.configuration.getMilestone().activeValidators / 3 - 1 && Math.random() <= 0.8) {
 			this.resetMissedBlocks();
 
 			// do not check network health here more than every 10 minutes

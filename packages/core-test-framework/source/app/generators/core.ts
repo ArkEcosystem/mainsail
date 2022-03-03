@@ -20,8 +20,8 @@ export class CoreGenerator extends Generator {
 
 		this.writePeers();
 
-		// this.writeDelegates(
-		// 	this.generateCoreDelegates(this.options.crypto.flags.delegates, this.options.crypto.flags.pubKeyHash),
+		// this.writeValidators(
+		// 	this.generateCoreValidators(this.options.crypto.flags.validators, this.options.crypto.flags.pubKeyHash),
 		// );
 
 		this.writeEnvironment();
@@ -32,7 +32,7 @@ export class CoreGenerator extends Generator {
 			root: this.destination,
 			env: resolve(this.destination, ".env"),
 			app: resolve(this.destination, "app.json"),
-			delegates: resolve(this.destination, "delegates.json"),
+			validators: resolve(this.destination, "validators.json"),
 			peers: resolve(this.destination, "peers.json"),
 		};
 	}
@@ -47,13 +47,13 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-	// private writeDelegates(delegates): void {
-	// 	const filePath: string = resolve(this.destination, "delegates.json");
+	// private writeValidators(validators): void {
+	// 	const filePath: string = resolve(this.destination, "validators.json");
 
-	// 	if (this.options.core.delegates) {
-	// 		writeJSONSync(filePath, this.options.core.delegates, { spaces: 4 });
+	// 	if (this.options.core.validators) {
+	// 		writeJSONSync(filePath, this.options.core.validators, { spaces: 4 });
 	// 	} else {
-	// 		writeJSONSync(filePath, { secrets: delegates.map((d) => d.passphrase) }, { spaces: 4 });
+	// 		writeJSONSync(filePath, { secrets: validators.map((d) => d.passphrase) }, { spaces: 4 });
 	// 	}
 	// }
 

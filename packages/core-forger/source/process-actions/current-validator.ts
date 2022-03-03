@@ -5,11 +5,11 @@ import { injectable, inject } from "@arkecosystem/core-container";
 import { ForgerService } from "../forger-service";
 
 @injectable()
-export class CurrentDelegateProcessAction implements Contracts.Kernel.ProcessAction {
+export class CurrentValidatorProcessAction implements Contracts.Kernel.ProcessAction {
 	@inject(Identifiers.ForgerService)
 	private readonly forger!: ForgerService;
 
-	public name = "forger.currentDelegate";
+	public name = "forger.currentValidator";
 
 	public async handler() {
 		const round = this.forger.getRound();
@@ -18,9 +18,9 @@ export class CurrentDelegateProcessAction implements Contracts.Kernel.ProcessAct
 
 		return {
 			// @ts-ignore
-			rank: round.currentForger.delegate.rank,
+			rank: round.currentForger.validator.rank,
 			// @ts-ignore
-			username: round.currentForger.delegate.username,
+			username: round.currentForger.validator.username,
 		};
 	}
 }

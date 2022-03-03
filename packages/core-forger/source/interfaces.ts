@@ -9,7 +9,7 @@ export interface RelayHost {
 	socket?: Nes.Client;
 }
 
-export interface Delegate {
+export interface Validator {
 	keys: Crypto.IKeyPair | undefined;
 
 	publicKey: string;

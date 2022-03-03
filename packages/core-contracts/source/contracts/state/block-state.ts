@@ -12,7 +12,7 @@ export interface BlockState {
 
 	revertTransaction(transaction: ITransaction): Promise<void>;
 
-	increaseWalletDelegateVoteBalance(wallet: Wallet, amount: BigNumber): void;
+	increaseWalletValidatorVoteBalance(wallet: Wallet, amount: BigNumber): void;
 
-	decreaseWalletDelegateVoteBalance(wallet: Wallet, amount: BigNumber): void;
+	decreaseWalletValidatorVoteBalance(wallet: Wallet, amount: BigNumber): void;
 }

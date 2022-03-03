@@ -20,11 +20,11 @@ export const defaults = {
 		minFeeBroadcast: 3000,
 		addonBytes: {
 			transfer: 100,
-			delegateRegistration: 400000,
+			validatorRegistration: 400000,
 			vote: 100,
 			multiSignature: 500,
 			multiPayment: 500,
-			delegateResignation: 100,
+			validatorResignation: 100,
 		},
 	},
 	workerPool: {

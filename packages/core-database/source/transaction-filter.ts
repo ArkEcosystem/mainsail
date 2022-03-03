@@ -131,17 +131,21 @@ export class TransactionFilter implements Contracts.Database.TransactionFilter {
 
 		const recipientWallet = this.walletRepository.findByAddress(criteria);
 		if (recipientWallet && recipientWallet.getPublicKey()) {
-			const delegateRegistrationExpression: Contracts.Search.AndExpression<Transaction> = {
+			const validatorRegistrationExpression: Contracts.Search.AndExpression<Transaction> = {
 				expressions: [
 					{ op: "equal", property: "typeGroup", value: Crypto.TransactionTypeGroup.Core },
-					{ op: "equal", property: "type", value: Crypto.TransactionType.DelegateRegistration },
+					{ op: "equal", property: "type", value: Crypto.TransactionType.ValidatorRegistration },
 					{ op: "equal", property: "senderPublicKey", value: recipientWallet.getPublicKey() },
 				],
 				op: "and",
 			};
 
 			return {
-				expressions: [recipientIdExpression, multipaymentRecipientIdExpression, delegateRegistrationExpression],
+				expressions: [
+					recipientIdExpression,
+					multipaymentRecipientIdExpression,
+					validatorRegistrationExpression,
+				],
 				op: "or",
 			};
 		} else {

@@ -1,21 +1,21 @@
 import { IBlockData } from "../crypto";
-import { WalletData, WalletDelegateAttributes } from "../state";
+import { WalletData, WalletValidatorAttributes } from "../state";
 
 export interface Response<T> {
 	data: T;
 }
 
-export interface DelegateWallet extends WalletData {
-	delegate: WalletDelegateAttributes;
+export interface ValidatorWallet extends WalletData {
+	validator: WalletValidatorAttributes;
 }
 
 export interface CurrentRound {
 	current: number;
 	reward: string;
 	timestamp: number;
-	delegates: DelegateWallet[];
-	currentForger: DelegateWallet;
-	nextForger: DelegateWallet;
+	validators: ValidatorWallet[];
+	currentForger: ValidatorWallet;
+	nextForger: ValidatorWallet;
 	lastBlock: IBlockData;
 	canForge: boolean;
 }

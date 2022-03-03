@@ -14,14 +14,14 @@ export class StandardCriteriaService {
 				//
 				// Example:
 				// [
-				//   { type: Enums.TransactionType.DelegateRegistration },
+				//   { type: Enums.TransactionType.ValidatorRegistration },
 				//   { type: Enums.TransactionType.Vote }
 				// ]
 				//
 				// Alternatively (behaves same as above):
 				// {
 				//   type: [
-				//     Enums.TransactionType.DelegateRegistration,
+				//     Enums.TransactionType.ValidatorRegistration,
 				//     Enums.TransactionType.Vote
 				//   ]
 				// }

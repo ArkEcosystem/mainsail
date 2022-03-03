@@ -5,7 +5,7 @@ import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Client } from "./client";
 import { HostNoResponseError, RelayCommunicationError } from "@arkecosystem/core-contracts";
-import { Delegate } from "./interfaces";
+import { Validator } from "./interfaces";
 
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
 @injectable()
@@ -27,7 +27,7 @@ export class ForgerService {
 
 	private client!: Client;
 
-	private delegates: Delegate[] = [];
+	private validators: Validator[] = [];
 
 	private usernames: { [key: string]: string } = {};
 
@@ -58,12 +58,12 @@ export class ForgerService {
 		this.client.register(options.hosts);
 	}
 
-	public async boot(delegates: Delegate[]): Promise<void> {
+	public async boot(validators: Validator[]): Promise<void> {
 		if (this.handlerProvider.isRegistrationRequired()) {
 			this.handlerProvider.registerHandlers();
 		}
 
-		this.delegates = delegates;
+		this.validators = validators;
 
 		let timeout = 2000;
 		try {
@@ -100,16 +100,16 @@ export class ForgerService {
 
 			AppUtils.assert.defined<string>(this.round.currentForger.publicKey);
 
-			const delegate: Delegate | undefined = this.isActiveDelegate(this.round.currentForger.publicKey);
+			const validator: Validator | undefined = this.isActiveValidator(this.round.currentForger.publicKey);
 
-			if (!delegate) {
+			if (!validator) {
 				AppUtils.assert.defined<string>(this.round.nextForger.publicKey);
 
-				if (this.isActiveDelegate(this.round.nextForger.publicKey)) {
+				if (this.isActiveValidator(this.round.nextForger.publicKey)) {
 					const username = this.usernames[this.round.nextForger.publicKey];
 
 					this.logger.info(
-						`Next forging delegate ${username} (${this.round.nextForger.publicKey}) is active on this node.`,
+						`Next forging validator ${username} (${this.round.nextForger.publicKey}) is active on this node.`,
 					);
 
 					await this.client.syncWithNetwork();
@@ -131,11 +131,11 @@ export class ForgerService {
 			if (
 				await this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("isForgingAllowed", { delegate, forgerService: this, networkState })
+					.call("isForgingAllowed", { validator, forgerService: this, networkState })
 			) {
 				await this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("forgeNewBlock", { delegate, forgerService: this, networkState, round: this.round });
+					.call("forgeNewBlock", { validator, forgerService: this, networkState, round: this.round });
 			}
 
 			this.logAppReady = true;
@@ -169,7 +169,7 @@ export class ForgerService {
 	}
 
 	public async forgeNewBlock(
-		delegate: Delegate,
+		validator: Validator,
 		round: Contracts.P2P.CurrentRound,
 		networkState: Contracts.P2P.NetworkState,
 	): Promise<void> {
@@ -178,7 +178,7 @@ export class ForgerService {
 
 		const transactions: Crypto.ITransactionData[] = await this.getTransactionsForForging();
 
-		const block: Crypto.IBlock | undefined = await delegate.forge(transactions, {
+		const block: Crypto.IBlock | undefined = await validator.forge(transactions, {
 			previousBlock: {
 				height: networkState.getNodeHeight(),
 				id: networkState.getLastBlockId(),
@@ -189,14 +189,14 @@ export class ForgerService {
 		});
 
 		AppUtils.assert.defined<Crypto.IBlock>(block);
-		AppUtils.assert.defined<string>(delegate.publicKey);
+		AppUtils.assert.defined<string>(validator.publicKey);
 
 		const minimumMs = 2000;
 		const timeLeftInMs: number = this.getRoundRemainingSlotTime(round);
-		const prettyName = `${this.usernames[delegate.publicKey]} (${delegate.publicKey})`;
+		const prettyName = `${this.usernames[validator.publicKey]} (${validator.publicKey})`;
 
 		if (timeLeftInMs >= minimumMs) {
-			this.logger.info(`Forged new block ${block.data.id} by delegate ${prettyName}`);
+			this.logger.info(`Forged new block ${block.data.id} by validator ${prettyName}`);
 
 			await this.client.broadcastBlock(block);
 
@@ -208,10 +208,10 @@ export class ForgerService {
 			}
 		} else if (timeLeftInMs > 0) {
 			this.logger.warning(
-				`Failed to forge new block by delegate ${prettyName}, because there were ${timeLeftInMs}ms left in the current slot (less than ${minimumMs}ms).`,
+				`Failed to forge new block by validator ${prettyName}, because there were ${timeLeftInMs}ms left in the current slot (less than ${minimumMs}ms).`,
 			);
 		} else {
-			this.logger.warning(`Failed to forge new block by delegate ${prettyName}, because already in next slot.`);
+			this.logger.warning(`Failed to forge new block by validator ${prettyName}, because already in next slot.`);
 		}
 	}
 
@@ -236,7 +236,7 @@ export class ForgerService {
 		return transactions;
 	}
 
-	public isForgingAllowed(networkState: Contracts.P2P.NetworkState, delegate: Delegate): boolean {
+	public isForgingAllowed(networkState: Contracts.P2P.NetworkState, validator: Validator): boolean {
 		switch (networkState.status) {
 			case NetworkStateStatus.Unknown: {
 				this.logger.info("Failed to get network state from client. Will not forge.");
@@ -266,13 +266,13 @@ export class ForgerService {
 			);
 
 			for (const overHeightBlockHeader of overHeightBlockHeaders) {
-				if (overHeightBlockHeader.generatorPublicKey === delegate.publicKey) {
-					AppUtils.assert.defined<string>(delegate.publicKey);
+				if (overHeightBlockHeader.generatorPublicKey === validator.publicKey) {
+					AppUtils.assert.defined<string>(validator.publicKey);
 
-					const username: string = this.usernames[delegate.publicKey];
+					const username: string = this.usernames[validator.publicKey];
 
 					this.logger.warning(
-						`Possible double forging delegate: ${username} (${delegate.publicKey}) - Block: ${overHeightBlockHeader.id}.`,
+						`Possible double forging validator: ${username} (${validator.publicKey}) - Block: ${overHeightBlockHeader.id}.`,
 					);
 				}
 			}
@@ -288,27 +288,27 @@ export class ForgerService {
 		return true;
 	}
 
-	private isActiveDelegate(publicKey: string): Delegate | undefined {
-		return this.delegates.find((delegate) => delegate.publicKey === publicKey);
+	private isActiveValidator(publicKey: string): Validator | undefined {
+		return this.validators.find((validator) => validator.publicKey === publicKey);
 	}
 
 	private async loadRound(): Promise<void> {
 		this.round = await this.client.getRound();
 
-		this.usernames = this.round.delegates.reduce((accumulator, wallet) => {
+		this.usernames = this.round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
 
 			return Object.assign(accumulator, {
-				[wallet.publicKey]: wallet.delegate.username,
+				[wallet.publicKey]: wallet.validator.username,
 			});
 		}, {});
 
 		if (!this.initialized) {
-			this.printLoadedDelegates();
+			this.printLoadedValidators();
 
 			// @ts-ignore
 			this.client.emitEvent(Enums.ForgerEvent.Started, {
-				activeDelegates: this.delegates.map((delegate) => delegate.publicKey),
+				activeValidators: this.validators.map((validator) => validator.publicKey),
 			});
 
 			this.logger.info(`Forger Manager started.`);
@@ -321,16 +321,16 @@ export class ForgerService {
 		setTimeout(() => this.checkSlot(), timeout);
 	}
 
-	private printLoadedDelegates(): void {
-		const activeDelegates: Delegate[] = this.delegates.filter((delegate) => {
-			AppUtils.assert.defined<string>(delegate.publicKey);
+	private printLoadedValidators(): void {
+		const activeValidators: Validator[] = this.validators.filter((validator) => {
+			AppUtils.assert.defined<string>(validator.publicKey);
 
-			return this.usernames.hasOwnProperty(delegate.publicKey);
+			return this.usernames.hasOwnProperty(validator.publicKey);
 		});
 
-		if (activeDelegates.length > 0) {
+		if (activeValidators.length > 0) {
 			this.logger.info(
-				`Loaded ${AppUtils.pluralize("active delegate", activeDelegates.length, true)}: ${activeDelegates
+				`Loaded ${AppUtils.pluralize("active validator", activeValidators.length, true)}: ${activeValidators
 					.map(({ publicKey }) => {
 						AppUtils.assert.defined<string>(publicKey);
 
@@ -340,17 +340,17 @@ export class ForgerService {
 			);
 		}
 
-		if (this.delegates.length > activeDelegates.length) {
-			const inactiveDelegates: (string | undefined)[] = this.delegates
-				.filter((delegate) => !activeDelegates.includes(delegate))
-				.map((delegate) => delegate.publicKey);
+		if (this.validators.length > activeValidators.length) {
+			const inactiveValidators: (string | undefined)[] = this.validators
+				.filter((validator) => !activeValidators.includes(validator))
+				.map((validator) => validator.publicKey);
 
 			this.logger.info(
 				`Loaded ${AppUtils.pluralize(
-					"inactive delegate",
-					inactiveDelegates.length,
+					"inactive validator",
+					inactiveValidators.length,
 					true,
-				)}: ${inactiveDelegates.join(", ")}`,
+				)}: ${inactiveValidators.join(", ")}`,
 			);
 		}
 	}

@@ -10,7 +10,7 @@ export abstract class Generator {
 		crypto: {
 			flags: {
 				blocktime: 8,
-				delegates: 51,
+				validators: 51,
 				distribute: true,
 				explorer: "http://uexplorer.ark.io",
 				maxBlockPayload: 2_097_152,
@@ -33,14 +33,14 @@ export abstract class Generator {
 		}
 	}
 
-	// protected generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Wallet[] {
+	// protected generateCoreValidators(activeValidators: number, pubKeyHash: number): Wallet[] {
 	// 	const wallets: Wallet[] = [];
 
-	// 	for (let index = 0; index < activeDelegates; index++) {
-	// 		const delegateWallet: Wallet = this.createWallet(pubKeyHash, passphrases[index]);
-	// 		delegateWallet.username = `genesis_${index + 1}`;
+	// 	for (let index = 0; index < activeValidators; index++) {
+	// 		const validatorWallet: Wallet = this.createWallet(pubKeyHash, passphrases[index]);
+	// 		validatorWallet.username = `genesis_${index + 1}`;
 
-	// 		wallets.push(delegateWallet);
+	// 		wallets.push(validatorWallet);
 	// 	}
 
 	// 	return wallets;

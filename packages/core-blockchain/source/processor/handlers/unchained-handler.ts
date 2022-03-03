@@ -51,11 +51,11 @@ export class UnchainedHandler implements BlockHandler {
 					this.configuration,
 				);
 
-				const delegates: Contracts.State.Wallet[] = await this.triggers.call("getActiveDelegates", {
+				const validators: Contracts.State.Wallet[] = await this.triggers.call("getActiveValidators", {
 					roundInfo,
 				});
 
-				if (delegates.some((delegate) => delegate.getPublicKey() === block.data.generatorPublicKey)) {
+				if (validators.some((validator) => validator.getPublicKey() === block.data.generatorPublicKey)) {
 					return BlockProcessorResult.Rollback;
 				}
 
@@ -104,7 +104,7 @@ export class UnchainedHandler implements BlockHandler {
 			}
 
 			this.logger.info(
-				`Forked block disregarded because it is not allowed to be forged. Caused by delegate: ${block.data.generatorPublicKey}`,
+				`Forked block disregarded because it is not allowed to be forged. Caused by validator: ${block.data.generatorPublicKey}`,
 			);
 
 			return UnchainedBlockStatus.GeneratorMismatch;

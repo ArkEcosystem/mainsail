@@ -9,7 +9,7 @@ import wif from "wif";
 export class Command extends Commands.Command {
 	public signature = "config:forger:bip38";
 
-	public description = "Configure the forging delegate (BIP38).";
+	public description = "Configure the forging validator (BIP38).";
 
 	public isHidden = true;
 
@@ -17,7 +17,7 @@ export class Command extends Commands.Command {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("network", "The name of the network.", Joi.string())
-			.setFlag("bip39", "A delegate plain text passphrase. Referred to as BIP39.", Joi.string())
+			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
@@ -29,7 +29,7 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				message: "Please enter your delegate plain text passphrase. Referred to as BIP39.",
+				message: "Please enter your validator plain text passphrase. Referred to as BIP39.",
 				name: "bip39",
 				type: "password",
 				validate: (value) =>
@@ -93,17 +93,17 @@ export class Command extends Commands.Command {
 			},
 			// {
 			// 	task: () => {
-			// 		const delegatesConfig = this.app.getCorePath("config", "delegates.json");
+			// 		const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
-			// 		const delegates = require(delegatesConfig);
-			// 		delegates.bip38 = Crypto.bip38.encrypt(
+			// 		const validators = require(validatorsConfig);
+			// 		validators.bip38 = Crypto.bip38.encrypt(
 			// 			decodedWIF.privateKey,
 			// 			decodedWIF.compressed,
 			// 			flags.password,
 			// 		);
-			// 		delegates.secrets = [];
+			// 		validators.secrets = [];
 
-			// 		writeJSONSync(delegatesConfig, delegates);
+			// 		writeJSONSync(validatorsConfig, validators);
 			// 	},
 			// 	title: "Encrypting BIP39 passphrase.",
 			// },

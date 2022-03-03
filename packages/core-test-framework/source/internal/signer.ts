@@ -2,7 +2,7 @@ import { inject } from "@arkecosystem/core-container";
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { DelegateRegistrationBuilder } from "../../../core-crypto-transaction-delegate-registration/source";
+import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration/source";
 import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment/source";
 import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration/source";
 import { TransferBuilder } from "../../../core-crypto-transaction-transfer/source";
@@ -40,9 +40,9 @@ export class Signer {
 		return transaction.getStruct();
 	}
 
-	public async makeDelegate(options: Record<string, any>) {
-		const transaction = await new DelegateRegistrationBuilder()
-			.fee(this.toSatoshi(options.delegateFee))
+	public async makeValidator(options: Record<string, any>) {
+		const transaction = await new ValidatorRegistrationBuilder()
+			.fee(this.toSatoshi(options.validatorFee))
 			.nonce(this.nonce.toString())
 			.usernameAsset(options.username)
 			.sign(options.passphrase);
@@ -55,7 +55,7 @@ export class Signer {
 		const transaction = await new VoteBuilder()
 			.fee(this.toSatoshi(options.voteFee))
 			.nonce(this.nonce.toString())
-			.votesAsset([`+${options.delegate}`])
+			.votesAsset([`+${options.validator}`])
 			.sign(options.passphrase);
 
 		this.incrementNonce();

@@ -3,8 +3,8 @@ import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { DelegateRegistrationBuilder } from "../../../core-crypto-transaction-delegate-registration/source";
-import { DelegateResignationBuilder } from "../../../core-crypto-transaction-delegate-resignation/source";
+import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration/source";
+import { ValidatorResignationBuilder } from "../../../core-crypto-transaction-validator-resignation/source";
 import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment/source";
 import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration/source";
 import { TransferBuilder } from "../../../core-crypto-transaction-transfer/source";
@@ -74,8 +74,8 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public delegateRegistration(username?: string): TransactionFactory {
-		const builder = new DelegateRegistrationBuilder();
+	public validatorRegistration(username?: string): TransactionFactory {
+		const builder = new ValidatorRegistrationBuilder();
 
 		if (username) {
 			builder.usernameAsset(username);
@@ -86,8 +86,8 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public delegateResignation(): TransactionFactory {
-		this.builder = new DelegateResignationBuilder();
+	public validatorResignation(): TransactionFactory {
+		this.builder = new ValidatorResignationBuilder();
 
 		return this;
 	}
@@ -285,11 +285,11 @@ export class TransactionFactory {
 			}
 
 			if (
-				this.builder.constructor.name === "DelegateRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
+				this.builder.constructor.name === "ValidatorRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
 				// always remember the previous username instead generating a new one on each iteration
-				!this.builder.data.asset.delegate.username
+				!this.builder.data.asset.validator.username
 			) {
-				this.builder = new DelegateRegistrationBuilder().usernameAsset(this.getRandomUsername());
+				this.builder = new ValidatorRegistrationBuilder().usernameAsset(this.getRandomUsername());
 			}
 
 			if (this.version) {

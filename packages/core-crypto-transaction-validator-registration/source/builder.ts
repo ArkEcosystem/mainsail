@@ -3,26 +3,26 @@ import { Crypto } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { DelegateRegistrationTransaction } from "./versions/1";
+import { ValidatorRegistrationTransaction } from "./versions/1";
 
 @injectable()
-export class DelegateRegistrationBuilder extends TransactionBuilder<DelegateRegistrationBuilder> {
+export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRegistrationBuilder> {
 	@postConstruct()
 	public postConstruct() {
 		this.initializeData();
 
-		this.data.type = DelegateRegistrationTransaction.type;
-		this.data.typeGroup = DelegateRegistrationTransaction.typeGroup;
-		this.data.fee = DelegateRegistrationTransaction.staticFee(this.configuration);
+		this.data.type = ValidatorRegistrationTransaction.type;
+		this.data.typeGroup = ValidatorRegistrationTransaction.typeGroup;
+		this.data.fee = ValidatorRegistrationTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;
-		this.data.asset = { delegate: {} } as Crypto.ITransactionAsset;
+		this.data.asset = { validator: {} } as Crypto.ITransactionAsset;
 	}
 
-	public usernameAsset(username: string): DelegateRegistrationBuilder {
-		if (this.data.asset && this.data.asset.delegate) {
-			this.data.asset.delegate.username = username;
+	public usernameAsset(username: string): ValidatorRegistrationBuilder {
+		if (this.data.asset && this.data.asset.validator) {
+			this.data.asset.validator.username = username;
 		}
 
 		return this;
@@ -36,7 +36,7 @@ export class DelegateRegistrationBuilder extends TransactionBuilder<DelegateRegi
 		return struct;
 	}
 
-	protected instance(): DelegateRegistrationBuilder {
+	protected instance(): ValidatorRegistrationBuilder {
 		return this;
 	}
 }

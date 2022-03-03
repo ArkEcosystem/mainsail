@@ -111,8 +111,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			if (claimedHeight < this.ourHeight()) {
 				const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight, this.configuration);
-				const delegates = await this.getDelegatesByRound(roundInfo);
-				if (this.verifyPeerBlock(blockHeader, claimedHeight, delegates)) {
+				const validators = await this.getValidatorsByRound(roundInfo);
+				if (this.verifyPeerBlock(blockHeader, claimedHeight, validators)) {
 					return true;
 				}
 			} else {
@@ -298,15 +298,15 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 	private async verifyPeerBlocks(startHeight: number, claimedHeight: number, deadline: number): Promise<boolean> {
 		const roundInfo = Utils.roundCalculator.calculateRound(startHeight, this.configuration);
-		const { maxDelegates, roundHeight } = roundInfo;
-		const lastBlockHeightInRound = roundHeight + maxDelegates - 1;
+		const { maxValidators, roundHeight } = roundInfo;
+		const lastBlockHeightInRound = roundHeight + maxValidators - 1;
 
 		// Verify a few blocks that are not too far up from the last common block. Within the
 		// same round as the last common block or in the next round if the last common block is
-		// the last block in a round (so that the delegates calculations are still the same for
+		// the last block in a round (so that the validators calculations are still the same for
 		// both chains).
 
-		const delegates = await this.getDelegatesByRound(roundInfo);
+		const validators = await this.getValidatorsByRound(roundInfo);
 
 		const hisBlocksByHeight = {};
 
@@ -326,7 +326,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 			assert(hisBlocksByHeight[height] !== undefined);
 
-			if (!this.verifyPeerBlock(hisBlocksByHeight[height], height, delegates)) {
+			if (!this.verifyPeerBlock(hisBlocksByHeight[height], height, validators)) {
 				return false;
 			}
 		}
@@ -334,30 +334,30 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return true;
 	}
 
-	private async getDelegatesByRound(
+	private async getValidatorsByRound(
 		roundInfo: Contracts.Shared.RoundInfo,
 	): Promise<Record<string, Contracts.State.Wallet>> {
-		let delegates: any = await this.app
+		let validators: any = await this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.call("getActiveDelegates", { roundInfo });
+			.call("getActiveValidators", { roundInfo });
 
-		if (delegates.length === 0) {
+		if (validators.length === 0) {
 			// This must be the current round, still not saved into the database (it is saved
-			// only after it has completed). So fetch the list of delegates from the wallet
+			// only after it has completed). So fetch the list of validators from the wallet
 			// manager.
 			// ! looks like DoS attack vector
 			const dposRound = this.dposState.getRoundInfo();
 			assert.strictEqual(dposRound.round, roundInfo.round);
-			assert.strictEqual(dposRound.maxDelegates, roundInfo.maxDelegates);
-			delegates = [...this.dposState.getRoundDelegates()];
+			assert.strictEqual(dposRound.maxValidators, roundInfo.maxValidators);
+			validators = [...this.dposState.getRoundValidators()];
 		}
 
-		const delegatesByPublicKey: Record<string, Contracts.State.Wallet> = {};
-		for (const delegate of delegates) {
-			Utils.assert.defined<string>(delegate.getPublicKey());
-			delegatesByPublicKey[delegate.getPublicKey()!] = delegate;
+		const validatorsByPublicKey: Record<string, Contracts.State.Wallet> = {};
+		for (const validator of validators) {
+			Utils.assert.defined<string>(validator.getPublicKey());
+			validatorsByPublicKey[validator.getPublicKey()!] = validator;
 		}
-		return delegatesByPublicKey;
+		return validatorsByPublicKey;
 	}
 
 	private async fetchBlocksFromHeight({
@@ -409,7 +409,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	private async verifyPeerBlock(
 		blockData: Crypto.IBlockData,
 		expectedHeight: number,
-		delegatesByPublicKey: Record<string, Contracts.State.Wallet>,
+		validatorsByPublicKey: Record<string, Contracts.State.Wallet>,
 	): Promise<boolean> {
 		const block: Crypto.IBlock | undefined = await this.blockFactory.fromData(blockData);
 
@@ -433,7 +433,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return false;
 		}
 
-		if (delegatesByPublicKey[block.data.generatorPublicKey]) {
+		if (validatorsByPublicKey[block.data.generatorPublicKey]) {
 			this.log(
 				Severity.DEBUG_EXTRA,
 				`successfully verified block at height ${height}, signed by ` + block.data.generatorPublicKey,
@@ -444,9 +444,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		this.log(
 			Severity.DEBUG_EXTRA,
-			`failure: block ${this.anyToString(blockData)} is not signed by any of the delegates ` +
+			`failure: block ${this.anyToString(blockData)} is not signed by any of the validators ` +
 				`for the corresponding round: ` +
-				this.anyToString(Object.values(delegatesByPublicKey)),
+				this.anyToString(Object.values(validatorsByPublicKey)),
 		);
 
 		return false;

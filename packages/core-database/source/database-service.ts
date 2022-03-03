@@ -196,12 +196,12 @@ export class DatabaseService {
 		return await this.roundRepository.getRound(round);
 	}
 
-	public async saveRound(activeDelegates: readonly Contracts.State.Wallet[]): Promise<void> {
-		this.logger.info(`Saving round ${activeDelegates[0].getAttribute("delegate.round").toLocaleString()}`);
+	public async saveRound(activeValidators: readonly Contracts.State.Wallet[]): Promise<void> {
+		this.logger.info(`Saving round ${activeValidators[0].getAttribute("validator.round").toLocaleString()}`);
 
-		await this.roundRepository.save(activeDelegates);
+		await this.roundRepository.save(activeValidators);
 
-		this.events.dispatch(Enums.RoundEvent.Created, activeDelegates);
+		this.events.dispatch(Enums.RoundEvent.Created, activeValidators);
 	}
 
 	public async deleteRound(round: number): Promise<void> {

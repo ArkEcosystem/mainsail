@@ -94,11 +94,11 @@ export class DatabaseInteraction {
 	}
 
 	// TODO: Remove
-	public async getActiveDelegates(
+	public async getActiveValidators(
 		roundInfo?: Contracts.Shared.RoundInfo,
-		delegates?: Contracts.State.Wallet[],
+		validators?: Contracts.State.Wallet[],
 	): Promise<Contracts.State.Wallet[]> {
-		return this.roundState.getActiveDelegates(roundInfo, delegates);
+		return this.roundState.getActiveValidators(roundInfo, validators);
 	}
 
 	private async reset(): Promise<void> {

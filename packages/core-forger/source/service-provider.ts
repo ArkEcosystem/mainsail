@@ -4,16 +4,16 @@ import Joi from "joi";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
 import { DELEGATE_FACTORY } from "./bindings";
-import { DelegateFactory } from "./delegate-factory";
-import { DelegateTracker } from "./delegate-tracker";
+import { ValidatorFactory } from "./validator-factory";
+import { ValidatorTracker } from "./validator-tracker";
 import { ForgerService } from "./forger-service";
-import { Delegate } from "./interfaces";
-import { CurrentDelegateProcessAction, LastForgedBlockRemoteAction, NextSlotProcessAction } from "./process-actions";
+import { Validator } from "./interfaces";
+import { CurrentValidatorProcessAction, LastForgedBlockRemoteAction, NextSlotProcessAction } from "./process-actions";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ForgerService).to(ForgerService).inSingletonScope();
-		this.app.bind(DELEGATE_FACTORY).to(DelegateFactory).inSingletonScope();
+		this.app.bind(DELEGATE_FACTORY).to(ValidatorFactory).inSingletonScope();
 
 		this.registerActions();
 
@@ -21,14 +21,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		const delegates: Delegate[] = await this.makeDelegates();
+		const validators: Validator[] = await this.makeValidators();
 
 		const forgerService = this.app.get<ForgerService>(Identifiers.ForgerService);
 
 		forgerService.register(this.config().all());
-		await forgerService.boot(delegates);
+		await forgerService.boot(validators);
 
-		this.startTracker(delegates);
+		this.startTracker(validators);
 
 		// // Don't keep bip38 password in memory
 		// this.config().set("app.flags.bip38", undefined);
@@ -40,7 +40,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async bootWhen(): Promise<boolean> {
-		const { secrets, bip38 }: { secrets: string[]; bip38: string } = this.app.config("delegates")!;
+		const { secrets, bip38 }: { secrets: string[]; bip38: string } = this.app.config("validators")!;
 
 		if (!bip38 && (!secrets || secrets.length === 0 || !Array.isArray(secrets))) {
 			return false;
@@ -82,7 +82,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	private registerProcessActions(): void {
 		this.app
 			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
-			.register(this.app.resolve(CurrentDelegateProcessAction));
+			.register(this.app.resolve(CurrentValidatorProcessAction));
 
 		this.app
 			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
@@ -93,8 +93,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.register(this.app.resolve(LastForgedBlockRemoteAction));
 	}
 
-	private startTracker(delegates: Delegate[]): void {
-		if (!Array.isArray(delegates) || delegates.length === 0) {
+	private startTracker(validators: Validator[]): void {
+		if (!Array.isArray(validators) || validators.length === 0) {
 			return;
 		}
 
@@ -103,24 +103,24 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)
 				.listen(
 					Enums.BlockEvent.Applied,
-					this.app.resolve<DelegateTracker>(DelegateTracker).initialize(delegates),
+					this.app.resolve<ValidatorTracker>(ValidatorTracker).initialize(validators),
 				);
 		}
 	}
 
-	private async makeDelegates(): Promise<Delegate[]> {
-		const delegates: Set<Delegate> = new Set<Delegate>();
+	private async makeValidators(): Promise<Validator[]> {
+		const validators: Set<Validator> = new Set<Validator>();
 
-		for (const secret of this.app.config("delegates.secrets")) {
-			delegates.add(await this.app.get<DelegateFactory>(DELEGATE_FACTORY).fromBIP39(secret));
+		for (const secret of this.app.config("validators.secrets")) {
+			validators.add(await this.app.get<ValidatorFactory>(DELEGATE_FACTORY).fromBIP39(secret));
 		}
 
 		const { bip38, password } = this.app.config("app.flags")!;
 
 		if (bip38) {
-			delegates.add(await this.app.get<DelegateFactory>(DELEGATE_FACTORY).fromBIP38(bip38, password));
+			validators.add(await this.app.get<ValidatorFactory>(DELEGATE_FACTORY).fromBIP38(bip38, password));
 		}
 
-		return [...delegates];
+		return [...validators];
 	}
 }

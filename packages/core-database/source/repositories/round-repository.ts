@@ -23,12 +23,12 @@ export class RoundRepository extends Repository<Round> {
 			.getMany();
 	}
 
-	public async save(delegates: readonly Contracts.State.Wallet[]): Promise<never> {
-		const round: { publicKey: string; balance: BigNumber; round: number }[] = delegates.map(
-			(delegate: Contracts.State.Wallet) => ({
-				balance: delegate.getAttribute("delegate.voteBalance"),
-				publicKey: delegate.getPublicKey()!,
-				round: delegate.getAttribute("delegate.round"),
+	public async save(validators: readonly Contracts.State.Wallet[]): Promise<never> {
+		const round: { publicKey: string; balance: BigNumber; round: number }[] = validators.map(
+			(validator: Contracts.State.Wallet) => ({
+				balance: validator.getAttribute("validator.voteBalance"),
+				publicKey: validator.getPublicKey()!,
+				round: validator.getAttribute("validator.round"),
 			}),
 		);
 

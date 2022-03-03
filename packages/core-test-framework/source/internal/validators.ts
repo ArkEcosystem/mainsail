@@ -14,7 +14,7 @@
 
 // export const wifs: string[] = passphrases.map((passphrase: string) => wifFactory.fromMnemonic(passphrase));
 
-// export const delegates: {
+// export const validators: {
 // 	passphrase: string;
 // 	address: string;
 // 	publicKey: string;

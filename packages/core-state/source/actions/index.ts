@@ -1,2 +1,2 @@
-export { BuildDelegateRankingAction } from "./build-delegate-ranking";
-export { GetActiveDelegatesAction } from "./get-active-delegates";
+export { BuildValidatorRankingAction } from "./build-validator-ranking";
+export { GetActiveValidatorsAction } from "./get-active-validators";

@@ -126,7 +126,7 @@ export class BlockRepository extends AbstractRepository<Block> {
 			.getRawMany();
 	}
 
-	public async getDelegatesForgedBlocks(): Promise<
+	public async getValidatorsForgedBlocks(): Promise<
 		{ generatorPublicKey: string; totalRewards: string; totalFees: string; totalProduced: number }[]
 	> {
 		return this.createQueryBuilder()

@@ -4,34 +4,34 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
-export abstract class DelegateRegistrationTransaction extends Transaction {
+export abstract class ValidatorRegistrationTransaction extends Transaction {
 	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
-	public static type: number = Crypto.TransactionType.DelegateRegistration;
-	public static key = "delegateRegistration";
+	public static type: number = Crypto.TransactionType.ValidatorRegistration;
+	public static key = "validatorRegistration";
 	public static version = 1;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("2500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
-			$id: "delegateRegistration",
+			$id: "validatorRegistration",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
-						delegate: {
+						validator: {
 							properties: {
-								username: { $ref: "delegateUsername" },
+								username: { $ref: "validatorUsername" },
 							},
 							required: ["username"],
 							type: "object",
 						},
 					},
-					required: ["delegate"],
+					required: ["validator"],
 					type: "object",
 				},
 				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
-				type: { transactionType: Crypto.TransactionType.DelegateRegistration },
+				type: { transactionType: Crypto.TransactionType.ValidatorRegistration },
 			},
 			required: ["asset"],
 		});
@@ -40,13 +40,13 @@ export abstract class DelegateRegistrationTransaction extends Transaction {
 	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
-		if (data.asset && data.asset.delegate) {
-			const delegateBytes: Buffer = Buffer.from(data.asset.delegate.username, "utf8");
-			const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(delegateBytes.length + 1));
+		if (data.asset && data.asset.validator) {
+			const validatorBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
+			const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(validatorBytes.length + 1));
 
-			buff.writeUInt8(delegateBytes.length);
-			// buffer.writeBuffer(delegateBytes, "hex");
-			buff.writeBuffer(delegateBytes);
+			buff.writeUInt8(validatorBytes.length);
+			// buffer.writeBuffer(validatorBytes, "hex");
+			buff.writeBuffer(validatorBytes);
 
 			return buff;
 		}
@@ -59,7 +59,7 @@ export abstract class DelegateRegistrationTransaction extends Transaction {
 		const usernameLength = buf.readUInt8();
 
 		data.asset = {
-			delegate: {
+			validator: {
 				username: buf.readBuffer(usernameLength).toString("utf8"),
 			},
 		};

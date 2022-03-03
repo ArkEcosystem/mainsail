@@ -1,5 +1,5 @@
 import { calculateForgingInfo } from "./calculate-forging-info";
-import { calculateApproval, calculateForgedTotal } from "./delegate-calculator";
+import { calculateApproval, calculateForgedTotal } from "./validator-calculator";
 import { calculateTransactionExpiration } from "./expiration-calculator";
 import { getBlockTimeLookup } from "./get-blocktime-lookup";
 import { calculateRound, isNewRound } from "./round-calculator";
@@ -13,7 +13,7 @@ export * from "./lock";
 export * as Search from "./search";
 export * from "@arkecosystem/utils";
 
-export const delegateCalculator = { calculateApproval, calculateForgedTotal };
+export const validatorCalculator = { calculateApproval, calculateForgedTotal };
 export const expirationCalculator = { calculateTransactionExpiration };
 export const roundCalculator = { calculateRound, isNewRound };
 export const supplyCalculator = { calculate };

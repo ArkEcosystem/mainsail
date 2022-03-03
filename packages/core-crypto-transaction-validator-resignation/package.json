@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-transaction-delegate-resignation",
+	"name": "@arkecosystem/core-crypto-transaction-validator-resignation",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
@@ -18,7 +18,7 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-delegate-registration": "workspace:*",
+		"@arkecosystem/core-crypto-transaction-validator-registration": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",

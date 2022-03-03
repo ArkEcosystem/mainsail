@@ -13,13 +13,13 @@ export const publicKeysIndexer = (index: Contracts.State.WalletIndex, wallet: Co
 };
 
 export const usernamesIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.Wallet) => {
-	if (wallet.isDelegate()) {
-		index.set(wallet.getAttribute("delegate.username"), wallet);
+	if (wallet.isValidator()) {
+		index.set(wallet.getAttribute("validator.username"), wallet);
 	}
 };
 
 export const resignationsIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.Wallet) => {
-	if (wallet.isDelegate() && wallet.hasAttribute("delegate.resigned")) {
-		index.set(wallet.getAttribute("delegate.username"), wallet);
+	if (wallet.isValidator() && wallet.hasAttribute("validator.resigned")) {
+		index.set(wallet.getAttribute("validator.username"), wallet);
 	}
 };

@@ -230,7 +230,7 @@ export class BlockProcessor {
 			block.data.height,
 			this.configuration,
 		);
-		const delegates: Contracts.State.Wallet[] = await this.triggers.call("getActiveDelegates", {
+		const validators: Contracts.State.Wallet[] = await this.triggers.call("getActiveValidators", {
 			roundInfo,
 		});
 
@@ -242,7 +242,7 @@ export class BlockProcessor {
 			this.slots,
 		);
 
-		const forgingDelegate: Contracts.State.Wallet = delegates[forgingInfo.currentForger];
+		const forgingValidator: Contracts.State.Wallet = validators[forgingInfo.currentForger];
 
 		const walletRepository = this.app.getTagged<Contracts.State.WalletRepository>(
 			Identifiers.WalletRepository,
@@ -255,36 +255,36 @@ export class BlockProcessor {
 
 		let generatorUsername: string;
 		try {
-			generatorUsername = generatorWallet.getAttribute("delegate.username");
+			generatorUsername = generatorWallet.getAttribute("validator.username");
 		} catch {
 			return false;
 		}
 
-		if (!forgingDelegate) {
+		if (!forgingValidator) {
 			this.logger.debug(
-				`Could not decide if delegate ${generatorUsername} (${
+				`Could not decide if validator ${generatorUsername} (${
 					block.data.generatorPublicKey
 				}) is allowed to forge block ${block.data.height.toLocaleString()}`,
 			);
-		} else if (forgingDelegate.getPublicKey() !== block.data.generatorPublicKey) {
-			AppUtils.assert.defined<string>(forgingDelegate.getPublicKey());
+		} else if (forgingValidator.getPublicKey() !== block.data.generatorPublicKey) {
+			AppUtils.assert.defined<string>(forgingValidator.getPublicKey());
 
 			const forgingWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-				forgingDelegate.getPublicKey()!,
+				forgingValidator.getPublicKey()!,
 			);
-			const forgingUsername: string = forgingWallet.getAttribute("delegate.username");
+			const forgingUsername: string = forgingWallet.getAttribute("validator.username");
 
 			this.logger.warning(
-				`Delegate ${generatorUsername} (${
+				`Validator ${generatorUsername} (${
 					block.data.generatorPublicKey
-				}) not allowed to forge, should be ${forgingUsername} (${forgingDelegate.getPublicKey()})`,
+				}) not allowed to forge, should be ${forgingUsername} (${forgingValidator.getPublicKey()})`,
 			);
 
 			return false;
 		}
 
 		this.logger.debug(
-			`Delegate ${generatorUsername} (${
+			`Validator ${generatorUsername} (${
 				block.data.generatorPublicKey
 			}) allowed to forge block ${block.data.height.toLocaleString()}`,
 		);

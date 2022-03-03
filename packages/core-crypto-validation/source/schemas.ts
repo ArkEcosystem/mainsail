@@ -96,7 +96,7 @@ export const schemas = {
 	},
 
 	username: {
-		$id: "delegateUsername",
+		$id: "validatorUsername",
 		allOf: [
 			{ pattern: "^[a-z0-9!@$&_.]+$", type: "string" },
 			{ maxLength: 20, minLength: 1 },

@@ -64,11 +64,11 @@ export class InternalController extends Controller {
 		const roundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
 
 		const reward = this.configuration.getMilestone(height).reward;
-		const delegates: Contracts.P2P.DelegateWallet[] = (
-			await this.databaseInteraction.getActiveDelegates(roundInfo)
+		const validators: Contracts.P2P.ValidatorWallet[] = (
+			await this.databaseInteraction.getActiveValidators(roundInfo)
 		).map((wallet) => ({
 			...wallet.getData(),
-			delegate: wallet.getAttribute("delegate"),
+			validator: wallet.getAttribute("validator"),
 		}));
 
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
@@ -89,10 +89,10 @@ export class InternalController extends Controller {
 		return {
 			canForge: forgingInfo.canForge,
 			current: roundInfo.round,
-			currentForger: delegates[forgingInfo.currentForger],
-			delegates,
+			currentForger: validators[forgingInfo.currentForger],
+			validators,
 			lastBlock: lastBlock.data,
-			nextForger: delegates[forgingInfo.nextForger],
+			nextForger: validators[forgingInfo.nextForger],
 			reward,
 			timestamp: forgingInfo.blockTimestamp,
 		};

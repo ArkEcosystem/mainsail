@@ -67,12 +67,12 @@ export class StateBuilder {
 				await handler.bootstrap();
 			}
 
-			this.logger.info(`State Generation - Step ${steps} of ${steps}: Vote Balances & Delegate Ranking`);
+			this.logger.info(`State Generation - Step ${steps} of ${steps}: Vote Balances & Validator Ranking`);
 			this.dposState.buildVoteBalances();
-			this.dposState.buildDelegateRanking();
+			this.dposState.buildValidatorRanking();
 
 			this.logger.info(
-				`Number of registered delegates: ${Object.keys(
+				`Number of registered validators: ${Object.keys(
 					this.walletRepository.allByUsername(),
 				).length.toLocaleString()}`,
 			);
@@ -147,8 +147,8 @@ export class StateBuilder {
 				}
 			}
 
-			if (wallet.hasAttribute("delegate.voteBalance")) {
-				const voteBalance: BigNumber = wallet.getAttribute("delegate.voteBalance");
+			if (wallet.hasAttribute("validator.voteBalance")) {
+				const voteBalance: BigNumber = wallet.getAttribute("validator.voteBalance");
 
 				if (voteBalance.isLessThan(0)) {
 					logNegativeBalance(wallet, "vote balance", voteBalance);

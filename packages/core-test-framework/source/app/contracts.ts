@@ -21,7 +21,7 @@ export interface CoreOptions {
 		options?: Record<string, Record<string, any>>;
 	};
 	peers?: Types.JsonObject;
-	delegates?: Types.JsonObject;
+	validators?: Types.JsonObject;
 	environment?: Types.JsonObject;
 	app?: Types.JsonObject;
 }
@@ -29,7 +29,7 @@ export interface CoreOptions {
 export interface CryptoFlags {
 	network: string;
 	premine: string;
-	delegates: number;
+	validators: number;
 	blocktime: number;
 	maxTxPerBlock: number;
 	maxBlockPayload: number;
@@ -59,7 +59,7 @@ export interface CoreConfigPaths {
 	root: string;
 	env: string;
 	app: string;
-	delegates: string;
+	validators: string;
 	peers: string;
 }
 

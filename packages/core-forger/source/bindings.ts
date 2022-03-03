@@ -1,1 +1,1 @@
-export const DELEGATE_FACTORY = Symbol.for("DelegateFactory");
+export const DELEGATE_FACTORY = Symbol.for("ValidatorFactory");

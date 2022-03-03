@@ -1,7 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { DelegateRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-delegate-registration";
+import { ValidatorRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-validator-registration";
 import { PoolError } from "@arkecosystem/core-contracts";
 import { Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
@@ -19,7 +19,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
-		return [DelegateRegistrationTransactionHandler];
+		return [ValidatorRegistrationTransactionHandler];
 	}
 
 	public walletAttributes(): ReadonlyArray<string> {
@@ -80,9 +80,9 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 
 		for (const vote of transaction.data.asset.votes) {
-			const delegatePublicKey: string = vote.slice(1);
-			const delegateWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				delegatePublicKey,
+			const validatorPublicKey: string = vote.slice(1);
+			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				validatorPublicKey,
 			);
 
 			if (vote.startsWith("+")) {
@@ -90,8 +90,8 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 					throw new Errors.AlreadyVotedError();
 				}
 
-				if (delegateWallet.hasAttribute("delegate.resigned")) {
-					throw new Errors.VotedForResignedDelegateError(vote);
+				if (validatorWallet.hasAttribute("validator.resigned")) {
+					throw new Errors.VotedForResignedValidatorError(vote);
 				}
 
 				walletVote = vote.slice(1);
@@ -105,8 +105,8 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 				walletVote = undefined;
 			}
 
-			if (!delegateWallet.isDelegate()) {
-				throw new Errors.VotedForNonDelegateError(vote);
+			if (!validatorWallet.isValidator()) {
+				throw new Errors.VotedForNonValidatorError(vote);
 			}
 		}
 
@@ -118,7 +118,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 		for (const vote of transaction.data.asset.votes) {
 			emitter.dispatch(vote.startsWith("+") ? AppEnums.VoteEvent.Vote : AppEnums.VoteEvent.Unvote, {
-				delegate: vote,
+				validator: vote,
 				transaction: transaction.data,
 			});
 		}

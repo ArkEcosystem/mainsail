@@ -245,17 +245,17 @@ export class UnsupportedMultiSignatureRegistrationException extends Exception {
 
 export class WalletAlreadyResignedError extends Exception {
 	public constructor() {
-		super(`Failed to apply transaction, because the wallet already resigned as delegate.`);
+		super(`Failed to apply transaction, because the wallet already resigned as validator.`);
 	}
 }
 
-export class WalletNotADelegateError extends Exception {
+export class WalletNotAValidatorError extends Exception {
 	public constructor() {
-		super(`Failed to apply transaction, because the wallet is not a delegate.`);
+		super(`Failed to apply transaction, because the wallet is not a validator.`);
 	}
 }
 
-export class WalletIsAlreadyDelegateError extends Exception {
+export class WalletIsAlreadyValidatorError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because the wallet already has a registered username.`);
 	}
@@ -291,21 +291,21 @@ export class UnvoteMismatchError extends Exception {
 	}
 }
 
-export class VotedForNonDelegateError extends Exception {
+export class VotedForNonValidatorError extends Exception {
 	public constructor(vote: string) {
-		super(`Failed to apply transaction, because only delegates can be voted.`);
+		super(`Failed to apply transaction, because only validators can be voted.`);
 	}
 }
 
-export class VotedForResignedDelegateError extends Exception {
+export class VotedForResignedValidatorError extends Exception {
 	public constructor(vote: string) {
-		super(`Failed to apply transaction, because it votes for a resigned delegate.`);
+		super(`Failed to apply transaction, because it votes for a resigned validator.`);
 	}
 }
 
-export class NotEnoughDelegatesError extends Exception {
+export class NotEnoughValidatorsError extends Exception {
 	public constructor() {
-		super(`Failed to apply transaction, because not enough delegates to allow resignation.`);
+		super(`Failed to apply transaction, because not enough validators to allow resignation.`);
 	}
 }
 

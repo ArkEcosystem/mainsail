@@ -5,11 +5,11 @@ import forge from "node-forge";
 import wif from "wif";
 import { injectable, inject } from "@arkecosystem/core-container";
 
-import { Delegate } from "../interfaces";
+import { Validator } from "../interfaces";
 import { Method } from "./method";
 
 @injectable()
-export class BIP38 extends Method implements Delegate {
+export class BIP38 extends Method implements Validator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Crypto.IConfiguration;
 

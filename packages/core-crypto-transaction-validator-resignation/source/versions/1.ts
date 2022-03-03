@@ -4,21 +4,21 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
-export class DelegateResignationTransaction extends Transaction {
+export class ValidatorResignationTransaction extends Transaction {
 	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
-	public static type: number = Crypto.TransactionType.DelegateResignation;
-	public static key = "delegateResignation";
+	public static type: number = Crypto.TransactionType.ValidatorResignation;
+	public static key = "validatorResignation";
 	public static version = 1;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("2500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
-			$id: "delegateResignation",
+			$id: "validatorResignation",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				fee: { bignumber: { minimum: 1 } },
-				type: { transactionType: Crypto.TransactionType.DelegateResignation },
+				type: { transactionType: Crypto.TransactionType.ValidatorResignation },
 			},
 		});
 	}

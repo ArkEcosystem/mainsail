@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-address-ss558",
+	"name": "@arkecosystem/core-crypto-address-ss58",
 	"version": "0.0.1",
 	"description": "ss58 Address Derivation",
 	"license": "MIT",

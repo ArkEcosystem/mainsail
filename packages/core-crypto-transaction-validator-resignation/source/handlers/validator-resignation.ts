@@ -1,17 +1,17 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { DelegateRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-delegate-registration";
+import { ValidatorRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-validator-registration";
 import { PoolError } from "@arkecosystem/core-contracts";
 import { Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
 
-import { DelegateResignationTransaction } from "../versions";
+import { ValidatorResignationTransaction } from "../versions";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @injectable()
-export class DelegateResignationTransactionHandler extends Handlers.TransactionHandler {
+export class ValidatorResignationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
@@ -19,15 +19,15 @@ export class DelegateResignationTransactionHandler extends Handlers.TransactionH
 	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
-		return [DelegateRegistrationTransactionHandler];
+		return [ValidatorRegistrationTransactionHandler];
 	}
 
 	public walletAttributes(): ReadonlyArray<string> {
-		return ["delegate.resigned"];
+		return ["validator.resigned"];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return DelegateResignationTransaction;
+		return ValidatorResignationTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
@@ -42,7 +42,7 @@ export class DelegateResignationTransactionHandler extends Handlers.TransactionH
 			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 				transaction.senderPublicKey,
 			);
-			wallet.setAttribute("delegate.resigned", true);
+			wallet.setAttribute("validator.resigned", true);
 			this.walletRepository.index(wallet);
 		}
 	}
@@ -54,28 +54,28 @@ export class DelegateResignationTransactionHandler extends Handlers.TransactionH
 		transaction: Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		if (!wallet.isDelegate()) {
-			throw new Errors.WalletNotADelegateError();
+		if (!wallet.isValidator()) {
+			throw new Errors.WalletNotAValidatorError();
 		}
 
-		if (wallet.hasAttribute("delegate.resigned")) {
+		if (wallet.hasAttribute("validator.resigned")) {
 			throw new Errors.WalletAlreadyResignedError();
 		}
 
-		const requiredDelegatesCount: number = this.configuration.getMilestone().activeDelegates;
-		const currentDelegatesCount: number = this.walletRepository
+		const requiredValidatorsCount: number = this.configuration.getMilestone().activeValidators;
+		const currentValidatorsCount: number = this.walletRepository
 			.allByUsername()
-			.filter((w) => w.hasAttribute("delegate.resigned") === false).length;
+			.filter((w) => w.hasAttribute("validator.resigned") === false).length;
 
-		if (currentDelegatesCount - 1 < requiredDelegatesCount) {
-			throw new Errors.NotEnoughDelegatesError();
+		if (currentValidatorsCount - 1 < requiredValidatorsCount) {
+			throw new Errors.NotEnoughValidatorsError();
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
 	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
-		emitter.dispatch(AppEnums.DelegateEvent.Resigned, transaction.data);
+		emitter.dispatch(AppEnums.ValidatorEvent.Resigned, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
@@ -91,7 +91,7 @@ export class DelegateResignationTransactionHandler extends Handlers.TransactionH
 				transaction.data.senderPublicKey,
 			);
 			throw new PoolError(
-				`Delegate resignation for "${wallet.getAttribute("delegate.username")}" already in the pool`,
+				`Validator resignation for "${wallet.getAttribute("validator.username")}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
@@ -104,7 +104,7 @@ export class DelegateResignationTransactionHandler extends Handlers.TransactionH
 
 		const senderWallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		senderWallet.setAttribute("delegate.resigned", true);
+		senderWallet.setAttribute("validator.resigned", true);
 
 		this.walletRepository.index(senderWallet);
 	}
@@ -116,7 +116,7 @@ export class DelegateResignationTransactionHandler extends Handlers.TransactionH
 
 		const senderWallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		senderWallet.forgetAttribute("delegate.resigned");
+		senderWallet.forgetAttribute("validator.resigned");
 
 		this.walletRepository.index(senderWallet);
 	}

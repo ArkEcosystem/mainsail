@@ -18,7 +18,7 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-delegate-registration": "workspace:*",
+		"@arkecosystem/core-crypto-transaction-validator-registration": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",

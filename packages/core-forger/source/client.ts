@@ -103,7 +103,7 @@ export class Client {
 
 	public async emitEvent(
 		event: string,
-		body: { error: string } | { activeDelegates: string[] } | Crypto.IBlockData | Crypto.ITransactionData,
+		body: { error: string } | { activeValidators: string[] } | Crypto.IBlockData | Crypto.ITransactionData,
 	): Promise<void> {
 		// NOTE: Events need to be emitted to the localhost. If you need to trigger
 		// actions on a remote host based on events you should be using webhooks

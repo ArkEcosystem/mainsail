@@ -6,12 +6,12 @@ import { Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel"
 import { Errors, Handlers } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { DelegateRegistrationTransaction } from "../versions";
+import { ValidatorRegistrationTransaction } from "../versions";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 // todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @injectable()
-export class DelegateRegistrationTransactionHandler extends Handlers.TransactionHandler {
+export class ValidatorRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
@@ -24,22 +24,22 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 
 	public walletAttributes(): ReadonlyArray<string> {
 		return [
-			"delegate.approval", // Used by the API
-			"delegate.forgedFees", // Used by the API
-			"delegate.forgedRewards", // Used by the API
-			"delegate.forgedTotal", // Used by the API
-			"delegate.lastBlock",
-			"delegate.producedBlocks", // Used by the API
-			"delegate.rank",
-			"delegate.round",
-			"delegate.username",
-			"delegate.voteBalance",
-			"delegate",
+			"validator.approval", // Used by the API
+			"validator.forgedFees", // Used by the API
+			"validator.forgedRewards", // Used by the API
+			"validator.forgedTotal", // Used by the API
+			"validator.lastBlock",
+			"validator.producedBlocks", // Used by the API
+			"validator.rank",
+			"validator.round",
+			"validator.username",
+			"validator.voteBalance",
+			"validator",
 		];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return DelegateRegistrationTransaction;
+		return ValidatorRegistrationTransaction;
 	}
 
 	public async bootstrap(): Promise<void> {
@@ -50,23 +50,23 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
-			AppUtils.assert.defined<string>(transaction.asset?.delegate?.username);
+			AppUtils.assert.defined<string>(transaction.asset?.validator?.username);
 
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 
-			wallet.setAttribute<Contracts.State.WalletDelegateAttributes>("delegate", {
+			wallet.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
 				forgedFees: BigNumber.ZERO,
 				forgedRewards: BigNumber.ZERO,
 				producedBlocks: 0,
 				rank: undefined,
-				username: transaction.asset.delegate.username,
+				username: transaction.asset.validator.username,
 				voteBalance: BigNumber.ZERO,
 			});
 
 			this.walletRepository.index(wallet);
 		}
 
-		const forgedBlocks = await this.blockRepository.getDelegatesForgedBlocks();
+		const forgedBlocks = await this.blockRepository.getValidatorsForgedBlocks();
 		const lastForgedBlocks = await this.blockRepository.getLastForgedBlocks();
 		for (const block of forgedBlocks) {
 			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
@@ -74,14 +74,14 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 			);
 
 			// Genesis wallet is empty
-			if (!wallet.hasAttribute("delegate")) {
+			if (!wallet.hasAttribute("validator")) {
 				continue;
 			}
 
-			const delegate: Contracts.State.WalletDelegateAttributes = wallet.getAttribute("delegate");
-			delegate.forgedFees = delegate.forgedFees.plus(block.totalFees);
-			delegate.forgedRewards = delegate.forgedRewards.plus(block.totalRewards);
-			delegate.producedBlocks += +block.totalProduced;
+			const validator: Contracts.State.WalletValidatorAttributes = wallet.getAttribute("validator");
+			validator.forgedFees = validator.forgedFees.plus(block.totalFees);
+			validator.forgedRewards = validator.forgedRewards.plus(block.totalRewards);
+			validator.producedBlocks += +block.totalProduced;
 		}
 
 		for (const block of lastForgedBlocks) {
@@ -90,11 +90,11 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 			);
 
 			// Genesis wallet is empty
-			if (!wallet.hasAttribute("delegate")) {
+			if (!wallet.hasAttribute("validator")) {
 				continue;
 			}
 
-			wallet.setAttribute("delegate.lastBlock", block);
+			wallet.setAttribute("validator.lastBlock", block);
 		}
 	}
 
@@ -116,12 +116,12 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 			throw new Errors.NotSupportedForMultiSignatureWalletError();
 		}
 
-		AppUtils.assert.defined<string>(data.asset?.delegate?.username);
+		AppUtils.assert.defined<string>(data.asset?.validator?.username);
 
-		const username: string = data.asset.delegate.username;
+		const username: string = data.asset.validator.username;
 
-		if (wallet.isDelegate()) {
-			throw new Errors.WalletIsAlreadyDelegateError();
+		if (wallet.isValidator()) {
+			throw new Errors.WalletIsAlreadyValidatorError();
 		}
 
 		if (this.walletRepository.hasByUsername(username)) {
@@ -132,7 +132,7 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 	}
 
 	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
-		emitter.dispatch(AppEnums.DelegateEvent.Registered, transaction.data);
+		emitter.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
@@ -145,21 +145,21 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 
 		if (hasSender) {
 			throw new PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.DelegateRegistration}' in the pool`,
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.ValidatorRegistration}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
 
-		AppUtils.assert.defined<string>(transaction.data.asset?.delegate?.username);
-		const username: string = transaction.data.asset.delegate.username;
+		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
+		const username: string = transaction.data.asset.validator.username;
 		const hasUsername: boolean = this.poolQuery
 			.getAll()
 			.whereKind(transaction)
-			.wherePredicate(async (t) => t.data.asset?.delegate?.username === username)
+			.wherePredicate(async (t) => t.data.asset?.validator?.username === username)
 			.has();
 
 		if (hasUsername) {
-			throw new PoolError(`Delegate registration for "${username}" already in the pool`, "ERR_PENDING");
+			throw new PoolError(`Validator registration for "${username}" already in the pool`, "ERR_PENDING");
 		}
 	}
 
@@ -172,14 +172,14 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 			transaction.data.senderPublicKey,
 		);
 
-		AppUtils.assert.defined<string>(transaction.data.asset?.delegate?.username);
+		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 
-		sender.setAttribute<Contracts.State.WalletDelegateAttributes>("delegate", {
+		sender.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
 			forgedFees: BigNumber.ZERO,
 			forgedRewards: BigNumber.ZERO,
 			producedBlocks: 0,
 			round: 0,
-			username: transaction.data.asset.delegate.username,
+			username: transaction.data.asset.validator.username,
 			voteBalance: BigNumber.ZERO,
 		});
 
@@ -195,7 +195,7 @@ export class DelegateRegistrationTransactionHandler extends Handlers.Transaction
 			transaction.data.senderPublicKey,
 		);
 
-		sender.forgetAttribute("delegate");
+		sender.forgetAttribute("validator");
 
 		this.walletRepository.index(sender);
 	}

@@ -8,7 +8,7 @@ import Joi from "joi";
 export class Command extends Commands.Command {
 	public signature = "config:forger:bip39";
 
-	public description = "Configure the forging delegate (BIP39).";
+	public description = "Configure the forging validator (BIP39).";
 
 	public isHidden = true;
 
@@ -16,7 +16,7 @@ export class Command extends Commands.Command {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("network", "The name of the network.", Joi.string())
-			.setFlag("bip39", "A delegate plain text passphrase. Referred to as BIP39.", Joi.string())
+			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
 
@@ -27,7 +27,7 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				message: "Please enter your delegate plain text passphrase. Referred to as BIP39.",
+				message: "Please enter your validator plain text passphrase. Referred to as BIP39.",
 				name: "bip39",
 				type: "password",
 				validate: (value) =>
@@ -59,13 +59,13 @@ export class Command extends Commands.Command {
 			},
 			{
 				task: () => {
-					const delegatesConfig = this.app.getCorePath("config", "delegates.json");
+					const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
-					const delegates: Record<string, string | string[]> = require(delegatesConfig);
-					delegates.secrets = [flags.bip39];
-					delete delegates.bip38;
+					const validators: Record<string, string | string[]> = require(validatorsConfig);
+					validators.secrets = [flags.bip39];
+					delete validators.bip38;
 
-					writeJSONSync(delegatesConfig, delegates);
+					writeJSONSync(validatorsConfig, validators);
 				},
 				title: "Writing BIP39 passphrase to configuration.",
 			},

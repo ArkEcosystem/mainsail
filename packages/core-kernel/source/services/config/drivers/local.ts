@@ -54,7 +54,7 @@ export class LocalConfigLoader implements Kernel.ConfigLoader {
 
 			this.loadPeers();
 
-			this.loadDelegates();
+			this.loadValidators();
 
 			this.loadCryptography();
 		} catch (error) {
@@ -111,9 +111,9 @@ export class LocalConfigLoader implements Kernel.ConfigLoader {
 		this.configRepository.set("peers", this.validationService.valid());
 	}
 
-	private loadDelegates(): void {
+	private loadValidators(): void {
 		this.validationService.validate(
-			this.loadFromLocation(["delegates.json"]),
+			this.loadFromLocation(["validators.json"]),
 			Joi.object({
 				bip38: Joi.string().optional(),
 				secrets: Joi.array().items(Joi.string()).optional(),
@@ -124,7 +124,7 @@ export class LocalConfigLoader implements Kernel.ConfigLoader {
 			throw new Error(JSON.stringify(this.validationService.errors()));
 		}
 
-		this.configRepository.set("delegates", this.validationService.valid());
+		this.configRepository.set("validators", this.validationService.valid());
 	}
 
 	private loadCryptography(): void {

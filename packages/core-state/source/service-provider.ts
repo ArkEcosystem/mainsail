@@ -3,7 +3,7 @@ import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
-import { BuildDelegateRankingAction, GetActiveDelegatesAction } from "./actions";
+import { BuildValidatorRankingAction, GetActiveValidatorsAction } from "./actions";
 import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
 import { DatabaseInterceptor } from "./database-interceptor";
@@ -126,10 +126,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	private registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("buildDelegateRanking", new BuildDelegateRankingAction());
+			.bind("buildValidatorRanking", new BuildValidatorRankingAction());
 
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("getActiveDelegates", new GetActiveDelegatesAction(this.app));
+			.bind("getActiveValidators", new GetActiveValidatorsAction(this.app));
 	}
 }

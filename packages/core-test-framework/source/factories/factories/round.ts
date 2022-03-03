@@ -13,7 +13,7 @@ export const registerRoundFactory = (factory: FactoryBuilder): void => {
 	// 	return publicKeys.map((publicKey: string, index: number) => {
 	// 		const wallet = new Wallets.Wallet(this.addressFactory.fromPublicKey(publicKey), knownAttributes);
 	// 		wallet.setPublicKey(publicKey);
-	// 		wallet.setAttribute("delegate", {
+	// 		wallet.setAttribute("validator", {
 	// 			forgedFees: BigNumber.ZERO,
 	// 			forgedRewards: BigNumber.ZERO,
 	// 			producedBlocks: 0,

@@ -142,11 +142,11 @@ importers:
       '@arkecosystem/core-crypto-signature-schnorr': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
-      '@arkecosystem/core-crypto-transaction-delegate-registration': workspace:*
-      '@arkecosystem/core-crypto-transaction-delegate-resignation': workspace:*
       '@arkecosystem/core-crypto-transaction-multi-payment': workspace:*
       '@arkecosystem/core-crypto-transaction-multi-signature-registration': workspace:*
       '@arkecosystem/core-crypto-transaction-transfer': workspace:*
+      '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
+      '@arkecosystem/core-crypto-transaction-validator-resignation': workspace:*
       '@arkecosystem/core-crypto-transaction-vote': workspace:*
       '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-crypto-wif': workspace:*
@@ -193,11 +193,11 @@ importers:
       '@arkecosystem/core-crypto-signature-schnorr': link:../core-crypto-signature-schnorr
       '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
-      '@arkecosystem/core-crypto-transaction-delegate-registration': link:../core-crypto-transaction-delegate-registration
-      '@arkecosystem/core-crypto-transaction-delegate-resignation': link:../core-crypto-transaction-delegate-resignation
       '@arkecosystem/core-crypto-transaction-multi-payment': link:../core-crypto-transaction-multi-payment
       '@arkecosystem/core-crypto-transaction-multi-signature-registration': link:../core-crypto-transaction-multi-signature-registration
       '@arkecosystem/core-crypto-transaction-transfer': link:../core-crypto-transaction-transfer
+      '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
+      '@arkecosystem/core-crypto-transaction-validator-resignation': link:../core-crypto-transaction-validator-resignation
       '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
       '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
@@ -899,44 +899,6 @@ importers:
       process-es6: 0.11.6
       util: 0.12.4
 
-  packages/core-crypto-transaction-delegate-registration:
-    specifiers:
-      '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-crypto-transaction': workspace:*
-      '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
-      '@arkecosystem/crypto-identities': ^1.0.0
-      '@arkecosystem/utils': workspace:*
-    dependencies:
-      '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
-      '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-transactions': link:../core-transactions
-      '@arkecosystem/crypto-identities': 1.2.0
-      '@arkecosystem/utils': link:../utils
-
-  packages/core-crypto-transaction-delegate-resignation:
-    specifiers:
-      '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-crypto-transaction': workspace:*
-      '@arkecosystem/core-crypto-transaction-delegate-registration': workspace:*
-      '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
-      '@arkecosystem/crypto-identities': ^1.0.0
-      '@arkecosystem/utils': workspace:*
-    dependencies:
-      '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
-      '@arkecosystem/core-crypto-transaction-delegate-registration': link:../core-crypto-transaction-delegate-registration
-      '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-transactions': link:../core-transactions
-      '@arkecosystem/crypto-identities': 1.2.0
-      '@arkecosystem/utils': link:../utils
-
   packages/core-crypto-transaction-multi-payment:
     specifiers:
       '@arkecosystem/core-container': workspace:*
@@ -995,12 +957,11 @@ importers:
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
 
-  packages/core-crypto-transaction-vote:
+  packages/core-crypto-transaction-validator-registration:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
-      '@arkecosystem/core-crypto-transaction-delegate-registration': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
@@ -1009,7 +970,46 @@ importers:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
-      '@arkecosystem/core-crypto-transaction-delegate-registration': link:../core-crypto-transaction-delegate-registration
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-transactions': link:../core-transactions
+      '@arkecosystem/crypto-identities': 1.2.0
+      '@arkecosystem/utils': link:../utils
+
+  packages/core-crypto-transaction-validator-resignation:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-transactions': workspace:*
+      '@arkecosystem/crypto-identities': ^1.0.0
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-transactions': link:../core-transactions
+      '@arkecosystem/crypto-identities': 1.2.0
+      '@arkecosystem/utils': link:../utils
+
+  packages/core-crypto-transaction-vote:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-transactions': workspace:*
+      '@arkecosystem/crypto-identities': ^1.0.0
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto-identities': 1.2.0

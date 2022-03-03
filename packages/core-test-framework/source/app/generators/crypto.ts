@@ -25,7 +25,7 @@ export class CryptoGenerator extends Generator {
 		// 	this.options.crypto.genesisBlock ??
 		// 	this.generateGenesisBlock(
 		// 		this.createWallet(this.options.crypto.flags.pubKeyHash),
-		// 		this.generateCoreDelegates(this.options.crypto.flags.delegates, this.options.crypto.flags.pubKeyHash),
+		// 		this.generateCoreValidators(this.options.crypto.flags.validators, this.options.crypto.flags.pubKeyHash),
 		// 		this.options.crypto.flags.pubKeyHash,
 		// 		this.options.crypto.flags.premine,
 		// 		this.options.crypto.flags.distribute,
@@ -77,7 +77,7 @@ export class CryptoGenerator extends Generator {
 	// }
 
 	// private generateMilestones(
-	// 	activeDelegates: number,
+	// 	activeValidators: number,
 	// 	blocktime: number,
 	// 	maxTransactions: number,
 	// 	maxPayload: number,
@@ -86,7 +86,7 @@ export class CryptoGenerator extends Generator {
 	// ) {
 	// 	return [
 	// 		{
-	// 			activeDelegates,
+	// 			activeValidators,
 	// 			block: {
 	// 				maxPayload,
 	// 				maxTransactions,
@@ -96,8 +96,8 @@ export class CryptoGenerator extends Generator {
 	// 			epoch: "2017-03-21T13:00:00.000Z",
 	// 			fees: {
 	// 				staticFees: {
-	// 					delegateRegistration: 2_500_000_000,
-	// 					delegateResignation: 2_500_000_000,
+	// 					validatorRegistration: 2_500_000_000,
+	// 					validatorResignation: 2_500_000_000,
 	// 					multiPayment: 10_000_000,
 	// 					multiSignature: 500_000_000,
 	// 					transfer: 10_000_000,
@@ -122,7 +122,7 @@ export class CryptoGenerator extends Generator {
 
 	// private generateGenesisBlock(
 	// 	genesisWallet,
-	// 	delegates,
+	// 	validators,
 	// 	pubKeyHash: number,
 	// 	totalPremine: string,
 	// 	distribute: boolean,
@@ -133,7 +133,7 @@ export class CryptoGenerator extends Generator {
 
 	// 	if (distribute) {
 	// 		transactions = transactions.concat(
-	// 			...this.createTransferTransactions(premineWallet, delegates, totalPremine, pubKeyHash),
+	// 			...this.createTransferTransactions(premineWallet, validators, totalPremine, pubKeyHash),
 	// 		);
 	// 	} else {
 	// 		transactions = transactions.concat(
@@ -142,8 +142,8 @@ export class CryptoGenerator extends Generator {
 	// 	}
 
 	// 	transactions = transactions.concat(
-	// 		...this.buildDelegateTransactions(delegates, pubKeyHash),
-	// 		...this.buildVoteTransactions(delegates, pubKeyHash),
+	// 		...this.buildValidatorTransactions(validators, pubKeyHash),
+	// 		...this.buildVoteTransactions(validators, pubKeyHash),
 	// 	);
 
 	// 	return this.createGenesisBlock(premineWallet.keys, transactions, 0);
@@ -173,10 +173,10 @@ export class CryptoGenerator extends Generator {
 	// 	);
 	// }
 
-	// private buildDelegateTransactions(senders: Wallet[], pubKeyHash: number) {
+	// private buildValidatorTransactions(senders: Wallet[], pubKeyHash: number) {
 	// 	return senders.map((sender: Wallet) =>
 	// 		this.formatGenesisTransaction(
-	// 			Transactions.BuilderFactory.delegateRegistration()
+	// 			Transactions.BuilderFactory.validatorRegistration()
 	// 				.network(pubKeyHash)
 	// 				.usernameAsset(sender.username)
 	// 				.fee(`${25 * 1e8}`)
@@ -348,7 +348,7 @@ export class CryptoGenerator extends Generator {
 	// 		writeJSONSync(
 	// 			resolve(this.destination, "milestones.json"),
 	// 			this.generateMilestones(
-	// 				this.options.crypto.flags.delegates,
+	// 				this.options.crypto.flags.validators,
 	// 				this.options.crypto.flags.blocktime,
 	// 				this.options.crypto.flags.maxTxPerBlock,
 	// 				this.options.crypto.flags.maxBlockPayload,

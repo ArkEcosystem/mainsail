@@ -125,25 +125,25 @@ export class BlockState implements Contracts.State.BlockState {
 		await this.revertVoteBalances(sender, recipient, data);
 	}
 
-	public async increaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
+	public async increaseWalletValidatorVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
 		// ? packages/core-transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
-		// ? is it guaranteed that delegate wallet exists, so delegateWallet.getAttribute("delegate.voteBalance") is safe?
+		// ? is it guaranteed that validator wallet exists, so validatorWallet.getAttribute("validator.voteBalance") is safe?
 		if (wallet.hasVoted()) {
-			const delegatePulicKey = wallet.getAttribute<string>("vote");
-			const delegateWallet = await this.walletRepository.findByPublicKey(delegatePulicKey);
-			const oldDelegateVoteBalance = delegateWallet.getAttribute<BigNumber>("delegate.voteBalance");
-			const newDelegateVoteBalance = oldDelegateVoteBalance.plus(amount);
-			delegateWallet.setAttribute("delegate.voteBalance", newDelegateVoteBalance);
+			const validatorPulicKey = wallet.getAttribute<string>("vote");
+			const validatorWallet = await this.walletRepository.findByPublicKey(validatorPulicKey);
+			const oldValidatorVoteBalance = validatorWallet.getAttribute<BigNumber>("validator.voteBalance");
+			const newValidatorVoteBalance = oldValidatorVoteBalance.plus(amount);
+			validatorWallet.setAttribute("validator.voteBalance", newValidatorVoteBalance);
 		}
 	}
 
-	public async decreaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
+	public async decreaseWalletValidatorVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
 		if (wallet.hasVoted()) {
-			const delegatePulicKey = wallet.getAttribute<string>("vote");
-			const delegateWallet = await this.walletRepository.findByPublicKey(delegatePulicKey);
-			const oldDelegateVoteBalance = delegateWallet.getAttribute<BigNumber>("delegate.voteBalance");
-			const newDelegateVoteBalance = oldDelegateVoteBalance.minus(amount);
-			delegateWallet.setAttribute("delegate.voteBalance", newDelegateVoteBalance);
+			const validatorPulicKey = wallet.getAttribute<string>("vote");
+			const validatorWallet = await this.walletRepository.findByPublicKey(validatorPulicKey);
+			const oldValidatorVoteBalance = validatorWallet.getAttribute<BigNumber>("validator.voteBalance");
+			const newValidatorVoteBalance = oldValidatorVoteBalance.minus(amount);
+			validatorWallet.setAttribute("validator.voteBalance", newValidatorVoteBalance);
 		}
 	}
 
@@ -165,26 +165,26 @@ export class BlockState implements Contracts.State.BlockState {
 	}
 
 	private applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Crypto.IBlockData) {
-		const delegateAttribute = forgerWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
-		delegateAttribute.producedBlocks++;
-		delegateAttribute.forgedFees = delegateAttribute.forgedFees.plus(blockData.totalFee);
-		delegateAttribute.forgedRewards = delegateAttribute.forgedRewards.plus(blockData.reward);
-		delegateAttribute.lastBlock = blockData;
+		const validatorAttribute = forgerWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("validator");
+		validatorAttribute.producedBlocks++;
+		validatorAttribute.forgedFees = validatorAttribute.forgedFees.plus(blockData.totalFee);
+		validatorAttribute.forgedRewards = validatorAttribute.forgedRewards.plus(blockData.reward);
+		validatorAttribute.lastBlock = blockData;
 
 		const balanceIncrease = blockData.reward.plus(blockData.totalFee);
-		this.increaseWalletDelegateVoteBalance(forgerWallet, balanceIncrease);
+		this.increaseWalletValidatorVoteBalance(forgerWallet, balanceIncrease);
 		forgerWallet.increaseBalance(balanceIncrease);
 	}
 
 	private revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Crypto.IBlockData) {
-		const delegateAttribute = forgerWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
-		delegateAttribute.producedBlocks--;
-		delegateAttribute.forgedFees = delegateAttribute.forgedFees.minus(blockData.totalFee);
-		delegateAttribute.forgedRewards = delegateAttribute.forgedRewards.minus(blockData.reward);
-		delegateAttribute.lastBlock = undefined;
+		const validatorAttribute = forgerWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("validator");
+		validatorAttribute.producedBlocks--;
+		validatorAttribute.forgedFees = validatorAttribute.forgedFees.minus(blockData.totalFee);
+		validatorAttribute.forgedRewards = validatorAttribute.forgedRewards.minus(blockData.reward);
+		validatorAttribute.lastBlock = undefined;
 
 		const balanceDecrease = blockData.reward.plus(blockData.totalFee);
-		this.decreaseWalletDelegateVoteBalance(forgerWallet, balanceDecrease);
+		this.decreaseWalletValidatorVoteBalance(forgerWallet, balanceDecrease);
 		forgerWallet.decreaseBalance(balanceDecrease);
 	}
 
@@ -200,35 +200,35 @@ export class BlockState implements Contracts.State.BlockState {
 		) {
 			AppUtils.assert.defined<Crypto.ITransactionAsset>(transaction.asset?.votes);
 
-			const senderDelegatedAmount = sender
+			const senderValidatordAmount = sender
 				.getBalance()
 				// balance already includes reverted fee when updateVoteBalances is called
 				.minus(revert ? transaction.fee : BigNumber.ZERO);
 
 			for (let index = 0; index < transaction.asset.votes.length; index++) {
 				const vote: string = transaction.asset.votes[index];
-				const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote.slice(1));
+				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote.slice(1));
 
 				// first unvote also changes vote balance by fee
-				const senderVoteDelegatedAmount =
+				const senderVoteValidatordAmount =
 					index === 0 && vote.startsWith("-")
-						? senderDelegatedAmount.plus(transaction.fee)
-						: senderDelegatedAmount;
+						? senderValidatordAmount.plus(transaction.fee)
+						: senderValidatordAmount;
 
-				const voteBalanceChange: BigNumber = senderVoteDelegatedAmount
+				const voteBalanceChange: BigNumber = senderVoteValidatordAmount
 					.times(vote.startsWith("-") ? -1 : 1)
 					.times(revert ? -1 : 1);
 
-				const voteBalance: BigNumber = delegate
-					.getAttribute("delegate.voteBalance", BigNumber.ZERO)
+				const voteBalance: BigNumber = validator
+					.getAttribute("validator.voteBalance", BigNumber.ZERO)
 					.plus(voteBalanceChange);
 
-				delegate.setAttribute("delegate.voteBalance", voteBalance);
+				validator.setAttribute("validator.voteBalance", voteBalance);
 			}
 		} else {
-			// Update vote balance of the sender's delegate
+			// Update vote balance of the sender's validator
 			if (sender.hasVoted()) {
-				const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					sender.getAttribute("vote"),
 				);
 
@@ -247,11 +247,11 @@ export class BlockState implements Contracts.State.BlockState {
 
 				const total: BigNumber = amount.plus(transaction.fee);
 
-				const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance", BigNumber.ZERO);
+				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
 
-				// General case : sender delegate vote balance reduced by amount + fees (or increased if revert)
-				delegate.setAttribute(
-					"delegate.voteBalance",
+				// General case : sender validator vote balance reduced by amount + fees (or increased if revert)
+				validator.setAttribute(
+					"validator.voteBalance",
 					revert ? voteBalance.plus(total) : voteBalance.minus(total),
 				);
 			}
@@ -262,30 +262,30 @@ export class BlockState implements Contracts.State.BlockState {
 			) {
 				AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.asset?.payments);
 
-				// go through all payments and update recipients delegates vote balance
+				// go through all payments and update recipients validators vote balance
 				for (const { recipientId, amount } of transaction.asset.payments) {
 					const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByAddress(recipientId);
 					if (recipientWallet.hasVoted()) {
 						const vote = recipientWallet.getAttribute("vote");
-						const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
-						const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance", BigNumber.ZERO);
-						delegate.setAttribute(
-							"delegate.voteBalance",
+						const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
+						const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
+						validator.setAttribute(
+							"validator.voteBalance",
 							revert ? voteBalance.minus(amount) : voteBalance.plus(amount),
 						);
 					}
 				}
 			}
 
-			// Update vote balance of recipient's delegate
+			// Update vote balance of recipient's validator
 			if (recipient && recipient.hasVoted()) {
-				const delegate: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					recipient.getAttribute("vote"),
 				);
-				const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance", BigNumber.ZERO);
+				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
 
-				delegate.setAttribute(
-					"delegate.voteBalance",
+				validator.setAttribute(
+					"validator.voteBalance",
 					revert ? voteBalance.minus(transaction.amount) : voteBalance.plus(transaction.amount),
 				);
 			}

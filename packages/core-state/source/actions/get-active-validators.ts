@@ -3,7 +3,7 @@ import { Services, Types } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "../round-state";
 
-export class GetActiveDelegatesAction extends Services.Triggers.Action {
+export class GetActiveValidatorsAction extends Services.Triggers.Action {
 	private app: Contracts.Kernel.Application;
 
 	public constructor(app: Contracts.Kernel.Application) {
@@ -13,8 +13,8 @@ export class GetActiveDelegatesAction extends Services.Triggers.Action {
 
 	public async execute(arguments_: Types.ActionArguments): Promise<Contracts.State.Wallet[]> {
 		const roundInfo: Contracts.Shared.RoundInfo = arguments_.roundInfo;
-		const delegates: Contracts.State.Wallet[] = arguments_.delegates;
+		const validators: Contracts.State.Wallet[] = arguments_.validators;
 
-		return this.app.get<RoundState>(Identifiers.RoundState).getActiveDelegates(roundInfo, delegates);
+		return this.app.get<RoundState>(Identifiers.RoundState).getActiveValidators(roundInfo, validators);
 	}
 }

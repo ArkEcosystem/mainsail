@@ -29,7 +29,7 @@ export class Sandbox {
 		crypto: {
 			flags: {
 				blocktime: 8,
-				delegates: 51,
+				validators: 51,
 				distribute: true,
 				explorer: "http://uexplorer.ark.io",
 				maxBlockPayload: 2_097_152,

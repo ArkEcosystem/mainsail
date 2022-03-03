@@ -1,6 +1,6 @@
 [
 	{
-		"activeDelegates": 51,
+		"activeValidators": 51,
 		"aip11": true,
 		"block": {
 			"maxPayload": 2097152,

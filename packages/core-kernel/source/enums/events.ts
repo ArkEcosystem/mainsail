@@ -28,9 +28,9 @@ export enum BlockEvent {
 	Reverted = "block.reverted",
 }
 
-export enum DelegateEvent {
-	Registered = "delegate.registered",
-	Resigned = "delegate.resigned",
+export enum ValidatorEvent {
+	Registered = "validator.registered",
+	Resigned = "validator.resigned",
 }
 
 export enum VoteEvent {

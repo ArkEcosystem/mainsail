@@ -6,22 +6,22 @@ export interface MilestoneSearchResult {
 	data: any;
 }
 
-export const getMilestonesWhichAffectActiveDelegateCount = (
+export const getMilestonesWhichAffectActiveValidatorCount = (
 	configuration: Crypto.IConfiguration,
 ): Array<MilestoneSearchResult> => {
 	const milestones: Array<MilestoneSearchResult> = [
 		{
-			data: configuration.getMilestone(1).activeDelegates,
+			data: configuration.getMilestone(1).activeValidators,
 			found: true,
 			height: 1,
 		},
 	];
 
-	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeDelegates");
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
 
 	while (nextMilestone.found) {
 		milestones.push(nextMilestone);
-		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
+		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
 	}
 
 	return milestones;
@@ -55,12 +55,12 @@ const findIndex = (
 	configuration: Crypto.IConfiguration,
 	slots,
 ): [number, number] => {
-	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeDelegates");
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
 
 	let lastSpanSlotNumber = 0;
-	let activeDelegates = configuration.getMilestone(1).activeDelegates;
+	let activeValidators = configuration.getMilestone(1).activeValidators;
 
-	const milestones = getMilestonesWhichAffectActiveDelegateCount(configuration);
+	const milestones = getMilestonesWhichAffectActiveValidatorCount(configuration);
 
 	for (let index = 0; index < milestones.length - 1; index++) {
 		if (height < nextMilestone.height) {
@@ -70,13 +70,13 @@ const findIndex = (
 		const lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1);
 		lastSpanSlotNumber =
 			slots.getSlotInfo(getTimeStampForBlock, lastSpanEndTime, nextMilestone.height - 1).slotNumber + 1;
-		activeDelegates = nextMilestone.data;
+		activeValidators = nextMilestone.data;
 
-		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeDelegates");
+		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
 	}
 
-	const currentForger = (slotNumber - lastSpanSlotNumber) % activeDelegates;
-	const nextForger = (currentForger + 1) % activeDelegates;
+	const currentForger = (slotNumber - lastSpanSlotNumber) % activeValidators;
+	const nextForger = (currentForger + 1) % activeValidators;
 
 	return [currentForger, nextForger];
 };

@@ -1,11 +1,11 @@
 import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
 
-import { Delegate } from "../interfaces";
+import { Validator } from "../interfaces";
 import { Method } from "./method";
 
 @injectable()
-export class BIP39 extends Method implements Delegate {
+export class BIP39 extends Method implements Validator {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Crypto.IAddressFactory;
 

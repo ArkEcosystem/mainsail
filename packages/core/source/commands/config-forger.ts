@@ -9,14 +9,14 @@ import { Command as BIP39Command } from "./config-forger-bip39";
 export class Command extends Commands.Command {
 	public signature = "config:forger";
 
-	public description = "Configure the forging delegate.";
+	public description = "Configure the forging validator.";
 
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("bip38", "", Joi.string())
-			.setFlag("bip39", "A delegate plain text passphrase. Referred to as BIP39.", Joi.string())
+			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag(
 				"method",
@@ -41,7 +41,7 @@ export class Command extends Commands.Command {
 					{ title: "Encrypted BIP38 (Recommended)", value: "bip38" },
 					{ title: "Plain BIP39", value: "bip39" },
 				],
-				message: "Please select how you wish to store your delegate passphrase?",
+				message: "Please select how you wish to store your validator passphrase?",
 				name: "method",
 				type: "select",
 			},

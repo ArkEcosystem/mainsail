@@ -1,2 +1,2 @@
-export * from "./delegate-factory";
+export * from "./validator-factory";
 export * from "./service-provider";

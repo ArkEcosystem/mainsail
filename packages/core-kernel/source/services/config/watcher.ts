@@ -10,7 +10,7 @@ export class Watcher {
 	private watcher!: NSFW;
 
 	public async boot(): Promise<void> {
-		const configFiles: string[] = [".env", "delegates.json", "peers.json", "plugins.js", "plugins.json"];
+		const configFiles: string[] = [".env", "validators.json", "peers.json", "plugins.js", "plugins.json"];
 
 		this.watcher = await nsfw(this.app.configPath(), (events) => {
 			for (const event of events) {

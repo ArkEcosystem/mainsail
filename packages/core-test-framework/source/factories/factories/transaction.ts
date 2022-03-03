@@ -63,19 +63,19 @@ import { FactoryBuilder } from "../factory-builder";
 // 	factory.get("Transfer").state("multiSign", multiSign);
 // };
 
-// export const registerDelegateRegistrationFactory = (factory: FactoryBuilder): void => {
-// 	factory.set("DelegateRegistration", ({ options }) =>
-// 		Transactions.BuilderFactory.delegateRegistration().usernameAsset(
+// export const registerValidatorRegistrationFactory = (factory: FactoryBuilder): void => {
+// 	factory.set("ValidatorRegistration", ({ options }) =>
+// 		Transactions.BuilderFactory.validatorRegistration().usernameAsset(
 // 			options.username || Math.random().toString(36).slice(8),
 // 		),
 // 	);
 
-// 	factory.get("DelegateRegistration").state("sign", sign);
+// 	factory.get("ValidatorRegistration").state("sign", sign);
 // };
 
-// export const registerDelegateResignationFactory = (factory: FactoryBuilder): void => {
-// 	factory.set("DelegateResignation", () => Transactions.BuilderFactory.delegateResignation());
-// 	factory.get("DelegateResignation").state("sign", sign);
+// export const registerValidatorResignationFactory = (factory: FactoryBuilder): void => {
+// 	factory.set("ValidatorResignation", () => Transactions.BuilderFactory.validatorResignation());
+// 	factory.get("ValidatorResignation").state("sign", sign);
 // };
 
 // export const registerVoteFactory = (factory: FactoryBuilder): void => {
@@ -147,8 +147,8 @@ import { FactoryBuilder } from "../factory-builder";
 
 export const registerTransactionFactory = (factory: FactoryBuilder): void => {
 	// registerTransferFactory(factory);
-	// registerDelegateRegistrationFactory(factory);
-	// registerDelegateResignationFactory(factory);
+	// registerValidatorRegistrationFactory(factory);
+	// registerValidatorResignationFactory(factory);
 	// registerVoteFactory(factory);
 	// registerUnvoteFactory(factory);
 	// registerMultiSignature(factory);

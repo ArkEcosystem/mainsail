@@ -24,19 +24,19 @@ export const buildBIP38 = async (flags, config?: string): Promise<Record<string,
 	}
 
 	// @todo: update to follow new config convention
-	const configDelegates = join(config, "delegates.json");
+	const configValidators = join(config, "validators.json");
 
-	if (!existsSync(configDelegates)) {
-		throw new MissingConfigFile(configDelegates);
+	if (!existsSync(configValidators)) {
+		throw new MissingConfigFile(configValidators);
 	}
 
-	const delegates = require(configDelegates);
+	const validators = require(configValidators);
 
-	if (!bip38 && delegates.bip38) {
-		bip38 = delegates.bip38;
+	if (!bip38 && validators.bip38) {
+		bip38 = validators.bip38;
 	}
 
-	if (!bip38 && !delegates.secrets?.length) {
+	if (!bip38 && !validators.secrets?.length) {
 		throw new PassphraseNotDetected();
 	}
 

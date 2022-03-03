@@ -3,17 +3,17 @@ import { Crypto } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { DelegateResignationTransaction } from "./versions/1";
+import { ValidatorResignationTransaction } from "./versions/1";
 
 @injectable()
-export class DelegateResignationBuilder extends TransactionBuilder<DelegateResignationBuilder> {
+export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorResignationBuilder> {
 	@postConstruct()
 	public postConstruct() {
 		this.initializeData();
 
-		this.data.type = DelegateResignationTransaction.type;
-		this.data.typeGroup = DelegateResignationTransaction.typeGroup;
-		this.data.fee = DelegateResignationTransaction.staticFee(this.configuration);
+		this.data.type = ValidatorResignationTransaction.type;
+		this.data.typeGroup = ValidatorResignationTransaction.typeGroup;
+		this.data.fee = ValidatorResignationTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.senderPublicKey = undefined;
 	}
@@ -24,7 +24,7 @@ export class DelegateResignationBuilder extends TransactionBuilder<DelegateResig
 		return struct;
 	}
 
-	protected instance(): DelegateResignationBuilder {
+	protected instance(): ValidatorResignationBuilder {
 		return this;
 	}
 }

@@ -1,4 +1,4 @@
-// import { DelegateFactory } from "@arkecosystem/core-forger";
+// import { ValidatorFactory } from "@arkecosystem/core-forger";
 
 // import secrets from "../../internal/passphrases.json";
 // import { Signer } from "../../internal/signer";
@@ -39,7 +39,7 @@ export const registerBlockFactory = (
 	// 			);
 	// 		}
 	// 	}
-	// 	return DelegateFactory.fromBIP39(options.passphrase || secrets[0]).forge(transactions, {
+	// 	return ValidatorFactory.fromBIP39(options.passphrase || secrets[0]).forge(transactions, {
 	// 		previousBlock,
 	// 		timestamp:
 	// 			Crypto.Slots.getSlotNumber(blockTimestampLookup, Crypto.Slots.getTime()) * options.blocktime ||

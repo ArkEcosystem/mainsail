@@ -75,7 +75,7 @@ export interface Wallet {
 
 	hasAttribute(key: string): boolean;
 
-	isDelegate(): boolean;
+	isValidator(): boolean;
 
 	hasVoted(): boolean;
 
@@ -86,7 +86,7 @@ export interface Wallet {
 
 export type WalletFactory = (address: string) => Wallet;
 
-export interface WalletDelegateAttributes {
+export interface WalletValidatorAttributes {
 	username: string;
 	voteBalance: BigNumber;
 	forgedFees: BigNumber;
@@ -151,7 +151,7 @@ export interface WalletRepository {
 
 export enum SearchScope {
 	Wallets,
-	Delegates,
+	Validators,
 	Locks,
 	Entities,
 }

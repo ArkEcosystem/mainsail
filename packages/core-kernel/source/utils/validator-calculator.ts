@@ -13,17 +13,21 @@ const toDecimal = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
 	return +Number(div).toFixed(2);
 };
 
-export const calculateApproval = (delegate: State.Wallet, height = 1, configuration: Crypto.IConfiguration): number => {
+export const calculateApproval = (
+	validator: State.Wallet,
+	height = 1,
+	configuration: Crypto.IConfiguration,
+): number => {
 	const totalSupply: BigNumber = BigNumber.make(calculateSupply(height, configuration));
-	const voteBalance: BigNumber = delegate.getAttribute("delegate.voteBalance");
+	const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance");
 
 	return toDecimal(voteBalance, totalSupply);
 };
 
 export const calculateForgedTotal = (wallet: State.Wallet): string => {
-	const delegate: State.WalletDelegateAttributes = wallet.getAttribute("delegate");
-	const forgedFees: BigNumber = BigNumber.make(delegate.forgedFees);
-	const forgedRewards: BigNumber = BigNumber.make(delegate.forgedRewards);
+	const validator: State.WalletValidatorAttributes = wallet.getAttribute("validator");
+	const forgedFees: BigNumber = BigNumber.make(validator.forgedFees);
+	const forgedRewards: BigNumber = BigNumber.make(validator.forgedRewards);
 
 	return forgedFees.plus(forgedRewards).toFixed();
 };

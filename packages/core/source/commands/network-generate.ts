@@ -10,10 +10,10 @@ import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/cor
 import { ServiceProvider as CoreCryptoTime } from "@arkecosystem/core-crypto-time";
 import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
 import {
-	DelegateRegistrationBuilder,
-	ServiceProvider as CoreCryptoTransactionDelegateRegistration,
-} from "@arkecosystem/core-crypto-transaction-delegate-registration";
-import { ServiceProvider as CoreCryptoTransactionDelegateResignation } from "@arkecosystem/core-crypto-transaction-delegate-resignation";
+	ValidatorRegistrationBuilder,
+	ServiceProvider as CoreCryptoTransactionValidatorRegistration,
+} from "@arkecosystem/core-crypto-transaction-validator-registration";
+import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@arkecosystem/core-crypto-transaction-validator-resignation";
 import { ServiceProvider as CoreCryptoTransactionMultiPayment } from "@arkecosystem/core-crypto-transaction-multi-payment";
 import { ServiceProvider as CoreCryptoTransactionMultiSignatureRegistration } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import {
@@ -55,18 +55,18 @@ interface DynamicFees {
 	minFeeBroadcast?: number;
 	addonBytes: {
 		transfer?: number;
-		delegateRegistration?: number;
+		validatorRegistration?: number;
 		vote?: number;
 		multiSignature?: number;
 		multiPayment?: number;
-		delegateResignation?: number;
+		validatorResignation?: number;
 	};
 }
 
 interface Options {
 	network: string;
 	premine: string;
-	delegates: number;
+	validators: number;
 	blocktime: number;
 	maxTxPerBlock: number;
 	maxBlockPayload: number;
@@ -130,8 +130,8 @@ export class Command extends Commands.Command {
 			default: "12500000000000000",
 		},
 		{
-			name: "delegates",
-			description: "The number of delegates to generate.",
+			name: "validators",
+			description: "The number of validators to generate.",
 			schema: Joi.number(),
 			promptType: "number",
 			default: 51,
@@ -159,7 +159,7 @@ export class Command extends Commands.Command {
 		},
 		{
 			name: "rewardHeight",
-			description: "The height at which delegate block reward starts.",
+			description: "The height at which validator block reward starts.",
 			schema: Joi.number(),
 			promptType: "number",
 			default: 75600,
@@ -208,7 +208,7 @@ export class Command extends Commands.Command {
 		},
 		{
 			name: "distribute",
-			description: "Distribute the premine evenly between all delegates?",
+			description: "Distribute the premine evenly between all validators?",
 			schema: Joi.bool(),
 			promptType: "confirm",
 			default: false,
@@ -235,8 +235,8 @@ export class Command extends Commands.Command {
 			default: 10000000,
 		},
 		{
-			name: "feeStaticDelegateRegistration",
-			description: "Fee for delegate registration transactions.",
+			name: "feeStaticValidatorRegistration",
+			description: "Fee for validator registration transactions.",
 			schema: Joi.number(),
 			default: 2500000000,
 		},
@@ -254,8 +254,8 @@ export class Command extends Commands.Command {
 			default: 10000000,
 		},
 		{
-			name: "feeStaticDelegateResignation",
-			description: "Fee for delegate resignation transactions.",
+			name: "feeStaticValidatorResignation",
+			description: "Fee for validator resignation transactions.",
 			schema: Joi.number(),
 			default: 2500000000,
 		},
@@ -321,10 +321,10 @@ export class Command extends Commands.Command {
 		await this.app.resolve<CoreFeesStatic>(CoreFeesStatic).register();
 		await this.app.resolve<CoreCryptoTransaction>(CoreCryptoTransaction).register();
 		await this.app
-			.resolve<CoreCryptoTransactionDelegateRegistration>(CoreCryptoTransactionDelegateRegistration)
+			.resolve<CoreCryptoTransactionValidatorRegistration>(CoreCryptoTransactionValidatorRegistration)
 			.register();
 		await this.app
-			.resolve<CoreCryptoTransactionDelegateResignation>(CoreCryptoTransactionDelegateResignation)
+			.resolve<CoreCryptoTransactionValidatorResignation>(CoreCryptoTransactionValidatorResignation)
 			.register();
 		await this.app.resolve<CoreCryptoTransactionMultiPayment>(CoreCryptoTransactionMultiPayment).register();
 		await this.app
@@ -421,7 +421,7 @@ export class Command extends Commands.Command {
 			const coreConfigDestination = join(configPath, flags.network);
 			const cryptoConfigDestination = join(coreConfigDestination, "crypto");
 
-			const delegates: any[] = await this.generateCoreDelegates(flags.delegates, flags.pubKeyHash);
+			const validators: any[] = await this.generateCoreValidators(flags.validators, flags.pubKeyHash);
 
 			const genesisWallet = await this.createWallet(flags.pubKeyHash);
 
@@ -475,7 +475,7 @@ export class Command extends Commands.Command {
 						});
 
 						// Genesis Block
-						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, delegates, flags);
+						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, validators, flags);
 
 						writeJSONSync(
 							resolve(cryptoConfigDestination, "network.json"),
@@ -508,8 +508,8 @@ export class Command extends Commands.Command {
 						});
 
 						writeJSONSync(
-							resolve(coreConfigDestination, "delegates.json"),
-							{ secrets: delegates.map((d) => d.passphrase) },
+							resolve(coreConfigDestination, "validators.json"),
+							{ secrets: validators.map((d) => d.passphrase) },
 							{ spaces: 4 },
 						);
 
@@ -557,7 +557,7 @@ export class Command extends Commands.Command {
 	private generateCryptoMilestones(options: Options) {
 		return [
 			{
-				activeDelegates: options.delegates,
+				activeValidators: options.validators,
 				aip11: true,
 				block: {
 					maxPayload: options.maxBlockPayload,
@@ -578,7 +578,7 @@ export class Command extends Commands.Command {
 		];
 	}
 
-	private async generateCryptoGenesisBlock(genesisWallet, delegates, options: Options) {
+	private async generateCryptoGenesisBlock(genesisWallet, validators, options: Options) {
 		const premineWallet: Wallet = await this.createWallet(options.pubKeyHash);
 
 		let transactions = [];
@@ -587,7 +587,7 @@ export class Command extends Commands.Command {
 			transactions = transactions.concat(
 				...(await this.createTransferTransactions(
 					premineWallet,
-					delegates,
+					validators,
 					options.premine,
 					options.pubKeyHash,
 				)),
@@ -599,8 +599,8 @@ export class Command extends Commands.Command {
 		}
 
 		transactions = transactions.concat(
-			...(await this.buildDelegateTransactions(delegates, options.pubKeyHash)),
-			...(await this.buildVoteTransactions(delegates, options.pubKeyHash)),
+			...(await this.buildValidatorTransactions(validators, options.pubKeyHash)),
+			...(await this.buildVoteTransactions(validators, options.pubKeyHash)),
 		);
 
 		return this.createGenesisBlock(premineWallet.keys, transactions, 0);
@@ -669,14 +669,14 @@ export class Command extends Commands.Command {
 		return readJSONSync(resolve(__dirname, "../../bin/config/testnet/app.json"));
 	}
 
-	private async generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Promise<Wallet[]> {
+	private async generateCoreValidators(activeValidators: number, pubKeyHash: number): Promise<Wallet[]> {
 		const wallets: Wallet[] = [];
 
-		for (let index = 0; index < activeDelegates; index++) {
-			const delegateWallet: Wallet = await this.createWallet(pubKeyHash);
-			delegateWallet.username = `genesis_${index + 1}`;
+		for (let index = 0; index < activeValidators; index++) {
+			const validatorWallet: Wallet = await this.createWallet(pubKeyHash);
+			validatorWallet.username = `genesis_${index + 1}`;
 
-			wallets.push(delegateWallet);
+			wallets.push(validatorWallet);
 		}
 
 		return wallets;
@@ -737,16 +737,16 @@ export class Command extends Commands.Command {
 		return result;
 	}
 
-	private async buildDelegateTransactions(senders: Wallet[], pubKeyHash: number) {
+	private async buildValidatorTransactions(senders: Wallet[], pubKeyHash: number) {
 		const result = [];
 
 		for (const [index, sender] of senders.entries()) {
 			result[index] = await this.formatGenesisTransaction(
 				(
 					await this.app
-						.resolve(DelegateRegistrationBuilder)
+						.resolve(ValidatorRegistrationBuilder)
 						.network(pubKeyHash)
-						.nonce("1") // delegate registration tx is always the first one from sender
+						.nonce("1") // validator registration tx is always the first one from sender
 						.usernameAsset(sender.username)
 						.fee(`${25 * 1e8}`)
 						.sign(sender.passphrase)
@@ -767,7 +767,7 @@ export class Command extends Commands.Command {
 					await this.app
 						.resolve(VoteBuilder)
 						.network(pubKeyHash)
-						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is delegate registration)
+						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
 						.votesAsset([`+${sender.keys.publicKey}`])
 						.fee(`${1 * 1e8}`)
 						.sign(sender.passphrase)

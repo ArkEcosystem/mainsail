@@ -1,6 +1,6 @@
 import { Repositories } from "../../../core-database";
 
-export type DelegateForgedBlock = {
+export type ValidatorForgedBlock = {
 	generatorPublicKey: string;
 	totalRewards: string;
 	totalFees: string;
@@ -8,11 +8,11 @@ export type DelegateForgedBlock = {
 };
 export type LastForgedBlock = { id: string; height: string; generatorPublicKey: string; timestamp: number };
 
-let mockDelegatesForgedBlocks: DelegateForgedBlock[] = [];
+let mockValidatorsForgedBlocks: ValidatorForgedBlock[] = [];
 let mockLastForgedBlocks: LastForgedBlock[] = [];
 
-export const setDelegateForgedBlocks = (blocks: DelegateForgedBlock[]) => {
-	mockDelegatesForgedBlocks = blocks;
+export const setValidatorForgedBlocks = (blocks: ValidatorForgedBlock[]) => {
+	mockValidatorsForgedBlocks = blocks;
 };
 
 export const setLastForgedBlocks = (blocks: LastForgedBlock[]) => {
@@ -20,8 +20,8 @@ export const setLastForgedBlocks = (blocks: LastForgedBlock[]) => {
 };
 
 class BlockRepositoryMock implements Partial<Repositories.BlockRepository> {
-	public async getDelegatesForgedBlocks() {
-		return mockDelegatesForgedBlocks;
+	public async getValidatorsForgedBlocks() {
+		return mockValidatorsForgedBlocks;
 	}
 
 	public async getLastForgedBlocks() {

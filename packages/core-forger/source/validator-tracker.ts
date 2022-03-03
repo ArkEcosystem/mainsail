@@ -2,10 +2,10 @@ import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 
-import { Delegate } from "./interfaces";
+import { Validator } from "./interfaces";
 
 @injectable()
-export class DelegateTracker {
+export class ValidatorTracker {
 	@inject(Identifiers.Application)
 	private readonly app: Contracts.Kernel.Application;
 
@@ -28,10 +28,10 @@ export class DelegateTracker {
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeCalculator: any;
 
-	private delegates: Delegate[] = [];
+	private validators: Validator[] = [];
 
-	public initialize(delegates: Delegate[]): this {
-		this.delegates = delegates;
+	public initialize(validators: Validator[]): this {
+		this.validators = validators;
 
 		return this;
 	}
@@ -39,16 +39,16 @@ export class DelegateTracker {
 	public async handle(): Promise<void> {
 		// Arrange...
 		const { height, timestamp } = this.blockchainService.getLastBlock().data;
-		const maxDelegates = this.configuration.getMilestone(height).activeDelegates;
+		const maxValidators = this.configuration.getMilestone(height).activeValidators;
 		const blockTime: number = this.blockTimeCalculator.calculateBlockTime(height);
 		const round: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
 
-		const activeDelegates: any = await this.app
+		const activeValidators: any = await this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.call("getActiveDelegates", { roundInfo: round });
+			.call("getActiveValidators", { roundInfo: round });
 
-		const activeDelegatesPublicKeys: (string | undefined)[] = activeDelegates.map(
-			(delegate: Contracts.State.Wallet) => delegate.getPublicKey(),
+		const activeValidatorsPublicKeys: (string | undefined)[] = activeValidators.map(
+			(validator: Contracts.State.Wallet) => validator.getPublicKey(),
 		);
 
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
@@ -67,22 +67,22 @@ export class DelegateTracker {
 
 		// Determine Next Forgers...
 		const nextForgers: string[] = [];
-		for (let index = 0; index <= maxDelegates; index++) {
-			const delegate: string | undefined =
-				activeDelegatesPublicKeys[(forgingInfo.currentForger + index) % maxDelegates];
+		for (let index = 0; index <= maxValidators; index++) {
+			const validator: string | undefined =
+				activeValidatorsPublicKeys[(forgingInfo.currentForger + index) % maxValidators];
 
-			if (delegate) {
-				nextForgers.push(delegate);
+			if (validator) {
+				nextForgers.push(validator);
 			}
 		}
 
-		if (activeDelegatesPublicKeys.length < maxDelegates) {
+		if (activeValidatorsPublicKeys.length < maxValidators) {
 			return this.logger.warning(
 				`Tracker only has ${Utils.pluralize(
-					"active delegate",
-					activeDelegatesPublicKeys.length,
+					"active validator",
+					activeValidatorsPublicKeys.length,
 					true,
-				)} from a required ${maxDelegates}`,
+				)} from a required ${maxValidators}`,
 			);
 		}
 
@@ -95,27 +95,27 @@ export class DelegateTracker {
 
 		this.logger.debug(`Next Forgers: ${JSON.stringify(nextForgersUsernames)}`);
 
-		const secondsToNextRound: number = (maxDelegates - forgingInfo.currentForger - 1) * blockTime;
+		const secondsToNextRound: number = (maxValidators - forgingInfo.currentForger - 1) * blockTime;
 
-		for (const delegate of this.delegates) {
+		for (const validator of this.validators) {
 			let indexInNextForgers = 0;
 			for (const [index, nextForger] of nextForgers.entries()) {
-				if (nextForger === delegate.publicKey) {
+				if (nextForger === validator.publicKey) {
 					indexInNextForgers = index;
 					break;
 				}
 			}
 
 			if (indexInNextForgers === 0) {
-				this.logger.debug(`${this.getUsername(delegate.publicKey)} will forge next.`);
-			} else if (indexInNextForgers <= maxDelegates - forgingInfo.nextForger) {
+				this.logger.debug(`${this.getUsername(validator.publicKey)} will forge next.`);
+			} else if (indexInNextForgers <= maxValidators - forgingInfo.nextForger) {
 				this.logger.debug(
-					`${this.getUsername(delegate.publicKey)} will forge in ${Utils.prettyTime(
+					`${this.getUsername(validator.publicKey)} will forge in ${Utils.prettyTime(
 						indexInNextForgers * blockTime * 1000,
 					)}.`,
 				);
 			} else {
-				this.logger.debug(`${this.getUsername(delegate.publicKey)} has already forged.`);
+				this.logger.debug(`${this.getUsername(validator.publicKey)} has already forged.`);
 			}
 		}
 
@@ -123,6 +123,6 @@ export class DelegateTracker {
 	}
 
 	private async getUsername(publicKey: string): Promise<string> {
-		return (await this.walletRepository.findByPublicKey(publicKey)).getAttribute("delegate.username");
+		return (await this.walletRepository.findByPublicKey(publicKey)).getAttribute("validator.username");
 	}
 }

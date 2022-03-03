@@ -25,20 +25,20 @@ export class DposPreviousRoundState implements Contracts.State.DposPreviousRound
 
 		await this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.call("buildDelegateRanking", { dposState: this.dposState });
+			.call("buildValidatorRanking", { dposState: this.dposState });
 
-		this.dposState.setDelegatesRound(roundInfo);
+		this.dposState.setValidatorsRound(roundInfo);
 	}
 
-	public getAllDelegates(): readonly Contracts.State.Wallet[] {
-		return this.dposState.getAllDelegates();
+	public getAllValidators(): readonly Contracts.State.Wallet[] {
+		return this.dposState.getAllValidators();
 	}
 
-	public getActiveDelegates(): readonly Contracts.State.Wallet[] {
-		return this.dposState.getActiveDelegates();
+	public getActiveValidators(): readonly Contracts.State.Wallet[] {
+		return this.dposState.getActiveValidators();
 	}
 
-	public getRoundDelegates(): readonly Contracts.State.Wallet[] {
-		return this.dposState.getRoundDelegates();
+	public getRoundValidators(): readonly Contracts.State.Wallet[] {
+		return this.dposState.getRoundValidators();
 	}
 }
