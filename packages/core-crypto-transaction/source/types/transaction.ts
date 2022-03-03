@@ -1,20 +1,19 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-import { NotImplemented } from "@arkecosystem/core-contracts";
 import { TransactionSchema } from "./schemas";
 
 @injectable()
-export abstract class Transaction implements Crypto.ITransaction {
+export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	protected readonly addressFactory: Crypto.IAddressFactory;
+	protected readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration: Crypto.IConfiguration;
+	protected readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	private readonly verifier: Crypto.ITransactionVerifier;
+	private readonly verifier: Contracts.Crypto.ITransactionVerifier;
 
 	public static type: number | undefined = undefined;
 	public static typeGroup: number | undefined = undefined;
@@ -25,19 +24,19 @@ export abstract class Transaction implements Crypto.ITransaction {
 
 	public isVerified = false;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
-	public data: Crypto.ITransactionData;
+	public data: Contracts.Crypto.ITransactionData;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: Buffer;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public timestamp: number;
 
 	public static getSchema(): TransactionSchema {
-		throw new NotImplemented(this.constructor.name, "getSchema");
+		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
 	}
 
 	public static staticFee(
-		configuration: Crypto.IConfiguration,
-		feeContext: { height?: number; data?: Crypto.ITransactionData } = {},
+		configuration: Contracts.Crypto.IConfiguration,
+		feeContext: { height?: number; data?: Contracts.Crypto.ITransactionData } = {},
 	): BigNumber {
 		const milestones = configuration.getMilestone(feeContext.height);
 
@@ -56,14 +55,14 @@ export abstract class Transaction implements Crypto.ITransaction {
 		return this.verifier.verifyHash(this.data);
 	}
 
-	public verifySchema(): Crypto.ISchemaValidationResult {
+	public verifySchema(): Contracts.Crypto.ISchemaValidationResult {
 		return this.verifier.verifySchema(this.data);
 	}
 
-	public toJson(): Crypto.ITransactionJson {
-		const data: Crypto.ITransactionJson = JSON.parse(JSON.stringify(this.data));
+	public toJson(): Contracts.Crypto.ITransactionJson {
+		const data: Contracts.Crypto.ITransactionJson = JSON.parse(JSON.stringify(this.data));
 
-		if (data.typeGroup === Crypto.TransactionTypeGroup.Core) {
+		if (data.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core) {
 			delete data.typeGroup;
 		}
 

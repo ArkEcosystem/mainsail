@@ -1,5 +1,5 @@
-import { Providers } from "@arkecosystem/core-kernel";
 import { Identifiers } from "@arkecosystem/core-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 
 import { Validator } from "./validator";
 

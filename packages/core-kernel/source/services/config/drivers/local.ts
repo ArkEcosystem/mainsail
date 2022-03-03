@@ -1,16 +1,11 @@
-import { existsSync, readFileSync } from "fs";
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { dotenv, get, set } from "@arkecosystem/utils";
+import { existsSync, readFileSync } from "fs";
 import importFresh from "import-fresh";
 import Joi from "joi";
 import { extname } from "path";
 
-import {
-	ApplicationConfigurationCannotBeLoaded,
-	EnvironmentConfigurationCannotBeLoaded,
-} from "../../../exceptions/config";
-import { FileException } from "../../../exceptions/filesystem";
 import { JsonObject, KeyValuePair, Primitive } from "../../../types";
 import { assert } from "../../../utils";
 import { ConfigRepository } from "../repository";
@@ -24,15 +19,15 @@ const processSchema = {
 };
 
 @injectable()
-export class LocalConfigLoader implements Kernel.ConfigLoader {
+export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.Application)
-	protected readonly app!: Kernel.Application;
+	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
 	@inject(Identifiers.ValidationService)
-	private readonly validationService!: Kernel.Validator;
+	private readonly validationService!: Contracts.Kernel.Validator;
 
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
@@ -44,7 +39,7 @@ export class LocalConfigLoader implements Kernel.ConfigLoader {
 				}
 			}
 		} catch (error) {
-			throw new EnvironmentConfigurationCannotBeLoaded(error.message);
+			throw new Exceptions.EnvironmentConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
@@ -58,7 +53,7 @@ export class LocalConfigLoader implements Kernel.ConfigLoader {
 
 			this.loadCryptography();
 		} catch (error) {
-			throw new ApplicationConfigurationCannotBeLoaded(error.message);
+			throw new Exceptions.ApplicationConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
@@ -157,6 +152,6 @@ export class LocalConfigLoader implements Kernel.ConfigLoader {
 			}
 		}
 
-		throw new FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
+		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
 	}
 }

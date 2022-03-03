@@ -1,10 +1,10 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { ripemd160 } from "@noble/hashes/ripemd160";
 import { sha256 } from "@noble/hashes/sha256";
 
 @injectable()
-export class HashFactory implements Crypto.IHashFactory {
+export class HashFactory implements Contracts.Crypto.IHashFactory {
 	public async ripemd160(data: Buffer): Promise<Buffer> {
 		return Buffer.from(ripemd160(Array.isArray(data) ? Buffer.concat(data) : data));
 	}

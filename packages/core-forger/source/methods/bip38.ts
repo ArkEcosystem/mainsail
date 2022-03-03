@@ -1,9 +1,9 @@
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import bip38 from "bip38";
 import forge from "node-forge";
 import wif from "wif";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Validator } from "../interfaces";
 import { Method } from "./method";
@@ -11,18 +11,18 @@ import { Method } from "./method";
 @injectable()
 export class BIP38 extends Method implements Validator {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly addressFactory: Crypto.IAddressFactory;
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly keyPairFactory: Crypto.IKeyPairFactory;
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Identity.WifFactory)
-	private readonly wifFactory: Crypto.IWIFFactory;
+	private readonly wifFactory: Contracts.Crypto.IWIFFactory;
 
-	public keys: Crypto.IKeyPair | undefined;
+	public keys: Contracts.Crypto.IKeyPair | undefined;
 
 	public publicKey: string;
 
@@ -49,12 +49,15 @@ export class BIP38 extends Method implements Validator {
 		return this;
 	}
 
-	public async forge(transactions: Crypto.ITransactionData[], options: Record<string, any>): Promise<Crypto.IBlock> {
+	public async forge(
+		transactions: Contracts.Crypto.ITransactionData[],
+		options: Record<string, any>,
+	): Promise<Contracts.Crypto.IBlock> {
 		await this.decryptKeysWithOtp();
 
-		AppUtils.assert.defined<Crypto.IKeyPair>(this.keys);
+		AppUtils.assert.defined<Contracts.Crypto.IKeyPair>(this.keys);
 
-		const block: Crypto.IBlock = await this.createBlock(this.keys, transactions, options);
+		const block: Contracts.Crypto.IBlock = await this.createBlock(this.keys, transactions, options);
 
 		await this.encryptKeysWithOtp();
 
@@ -62,7 +65,7 @@ export class BIP38 extends Method implements Validator {
 	}
 
 	private async encryptKeysWithOtp(): Promise<void> {
-		AppUtils.assert.defined<Crypto.IKeyPair>(this.keys);
+		AppUtils.assert.defined<Contracts.Crypto.IKeyPair>(this.keys);
 
 		const wifKey: string = await this.wifFactory.fromKeys(this.keys);
 
@@ -82,8 +85,8 @@ export class BIP38 extends Method implements Validator {
 		this.encryptedKeys = undefined;
 	}
 
-	private async decryptPassphrase(passphrase: string, password: string): Promise<Crypto.IKeyPair> {
-		const decryptedWif: Crypto.IDecryptResult = bip38.decrypt(passphrase, password);
+	private async decryptPassphrase(passphrase: string, password: string): Promise<Contracts.Crypto.IKeyPair> {
+		const decryptedWif: Contracts.Crypto.IDecryptResult = bip38.decrypt(passphrase, password);
 		const wifKey: string = wif.encode(
 			this.configuration.get("network.wif"),
 			decryptedWif.privateKey,

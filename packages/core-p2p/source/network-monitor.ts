@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
 import prettyMs from "pretty-ms";
@@ -37,7 +37,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
@@ -279,7 +279,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		await this.discoverPeers(true);
 		await this.cleansePeers({ forcePing: true });
 
-		const lastBlock: Crypto.IBlock = this.app
+		const lastBlock: Contracts.Crypto.IBlock = this.app
 			.get<Contracts.State.StateStore>(Identifiers.StateStore)
 			.getLastBlock();
 
@@ -335,7 +335,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async downloadBlocksFromHeight(
 		fromBlockHeight: number,
 		maxParallelDownloads = 10,
-	): Promise<Crypto.IBlockData[]> {
+	): Promise<Contracts.Crypto.IBlockData[]> {
 		const peersAll: Contracts.P2P.Peer[] = this.repository.getPeers();
 
 		if (peersAll.length === 0) {
@@ -390,7 +390,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 					return;
 				}
 
-				let blocks!: Crypto.IBlockData[];
+				let blocks!: Contracts.Crypto.IBlockData[];
 				let peer: Contracts.P2P.Peer;
 				let peerPrint!: string;
 
@@ -459,7 +459,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			firstFailureMessage = error.message;
 		}
 
-		let downloadedBlocks: Crypto.IBlockData[] = [];
+		let downloadedBlocks: Contracts.Crypto.IBlockData[] = [];
 
 		let index;
 
@@ -489,7 +489,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		return downloadedBlocks;
 	}
 
-	public async broadcastBlock(block: Crypto.IBlock): Promise<void> {
+	public async broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		const blockchain = this.app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService);
 
 		let blockPing = blockchain.getBlockPing();

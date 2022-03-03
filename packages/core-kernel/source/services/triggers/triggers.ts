@@ -1,6 +1,6 @@
 import { injectable } from "@arkecosystem/core-container";
 
-import { InvalidArgumentException } from "../../exceptions/logic";
+import { Exceptions } from "@arkecosystem/core-contracts";
 import { ActionArguments } from "../../types";
 import { assert } from "../../utils";
 import { Action } from "./action";
@@ -11,11 +11,11 @@ export class Triggers {
 
 	public bind(name: string, action: Action): Action {
 		if (this.triggers.has(name)) {
-			throw new InvalidArgumentException(`The given trigger [${name}] is already registered.`);
+			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is already registered.`);
 		}
 
 		if (this.usesReservedBindingName(name)) {
-			throw new InvalidArgumentException(`The given trigger [${name}] is reserved.`);
+			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is reserved.`);
 		}
 
 		this.triggers.set(name, action);
@@ -27,7 +27,7 @@ export class Triggers {
 		const trigger = this.triggers.get(name);
 
 		if (!trigger) {
-			throw new InvalidArgumentException(`The given trigger [${name}] is not available.`);
+			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is not available.`);
 		}
 
 		this.triggers.delete(name);
@@ -111,7 +111,7 @@ export class Triggers {
 
 	private throwIfActionIsMissing(name: string): void {
 		if (!this.triggers.has(name)) {
-			throw new InvalidArgumentException(`The given trigger [${name}] is not available.`);
+			throw new Exceptions.InvalidArgumentException(`The given trigger [${name}] is not available.`);
 		}
 	}
 

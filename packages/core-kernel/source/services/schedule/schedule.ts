@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { BlockJob } from "./block-job";
 import { CronJob } from "./cron-job";
@@ -7,7 +7,7 @@ import { CronJob } from "./cron-job";
 @injectable()
 export class Schedule {
 	@inject(Identifiers.Application)
-	private readonly app!: Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	public cron(): CronJob {
 		return this.app.resolve<CronJob>(CronJob);

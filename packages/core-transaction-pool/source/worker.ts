@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
@@ -7,10 +7,10 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	private readonly createWorkerSubprocess: Contracts.TransactionPool.WorkerIpcSubprocessFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Crypto.ITransactionFactory;
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerIpcSubprocess;
 	private lastHeight = 0;
@@ -25,8 +25,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async getTransactionFromData(
-		transactionData: Crypto.ITransactionData | Buffer,
-	): Promise<Crypto.ITransaction> {
+		transactionData: Contracts.Crypto.ITransactionData | Buffer,
+	): Promise<Contracts.Crypto.ITransaction> {
 		const currentHeight = this.configuration.getHeight()!;
 		if (currentHeight !== this.lastHeight) {
 			this.lastHeight = currentHeight;

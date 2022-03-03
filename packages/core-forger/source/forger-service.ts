@@ -1,10 +1,9 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Client } from "./client";
-import { HostNoResponseError, RelayCommunicationError } from "@arkecosystem/core-contracts";
 import { Validator } from "./interfaces";
 
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
@@ -20,10 +19,10 @@ export class ForgerService {
 	private readonly handlerProvider: Contracts.Transactions.ITransactionHandlerProvider;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Crypto.ITransactionFactory;
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	private client!: Client;
 
@@ -35,7 +34,7 @@ export class ForgerService {
 
 	private round: Contracts.P2P.CurrentRound | undefined;
 
-	private lastForgedBlock: Crypto.IBlock | undefined;
+	private lastForgedBlock: Contracts.Crypto.IBlock | undefined;
 
 	private initialized = false;
 
@@ -49,7 +48,7 @@ export class ForgerService {
 		return this.round ? this.getRoundRemainingSlotTime(this.round) : undefined;
 	}
 
-	public getLastForgedBlock(): Crypto.IBlock | undefined {
+	public getLastForgedBlock(): Contracts.Crypto.IBlock | undefined {
 		return this.lastForgedBlock;
 	}
 
@@ -142,7 +141,10 @@ export class ForgerService {
 
 			return this.checkLater(this.getRoundRemainingSlotTime(this.round));
 		} catch (error) {
-			if (error instanceof HostNoResponseError || error instanceof RelayCommunicationError) {
+			if (
+				error instanceof Exceptions.HostNoResponseError ||
+				error instanceof Exceptions.RelayCommunicationError
+			) {
 				if (error.message.includes("blockchain isn't ready") || error.message.includes("App is not ready")) {
 					if (this.logAppReady) {
 						this.logger.info("Waiting for relay to become ready.");
@@ -176,9 +178,9 @@ export class ForgerService {
 		AppUtils.assert.defined<number>(networkState.getNodeHeight());
 		this.configuration.setHeight(networkState.getNodeHeight()!);
 
-		const transactions: Crypto.ITransactionData[] = await this.getTransactionsForForging();
+		const transactions: Contracts.Crypto.ITransactionData[] = await this.getTransactionsForForging();
 
-		const block: Crypto.IBlock | undefined = await validator.forge(transactions, {
+		const block: Contracts.Crypto.IBlock | undefined = await validator.forge(transactions, {
 			previousBlock: {
 				height: networkState.getNodeHeight(),
 				id: networkState.getLastBlockId(),
@@ -188,7 +190,7 @@ export class ForgerService {
 			timestamp: round.timestamp,
 		});
 
-		AppUtils.assert.defined<Crypto.IBlock>(block);
+		AppUtils.assert.defined<Contracts.Crypto.IBlock>(block);
 		AppUtils.assert.defined<string>(validator.publicKey);
 
 		const minimumMs = 2000;
@@ -215,7 +217,7 @@ export class ForgerService {
 		}
 	}
 
-	public async getTransactionsForForging(): Promise<Crypto.ITransactionData[]> {
+	public async getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
 		const response = await this.client.getTransactions();
 		if (AppUtils.isEmpty(response)) {
 			this.logger.error("Could not get unconfirmed transactions from transaction pool.");

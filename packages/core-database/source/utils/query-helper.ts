@@ -1,4 +1,4 @@
-import Contracts from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { EntityMetadata } from "typeorm";
 
 export type SqlExpression = {

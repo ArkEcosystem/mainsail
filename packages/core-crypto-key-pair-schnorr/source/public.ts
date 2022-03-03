@@ -1,12 +1,11 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { schnorr } from "bcrypto";
 
 @injectable()
-export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
+export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
-	private readonly keyPairFactory: Crypto.IKeyPairFactory;
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
@@ -16,17 +15,17 @@ export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
 		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
-	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
-		const { min, publicKeys }: Crypto.IMultiSignatureAsset = asset;
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+		const { min, publicKeys }: Contracts.Crypto.IMultiSignatureAsset = asset;
 
 		for (const publicKey of publicKeys) {
 			if (!this.verify(publicKey)) {
-				throw new PublicKeyError(publicKey);
+				throw new Exceptions.PublicKeyError(publicKey);
 			}
 		}
 
 		if (min < 1 || min > publicKeys.length) {
-			throw new InvalidMultiSignatureAssetError();
+			throw new Exceptions.InvalidMultiSignatureAssetError();
 		}
 
 		const minKey: string = await this.fromMnemonic(this.#numberToHex(min));

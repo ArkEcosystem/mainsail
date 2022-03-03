@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
 
 import { ConfigManager, ConfigRepository } from "../../services/config";
 import { KeyValuePair } from "../../types";
@@ -8,7 +8,7 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class RegisterBaseConfiguration implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;

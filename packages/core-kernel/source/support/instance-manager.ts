@@ -1,13 +1,12 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Exceptions, Identifiers, Contracts } from "@arkecosystem/core-contracts";
 
-import { DriverCannotBeResolved } from "../exceptions/container";
 import { pascalCase } from "../utils";
 
 @injectable()
 export abstract class InstanceManager<T> {
 	@inject(Identifiers.Application)
-	protected readonly app!: Kernel.Application;
+	protected readonly app!: Contracts.Kernel.Application;
 
 	private defaultDriver: string;
 
@@ -27,13 +26,13 @@ export abstract class InstanceManager<T> {
 		const driver: T | undefined = this.drivers.get(name);
 
 		if (!driver) {
-			throw new DriverCannotBeResolved(name);
+			throw new Exceptions.DriverCannotBeResolved(name);
 		}
 
 		return driver;
 	}
 
-	public async extend(name: string, callback: (app: Kernel.Application) => Promise<T>): Promise<void> {
+	public async extend(name: string, callback: (app: Contracts.Kernel.Application) => Promise<T>): Promise<void> {
 		this.drivers.set(name, await callback(this.app));
 	}
 

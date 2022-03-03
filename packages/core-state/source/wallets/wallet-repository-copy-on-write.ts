@@ -1,4 +1,4 @@
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 
 import { WalletRepository } from "./wallet-repository";

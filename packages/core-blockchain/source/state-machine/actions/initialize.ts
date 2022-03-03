@@ -1,8 +1,8 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Action } from "../contracts";
 
@@ -33,11 +33,11 @@ export class Initialize implements Action {
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	public async handle(): Promise<void> {
 		try {
-			const block: Crypto.IBlock = this.stateStore.getLastBlock();
+			const block: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
 
 			if (!this.stateStore.getRestoredDatabaseIntegrity()) {
 				this.logger.info("Verifying database integrity");

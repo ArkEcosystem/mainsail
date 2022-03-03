@@ -1,4 +1,4 @@
-import Contracts from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Column, Entity, Index } from "typeorm";
 

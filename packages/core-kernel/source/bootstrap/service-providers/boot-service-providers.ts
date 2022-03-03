@@ -1,8 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
 import { BlockEvent, KernelEvent } from "../../enums";
-import { ServiceProviderCannotBeBooted } from "../../exceptions/plugins";
 import { ServiceProviderRepository } from "../../providers";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
@@ -13,16 +12,16 @@ import { ChangeServiceProviderState } from "./listeners";
 @injectable()
 export class BootServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.ServiceProviderRepository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Kernel.EventDispatcher;
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
-	private readonly logger!: Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
 		for (const [name, serviceProvider] of this.serviceProviders.all()) {
@@ -38,7 +37,7 @@ export class BootServiceProviders implements Bootstrapper {
 					const isRequired: boolean = await serviceProvider.required();
 
 					if (isRequired) {
-						throw new ServiceProviderCannotBeBooted(serviceProviderName, error.message);
+						throw new Exceptions.ServiceProviderCannotBeBooted(serviceProviderName, error.message);
 					}
 
 					this.serviceProviders.fail(serviceProviderName);
@@ -47,7 +46,7 @@ export class BootServiceProviders implements Bootstrapper {
 				this.serviceProviders.defer(name);
 			}
 
-			const eventListener: Kernel.EventListener = this.app
+			const eventListener: Contracts.Kernel.EventListener = this.app
 				.resolve(ChangeServiceProviderState)
 				.initialize(serviceProviderName, serviceProvider);
 

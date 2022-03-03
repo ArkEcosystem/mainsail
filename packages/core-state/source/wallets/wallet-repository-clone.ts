@@ -1,8 +1,7 @@
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable, tagged, postConstruct } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { WalletIndexNotFoundError } from "@arkecosystem/core-contracts";
 import { WalletIndex } from "./wallet-index";
 import { WalletRepository } from "./wallet-repository";
 
@@ -160,7 +159,7 @@ export class WalletRepositoryClone extends WalletRepository {
 
 	private getForgetIndex(name: string): Contracts.State.WalletIndex {
 		if (!this.forgetIndexes[name]) {
-			throw new WalletIndexNotFoundError(name);
+			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
 		return this.forgetIndexes[name];
 	}

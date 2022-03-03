@@ -1,4 +1,4 @@
-import Contracts from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { BlocksRoute } from "../routes/blocks";
 import { InternalRoute } from "../routes/internal";

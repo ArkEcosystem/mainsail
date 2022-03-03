@@ -1,21 +1,21 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Comparator, IteratorMany } from "./utils";
 
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
-	public transactions: Iterable<Crypto.ITransaction>;
+	public transactions: Iterable<Contracts.Crypto.ITransaction>;
 	public predicate?: Contracts.TransactionPool.QueryPredicate;
 
 	public constructor(
-		transactions: Iterable<Crypto.ITransaction>,
+		transactions: Iterable<Contracts.Crypto.ITransaction>,
 		predicate?: Contracts.TransactionPool.QueryPredicate,
 	) {
 		this.transactions = transactions;
 		this.predicate = predicate;
 	}
 
-	public *[Symbol.iterator](): Iterator<Crypto.ITransaction> {
+	public *[Symbol.iterator](): Iterator<Contracts.Crypto.ITransaction> {
 		for (const transaction of this.transactions) {
 			if (!this.predicate || this.predicate(transaction)) {
 				yield transaction;
@@ -31,11 +31,11 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return this.wherePredicate(async (t) => t.id === id);
 	}
 
-	public whereType(type: Crypto.TransactionType | number): QueryIterable {
+	public whereType(type: Contracts.Crypto.TransactionType | number): QueryIterable {
 		return this.wherePredicate(async (t) => t.type === type);
 	}
 
-	public whereTypeGroup(typeGroup: Crypto.TransactionTypeGroup | number): QueryIterable {
+	public whereTypeGroup(typeGroup: Contracts.Crypto.TransactionTypeGroup | number): QueryIterable {
 		return this.wherePredicate(async (t) => t.typeGroup === typeGroup);
 	}
 
@@ -43,7 +43,7 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return this.wherePredicate(async (t) => t.data.version === version);
 	}
 
-	public whereKind(transaction: Crypto.ITransaction): QueryIterable {
+	public whereKind(transaction: Contracts.Crypto.ITransaction): QueryIterable {
 		return this.wherePredicate(async (t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
 	}
 
@@ -54,7 +54,7 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return false;
 	}
 
-	public first(): Crypto.ITransaction {
+	public first(): Contracts.Crypto.ITransaction {
 		for (const transaction of this) {
 			return transaction;
 		}
@@ -68,7 +68,7 @@ export class Query implements Contracts.TransactionPool.Query {
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
 	public getAll(): QueryIterable {
-		const iterable: Iterable<Crypto.ITransaction> = function* (this: Query) {
+		const iterable: Iterable<Contracts.Crypto.ITransaction> = function* (this: Query) {
 			for (const senderMempool of this.mempool.getSenderMempools()) {
 				for (const transaction of senderMempool.getFromLatest()) {
 					yield transaction;
@@ -80,7 +80,7 @@ export class Query implements Contracts.TransactionPool.Query {
 	}
 
 	public getAllBySender(senderPublicKey: string): QueryIterable {
-		const iterable: Iterable<Crypto.ITransaction> = function* (this: Query) {
+		const iterable: Iterable<Contracts.Crypto.ITransaction> = function* (this: Query) {
 			if (this.mempool.hasSenderMempool(senderPublicKey)) {
 				const transactions = this.mempool.getSenderMempool(senderPublicKey).getFromEarliest();
 				for (const transaction of transactions) {
@@ -95,14 +95,16 @@ export class Query implements Contracts.TransactionPool.Query {
 	public getFromLowestPriority(): QueryIterable {
 		const iterable = {
 			[Symbol.iterator]: () => {
-				const comparator: Comparator<Crypto.ITransaction> = (a: Crypto.ITransaction, b: Crypto.ITransaction) =>
-					a.data.fee.comparedTo(b.data.fee);
+				const comparator: Comparator<Contracts.Crypto.ITransaction> = (
+					a: Contracts.Crypto.ITransaction,
+					b: Contracts.Crypto.ITransaction,
+				) => a.data.fee.comparedTo(b.data.fee);
 
-				const iterators: Iterator<Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
+				const iterators: Iterator<Contracts.Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
 					.map((p) => p.getFromLatest())
 					.map((index) => index[Symbol.iterator]());
 
-				return new IteratorMany<Crypto.ITransaction>(iterators, comparator);
+				return new IteratorMany<Contracts.Crypto.ITransaction>(iterators, comparator);
 			},
 		};
 
@@ -112,14 +114,16 @@ export class Query implements Contracts.TransactionPool.Query {
 	public getFromHighestPriority(): QueryIterable {
 		const iterable = {
 			[Symbol.iterator]: () => {
-				const comparator: Comparator<Crypto.ITransaction> = (a: Crypto.ITransaction, b: Crypto.ITransaction) =>
-					b.data.fee.comparedTo(a.data.fee);
+				const comparator: Comparator<Contracts.Crypto.ITransaction> = (
+					a: Contracts.Crypto.ITransaction,
+					b: Contracts.Crypto.ITransaction,
+				) => b.data.fee.comparedTo(a.data.fee);
 
-				const iterators: Iterator<Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
+				const iterators: Iterator<Contracts.Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
 					.map((p) => p.getFromEarliest())
 					.map((index) => index[Symbol.iterator]());
 
-				return new IteratorMany<Crypto.ITransaction>(iterators, comparator);
+				return new IteratorMany<Contracts.Crypto.ITransaction>(iterators, comparator);
 			},
 		};
 

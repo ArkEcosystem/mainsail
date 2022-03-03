@@ -1,4 +1,4 @@
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 

@@ -1,9 +1,9 @@
-import { Crypto, Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 const mapHeightToMilestoneSpanTimestamp = async (
 	height: number,
 	findBlockTimestampByHeight: (height: number) => Promise<number>,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 ): Promise<(height: number) => number> => {
 	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
@@ -33,9 +33,9 @@ const mapHeightToMilestoneSpanTimestamp = async (
 };
 
 export const getBlockTimeLookup = async (
-	app: Kernel.Application,
+	app: Contracts.Kernel.Application,
 	height: number,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 ): Promise<(height: number) => number> => {
 	const databaseService = app.get<any>(Identifiers.DatabaseService);
 

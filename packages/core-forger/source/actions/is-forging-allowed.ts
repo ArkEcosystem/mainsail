@@ -1,4 +1,4 @@
-import Contracts from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { Services, Types } from "@arkecosystem/core-kernel";
 
 import { ForgerService } from "../forger-service";

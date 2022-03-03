@@ -1,4 +1,4 @@
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Ajv } from "ajv";
 import ajvKeywords from "ajv-keywords";
@@ -13,7 +13,7 @@ export enum TransactionType {
 	ValidatorResignation = 7,
 }
 
-export const registerKeywords = (configuration: Crypto.IConfiguration) => {
+export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
 	const maxBytes = (ajv: Ajv) => {
 		ajv.addKeyword("maxBytes", {
 			compile(schema, parentSchema) {
@@ -38,10 +38,10 @@ export const registerKeywords = (configuration: Crypto.IConfiguration) => {
 		ajv.addKeyword("transactionType", {
 			// @ts-ignore
 			compile(schema) {
-				return (data, dataPath, parentObject: Crypto.ITransactionData) => {
+				return (data, dataPath, parentObject: Contracts.Crypto.ITransactionData) => {
 					// Impose dynamic multipayment limit based on milestone
 					if (
-						data === Crypto.TransactionType.MultiPayment &&
+						data === Contracts.Crypto.TransactionType.MultiPayment &&
 						parentObject &&
 						(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
 						parentObject.asset &&

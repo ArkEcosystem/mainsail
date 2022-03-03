@@ -1,4 +1,5 @@
 import "reflect-metadata";
 
-export * from "./contracts";
-export * from "./exceptions";
+export * as Contracts from "./contracts";
+export * as Exceptions from "./exceptions";
+export * from "./identifiers";

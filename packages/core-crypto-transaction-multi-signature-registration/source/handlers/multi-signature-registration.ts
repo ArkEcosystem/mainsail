@@ -1,9 +1,8 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { PoolError } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Errors, Handlers } from "@arkecosystem/core-transactions";
+import { Handlers } from "@arkecosystem/core-transactions";
 
 import { MultiSignatureRegistrationTransaction } from "../versions";
 
@@ -16,10 +15,10 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 	private readonly transactionHistoryService: Contracts.Shared.TransactionHistoryService;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Crypto.IAddressFactory;
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -41,7 +40,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		};
 
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
-			AppUtils.assert.defined<Crypto.IMultiSignatureAsset>(transaction.asset?.multiSignature);
+			AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(transaction.asset?.multiSignature);
 
 			const multiSignature: Contracts.State.WalletMultiSignatureAttributes = transaction.asset.multiSignature;
 			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
@@ -49,7 +48,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			);
 
 			if (wallet.hasMultiSignature()) {
-				throw new Errors.MultiSignatureAlreadyRegisteredError();
+				throw new Exceptions.MultiSignatureAlreadyRegisteredError();
 			}
 
 			wallet.setAttribute("multiSignature", multiSignature);
@@ -62,25 +61,25 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		const { data }: Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.ITransaction = transaction;
 
-		AppUtils.assert.defined<Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
 
 		const { publicKeys, min } = data.asset.multiSignature;
 		if (min < 1 || min > publicKeys.length || min > 16) {
-			throw new Errors.MultiSignatureMinimumKeysError();
+			throw new Exceptions.MultiSignatureMinimumKeysError();
 		}
 
 		AppUtils.assert.defined<string[]>(data.signatures);
 
 		if (publicKeys.length !== data.signatures.length) {
-			throw new Errors.MultiSignatureKeyCountMismatchError();
+			throw new Exceptions.MultiSignatureKeyCountMismatchError();
 		}
 
-		AppUtils.assert.defined<Crypto.IMultiSignatureAsset>(data.asset.multiSignature);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset.multiSignature);
 
 		const multiSigPublicKey: string = await this.publicKeyFactory.fromMultiSignatureAsset(
 			data.asset.multiSignature,
@@ -88,19 +87,19 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		const recipientWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(multiSigPublicKey);
 
 		if (recipientWallet.hasMultiSignature()) {
-			throw new Errors.MultiSignatureAlreadyRegisteredError();
+			throw new Exceptions.MultiSignatureAlreadyRegisteredError();
 		}
 
 		if (!this.verifySignatures(wallet, data, data.asset.multiSignature)) {
-			throw new Errors.InvalidMultiSignatureError();
+			throw new Exceptions.InvalidMultiSignatureError();
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-		AppUtils.assert.defined<Crypto.IMultiSignatureAsset>(transaction.data.asset?.multiSignature);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(transaction.data.asset?.multiSignature);
 
 		const hasSender: boolean = this.poolQuery
 			.getAllBySender(transaction.data.senderPublicKey)
@@ -108,8 +107,8 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			.has();
 
 		if (hasSender) {
-			throw new PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.MultiSignature}' in the pool`,
+			throw new Exceptions.PoolError(
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.MultiSignature}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
@@ -125,24 +124,27 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			.has();
 
 		if (hasAddress) {
-			throw new PoolError(`MultiSignatureRegistration for address ${address} already in the pool`, "ERR_PENDING");
+			throw new Exceptions.PoolError(
+				`MultiSignatureRegistration for address ${address} already in the pool`,
+				"ERR_PENDING",
+			);
 		}
 	}
 
-	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 	}
 
-	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 		// Nothing else to do for the sender since the recipient wallet
 		// is made into a multi sig wallet.
 	}
 
-	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {
-		const { data }: Crypto.ITransaction = transaction;
+	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		const { data }: Contracts.Crypto.ITransaction = transaction;
 
-		AppUtils.assert.defined<Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
 
 		const recipientWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 			await this.publicKeyFactory.fromMultiSignatureAsset(data.asset.multiSignature),
@@ -151,10 +153,10 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		recipientWallet.setAttribute("multiSignature", data.asset.multiSignature);
 	}
 
-	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {
-		const { data }: Crypto.ITransaction = transaction;
+	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		const { data }: Contracts.Crypto.ITransaction = transaction;
 
-		AppUtils.assert.defined<Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
 
 		const recipientWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 			await this.publicKeyFactory.fromMultiSignatureAsset(data.asset.multiSignature),

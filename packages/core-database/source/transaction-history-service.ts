@@ -1,5 +1,5 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import assert from "assert";
 
 import { BlockRepository } from "./repositories/block-repository";
@@ -24,7 +24,7 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 
 	public async findOneByCriteria(
 		criteria: Contracts.Shared.OrTransactionCriteria,
-	): Promise<Crypto.ITransactionData | undefined> {
+	): Promise<Contracts.Crypto.ITransactionData | undefined> {
 		const data = await this.findManyByCriteria(criteria);
 		assert(data.length <= 1);
 		return data[0];
@@ -32,7 +32,7 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 
 	public async findManyByCriteria(
 		criteria: Contracts.Shared.OrTransactionCriteria,
-	): Promise<Crypto.ITransactionData[]> {
+	): Promise<Contracts.Crypto.ITransactionData[]> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [
 			{ direction: "asc", property: "blockHeight" },
@@ -44,7 +44,7 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 
 	public async *streamByCriteria(
 		criteria: Contracts.Search.OrCriteria<Contracts.Shared.TransactionCriteria>,
-	): AsyncIterable<Crypto.ITransactionData> {
+	): AsyncIterable<Contracts.Crypto.ITransactionData> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [
 			{ direction: "asc", property: "blockHeight" },
@@ -61,7 +61,7 @@ export class TransactionHistoryService implements Contracts.Shared.TransactionHi
 		sorting: Contracts.Search.Sorting,
 		pagination: Contracts.Search.Pagination,
 		options?: Contracts.Search.Options,
-	): Promise<Contracts.Search.ResultsPage<Crypto.ITransactionData>> {
+	): Promise<Contracts.Search.ResultsPage<Contracts.Crypto.ITransactionData>> {
 		const expression = await this.transactionFilter.getExpression(criteria);
 		const resultsPage = await this.transactionRepository.listByExpression(expression, sorting, pagination, options);
 		const models = resultsPage.results;

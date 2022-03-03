@@ -1,6 +1,6 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { injectable, inject, tagged } from "@arkecosystem/core-container";
 
 import { Transaction } from "./models/transaction";
 
@@ -122,8 +122,8 @@ export class TransactionFilter implements Contracts.Database.TransactionFilter {
 
 		const multipaymentRecipientIdExpression: Contracts.Search.AndExpression<Transaction> = {
 			expressions: [
-				{ op: "equal", property: "typeGroup", value: Crypto.TransactionTypeGroup.Core },
-				{ op: "equal", property: "type", value: Crypto.TransactionType.MultiPayment },
+				{ op: "equal", property: "typeGroup", value: Contracts.Crypto.TransactionTypeGroup.Core },
+				{ op: "equal", property: "type", value: Contracts.Crypto.TransactionType.MultiPayment },
 				{ op: "contains", property: "asset", value: { payments: [{ recipientId: criteria }] } },
 			],
 			op: "and",
@@ -133,8 +133,8 @@ export class TransactionFilter implements Contracts.Database.TransactionFilter {
 		if (recipientWallet && recipientWallet.getPublicKey()) {
 			const validatorRegistrationExpression: Contracts.Search.AndExpression<Transaction> = {
 				expressions: [
-					{ op: "equal", property: "typeGroup", value: Crypto.TransactionTypeGroup.Core },
-					{ op: "equal", property: "type", value: Crypto.TransactionType.ValidatorRegistration },
+					{ op: "equal", property: "typeGroup", value: Contracts.Crypto.TransactionTypeGroup.Core },
+					{ op: "equal", property: "type", value: Contracts.Crypto.TransactionType.ValidatorRegistration },
 					{ op: "equal", property: "senderPublicKey", value: recipientWallet.getPublicKey() },
 				],
 				op: "and",
@@ -224,7 +224,7 @@ export class TransactionFilter implements Contracts.Database.TransactionFilter {
 		criteria: Contracts.Shared.TransactionCriteria,
 	): Promise<Contracts.Search.Expression<Transaction>> {
 		if (hasOrCriteria(criteria.type) && hasOrCriteria(criteria.typeGroup) === false) {
-			return { op: "equal", property: "typeGroup", value: Crypto.TransactionTypeGroup.Core };
+			return { op: "equal", property: "typeGroup", value: Contracts.Crypto.TransactionTypeGroup.Core };
 		} else {
 			return { op: "true" };
 		}

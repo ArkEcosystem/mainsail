@@ -1,4 +1,4 @@
-import { InvalidPackageJson } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@arkecosystem/core-contracts";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra";
 import { join } from "path";
 
@@ -49,7 +49,7 @@ export abstract class AbstractSource implements Source {
 		try {
 			return readJSONSync(join(path, "package.json")).name;
 		} catch {
-			throw new InvalidPackageJson();
+			throw new Exceptions.InvalidPackageJson();
 		}
 	}
 

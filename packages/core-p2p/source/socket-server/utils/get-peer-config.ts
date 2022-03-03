@@ -1,4 +1,4 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services, Utils } from "@arkecosystem/core-kernel";
 
 type PluginConfig = { package: string; options: any };
@@ -43,7 +43,7 @@ const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Applica
 	});
 
 export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.PeerConfig => {
-	const configuration: Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
+	const configuration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
 
 	return {
 		network: {

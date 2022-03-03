@@ -1,13 +1,13 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { ClassManager } from "../../support/class-manager";
 import { MemoryQueue } from "./drivers/memory";
 
 @injectable()
 export class QueueManager extends ClassManager {
-	protected async createMemoryDriver(): Promise<Kernel.Queue> {
-		return this.app.resolve<Kernel.Queue>(MemoryQueue).make();
+	protected async createMemoryDriver(): Promise<Contracts.Kernel.Queue> {
+		return this.app.resolve<Contracts.Kernel.Queue>(MemoryQueue).make();
 	}
 
 	protected getDefaultDriver(): string {

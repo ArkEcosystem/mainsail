@@ -1,11 +1,11 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { AnySchema, ValidationErrorItem } from "joi";
 
 import { JsonObject } from "../../../types";
 
 @injectable()
-export class JoiValidator implements Kernel.Validator {
+export class JoiValidator implements Contracts.Kernel.Validator {
 	private data!: JsonObject;
 
 	private resultValue: JsonObject | undefined;

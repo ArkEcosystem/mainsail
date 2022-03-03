@@ -1,8 +1,8 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
 import assert from "assert";
 import { OrderedMap, OrderedSet, Seq } from "immutable";
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
 
 // todo: extract block and transaction behaviours into their respective stores
 // todo: review the implementation
@@ -19,15 +19,15 @@ export class StateStore implements Contracts.State.StateStore {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	private blockchain: any = {};
-	private genesisBlock?: Crypto.IBlock;
-	private lastDownloadedBlock?: Crypto.IBlockData;
+	private genesisBlock?: Contracts.Crypto.IBlock;
+	private lastDownloadedBlock?: Contracts.Crypto.IBlockData;
 	private lastStoredBlockHeight = 1;
 	private blockPing?: Contracts.State.BlockPing;
 	private started = false;
-	private forkedBlock?: Crypto.IBlock;
+	private forkedBlock?: Contracts.Crypto.IBlock;
 	private wakeUpTimeout?: NodeJS.Timeout;
 	private noBlockCounter = 0;
 	private p2pUpdateCounter = 0;
@@ -37,7 +37,7 @@ export class StateStore implements Contracts.State.StateStore {
 
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
-	private lastBlocks: OrderedMap<number, Crypto.IBlock> = OrderedMap<number, Crypto.IBlock>();
+	private lastBlocks: OrderedMap<number, Contracts.Crypto.IBlock> = OrderedMap<number, Contracts.Crypto.IBlock>();
 	// Stores the last n incoming transaction ids. The amount of transaction ids
 	// can be configured with the option `state.maxLastTransactionIds`.
 	private cachedTransactionIds: OrderedSet<string> = OrderedSet();
@@ -50,21 +50,21 @@ export class StateStore implements Contracts.State.StateStore {
 		this.blockchain = blockchain;
 	}
 
-	public getGenesisBlock(): Crypto.IBlock {
-		Utils.assert.defined<Crypto.IBlock>(this.genesisBlock);
+	public getGenesisBlock(): Contracts.Crypto.IBlock {
+		Utils.assert.defined<Contracts.Crypto.IBlock>(this.genesisBlock);
 
 		return this.genesisBlock;
 	}
 
-	public setGenesisBlock(block: Crypto.IBlock): void {
+	public setGenesisBlock(block: Contracts.Crypto.IBlock): void {
 		this.genesisBlock = block;
 	}
 
-	public getLastDownloadedBlock(): Crypto.IBlockData | undefined {
+	public getLastDownloadedBlock(): Contracts.Crypto.IBlockData | undefined {
 		return this.lastDownloadedBlock;
 	}
 
-	public setLastDownloadedBlock(block: Crypto.IBlockData): void {
+	public setLastDownloadedBlock(block: Contracts.Crypto.IBlockData): void {
 		this.lastDownloadedBlock = block;
 	}
 
@@ -88,11 +88,11 @@ export class StateStore implements Contracts.State.StateStore {
 		this.started = started;
 	}
 
-	public getForkedBlock(): Crypto.IBlock | undefined {
+	public getForkedBlock(): Contracts.Crypto.IBlock | undefined {
 		return this.forkedBlock;
 	}
 
-	public setForkedBlock(block: Crypto.IBlock): void {
+	public setForkedBlock(block: Contracts.Crypto.IBlock): void {
 		this.forkedBlock = block;
 	}
 
@@ -170,18 +170,21 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.getLastBlock().data.height;
 	}
 
-	public getLastBlock(): Crypto.IBlock {
-		const lastBlock: Crypto.IBlock | undefined = this.lastBlocks.last();
+	public getLastBlock(): Contracts.Crypto.IBlock {
+		const lastBlock: Contracts.Crypto.IBlock | undefined = this.lastBlocks.last();
 
-		Utils.assert.defined<Crypto.IBlock>(lastBlock);
+		Utils.assert.defined<Contracts.Crypto.IBlock>(lastBlock);
 
 		return lastBlock;
 	}
 
-	public setLastBlock(block: Crypto.IBlock): void {
+	public setLastBlock(block: Contracts.Crypto.IBlock): void {
 		// Only keep blocks which are below the new block height (i.e. rollback)
-		if (this.lastBlocks.last() && this.lastBlocks.last<Crypto.IBlock>().data.height !== block.data.height - 1) {
-			assert(block.data.height - 1 <= this.lastBlocks.last<Crypto.IBlock>().data.height);
+		if (
+			this.lastBlocks.last() &&
+			this.lastBlocks.last<Contracts.Crypto.IBlock>().data.height !== block.data.height - 1
+		) {
+			assert(block.data.height - 1 <= this.lastBlocks.last<Contracts.Crypto.IBlock>().data.height);
 			this.lastBlocks = this.lastBlocks.filter((b) => b.data.height < block.data.height);
 		}
 
@@ -199,18 +202,18 @@ export class StateStore implements Contracts.State.StateStore {
 
 		// Delete oldest block if size exceeds the maximum
 		if (this.lastBlocks.size > this.getMaxLastBlocks()) {
-			this.lastBlocks = this.lastBlocks.delete(this.lastBlocks.first<Crypto.IBlock>().data.height);
+			this.lastBlocks = this.lastBlocks.delete(this.lastBlocks.first<Contracts.Crypto.IBlock>().data.height);
 		}
 
 		this.noBlockCounter = 0;
 		this.p2pUpdateCounter = 0;
 	}
 
-	public getLastBlocks(): Crypto.IBlock[] {
+	public getLastBlocks(): Contracts.Crypto.IBlock[] {
 		return this.lastBlocks.valueSeq().reverse().toArray();
 	}
 
-	public getLastBlocksData(headersOnly?: boolean): Seq<number, Crypto.IBlockData> {
+	public getLastBlocksData(headersOnly?: boolean): Seq<number, Contracts.Crypto.IBlockData> {
 		return this.mapToBlockData(this.lastBlocks.valueSeq().reverse(), headersOnly);
 	}
 
@@ -226,7 +229,7 @@ export class StateStore implements Contracts.State.StateStore {
 			.toArray();
 	}
 
-	public getLastBlocksByHeight(start: number, end?: number, headersOnly?: boolean): Crypto.IBlockData[] {
+	public getLastBlocksByHeight(start: number, end?: number, headersOnly?: boolean): Contracts.Crypto.IBlockData[] {
 		const tail: number | undefined = end || start;
 
 		Utils.assert.defined<number>(tail);
@@ -235,10 +238,10 @@ export class StateStore implements Contracts.State.StateStore {
 			.valueSeq()
 			.filter((block) => block.data.height >= start && block.data.height <= tail);
 
-		return this.mapToBlockData(blocks, headersOnly).toArray() as Crypto.IBlockData[];
+		return this.mapToBlockData(blocks, headersOnly).toArray() as Contracts.Crypto.IBlockData[];
 	}
 
-	public getCommonBlocks(ids: string[]): Crypto.IBlockData[] {
+	public getCommonBlocks(ids: string[]): Contracts.Crypto.IBlockData[] {
 		const idsHash = {};
 
 		for (const id of ids) {
@@ -251,15 +254,15 @@ export class StateStore implements Contracts.State.StateStore {
 
 				return idsHash[block.id];
 			})
-			.toArray() as Crypto.IBlockData[];
+			.toArray() as Contracts.Crypto.IBlockData[];
 	}
 
-	public cacheTransactions(transactions: Crypto.ITransactionData[]): {
-		added: Crypto.ITransactionData[];
-		notAdded: Crypto.ITransactionData[];
+	public cacheTransactions(transactions: Contracts.Crypto.ITransactionData[]): {
+		added: Contracts.Crypto.ITransactionData[];
+		notAdded: Contracts.Crypto.ITransactionData[];
 	} {
-		const notAdded: Crypto.ITransactionData[] = [];
-		const added: Crypto.ITransactionData[] = transactions.filter((tx) => {
+		const notAdded: Contracts.Crypto.ITransactionData[] = [];
+		const added: Contracts.Crypto.ITransactionData[] = transactions.filter((tx) => {
 			Utils.assert.defined<string>(tx.id);
 
 			if (this.cachedTransactionIds.has(tx.id)) {
@@ -297,7 +300,7 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.cachedTransactionIds.toArray();
 	}
 
-	public pingBlock(incomingBlock: Crypto.IBlockData): boolean {
+	public pingBlock(incomingBlock: Contracts.Crypto.IBlockData): boolean {
 		if (!this.blockPing) {
 			return false;
 		}
@@ -312,7 +315,7 @@ export class StateStore implements Contracts.State.StateStore {
 		return false;
 	}
 
-	public pushPingBlock(block: Crypto.IBlockData, fromForger = false): void {
+	public pushPingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): void {
 		if (this.blockPing) {
 			this.logger.info(
 				`Previous block ${this.blockPing.block.height.toLocaleString()} pinged blockchain ${
@@ -331,7 +334,10 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	// Map Block instances to block data.
-	private mapToBlockData(blocks: Seq<number, Crypto.IBlock>, headersOnly?: boolean): Seq<number, Crypto.IBlockData> {
+	private mapToBlockData(
+		blocks: Seq<number, Contracts.Crypto.IBlock>,
+		headersOnly?: boolean,
+	): Seq<number, Contracts.Crypto.IBlockData> {
 		return blocks.map((block) => ({
 			...block.data,
 			transactions: headersOnly ? undefined : block.transactions.map((tx) => tx.data),

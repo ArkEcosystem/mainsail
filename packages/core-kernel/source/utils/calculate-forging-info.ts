@@ -1,4 +1,4 @@
-import { Crypto, Shared } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 export interface MilestoneSearchResult {
 	found: boolean;
@@ -7,7 +7,7 @@ export interface MilestoneSearchResult {
 }
 
 export const getMilestonesWhichAffectActiveValidatorCount = (
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 ): Array<MilestoneSearchResult> => {
 	const milestones: Array<MilestoneSearchResult> = [
 		{
@@ -31,9 +31,9 @@ export const calculateForgingInfo = (
 	timestamp: number,
 	height: number,
 	getTimeStampForBlock: (blockheight: number) => number,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 	slots,
-): Shared.ForgingInfo => {
+): Contracts.Shared.ForgingInfo => {
 	const slotInfo = slots.getSlotInfo(getTimeStampForBlock, timestamp, height);
 
 	const [currentForger, nextForger] = findIndex(
@@ -52,7 +52,7 @@ const findIndex = (
 	height: number,
 	slotNumber: number,
 	getTimeStampForBlock: (blockheight: number) => number,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 	slots,
 ): [number, number] => {
 	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");

@@ -1,6 +1,6 @@
 import { Providers, Types } from "@arkecosystem/core-kernel";
 import Joi from "joi";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Database } from "./database";
 import { InternalIdentifiers } from "./identifiers";

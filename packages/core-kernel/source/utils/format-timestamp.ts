@@ -1,4 +1,4 @@
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 
@@ -6,7 +6,7 @@ dayjs.extend(utc);
 
 export const formatTimestamp = (
 	epochStamp: number,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 ): {
 	epoch: number;
 	unix: number;

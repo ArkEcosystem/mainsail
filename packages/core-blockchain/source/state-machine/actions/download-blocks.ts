@@ -1,6 +1,6 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Action } from "../contracts";
 
@@ -22,16 +22,16 @@ export class DownloadBlocks implements Action {
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
 	public async handle(): Promise<void> {
-		const lastDownloadedBlock: Crypto.IBlockData =
+		const lastDownloadedBlock: Contracts.Crypto.IBlockData =
 			this.stateStore.getLastDownloadedBlock() || this.stateStore.getLastBlock().data;
 
-		const blocks: Crypto.IBlockData[] = await this.networkMonitor.downloadBlocksFromHeight(
+		const blocks: Contracts.Crypto.IBlockData[] = await this.networkMonitor.downloadBlocksFromHeight(
 			lastDownloadedBlock.height,
 		);
 

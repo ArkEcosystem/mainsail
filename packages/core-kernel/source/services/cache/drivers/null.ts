@@ -1,9 +1,9 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class NullCacheStore<K, T> implements Kernel.CacheStore<K, T> {
-	public async make(): Promise<Kernel.CacheStore<K, T>> {
+export class NullCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
+	public async make(): Promise<Contracts.Kernel.CacheStore<K, T>> {
 		return this;
 	}
 

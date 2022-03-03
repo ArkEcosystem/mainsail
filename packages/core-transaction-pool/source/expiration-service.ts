@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 @injectable()
@@ -15,12 +15,12 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	public canExpire(transaction: Crypto.ITransaction): boolean {
+	public canExpire(transaction: Contracts.Crypto.ITransaction): boolean {
 		if (transaction.data.version && transaction.data.version >= 2) {
 			return !!transaction.data.expiration;
 		} else {
@@ -28,7 +28,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		}
 	}
 
-	public async isExpired(transaction: Crypto.ITransaction): Promise<boolean> {
+	public async isExpired(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
 		if (this.canExpire(transaction)) {
 			return (await this.getExpirationHeight(transaction)) <= this.stateStore.getLastHeight() + 1;
 		} else {
@@ -36,7 +36,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		}
 	}
 
-	public async getExpirationHeight(transaction: Crypto.ITransaction): Promise<number> {
+	public async getExpirationHeight(transaction: Contracts.Crypto.ITransaction): Promise<number> {
 		if (transaction.data.version && transaction.data.version >= 2) {
 			AppUtils.assert.defined<number>(transaction.data.expiration);
 			return transaction.data.expiration;

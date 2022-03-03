@@ -1,7 +1,7 @@
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 export const calculateTransactionExpiration = (
-	transaction: Crypto.ITransactionData,
+	transaction: Contracts.Crypto.ITransactionData,
 	context: {
 		blockTime: number;
 		currentHeight: number;

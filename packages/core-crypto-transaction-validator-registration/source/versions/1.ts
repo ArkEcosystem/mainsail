@@ -1,12 +1,12 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export abstract class ValidatorRegistrationTransaction extends Transaction {
-	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
-	public static type: number = Crypto.TransactionType.ValidatorRegistration;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
+	public static type: number = Contracts.Crypto.TransactionType.ValidatorRegistration;
 	public static key = "validatorRegistration";
 	public static version = 1;
 
@@ -31,13 +31,13 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 					type: "object",
 				},
 				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
-				type: { transactionType: Crypto.TransactionType.ValidatorRegistration },
+				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorRegistration },
 			},
 			required: ["asset"],
 		});
 	}
 
-	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
 		if (data.asset && data.asset.validator) {

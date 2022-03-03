@@ -1,15 +1,15 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class Pm2ProcessActionsService implements Kernel.ProcessActionsService {
+export class Pm2ProcessActionsService implements Contracts.Kernel.ProcessActionsService {
 	private readonly pmx;
 
 	public constructor() {
 		this.pmx = require("@pm2/io");
 	}
 
-	public register(remoteAction: Kernel.ProcessAction): void {
+	public register(remoteAction: Contracts.Kernel.ProcessAction): void {
 		this.pmx.action(remoteAction.name, (reply) => {
 			remoteAction
 				.handler()

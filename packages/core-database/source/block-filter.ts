@@ -1,5 +1,5 @@
 import { injectable } from "@arkecosystem/core-container";
-import Contracts from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { Block } from "./models/block";

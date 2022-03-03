@@ -1,5 +1,5 @@
 import { inject } from "@arkecosystem/core-container";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 
 import { Controller } from "./controller";

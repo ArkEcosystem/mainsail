@@ -1,6 +1,6 @@
+import { interfaces, Selectors } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services } from "@arkecosystem/core-kernel";
-import { interfaces, Selectors } from "@arkecosystem/core-container";
 
 import { TransactionHandlerConstructor } from "./handlers";
 import { TransactionHandlerProvider } from "./handlers/handler-provider";

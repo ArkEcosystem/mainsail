@@ -1,6 +1,6 @@
-import { fork } from "child_process";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { fork } from "child_process";
 import Joi from "joi";
 
 import {

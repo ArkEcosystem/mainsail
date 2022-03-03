@@ -1,10 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import {
-	PeerPingTimeoutError,
-	PeerStatusResponseError,
-	PeerVerificationFailedError,
-} from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
@@ -40,13 +35,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private readonly createQueue!: Types.QueueFactory;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Crypto.IBlockSerializer;
+	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Crypto.ITransactionFactory;
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator!: Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.IValidator;
 
 	private outgoingRateLimiter!: RateLimiter;
 
@@ -70,7 +65,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		});
 	}
 
-	public async postBlock(peer: Contracts.P2P.Peer, block: Crypto.IBlock) {
+	public async postBlock(peer: Contracts.P2P.Peer, block: Contracts.Crypto.IBlock) {
 		const postBlockTimeout = 10_000;
 
 		const response = await this.emit(
@@ -129,24 +124,24 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		);
 
 		if (!pingResponse) {
-			throw new PeerStatusResponseError(peer.ip);
+			throw new Exceptions.PeerStatusResponseError(peer.ip);
 		}
 
 		if (process.env.CORE_SKIP_PEER_STATE_VERIFICATION !== "true") {
 			if (!this.validatePeerConfig(peer, pingResponse.config)) {
-				throw new PeerVerificationFailedError();
+				throw new Exceptions.PeerVerificationFailedError();
 			}
 
 			const peerVerifier = this.app.resolve(PeerVerifier).initialize(peer);
 
 			if (deadline <= Date.now()) {
-				throw new PeerPingTimeoutError(timeoutMsec);
+				throw new Exceptions.PeerPingTimeoutError(timeoutMsec);
 			}
 
 			peer.verificationResult = await peerVerifier.checkState(pingResponse.state, deadline);
 
 			if (!peer.isVerified()) {
-				throw new PeerVerificationFailedError();
+				throw new Exceptions.PeerVerificationFailedError();
 			}
 		}
 
@@ -197,7 +192,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			blockLimit = constants.MAX_DOWNLOAD_BLOCKS,
 			headersOnly,
 		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
-	): Promise<Crypto.IBlockData[]> {
+	): Promise<Contracts.Crypto.IBlockData[]> {
 		const maxPayload = headersOnly ? blockLimit * constants.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
 
 		const peerBlocks = await this.emit(

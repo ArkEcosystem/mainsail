@@ -1,12 +1,6 @@
 import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { schemas } from "@arkecosystem/core-crypto-validation";
-import {
-	TransactionAlreadyRegisteredError,
-	TransactionKeyAlreadyRegisteredError,
-	TransactionVersionAlreadyRegisteredError,
-	UnkownTransactionError,
-} from "@arkecosystem/core-contracts";
 
 import { Transaction } from "./types";
 import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
@@ -14,9 +8,9 @@ import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 export type TransactionConstructor = typeof Transaction;
 
 @injectable()
-export class TransactionRegistry implements Crypto.ITransactionRegistry {
+export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistry {
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator: Crypto.IValidator;
+	private readonly validator: Contracts.Crypto.IValidator;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
@@ -33,7 +27,7 @@ export class TransactionRegistry implements Crypto.ITransactionRegistry {
 		this.transactionTypeFactory.initialize(this.transactionTypes);
 	}
 
-	public registerTransactionType(constructor: Crypto.TransactionConstructor): void {
+	public registerTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
 		const { typeGroup, type } = constructor;
 
 		if (typeof type === "undefined" || typeof typeGroup === "undefined") {
@@ -50,12 +44,12 @@ export class TransactionRegistry implements Crypto.ITransactionRegistry {
 					first.key === constructor.key &&
 					Contracts.Transactions.InternalTransactionType.from(first.type, first.typeGroup) !== internalType
 				) {
-					throw new TransactionKeyAlreadyRegisteredError(first.key);
+					throw new Exceptions.TransactionKeyAlreadyRegisteredError(first.key);
 				}
 
 				for (const registeredConstructor of registeredConstructors.values()) {
 					if (registeredConstructor === constructor) {
-						throw new TransactionAlreadyRegisteredError(constructor.name);
+						throw new Exceptions.TransactionAlreadyRegisteredError(constructor.name);
 					}
 				}
 			}
@@ -64,14 +58,14 @@ export class TransactionRegistry implements Crypto.ITransactionRegistry {
 		if (!this.transactionTypes.has(internalType)) {
 			this.transactionTypes.set(internalType, new Map());
 		} else if (this.transactionTypes.get(internalType)?.has(constructor.version)) {
-			throw new TransactionVersionAlreadyRegisteredError(constructor.name, constructor.version);
+			throw new Exceptions.TransactionVersionAlreadyRegisteredError(constructor.name, constructor.version);
 		}
 
 		this.transactionTypes.get(internalType)!.set(constructor.version, constructor);
 		this.#updateSchemas(constructor.getSchema());
 	}
 
-	public deregisterTransactionType(constructor: Crypto.TransactionConstructor): void {
+	public deregisterTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
 		const { typeGroup, type, version } = constructor;
 
 		if (typeof type === "undefined" || typeof typeGroup === "undefined") {
@@ -81,14 +75,14 @@ export class TransactionRegistry implements Crypto.ITransactionRegistry {
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 		if (!this.transactionTypes.has(internalType)) {
-			throw new UnkownTransactionError(internalType.toString());
+			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
 
 		this.#updateSchemas(constructor.getSchema(), true);
 
 		const constructors = this.transactionTypes.get(internalType)!;
 		if (!constructors.has(version)) {
-			throw new UnkownTransactionError(internalType.toString());
+			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
 
 		constructors.delete(version);

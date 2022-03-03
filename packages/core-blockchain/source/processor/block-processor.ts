@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
 import { Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
@@ -48,12 +48,12 @@ export class BlockProcessor {
 	private readonly triggers!: Services.Triggers.Triggers;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	public async process(block: Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async process(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		if (!(await this.verifyBlock(block))) {
 			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
 		}
@@ -95,7 +95,7 @@ export class BlockProcessor {
 		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(block);
 	}
 
-	private async verifyBlock(block: Crypto.IBlock): Promise<boolean> {
+	private async verifyBlock(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		if (block.verification.containsMultiSignatures) {
 			try {
 				for (const transaction of block.transactions) {
@@ -131,7 +131,7 @@ export class BlockProcessor {
 		return true;
 	}
 
-	private async checkBlockContainsForgedTransactions(block: Crypto.IBlock): Promise<boolean> {
+	private async checkBlockContainsForgedTransactions(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		if (block.transactions.length > 0) {
 			const transactionIds = block.transactions.map((tx) => {
 				AppUtils.assert.defined<string>(tx.id);
@@ -171,7 +171,7 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private blockContainsIncompatibleTransactions(block: Crypto.IBlock): boolean {
+	private blockContainsIncompatibleTransactions(block: Contracts.Crypto.IBlock): boolean {
 		for (let index = 1; index < block.transactions.length; index++) {
 			if (block.transactions[index].data.version !== block.transactions[0].data.version) {
 				return true;
@@ -181,7 +181,7 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private blockContainsOutOfOrderNonce(block: Crypto.IBlock): boolean {
+	private blockContainsOutOfOrderNonce(block: Contracts.Crypto.IBlock): boolean {
 		const nonceBySender = {};
 
 		for (const transaction of block.transactions) {
@@ -219,7 +219,7 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private async validateGenerator(block: Crypto.IBlock): Promise<boolean> {
+	private async validateGenerator(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
 			this.app,
 			block.data.height,

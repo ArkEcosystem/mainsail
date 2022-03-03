@@ -1,4 +1,4 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import cloneDeep from "lodash.clonedeep";
@@ -15,7 +15,7 @@ export const snoozeForBlock = async (
 	sleep = 0,
 	height = 1,
 	blockTimestampLookupByHeight = defaultblockTimestampLookup,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 	slots,
 ): Promise<void> => {
 	const blockTime: number = configuration.getMilestone(height).blocktime * 1000;
@@ -28,7 +28,7 @@ export const snoozeForBlock = async (
 export const injectMilestone = (
 	index: number,
 	milestone: Record<string, any>,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 ): void =>
 	(configuration as any).milestones.splice(index, 0, {
 		...cloneDeep(configuration.getMilestone()),

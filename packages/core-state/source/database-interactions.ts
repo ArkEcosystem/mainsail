@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Enums } from "@arkecosystem/core-kernel";
 
@@ -40,10 +40,10 @@ export class DatabaseInteraction {
 	private readonly roundState!: RoundState;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Crypto.IBlockFactory;
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	public async initialize(): Promise<void> {
 		try {
@@ -65,7 +65,7 @@ export class DatabaseInteraction {
 		}
 	}
 
-	public async applyBlock(block: Crypto.IBlock): Promise<void> {
+	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		await this.roundState.detectMissedBlocks(block);
 
 		await this.blockState.applyBlock(block);
@@ -78,7 +78,7 @@ export class DatabaseInteraction {
 		this.events.dispatch(Enums.BlockEvent.Applied, block.data);
 	}
 
-	public async revertBlock(block: Crypto.IBlock): Promise<void> {
+	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		await this.roundState.revertBlock(block);
 		await this.blockState.revertBlock(block);
 
@@ -109,27 +109,27 @@ export class DatabaseInteraction {
 	private async initializeLastBlock(): Promise<void> {
 		// ? attempt to remove potentially corrupt blocks from database
 
-		let lastBlock: Crypto.IBlock | undefined;
+		let lastBlock: Contracts.Crypto.IBlock | undefined;
 		let tries = 5; // ! actually 6, but only 5 will be removed
 
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
 		let lastHeight = 1;
-		const latest: Crypto.IBlockData | undefined = await this.databaseService.findLatestBlock();
+		const latest: Contracts.Crypto.IBlockData | undefined = await this.databaseService.findLatestBlock();
 		if (latest) {
 			lastHeight = latest.height;
 		}
 
 		this.configuration.setHeight(lastHeight);
 
-		const getLastBlock = async (): Promise<Crypto.IBlock | undefined> => {
+		const getLastBlock = async (): Promise<Contracts.Crypto.IBlock | undefined> => {
 			try {
 				return await this.databaseService.getLastBlock();
 			} catch (error) {
 				this.logger.error(error.message);
 
 				if (tries > 0) {
-					const block: Crypto.IBlockData = (await this.databaseService.findLatestBlock())!;
+					const block: Contracts.Crypto.IBlockData = (await this.databaseService.findLatestBlock())!;
 					await this.databaseService.deleteBlocks([block]);
 					tries--;
 				} else {
@@ -151,13 +151,13 @@ export class DatabaseInteraction {
 		this.configureState(lastBlock);
 	}
 
-	private async createGenesisBlock(): Promise<Crypto.IBlock> {
+	private async createGenesisBlock(): Promise<Contracts.Crypto.IBlock> {
 		const genesisBlock = this.stateStore.getGenesisBlock();
 		await this.databaseService.saveBlocks([genesisBlock]);
 		return genesisBlock;
 	}
 
-	private configureState(lastBlock: Crypto.IBlock): void {
+	private configureState(lastBlock: Contracts.Crypto.IBlock): void {
 		this.stateStore.setLastBlock(lastBlock);
 		const { blocktime, block } = this.configuration.getMilestone();
 		const blocksPerDay: number = Math.ceil(86_400 / blocktime);
@@ -165,7 +165,7 @@ export class DatabaseInteraction {
 		this.stateTransactionStore.resize(blocksPerDay * block.maxTransactions);
 	}
 
-	private async emitTransactionEvents(transaction: Crypto.ITransaction): Promise<void> {
+	private async emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// ! no reason to pass this.emitter

@@ -1,11 +1,10 @@
 import { inject } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
-import { MissingCommonBlockError } from "@arkecosystem/core-contracts";
 import { getPeerIp } from "../../utils/get-peer-ip";
 import { getPeerConfig } from "../utils/get-peer-config";
 import { Controller } from "./controller";
@@ -21,7 +20,7 @@ export class PeerController extends Controller {
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
@@ -47,15 +46,15 @@ export class PeerController extends Controller {
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<{
-		common: Crypto.IBlockData;
+		common: Contracts.Crypto.IBlockData;
 		lastBlockHeight: number;
 	}> {
-		const commonBlocks: Crypto.IBlockData[] = await this.databaseInterceptor.getCommonBlocks(
+		const commonBlocks: Contracts.Crypto.IBlockData[] = await this.databaseInterceptor.getCommonBlocks(
 			(request.payload as any).ids,
 		);
 
 		if (commonBlocks.length === 0) {
-			throw new MissingCommonBlockError();
+			throw new Exceptions.MissingCommonBlockError();
 		}
 
 		return {
@@ -65,7 +64,7 @@ export class PeerController extends Controller {
 	}
 
 	public async getStatus(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerPingResponse> {
-		const lastBlock: Crypto.IBlock = this.blockchain.getLastBlock();
+		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
 			this.app,

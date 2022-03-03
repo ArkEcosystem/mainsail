@@ -1,12 +1,12 @@
 import { EventEmitter } from "events";
 import { decorateInjectable, injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 decorateInjectable(EventEmitter);
 
 @injectable()
-export class NullQueue extends EventEmitter implements Kernel.Queue {
-	public async make(): Promise<Kernel.Queue> {
+export class NullQueue extends EventEmitter implements Contracts.Kernel.Queue {
+	public async make(): Promise<Contracts.Kernel.Queue> {
 		return this;
 	}
 
@@ -30,15 +30,15 @@ export class NullQueue extends EventEmitter implements Kernel.Queue {
 		return;
 	}
 
-	public async push(job: Kernel.QueueJob): Promise<void> {
+	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
 		return;
 	}
 
-	public async later(delay: number, job: Kernel.QueueJob): Promise<void> {
+	public async later(delay: number, job: Contracts.Kernel.QueueJob): Promise<void> {
 		return;
 	}
 
-	public async bulk(jobs: Kernel.QueueJob[]): Promise<void> {
+	public async bulk(jobs: Contracts.Kernel.QueueJob[]): Promise<void> {
 		return;
 	}
 

@@ -1,4 +1,4 @@
-import Contracts, { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 let accept: string[] = [];
 let broadcast: string[] = [];
@@ -16,7 +16,7 @@ export const setProcessorState = (state: any): void => {
 };
 
 class TransactionPoolProcessorMock implements Partial<Contracts.TransactionPool.Processor> {
-	public async process(data: Crypto.ITransactionData[] | Buffer[]): Promise<{
+	public async process(data: Contracts.Crypto.ITransactionData[] | Buffer[]): Promise<{
 		accept: string[];
 		broadcast: string[];
 		invalid: string[];

@@ -1,5 +1,5 @@
 import { interfaces, Selectors } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
@@ -22,7 +22,7 @@ import { WalletSyncService } from "./wallets/wallet-sync-service";
 export const dposPreviousRoundStateProvider =
 	(context: interfaces.Context) =>
 	async (
-		blocks: Crypto.IBlock[],
+		blocks: Contracts.Crypto.IBlock[],
 		roundInfo: Contracts.Shared.RoundInfo,
 	): Promise<Contracts.State.DposPreviousRoundState> => {
 		const previousRound = context.container.resolve(DposPreviousRoundState);

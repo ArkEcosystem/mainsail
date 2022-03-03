@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Utils } from "@arkecosystem/core-kernel";
 
 import { PeerCommunicator } from "./peer-communicator";
@@ -20,9 +20,9 @@ export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcas
 	private readonly communicator!: PeerCommunicator;
 
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
-	private readonly serializer!: Crypto.ITransactionSerializer;
+	private readonly serializer!: Contracts.Crypto.ITransactionSerializer;
 
-	public async broadcastTransactions(transactions: Crypto.ITransaction[]): Promise<void> {
+	public async broadcastTransactions(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
 		if (transactions.length === 0) {
 			this.logger.warning("Broadcasting 0 transactions");
 			return;

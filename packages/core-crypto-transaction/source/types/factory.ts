@@ -1,7 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
-import { UnkownTransactionError } from "@arkecosystem/core-contracts";
 import { Transaction } from "./transaction";
 
 type TransactionConstructor = typeof Transaction;
@@ -19,24 +18,30 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		this.transactionTypes = transactionTypes;
 	}
 
-	public create(data: Crypto.ITransactionData): Crypto.ITransaction {
-		const instance: Crypto.ITransaction = this.app.resolve(this.get(data.type, data.typeGroup, data.version));
+	public create(data: Contracts.Crypto.ITransactionData): Contracts.Crypto.ITransaction {
+		const instance: Contracts.Crypto.ITransaction = this.app.resolve(
+			this.get(data.type, data.typeGroup, data.version),
+		);
 		instance.data = data;
 		instance.data.version = data.version || 1;
 
 		return instance;
 	}
 
-	public get(type: number, typeGroup?: number, version?: number): Crypto.TransactionConstructor | undefined {
+	public get(
+		type: number,
+		typeGroup?: number,
+		version?: number,
+	): Contracts.Crypto.TransactionConstructor | undefined {
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 
 		if (!this.transactionTypes.has(internalType)) {
-			throw new UnkownTransactionError(internalType.toString());
+			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
 
 		// Either there is a match for the provided version or use the first available constructor as a fallback
-		const constructor: Crypto.TransactionConstructor | undefined = this.transactionTypes
+		const constructor: Contracts.Crypto.TransactionConstructor | undefined = this.transactionTypes
 			.get(internalType)
 			?.get(version || 1);
 

@@ -1,9 +1,8 @@
-import { Crypto, Shared } from "@arkecosystem/core-contracts";
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 
 import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 
-export const isNewRound = (height: number, configuration: Crypto.IConfiguration): boolean => {
+export const isNewRound = (height: number, configuration: Contracts.Crypto.IConfiguration): boolean => {
 	const milestones = configuration.get("milestones");
 
 	// Since milestones are merged, find the first milestone to introduce the validator count.
@@ -24,8 +23,11 @@ export const isNewRound = (height: number, configuration: Crypto.IConfiguration)
 	return height === 1 || (height - milestone.height) % milestone.activeValidators === 0;
 };
 
-export const calculateRound = (height: number, configuration: Crypto.IConfiguration): Shared.RoundInfo => {
-	const result: Shared.RoundInfo = {
+export const calculateRound = (
+	height: number,
+	configuration: Contracts.Crypto.IConfiguration,
+): Contracts.Shared.RoundInfo => {
+	const result: Contracts.Shared.RoundInfo = {
 		maxValidators: 0,
 		nextRound: 0,
 		round: 1,
@@ -45,7 +47,7 @@ export const calculateRound = (height: number, configuration: Crypto.IConfigurat
 
 		const spanHeight = nextMilestone.height - milestoneHeight;
 		if (spanHeight % activeValidators !== 0) {
-			throw new InvalidMilestoneConfigurationError(
+			throw new Exceptions.InvalidMilestoneConfigurationError(
 				`Bad milestone at height: ${height}. The number of validators can only be changed at the beginning of a new round.`,
 			);
 		}

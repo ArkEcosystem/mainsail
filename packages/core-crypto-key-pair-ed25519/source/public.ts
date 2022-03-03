@@ -1,11 +1,10 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { NotImplemented } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
+export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
-	private readonly keyPairFactory: Crypto.IKeyPairFactory;
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
@@ -15,11 +14,11 @@ export class PublicKeyFactory implements Crypto.IPublicKeyFactory {
 		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
-	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
-		throw new NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+		throw new Exceptions.NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
-		throw new NotImplemented(this.constructor.name, "verify");
+		throw new Exceptions.NotImplemented(this.constructor.name, "verify");
 	}
 }

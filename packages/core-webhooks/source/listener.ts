@@ -7,7 +7,7 @@ import { Database } from "./database";
 import { WebhookEvent } from "./events";
 import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Listener {

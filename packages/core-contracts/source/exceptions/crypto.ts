@@ -1,4 +1,5 @@
-import { State, Transactions } from "../contracts";
+import { Wallet } from "../contracts/state";
+import { InternalTransactionType } from "../contracts/transactions";
 import { Exception } from "./base";
 
 export class Bip38CompressionError extends Exception {
@@ -168,31 +169,31 @@ export class DuplicateParticipantInMultiSignatureError extends Exception {
 }
 
 export class InvalidTransactionTypeError extends Exception {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} does not exist.`);
 	}
 }
 
 export class DeactivatedTransactionHandlerError extends Exception {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is deactivated.`);
 	}
 }
 
 export class UnsatisfiedDependencyError extends Exception {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is missing required dependencies`);
 	}
 }
 
 export class AlreadyRegisteredError extends Exception {
-	public constructor(type: Transactions.InternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is already registered`);
 	}
 }
 
 export class UnexpectedNonceError extends Exception {
-	public constructor(txNonce: any, sender: State.Wallet, reversal: boolean) {
+	public constructor(txNonce: any, sender: Wallet, reversal: boolean) {
 		const action: string = reversal ? "revert" : "apply";
 		super(
 			`Cannot ${action} a transaction with nonce ${txNonce.toFixed()}: the ` +

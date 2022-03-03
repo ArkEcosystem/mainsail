@@ -1,11 +1,10 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Search } from "@arkecosystem/core-contracts";
-import { InvalidCriteria, UnexpectedError, UnsupportedValue } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
 export class StandardCriteriaService {
-	public testStandardCriterias<T>(value: T, ...criterias: Search.StandardCriteriaOf<T>[]): boolean {
+	public testStandardCriterias<T>(value: T, ...criterias: Contracts.Search.StandardCriteriaOf<T>[]): boolean {
 		return criterias.every((criteria) => {
 			// Criteria is either single criteria item or array of criteria items.
 
@@ -39,28 +38,37 @@ export class StandardCriteriaService {
 		});
 	}
 
-	private testStandardCriteriaItem<T>(value: T, criteriaItem: Search.StandardCriteriaOfItem<T>): boolean {
+	private testStandardCriteriaItem<T>(value: T, criteriaItem: Contracts.Search.StandardCriteriaOfItem<T>): boolean {
 		if (typeof value === "undefined" || value === null) {
 			return false;
 		}
 
 		if (typeof value === "boolean") {
 			// narrowing `value` to `boolean` doesn't narrow `criteriaItem` to `StandardCriteriaOfItem<boolean>` :-(
-			return this.testBooleanValueCriteriaItem(value, criteriaItem as Search.StandardCriteriaOfItem<boolean>);
+			return this.testBooleanValueCriteriaItem(
+				value,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<boolean>,
+			);
 		}
 
 		if (typeof value === "string") {
-			return this.testStringValueCriteriaItem(value, criteriaItem as Search.StandardCriteriaOfItem<string>);
+			return this.testStringValueCriteriaItem(
+				value,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<string>,
+			);
 		}
 
 		if (typeof value === "number") {
-			return this.testNumberValueCriteriaItem(value, criteriaItem as Search.StandardCriteriaOfItem<number>);
+			return this.testNumberValueCriteriaItem(
+				value,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<number>,
+			);
 		}
 
 		if (typeof value === "bigint" || value instanceof BigNumber) {
 			return this.testBigNumberValueCriteriaItem(
 				value,
-				criteriaItem as Search.StandardCriteriaOfItem<BigInt | BigNumber>,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<BigInt | BigNumber>,
 			);
 		}
 
@@ -68,7 +76,7 @@ export class StandardCriteriaService {
 			// doesn't narrow to `object`, nor excluding `symbol` does :-(
 			return this.testObjectValueCriteriaItem(
 				value as any,
-				criteriaItem as Search.StandardCriteriaOfItem<object>,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<object>,
 			);
 		}
 
@@ -89,12 +97,12 @@ export class StandardCriteriaService {
 		//
 		// Peer is the only resource with array property.
 
-		throw new UnsupportedValue(value, []);
+		throw new Exceptions.UnsupportedValue(value, []);
 	}
 
 	private testBooleanValueCriteriaItem(
 		value: boolean,
-		criteriaItem: Search.StandardCriteriaOfItem<boolean>,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<boolean>,
 	): boolean {
 		// In most cases criteria is cast to the same type as value during validation (by joi).
 		// Wallet's attributes property is an exception. There is currently now way to know what types may be there.
@@ -102,7 +110,7 @@ export class StandardCriteriaService {
 		// For example boolean `true` value is checked against boolean `true` and string `"true"`.
 
 		if ([true, false, "true", "false"].includes(criteriaItem) === false) {
-			throw new InvalidCriteria(value, criteriaItem, []);
+			throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 		}
 
 		if (value) {
@@ -112,9 +120,12 @@ export class StandardCriteriaService {
 		}
 	}
 
-	private testStringValueCriteriaItem(value: string, criteriaItem: Search.StandardCriteriaOfItem<string>): boolean {
+	private testStringValueCriteriaItem(
+		value: string,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<string>,
+	): boolean {
 		if (typeof criteriaItem !== "string") {
-			throw new InvalidCriteria(value, criteriaItem, []);
+			throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 		}
 
 		if (!criteriaItem.includes("%")) {
@@ -134,10 +145,13 @@ export class StandardCriteriaService {
 		return true;
 	}
 
-	private testNumberValueCriteriaItem(value: number, criteriaItem: Search.StandardCriteriaOfItem<number>): boolean {
+	private testNumberValueCriteriaItem(
+		value: number,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<number>,
+	): boolean {
 		if (typeof criteriaItem === "string" || typeof criteriaItem === "number") {
 			if (isNaN(Number(criteriaItem))) {
-				throw new InvalidCriteria(value, criteriaItem, []);
+				throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 			}
 
 			return value === Number(criteriaItem);
@@ -145,11 +159,11 @@ export class StandardCriteriaService {
 
 		if (typeof criteriaItem === "object" && criteriaItem !== null) {
 			if ("from" in criteriaItem && isNaN(Number(criteriaItem["from"]))) {
-				throw new InvalidCriteria(value, criteriaItem.from, ["from"]);
+				throw new Exceptions.InvalidCriteria(value, criteriaItem.from, ["from"]);
 			}
 
 			if ("to" in criteriaItem && isNaN(Number(criteriaItem["to"]))) {
-				throw new InvalidCriteria(value, criteriaItem.to, ["to"]);
+				throw new Exceptions.InvalidCriteria(value, criteriaItem.to, ["to"]);
 			}
 
 			if ("from" in criteriaItem && "to" in criteriaItem) {
@@ -165,12 +179,12 @@ export class StandardCriteriaService {
 			}
 		}
 
-		throw new InvalidCriteria(value, criteriaItem, []);
+		throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 	}
 
 	private testBigNumberValueCriteriaItem(
 		value: BigInt | BigNumber,
-		criteriaItem: Search.StandardCriteriaOfItem<BigInt | BigNumber>,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<BigInt | BigNumber>,
 	): boolean {
 		// BigNumber.make doesn't perform instanceof check
 		const bnValue = value instanceof BigNumber ? value : BigNumber.make(value);
@@ -184,7 +198,7 @@ export class StandardCriteriaService {
 			try {
 				return bnValue.isEqualTo(criteriaItem);
 			} catch {
-				throw new InvalidCriteria(value, criteriaItem, []);
+				throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 			}
 		}
 
@@ -206,7 +220,7 @@ export class StandardCriteriaService {
 					try {
 						BigNumber.make(criteriaItem.from);
 					} catch {
-						throw new InvalidCriteria(value, criteriaItem.from, ["from"]);
+						throw new Exceptions.InvalidCriteria(value, criteriaItem.from, ["from"]);
 					}
 				}
 
@@ -214,7 +228,7 @@ export class StandardCriteriaService {
 					try {
 						BigNumber.make(criteriaItem.to);
 					} catch {
-						throw new InvalidCriteria(value, criteriaItem.to, ["to"]);
+						throw new Exceptions.InvalidCriteria(value, criteriaItem.to, ["to"]);
 					}
 				}
 
@@ -224,10 +238,13 @@ export class StandardCriteriaService {
 			}
 		}
 
-		throw new InvalidCriteria(value, criteriaItem, []);
+		throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 	}
 
-	private testObjectValueCriteriaItem(value: object, criteriaItem: Search.StandardCriteriaOfItem<object>): boolean {
+	private testObjectValueCriteriaItem(
+		value: object,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<object>,
+	): boolean {
 		const criteriaKeys = Object.keys(criteriaItem);
 
 		if (criteriaKeys.length === 1 && criteriaKeys[0] === "*") {
@@ -248,18 +265,18 @@ export class StandardCriteriaService {
 	}
 
 	private rethrowError(error: Error, key: string): never {
-		if (error instanceof InvalidCriteria) {
-			throw new InvalidCriteria(error.value, error.criteria, [key, ...error.path]);
+		if (error instanceof Exceptions.InvalidCriteria) {
+			throw new Exceptions.InvalidCriteria(error.value, error.criteria, [key, ...error.path]);
 		}
 
-		if (error instanceof UnsupportedValue) {
-			throw new UnsupportedValue(error.value, [key, ...error.path]);
+		if (error instanceof Exceptions.UnsupportedValue) {
+			throw new Exceptions.UnsupportedValue(error.value, [key, ...error.path]);
 		}
 
-		if (error instanceof UnexpectedError) {
-			throw new UnexpectedError(error.error, [key, ...error.path]);
+		if (error instanceof Exceptions.UnexpectedError) {
+			throw new Exceptions.UnexpectedError(error.error, [key, ...error.path]);
 		}
 
-		throw new UnexpectedError(error, [key]);
+		throw new Exceptions.UnexpectedError(error, [key]);
 	}
 }

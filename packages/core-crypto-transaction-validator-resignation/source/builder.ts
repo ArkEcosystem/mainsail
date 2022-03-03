@@ -1,5 +1,5 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -18,8 +18,8 @@ export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorRes
 		this.data.senderPublicKey = undefined;
 	}
 
-	public async getStruct(): Promise<Crypto.ITransactionData> {
-		const struct: Crypto.ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
+		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		return struct;
 	}

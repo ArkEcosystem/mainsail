@@ -29,7 +29,6 @@ export class Sandbox {
 		crypto: {
 			flags: {
 				blocktime: 8,
-				validators: 51,
 				distribute: true,
 				explorer: "http://uexplorer.ark.io",
 				maxBlockPayload: 2_097_152,
@@ -41,6 +40,7 @@ export class Sandbox {
 				rewardHeight: 75_600,
 				symbol: "UѦ",
 				token: "UARK",
+				validators: 51,
 				wif: 186,
 			},
 		},

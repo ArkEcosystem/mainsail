@@ -1,8 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 
-import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "@arkecosystem/core-contracts";
 import { TransactionHandlerConstructor } from "./transaction";
 
 @injectable()
@@ -14,7 +13,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 	private readonly handlerConstructors: TransactionHandlerConstructor[];
 
 	@inject(Identifiers.Cryptography.Transaction.Registry)
-	private readonly transactionRegistry: Crypto.ITransactionRegistry;
+	private readonly transactionRegistry: Contracts.Crypto.ITransactionRegistry;
 
 	private registered = false;
 
@@ -43,12 +42,12 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 		);
 
 		if (this.hasOtherHandlerHandling(handlerConstructor, internalType, transactionConstructor.version)) {
-			throw new AlreadyRegisteredError(internalType);
+			throw new Exceptions.AlreadyRegisteredError(internalType);
 		}
 
 		for (const dependency of handler.dependencies()) {
 			if (this.hasOtherHandler(handlerConstructor, dependency) === false) {
-				throw new UnsatisfiedDependencyError(internalType);
+				throw new Exceptions.UnsatisfiedDependencyError(internalType);
 			}
 		}
 
@@ -58,7 +57,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 			}
 		}
 
-		if (transactionConstructor.typeGroup !== Crypto.TransactionTypeGroup.Core) {
+		if (transactionConstructor.typeGroup !== Contracts.Crypto.TransactionTypeGroup.Core) {
 			this.transactionRegistry.registerTransactionType(transactionConstructor);
 		}
 	}

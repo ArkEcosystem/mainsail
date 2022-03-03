@@ -3,7 +3,7 @@ import { Types, Utils } from "@arkecosystem/core-kernel";
 import { badData } from "@hapi/boom";
 import Boom from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Database } from "../database";

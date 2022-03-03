@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { ConfigManager, ConfigRepository } from "../../services/config";
 import { Bootstrapper } from "../interfaces";
@@ -7,7 +7,7 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class LoadConfiguration implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
 		await this.app

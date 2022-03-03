@@ -1,6 +1,5 @@
 import { inject, injectable, multiInject, optional } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { InvalidTransactionDataError, PoolError } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -20,13 +19,13 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Crypto.ITransactionFactory;
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Deserializer)
-	private readonly deserializer: Crypto.ITransactionDeserializer;
+	private readonly deserializer: Contracts.Crypto.ITransactionDeserializer;
 
 	public async process(
-		data: Crypto.ITransactionData[] | Buffer[],
+		data: Contracts.Crypto.ITransactionData[] | Buffer[],
 	): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: string[] = [];
 		const broadcast: string[] = [];
@@ -34,7 +33,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		const excess: string[] = [];
 		let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
-		const broadcastTransactions: Crypto.ITransaction[] = [];
+		const broadcastTransactions: Contracts.Crypto.ITransaction[] = [];
 
 		try {
 			for (const [index, transactionData] of data.entries()) {
@@ -56,7 +55,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				} catch (error) {
 					invalid.push(entryId);
 
-					if (error instanceof PoolError) {
+					if (error instanceof Exceptions.PoolError) {
 						if (error.type === "ERR_EXCEEDS_MAX_COUNT") {
 							excess.push(entryId);
 						}
@@ -90,23 +89,25 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		};
 	}
 
-	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Crypto.ITransaction> {
+	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.ITransaction> {
 		try {
-			const transactionCommon = {} as Crypto.ITransactionData;
+			const transactionCommon = {} as Contracts.Crypto.ITransactionData;
 			const txByteBuffer = new ByteBuffer(transactionData);
 			this.deserializer.deserializeCommon(transactionCommon, txByteBuffer);
 
 			return this.transactionFactory.fromBytes(transactionData);
 		} catch (error) {
-			throw new InvalidTransactionDataError(error.message);
+			throw new Exceptions.InvalidTransactionDataError(error.message);
 		}
 	}
 
-	private async getTransactionFromData(transactionData: Crypto.ITransactionData): Promise<Crypto.ITransaction> {
+	private async getTransactionFromData(
+		transactionData: Contracts.Crypto.ITransactionData,
+	): Promise<Contracts.Crypto.ITransaction> {
 		try {
 			return this.transactionFactory.fromData(transactionData);
 		} catch (error) {
-			throw new InvalidTransactionDataError(error.message);
+			throw new Exceptions.InvalidTransactionDataError(error.message);
 		}
 	}
 }

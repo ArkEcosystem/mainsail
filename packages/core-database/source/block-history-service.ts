@@ -1,5 +1,5 @@
 import assert from "assert";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
 
 import { BlockRepository } from "./repositories/block-repository";
@@ -22,13 +22,17 @@ export class BlockHistoryService implements Contracts.Shared.BlockHistoryService
 	@inject(Identifiers.DatabaseModelConverter)
 	private readonly modelConverter!: Contracts.Database.ModelConverter;
 
-	public async findOneByCriteria(criteria: Contracts.Shared.OrBlockCriteria): Promise<Crypto.IBlockData | undefined> {
+	public async findOneByCriteria(
+		criteria: Contracts.Shared.OrBlockCriteria,
+	): Promise<Contracts.Crypto.IBlockData | undefined> {
 		const data = await this.findManyByCriteria(criteria);
 		assert(data.length <= 1);
 		return data[0];
 	}
 
-	public async findManyByCriteria(criteria: Contracts.Shared.OrBlockCriteria): Promise<Crypto.IBlockData[]> {
+	public async findManyByCriteria(
+		criteria: Contracts.Shared.OrBlockCriteria,
+	): Promise<Contracts.Crypto.IBlockData[]> {
 		const expression = await this.blockFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [{ direction: "asc", property: "height" }];
 		const models = await this.blockRepository.findManyByExpression(expression, sorting);
@@ -40,7 +44,7 @@ export class BlockHistoryService implements Contracts.Shared.BlockHistoryService
 		sorting: Contracts.Search.Sorting,
 		pagination: Contracts.Search.Pagination,
 		options?: Contracts.Search.Options,
-	): Promise<Contracts.Search.ResultsPage<Crypto.IBlockData>> {
+	): Promise<Contracts.Search.ResultsPage<Contracts.Crypto.IBlockData>> {
 		const expression = await this.blockFilter.getExpression(criteria);
 		const modelResultsPage = await this.blockRepository.listByExpression(expression, sorting, pagination, options);
 		const models = modelResultsPage.results;

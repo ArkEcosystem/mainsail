@@ -1,8 +1,8 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
 import { Application, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { injectable, inject, tagged } from "@arkecosystem/core-container";
 
 // todo: review the implementation
 @injectable()
@@ -34,7 +34,7 @@ export class StateBuilder {
 	private readonly configRepository!: Services.Config.ConfigRepository;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async run(): Promise<void> {
 		this.events = this.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService);

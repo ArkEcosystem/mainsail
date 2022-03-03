@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Providers } from "@arkecosystem/core-kernel";
 
@@ -32,7 +32,7 @@ export class RollbackDatabase implements Action {
 		let maxBlockRewind = this.configuration.getRequired<number>("databaseRollback.maxBlockRewind");
 		let steps = this.configuration.getRequired<number>("databaseRollback.steps");
 
-		let lastBlock: Crypto.IBlock = await this.databaseService.getLastBlock();
+		let lastBlock: Contracts.Crypto.IBlock = await this.databaseService.getLastBlock();
 		let lastBlockHeight = lastBlock.data.height;
 
 		let isVerified = false;

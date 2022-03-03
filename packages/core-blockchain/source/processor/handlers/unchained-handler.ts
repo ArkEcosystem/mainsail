@@ -1,6 +1,6 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { BlockProcessorResult } from "../block-processor";
 import { BlockHandler } from "../contracts";
@@ -26,7 +26,7 @@ export class UnchainedHandler implements BlockHandler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	private isValidGenerator = false;
 
@@ -37,7 +37,7 @@ export class UnchainedHandler implements BlockHandler {
 		return this;
 	}
 
-	public async execute(block: Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		this.blockchain.resetLastDownloadedBlock();
 
 		this.blockchain.clearQueue();
@@ -74,8 +74,8 @@ export class UnchainedHandler implements BlockHandler {
 		}
 	}
 
-	private checkUnchainedBlock(block: Crypto.IBlock): UnchainedBlockStatus {
-		const lastBlock: Crypto.IBlock = this.blockchain.getLastBlock();
+	private checkUnchainedBlock(block: Contracts.Crypto.IBlock): UnchainedBlockStatus {
+		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
 		// todo: clean up this if-else-if-else-if-else mess
 		if (block.data.height > lastBlock.data.height + 1) {

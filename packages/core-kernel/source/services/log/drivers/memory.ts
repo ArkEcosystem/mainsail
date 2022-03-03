@@ -1,17 +1,17 @@
-import { inspect } from "util";
 import { injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { isEmpty, prettyTime } from "@arkecosystem/utils";
 import chalk, { Chalk } from "chalk";
 import dayjs, { Dayjs } from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import utc from "dayjs/plugin/utc";
+import { inspect } from "util";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(utc);
 
 @injectable()
-export class MemoryLogger implements Kernel.Logger {
+export class MemoryLogger implements Contracts.Kernel.Logger {
 	private readonly levelStyles: Record<string, Chalk> = {
 		alert: chalk.red,
 		critical: chalk.red,
@@ -27,7 +27,7 @@ export class MemoryLogger implements Kernel.Logger {
 
 	private lastTimestamp: Dayjs = dayjs().utc();
 
-	public async make(options?: any): Promise<Kernel.Logger> {
+	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		return this;
 	}
 

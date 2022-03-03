@@ -1,7 +1,7 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums } from "@arkecosystem/core-kernel";
 import { Connection } from "typeorm";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { DatabaseEvent } from "./events";
 import { Round } from "./models";
@@ -34,10 +34,10 @@ export class DatabaseService {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Crypto.IBlockFactory;
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Crypto.ITransactionFactory;
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	public async initialize(): Promise<void> {
 		try {
@@ -65,9 +65,11 @@ export class DatabaseService {
 		await this.connection.query("TRUNCATE TABLE blocks, rounds, transactions RESTART IDENTITY;");
 	}
 
-	public async getBlock(id: string): Promise<Crypto.IBlock | undefined> {
+	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
 		// TODO: caching the last 1000 blocks, in combination with `saveBlock` could help to optimise
-		const block: Crypto.IBlockData = (await this.blockRepository.findOne(id)) as unknown as Crypto.IBlockData;
+		const block: Contracts.Crypto.IBlockData = (await this.blockRepository.findOne(
+			id,
+		)) as unknown as Contracts.Crypto.IBlockData;
 
 		if (!block) {
 			return undefined;
@@ -93,7 +95,7 @@ export class DatabaseService {
 
 	// ! three methods below (getBlocks, getBlocksForDownload, getBlocksByHeight) can be merged into one
 
-	public async getBlocks(start: number, end: number, headersOnly?: boolean): Promise<Crypto.IBlockData[]> {
+	public async getBlocks(start: number, end: number, headersOnly?: boolean): Promise<Contracts.Crypto.IBlockData[]> {
 		// ! assumes that earlier blocks may be missing
 		// ! but querying database is unnecessary when later blocks are missing too (aren't forged yet)
 		return headersOnly
@@ -126,8 +128,8 @@ export class DatabaseService {
 		return await this.blockRepository.findByHeights(heights);
 	}
 
-	public async getLastBlock(): Promise<Crypto.IBlock> {
-		const block: Crypto.IBlockData | undefined = await this.blockRepository.findLatest();
+	public async getLastBlock(): Promise<Contracts.Crypto.IBlock> {
+		const block: Contracts.Crypto.IBlockData | undefined = await this.blockRepository.findLatest();
 
 		if (!block) {
 			// @ts-ignore Technically, this cannot happen
@@ -149,19 +151,19 @@ export class DatabaseService {
 			).data;
 		}
 
-		const lastBlock: Crypto.IBlock = await this.blockFactory.fromData(block, {
+		const lastBlock: Contracts.Crypto.IBlock = await this.blockFactory.fromData(block, {
 			deserializeTransactionsUnchecked: true,
 		})!;
 
 		return lastBlock;
 	}
 
-	public async getTopBlocks(count: number): Promise<Crypto.IBlockData[]> {
+	public async getTopBlocks(count: number): Promise<Contracts.Crypto.IBlockData[]> {
 		// ! blockRepository.findTop returns blocks in reverse order
 		// ! where recent block is first in array
-		const blocks: Crypto.IBlockData[] = (await this.blockRepository.findTop(
+		const blocks: Contracts.Crypto.IBlockData[] = (await this.blockRepository.findTop(
 			count,
-		)) as unknown as Crypto.IBlockData[];
+		)) as unknown as Contracts.Crypto.IBlockData[];
 
 		await this.loadTransactionsForBlocks(blocks);
 
@@ -172,20 +174,20 @@ export class DatabaseService {
 		return this.transactionRepository.findOne(id);
 	}
 
-	public async deleteBlocks(blocks: Crypto.IBlockData[]): Promise<void> {
+	public async deleteBlocks(blocks: Contracts.Crypto.IBlockData[]): Promise<void> {
 		return await this.blockRepository.deleteBlocks(blocks);
 	}
 
-	public async saveBlocks(blocks: Crypto.IBlock[]): Promise<void> {
+	public async saveBlocks(blocks: Contracts.Crypto.IBlock[]): Promise<void> {
 		return await this.blockRepository.saveBlocks(blocks);
 	}
 
-	public async findLatestBlock(): Promise<Crypto.IBlockData | undefined> {
+	public async findLatestBlock(): Promise<Contracts.Crypto.IBlockData | undefined> {
 		return await this.blockRepository.findLatest();
 	}
 
-	public async findBlockByID(ids: any[]): Promise<Crypto.IBlockData[] | undefined> {
-		return (await this.blockRepository.findByIds(ids)) as unknown as Crypto.IBlockData[];
+	public async findBlockByID(ids: any[]): Promise<Contracts.Crypto.IBlockData[] | undefined> {
+		return (await this.blockRepository.findByIds(ids)) as unknown as Contracts.Crypto.IBlockData[];
 	}
 
 	public async findRecentBlocks(limit: number): Promise<{ id: string }[]> {
@@ -208,10 +210,10 @@ export class DatabaseService {
 		await this.roundRepository.deleteFrom(round);
 	}
 
-	public async verifyBlockchain(lastBlock?: Crypto.IBlock): Promise<boolean> {
+	public async verifyBlockchain(lastBlock?: Contracts.Crypto.IBlock): Promise<boolean> {
 		const errors: string[] = [];
 
-		const block: Crypto.IBlock = lastBlock ? lastBlock : await this.getLastBlock();
+		const block: Contracts.Crypto.IBlock = lastBlock ? lastBlock : await this.getLastBlock();
 
 		// Last block is available
 		if (!block) {
@@ -272,7 +274,7 @@ export class DatabaseService {
 		return !hasErrors;
 	}
 
-	private async loadTransactionsForBlocks(blocks: Crypto.IBlockData[]): Promise<void> {
+	private async loadTransactionsForBlocks(blocks: Contracts.Crypto.IBlockData[]): Promise<void> {
 		const databaseTransactions: Array<{
 			id: string;
 			blockId: string;
@@ -294,7 +296,7 @@ export class DatabaseService {
 		}
 	}
 
-	private async getTransactionsForBlocks(blocks: Crypto.IBlockData[]): Promise<
+	private async getTransactionsForBlocks(blocks: Contracts.Crypto.IBlockData[]): Promise<
 		Array<{
 			id: string;
 			blockId: string;
@@ -305,7 +307,7 @@ export class DatabaseService {
 			return [];
 		}
 
-		const ids: string[] = blocks.map((block: Crypto.IBlockData) => block.id);
+		const ids: string[] = blocks.map((block: Contracts.Crypto.IBlockData) => block.id);
 		return this.transactionRepository.findByBlockIds(ids);
 	}
 }

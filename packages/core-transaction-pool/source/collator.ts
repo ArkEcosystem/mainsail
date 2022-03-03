@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { TransactionHasExpiredError } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Collator implements Contracts.TransactionPool.Collator {
@@ -23,9 +22,9 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	public async getBlockCandidateTransactions(): Promise<Crypto.ITransaction[]> {
+	public async getBlockCandidateTransactions(): Promise<Contracts.Crypto.ITransaction[]> {
 		const height: number = this.blockchain.getLastBlock().data.height;
 		const milestone = this.configuration.getMilestone(height);
 		const blockHeaderSize =
@@ -43,9 +42,9 @@ export class Collator implements Contracts.TransactionPool.Collator {
 
 		let bytesLeft: number = milestone.block.maxPayload - blockHeaderSize;
 
-		const candidateTransactions: Crypto.ITransaction[] = [];
+		const candidateTransactions: Contracts.Crypto.ITransaction[] = [];
 		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
-		const failedTransactions: Crypto.ITransaction[] = [];
+		const failedTransactions: Contracts.Crypto.ITransaction[] = [];
 
 		for (const transaction of this.poolQuery.getFromHighestPriority()) {
 			if (candidateTransactions.length === milestone.block.maxTransactions) {
@@ -59,7 +58,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 			try {
 				if (await this.expirationService.isExpired(transaction)) {
 					const expirationHeight: number = await this.expirationService.getExpirationHeight(transaction);
-					throw new TransactionHasExpiredError(transaction, expirationHeight);
+					throw new Exceptions.TransactionHasExpiredError(transaction, expirationHeight);
 				}
 
 				if (bytesLeft - 4 - transaction.serialized.length < 0) {

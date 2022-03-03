@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { BlockProcessorResult } from "../block-processor";
 import { BlockHandler } from "../contracts";
@@ -12,7 +12,7 @@ export class IncompatibleTransactionsHandler implements BlockHandler {
 	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	public async execute(block?: Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block?: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		this.blockchain.resetLastDownloadedBlock();
 
 		return BlockProcessorResult.Rejected;

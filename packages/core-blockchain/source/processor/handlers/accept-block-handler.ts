@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { BlockProcessorResult } from "../block-processor";
@@ -26,7 +26,7 @@ export class AcceptBlockHandler implements BlockHandler {
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	public async execute(block: Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		try {
 			await this.databaseInteraction.applyBlock(block);
 

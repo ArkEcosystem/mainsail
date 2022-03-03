@@ -1,9 +1,8 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { injectable, inject, multiInject, postConstruct } from "@arkecosystem/core-container";
 
-import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "@arkecosystem/core-contracts";
 import { WalletIndex } from "./wallet-index";
 
 // todo: review the implementation
@@ -16,7 +15,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	protected readonly addressFactory: Crypto.IAddressFactory;
+	protected readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};
 
@@ -24,7 +23,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	public initialize(): void {
 		for (const { name, indexer, autoIndex } of this.indexerIndexes) {
 			if (this.indexes[name]) {
-				throw new WalletIndexAlreadyRegisteredError(name);
+				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
 			}
 			this.indexes[name] = new WalletIndex(indexer, autoIndex);
 		}
@@ -36,7 +35,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public getIndex(name: string): Contracts.State.WalletIndex {
 		if (!this.indexes[name]) {
-			throw new WalletIndexNotFoundError(name);
+			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
 		return this.indexes[name];
 	}

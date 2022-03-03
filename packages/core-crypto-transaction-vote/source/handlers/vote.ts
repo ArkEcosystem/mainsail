@@ -1,10 +1,9 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { PoolError } from "@arkecosystem/core-contracts";
 import { Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
-import { Errors, Handlers } from "@arkecosystem/core-transactions";
+import { Handlers } from "@arkecosystem/core-transactions";
 
 import { VoteTransaction } from "../versions";
 
@@ -47,15 +46,15 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 				if (vote.startsWith("+")) {
 					if (hasVoted) {
-						throw new Errors.AlreadyVotedError();
+						throw new Exceptions.AlreadyVotedError();
 					}
 
 					wallet.setAttribute("vote", vote.slice(1));
 				} else {
 					if (!hasVoted) {
-						throw new Errors.NoVoteError();
+						throw new Exceptions.NoVoteError();
 					} else if (wallet.getAttribute("vote") !== vote.slice(1)) {
-						throw new Errors.UnvoteMismatchError();
+						throw new Exceptions.UnvoteMismatchError();
 					}
 
 					wallet.forgetAttribute("vote");
@@ -69,7 +68,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
@@ -87,44 +86,44 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 			if (vote.startsWith("+")) {
 				if (walletVote) {
-					throw new Errors.AlreadyVotedError();
+					throw new Exceptions.AlreadyVotedError();
 				}
 
 				if (validatorWallet.hasAttribute("validator.resigned")) {
-					throw new Errors.VotedForResignedValidatorError(vote);
+					throw new Exceptions.VotedForResignedValidatorError(vote);
 				}
 
 				walletVote = vote.slice(1);
 			} else {
 				if (!walletVote) {
-					throw new Errors.NoVoteError();
+					throw new Exceptions.NoVoteError();
 				} else if (walletVote !== vote.slice(1)) {
-					throw new Errors.UnvoteMismatchError();
+					throw new Exceptions.UnvoteMismatchError();
 				}
 
 				walletVote = undefined;
 			}
 
 			if (!validatorWallet.isValidator()) {
-				throw new Errors.VotedForNonValidatorError(vote);
+				throw new Exceptions.VotedForNonValidatorError(vote);
 			}
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 
 		for (const vote of transaction.data.asset.votes) {
 			emitter.dispatch(vote.startsWith("+") ? AppEnums.VoteEvent.Vote : AppEnums.VoteEvent.Unvote, {
-				validator: vote,
 				transaction: transaction.data,
+				validator: vote,
 			});
 		}
 	}
 
-	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = this.poolQuery
@@ -133,14 +132,14 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 			.has();
 
 		if (hasSender) {
-			throw new PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.Vote}' in the pool`,
+			throw new Exceptions.PoolError(
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.Vote}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
 	}
 
-	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -160,7 +159,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -169,7 +168,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 			transaction.data.senderPublicKey,
 		);
 
-		Utils.assert.defined<Crypto.ITransactionAsset>(transaction.data.asset?.votes);
+		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.votes);
 
 		for (const vote of [...transaction.data.asset.votes].reverse()) {
 			if (vote.startsWith("+")) {
@@ -180,7 +179,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
-	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 }

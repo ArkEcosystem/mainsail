@@ -1,18 +1,18 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { secp256k1, SHA256 } from "bcrypto";
 import WIF from "wif";
 
 @injectable()
-export class KeyPairFactory implements Crypto.IKeyPairFactory {
+export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	public async fromMnemonic(mnemonic: string, compressed = true): Promise<Crypto.IKeyPair> {
+	public async fromMnemonic(mnemonic: string, compressed = true): Promise<Contracts.Crypto.IKeyPair> {
 		return this.fromPrivateKey(SHA256.digest(Buffer.from(mnemonic, "utf8")), compressed);
 	}
 
-	public async fromPrivateKey(privateKey: Buffer, compressed = true): Promise<Crypto.IKeyPair> {
+	public async fromPrivateKey(privateKey: Buffer, compressed = true): Promise<Contracts.Crypto.IKeyPair> {
 		return {
 			compressed,
 			privateKey: privateKey.toString("hex"),
@@ -20,7 +20,7 @@ export class KeyPairFactory implements Crypto.IKeyPairFactory {
 		};
 	}
 
-	public async fromWIF(wif: string): Promise<Crypto.IKeyPair> {
+	public async fromWIF(wif: string): Promise<Contracts.Crypto.IKeyPair> {
 		const decoded = WIF.decode(wif, this.configuration.get("network.wif"));
 
 		return {

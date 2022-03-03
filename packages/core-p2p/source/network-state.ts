@@ -1,4 +1,4 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Utils } from "@arkecosystem/core-kernel";
 
 import { NetworkStateStatus } from "./enums";
@@ -31,7 +31,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	private lastBlockId?: string;
 	private quorumDetails: QuorumDetails;
 
-	public constructor(public readonly status: NetworkStateStatus, lastBlock?: Crypto.IBlock) {
+	public constructor(public readonly status: NetworkStateStatus, lastBlock?: Contracts.Crypto.IBlock) {
 		this.quorumDetails = new QuorumDetails();
 
 		if (lastBlock) {
@@ -42,11 +42,11 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	public static async analyze(
 		monitor: Contracts.P2P.NetworkMonitor,
 		repository: Contracts.P2P.PeerRepository,
-		cryptoConfiguration: Crypto.IConfiguration,
+		cryptoConfiguration: Contracts.Crypto.IConfiguration,
 		slots,
 	): Promise<Contracts.P2P.NetworkState> {
 		// @ts-ignore - app exists but isn't on the interface for now
-		const lastBlock: Crypto.IBlock = monitor.app.get<any>(Identifiers.BlockchainService).getLastBlock();
+		const lastBlock: Contracts.Crypto.IBlock = monitor.app.get<any>(Identifiers.BlockchainService).getLastBlock();
 
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
 			// @ts-ignore - app exists but isn't on the interface for now
@@ -133,7 +133,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		return JSON.stringify(data, undefined, 2);
 	}
 
-	private setLastBlock(lastBlock: Crypto.IBlock): void {
+	private setLastBlock(lastBlock: Contracts.Crypto.IBlock): void {
 		this.nodeHeight = lastBlock.data.height;
 		this.lastBlockId = lastBlock.data.id;
 	}

@@ -1,4 +1,4 @@
-import Contracts from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 export type PeerFactory = (ip: string) => Contracts.P2P.Peer;
 

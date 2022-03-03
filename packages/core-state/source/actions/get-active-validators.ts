@@ -1,4 +1,4 @@
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Types } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "../round-state";

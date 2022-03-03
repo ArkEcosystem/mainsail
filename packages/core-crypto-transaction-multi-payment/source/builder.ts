@@ -1,7 +1,6 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
-import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { MultiPaymentTransaction } from "./versions/1";
@@ -27,7 +26,7 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 			const limit: number = this.configuration.getMilestone().multiPaymentLimit || 256;
 
 			if (this.data.asset.payments.length >= limit) {
-				throw new MaximumPaymentCountExceededError(limit);
+				throw new Exceptions.MaximumPaymentCountExceededError(limit);
 			}
 
 			this.data.asset.payments.push({
@@ -39,17 +38,17 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 		return this;
 	}
 
-	public async getStruct(): Promise<Crypto.ITransactionData> {
+	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
 		if (
 			!this.data.asset ||
 			!this.data.asset.payments ||
 			!Array.isArray(this.data.asset.payments) ||
 			this.data.asset.payments.length <= 1
 		) {
-			throw new MinimumPaymentCountSubceededError();
+			throw new Exceptions.MinimumPaymentCountSubceededError();
 		}
 
-		const struct: Crypto.ITransactionData = await super.getStruct();
+		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
 		struct.senderPublicKey = this.data.senderPublicKey;
 		struct.vendorField = this.data.vendorField;
 		struct.amount = this.data.amount;

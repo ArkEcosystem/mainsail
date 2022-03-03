@@ -1,7 +1,6 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { FeeRegistry } from "@arkecosystem/core-fees";
-import { TransactionFeeToHighError, TransactionFeeToLowError } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { FeeRegistry } from "@arkecosystem/core-fees";
 import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
@@ -12,15 +11,15 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Fee.Registry)
 	private readonly feeRegistry: FeeRegistry;
 
-	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		this.#throwIfCannot("pool", transaction);
 	}
 
-	public async throwIfCannotBroadcast(transaction: Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotBroadcast(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		this.#throwIfCannot("broadcast", transaction);
 	}
 
-	#throwIfCannot(action: string, transaction: Crypto.ITransaction): void {
+	#throwIfCannot(action: string, transaction: Contracts.Crypto.ITransaction): void {
 		const feeString = transaction.data.fee; // @TODO: formatSatoshi
 
 		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);
@@ -35,11 +34,11 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		if (transaction.data.fee.isLessThan(staticFee)) {
 			this.logger.notice(`${transaction} not eligible for ${action} (fee ${feeString} < ${staticFeeString})`);
 
-			throw new TransactionFeeToLowError(transaction);
+			throw new Exceptions.TransactionFeeToLowError(transaction);
 		}
 
 		this.logger.notice(`${transaction} not eligible for ${action} (fee ${feeString} > ${staticFeeString})`);
 
-		throw new TransactionFeeToHighError(transaction);
+		throw new Exceptions.TransactionFeeToHighError(transaction);
 	}
 }

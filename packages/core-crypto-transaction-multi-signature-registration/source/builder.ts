@@ -1,5 +1,5 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -23,7 +23,7 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 
 	public participant(publicKey: string): MultiSignatureBuilder {
 		if (this.data.asset && this.data.asset.multiSignature) {
-			const { publicKeys }: Crypto.IMultiSignatureAsset = this.data.asset.multiSignature;
+			const { publicKeys }: Contracts.Crypto.IMultiSignatureAsset = this.data.asset.multiSignature;
 
 			if (publicKeys.length <= 16) {
 				publicKeys.push(publicKey);
@@ -44,7 +44,7 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 		return this;
 	}
 
-	public multiSignatureAsset(multiSignature: Crypto.IMultiSignatureAsset): MultiSignatureBuilder {
+	public multiSignatureAsset(multiSignature: Contracts.Crypto.IMultiSignatureAsset): MultiSignatureBuilder {
 		if (this.data.asset && this.data.asset.multiSignature) {
 			this.data.asset.multiSignature = multiSignature;
 			this.data.fee = MultiSignatureRegistrationTransaction.staticFee(this.configuration, {
@@ -55,8 +55,8 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 		return this;
 	}
 
-	public async getStruct(): Promise<Crypto.ITransactionData> {
-		const struct: Crypto.ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
+		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;

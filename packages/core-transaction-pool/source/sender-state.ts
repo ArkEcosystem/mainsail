@@ -1,14 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import {
-	RetryTransactionError,
-	TransactionExceedsMaximumByteSizeError,
-	TransactionFailedToApplyError,
-	TransactionFailedToVerifyError,
-	TransactionFromFutureError,
-	TransactionFromWrongNetworkError,
-	TransactionHasExpiredError,
-} from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
 
 @injectable()
@@ -35,27 +26,27 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	private corrupt = false;
 
-	public async apply(transaction: Crypto.ITransaction): Promise<void> {
+	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {
-			throw new TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
+			throw new Exceptions.TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
 
 		const currentNetwork: number = this.configuration.get<number>("network.pubKeyHash");
 		if (transaction.data.network && transaction.data.network !== currentNetwork) {
-			throw new TransactionFromWrongNetworkError(transaction, currentNetwork);
+			throw new Exceptions.TransactionFromWrongNetworkError(transaction, currentNetwork);
 		}
 
 		const now: number = this.slots.getTime();
 		if (transaction.timestamp > now + 3600) {
 			const secondsInFuture: number = transaction.timestamp - now;
-			throw new TransactionFromFutureError(transaction, secondsInFuture);
+			throw new Exceptions.TransactionFromFutureError(transaction, secondsInFuture);
 		}
 
 		if (await this.expirationService.isExpired(transaction)) {
 			this.events.dispatch(Enums.TransactionEvent.Expired, transaction.data);
 			const expirationHeight: number = await this.expirationService.getExpirationHeight(transaction);
-			throw new TransactionHasExpiredError(transaction, expirationHeight);
+			throw new Exceptions.TransactionHasExpiredError(transaction, expirationHeight);
 		}
 
 		const handler: Contracts.Transactions.ITransactionHandler =
@@ -63,21 +54,21 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 		if (await this.triggers.call("verifyTransaction", { handler, transaction })) {
 			if (this.corrupt) {
-				throw new RetryTransactionError(transaction);
+				throw new Exceptions.RetryTransactionError(transaction);
 			}
 
 			try {
 				await this.triggers.call("throwIfCannotEnterPool", { handler, transaction });
 				await this.triggers.call("applyTransaction", { handler, transaction });
 			} catch (error) {
-				throw new TransactionFailedToApplyError(transaction, error);
+				throw new Exceptions.TransactionFailedToApplyError(transaction, error);
 			}
 		} else {
-			throw new TransactionFailedToVerifyError(transaction);
+			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
 	}
 
-	public async revert(transaction: Crypto.ITransaction): Promise<void> {
+	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		try {
 			const handler: Contracts.Transactions.ITransactionHandler =
 				await this.handlerRegistry.getActivatedHandlerForData(transaction.data);

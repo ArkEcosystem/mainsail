@@ -1,7 +1,7 @@
-import { performance } from "perf_hooks";
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { CronCommand, CronJob as Cron } from "cron";
+import { performance } from "perf_hooks";
 
 import { ScheduleEvent } from "../../enums";
 import { Job } from "./interfaces";
@@ -9,7 +9,7 @@ import { Job } from "./interfaces";
 @injectable()
 export class CronJob implements Job {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Kernel.EventDispatcher;
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	protected expression = "* * * * *";
 

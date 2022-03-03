@@ -1,13 +1,13 @@
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { assert } from "./assert";
 
 // todo: review the implementation
-export const calculate = (height: number, configuration: Crypto.IConfiguration): string => {
-	const config: Crypto.NetworkConfig | undefined = configuration.all();
+export const calculate = (height: number, configuration: Contracts.Crypto.IConfiguration): string => {
+	const config: Contracts.Crypto.NetworkConfig | undefined = configuration.all();
 
-	assert.defined<Crypto.NetworkConfig>(config);
+	assert.defined<Contracts.Crypto.NetworkConfig>(config);
 
 	const { genesisBlock, milestones } = config;
 

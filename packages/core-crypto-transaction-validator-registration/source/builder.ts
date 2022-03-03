@@ -1,5 +1,5 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -17,7 +17,7 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;
-		this.data.asset = { validator: {} } as Crypto.ITransactionAsset;
+		this.data.asset = { validator: {} } as Contracts.Crypto.ITransactionAsset;
 	}
 
 	public usernameAsset(username: string): ValidatorRegistrationBuilder {
@@ -28,8 +28,8 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		return this;
 	}
 
-	public async getStruct(): Promise<Crypto.ITransactionData> {
-		const struct: Crypto.ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
+		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;

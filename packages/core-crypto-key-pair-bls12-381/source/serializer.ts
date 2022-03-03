@@ -1,9 +1,9 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import ByteBuffer from "bytebuffer";
 
 @injectable()
-export class PublicKeySerializer implements Crypto.IPublicKeySerializer {
+export class PublicKeySerializer implements Contracts.Crypto.IPublicKeySerializer {
 	public serialize(buffer: ByteBuffer, publicKey: string): void {
 		buffer.append(publicKey, "hex");
 	}

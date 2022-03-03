@@ -1,18 +1,17 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
 
 @injectable()
-export class Configuration implements Crypto.IConfiguration {
-	#config: Crypto.NetworkConfig | undefined;
+export class Configuration implements Contracts.Crypto.IConfiguration {
+	#config: Contracts.Crypto.NetworkConfig | undefined;
 	#height: number | undefined;
-	#milestone: Crypto.IMilestone | undefined;
+	#milestone: Contracts.Crypto.IMilestone | undefined;
 	#milestones: Record<string, any> | undefined;
 
-	public setConfig(config: Crypto.NetworkConfig): void {
+	public setConfig(config: Contracts.Crypto.NetworkConfig): void {
 		this.#config = {
 			genesisBlock: config.genesisBlock,
 			milestones: config.milestones,
@@ -23,7 +22,7 @@ export class Configuration implements Crypto.IConfiguration {
 		this.buildConstants();
 	}
 
-	public all(): Crypto.NetworkConfig | undefined {
+	public all(): Contracts.Crypto.NetworkConfig | undefined {
 		return this.#config;
 	}
 
@@ -93,7 +92,7 @@ export class Configuration implements Crypto.IConfiguration {
 		return this.#milestone.data;
 	}
 
-	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): Crypto.MilestoneSearchResult {
+	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): Contracts.Crypto.MilestoneSearchResult {
 		if (!this.#milestones || this.#milestones.length === 0) {
 			throw new Error(`Attempted to get next milestone but none were set`);
 		}
@@ -169,7 +168,7 @@ export class Configuration implements Crypto.IConfiguration {
 			}
 
 			if ((current.height - previous.height) % previous.activeValidators !== 0) {
-				throw new InvalidMilestoneConfigurationError(
+				throw new Exceptions.InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${current.height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
 			}

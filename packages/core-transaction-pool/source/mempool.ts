@@ -1,6 +1,6 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
@@ -11,7 +11,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly addressFactory: Crypto.IAddressFactory;
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	private readonly senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 
@@ -35,7 +35,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return this.senderMempools.values();
 	}
 
-	public async addTransaction(transaction: Crypto.ITransaction): Promise<void> {
+	public async addTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		let senderMempool = this.senderMempools.get(transaction.data.senderPublicKey);
@@ -59,7 +59,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeTransaction(senderPublicKey: string, id: string): Promise<Crypto.ITransaction[]> {
+	public async removeTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.ITransaction[]> {
 		const senderMempool = this.senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];
@@ -75,7 +75,10 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeForgedTransaction(senderPublicKey: string, id: string): Promise<Crypto.ITransaction[]> {
+	public async removeForgedTransaction(
+		senderPublicKey: string,
+		id: string,
+	): Promise<Contracts.Crypto.ITransaction[]> {
 		const senderMempool = this.senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];

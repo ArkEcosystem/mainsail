@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { isValidPeer } from "@arkecosystem/core-crypto-validation";
 import { Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
 

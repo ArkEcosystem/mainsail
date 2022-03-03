@@ -1,7 +1,6 @@
 import { injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { PoolError } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { Handlers, Utils as TransactionUtils } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
@@ -38,7 +37,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
 		return super.throwIfCannotBeApplied(transaction, sender);
@@ -48,21 +47,21 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		return true;
 	}
 
-	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
 
 		// @TODO
 		if (!TransactionUtils.isRecipientOnActiveNetwork(recipientId, undefined, this.configuration)) {
 			const network: string = this.configuration.get<string>("network.pubKeyHash");
-			throw new PoolError(
+			throw new Exceptions.PoolError(
 				`Recipient ${recipientId} is not on the same network: ${network} `,
 				"ERR_INVALID_RECIPIENT",
 			);
 		}
 	}
 
-	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {
+	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 
 		const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(transaction.data.recipientId);
@@ -70,7 +69,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		recipient.increaseBalance(transaction.data.amount);
 	}
 
-	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {
+	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 
 		const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(transaction.data.recipientId);

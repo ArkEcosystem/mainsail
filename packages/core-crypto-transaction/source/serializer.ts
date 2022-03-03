@@ -1,19 +1,18 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { TransactionVersionError } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
-export class Serializer implements Crypto.ITransactionSerializer {
+export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async getBytes(
-		transaction: Crypto.ITransactionData,
-		options: Crypto.ISerializeOptions = {},
+		transaction: Contracts.Crypto.ITransactionData,
+		options: Contracts.Crypto.ISerializeOptions = {},
 	): Promise<Buffer> {
 		const version: number = transaction.version || 1;
 
@@ -21,10 +20,13 @@ export class Serializer implements Crypto.ITransactionSerializer {
 			return this.serialize(this.transactionTypeFactory.create(transaction), options);
 		}
 
-		throw new TransactionVersionError(version);
+		throw new Exceptions.TransactionVersionError(version);
 	}
 
-	public async serialize(transaction: Crypto.ITransaction, options: Crypto.ISerializeOptions = {}): Promise<Buffer> {
+	public async serialize(
+		transaction: Contracts.Crypto.ITransaction,
+		options: Contracts.Crypto.ISerializeOptions = {},
+	): Promise<Buffer> {
 		const buff: ByteBuffer = new ByteBuffer(
 			Buffer.alloc(this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192),
 		);
@@ -48,10 +50,10 @@ export class Serializer implements Crypto.ITransactionSerializer {
 		return bufferBuffer;
 	}
 
-	private serializeCommon(transaction: Crypto.ITransactionData, buff: ByteBuffer): void {
+	private serializeCommon(transaction: Contracts.Crypto.ITransactionData, buff: ByteBuffer): void {
 		transaction.version = transaction.version || 0x01;
 		if (transaction.typeGroup === undefined) {
-			transaction.typeGroup = Crypto.TransactionTypeGroup.Core;
+			transaction.typeGroup = Contracts.Crypto.TransactionTypeGroup.Core;
 		}
 
 		buff.writeUInt8(0xff);
@@ -77,8 +79,8 @@ export class Serializer implements Crypto.ITransactionSerializer {
 		buff.writeBigInt64LE(transaction.fee.toBigInt());
 	}
 
-	private serializeVendorField(transaction: Crypto.ITransaction, buff: ByteBuffer): void {
-		const { data }: Crypto.ITransaction = transaction;
+	private serializeVendorField(transaction: Contracts.Crypto.ITransaction, buff: ByteBuffer): void {
+		const { data }: Contracts.Crypto.ITransaction = transaction;
 
 		if (transaction.hasVendorField() && data.vendorField) {
 			const vf: Buffer = Buffer.from(data.vendorField, "utf8");
@@ -90,9 +92,9 @@ export class Serializer implements Crypto.ITransactionSerializer {
 	}
 
 	private serializeSignatures(
-		transaction: Crypto.ITransactionData,
+		transaction: Contracts.Crypto.ITransactionData,
 		buff: ByteBuffer,
-		options: Crypto.ISerializeOptions = {},
+		options: Contracts.Crypto.ISerializeOptions = {},
 	): void {
 		if (transaction.signature && !options.excludeSignature) {
 			buff.writeBuffer(Buffer.from(transaction.signature, "hex"));

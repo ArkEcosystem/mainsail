@@ -1,12 +1,12 @@
-import { Crypto } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 const SATOSHI = 1e8;
 
 let genesisTransactions: { [key: string]: boolean };
 let currentNetwork: number;
 
-export const formatSatoshi = (configuration: Crypto.IConfiguration, amount: BigNumber): string => {
+export const formatSatoshi = (configuration: Contracts.Crypto.IConfiguration, amount: BigNumber): string => {
 	const localeString = (+amount / SATOSHI).toLocaleString("en", {
 		maximumFractionDigits: 8,
 		minimumFractionDigits: 0,
@@ -15,7 +15,7 @@ export const formatSatoshi = (configuration: Crypto.IConfiguration, amount: BigN
 	return `${localeString} ${configuration.get("network.client.symbol")}`;
 };
 
-export const isGenesisTransaction = (configuration: Crypto.IConfiguration, id: string): boolean => {
+export const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id: string): boolean => {
 	const network: number = configuration.get("network.pubKeyHash");
 
 	if (!genesisTransactions || currentNetwork !== network) {
@@ -35,5 +35,5 @@ export const numberToHex = (number_: number, padding = 2): string => {
 	return "0".repeat(padding - indexHex.length) + indexHex;
 };
 
-export const maxVendorFieldLength = (configuration: Crypto.IConfiguration, height?: number): number =>
+export const maxVendorFieldLength = (configuration: Contracts.Crypto.IConfiguration, height?: number): number =>
 	configuration.getMilestone(height).vendorFieldLength;

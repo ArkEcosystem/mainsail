@@ -1,5 +1,5 @@
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Validator } from "../interfaces";
 import { Method } from "./method";
@@ -7,14 +7,14 @@ import { Method } from "./method";
 @injectable()
 export class BIP39 extends Method implements Validator {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Crypto.IAddressFactory;
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
-	private readonly keyPairFactory: Crypto.IKeyPairFactory;
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	#passphrase: string;
 
-	public keys: Crypto.IKeyPair | undefined;
+	public keys: Contracts.Crypto.IKeyPair | undefined;
 
 	public publicKey: string;
 
@@ -29,7 +29,10 @@ export class BIP39 extends Method implements Validator {
 		return this;
 	}
 
-	public async forge(transactions: Crypto.ITransactionData[], options: Record<string, any>): Promise<Crypto.IBlock> {
+	public async forge(
+		transactions: Contracts.Crypto.ITransactionData[],
+		options: Record<string, any>,
+	): Promise<Contracts.Crypto.IBlock> {
 		return this.createBlock(this.keys, transactions, options);
 	}
 }

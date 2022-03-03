@@ -1,11 +1,11 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
 
 import { BlockEvent, KernelEvent } from "../../enums";
 import { ServiceProvider, ServiceProviderRepository } from "../../providers";
 
 @injectable()
-export class ChangeServiceProviderState implements Kernel.EventListener {
+export class ChangeServiceProviderState implements Contracts.Kernel.EventListener {
 	@inject(Identifiers.ServiceProviderRepository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 

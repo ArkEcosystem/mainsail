@@ -1,12 +1,12 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class ValidatorResignationTransaction extends Transaction {
-	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
-	public static type: number = Crypto.TransactionType.ValidatorResignation;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
+	public static type: number = Contracts.Crypto.TransactionType.ValidatorResignation;
 	public static key = "validatorResignation";
 	public static version = 1;
 
@@ -18,12 +18,12 @@ export class ValidatorResignationTransaction extends Transaction {
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				fee: { bignumber: { minimum: 1 } },
-				type: { transactionType: Crypto.TransactionType.ValidatorResignation },
+				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorResignation },
 			},
 		});
 	}
 
-	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		return new ByteBuffer(Buffer.alloc(0));
 	}
 

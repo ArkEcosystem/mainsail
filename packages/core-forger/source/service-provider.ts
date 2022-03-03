@@ -1,14 +1,14 @@
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
 import { DELEGATE_FACTORY } from "./bindings";
-import { ValidatorFactory } from "./validator-factory";
-import { ValidatorTracker } from "./validator-tracker";
 import { ForgerService } from "./forger-service";
 import { Validator } from "./interfaces";
 import { CurrentValidatorProcessAction, LastForgedBlockRemoteAction, NextSlotProcessAction } from "./process-actions";
+import { ValidatorFactory } from "./validator-factory";
+import { ValidatorTracker } from "./validator-tracker";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

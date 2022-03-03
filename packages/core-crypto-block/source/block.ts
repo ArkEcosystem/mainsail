@@ -1,38 +1,38 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
-export class Block implements Crypto.IBlock {
+export class Block implements Contracts.Crypto.IBlock {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Crypto.IBlockSerializer; // @TODO: create contract for block serializer
+	private readonly serializer: Contracts.Crypto.IBlockSerializer; // @TODO: create contract for block serializer
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Crypto.IHashFactory;
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
 	@inject(Identifiers.Cryptography.Signature)
-	private readonly signatureFactory: Crypto.ISignature;
+	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Slots;
 
 	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;
-	public data: Crypto.IBlockData;
-	public transactions: Crypto.ITransaction[];
-	public verification: Crypto.IBlockVerification;
+	public data: Contracts.Crypto.IBlockData;
+	public transactions: Contracts.Crypto.ITransaction[];
+	public verification: Contracts.Crypto.IBlockVerification;
 
 	public async init({
 		data,
 		transactions,
 		id,
 	}: {
-		data: Crypto.IBlockData;
-		transactions: Crypto.ITransaction[];
+		data: Contracts.Crypto.IBlockData;
+		transactions: Contracts.Crypto.ITransaction[];
 		id?: string;
 	}) {
 		this.data = data;
@@ -55,8 +55,8 @@ export class Block implements Crypto.IBlock {
 		return this;
 	}
 
-	public getHeader(): Crypto.IBlockData {
-		const header: Crypto.IBlockData = Object.assign({}, this.data);
+	public getHeader(): Contracts.Crypto.IBlockData {
+		const header: Contracts.Crypto.IBlockData = Object.assign({}, this.data);
 
 		delete header.transactions;
 
@@ -78,8 +78,8 @@ export class Block implements Crypto.IBlock {
 		);
 	}
 
-	public toJson(): Crypto.IBlockJson {
-		const data: Crypto.IBlockJson = JSON.parse(JSON.stringify(this.data));
+	public toJson(): Contracts.Crypto.IBlockJson {
+		const data: Contracts.Crypto.IBlockJson = JSON.parse(JSON.stringify(this.data));
 		data.reward = this.data.reward.toString();
 		data.totalAmount = this.data.totalAmount.toString();
 		data.totalFee = this.data.totalFee.toString();
@@ -88,9 +88,9 @@ export class Block implements Crypto.IBlock {
 		return data;
 	}
 
-	public async verify(): Promise<Crypto.IBlockVerification> {
-		const block: Crypto.IBlockData = this.data;
-		const result: Crypto.IBlockVerification = {
+	public async verify(): Promise<Contracts.Crypto.IBlockVerification> {
+		const block: Contracts.Crypto.IBlockData = this.data;
+		const result: Contracts.Crypto.IBlockVerification = {
 			containsMultiSignatures: false,
 			errors: [],
 			verified: false,
@@ -126,7 +126,7 @@ export class Block implements Crypto.IBlock {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
 
-			const invalidTransactions: Crypto.ITransaction[] = this.transactions.filter((tx) => !tx.verified);
+			const invalidTransactions: Contracts.Crypto.ITransaction[] = this.transactions.filter((tx) => !tx.verified);
 			if (invalidTransactions.length > 0) {
 				result.errors.push("One or more transactions are not verified:");
 
@@ -146,7 +146,7 @@ export class Block implements Crypto.IBlock {
 			}
 
 			// Checking if transactions of the block adds up to block values.
-			const appliedTransactions: Record<string, Crypto.ITransactionData> = {};
+			const appliedTransactions: Record<string, Contracts.Crypto.ITransactionData> = {};
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;

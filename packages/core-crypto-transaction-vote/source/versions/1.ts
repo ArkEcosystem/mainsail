@@ -1,12 +1,12 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Crypto } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class VoteTransaction extends Transaction {
-	public static typeGroup: number = Crypto.TransactionTypeGroup.Core;
-	public static type: number = Crypto.TransactionType.Vote;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
+	public static type: number = Contracts.Crypto.TransactionType.Vote;
 	public static key = "vote";
 	public static version = 1;
 
@@ -32,13 +32,13 @@ export class VoteTransaction extends Transaction {
 				},
 				fee: { bignumber: { minimum: 1 } },
 				recipientId: { $ref: "address" },
-				type: { transactionType: Crypto.TransactionType.Vote },
+				type: { transactionType: Contracts.Crypto.TransactionType.Vote },
 			},
 			required: ["asset"],
 		});
 	}
 
-	public async serialize(options?: Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(100));
 

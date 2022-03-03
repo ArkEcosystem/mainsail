@@ -1,20 +1,19 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
 
-import { NetworkCannotBeDetermined } from "../../exceptions/config";
 import { Bootstrapper } from "../interfaces";
 
 @injectable()
 export class RegisterBaseNamespace implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
 		const token: string = this.app.token();
 		const network: string = this.app.network();
 
 		if (!token || !network) {
-			throw new NetworkCannotBeDetermined();
+			throw new Exceptions.NetworkCannotBeDetermined();
 		}
 
 		this.app.bind<string>(Identifiers.ApplicationNamespace).toConstantValue(`${token}-${network}`);

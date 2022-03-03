@@ -1,19 +1,19 @@
 import { inject } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration/source";
 import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment/source";
 import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration/source";
 import { TransferBuilder } from "../../../core-crypto-transaction-transfer/source";
+import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration/source";
 import { VoteBuilder } from "../../../core-crypto-transaction-vote/source";
 
 export class Signer {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	private nonce: BigNumber;
 

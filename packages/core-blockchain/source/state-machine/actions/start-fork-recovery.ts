@@ -1,6 +1,6 @@
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Action } from "../contracts";
 

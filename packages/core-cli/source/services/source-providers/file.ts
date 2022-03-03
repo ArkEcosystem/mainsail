@@ -1,4 +1,4 @@
-import { MissingPackageFolder } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@arkecosystem/core-contracts";
 import { existsSync } from "fs-extra";
 import { extract } from "tar";
 
@@ -28,7 +28,7 @@ export class File extends AbstractSource {
 		);
 
 		if (!existsSync(this.getOriginPath())) {
-			throw new MissingPackageFolder();
+			throw new Exceptions.MissingPackageFolder();
 		}
 	}
 }

@@ -1,8 +1,7 @@
 import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 
-import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "@arkecosystem/core-contracts";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandler } from "./transaction";
 
@@ -42,7 +41,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 			}
 		}
 
-		throw new InvalidTransactionTypeError(internalType);
+		throw new Exceptions.InvalidTransactionTypeError(internalType);
 	}
 
 	public async getActivatedHandlers(): Promise<TransactionHandler[]> {
@@ -62,10 +61,12 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 		if (await handler.isActivated()) {
 			return handler;
 		}
-		throw new DeactivatedTransactionHandlerError(internalType);
+		throw new Exceptions.DeactivatedTransactionHandlerError(internalType);
 	}
 
-	public async getActivatedHandlerForData(transactionData: Crypto.ITransactionData): Promise<TransactionHandler> {
+	public async getActivatedHandlerForData(
+		transactionData: Contracts.Crypto.ITransactionData,
+	): Promise<TransactionHandler> {
 		const internalType = Contracts.Transactions.InternalTransactionType.from(
 			transactionData.type,
 			transactionData.typeGroup,

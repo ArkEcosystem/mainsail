@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Crypto, Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import { performance } from "perf_hooks";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { BlockEvent, ScheduleEvent } from "../../enums";
 import { Job } from "./interfaces";
@@ -9,10 +9,10 @@ import { ExecuteCallbackWhenReady } from "./listeners";
 @injectable()
 export class BlockJob implements Job {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events: Kernel.EventDispatcher;
+	private readonly events: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	protected blockCount = 1;
 

@@ -1,4 +1,4 @@
-import Contracts from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { Services } from "@arkecosystem/core-kernel";
 
 import { Wallet } from "./wallet";

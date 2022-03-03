@@ -1,5 +1,5 @@
 import * as console from "console";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import chalk, { Chalk } from "chalk";
 import pino, { PrettyOptions } from "pino";

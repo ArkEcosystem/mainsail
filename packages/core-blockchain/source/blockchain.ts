@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
@@ -49,10 +49,10 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Crypto.IBlockFactory;
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
@@ -176,7 +176,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.queue.clear();
 	}
 
-	public async handleIncomingBlock(block: Crypto.IBlockData, fromForger = false): Promise<void> {
+	public async handleIncomingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): Promise<void> {
 		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
 			this.app,
 			block.height,
@@ -214,12 +214,12 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		}
 	}
 
-	public enqueueBlocks(blocks: Crypto.IBlockData[]): void {
+	public enqueueBlocks(blocks: Contracts.Crypto.IBlockData[]): void {
 		if (blocks.length === 0) {
 			return;
 		}
 
-		const __createQueueJob = (blocks: Crypto.IBlockData[]) => {
+		const __createQueueJob = (blocks: Contracts.Crypto.IBlockData[]) => {
 			const processBlocksJob = this.app.resolve<ProcessBlocksJob>(ProcessBlocksJob);
 			processBlocksJob.setBlocks(blocks);
 
@@ -239,7 +239,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		let currentBlocksChunk: any[] = [];
 		let currentTransactionsCount = 0;
 		for (const block of blocks) {
-			Utils.assert.defined<Crypto.IBlockData>(block);
+			Utils.assert.defined<Contracts.Crypto.IBlockData>(block);
 
 			currentBlocksChunk.push(block);
 			currentTransactionsCount += block.numberOfTransactions;
@@ -266,44 +266,45 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		try {
 			this.clearAndStopQueue();
 
-			const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
+			const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
 
 			// If the current chain height is H and we will be removing blocks [N, H],
 			// then blocksToRemove[] will contain blocks [N - 1, H - 1].
-			const blocksToRemove: Crypto.IBlockData[] = await this.database.getBlocks(
+			const blocksToRemove: Contracts.Crypto.IBlockData[] = await this.database.getBlocks(
 				lastBlock.data.height - nblocks,
 				lastBlock.data.height,
 			);
 
-			const removedBlocks: Crypto.IBlockData[] = [];
-			const removedTransactions: Crypto.ITransaction[] = [];
+			const removedBlocks: Contracts.Crypto.IBlockData[] = [];
+			const removedTransactions: Contracts.Crypto.ITransaction[] = [];
 
 			const revertLastBlock = async () => {
-				const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
+				const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
 
 				await this.databaseInteraction.revertBlock(lastBlock);
 				removedBlocks.push(lastBlock.data);
 				removedTransactions.push(...[...lastBlock.transactions].reverse());
 				blocksToRemove.pop();
 
-				let newLastBlock: Crypto.IBlock;
+				let newLastBlock: Contracts.Crypto.IBlock;
 				// eslint-disable-next-line unicorn/prefer-at
 				if (blocksToRemove[blocksToRemove.length - 1].height === 1) {
 					newLastBlock = this.stateStore.getGenesisBlock();
 				} else {
 					// eslint-disable-next-line unicorn/prefer-at
-					const temporaryNewLastBlockData: Crypto.IBlockData = blocksToRemove[blocksToRemove.length - 1];
+					const temporaryNewLastBlockData: Contracts.Crypto.IBlockData =
+						blocksToRemove[blocksToRemove.length - 1];
 
-					Utils.assert.defined<Crypto.IBlockData>(temporaryNewLastBlockData);
+					Utils.assert.defined<Contracts.Crypto.IBlockData>(temporaryNewLastBlockData);
 
-					const temporaryNewLastBlock: Crypto.IBlock | undefined = await this.blockFactory.fromData(
+					const temporaryNewLastBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(
 						temporaryNewLastBlockData,
 						{
 							deserializeTransactionsUnchecked: true,
 						},
 					);
 
-					Utils.assert.defined<Crypto.IBlockData>(temporaryNewLastBlock);
+					Utils.assert.defined<Contracts.Crypto.IBlockData>(temporaryNewLastBlock);
 
 					newLastBlock = temporaryNewLastBlock;
 				}
@@ -317,7 +318,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 					return;
 				}
 
-				const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
+				const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
 
 				this.logger.info(`Undoing block ${lastBlock.data.height.toLocaleString()}`);
 
@@ -376,7 +377,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.dispatch("WAKEUP");
 	}
 
-	public forkBlock(block: Crypto.IBlock, numberOfBlockToRollback?: number): void {
+	public forkBlock(block: Contracts.Crypto.IBlock, numberOfBlockToRollback?: number): void {
 		this.stateStore.setForkedBlock(block);
 
 		this.clearAndStopQueue();
@@ -388,7 +389,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.dispatch("FORK");
 	}
 
-	public isSynced(block?: Crypto.IBlockData): boolean {
+	public isSynced(block?: Contracts.Crypto.IBlockData): boolean {
 		if (!this.peerRepository.hasPeers()) {
 			return true;
 		}
@@ -398,7 +399,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.slots.getTime() - block.timestamp < 3 * this.configuration.getMilestone(block.height).blocktime;
 	}
 
-	public getLastBlock(): Crypto.IBlock {
+	public getLastBlock(): Contracts.Crypto.IBlock {
 		return this.stateStore.getLastBlock();
 	}
 
@@ -406,7 +407,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.getLastBlock().data.height;
 	}
 
-	public getLastDownloadedBlock(): Crypto.IBlockData {
+	public getLastDownloadedBlock(): Contracts.Crypto.IBlockData {
 		return this.stateStore.getLastDownloadedBlock() || this.getLastBlock().data;
 	}
 
@@ -414,11 +415,11 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.stateStore.getBlockPing();
 	}
 
-	public pingBlock(incomingBlock: Crypto.IBlockData): boolean {
+	public pingBlock(incomingBlock: Contracts.Crypto.IBlockData): boolean {
 		return this.stateStore.pingBlock(incomingBlock);
 	}
 
-	public pushPingBlock(block: Crypto.IBlockData, fromForger = false): void {
+	public pushPingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): void {
 		this.stateStore.pushPingBlock(block, fromForger);
 	}
 

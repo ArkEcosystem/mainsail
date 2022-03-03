@@ -1,9 +1,9 @@
-import assert from "assert";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { injectable, inject, tagged } from "@arkecosystem/core-container";
+import assert from "assert";
 
 @injectable()
 export class RoundState {
@@ -37,30 +37,30 @@ export class RoundState {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Crypto.IAddressFactory;
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Crypto.IHashFactory;
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Crypto.IBlockFactory;
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	private blocksInCurrentRound: Crypto.IBlock[] = [];
+	private blocksInCurrentRound: Contracts.Crypto.IBlock[] = [];
 	private forgingValidators: Contracts.State.Wallet[] = [];
 
-	public async applyBlock(block: Crypto.IBlock): Promise<void> {
+	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		this.blocksInCurrentRound.push(block);
 
 		await this.applyRound(block.data.height);
 	}
 
-	public async revertBlock(block: Crypto.IBlock): Promise<void> {
+	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		if (this.blocksInCurrentRound.length === 0) {
 			this.blocksInCurrentRound = await this.getBlocksForRound();
 		}
@@ -132,8 +132,8 @@ export class RoundState {
 		return this.shuffleValidators(roundInfo, validators ?? []);
 	}
 
-	public async detectMissedBlocks(block: Crypto.IBlock): Promise<void> {
-		const lastBlock: Crypto.IBlock = this.stateStore.getLastBlock();
+	public async detectMissedBlocks(block: Contracts.Crypto.IBlock): Promise<void> {
+		const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
 
 		if (lastBlock.data.height === 1) {
 			return;
@@ -227,7 +227,7 @@ export class RoundState {
 		}
 	}
 
-	private async getBlocksForRound(): Promise<Crypto.IBlock[]> {
+	private async getBlocksForRound(): Promise<Contracts.Crypto.IBlock[]> {
 		const lastBlock = this.stateStore.getLastBlock();
 		const roundInfo = this.getRound(lastBlock.data.height);
 
@@ -295,13 +295,13 @@ export class RoundState {
 	): Promise<void> {
 		// ! it's this.getActiveValidators(roundInfo, validators);
 		// ! only last part of that function which reshuffles validators is used
-		const result = await this.triggers.call("getActiveValidators", { validators, roundInfo });
+		const result = await this.triggers.call("getActiveValidators", { roundInfo, validators });
 		this.forgingValidators = (result as Contracts.State.Wallet[]) || [];
 	}
 
 	private async calcPreviousActiveValidators(
 		roundInfo: Contracts.Shared.RoundInfo,
-		blocks: Crypto.IBlock[],
+		blocks: Contracts.Crypto.IBlock[],
 	): Promise<Contracts.State.Wallet[]> {
 		const previousRoundState = await this.getDposPreviousRoundState(blocks, roundInfo);
 

@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { decorateInjectable, inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { performance } from "perf_hooks";
 
 import { QueueEvent } from "../../../enums";
@@ -8,14 +8,14 @@ import { QueueEvent } from "../../../enums";
 decorateInjectable(EventEmitter);
 
 @injectable()
-export class MemoryQueue extends EventEmitter implements Kernel.Queue {
+export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Kernel.EventDispatcher;
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
-	private readonly logger!: Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
-	private jobs: Kernel.QueueJob[] = [];
+	private jobs: Contracts.Kernel.QueueJob[] = [];
 
 	private running = false;
 	private started = false;
@@ -27,7 +27,7 @@ export class MemoryQueue extends EventEmitter implements Kernel.Queue {
 		this.setMaxListeners(0);
 	}
 
-	public async make(): Promise<Kernel.Queue> {
+	public async make(): Promise<Contracts.Kernel.Queue> {
 		return this;
 	}
 
@@ -61,17 +61,17 @@ export class MemoryQueue extends EventEmitter implements Kernel.Queue {
 		this.jobs = [];
 	}
 
-	public async push(job: Kernel.QueueJob): Promise<void> {
+	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
 		this.jobs.push(job);
 
 		this.processJobs();
 	}
 
-	public async later(delay: number, job: Kernel.QueueJob): Promise<void> {
+	public async later(delay: number, job: Contracts.Kernel.QueueJob): Promise<void> {
 		setTimeout(() => this.push(job), delay);
 	}
 
-	public async bulk(jobs: Kernel.QueueJob[]): Promise<void> {
+	public async bulk(jobs: Contracts.Kernel.QueueJob[]): Promise<void> {
 		for (const job of jobs) {
 			this.jobs.push(job);
 		}

@@ -1,5 +1,5 @@
 import { inject } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import dayjs from "dayjs";
 import { EntityRepository, In } from "typeorm";
@@ -148,8 +148,8 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 			.select([])
 			.addSelect("recipient_id", "recipientId")
 			.addSelect("SUM(amount)", "amount")
-			.where(`type_group = ${Crypto.TransactionTypeGroup.Core}`)
-			.andWhere(`type = ${Crypto.TransactionType.Transfer}`)
+			.where(`type_group = ${Contracts.Crypto.TransactionTypeGroup.Core}`)
+			.andWhere(`type = ${Contracts.Crypto.TransactionType.Transfer}`)
 			.groupBy("recipient_id")
 			.getRawMany();
 	}

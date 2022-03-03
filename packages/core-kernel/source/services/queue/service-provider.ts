@@ -1,5 +1,5 @@
 import { interfaces } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { QueueManager } from "./manager";
@@ -10,8 +10,8 @@ export class ServiceProvider extends BaseServiceProvider {
 
 		this.app.bind(Identifiers.QueueFactory).toFactory(
 			(context: interfaces.Context) =>
-				async <K, T>(name?: string): Promise<Kernel.Queue> =>
-					context.container.get<QueueManager>(Identifiers.QueueManager).driver<Kernel.Queue>(name),
+				async <K, T>(name?: string): Promise<Contracts.Kernel.Queue> =>
+					context.container.get<QueueManager>(Identifiers.QueueManager).driver<Contracts.Kernel.Queue>(name),
 		);
 	}
 }

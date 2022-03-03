@@ -1,4 +1,4 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 import semver from "semver";
 
@@ -12,7 +12,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 		return false;
 	}
 
-	const configuration: Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
+	const configuration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
 
 	let minimumVersions: string[];
 	const milestones: Record<string, any> = configuration.getMilestone();

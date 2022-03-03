@@ -1,18 +1,18 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { RIPEMD160, SHA256 } from "bcrypto";
 import { base58 } from "bstring";
 
 @injectable()
-export class AddressFactory implements Crypto.IAddressFactory {
+export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
-	private readonly keyPairFactory: Crypto.IKeyPairFactory;
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
@@ -32,11 +32,11 @@ export class AddressFactory implements Crypto.IAddressFactory {
 		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif));
 	}
 
-	public async fromMultiSignatureAsset(asset: Crypto.IMultiSignatureAsset): Promise<string> {
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
 		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
 	}
 
-	public async fromPrivateKey(privateKey: Crypto.IKeyPair): Promise<string> {
+	public async fromPrivateKey(privateKey: Contracts.Crypto.IKeyPair): Promise<string> {
 		return this.fromPublicKey(privateKey.publicKey);
 	}
 

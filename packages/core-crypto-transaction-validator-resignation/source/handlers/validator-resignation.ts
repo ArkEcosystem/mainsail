@@ -1,10 +1,9 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { PoolError } from "@arkecosystem/core-contracts";
 import { Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Errors, Handlers } from "@arkecosystem/core-transactions";
+import { Handlers } from "@arkecosystem/core-transactions";
 
 import { ValidatorResignationTransaction } from "../versions";
 
@@ -51,15 +50,15 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		if (!wallet.isValidator()) {
-			throw new Errors.WalletNotAValidatorError();
+			throw new Exceptions.WalletNotAValidatorError();
 		}
 
 		if (wallet.hasAttribute("validator.resigned")) {
-			throw new Errors.WalletAlreadyResignedError();
+			throw new Exceptions.WalletAlreadyResignedError();
 		}
 
 		const requiredValidatorsCount: number = this.configuration.getMilestone().activeValidators;
@@ -68,17 +67,17 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			.filter((w) => w.hasAttribute("validator.resigned") === false).length;
 
 		if (currentValidatorsCount - 1 < requiredValidatorsCount) {
-			throw new Errors.NotEnoughValidatorsError();
+			throw new Exceptions.NotEnoughValidatorsError();
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		emitter.dispatch(AppEnums.ValidatorEvent.Resigned, transaction.data);
 	}
 
-	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = this.poolQuery
@@ -90,14 +89,14 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
-			throw new PoolError(
+			throw new Exceptions.PoolError(
 				`Validator resignation for "${wallet.getAttribute("validator.username")}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
 	}
 
-	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -109,7 +108,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		this.walletRepository.index(senderWallet);
 	}
 
-	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -122,12 +121,12 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public async applyToRecipient(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}
 
 	public async revertForRecipient(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}
 }

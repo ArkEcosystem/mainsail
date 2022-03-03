@@ -42,7 +42,7 @@ export const registerBlockFactory = (
 	// 	return ValidatorFactory.fromBIP39(options.passphrase || secrets[0]).forge(transactions, {
 	// 		previousBlock,
 	// 		timestamp:
-	// 			Crypto.Slots.getSlotNumber(blockTimestampLookup, Crypto.Slots.getTime()) * options.blocktime ||
+	// 			Crypto.Slots.getSlotNumber(blockTimestampLookup, Contracts.Crypto.Slots.getTime()) * options.blocktime ||
 	// 			blocktime,
 	// 		reward: options.reward || reward,
 	// 	})!;

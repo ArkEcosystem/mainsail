@@ -1,5 +1,5 @@
 import { interfaces } from "@arkecosystem/core-container";
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { Block } from "./block";
@@ -11,7 +11,7 @@ import { Serializer } from "./serializer";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(INTERNAL_FACTORY).toFactory<Crypto.IBlock>(
+		this.app.bind(INTERNAL_FACTORY).toFactory<Contracts.Crypto.IBlock>(
 			// @ts-ignore
 			(context: interfaces.Context) => (data) => context.container.resolve(Block).init(data),
 		);

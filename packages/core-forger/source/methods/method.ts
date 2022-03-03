@@ -1,21 +1,21 @@
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 @injectable()
 export abstract class Method {
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Crypto.IBlockFactory;
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Crypto.IHashFactory;
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
 	protected async createBlock(
-		keys: Crypto.IKeyPair,
-		transactions: Crypto.ITransactionData[],
+		keys: Contracts.Crypto.IKeyPair,
+		transactions: Contracts.Crypto.ITransactionData[],
 		options: Record<string, any>,
-	): Promise<Crypto.IBlock> {
+	): Promise<Contracts.Crypto.IBlock> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,

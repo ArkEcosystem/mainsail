@@ -1,4 +1,4 @@
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { Configuration } from "./configuration";
@@ -8,15 +8,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		// if (this.app.isBound(Identifiers.Crypto)) {
-		const config: Crypto.NetworkConfig = this.fromConfigRepository();
+		const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
 
-		this.app.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
+		this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
-		this.app.bind<Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
+		this.app.bind<Contracts.Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
 		// }
 	}
 
-	private fromConfigRepository(): Crypto.NetworkConfig {
+	private fromConfigRepository(): Contracts.Crypto.NetworkConfig {
 		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
 
 		return {

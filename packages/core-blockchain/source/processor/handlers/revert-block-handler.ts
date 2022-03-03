@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService } from "@arkecosystem/core-database";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
@@ -23,7 +23,7 @@ export class RevertBlockHandler implements BlockHandler {
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	public async execute(block: Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		try {
 			await this.databaseInteraction.revertBlock(block);
 
@@ -33,7 +33,7 @@ export class RevertBlockHandler implements BlockHandler {
 			}
 
 			// Remove last block, take from DB if list is empty
-			let previousBlock: Crypto.IBlock | undefined = this.state
+			let previousBlock: Contracts.Crypto.IBlock | undefined = this.state
 				.getLastBlocks()
 				.find((stateBlock) => stateBlock.data.height === block.data.height - 1);
 

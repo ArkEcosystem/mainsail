@@ -1,4 +1,4 @@
-import { Crypto, State } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { calculate as calculateSupply } from "./supply-calculator";
@@ -14,9 +14,9 @@ const toDecimal = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
 };
 
 export const calculateApproval = (
-	validator: State.Wallet,
+	validator: Contracts.State.Wallet,
 	height = 1,
-	configuration: Crypto.IConfiguration,
+	configuration: Contracts.Crypto.IConfiguration,
 ): number => {
 	const totalSupply: BigNumber = BigNumber.make(calculateSupply(height, configuration));
 	const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance");
@@ -24,8 +24,8 @@ export const calculateApproval = (
 	return toDecimal(voteBalance, totalSupply);
 };
 
-export const calculateForgedTotal = (wallet: State.Wallet): string => {
-	const validator: State.WalletValidatorAttributes = wallet.getAttribute("validator");
+export const calculateForgedTotal = (wallet: Contracts.State.Wallet): string => {
+	const validator: Contracts.State.WalletValidatorAttributes = wallet.getAttribute("validator");
 	const forgedFees: BigNumber = BigNumber.make(validator.forgedFees);
 	const forgedRewards: BigNumber = BigNumber.make(validator.forgedRewards);
 

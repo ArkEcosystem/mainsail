@@ -1,17 +1,16 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
 import { CacheEvent } from "../../../enums";
-import { NotImplemented } from "../../../exceptions/runtime";
 
 @injectable()
-export class MemoryCacheStore<K, T> implements Kernel.CacheStore<K, T> {
+export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly eventDispatcher!: Kernel.EventDispatcher;
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	private readonly store: Map<K, T> = new Map<K, T>();
 
-	public async make(): Promise<Kernel.CacheStore<K, T>> {
+	public async make(): Promise<Contracts.Kernel.CacheStore<K, T>> {
 		return this;
 	}
 
@@ -70,11 +69,11 @@ export class MemoryCacheStore<K, T> implements Kernel.CacheStore<K, T> {
 	}
 
 	public async forever(key: K, value: T): Promise<boolean> {
-		throw new NotImplemented(this.constructor.name, "forever");
+		throw new Exceptions.NotImplemented(this.constructor.name, "forever");
 	}
 
 	public async foreverMany(values: Array<[K, T]>): Promise<boolean[]> {
-		throw new NotImplemented(this.constructor.name, "foreverMany");
+		throw new Exceptions.NotImplemented(this.constructor.name, "foreverMany");
 	}
 
 	public async forget(key: K): Promise<boolean> {
@@ -98,6 +97,6 @@ export class MemoryCacheStore<K, T> implements Kernel.CacheStore<K, T> {
 	}
 
 	public async getPrefix(): Promise<string> {
-		throw new NotImplemented(this.constructor.name, "getPrefix");
+		throw new Exceptions.NotImplemented(this.constructor.name, "getPrefix");
 	}
 }

@@ -1,8 +1,8 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";
-import { inject } from "@arkecosystem/core-container";
 
 import { Controller } from "./controller";
 
@@ -29,7 +29,7 @@ export class InternalController extends Controller {
 	private readonly collator!: Contracts.TransactionPool.Collator;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
@@ -49,7 +49,7 @@ export class InternalController extends Controller {
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.UnconfirmedTransactions> {
-		const transactions: Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
+		const transactions: Contracts.Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
 
 		return {
 			poolSize: this.transactionPool.getPoolSize(),
@@ -90,11 +90,11 @@ export class InternalController extends Controller {
 			canForge: forgingInfo.canForge,
 			current: roundInfo.round,
 			currentForger: validators[forgingInfo.currentForger],
-			validators,
 			lastBlock: lastBlock.data,
 			nextForger: validators[forgingInfo.nextForger],
 			reward,
 			timestamp: forgingInfo.blockTimestamp,
+			validators,
 		};
 	}
 

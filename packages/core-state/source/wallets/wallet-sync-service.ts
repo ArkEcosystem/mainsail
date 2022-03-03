@@ -1,4 +1,4 @@
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
 import { injectable, inject, tagged } from "@arkecosystem/core-container";
 

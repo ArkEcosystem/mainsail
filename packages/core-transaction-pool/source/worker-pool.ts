@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
 @injectable()
@@ -23,8 +23,8 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 	}
 
 	public async getTransactionFromData(
-		transactionData: Crypto.ITransactionData | Buffer,
-	): Promise<Crypto.ITransaction> {
+		transactionData: Contracts.Crypto.ITransactionData | Buffer,
+	): Promise<Contracts.Crypto.ITransaction> {
 		const worker: Contracts.TransactionPool.Worker = this.workers.reduce((previous, next) => {
 			if (previous.getQueueSize() < next.getQueueSize()) {
 				return previous;

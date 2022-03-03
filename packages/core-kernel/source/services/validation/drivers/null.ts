@@ -1,10 +1,10 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { JsonObject } from "../../../types";
 
 @injectable()
-export class NullValidator implements Kernel.Validator {
+export class NullValidator implements Contracts.Kernel.Validator {
 	public validate(data: JsonObject, schema: object): void {
 		//
 	}

@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { ForgerService } from "../forger-service";
 

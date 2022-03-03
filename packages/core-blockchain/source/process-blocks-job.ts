@@ -1,12 +1,12 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
 import { RevertBlockHandler } from "./processor/handlers";
-import { StateMachine } from "./state-machine/state-machine";
+import { StateMachine } from "./state-machine";
 
 @injectable()
 export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
@@ -41,21 +41,21 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Crypto.IBlockFactory;
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
-	private blocks: Crypto.IBlockData[] = [];
+	private blocks: Contracts.Crypto.IBlockData[] = [];
 
-	public getBlocks(): Crypto.IBlockData[] {
+	public getBlocks(): Contracts.Crypto.IBlockData[] {
 		return this.blocks;
 	}
 
-	public setBlocks(blocks: Crypto.IBlockData[]): void {
+	public setBlocks(blocks: Contracts.Crypto.IBlockData[]): void {
 		this.blocks = blocks;
 	}
 
@@ -93,10 +93,10 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			return;
 		}
 
-		const acceptedBlocks: Crypto.IBlock[] = [];
-		let forkBlock: Crypto.IBlock | undefined;
+		const acceptedBlocks: Contracts.Crypto.IBlock[] = [];
+		let forkBlock: Contracts.Crypto.IBlock | undefined;
 		let lastProcessResult: BlockProcessorResult | undefined;
-		let lastProcessedBlock: Crypto.IBlock | undefined;
+		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
 		const acceptedBlockTimeLookup = (height: number) =>
 			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
@@ -114,7 +114,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 				}
 
 				const blockInstance = await this.blockFactory.fromData(block);
-				Utils.assert.defined<Crypto.IBlock>(blockInstance);
+				Utils.assert.defined<Contracts.Crypto.IBlock>(blockInstance);
 
 				lastProcessResult = await this.triggers.call("processBlock", {
 					block: blockInstance,
@@ -181,7 +181,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		return;
 	}
 
-	private async revertBlocks(blocksToRevert: Crypto.IBlock[]): Promise<void> {
+	private async revertBlocks(blocksToRevert: Contracts.Crypto.IBlock[]): Promise<void> {
 		// Rounds are saved while blocks are being processed and may now be out of sync with the last
 		// block that was written into the database.
 

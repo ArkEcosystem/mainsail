@@ -1,4 +1,4 @@
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { registerFormats } from "./formats";
@@ -19,7 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			registerFormats(this.app.get(Identifiers.Cryptography.Configuration)),
 		)) {
 			// @ts-ignore
-			this.app.get<Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}
 	}
 
@@ -28,13 +28,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			registerKeywords(this.app.get(Identifiers.Cryptography.Configuration)),
 		)) {
 			// @ts-ignore
-			this.app.get<Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}
 	}
 
 	private async registerSchemas(): Promise<void> {
 		for (const schema of Object.values(schemas)) {
-			this.app.get<Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
 }

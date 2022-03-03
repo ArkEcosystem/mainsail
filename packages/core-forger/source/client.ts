@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { HostNoResponseError, RelayCommunicationError } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
 
@@ -14,7 +13,7 @@ export class Client {
 	private readonly logger: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Crypto.IBlockSerializer;
+	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
 	public hosts: RelayHost[] = [];
 
@@ -50,7 +49,7 @@ export class Client {
 		}
 	}
 
-	public async broadcastBlock(block: Crypto.IBlock): Promise<void> {
+	public async broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		this.logger.debug(
 			`Broadcasting block ${block.data.height.toLocaleString()} (${block.data.id}) with ${
 				block.data.numberOfTransactions
@@ -103,7 +102,11 @@ export class Client {
 
 	public async emitEvent(
 		event: string,
-		body: { error: string } | { activeValidators: string[] } | Crypto.IBlockData | Crypto.ITransactionData,
+		body:
+			| { error: string }
+			| { activeValidators: string[] }
+			| Contracts.Crypto.IBlockData
+			| Contracts.Crypto.ITransactionData,
 	): Promise<void> {
 		// NOTE: Events need to be emitted to the localhost. If you need to trigger
 		// actions on a remote host based on events you should be using webhooks
@@ -145,7 +148,7 @@ export class Client {
 			)}.`,
 		);
 
-		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join(","));
+		throw new Exceptions.HostNoResponseError(this.hosts.map((host) => host.hostname).join(","));
 	}
 
 	private async emit<T = object>(event: string, payload: Record<string, any> = {}, timeout = 4000): Promise<T> {
@@ -163,7 +166,10 @@ export class Client {
 
 			return codec.response.deserialize(response.payload);
 		} catch (error) {
-			throw new RelayCommunicationError(`${this.host.hostname}:${this.host.port}<${event}>`, error.message);
+			throw new Exceptions.RelayCommunicationError(
+				`${this.host.hostname}:${this.host.port}<${event}>`,
+				error.message,
+			);
 		}
 	}
 

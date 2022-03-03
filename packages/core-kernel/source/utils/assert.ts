@@ -1,9 +1,10 @@
 // import { IBlock, ITransaction } from "@arkecosystem/core-contracts";
-import { AssertionException } from "../exceptions/runtime";
+
+import { Exceptions } from "@arkecosystem/core-contracts";
 
 const assertType = (condition: boolean, description: string): asserts condition => {
 	if (!condition) {
-		throw new AssertionException(`Expected value which is "${description}".`);
+		throw new Exceptions.AssertionException(`Expected value which is "${description}".`);
 	}
 };
 

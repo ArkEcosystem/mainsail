@@ -1,26 +1,26 @@
-import { existsSync, removeSync, writeFileSync } from "fs-extra";
+// eslint-disable-next-line simple-import-sort/imports
 import { join } from "path";
+import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { existsSync, removeSync, writeFileSync } from "fs-extra";
 
 import * as Bootstrappers from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
 import { KernelEvent } from "./enums";
-import { DirectoryCannotBeFound } from "./exceptions/filesystem";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 // import { ShutdownSignal } from "./enums/process";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
 import { JsonObject, KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
-export class Application implements Kernel.Application {
-	private booted: boolean = false;
+export class Application implements Contracts.Kernel.Application {
+	private booted = false;
 
-	public constructor(public readonly container: Kernel.Container.Container) {
+	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
 		// todo: enable this after solving the event emitter limit issues
 		// this.listenToShutdownSignals();
 
-		this.bind<Kernel.Application>(Identifiers.Application).toConstantValue(this);
+		this.bind<Contracts.Kernel.Application>(Identifiers.Application).toConstantValue(this);
 
 		this.bind<ConfigRepository>(Identifiers.ConfigRepository).to(ConfigRepository).inSingletonScope();
 
@@ -153,19 +153,25 @@ export class Application implements Kernel.Application {
 	}
 
 	public enableMaintenance(): void {
-		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: +new Date() }));
+		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
 
-		this.get<Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
 
-		this.get<Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch("kernel.maintenance", true);
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+			"kernel.maintenance",
+			true,
+		);
 	}
 
 	public disableMaintenance(): void {
 		removeSync(this.tempPath("maintenance"));
 
-		this.get<Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
 
-		this.get<Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch("kernel.maintenance", false);
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+			"kernel.maintenance",
+			false,
+		);
 	}
 
 	public isDownForMaintenance(): boolean {
@@ -176,21 +182,25 @@ export class Application implements Kernel.Application {
 		this.booted = false;
 
 		if (reason) {
-			this.get<Kernel.Logger>(Identifiers.LogService).notice(reason);
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice(reason);
 		}
 
 		if (error) {
-			this.get<Kernel.Logger>(Identifiers.LogService).error(error.stack);
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack);
 		}
 
 		await this.disposeServiceProviders();
 	}
 
-	public bind<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): Kernel.Container.BindingToSyntax<T> {
+	public bind<T>(
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+	): Contracts.Kernel.Container.BindingToSyntax<T> {
 		return this.container.bind(serviceIdentifier);
 	}
 
-	public rebind<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): Kernel.Container.BindingToSyntax<T> {
+	public rebind<T>(
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+	): Contracts.Kernel.Container.BindingToSyntax<T> {
 		if (this.container.isBound(serviceIdentifier)) {
 			this.container.unbind(serviceIdentifier);
 		}
@@ -198,33 +208,34 @@ export class Application implements Kernel.Application {
 		return this.container.bind(serviceIdentifier);
 	}
 
-	public unbind<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): void {
+	public unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void {
 		return this.container.unbind(serviceIdentifier);
 	}
 
-	public get<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): T {
+	public get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T {
 		return this.container.get(serviceIdentifier);
 	}
 
 	public getTagged<T>(
-		serviceIdentifier: Kernel.Container.ServiceIdentifier<T>,
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 		key: string | number | symbol,
 		value: any,
 	): T {
 		return this.container.getTagged(serviceIdentifier, key, value);
 	}
 
-	public isBound<T>(serviceIdentifier: Kernel.Container.ServiceIdentifier<T>): boolean {
+	public isBound<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): boolean {
 		return this.container.isBound(serviceIdentifier);
 	}
 
-	public resolve<T>(constructorFunction: Kernel.Container.Newable<T>): T {
+	public resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T {
 		return this.container.resolve(constructorFunction);
 	}
 
 	private async bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers[type]);
-		const events: Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
+		// @ts-ignore
+		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers);
+		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
 
 		for (const bootstrapper of bootstrappers) {
 			events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
@@ -245,7 +256,7 @@ export class Application implements Kernel.Application {
 		).allLoadedProviders();
 
 		for (const serviceProvider of serviceProviders.reverse()) {
-			this.get<Kernel.Logger>(Identifiers.LogService).debug(`Disposing ${serviceProvider.name()}...`);
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).debug(`Disposing ${serviceProvider.name()}...`);
 
 			try {
 				await serviceProvider.dispose();
@@ -257,7 +268,7 @@ export class Application implements Kernel.Application {
 		const path: string = this.get<string>(`path.${type}`);
 
 		if (!existsSync(path)) {
-			throw new DirectoryCannotBeFound(path);
+			throw new Exceptions.DirectoryCannotBeFound(path);
 		}
 
 		return path;
@@ -265,7 +276,7 @@ export class Application implements Kernel.Application {
 
 	private usePath(type: string, path: string): void {
 		if (!existsSync(path)) {
-			throw new DirectoryCannotBeFound(path);
+			throw new Exceptions.DirectoryCannotBeFound(path);
 		}
 
 		this.rebind<string>(`path.${type}`).toConstantValue(path);

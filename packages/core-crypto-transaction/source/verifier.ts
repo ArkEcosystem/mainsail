@@ -1,34 +1,31 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import {
-	DuplicateParticipantInMultiSignatureError,
-	InvalidMultiSignatureAssetError,
-} from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class Verifier implements Crypto.ITransactionVerifier {
+export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 	@inject(Identifiers.Cryptography.Signature)
-	private readonly signatureFactory: Crypto.ISignature;
+	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: any;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils: Crypto.ITransactionUtils;
+	private readonly utils: Contracts.Crypto.ITransactionUtils;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async verifySignatures(
-		transaction: Crypto.ITransactionData,
-		multiSignature: Crypto.IMultiSignatureAsset,
+		transaction: Contracts.Crypto.ITransactionData,
+		multiSignature: Contracts.Crypto.IMultiSignatureAsset,
 	): Promise<boolean> {
 		if (!multiSignature) {
-			throw new InvalidMultiSignatureAssetError();
+			throw new Exceptions.InvalidMultiSignatureAssetError();
 		}
 
-		const { publicKeys, min }: Crypto.IMultiSignatureAsset = multiSignature;
-		const { signatures }: Crypto.ITransactionData = transaction;
+		const { publicKeys, min }: Contracts.Crypto.IMultiSignatureAsset = multiSignature;
+		const { signatures }: Contracts.Crypto.ITransactionData = transaction;
 
 		const hash: Buffer = await this.utils.toHash(transaction, {
 			excludeMultiSignature: true,
@@ -47,7 +44,7 @@ export class Verifier implements Crypto.ITransactionVerifier {
 				if (!publicKeyIndexes[publicKeyIndex]) {
 					publicKeyIndexes[publicKeyIndex] = true;
 				} else {
-					throw new DuplicateParticipantInMultiSignatureError();
+					throw new Exceptions.DuplicateParticipantInMultiSignatureError();
 				}
 
 				const partialSignature: string = signature.slice(2, 130);
@@ -75,7 +72,7 @@ export class Verifier implements Crypto.ITransactionVerifier {
 		return verified;
 	}
 
-	public async verifyHash(data: Crypto.ITransactionData, disableVersionCheck = false): Promise<boolean> {
+	public async verifyHash(data: Contracts.Crypto.ITransactionData, disableVersionCheck = false): Promise<boolean> {
 		const { signature, senderPublicKey } = data;
 
 		if (!signature || !senderPublicKey) {
@@ -90,7 +87,10 @@ export class Verifier implements Crypto.ITransactionVerifier {
 		return this.signatureFactory.verify(hash, Buffer.from(signature, "hex"), Buffer.from(senderPublicKey, "hex"));
 	}
 
-	public verifySchema(data: Crypto.ITransactionData, strict = true): Crypto.ISchemaValidationResult {
+	public verifySchema(
+		data: Contracts.Crypto.ITransactionData,
+		strict: boolean,
+	): Contracts.Crypto.ISchemaValidationResult {
 		const transactionType = this.transactionTypeFactory.get(data.type, data.typeGroup, data.version);
 
 		if (!transactionType) {

@@ -1,13 +1,13 @@
 import { inject } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration/source";
-import { ValidatorResignationBuilder } from "../../../core-crypto-transaction-validator-resignation/source";
 import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment/source";
 import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration/source";
 import { TransferBuilder } from "../../../core-crypto-transaction-transfer/source";
+import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration/source";
+import { ValidatorResignationBuilder } from "../../../core-crypto-transaction-validator-resignation/source";
 import { VoteBuilder } from "../../../core-crypto-transaction-vote/source";
 import secrets from "../internal/passphrases.json";
 import { getWalletNonce } from "./generic";
@@ -21,20 +21,20 @@ interface IPassphrasePair {
 // todo: replace this by the use of real factories
 export class TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Crypto.IAddressFactory;
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	protected builder: any;
 	protected app: Contracts.Kernel.Application;
 
 	// @ts-ignore
 	private network = "testnet";
-	private networkConfig: Crypto.NetworkConfig | undefined;
+	private networkConfig: Contracts.Crypto.NetworkConfig | undefined;
 	private nonce: BigNumber | undefined;
 	private fee: BigNumber | undefined;
 	private timestamp: number | undefined;
@@ -164,7 +164,7 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public withNetworkConfig(networkConfig: Crypto.NetworkConfig): TransactionFactory {
+	public withNetworkConfig(networkConfig: Contracts.Crypto.NetworkConfig): TransactionFactory {
 		this.networkConfig = networkConfig;
 
 		return this;
@@ -230,16 +230,16 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public async create(quantity = 1): Promise<Crypto.ITransactionData[]> {
-		return this.make<Crypto.ITransactionData>(quantity, "getStruct");
+	public async create(quantity = 1): Promise<Contracts.Crypto.ITransactionData[]> {
+		return this.make<Contracts.Crypto.ITransactionData>(quantity, "getStruct");
 	}
 
-	public async createOne(): Promise<Crypto.ITransactionData> {
+	public async createOne(): Promise<Contracts.Crypto.ITransactionData> {
 		return (await this.create(1))[0];
 	}
 
-	public async build(quantity = 1): Promise<Crypto.ITransaction[]> {
-		return this.make<Crypto.ITransaction>(quantity, "build");
+	public async build(quantity = 1): Promise<Contracts.Crypto.ITransaction[]> {
+		return this.make<Contracts.Crypto.ITransaction>(quantity, "build");
 	}
 
 	public async getNonce(): Promise<BigNumber> {

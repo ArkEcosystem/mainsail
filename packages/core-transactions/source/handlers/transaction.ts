@@ -1,20 +1,8 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { injectable, inject } from "@arkecosystem/core-container";
-
-import {
-	ColdWalletError,
-	InsufficientBalanceError,
-	InvalidMultiSignaturesError,
-	LegacyMultiSignatureError,
-	LegacyMultiSignatureRegistrationError,
-	MissingMultiSignatureOnSenderError,
-	SenderWalletMismatchError,
-	UnexpectedNonceError,
-	UnsupportedMultiSignatureRegistrationTransactionError,
-} from "@arkecosystem/core-contracts";
 
 // todo: revisit the implementation, container usage and arguments after core-database rework
 @injectable()
@@ -35,12 +23,12 @@ export abstract class TransactionHandler {
 	protected readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration: Crypto.IConfiguration;
+	protected readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier: Crypto.ITransactionVerifier;
+	protected readonly verifier: Contracts.Crypto.ITransactionVerifier;
 
-	public async verify(transaction: Crypto.ITransaction): Promise<boolean> {
+	public async verify(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const senderWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
@@ -55,7 +43,7 @@ export abstract class TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
 		const senderWallet: Contracts.State.Wallet = this.walletRepository.findByAddress(sender.getAddress());
@@ -63,30 +51,30 @@ export abstract class TransactionHandler {
 		AppUtils.assert.defined<string>(sender.getPublicKey());
 
 		if (!this.walletRepository.hasByPublicKey(sender.getPublicKey()!) && senderWallet.getBalance().isZero()) {
-			throw new ColdWalletError();
+			throw new Exceptions.ColdWalletError();
 		}
 
 		return this.performGenericWalletChecks(transaction, sender);
 	}
 
-	public async apply(transaction: Crypto.ITransaction): Promise<void> {
+	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await this.applyToSender(transaction);
 		await this.applyToRecipient(transaction);
 	}
 
-	public async revert(transaction: Crypto.ITransaction): Promise<void> {
+	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await this.revertForSender(transaction);
 		await this.revertForRecipient(transaction);
 	}
 
-	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 			transaction.data.senderPublicKey,
 		);
 
-		const data: Crypto.ITransactionData = transaction.data;
+		const data: Contracts.Crypto.ITransactionData = transaction.data;
 
 		await this.throwIfCannotBeApplied(transaction, sender);
 
@@ -105,14 +93,14 @@ export abstract class TransactionHandler {
 		sender.setBalance(newBalance);
 	}
 
-	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 			transaction.data.senderPublicKey,
 		);
 
-		const data: Crypto.ITransactionData = transaction.data;
+		const data: Contracts.Crypto.ITransactionData = transaction.data;
 
 		sender.increaseBalance(data.amount.plus(data.fee));
 
@@ -122,40 +110,40 @@ export abstract class TransactionHandler {
 		sender.decreaseNonce();
 	}
 
-	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
+	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
 
-	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {}
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,
-		transaction: Crypto.ITransactionData,
-		multiSignature?: Crypto.IMultiSignatureAsset,
+		transaction: Contracts.Crypto.ITransactionData,
+		multiSignature?: Contracts.Crypto.IMultiSignatureAsset,
 	): Promise<boolean> {
 		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
 	}
 
 	protected async performGenericWalletChecks(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
-		const data: Crypto.ITransactionData = transaction.data;
+		const data: Contracts.Crypto.ITransactionData = transaction.data;
 
 		this.verifyTransactionNonceApply(sender, transaction);
 
 		if (sender.getBalance().minus(data.amount).minus(data.fee).isNegative()) {
-			throw new InsufficientBalanceError();
+			throw new Exceptions.InsufficientBalanceError();
 		}
 
 		if (data.senderPublicKey !== sender.getPublicKey()) {
-			throw new SenderWalletMismatchError();
+			throw new Exceptions.SenderWalletMismatchError();
 		}
 
 		// Prevent legacy multi signatures from being used
 		const isMultiSignatureRegistration: boolean =
-			transaction.type === Crypto.TransactionType.MultiSignature &&
-			transaction.typeGroup === Crypto.TransactionTypeGroup.Core;
+			transaction.type === Contracts.Crypto.TransactionType.MultiSignature &&
+			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core;
 		if (isMultiSignatureRegistration && !this.configuration.getMilestone().aip11) {
-			throw new LegacyMultiSignatureRegistrationError();
+			throw new Exceptions.LegacyMultiSignatureRegistrationError();
 		}
 
 		if (sender.hasMultiSignature()) {
@@ -167,38 +155,44 @@ export abstract class TransactionHandler {
 			);
 
 			if (!databaseSender.hasMultiSignature()) {
-				throw new MissingMultiSignatureOnSenderError();
+				throw new Exceptions.MissingMultiSignatureOnSenderError();
 			}
 
 			if (databaseSender.hasAttribute("multiSignature.legacy")) {
-				throw new LegacyMultiSignatureError();
+				throw new Exceptions.LegacyMultiSignatureError();
 			}
 
 			if (!this.verifySignatures(databaseSender, data, databaseSender.getAttribute("multiSignature"))) {
-				throw new InvalidMultiSignaturesError();
+				throw new Exceptions.InvalidMultiSignaturesError();
 			}
 		} else if (transaction.data.signatures && !isMultiSignatureRegistration) {
-			throw new UnsupportedMultiSignatureRegistrationTransactionError();
+			throw new Exceptions.UnsupportedMultiSignatureRegistrationTransactionError();
 		}
 	}
 
-	protected verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Crypto.ITransaction): void {
+	protected verifyTransactionNonceApply(
+		wallet: Contracts.State.Wallet,
+		transaction: Contracts.Crypto.ITransaction,
+	): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
-			throw new UnexpectedNonceError(nonce, wallet, false);
+			throw new Exceptions.UnexpectedNonceError(nonce, wallet, false);
 		}
 	}
 
-	protected verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Crypto.ITransaction): void {
+	protected verifyTransactionNonceRevert(
+		wallet: Contracts.State.Wallet,
+		transaction: Contracts.Crypto.ITransaction,
+	): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().isEqualTo(nonce)) {
-			throw new UnexpectedNonceError(nonce, wallet, true);
+			throw new Exceptions.UnexpectedNonceError(nonce, wallet, true);
 		}
 	}
 
-	public abstract getConstructor(): Crypto.TransactionConstructor;
+	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;
 
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
 
@@ -208,9 +202,9 @@ export abstract class TransactionHandler {
 
 	public abstract bootstrap(): Promise<void>;
 
-	public abstract applyToRecipient(transaction: Crypto.ITransaction): Promise<void>;
+	public abstract applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void>;
 
-	public abstract revertForRecipient(transaction: Crypto.ITransaction): Promise<void>;
+	public abstract revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void>;
 }
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;

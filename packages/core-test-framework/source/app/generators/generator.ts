@@ -1,4 +1,4 @@
-// import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+// import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 // import { generateMnemonic } from "bip39";
 
 // import passphrases from "../../internal/passphrases.json";
@@ -51,7 +51,7 @@ export abstract class Generator {
 	// 		passphrase = generateMnemonic();
 	// 	}
 
-	// 	const keys: Crypto.IKeyPair = Identities.Keys.fromMnemonic(passphrase);
+	// 	const keys: Contracts.Crypto.IKeyPair = Identities.Keys.fromMnemonic(passphrase);
 
 	// 	return {
 	// 		address: this.addressFactory.fromPublicKey(keys.publicKey, pubKeyHash),

@@ -1,9 +1,9 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Kernel } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class NullFilesystem implements Kernel.Filesystem {
-	public async make(): Promise<Kernel.Filesystem> {
+export class NullFilesystem implements Contracts.Kernel.Filesystem {
+	public async make(): Promise<Contracts.Kernel.Filesystem> {
 		return this;
 	}
 

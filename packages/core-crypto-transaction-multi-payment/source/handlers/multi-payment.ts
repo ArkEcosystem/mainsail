@@ -1,10 +1,10 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import { injectable, inject } from "@arkecosystem/core-container";
 
-import { Errors, Handlers } from "@arkecosystem/core-transactions";
+import { Handlers } from "@arkecosystem/core-transactions";
 import { MultiPaymentTransaction } from "../versions";
 
 @injectable()
@@ -50,25 +50,25 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
-		const payments: Crypto.IMultiPaymentItem[] = transaction.data.asset.payments;
+		const payments: Contracts.Crypto.IMultiPaymentItem[] = transaction.data.asset.payments;
 		const totalPaymentsAmount = payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
 		if (wallet.getBalance().minus(totalPaymentsAmount).minus(transaction.data.fee).isNegative()) {
-			throw new Errors.InsufficientBalanceError();
+			throw new Exceptions.InsufficientBalanceError();
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 
-		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		const totalPaymentsAmount = transaction.data.asset.payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
@@ -81,10 +81,10 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		sender.decreaseBalance(totalPaymentsAmount);
 	}
 
-	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 
-		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+		AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		const totalPaymentsAmount = transaction.data.asset.payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
@@ -97,8 +97,8 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		sender.increaseBalance(totalPaymentsAmount);
 	}
 
-	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {
-		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		for (const payment of transaction.data.asset.payments) {
 			const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(payment.recipientId);
@@ -107,8 +107,8 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		}
 	}
 
-	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {
-		AppUtils.assert.defined<Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
+	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		for (const payment of transaction.data.asset.payments) {
 			const recipient: Contracts.State.Wallet = this.walletRepository.findByAddress(payment.recipientId);

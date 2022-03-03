@@ -1,9 +1,8 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
-import { PoolError } from "@arkecosystem/core-contracts";
 import { Enums as AppEnums, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Errors, Handlers } from "@arkecosystem/core-transactions";
+import { Handlers } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { ValidatorRegistrationTransaction } from "../versions";
@@ -103,17 +102,17 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public async throwIfCannotBeApplied(
-		transaction: Crypto.ITransaction,
+		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		const { data }: Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.ITransaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(data.senderPublicKey);
 
 		if (sender.hasMultiSignature()) {
-			throw new Errors.NotSupportedForMultiSignatureWalletError();
+			throw new Exceptions.NotSupportedForMultiSignatureWalletError();
 		}
 
 		AppUtils.assert.defined<string>(data.asset?.validator?.username);
@@ -121,21 +120,21 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		const username: string = data.asset.validator.username;
 
 		if (wallet.isValidator()) {
-			throw new Errors.WalletIsAlreadyValidatorError();
+			throw new Exceptions.WalletIsAlreadyValidatorError();
 		}
 
 		if (this.walletRepository.hasByUsername(username)) {
-			throw new Errors.WalletUsernameAlreadyRegisteredError(username);
+			throw new Exceptions.WalletUsernameAlreadyRegisteredError(username);
 		}
 
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public emitEvents(transaction: Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		emitter.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
 	}
 
-	public async throwIfCannotEnterPool(transaction: Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = this.poolQuery
@@ -144,8 +143,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			.has();
 
 		if (hasSender) {
-			throw new PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Crypto.TransactionType.ValidatorRegistration}' in the pool`,
+			throw new Exceptions.PoolError(
+				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.ValidatorRegistration}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
@@ -159,11 +158,14 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			.has();
 
 		if (hasUsername) {
-			throw new PoolError(`Validator registration for "${username}" already in the pool`, "ERR_PENDING");
+			throw new Exceptions.PoolError(
+				`Validator registration for "${username}" already in the pool`,
+				"ERR_PENDING",
+			);
 		}
 	}
 
-	public async applyToSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.applyToSender(transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -186,7 +188,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		this.walletRepository.index(sender);
 	}
 
-	public async revertForSender(transaction: Crypto.ITransaction): Promise<void> {
+	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await super.revertForSender(transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -200,7 +202,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		this.walletRepository.index(sender);
 	}
 
-	public async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
-	public async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 }

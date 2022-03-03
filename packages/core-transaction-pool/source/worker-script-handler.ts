@@ -1,13 +1,13 @@
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Crypto.IConfiguration;
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Crypto.ITransactionFactory;
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	public setConfig(networkConfig: any): void {
 		this.configuration.setConfig(networkConfig);
@@ -18,7 +18,7 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 	}
 
 	public async getTransactionFromData(
-		transactionData: Crypto.ITransactionData | string,
+		transactionData: Contracts.Crypto.ITransactionData | string,
 	): Promise<Contracts.TransactionPool.SerializedTransaction> {
 		const tx =
 			typeof transactionData === "string"
