@@ -1,6 +1,6 @@
-import { BIP39 } from "@packages/core-forger/source/methods/bip39";
-import { TransactionFactory } from "@packages/core-test-framework/source/utils/transaction-factory";
-import { Utils } from "@packages/crypto";
+import { BIP39 } from "../source/methods/bip39";
+import { TransactionFactory } from "../../core-test-framework/source";
+import { Utils } from "@arkecosystem/crypto";
 
 export const dummy = {
 	plainPassphrase: "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire",

@@ -1,11 +1,12 @@
-import "jest-extended";
+import { injectable } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Services } from "@arkecosystem/core-kernel";
+import { Actions } from "@arkecosystem/core-state";
+import { Wallet } from "@arkecosystem/core-state/source/wallets";
+import { spy } from "sinon";
 
-import { DelegateTracker } from "@packages/core-forger/source/delegate-tracker";
-import { Container, Services } from "@packages/core-kernel";
-import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
-import { Wallet } from "@packages/core-state/source/wallets";
-import { Sandbox } from "@packages/core-test-framework/source";
-import { Managers } from "@packages/crypto/source";
+import { Sandbox } from "../../core-test-framework/source";
+import { ValidatorTracker } from "../source/validator-tracker";
 
 export const mockLastBlock = {
 	data: { height: 3, timestamp: 16 },
@@ -14,14 +15,10 @@ export const mockLastBlock = {
 export const setup = async (activeDelegates) => {
 	const sandbox = new Sandbox();
 
-	const error: jest.SpyInstance = jest.fn();
-	const debug: jest.SpyInstance = jest.fn();
-	const warning: jest.SpyInstance = jest.fn();
-
 	const logger = {
-		debug,
-		error,
-		warning,
+		debug: spy(),
+		error: spy(),
+		warning: spy(),
 	};
 
 	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
@@ -68,9 +65,9 @@ export const setup = async (activeDelegates) => {
 
 	sandbox.app
 		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-		.bind("getActiveDelegates", new GetActiveDelegatesAction(sandbox.app));
+		.bind("getActiveDelegates", new Actions.GetActiveDelegatesAction(sandbox.app));
 
-	const delegateTracker = sandbox.app.resolve(DelegateTracker);
+	const delegateTracker = sandbox.app.resolve(ValidatorTracker);
 
 	await sandbox.boot();
 

@@ -1,12 +1,11 @@
 import { Contracts } from "@arkecosystem/core-contracts";
-import { Nes } from "@arkecosystem/core-p2p";
 
 export interface RelayHost {
 	hostname: string;
 
 	port: number;
 
-	socket?: Nes.Client;
+	socket?: any;
 }
 
 export interface Validator {

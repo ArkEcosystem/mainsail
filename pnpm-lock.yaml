@@ -1137,12 +1137,16 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-state': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
       bip38: ^3.1.1
+      import-fresh: 3.3.0
       joi: 17.4.2
       node-forge: 1.2.1
+      sinon: ^12.0.1
+      uvu: ^0.5.3
       wif: 2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
@@ -1155,8 +1159,12 @@ importers:
       node-forge: 1.2.1
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-state': link:../core-state
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      import-fresh: 3.3.0
+      sinon: 12.0.1
+      uvu: 0.5.3
 
   packages/core-kernel:
     specifiers:
@@ -4160,13 +4168,11 @@ packages:
     resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-    dev: false
 
   /@sinonjs/fake-timers/9.1.0:
     resolution: {integrity: sha512-M8vapsv9qQupMdzrVzkn5rb9jG7aUTEPAZdMtME2PuBaefksFZVE2C1g4LBRTkF/k3nRDNbDc5tp5NFC1PEYxA==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-    dev: false
 
   /@sinonjs/samsam/5.3.1:
     resolution: {integrity: sha512-1Hc0b1TtyfBu8ixF/tpfSHTVWKwCBLY4QJbkgnE7HcwyvT2xArDxb4K7dMgqRm3szI+LJbzmW/s4xxEhv6hwDg==}
@@ -4182,7 +4188,6 @@ packages:
       '@sinonjs/commons': 1.8.3
       lodash.get: 4.4.2
       type-detect: 4.0.8
-    dev: false
 
   /@sinonjs/text-encoding/0.7.1:
     resolution: {integrity: sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==}
@@ -11084,7 +11089,6 @@ packages:
       '@sinonjs/text-encoding': 0.7.1
       just-extend: 4.2.1
       path-to-regexp: 1.8.0
-    dev: false
 
   /no-case/3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
@@ -13068,7 +13072,6 @@ packages:
       diff: 5.0.0
       nise: 5.1.1
       supports-color: 7.2.0
-    dev: false
 
   /sinon/9.2.4:
     resolution: {integrity: sha512-zljcULZQsJxVra28qIAL6ow1Z9tpattkCTEJR4RBP3TGc00FcttsP5pK284Nas5WjMZU5Yzy3kAIp3B3KRf5Yg==}

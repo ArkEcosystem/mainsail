@@ -1,5 +1,5 @@
-import { Callback, Context, suite, Test } from "uvu";
 import sinon from "sinon";
+import { Callback, Context, suite, Test } from "uvu";
 import { z as schema } from "zod";
 
 import { assert } from "./assert";
@@ -19,6 +19,7 @@ interface CallbackArguments<T> {
 	assert: typeof assert;
 	beforeAll: (callback_: ContextCallback<T>) => void;
 	beforeEach: (callback_: ContextCallback<T>) => void;
+	clock: (config?: number | Date | Partial<sinon.SinonFakeTimersConfig>) => sinon.SinonFakeTimers;
 	dataset: unknown;
 	each: (name: string, callback: Callback<any>, datasets: unknown[]) => void;
 	it: Test<T>;
@@ -36,6 +37,7 @@ interface CallbackArguments<T> {
 type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
 
 const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
+	let clocks: sinon.SinonFakeTimers[] = [];
 	let stubs: Stub[] = [];
 	let spies: Spy[] = [];
 
@@ -50,6 +52,10 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 	suite.after.each(() => {
 		nock.cleanAll();
 
+		for (const clock of clocks) {
+			clock.restore();
+		}
+
 		for (const stub of stubs) {
 			stub.restore();
 		}
@@ -58,6 +64,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			stub.restore();
 		}
 
+		clocks = [];
 		stubs = [];
 		spies = [];
 	});
@@ -68,6 +75,13 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		assert,
 		beforeAll: async (callback_: ContextCallback<T>) => suite.before(runHook(callback_)),
 		beforeEach: async (callback_: ContextCallback<T>) => suite.before.each(runHook(callback_)),
+		clock: (config?: number | Date | Partial<sinon.SinonFakeTimersConfig>) => {
+			const result: sinon.SinonFakeTimers = sinon.useFakeTimers(config);
+
+			clocks.push(result);
+
+			return result;
+		},
 		dataset,
 		each: each(suite),
 		it: suite,
