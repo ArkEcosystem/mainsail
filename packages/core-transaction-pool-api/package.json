@@ -1,0 +1,34 @@
+{
+	"name": "@arkecosystem/core-transaction-pool-api",
+	"version": "0.0.1",
+	"description": "Transaction Pool Manager for ARK Core",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution"
+	},
+	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
+		"fastify": "^3.27.2",
+		"fastify-accepts-serializer": "^3.2.0",
+		"fastify-compress": "^4.0.1",
+		"fastify-helmet": "^7.0.1",
+		"fastify-rate-limit": "^5.7.2",
+		"fastify-response-validation": "^0.2.0",
+		"fastify-sensible": "^3.1.2",
+		"uuid": "^8.3.2"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}

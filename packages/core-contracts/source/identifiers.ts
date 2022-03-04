@@ -140,6 +140,7 @@ export const Identifiers = {
 	TransactionPoolSenderMempool: Symbol.for("TransactionPool<SenderMempool>"),
 	TransactionPoolSenderMempoolFactory: Symbol.for("TransactionPool<SenderMempoolFactory>"),
 	TransactionPoolSenderState: Symbol.for("TransactionPool<SenderState>"),
+	TransactionPoolServer: Symbol.for("TransactionPool<Server>"),
 	TransactionPoolService: Symbol.for("TransactionPool<Service>"),
 	TransactionPoolStorage: Symbol.for("TransactionPool<Storage>"),
 	TransactionPoolWorker: Symbol.for("TransactionPool<Worker>"),

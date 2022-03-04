@@ -52,6 +52,7 @@
 		"@arkecosystem/core-serializer": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
+		"@arkecosystem/core-transaction-pool-api": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/core-validation": "workspace:*",
 		"@arkecosystem/core-webhooks": "workspace:*",

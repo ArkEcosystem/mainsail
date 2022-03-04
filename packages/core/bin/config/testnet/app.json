@@ -77,6 +77,9 @@
 				"package": "@arkecosystem/core-transaction-pool"
 			},
 			{
+				"package": "@arkecosystem/core-transaction-pool-api"
+			},
+			{
 				"package": "@arkecosystem/core-p2p"
 			},
 			{
