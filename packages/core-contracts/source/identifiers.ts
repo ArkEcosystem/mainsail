@@ -40,6 +40,14 @@ export const Identifiers = {
 		},
 		Serializer: Symbol.for("Crypto<Serializer>"),
 		Signature: Symbol.for("Crypto<Signature>"),
+		Size: {
+			Address: Symbol.for("Crypto<Size.Address>"),
+			HASH256: Symbol.for("Crypto<Size.HASH256>"),
+			PublicKey: Symbol.for("Crypto<Size.PublicKey>"),
+			RIPEMD160: Symbol.for("Crypto<Size.RIPEMD160>"),
+			SHA256: Symbol.for("Crypto<Size.SHA256>"),
+			Signature: Symbol.for("Crypto<Size.Signature>"),
+		},
 		Time: {
 			BlockTimeCalculator: Symbol.for("Crypto<Time.BlockTimeCalculator>"),
 			Slots: Symbol.for("Crypto<Time.Slots>"),

@@ -8,6 +8,8 @@ import { PublicKeySerializer } from "./serializer";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		this.app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(32);
+
 		this.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Identity.PrivateKeyFactory).to(PrivateKeyFactory).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();

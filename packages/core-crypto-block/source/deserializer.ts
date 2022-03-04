@@ -43,7 +43,6 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 				},
 				previousBlock: {
 					type: "hash",
-					size: 32,
 				},
 				numberOfTransactions: {
 					type: "uint32",
@@ -62,7 +61,6 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 				},
 				payloadHash: {
 					type: "hash",
-					size: 32,
 				},
 				generatorPublicKey: {
 					type: "publicKey",

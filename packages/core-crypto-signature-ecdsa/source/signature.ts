@@ -1,10 +1,13 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { secp256k1 } from "bcrypto";
 import ByteBuffer from "bytebuffer";
 
 @injectable()
 export class Signature implements Contracts.Crypto.ISignature {
+	@inject(Identifiers.Cryptography.Size.Signature)
+	private readonly signatureSize: Function;
+
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return secp256k1.signatureExport(secp256k1.sign(message, privateKey)).toString("hex");
 	}
@@ -52,20 +55,10 @@ export class Signature implements Contracts.Crypto.ISignature {
 	}
 
 	public deserialize(buffer: ByteBuffer): Buffer {
-		const signatureLength = (): number => {
-			buffer.mark();
-
-			const lengthHex: string = buffer.skip(1).readBytes(1).toString("hex");
-
-			buffer.reset();
-
-			return Number.parseInt(lengthHex, 16) + 2;
-		};
-
 		if (typeof buffer.readBytes === "function") {
-			return buffer.readBytes(signatureLength());
+			return buffer.readBytes(this.signatureSize(buffer));
 		}
 
-		return buffer.readBuffer(signatureLength());
+		return buffer.readBuffer(this.signatureSize(buffer));
 	}
 }

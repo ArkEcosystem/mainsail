@@ -20,6 +20,9 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly transactionUtils: any;
 
+	@inject(Identifiers.Cryptography.Size.HASH256)
+	private readonly hashSize: number;
+
 	public async serialize<T>(
 		data: T,
 		configuration: Contracts.Serializer.SerializationConfiguration,
@@ -98,8 +101,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "hash") {
-				// @TODO: get hash size from configuration
-				target[property] = source.readBytes(schema.size).toString("hex");
+				target[property] = source.readBytes(schema.size ?? this.hashSize).toString("hex");
 			}
 
 			if (schema.type === "address") {
