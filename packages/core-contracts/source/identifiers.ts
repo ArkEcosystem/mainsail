@@ -115,6 +115,9 @@ export const Identifiers = {
 	ServiceProviderRepository: Symbol.for("Repository<ServiceProvider>"),
 	SnapshotService: Symbol.for("Service<Snapshot>"),
 	StandardCriteriaService: Symbol.for("Service<StandardCriteriaService>"),
+	State: {
+		ValidatorMutator: Symbol.for("State<ValidatorMutator>"),
+	},
 	StateBlockStore: Symbol.for("State<BlockStore>"),
 	StateBuilder: Symbol.for("State<StateBuilder>"),
 	StateMachine: Symbol.for("Blockchain<StateMachine>"),

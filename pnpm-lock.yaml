@@ -1105,6 +1105,18 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
 
+  packages/core-fees-burn:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
+
   packages/core-fees-managed:
     specifiers:
       '@arkecosystem/core-container': workspace:*

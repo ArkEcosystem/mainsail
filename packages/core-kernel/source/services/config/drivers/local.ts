@@ -64,8 +64,6 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			this.loadFromLocation(["app.json", "app.js"]),
 			Joi.object({
 				core: Joi.object().keys(processSchema).required(),
-				forger: Joi.object().keys(processSchema).required(),
-				relay: Joi.object().keys(processSchema).required(),
 			}).unknown(true),
 		);
 

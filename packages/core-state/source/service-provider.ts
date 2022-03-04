@@ -8,6 +8,8 @@ import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
 import { DatabaseInterceptor } from "./database-interceptor";
 import { DposPreviousRoundState, DposState } from "./dpos";
+import { AttributeMutator } from "./mutators/attribute";
+import { BalanceMutator } from "./mutators/balance";
 import { RoundState } from "./round-state";
 import { StateBuilder } from "./state-builder";
 import { BlockStore } from "./stores/blocks";
@@ -96,6 +98,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.StateBuilder).to(StateBuilder);
 
 		this.registerActions();
+
+		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
+		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
 	}
 
 	public async boot(): Promise<void> {

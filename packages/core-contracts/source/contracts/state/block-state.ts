@@ -1,6 +1,4 @@
-import { BigNumber } from "@arkecosystem/utils";
-
-import { IBlock, ITransaction } from "../crypto";
+import { IBlock, IBlockData, ITransaction, ITransactionData } from "../crypto";
 import { Wallet } from "./wallets";
 
 export interface BlockState {
@@ -11,8 +9,16 @@ export interface BlockState {
 	applyTransaction(transaction: ITransaction): Promise<void>;
 
 	revertTransaction(transaction: ITransaction): Promise<void>;
+}
 
-	increaseWalletValidatorVoteBalance(wallet: Wallet, amount: BigNumber): void;
+export interface VoteBalanceMutator {
+	apply(sender: Wallet, recipient: Wallet, transaction: ITransactionData): Promise<void>;
 
-	decreaseWalletValidatorVoteBalance(wallet: Wallet, amount: BigNumber): void;
+	revert(sender: Wallet, recipient: Wallet, transaction: ITransactionData): Promise<void>;
+}
+
+export interface ValidatorMutator {
+	apply(wallet: Wallet, block: IBlockData): Promise<void>;
+
+	revert(wallet: Wallet, block: IBlockData): Promise<void>;
 }

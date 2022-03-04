@@ -1,4 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
+import { inject, injectable, multiInject } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
@@ -21,6 +21,9 @@ export class BlockState implements Contracts.State.BlockState {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
+	@multiInject(Identifiers.State.ValidatorMutator)
+	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
+
 	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		if (block.data.height === 1) {
 			await this.initGenesisForgerWallet(block.data.generatorPublicKey);
@@ -39,7 +42,7 @@ export class BlockState implements Contracts.State.BlockState {
 				await this.applyTransaction(transaction);
 				appliedTransactions.push(transaction);
 			}
-			this.applyBlockToForger(forgerWallet, block.data);
+			await this.applyBlockToForger(forgerWallet, block.data);
 
 			this.state.setLastBlock(block);
 		} catch (error) {
@@ -65,7 +68,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 		const revertedTransactions: Contracts.Crypto.ITransaction[] = [];
 		try {
-			this.revertBlockFromForger(forgerWallet, block.data);
+			await this.revertBlockFromForger(forgerWallet, block.data);
 
 			for (const transaction of [...block.transactions].reverse()) {
 				await this.revertTransaction(transaction);
@@ -125,28 +128,6 @@ export class BlockState implements Contracts.State.BlockState {
 		await this.revertVoteBalances(sender, recipient, data);
 	}
 
-	public async increaseWalletValidatorVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
-		// ? packages/core-transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
-		// ? is it guaranteed that validator wallet exists, so validatorWallet.getAttribute("validator.voteBalance") is safe?
-		if (wallet.hasVoted()) {
-			const validatorPulicKey = wallet.getAttribute<string>("vote");
-			const validatorWallet = await this.walletRepository.findByPublicKey(validatorPulicKey);
-			const oldValidatorVoteBalance = validatorWallet.getAttribute<BigNumber>("validator.voteBalance");
-			const newValidatorVoteBalance = oldValidatorVoteBalance.plus(amount);
-			validatorWallet.setAttribute("validator.voteBalance", newValidatorVoteBalance);
-		}
-	}
-
-	public async decreaseWalletValidatorVoteBalance(wallet: Contracts.State.Wallet, amount: BigNumber): Promise<void> {
-		if (wallet.hasVoted()) {
-			const validatorPulicKey = wallet.getAttribute<string>("vote");
-			const validatorWallet = await this.walletRepository.findByPublicKey(validatorPulicKey);
-			const oldValidatorVoteBalance = validatorWallet.getAttribute<BigNumber>("validator.voteBalance");
-			const newValidatorVoteBalance = oldValidatorVoteBalance.minus(amount);
-			validatorWallet.setAttribute("validator.voteBalance", newValidatorVoteBalance);
-		}
-	}
-
 	// WALLETS
 	private async applyVoteBalances(
 		sender: Contracts.State.Wallet,
@@ -164,28 +145,16 @@ export class BlockState implements Contracts.State.BlockState {
 		return this.updateVoteBalances(sender, recipient, transaction, true);
 	}
 
-	private applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
-		const validatorAttribute = forgerWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("validator");
-		validatorAttribute.producedBlocks++;
-		validatorAttribute.forgedFees = validatorAttribute.forgedFees.plus(blockData.totalFee);
-		validatorAttribute.forgedRewards = validatorAttribute.forgedRewards.plus(blockData.reward);
-		validatorAttribute.lastBlock = blockData;
-
-		const balanceIncrease = blockData.reward.plus(blockData.totalFee);
-		this.increaseWalletValidatorVoteBalance(forgerWallet, balanceIncrease);
-		forgerWallet.increaseBalance(balanceIncrease);
+	private async applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
+		for (const validatorMutator of this.validatorMutators) {
+			await validatorMutator.apply(forgerWallet, blockData);
+		}
 	}
 
-	private revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
-		const validatorAttribute = forgerWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("validator");
-		validatorAttribute.producedBlocks--;
-		validatorAttribute.forgedFees = validatorAttribute.forgedFees.minus(blockData.totalFee);
-		validatorAttribute.forgedRewards = validatorAttribute.forgedRewards.minus(blockData.reward);
-		validatorAttribute.lastBlock = undefined;
-
-		const balanceDecrease = blockData.reward.plus(blockData.totalFee);
-		this.decreaseWalletValidatorVoteBalance(forgerWallet, balanceDecrease);
-		forgerWallet.decreaseBalance(balanceDecrease);
+	private async revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
+		for (const validatorMutator of this.validatorMutators) {
+			await validatorMutator.revert(forgerWallet, blockData);
+		}
 	}
 
 	private async updateVoteBalances(
