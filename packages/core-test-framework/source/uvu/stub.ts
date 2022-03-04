@@ -21,8 +21,20 @@ export class Stub extends Fake<SinonStub> {
 		return this;
 	}
 
+	public returnValueNth(nth: number, value: unknown): Stub {
+		this.subject.onCall(nth).returns(value);
+
+		return this;
+	}
+
 	public resolvedValue(value: unknown): Stub {
 		this.subject.resolves(value);
+
+		return this;
+	}
+
+	public rejectedValue(value: unknown): Stub {
+		this.subject.rejects(value);
 
 		return this;
 	}
