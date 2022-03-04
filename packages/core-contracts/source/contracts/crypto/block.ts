@@ -23,12 +23,10 @@ export interface IBlock {
 
 export interface IBlockData {
 	id?: string;
-	idHex?: string;
 
 	timestamp: number;
 	version: number;
 	height: number;
-	previousBlockHex?: string;
 	previousBlock: string;
 	numberOfTransactions: number;
 	totalAmount: any; // @TODO: use BigNumber from ../../crypto/utils
@@ -45,12 +43,10 @@ export interface IBlockData {
 
 export interface IBlockJson {
 	id?: string;
-	idHex?: string;
 
 	timestamp: number;
 	version: number;
 	height: number;
-	previousBlockHex?: string;
 	previousBlock: string;
 	numberOfTransactions: number;
 	totalAmount: string;

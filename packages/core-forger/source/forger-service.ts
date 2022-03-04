@@ -184,7 +184,6 @@ export class ForgerService {
 			previousBlock: {
 				height: networkState.getNodeHeight(),
 				id: networkState.getLastBlockId(),
-				idHex: networkState.getLastBlockId(),
 			},
 			reward: round.reward,
 			timestamp: round.timestamp,

@@ -13,7 +13,6 @@ export const expectedBlock = {
 	version: 0,
 	timestamp: 12345689,
 	height: 3,
-	previousBlockHex: "0000000000a98ac7",
 	previousBlock: "11111111",
 	numberOfTransactions: 50,
 	totalAmount: BigNumber.make(500),
@@ -27,7 +26,6 @@ export const optionsDefault = {
 	timestamp: 12345689,
 	previousBlock: {
 		id: "11111111",
-		idHex: "11111111",
 		height: 2,
 	},
 	reward: BigNumber.make(0),

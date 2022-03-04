@@ -16,9 +16,13 @@ $root.blocks = (function () {
 
 	blocks.PostBlockRequest = (function () {
 		function PostBlockRequest(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		PostBlockRequest.prototype.block = $util.newBuffer([]);
@@ -30,11 +34,15 @@ $root.blocks = (function () {
 		};
 
 		PostBlockRequest.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.block != null && Object.hasOwnProperty.call(message, "block"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.block != undefined && Object.hasOwnProperty.call(message, "block")) {
 				writer.uint32(/* id 1, wireType 2 =*/ 10).bytes(message.block);
-			if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+			}
+			if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers")) {
 				$root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/ 18).fork()).ldelim();
+			}
 			return writer;
 		};
 
@@ -43,7 +51,9 @@ $root.blocks = (function () {
 		};
 
 		PostBlockRequest.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.blocks.PostBlockRequest();
 			while (reader.pos < end) {
@@ -64,61 +74,84 @@ $root.blocks = (function () {
 		};
 
 		PostBlockRequest.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		PostBlockRequest.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.block != null && message.hasOwnProperty("block"))
-				if (!((message.block && typeof message.block.length === "number") || $util.isString(message.block)))
-					return "block: buffer expected";
-			if (message.headers != null && message.hasOwnProperty("headers")) {
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (
+				message.block != undefined &&
+				message.hasOwnProperty("block") &&
+				!((message.block && typeof message.block.length === "number") || $util.isString(message.block))
+			) {
+				return "block: buffer expected";
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				var error = $root.shared.Headers.verify(message.headers);
-				if (error) return "headers." + error;
+				if (error) {
+					return "headers." + error;
+				}
 			}
 			return null;
 		};
 
 		PostBlockRequest.fromObject = function fromObject(object) {
-			if (object instanceof $root.blocks.PostBlockRequest) return object;
+			if (object instanceof $root.blocks.PostBlockRequest) {
+				return object;
+			}
 			var message = new $root.blocks.PostBlockRequest();
-			if (object.block != null)
-				if (typeof object.block === "string")
+			if (object.block != undefined) {
+				if (typeof object.block === "string") {
 					$util.base64.decode(
 						object.block,
 						(message.block = $util.newBuffer($util.base64.length(object.block))),
 						0,
 					);
-				else if (object.block.length) message.block = object.block;
-			if (object.headers != null) {
-				if (typeof object.headers !== "object")
-					throw TypeError(".blocks.PostBlockRequest.headers: object expected");
+				} else if (object.block.length > 0) {
+					message.block = object.block;
+				}
+			}
+			if (object.headers != undefined) {
+				if (typeof object.headers !== "object") {
+					throw new TypeError(".blocks.PostBlockRequest.headers: object expected");
+				}
 				message.headers = $root.shared.Headers.fromObject(object.headers);
 			}
 			return message;
 		};
 
 		PostBlockRequest.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
 			if (options.defaults) {
-				if (options.bytes === String) object.block = "";
-				else {
+				if (options.bytes === String) {
+					object.block = "";
+				} else {
 					object.block = [];
-					if (options.bytes !== Array) object.block = $util.newBuffer(object.block);
+					if (options.bytes !== Array) {
+						object.block = $util.newBuffer(object.block);
+					}
 				}
 				object.headers = null;
 			}
-			if (message.block != null && message.hasOwnProperty("block"))
+			if (message.block != undefined && message.hasOwnProperty("block")) {
 				object.block =
 					options.bytes === String
 						? $util.base64.encode(message.block, 0, message.block.length)
 						: options.bytes === Array
 						? Array.prototype.slice.call(message.block)
 						: message.block;
-			if (message.headers != null && message.hasOwnProperty("headers"))
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				object.headers = $root.shared.Headers.toObject(message.headers, options);
+			}
 			return object;
 		};
 
@@ -131,9 +164,13 @@ $root.blocks = (function () {
 
 	blocks.PostBlockResponse = (function () {
 		function PostBlockResponse(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		PostBlockResponse.prototype.status = false;
@@ -145,11 +182,15 @@ $root.blocks = (function () {
 		};
 
 		PostBlockResponse.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.status != undefined && Object.hasOwnProperty.call(message, "status")) {
 				writer.uint32(/* id 1, wireType 0 =*/ 8).bool(message.status);
-			if (message.height != null && Object.hasOwnProperty.call(message, "height"))
+			}
+			if (message.height != undefined && Object.hasOwnProperty.call(message, "height")) {
 				writer.uint32(/* id 2, wireType 0 =*/ 16).uint32(message.height);
+			}
 			return writer;
 		};
 
@@ -158,7 +199,9 @@ $root.blocks = (function () {
 		};
 
 		PostBlockResponse.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.blocks.PostBlockResponse();
 			while (reader.pos < end) {
@@ -179,36 +222,58 @@ $root.blocks = (function () {
 		};
 
 		PostBlockResponse.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		PostBlockResponse.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.status != null && message.hasOwnProperty("status"))
-				if (typeof message.status !== "boolean") return "status: boolean expected";
-			if (message.height != null && message.hasOwnProperty("height"))
-				if (!$util.isInteger(message.height)) return "height: integer expected";
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (
+				message.status != undefined &&
+				message.hasOwnProperty("status") &&
+				typeof message.status !== "boolean"
+			) {
+				return "status: boolean expected";
+			}
+			if (message.height != undefined && message.hasOwnProperty("height") && !$util.isInteger(message.height)) {
+				return "height: integer expected";
+			}
 			return null;
 		};
 
 		PostBlockResponse.fromObject = function fromObject(object) {
-			if (object instanceof $root.blocks.PostBlockResponse) return object;
+			if (object instanceof $root.blocks.PostBlockResponse) {
+				return object;
+			}
 			var message = new $root.blocks.PostBlockResponse();
-			if (object.status != null) message.status = Boolean(object.status);
-			if (object.height != null) message.height = object.height >>> 0;
+			if (object.status != undefined) {
+				message.status = Boolean(object.status);
+			}
+			if (object.height != undefined) {
+				message.height = object.height >>> 0;
+			}
 			return message;
 		};
 
 		PostBlockResponse.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
 			if (options.defaults) {
 				object.status = false;
 				object.height = 0;
 			}
-			if (message.status != null && message.hasOwnProperty("status")) object.status = message.status;
-			if (message.height != null && message.hasOwnProperty("height")) object.height = message.height;
+			if (message.status != undefined && message.hasOwnProperty("status")) {
+				object.status = message.status;
+			}
+			if (message.height != undefined && message.hasOwnProperty("height")) {
+				object.height = message.height;
+			}
 			return object;
 		};
 
@@ -221,9 +286,13 @@ $root.blocks = (function () {
 
 	blocks.GetBlocksRequest = (function () {
 		function GetBlocksRequest(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetBlocksRequest.prototype.lastBlockHeight = 0;
@@ -241,17 +310,24 @@ $root.blocks = (function () {
 		};
 
 		GetBlocksRequest.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.lastBlockHeight != null && Object.hasOwnProperty.call(message, "lastBlockHeight"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.lastBlockHeight != undefined && Object.hasOwnProperty.call(message, "lastBlockHeight")) {
 				writer.uint32(/* id 1, wireType 0 =*/ 8).uint32(message.lastBlockHeight);
-			if (message.blockLimit != null && Object.hasOwnProperty.call(message, "blockLimit"))
+			}
+			if (message.blockLimit != undefined && Object.hasOwnProperty.call(message, "blockLimit")) {
 				writer.uint32(/* id 2, wireType 0 =*/ 16).uint32(message.blockLimit);
-			if (message.headersOnly != null && Object.hasOwnProperty.call(message, "headersOnly"))
+			}
+			if (message.headersOnly != undefined && Object.hasOwnProperty.call(message, "headersOnly")) {
 				writer.uint32(/* id 3, wireType 0 =*/ 24).bool(message.headersOnly);
-			if (message.serialized != null && Object.hasOwnProperty.call(message, "serialized"))
+			}
+			if (message.serialized != undefined && Object.hasOwnProperty.call(message, "serialized")) {
 				writer.uint32(/* id 4, wireType 0 =*/ 32).bool(message.serialized);
-			if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+			}
+			if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers")) {
 				$root.shared.Headers.encode(message.headers, writer.uint32(/* id 5, wireType 2 =*/ 42).fork()).ldelim();
+			}
 			return writer;
 		};
 
@@ -260,7 +336,9 @@ $root.blocks = (function () {
 		};
 
 		GetBlocksRequest.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.blocks.GetBlocksRequest();
 			while (reader.pos < end) {
@@ -290,44 +368,83 @@ $root.blocks = (function () {
 		};
 
 		GetBlocksRequest.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetBlocksRequest.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.lastBlockHeight != null && message.hasOwnProperty("lastBlockHeight"))
-				if (!$util.isInteger(message.lastBlockHeight)) return "lastBlockHeight: integer expected";
-			if (message.blockLimit != null && message.hasOwnProperty("blockLimit"))
-				if (!$util.isInteger(message.blockLimit)) return "blockLimit: integer expected";
-			if (message.headersOnly != null && message.hasOwnProperty("headersOnly"))
-				if (typeof message.headersOnly !== "boolean") return "headersOnly: boolean expected";
-			if (message.serialized != null && message.hasOwnProperty("serialized"))
-				if (typeof message.serialized !== "boolean") return "serialized: boolean expected";
-			if (message.headers != null && message.hasOwnProperty("headers")) {
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (
+				message.lastBlockHeight != undefined &&
+				message.hasOwnProperty("lastBlockHeight") &&
+				!$util.isInteger(message.lastBlockHeight)
+			) {
+				return "lastBlockHeight: integer expected";
+			}
+			if (
+				message.blockLimit != undefined &&
+				message.hasOwnProperty("blockLimit") &&
+				!$util.isInteger(message.blockLimit)
+			) {
+				return "blockLimit: integer expected";
+			}
+			if (
+				message.headersOnly != undefined &&
+				message.hasOwnProperty("headersOnly") &&
+				typeof message.headersOnly !== "boolean"
+			) {
+				return "headersOnly: boolean expected";
+			}
+			if (
+				message.serialized != undefined &&
+				message.hasOwnProperty("serialized") &&
+				typeof message.serialized !== "boolean"
+			) {
+				return "serialized: boolean expected";
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				var error = $root.shared.Headers.verify(message.headers);
-				if (error) return "headers." + error;
+				if (error) {
+					return "headers." + error;
+				}
 			}
 			return null;
 		};
 
 		GetBlocksRequest.fromObject = function fromObject(object) {
-			if (object instanceof $root.blocks.GetBlocksRequest) return object;
+			if (object instanceof $root.blocks.GetBlocksRequest) {
+				return object;
+			}
 			var message = new $root.blocks.GetBlocksRequest();
-			if (object.lastBlockHeight != null) message.lastBlockHeight = object.lastBlockHeight >>> 0;
-			if (object.blockLimit != null) message.blockLimit = object.blockLimit >>> 0;
-			if (object.headersOnly != null) message.headersOnly = Boolean(object.headersOnly);
-			if (object.serialized != null) message.serialized = Boolean(object.serialized);
-			if (object.headers != null) {
-				if (typeof object.headers !== "object")
-					throw TypeError(".blocks.GetBlocksRequest.headers: object expected");
+			if (object.lastBlockHeight != undefined) {
+				message.lastBlockHeight = object.lastBlockHeight >>> 0;
+			}
+			if (object.blockLimit != undefined) {
+				message.blockLimit = object.blockLimit >>> 0;
+			}
+			if (object.headersOnly != undefined) {
+				message.headersOnly = Boolean(object.headersOnly);
+			}
+			if (object.serialized != undefined) {
+				message.serialized = Boolean(object.serialized);
+			}
+			if (object.headers != undefined) {
+				if (typeof object.headers !== "object") {
+					throw new TypeError(".blocks.GetBlocksRequest.headers: object expected");
+				}
 				message.headers = $root.shared.Headers.fromObject(object.headers);
 			}
 			return message;
 		};
 
 		GetBlocksRequest.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
 			if (options.defaults) {
 				object.lastBlockHeight = 0;
@@ -336,16 +453,21 @@ $root.blocks = (function () {
 				object.serialized = false;
 				object.headers = null;
 			}
-			if (message.lastBlockHeight != null && message.hasOwnProperty("lastBlockHeight"))
+			if (message.lastBlockHeight != undefined && message.hasOwnProperty("lastBlockHeight")) {
 				object.lastBlockHeight = message.lastBlockHeight;
-			if (message.blockLimit != null && message.hasOwnProperty("blockLimit"))
+			}
+			if (message.blockLimit != undefined && message.hasOwnProperty("blockLimit")) {
 				object.blockLimit = message.blockLimit;
-			if (message.headersOnly != null && message.hasOwnProperty("headersOnly"))
+			}
+			if (message.headersOnly != undefined && message.hasOwnProperty("headersOnly")) {
 				object.headersOnly = message.headersOnly;
-			if (message.serialized != null && message.hasOwnProperty("serialized"))
+			}
+			if (message.serialized != undefined && message.hasOwnProperty("serialized")) {
 				object.serialized = message.serialized;
-			if (message.headers != null && message.hasOwnProperty("headers"))
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				object.headers = $root.shared.Headers.toObject(message.headers, options);
+			}
 			return object;
 		};
 
@@ -358,9 +480,13 @@ $root.blocks = (function () {
 
 	blocks.GetBlocksResponse = (function () {
 		function GetBlocksResponse(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetBlocksResponse.prototype.blocks = $util.newBuffer([]);
@@ -370,9 +496,12 @@ $root.blocks = (function () {
 		};
 
 		GetBlocksResponse.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.blocks != null && Object.hasOwnProperty.call(message, "blocks"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.blocks != undefined && Object.hasOwnProperty.call(message, "blocks")) {
 				writer.uint32(/* id 1, wireType 2 =*/ 10).bytes(message.blocks);
+			}
 			return writer;
 		};
 
@@ -381,7 +510,9 @@ $root.blocks = (function () {
 		};
 
 		GetBlocksResponse.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.blocks.GetBlocksResponse();
 			while (reader.pos < end) {
@@ -399,48 +530,68 @@ $root.blocks = (function () {
 		};
 
 		GetBlocksResponse.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetBlocksResponse.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.blocks != null && message.hasOwnProperty("blocks"))
-				if (!((message.blocks && typeof message.blocks.length === "number") || $util.isString(message.blocks)))
-					return "blocks: buffer expected";
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (
+				message.blocks != undefined &&
+				message.hasOwnProperty("blocks") &&
+				!((message.blocks && typeof message.blocks.length === "number") || $util.isString(message.blocks))
+			) {
+				return "blocks: buffer expected";
+			}
 			return null;
 		};
 
 		GetBlocksResponse.fromObject = function fromObject(object) {
-			if (object instanceof $root.blocks.GetBlocksResponse) return object;
+			if (object instanceof $root.blocks.GetBlocksResponse) {
+				return object;
+			}
 			var message = new $root.blocks.GetBlocksResponse();
-			if (object.blocks != null)
-				if (typeof object.blocks === "string")
+			if (object.blocks != undefined) {
+				if (typeof object.blocks === "string") {
 					$util.base64.decode(
 						object.blocks,
 						(message.blocks = $util.newBuffer($util.base64.length(object.blocks))),
 						0,
 					);
-				else if (object.blocks.length) message.blocks = object.blocks;
+				} else if (object.blocks.length > 0) {
+					message.blocks = object.blocks;
+				}
+			}
 			return message;
 		};
 
 		GetBlocksResponse.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
-			if (options.defaults)
-				if (options.bytes === String) object.blocks = "";
-				else {
+			if (options.defaults) {
+				if (options.bytes === String) {
+					object.blocks = "";
+				} else {
 					object.blocks = [];
-					if (options.bytes !== Array) object.blocks = $util.newBuffer(object.blocks);
+					if (options.bytes !== Array) {
+						object.blocks = $util.newBuffer(object.blocks);
+					}
 				}
-			if (message.blocks != null && message.hasOwnProperty("blocks"))
+			}
+			if (message.blocks != undefined && message.hasOwnProperty("blocks")) {
 				object.blocks =
 					options.bytes === String
 						? $util.base64.encode(message.blocks, 0, message.blocks.length)
 						: options.bytes === Array
 						? Array.prototype.slice.call(message.blocks)
 						: message.blocks;
+			}
 			return object;
 		};
 
@@ -450,22 +601,22 @@ $root.blocks = (function () {
 
 		GetBlocksResponse.BlockHeader = (function () {
 			function BlockHeader(properties) {
-				if (properties)
-					for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-						if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+				if (properties) {
+					for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+						if (properties[keys[index]] != undefined) {
+							this[keys[index]] = properties[keys[index]];
+						}
+					}
+				}
 			}
 
 			BlockHeader.prototype.id = "";
-
-			BlockHeader.prototype.idHex = "";
 
 			BlockHeader.prototype.version = 0;
 
 			BlockHeader.prototype.timestamp = 0;
 
 			BlockHeader.prototype.previousBlock = "";
-
-			BlockHeader.prototype.previousBlockHex = "";
 
 			BlockHeader.prototype.height = 0;
 
@@ -492,39 +643,57 @@ $root.blocks = (function () {
 			};
 
 			BlockHeader.encode = function encode(message, writer) {
-				if (!writer) writer = $Writer.create();
-				if (message.id != null && Object.hasOwnProperty.call(message, "id"))
+				if (!writer) {
+					writer = $Writer.create();
+				}
+				if (message.id != undefined && Object.hasOwnProperty.call(message, "id")) {
 					writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.id);
-				if (message.idHex != null && Object.hasOwnProperty.call(message, "idHex"))
-					writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.idHex);
-				if (message.version != null && Object.hasOwnProperty.call(message, "version"))
-					writer.uint32(/* id 3, wireType 0 =*/ 24).uint32(message.version);
-				if (message.timestamp != null && Object.hasOwnProperty.call(message, "timestamp"))
-					writer.uint32(/* id 4, wireType 0 =*/ 32).uint32(message.timestamp);
-				if (message.previousBlock != null && Object.hasOwnProperty.call(message, "previousBlock"))
-					writer.uint32(/* id 5, wireType 2 =*/ 42).string(message.previousBlock);
-				if (message.previousBlockHex != null && Object.hasOwnProperty.call(message, "previousBlockHex"))
-					writer.uint32(/* id 6, wireType 2 =*/ 50).string(message.previousBlockHex);
-				if (message.height != null && Object.hasOwnProperty.call(message, "height"))
-					writer.uint32(/* id 7, wireType 0 =*/ 56).uint32(message.height);
-				if (message.numberOfTransactions != null && Object.hasOwnProperty.call(message, "numberOfTransactions"))
-					writer.uint32(/* id 8, wireType 0 =*/ 64).uint32(message.numberOfTransactions);
-				if (message.totalAmount != null && Object.hasOwnProperty.call(message, "totalAmount"))
-					writer.uint32(/* id 9, wireType 2 =*/ 74).string(message.totalAmount);
-				if (message.totalFee != null && Object.hasOwnProperty.call(message, "totalFee"))
-					writer.uint32(/* id 10, wireType 2 =*/ 82).string(message.totalFee);
-				if (message.reward != null && Object.hasOwnProperty.call(message, "reward"))
-					writer.uint32(/* id 11, wireType 2 =*/ 90).string(message.reward);
-				if (message.payloadLength != null && Object.hasOwnProperty.call(message, "payloadLength"))
-					writer.uint32(/* id 12, wireType 0 =*/ 96).uint32(message.payloadLength);
-				if (message.payloadHash != null && Object.hasOwnProperty.call(message, "payloadHash"))
-					writer.uint32(/* id 13, wireType 2 =*/ 106).string(message.payloadHash);
-				if (message.generatorPublicKey != null && Object.hasOwnProperty.call(message, "generatorPublicKey"))
-					writer.uint32(/* id 14, wireType 2 =*/ 114).string(message.generatorPublicKey);
-				if (message.blockSignature != null && Object.hasOwnProperty.call(message, "blockSignature"))
-					writer.uint32(/* id 15, wireType 2 =*/ 122).string(message.blockSignature);
-				if (message.transactions != null && Object.hasOwnProperty.call(message, "transactions"))
-					writer.uint32(/* id 16, wireType 2 =*/ 130).bytes(message.transactions);
+				}
+				if (message.version != undefined && Object.hasOwnProperty.call(message, "version")) {
+					writer.uint32(/* id 2, wireType 0 =*/ 24).uint32(message.version);
+				}
+				if (message.timestamp != undefined && Object.hasOwnProperty.call(message, "timestamp")) {
+					writer.uint32(/* id 3, wireType 2 =*/ 32).string(message.timestamp);
+				}
+				if (message.previousBlock != undefined && Object.hasOwnProperty.call(message, "previousBlock")) {
+					writer.uint32(/* id 4, wireType 2 =*/ 50).string(message.previousBlock);
+				}
+				if (message.height != undefined && Object.hasOwnProperty.call(message, "height")) {
+					writer.uint32(/* id 5, wireType 0 =*/ 56).uint32(message.height);
+				}
+				if (
+					message.numberOfTransactions != undefined &&
+					Object.hasOwnProperty.call(message, "numberOfTransactions")
+				) {
+					writer.uint32(/* id 6, wireType 0 =*/ 64).uint32(message.numberOfTransactions);
+				}
+				if (message.totalAmount != undefined && Object.hasOwnProperty.call(message, "totalAmount")) {
+					writer.uint32(/* id 7, wireType 2 =*/ 74).string(message.totalAmount);
+				}
+				if (message.totalFee != undefined && Object.hasOwnProperty.call(message, "totalFee")) {
+					writer.uint32(/* id 8, wireType 2 =*/ 82).string(message.totalFee);
+				}
+				if (message.reward != undefined && Object.hasOwnProperty.call(message, "reward")) {
+					writer.uint32(/* id 9, wireType 2 =*/ 90).string(message.reward);
+				}
+				if (message.payloadLength != undefined && Object.hasOwnProperty.call(message, "payloadLength")) {
+					writer.uint32(/* id 10, wireType 0 =*/ 96).uint32(message.payloadLength);
+				}
+				if (message.payloadHash != undefined && Object.hasOwnProperty.call(message, "payloadHash")) {
+					writer.uint32(/* id 11, wireType 2 =*/ 106).string(message.payloadHash);
+				}
+				if (
+					message.generatorPublicKey != undefined &&
+					Object.hasOwnProperty.call(message, "generatorPublicKey")
+				) {
+					writer.uint32(/* id 12, wireType 2 =*/ 114).string(message.generatorPublicKey);
+				}
+				if (message.blockSignature != undefined && Object.hasOwnProperty.call(message, "blockSignature")) {
+					writer.uint32(/* id 13, wireType 2 =*/ 122).string(message.blockSignature);
+				}
+				if (message.transactions != undefined && Object.hasOwnProperty.call(message, "transactions")) {
+					writer.uint32(/* id 14, wireType 2 =*/ 130).bytes(message.transactions);
+				}
 				return writer;
 			};
 
@@ -533,7 +702,9 @@ $root.blocks = (function () {
 			};
 
 			BlockHeader.decode = function decode(reader, length) {
-				if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = $Reader.create(reader);
+				}
 				var end = length === undefined ? reader.len : reader.pos + length,
 					message = new $root.blocks.GetBlocksResponse.BlockHeader();
 				while (reader.pos < end) {
@@ -543,48 +714,42 @@ $root.blocks = (function () {
 							message.id = reader.string();
 							break;
 						case 2:
-							message.idHex = reader.string();
-							break;
-						case 3:
 							message.version = reader.uint32();
 							break;
-						case 4:
-							message.timestamp = reader.uint32();
+						case 3:
+							message.timestamp = reader.string();
 							break;
-						case 5:
+						case 4:
 							message.previousBlock = reader.string();
 							break;
-						case 6:
-							message.previousBlockHex = reader.string();
-							break;
-						case 7:
+						case 5:
 							message.height = reader.uint32();
 							break;
-						case 8:
+						case 6:
 							message.numberOfTransactions = reader.uint32();
 							break;
-						case 9:
+						case 7:
 							message.totalAmount = reader.string();
 							break;
-						case 10:
+						case 8:
 							message.totalFee = reader.string();
 							break;
-						case 11:
+						case 9:
 							message.reward = reader.string();
 							break;
-						case 12:
+						case 10:
 							message.payloadLength = reader.uint32();
 							break;
-						case 13:
+						case 11:
 							message.payloadHash = reader.string();
 							break;
-						case 14:
+						case 12:
 							message.generatorPublicKey = reader.string();
 							break;
-						case 15:
+						case 13:
 							message.blockSignature = reader.string();
 							break;
-						case 16:
+						case 14:
 							message.transactions = reader.bytes();
 							break;
 						default:
@@ -596,93 +761,184 @@ $root.blocks = (function () {
 			};
 
 			BlockHeader.decodeDelimited = function decodeDelimited(reader) {
-				if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = new $Reader(reader);
+				}
 				return this.decode(reader, reader.uint32());
 			};
 
 			BlockHeader.verify = function verify(message) {
-				if (typeof message !== "object" || message === null) return "object expected";
-				if (message.id != null && message.hasOwnProperty("id"))
-					if (!$util.isString(message.id)) return "id: string expected";
-				if (message.idHex != null && message.hasOwnProperty("idHex"))
-					if (!$util.isString(message.idHex)) return "idHex: string expected";
-				if (message.version != null && message.hasOwnProperty("version"))
-					if (!$util.isInteger(message.version)) return "version: integer expected";
-				if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-					if (!$util.isInteger(message.timestamp)) return "timestamp: integer expected";
-				if (message.previousBlock != null && message.hasOwnProperty("previousBlock"))
-					if (!$util.isString(message.previousBlock)) return "previousBlock: string expected";
-				if (message.previousBlockHex != null && message.hasOwnProperty("previousBlockHex"))
-					if (!$util.isString(message.previousBlockHex)) return "previousBlockHex: string expected";
-				if (message.height != null && message.hasOwnProperty("height"))
-					if (!$util.isInteger(message.height)) return "height: integer expected";
-				if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
-					if (!$util.isInteger(message.numberOfTransactions)) return "numberOfTransactions: integer expected";
-				if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
-					if (!$util.isString(message.totalAmount)) return "totalAmount: string expected";
-				if (message.totalFee != null && message.hasOwnProperty("totalFee"))
-					if (!$util.isString(message.totalFee)) return "totalFee: string expected";
-				if (message.reward != null && message.hasOwnProperty("reward"))
-					if (!$util.isString(message.reward)) return "reward: string expected";
-				if (message.payloadLength != null && message.hasOwnProperty("payloadLength"))
-					if (!$util.isInteger(message.payloadLength)) return "payloadLength: integer expected";
-				if (message.payloadHash != null && message.hasOwnProperty("payloadHash"))
-					if (!$util.isString(message.payloadHash)) return "payloadHash: string expected";
-				if (message.generatorPublicKey != null && message.hasOwnProperty("generatorPublicKey"))
-					if (!$util.isString(message.generatorPublicKey)) return "generatorPublicKey: string expected";
-				if (message.blockSignature != null && message.hasOwnProperty("blockSignature"))
-					if (!$util.isString(message.blockSignature)) return "blockSignature: string expected";
-				if (message.transactions != null && message.hasOwnProperty("transactions"))
-					if (
-						!(
-							(message.transactions && typeof message.transactions.length === "number") ||
-							$util.isString(message.transactions)
-						)
+				if (typeof message !== "object" || message === null) {
+					return "object expected";
+				}
+				if (message.id != undefined && message.hasOwnProperty("id") && !$util.isString(message.id)) {
+					return "id: string expected";
+				}
+				if (
+					message.version != undefined &&
+					message.hasOwnProperty("version") &&
+					!$util.isInteger(message.version)
+				) {
+					return "version: integer expected";
+				}
+				if (
+					message.timestamp != undefined &&
+					message.hasOwnProperty("timestamp") &&
+					!$util.isInteger(message.timestamp)
+				) {
+					return "timestamp: integer expected";
+				}
+				if (
+					message.previousBlock != undefined &&
+					message.hasOwnProperty("previousBlock") &&
+					!$util.isString(message.previousBlock)
+				) {
+					return "previousBlock: string expected";
+				}
+				if (
+					message.height != undefined &&
+					message.hasOwnProperty("height") &&
+					!$util.isInteger(message.height)
+				) {
+					return "height: integer expected";
+				}
+				if (
+					message.numberOfTransactions != undefined &&
+					message.hasOwnProperty("numberOfTransactions") &&
+					!$util.isInteger(message.numberOfTransactions)
+				) {
+					return "numberOfTransactions: integer expected";
+				}
+				if (
+					message.totalAmount != undefined &&
+					message.hasOwnProperty("totalAmount") &&
+					!$util.isString(message.totalAmount)
+				) {
+					return "totalAmount: string expected";
+				}
+				if (
+					message.totalFee != undefined &&
+					message.hasOwnProperty("totalFee") &&
+					!$util.isString(message.totalFee)
+				) {
+					return "totalFee: string expected";
+				}
+				if (
+					message.reward != undefined &&
+					message.hasOwnProperty("reward") &&
+					!$util.isString(message.reward)
+				) {
+					return "reward: string expected";
+				}
+				if (
+					message.payloadLength != undefined &&
+					message.hasOwnProperty("payloadLength") &&
+					!$util.isInteger(message.payloadLength)
+				) {
+					return "payloadLength: integer expected";
+				}
+				if (
+					message.payloadHash != undefined &&
+					message.hasOwnProperty("payloadHash") &&
+					!$util.isString(message.payloadHash)
+				) {
+					return "payloadHash: string expected";
+				}
+				if (
+					message.generatorPublicKey != undefined &&
+					message.hasOwnProperty("generatorPublicKey") &&
+					!$util.isString(message.generatorPublicKey)
+				) {
+					return "generatorPublicKey: string expected";
+				}
+				if (
+					message.blockSignature != undefined &&
+					message.hasOwnProperty("blockSignature") &&
+					!$util.isString(message.blockSignature)
+				) {
+					return "blockSignature: string expected";
+				}
+				if (
+					message.transactions != undefined &&
+					message.hasOwnProperty("transactions") &&
+					!(
+						(message.transactions && typeof message.transactions.length === "number") ||
+						$util.isString(message.transactions)
 					)
-						return "transactions: buffer expected";
+				) {
+					return "transactions: buffer expected";
+				}
 				return null;
 			};
 
 			BlockHeader.fromObject = function fromObject(object) {
-				if (object instanceof $root.blocks.GetBlocksResponse.BlockHeader) return object;
+				if (object instanceof $root.blocks.GetBlocksResponse.BlockHeader) {
+					return object;
+				}
 				var message = new $root.blocks.GetBlocksResponse.BlockHeader();
-				if (object.id != null) message.id = String(object.id);
-				if (object.idHex != null) message.idHex = String(object.idHex);
-				if (object.version != null) message.version = object.version >>> 0;
-				if (object.timestamp != null) message.timestamp = object.timestamp >>> 0;
-				if (object.previousBlock != null) message.previousBlock = String(object.previousBlock);
-				if (object.previousBlockHex != null) message.previousBlockHex = String(object.previousBlockHex);
-				if (object.height != null) message.height = object.height >>> 0;
-				if (object.numberOfTransactions != null)
+				if (object.id != undefined) {
+					message.id = String(object.id);
+				}
+				if (object.version != undefined) {
+					message.version = object.version >>> 0;
+				}
+				if (object.timestamp != undefined) {
+					message.timestamp = object.timestamp >>> 0;
+				}
+				if (object.previousBlock != undefined) {
+					message.previousBlock = String(object.previousBlock);
+				}
+				if (object.height != undefined) {
+					message.height = object.height >>> 0;
+				}
+				if (object.numberOfTransactions != undefined) {
 					message.numberOfTransactions = object.numberOfTransactions >>> 0;
-				if (object.totalAmount != null) message.totalAmount = String(object.totalAmount);
-				if (object.totalFee != null) message.totalFee = String(object.totalFee);
-				if (object.reward != null) message.reward = String(object.reward);
-				if (object.payloadLength != null) message.payloadLength = object.payloadLength >>> 0;
-				if (object.payloadHash != null) message.payloadHash = String(object.payloadHash);
-				if (object.generatorPublicKey != null) message.generatorPublicKey = String(object.generatorPublicKey);
-				if (object.blockSignature != null) message.blockSignature = String(object.blockSignature);
-				if (object.transactions != null)
-					if (typeof object.transactions === "string")
+				}
+				if (object.totalAmount != undefined) {
+					message.totalAmount = String(object.totalAmount);
+				}
+				if (object.totalFee != undefined) {
+					message.totalFee = String(object.totalFee);
+				}
+				if (object.reward != undefined) {
+					message.reward = String(object.reward);
+				}
+				if (object.payloadLength != undefined) {
+					message.payloadLength = object.payloadLength >>> 0;
+				}
+				if (object.payloadHash != undefined) {
+					message.payloadHash = String(object.payloadHash);
+				}
+				if (object.generatorPublicKey != undefined) {
+					message.generatorPublicKey = String(object.generatorPublicKey);
+				}
+				if (object.blockSignature != undefined) {
+					message.blockSignature = String(object.blockSignature);
+				}
+				if (object.transactions != undefined) {
+					if (typeof object.transactions === "string") {
 						$util.base64.decode(
 							object.transactions,
 							(message.transactions = $util.newBuffer($util.base64.length(object.transactions))),
 							0,
 						);
-					else if (object.transactions.length) message.transactions = object.transactions;
+					} else if (object.transactions.length > 0) {
+						message.transactions = object.transactions;
+					}
+				}
 				return message;
 			};
 
 			BlockHeader.toObject = function toObject(message, options) {
-				if (!options) options = {};
+				if (!options) {
+					options = {};
+				}
 				var object = {};
 				if (options.defaults) {
 					object.id = "";
-					object.idHex = "";
 					object.version = 0;
 					object.timestamp = 0;
 					object.previousBlock = "";
-					object.previousBlockHex = "";
 					object.height = 0;
 					object.numberOfTransactions = 0;
 					object.totalAmount = "";
@@ -692,43 +948,62 @@ $root.blocks = (function () {
 					object.payloadHash = "";
 					object.generatorPublicKey = "";
 					object.blockSignature = "";
-					if (options.bytes === String) object.transactions = "";
-					else {
+					if (options.bytes === String) {
+						object.transactions = "";
+					} else {
 						object.transactions = [];
-						if (options.bytes !== Array) object.transactions = $util.newBuffer(object.transactions);
+						if (options.bytes !== Array) {
+							object.transactions = $util.newBuffer(object.transactions);
+						}
 					}
 				}
-				if (message.id != null && message.hasOwnProperty("id")) object.id = message.id;
-				if (message.idHex != null && message.hasOwnProperty("idHex")) object.idHex = message.idHex;
-				if (message.version != null && message.hasOwnProperty("version")) object.version = message.version;
-				if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+				if (message.id != undefined && message.hasOwnProperty("id")) {
+					object.id = message.id;
+				}
+				if (message.version != undefined && message.hasOwnProperty("version")) {
+					object.version = message.version;
+				}
+				if (message.timestamp != undefined && message.hasOwnProperty("timestamp")) {
 					object.timestamp = message.timestamp;
-				if (message.previousBlock != null && message.hasOwnProperty("previousBlock"))
+				}
+				if (message.previousBlock != undefined && message.hasOwnProperty("previousBlock")) {
 					object.previousBlock = message.previousBlock;
-				if (message.previousBlockHex != null && message.hasOwnProperty("previousBlockHex"))
-					object.previousBlockHex = message.previousBlockHex;
-				if (message.height != null && message.hasOwnProperty("height")) object.height = message.height;
-				if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
+				}
+				if (message.height != undefined && message.hasOwnProperty("height")) {
+					object.height = message.height;
+				}
+				if (message.numberOfTransactions != undefined && message.hasOwnProperty("numberOfTransactions")) {
 					object.numberOfTransactions = message.numberOfTransactions;
-				if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
+				}
+				if (message.totalAmount != undefined && message.hasOwnProperty("totalAmount")) {
 					object.totalAmount = message.totalAmount;
-				if (message.totalFee != null && message.hasOwnProperty("totalFee")) object.totalFee = message.totalFee;
-				if (message.reward != null && message.hasOwnProperty("reward")) object.reward = message.reward;
-				if (message.payloadLength != null && message.hasOwnProperty("payloadLength"))
+				}
+				if (message.totalFee != undefined && message.hasOwnProperty("totalFee")) {
+					object.totalFee = message.totalFee;
+				}
+				if (message.reward != undefined && message.hasOwnProperty("reward")) {
+					object.reward = message.reward;
+				}
+				if (message.payloadLength != undefined && message.hasOwnProperty("payloadLength")) {
 					object.payloadLength = message.payloadLength;
-				if (message.payloadHash != null && message.hasOwnProperty("payloadHash"))
+				}
+				if (message.payloadHash != undefined && message.hasOwnProperty("payloadHash")) {
 					object.payloadHash = message.payloadHash;
-				if (message.generatorPublicKey != null && message.hasOwnProperty("generatorPublicKey"))
+				}
+				if (message.generatorPublicKey != undefined && message.hasOwnProperty("generatorPublicKey")) {
 					object.generatorPublicKey = message.generatorPublicKey;
-				if (message.blockSignature != null && message.hasOwnProperty("blockSignature"))
+				}
+				if (message.blockSignature != undefined && message.hasOwnProperty("blockSignature")) {
 					object.blockSignature = message.blockSignature;
-				if (message.transactions != null && message.hasOwnProperty("transactions"))
+				}
+				if (message.transactions != undefined && message.hasOwnProperty("transactions")) {
 					object.transactions =
 						options.bytes === String
 							? $util.base64.encode(message.transactions, 0, message.transactions.length)
 							: options.bytes === Array
 							? Array.prototype.slice.call(message.transactions)
 							: message.transactions;
+				}
 				return object;
 			};
 
@@ -750,9 +1025,13 @@ $root.peer = (function () {
 
 	peer.GetPeersRequest = (function () {
 		function GetPeersRequest(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetPeersRequest.prototype.headers = null;
@@ -762,9 +1041,12 @@ $root.peer = (function () {
 		};
 
 		GetPeersRequest.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers")) {
 				$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/ 10).fork()).ldelim();
+			}
 			return writer;
 		};
 
@@ -773,7 +1055,9 @@ $root.peer = (function () {
 		};
 
 		GetPeersRequest.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.peer.GetPeersRequest();
 			while (reader.pos < end) {
@@ -791,36 +1075,50 @@ $root.peer = (function () {
 		};
 
 		GetPeersRequest.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetPeersRequest.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.headers != null && message.hasOwnProperty("headers")) {
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				var error = $root.shared.Headers.verify(message.headers);
-				if (error) return "headers." + error;
+				if (error) {
+					return "headers." + error;
+				}
 			}
 			return null;
 		};
 
 		GetPeersRequest.fromObject = function fromObject(object) {
-			if (object instanceof $root.peer.GetPeersRequest) return object;
+			if (object instanceof $root.peer.GetPeersRequest) {
+				return object;
+			}
 			var message = new $root.peer.GetPeersRequest();
-			if (object.headers != null) {
-				if (typeof object.headers !== "object")
-					throw TypeError(".peer.GetPeersRequest.headers: object expected");
+			if (object.headers != undefined) {
+				if (typeof object.headers !== "object") {
+					throw new TypeError(".peer.GetPeersRequest.headers: object expected");
+				}
 				message.headers = $root.shared.Headers.fromObject(object.headers);
 			}
 			return message;
 		};
 
 		GetPeersRequest.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
-			if (options.defaults) object.headers = null;
-			if (message.headers != null && message.hasOwnProperty("headers"))
+			if (options.defaults) {
+				object.headers = null;
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				object.headers = $root.shared.Headers.toObject(message.headers, options);
+			}
 			return object;
 		};
 
@@ -834,9 +1132,13 @@ $root.peer = (function () {
 	peer.GetPeersResponse = (function () {
 		function GetPeersResponse(properties) {
 			this.peers = [];
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetPeersResponse.prototype.peers = $util.emptyArray;
@@ -846,13 +1148,17 @@ $root.peer = (function () {
 		};
 
 		GetPeersResponse.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.peers != null && message.peers.length)
-				for (var i = 0; i < message.peers.length; ++i)
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.peers != undefined && message.peers.length > 0) {
+				for (var index = 0; index < message.peers.length; ++index) {
 					$root.peer.GetPeersResponse.Peer.encode(
-						message.peers[i],
+						message.peers[index],
 						writer.uint32(/* id 1, wireType 2 =*/ 10).fork(),
 					).ldelim();
+				}
+			}
 			return writer;
 		};
 
@@ -861,14 +1167,18 @@ $root.peer = (function () {
 		};
 
 		GetPeersResponse.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.peer.GetPeersResponse();
 			while (reader.pos < end) {
 				var tag = reader.uint32();
 				switch (tag >>> 3) {
 					case 1:
-						if (!(message.peers && message.peers.length)) message.peers = [];
+						if (!(message.peers && message.peers.length > 0)) {
+							message.peers = [];
+						}
 						message.peers.push($root.peer.GetPeersResponse.Peer.decode(reader, reader.uint32()));
 						break;
 					default:
@@ -880,45 +1190,63 @@ $root.peer = (function () {
 		};
 
 		GetPeersResponse.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetPeersResponse.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.peers != null && message.hasOwnProperty("peers")) {
-				if (!Array.isArray(message.peers)) return "peers: array expected";
-				for (var i = 0; i < message.peers.length; ++i) {
-					var error = $root.peer.GetPeersResponse.Peer.verify(message.peers[i]);
-					if (error) return "peers." + error;
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (message.peers != undefined && message.hasOwnProperty("peers")) {
+				if (!Array.isArray(message.peers)) {
+					return "peers: array expected";
+				}
+				for (var index = 0; index < message.peers.length; ++index) {
+					var error = $root.peer.GetPeersResponse.Peer.verify(message.peers[index]);
+					if (error) {
+						return "peers." + error;
+					}
 				}
 			}
 			return null;
 		};
 
 		GetPeersResponse.fromObject = function fromObject(object) {
-			if (object instanceof $root.peer.GetPeersResponse) return object;
+			if (object instanceof $root.peer.GetPeersResponse) {
+				return object;
+			}
 			var message = new $root.peer.GetPeersResponse();
 			if (object.peers) {
-				if (!Array.isArray(object.peers)) throw TypeError(".peer.GetPeersResponse.peers: array expected");
+				if (!Array.isArray(object.peers)) {
+					throw new TypeError(".peer.GetPeersResponse.peers: array expected");
+				}
 				message.peers = [];
-				for (var i = 0; i < object.peers.length; ++i) {
-					if (typeof object.peers[i] !== "object")
-						throw TypeError(".peer.GetPeersResponse.peers: object expected");
-					message.peers[i] = $root.peer.GetPeersResponse.Peer.fromObject(object.peers[i]);
+				for (var index = 0; index < object.peers.length; ++index) {
+					if (typeof object.peers[index] !== "object") {
+						throw new TypeError(".peer.GetPeersResponse.peers: object expected");
+					}
+					message.peers[index] = $root.peer.GetPeersResponse.Peer.fromObject(object.peers[index]);
 				}
 			}
 			return message;
 		};
 
 		GetPeersResponse.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
-			if (options.arrays || options.defaults) object.peers = [];
-			if (message.peers && message.peers.length) {
+			if (options.arrays || options.defaults) {
 				object.peers = [];
-				for (var j = 0; j < message.peers.length; ++j)
-					object.peers[j] = $root.peer.GetPeersResponse.Peer.toObject(message.peers[j], options);
+			}
+			if (message.peers && message.peers.length > 0) {
+				object.peers = [];
+				for (var index = 0; index < message.peers.length; ++index) {
+					object.peers[index] = $root.peer.GetPeersResponse.Peer.toObject(message.peers[index], options);
+				}
 			}
 			return object;
 		};
@@ -929,9 +1257,13 @@ $root.peer = (function () {
 
 		GetPeersResponse.Peer = (function () {
 			function Peer(properties) {
-				if (properties)
-					for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-						if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+				if (properties) {
+					for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+						if (properties[keys[index]] != undefined) {
+							this[keys[index]] = properties[keys[index]];
+						}
+					}
+				}
 			}
 
 			Peer.prototype.ip = "";
@@ -943,11 +1275,15 @@ $root.peer = (function () {
 			};
 
 			Peer.encode = function encode(message, writer) {
-				if (!writer) writer = $Writer.create();
-				if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
+				if (!writer) {
+					writer = $Writer.create();
+				}
+				if (message.ip != undefined && Object.hasOwnProperty.call(message, "ip")) {
 					writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.ip);
-				if (message.port != null && Object.hasOwnProperty.call(message, "port"))
+				}
+				if (message.port != undefined && Object.hasOwnProperty.call(message, "port")) {
 					writer.uint32(/* id 2, wireType 0 =*/ 16).uint32(message.port);
+				}
 				return writer;
 			};
 
@@ -956,7 +1292,9 @@ $root.peer = (function () {
 			};
 
 			Peer.decode = function decode(reader, length) {
-				if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = $Reader.create(reader);
+				}
 				var end = length === undefined ? reader.len : reader.pos + length,
 					message = new $root.peer.GetPeersResponse.Peer();
 				while (reader.pos < end) {
@@ -977,36 +1315,54 @@ $root.peer = (function () {
 			};
 
 			Peer.decodeDelimited = function decodeDelimited(reader) {
-				if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = new $Reader(reader);
+				}
 				return this.decode(reader, reader.uint32());
 			};
 
 			Peer.verify = function verify(message) {
-				if (typeof message !== "object" || message === null) return "object expected";
-				if (message.ip != null && message.hasOwnProperty("ip"))
-					if (!$util.isString(message.ip)) return "ip: string expected";
-				if (message.port != null && message.hasOwnProperty("port"))
-					if (!$util.isInteger(message.port)) return "port: integer expected";
+				if (typeof message !== "object" || message === null) {
+					return "object expected";
+				}
+				if (message.ip != undefined && message.hasOwnProperty("ip") && !$util.isString(message.ip)) {
+					return "ip: string expected";
+				}
+				if (message.port != undefined && message.hasOwnProperty("port") && !$util.isInteger(message.port)) {
+					return "port: integer expected";
+				}
 				return null;
 			};
 
 			Peer.fromObject = function fromObject(object) {
-				if (object instanceof $root.peer.GetPeersResponse.Peer) return object;
+				if (object instanceof $root.peer.GetPeersResponse.Peer) {
+					return object;
+				}
 				var message = new $root.peer.GetPeersResponse.Peer();
-				if (object.ip != null) message.ip = String(object.ip);
-				if (object.port != null) message.port = object.port >>> 0;
+				if (object.ip != undefined) {
+					message.ip = String(object.ip);
+				}
+				if (object.port != undefined) {
+					message.port = object.port >>> 0;
+				}
 				return message;
 			};
 
 			Peer.toObject = function toObject(message, options) {
-				if (!options) options = {};
+				if (!options) {
+					options = {};
+				}
 				var object = {};
 				if (options.defaults) {
 					object.ip = "";
 					object.port = 0;
 				}
-				if (message.ip != null && message.hasOwnProperty("ip")) object.ip = message.ip;
-				if (message.port != null && message.hasOwnProperty("port")) object.port = message.port;
+				if (message.ip != undefined && message.hasOwnProperty("ip")) {
+					object.ip = message.ip;
+				}
+				if (message.port != undefined && message.hasOwnProperty("port")) {
+					object.port = message.port;
+				}
 				return object;
 			};
 
@@ -1023,9 +1379,13 @@ $root.peer = (function () {
 	peer.GetCommonBlocksRequest = (function () {
 		function GetCommonBlocksRequest(properties) {
 			this.ids = [];
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetCommonBlocksRequest.prototype.ids = $util.emptyArray;
@@ -1037,12 +1397,17 @@ $root.peer = (function () {
 		};
 
 		GetCommonBlocksRequest.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.ids != null && message.ids.length)
-				for (var i = 0; i < message.ids.length; ++i)
-					writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.ids[i]);
-			if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.ids != undefined && message.ids.length > 0) {
+				for (var index = 0; index < message.ids.length; ++index) {
+					writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.ids[index]);
+				}
+			}
+			if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers")) {
 				$root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/ 18).fork()).ldelim();
+			}
 			return writer;
 		};
 
@@ -1051,14 +1416,18 @@ $root.peer = (function () {
 		};
 
 		GetCommonBlocksRequest.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.peer.GetCommonBlocksRequest();
 			while (reader.pos < end) {
 				var tag = reader.uint32();
 				switch (tag >>> 3) {
 					case 1:
-						if (!(message.ids && message.ids.length)) message.ids = [];
+						if (!(message.ids && message.ids.length > 0)) {
+							message.ids = [];
+						}
 						message.ids.push(reader.string());
 						break;
 					case 2:
@@ -1073,51 +1442,78 @@ $root.peer = (function () {
 		};
 
 		GetCommonBlocksRequest.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetCommonBlocksRequest.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.ids != null && message.hasOwnProperty("ids")) {
-				if (!Array.isArray(message.ids)) return "ids: array expected";
-				for (var i = 0; i < message.ids.length; ++i)
-					if (!$util.isString(message.ids[i])) return "ids: string[] expected";
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
 			}
-			if (message.headers != null && message.hasOwnProperty("headers")) {
+			if (message.ids != undefined && message.hasOwnProperty("ids")) {
+				if (!Array.isArray(message.ids)) {
+					return "ids: array expected";
+				}
+				for (var index = 0; index < message.ids.length; ++index) {
+					if (!$util.isString(message.ids[index])) {
+						return "ids: string[] expected";
+					}
+				}
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				var error = $root.shared.Headers.verify(message.headers);
-				if (error) return "headers." + error;
+				if (error) {
+					return "headers." + error;
+				}
 			}
 			return null;
 		};
 
 		GetCommonBlocksRequest.fromObject = function fromObject(object) {
-			if (object instanceof $root.peer.GetCommonBlocksRequest) return object;
+			if (object instanceof $root.peer.GetCommonBlocksRequest) {
+				return object;
+			}
 			var message = new $root.peer.GetCommonBlocksRequest();
 			if (object.ids) {
-				if (!Array.isArray(object.ids)) throw TypeError(".peer.GetCommonBlocksRequest.ids: array expected");
+				if (!Array.isArray(object.ids)) {
+					throw new TypeError(".peer.GetCommonBlocksRequest.ids: array expected");
+				}
 				message.ids = [];
-				for (var i = 0; i < object.ids.length; ++i) message.ids[i] = String(object.ids[i]);
+				for (var index = 0; index < object.ids.length; ++index) {
+					message.ids[index] = String(object.ids[index]);
+				}
 			}
-			if (object.headers != null) {
-				if (typeof object.headers !== "object")
-					throw TypeError(".peer.GetCommonBlocksRequest.headers: object expected");
+			if (object.headers != undefined) {
+				if (typeof object.headers !== "object") {
+					throw new TypeError(".peer.GetCommonBlocksRequest.headers: object expected");
+				}
 				message.headers = $root.shared.Headers.fromObject(object.headers);
 			}
 			return message;
 		};
 
 		GetCommonBlocksRequest.toObject = function toObject(message, options) {
-			if (!options) options = {};
-			var object = {};
-			if (options.arrays || options.defaults) object.ids = [];
-			if (options.defaults) object.headers = null;
-			if (message.ids && message.ids.length) {
-				object.ids = [];
-				for (var j = 0; j < message.ids.length; ++j) object.ids[j] = message.ids[j];
+			if (!options) {
+				options = {};
 			}
-			if (message.headers != null && message.hasOwnProperty("headers"))
+			var object = {};
+			if (options.arrays || options.defaults) {
+				object.ids = [];
+			}
+			if (options.defaults) {
+				object.headers = null;
+			}
+			if (message.ids && message.ids.length > 0) {
+				object.ids = [];
+				for (var index = 0; index < message.ids.length; ++index) {
+					object.ids[index] = message.ids[index];
+				}
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				object.headers = $root.shared.Headers.toObject(message.headers, options);
+			}
 			return object;
 		};
 
@@ -1130,9 +1526,13 @@ $root.peer = (function () {
 
 	peer.GetCommonBlocksResponse = (function () {
 		function GetCommonBlocksResponse(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetCommonBlocksResponse.prototype.common = null;
@@ -1142,12 +1542,15 @@ $root.peer = (function () {
 		};
 
 		GetCommonBlocksResponse.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.common != null && Object.hasOwnProperty.call(message, "common"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.common != undefined && Object.hasOwnProperty.call(message, "common")) {
 				$root.peer.GetCommonBlocksResponse.Common.encode(
 					message.common,
 					writer.uint32(/* id 1, wireType 2 =*/ 10).fork(),
 				).ldelim();
+			}
 			return writer;
 		};
 
@@ -1156,7 +1559,9 @@ $root.peer = (function () {
 		};
 
 		GetCommonBlocksResponse.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.peer.GetCommonBlocksResponse();
 			while (reader.pos < end) {
@@ -1174,36 +1579,50 @@ $root.peer = (function () {
 		};
 
 		GetCommonBlocksResponse.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetCommonBlocksResponse.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.common != null && message.hasOwnProperty("common")) {
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (message.common != undefined && message.hasOwnProperty("common")) {
 				var error = $root.peer.GetCommonBlocksResponse.Common.verify(message.common);
-				if (error) return "common." + error;
+				if (error) {
+					return "common." + error;
+				}
 			}
 			return null;
 		};
 
 		GetCommonBlocksResponse.fromObject = function fromObject(object) {
-			if (object instanceof $root.peer.GetCommonBlocksResponse) return object;
+			if (object instanceof $root.peer.GetCommonBlocksResponse) {
+				return object;
+			}
 			var message = new $root.peer.GetCommonBlocksResponse();
-			if (object.common != null) {
-				if (typeof object.common !== "object")
-					throw TypeError(".peer.GetCommonBlocksResponse.common: object expected");
+			if (object.common != undefined) {
+				if (typeof object.common !== "object") {
+					throw new TypeError(".peer.GetCommonBlocksResponse.common: object expected");
+				}
 				message.common = $root.peer.GetCommonBlocksResponse.Common.fromObject(object.common);
 			}
 			return message;
 		};
 
 		GetCommonBlocksResponse.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
-			if (options.defaults) object.common = null;
-			if (message.common != null && message.hasOwnProperty("common"))
+			if (options.defaults) {
+				object.common = null;
+			}
+			if (message.common != undefined && message.hasOwnProperty("common")) {
 				object.common = $root.peer.GetCommonBlocksResponse.Common.toObject(message.common, options);
+			}
 			return object;
 		};
 
@@ -1213,9 +1632,13 @@ $root.peer = (function () {
 
 		GetCommonBlocksResponse.Common = (function () {
 			function Common(properties) {
-				if (properties)
-					for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-						if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+				if (properties) {
+					for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+						if (properties[keys[index]] != undefined) {
+							this[keys[index]] = properties[keys[index]];
+						}
+					}
+				}
 			}
 
 			Common.prototype.height = 0;
@@ -1227,11 +1650,15 @@ $root.peer = (function () {
 			};
 
 			Common.encode = function encode(message, writer) {
-				if (!writer) writer = $Writer.create();
-				if (message.height != null && Object.hasOwnProperty.call(message, "height"))
+				if (!writer) {
+					writer = $Writer.create();
+				}
+				if (message.height != undefined && Object.hasOwnProperty.call(message, "height")) {
 					writer.uint32(/* id 1, wireType 0 =*/ 8).uint32(message.height);
-				if (message.id != null && Object.hasOwnProperty.call(message, "id"))
+				}
+				if (message.id != undefined && Object.hasOwnProperty.call(message, "id")) {
 					writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.id);
+				}
 				return writer;
 			};
 
@@ -1240,7 +1667,9 @@ $root.peer = (function () {
 			};
 
 			Common.decode = function decode(reader, length) {
-				if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = $Reader.create(reader);
+				}
 				var end = length === undefined ? reader.len : reader.pos + length,
 					message = new $root.peer.GetCommonBlocksResponse.Common();
 				while (reader.pos < end) {
@@ -1261,36 +1690,58 @@ $root.peer = (function () {
 			};
 
 			Common.decodeDelimited = function decodeDelimited(reader) {
-				if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = new $Reader(reader);
+				}
 				return this.decode(reader, reader.uint32());
 			};
 
 			Common.verify = function verify(message) {
-				if (typeof message !== "object" || message === null) return "object expected";
-				if (message.height != null && message.hasOwnProperty("height"))
-					if (!$util.isInteger(message.height)) return "height: integer expected";
-				if (message.id != null && message.hasOwnProperty("id"))
-					if (!$util.isString(message.id)) return "id: string expected";
+				if (typeof message !== "object" || message === null) {
+					return "object expected";
+				}
+				if (
+					message.height != undefined &&
+					message.hasOwnProperty("height") &&
+					!$util.isInteger(message.height)
+				) {
+					return "height: integer expected";
+				}
+				if (message.id != undefined && message.hasOwnProperty("id") && !$util.isString(message.id)) {
+					return "id: string expected";
+				}
 				return null;
 			};
 
 			Common.fromObject = function fromObject(object) {
-				if (object instanceof $root.peer.GetCommonBlocksResponse.Common) return object;
+				if (object instanceof $root.peer.GetCommonBlocksResponse.Common) {
+					return object;
+				}
 				var message = new $root.peer.GetCommonBlocksResponse.Common();
-				if (object.height != null) message.height = object.height >>> 0;
-				if (object.id != null) message.id = String(object.id);
+				if (object.height != undefined) {
+					message.height = object.height >>> 0;
+				}
+				if (object.id != undefined) {
+					message.id = String(object.id);
+				}
 				return message;
 			};
 
 			Common.toObject = function toObject(message, options) {
-				if (!options) options = {};
+				if (!options) {
+					options = {};
+				}
 				var object = {};
 				if (options.defaults) {
 					object.height = 0;
 					object.id = "";
 				}
-				if (message.height != null && message.hasOwnProperty("height")) object.height = message.height;
-				if (message.id != null && message.hasOwnProperty("id")) object.id = message.id;
+				if (message.height != undefined && message.hasOwnProperty("height")) {
+					object.height = message.height;
+				}
+				if (message.id != undefined && message.hasOwnProperty("id")) {
+					object.id = message.id;
+				}
 				return object;
 			};
 
@@ -1306,9 +1757,13 @@ $root.peer = (function () {
 
 	peer.GetStatusRequest = (function () {
 		function GetStatusRequest(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetStatusRequest.prototype.headers = null;
@@ -1318,9 +1773,12 @@ $root.peer = (function () {
 		};
 
 		GetStatusRequest.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers")) {
 				$root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/ 10).fork()).ldelim();
+			}
 			return writer;
 		};
 
@@ -1329,7 +1787,9 @@ $root.peer = (function () {
 		};
 
 		GetStatusRequest.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.peer.GetStatusRequest();
 			while (reader.pos < end) {
@@ -1347,36 +1807,50 @@ $root.peer = (function () {
 		};
 
 		GetStatusRequest.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetStatusRequest.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.headers != null && message.hasOwnProperty("headers")) {
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				var error = $root.shared.Headers.verify(message.headers);
-				if (error) return "headers." + error;
+				if (error) {
+					return "headers." + error;
+				}
 			}
 			return null;
 		};
 
 		GetStatusRequest.fromObject = function fromObject(object) {
-			if (object instanceof $root.peer.GetStatusRequest) return object;
+			if (object instanceof $root.peer.GetStatusRequest) {
+				return object;
+			}
 			var message = new $root.peer.GetStatusRequest();
-			if (object.headers != null) {
-				if (typeof object.headers !== "object")
-					throw TypeError(".peer.GetStatusRequest.headers: object expected");
+			if (object.headers != undefined) {
+				if (typeof object.headers !== "object") {
+					throw new TypeError(".peer.GetStatusRequest.headers: object expected");
+				}
 				message.headers = $root.shared.Headers.fromObject(object.headers);
 			}
 			return message;
 		};
 
 		GetStatusRequest.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
-			if (options.defaults) object.headers = null;
-			if (message.headers != null && message.hasOwnProperty("headers"))
+			if (options.defaults) {
+				object.headers = null;
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				object.headers = $root.shared.Headers.toObject(message.headers, options);
+			}
 			return object;
 		};
 
@@ -1389,9 +1863,13 @@ $root.peer = (function () {
 
 	peer.GetStatusResponse = (function () {
 		function GetStatusResponse(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		GetStatusResponse.prototype.state = null;
@@ -1403,17 +1881,21 @@ $root.peer = (function () {
 		};
 
 		GetStatusResponse.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.state != null && Object.hasOwnProperty.call(message, "state"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.state != undefined && Object.hasOwnProperty.call(message, "state")) {
 				$root.peer.GetStatusResponse.State.encode(
 					message.state,
 					writer.uint32(/* id 1, wireType 2 =*/ 10).fork(),
 				).ldelim();
-			if (message.config != null && Object.hasOwnProperty.call(message, "config"))
+			}
+			if (message.config != undefined && Object.hasOwnProperty.call(message, "config")) {
 				$root.peer.GetStatusResponse.Config.encode(
 					message.config,
 					writer.uint32(/* id 2, wireType 2 =*/ 18).fork(),
 				).ldelim();
+			}
 			return writer;
 		};
 
@@ -1422,7 +1904,9 @@ $root.peer = (function () {
 		};
 
 		GetStatusResponse.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.peer.GetStatusResponse();
 			while (reader.pos < end) {
@@ -1443,49 +1927,66 @@ $root.peer = (function () {
 		};
 
 		GetStatusResponse.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		GetStatusResponse.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.state != null && message.hasOwnProperty("state")) {
-				var error = $root.peer.GetStatusResponse.State.verify(message.state);
-				if (error) return "state." + error;
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
 			}
-			if (message.config != null && message.hasOwnProperty("config")) {
+			if (message.state != undefined && message.hasOwnProperty("state")) {
+				var error = $root.peer.GetStatusResponse.State.verify(message.state);
+				if (error) {
+					return "state." + error;
+				}
+			}
+			if (message.config != undefined && message.hasOwnProperty("config")) {
 				var error = $root.peer.GetStatusResponse.Config.verify(message.config);
-				if (error) return "config." + error;
+				if (error) {
+					return "config." + error;
+				}
 			}
 			return null;
 		};
 
 		GetStatusResponse.fromObject = function fromObject(object) {
-			if (object instanceof $root.peer.GetStatusResponse) return object;
+			if (object instanceof $root.peer.GetStatusResponse) {
+				return object;
+			}
 			var message = new $root.peer.GetStatusResponse();
-			if (object.state != null) {
-				if (typeof object.state !== "object") throw TypeError(".peer.GetStatusResponse.state: object expected");
+			if (object.state != undefined) {
+				if (typeof object.state !== "object") {
+					throw new TypeError(".peer.GetStatusResponse.state: object expected");
+				}
 				message.state = $root.peer.GetStatusResponse.State.fromObject(object.state);
 			}
-			if (object.config != null) {
-				if (typeof object.config !== "object")
-					throw TypeError(".peer.GetStatusResponse.config: object expected");
+			if (object.config != undefined) {
+				if (typeof object.config !== "object") {
+					throw new TypeError(".peer.GetStatusResponse.config: object expected");
+				}
 				message.config = $root.peer.GetStatusResponse.Config.fromObject(object.config);
 			}
 			return message;
 		};
 
 		GetStatusResponse.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
 			if (options.defaults) {
 				object.state = null;
 				object.config = null;
 			}
-			if (message.state != null && message.hasOwnProperty("state"))
+			if (message.state != undefined && message.hasOwnProperty("state")) {
 				object.state = $root.peer.GetStatusResponse.State.toObject(message.state, options);
-			if (message.config != null && message.hasOwnProperty("config"))
+			}
+			if (message.config != undefined && message.hasOwnProperty("config")) {
 				object.config = $root.peer.GetStatusResponse.Config.toObject(message.config, options);
+			}
 			return object;
 		};
 
@@ -1495,9 +1996,13 @@ $root.peer = (function () {
 
 		GetStatusResponse.State = (function () {
 			function State(properties) {
-				if (properties)
-					for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-						if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+				if (properties) {
+					for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+						if (properties[keys[index]] != undefined) {
+							this[keys[index]] = properties[keys[index]];
+						}
+					}
+				}
 			}
 
 			State.prototype.height = 0;
@@ -1513,18 +2018,24 @@ $root.peer = (function () {
 			};
 
 			State.encode = function encode(message, writer) {
-				if (!writer) writer = $Writer.create();
-				if (message.height != null && Object.hasOwnProperty.call(message, "height"))
+				if (!writer) {
+					writer = $Writer.create();
+				}
+				if (message.height != undefined && Object.hasOwnProperty.call(message, "height")) {
 					writer.uint32(/* id 1, wireType 0 =*/ 8).uint32(message.height);
-				if (message.forgingAllowed != null && Object.hasOwnProperty.call(message, "forgingAllowed"))
+				}
+				if (message.forgingAllowed != undefined && Object.hasOwnProperty.call(message, "forgingAllowed")) {
 					writer.uint32(/* id 2, wireType 0 =*/ 16).bool(message.forgingAllowed);
-				if (message.currentSlot != null && Object.hasOwnProperty.call(message, "currentSlot"))
+				}
+				if (message.currentSlot != undefined && Object.hasOwnProperty.call(message, "currentSlot")) {
 					writer.uint32(/* id 3, wireType 0 =*/ 24).uint32(message.currentSlot);
-				if (message.header != null && Object.hasOwnProperty.call(message, "header"))
+				}
+				if (message.header != undefined && Object.hasOwnProperty.call(message, "header")) {
 					$root.peer.GetStatusResponse.State.BlockHeader.encode(
 						message.header,
 						writer.uint32(/* id 4, wireType 2 =*/ 34).fork(),
 					).ldelim();
+				}
 				return writer;
 			};
 
@@ -1533,7 +2044,9 @@ $root.peer = (function () {
 			};
 
 			State.decode = function decode(reader, length) {
-				if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = $Reader.create(reader);
+				}
 				var end = length === undefined ? reader.len : reader.pos + length,
 					message = new $root.peer.GetStatusResponse.State();
 				while (reader.pos < end) {
@@ -1563,41 +2076,73 @@ $root.peer = (function () {
 			};
 
 			State.decodeDelimited = function decodeDelimited(reader) {
-				if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = new $Reader(reader);
+				}
 				return this.decode(reader, reader.uint32());
 			};
 
 			State.verify = function verify(message) {
-				if (typeof message !== "object" || message === null) return "object expected";
-				if (message.height != null && message.hasOwnProperty("height"))
-					if (!$util.isInteger(message.height)) return "height: integer expected";
-				if (message.forgingAllowed != null && message.hasOwnProperty("forgingAllowed"))
-					if (typeof message.forgingAllowed !== "boolean") return "forgingAllowed: boolean expected";
-				if (message.currentSlot != null && message.hasOwnProperty("currentSlot"))
-					if (!$util.isInteger(message.currentSlot)) return "currentSlot: integer expected";
-				if (message.header != null && message.hasOwnProperty("header")) {
+				if (typeof message !== "object" || message === null) {
+					return "object expected";
+				}
+				if (
+					message.height != undefined &&
+					message.hasOwnProperty("height") &&
+					!$util.isInteger(message.height)
+				) {
+					return "height: integer expected";
+				}
+				if (
+					message.forgingAllowed != undefined &&
+					message.hasOwnProperty("forgingAllowed") &&
+					typeof message.forgingAllowed !== "boolean"
+				) {
+					return "forgingAllowed: boolean expected";
+				}
+				if (
+					message.currentSlot != undefined &&
+					message.hasOwnProperty("currentSlot") &&
+					!$util.isInteger(message.currentSlot)
+				) {
+					return "currentSlot: integer expected";
+				}
+				if (message.header != undefined && message.hasOwnProperty("header")) {
 					var error = $root.peer.GetStatusResponse.State.BlockHeader.verify(message.header);
-					if (error) return "header." + error;
+					if (error) {
+						return "header." + error;
+					}
 				}
 				return null;
 			};
 
 			State.fromObject = function fromObject(object) {
-				if (object instanceof $root.peer.GetStatusResponse.State) return object;
+				if (object instanceof $root.peer.GetStatusResponse.State) {
+					return object;
+				}
 				var message = new $root.peer.GetStatusResponse.State();
-				if (object.height != null) message.height = object.height >>> 0;
-				if (object.forgingAllowed != null) message.forgingAllowed = Boolean(object.forgingAllowed);
-				if (object.currentSlot != null) message.currentSlot = object.currentSlot >>> 0;
-				if (object.header != null) {
-					if (typeof object.header !== "object")
-						throw TypeError(".peer.GetStatusResponse.State.header: object expected");
+				if (object.height != undefined) {
+					message.height = object.height >>> 0;
+				}
+				if (object.forgingAllowed != undefined) {
+					message.forgingAllowed = Boolean(object.forgingAllowed);
+				}
+				if (object.currentSlot != undefined) {
+					message.currentSlot = object.currentSlot >>> 0;
+				}
+				if (object.header != undefined) {
+					if (typeof object.header !== "object") {
+						throw new TypeError(".peer.GetStatusResponse.State.header: object expected");
+					}
 					message.header = $root.peer.GetStatusResponse.State.BlockHeader.fromObject(object.header);
 				}
 				return message;
 			};
 
 			State.toObject = function toObject(message, options) {
-				if (!options) options = {};
+				if (!options) {
+					options = {};
+				}
 				var object = {};
 				if (options.defaults) {
 					object.height = 0;
@@ -1605,13 +2150,18 @@ $root.peer = (function () {
 					object.currentSlot = 0;
 					object.header = null;
 				}
-				if (message.height != null && message.hasOwnProperty("height")) object.height = message.height;
-				if (message.forgingAllowed != null && message.hasOwnProperty("forgingAllowed"))
+				if (message.height != undefined && message.hasOwnProperty("height")) {
+					object.height = message.height;
+				}
+				if (message.forgingAllowed != undefined && message.hasOwnProperty("forgingAllowed")) {
 					object.forgingAllowed = message.forgingAllowed;
-				if (message.currentSlot != null && message.hasOwnProperty("currentSlot"))
+				}
+				if (message.currentSlot != undefined && message.hasOwnProperty("currentSlot")) {
 					object.currentSlot = message.currentSlot;
-				if (message.header != null && message.hasOwnProperty("header"))
+				}
+				if (message.header != undefined && message.hasOwnProperty("header")) {
 					object.header = $root.peer.GetStatusResponse.State.BlockHeader.toObject(message.header, options);
+				}
 				return object;
 			};
 
@@ -1621,22 +2171,22 @@ $root.peer = (function () {
 
 			State.BlockHeader = (function () {
 				function BlockHeader(properties) {
-					if (properties)
-						for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-							if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+					if (properties) {
+						for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+							if (properties[keys[index]] != undefined) {
+								this[keys[index]] = properties[keys[index]];
+							}
+						}
+					}
 				}
 
 				BlockHeader.prototype.id = "";
-
-				BlockHeader.prototype.idHex = "";
 
 				BlockHeader.prototype.version = 0;
 
 				BlockHeader.prototype.timestamp = 0;
 
 				BlockHeader.prototype.previousBlock = "";
-
-				BlockHeader.prototype.previousBlockHex = "";
 
 				BlockHeader.prototype.height = 0;
 
@@ -1661,40 +2211,54 @@ $root.peer = (function () {
 				};
 
 				BlockHeader.encode = function encode(message, writer) {
-					if (!writer) writer = $Writer.create();
-					if (message.id != null && Object.hasOwnProperty.call(message, "id"))
+					if (!writer) {
+						writer = $Writer.create();
+					}
+					if (message.id != undefined && Object.hasOwnProperty.call(message, "id")) {
 						writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.id);
-					if (message.idHex != null && Object.hasOwnProperty.call(message, "idHex"))
-						writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.idHex);
-					if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+					}
+					if (message.version != undefined && Object.hasOwnProperty.call(message, "version")) {
 						writer.uint32(/* id 3, wireType 0 =*/ 24).uint32(message.version);
-					if (message.timestamp != null && Object.hasOwnProperty.call(message, "timestamp"))
-						writer.uint32(/* id 4, wireType 0 =*/ 32).uint32(message.timestamp);
-					if (message.previousBlock != null && Object.hasOwnProperty.call(message, "previousBlock"))
+					}
+					if (message.timestamp != undefined && Object.hasOwnProperty.call(message, "timestamp")) {
+						writer.uint32(/* id 4, wireType 2 =*/ 32).string(message.timestamp);
+					}
+					if (message.previousBlock != undefined && Object.hasOwnProperty.call(message, "previousBlock")) {
 						writer.uint32(/* id 5, wireType 2 =*/ 42).string(message.previousBlock);
-					if (message.previousBlockHex != null && Object.hasOwnProperty.call(message, "previousBlockHex"))
-						writer.uint32(/* id 6, wireType 2 =*/ 50).string(message.previousBlockHex);
-					if (message.height != null && Object.hasOwnProperty.call(message, "height"))
+					}
+					if (message.height != undefined && Object.hasOwnProperty.call(message, "height")) {
 						writer.uint32(/* id 7, wireType 0 =*/ 56).uint32(message.height);
+					}
 					if (
-						message.numberOfTransactions != null &&
+						message.numberOfTransactions != undefined &&
 						Object.hasOwnProperty.call(message, "numberOfTransactions")
-					)
+					) {
 						writer.uint32(/* id 8, wireType 0 =*/ 64).uint32(message.numberOfTransactions);
-					if (message.totalAmount != null && Object.hasOwnProperty.call(message, "totalAmount"))
+					}
+					if (message.totalAmount != undefined && Object.hasOwnProperty.call(message, "totalAmount")) {
 						writer.uint32(/* id 9, wireType 2 =*/ 74).string(message.totalAmount);
-					if (message.totalFee != null && Object.hasOwnProperty.call(message, "totalFee"))
+					}
+					if (message.totalFee != undefined && Object.hasOwnProperty.call(message, "totalFee")) {
 						writer.uint32(/* id 10, wireType 2 =*/ 82).string(message.totalFee);
-					if (message.reward != null && Object.hasOwnProperty.call(message, "reward"))
+					}
+					if (message.reward != undefined && Object.hasOwnProperty.call(message, "reward")) {
 						writer.uint32(/* id 11, wireType 2 =*/ 90).string(message.reward);
-					if (message.payloadLength != null && Object.hasOwnProperty.call(message, "payloadLength"))
+					}
+					if (message.payloadLength != undefined && Object.hasOwnProperty.call(message, "payloadLength")) {
 						writer.uint32(/* id 12, wireType 0 =*/ 96).uint32(message.payloadLength);
-					if (message.payloadHash != null && Object.hasOwnProperty.call(message, "payloadHash"))
+					}
+					if (message.payloadHash != undefined && Object.hasOwnProperty.call(message, "payloadHash")) {
 						writer.uint32(/* id 13, wireType 2 =*/ 106).string(message.payloadHash);
-					if (message.generatorPublicKey != null && Object.hasOwnProperty.call(message, "generatorPublicKey"))
+					}
+					if (
+						message.generatorPublicKey != undefined &&
+						Object.hasOwnProperty.call(message, "generatorPublicKey")
+					) {
 						writer.uint32(/* id 14, wireType 2 =*/ 114).string(message.generatorPublicKey);
-					if (message.blockSignature != null && Object.hasOwnProperty.call(message, "blockSignature"))
+					}
+					if (message.blockSignature != undefined && Object.hasOwnProperty.call(message, "blockSignature")) {
 						writer.uint32(/* id 15, wireType 2 =*/ 122).string(message.blockSignature);
+					}
 					return writer;
 				};
 
@@ -1703,7 +2267,9 @@ $root.peer = (function () {
 				};
 
 				BlockHeader.decode = function decode(reader, length) {
-					if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+					if (!(reader instanceof $Reader)) {
+						reader = $Reader.create(reader);
+					}
 					var end = length === undefined ? reader.len : reader.pos + length,
 						message = new $root.peer.GetStatusResponse.State.BlockHeader();
 					while (reader.pos < end) {
@@ -1713,45 +2279,39 @@ $root.peer = (function () {
 								message.id = reader.string();
 								break;
 							case 2:
-								message.idHex = reader.string();
-								break;
-							case 3:
 								message.version = reader.uint32();
 								break;
-							case 4:
-								message.timestamp = reader.uint32();
+							case 3:
+								message.timestamp = reader.string();
 								break;
-							case 5:
+							case 4:
 								message.previousBlock = reader.string();
 								break;
-							case 6:
-								message.previousBlockHex = reader.string();
-								break;
-							case 7:
+							case 5:
 								message.height = reader.uint32();
 								break;
-							case 8:
+							case 6:
 								message.numberOfTransactions = reader.uint32();
 								break;
-							case 9:
+							case 7:
 								message.totalAmount = reader.string();
 								break;
-							case 10:
+							case 8:
 								message.totalFee = reader.string();
 								break;
-							case 11:
+							case 9:
 								message.reward = reader.string();
 								break;
-							case 12:
+							case 10:
 								message.payloadLength = reader.uint32();
 								break;
-							case 13:
+							case 11:
 								message.payloadHash = reader.string();
 								break;
-							case 14:
+							case 12:
 								message.generatorPublicKey = reader.string();
 								break;
-							case 15:
+							case 13:
 								message.blockSignature = reader.string();
 								break;
 							default:
@@ -1763,79 +2323,163 @@ $root.peer = (function () {
 				};
 
 				BlockHeader.decodeDelimited = function decodeDelimited(reader) {
-					if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+					if (!(reader instanceof $Reader)) {
+						reader = new $Reader(reader);
+					}
 					return this.decode(reader, reader.uint32());
 				};
 
 				BlockHeader.verify = function verify(message) {
-					if (typeof message !== "object" || message === null) return "object expected";
-					if (message.id != null && message.hasOwnProperty("id"))
-						if (!$util.isString(message.id)) return "id: string expected";
-					if (message.idHex != null && message.hasOwnProperty("idHex"))
-						if (!$util.isString(message.idHex)) return "idHex: string expected";
-					if (message.version != null && message.hasOwnProperty("version"))
-						if (!$util.isInteger(message.version)) return "version: integer expected";
-					if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-						if (!$util.isInteger(message.timestamp)) return "timestamp: integer expected";
-					if (message.previousBlock != null && message.hasOwnProperty("previousBlock"))
-						if (!$util.isString(message.previousBlock)) return "previousBlock: string expected";
-					if (message.previousBlockHex != null && message.hasOwnProperty("previousBlockHex"))
-						if (!$util.isString(message.previousBlockHex)) return "previousBlockHex: string expected";
-					if (message.height != null && message.hasOwnProperty("height"))
-						if (!$util.isInteger(message.height)) return "height: integer expected";
-					if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
-						if (!$util.isInteger(message.numberOfTransactions))
-							return "numberOfTransactions: integer expected";
-					if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
-						if (!$util.isString(message.totalAmount)) return "totalAmount: string expected";
-					if (message.totalFee != null && message.hasOwnProperty("totalFee"))
-						if (!$util.isString(message.totalFee)) return "totalFee: string expected";
-					if (message.reward != null && message.hasOwnProperty("reward"))
-						if (!$util.isString(message.reward)) return "reward: string expected";
-					if (message.payloadLength != null && message.hasOwnProperty("payloadLength"))
-						if (!$util.isInteger(message.payloadLength)) return "payloadLength: integer expected";
-					if (message.payloadHash != null && message.hasOwnProperty("payloadHash"))
-						if (!$util.isString(message.payloadHash)) return "payloadHash: string expected";
-					if (message.generatorPublicKey != null && message.hasOwnProperty("generatorPublicKey"))
-						if (!$util.isString(message.generatorPublicKey)) return "generatorPublicKey: string expected";
-					if (message.blockSignature != null && message.hasOwnProperty("blockSignature"))
-						if (!$util.isString(message.blockSignature)) return "blockSignature: string expected";
+					if (typeof message !== "object" || message === null) {
+						return "object expected";
+					}
+					if (message.id != undefined && message.hasOwnProperty("id") && !$util.isString(message.id)) {
+						return "id: string expected";
+					}
+					if (
+						message.version != undefined &&
+						message.hasOwnProperty("version") &&
+						!$util.isInteger(message.version)
+					) {
+						return "version: integer expected";
+					}
+					if (
+						message.timestamp != undefined &&
+						message.hasOwnProperty("timestamp") &&
+						!$util.isInteger(message.timestamp)
+					) {
+						return "timestamp: integer expected";
+					}
+					if (
+						message.previousBlock != undefined &&
+						message.hasOwnProperty("previousBlock") &&
+						!$util.isString(message.previousBlock)
+					) {
+						return "previousBlock: string expected";
+					}
+					if (
+						message.height != undefined &&
+						message.hasOwnProperty("height") &&
+						!$util.isInteger(message.height)
+					) {
+						return "height: integer expected";
+					}
+					if (
+						message.numberOfTransactions != undefined &&
+						message.hasOwnProperty("numberOfTransactions") &&
+						!$util.isInteger(message.numberOfTransactions)
+					) {
+						return "numberOfTransactions: integer expected";
+					}
+					if (
+						message.totalAmount != undefined &&
+						message.hasOwnProperty("totalAmount") &&
+						!$util.isString(message.totalAmount)
+					) {
+						return "totalAmount: string expected";
+					}
+					if (
+						message.totalFee != undefined &&
+						message.hasOwnProperty("totalFee") &&
+						!$util.isString(message.totalFee)
+					) {
+						return "totalFee: string expected";
+					}
+					if (
+						message.reward != undefined &&
+						message.hasOwnProperty("reward") &&
+						!$util.isString(message.reward)
+					) {
+						return "reward: string expected";
+					}
+					if (
+						message.payloadLength != undefined &&
+						message.hasOwnProperty("payloadLength") &&
+						!$util.isInteger(message.payloadLength)
+					) {
+						return "payloadLength: integer expected";
+					}
+					if (
+						message.payloadHash != undefined &&
+						message.hasOwnProperty("payloadHash") &&
+						!$util.isString(message.payloadHash)
+					) {
+						return "payloadHash: string expected";
+					}
+					if (
+						message.generatorPublicKey != undefined &&
+						message.hasOwnProperty("generatorPublicKey") &&
+						!$util.isString(message.generatorPublicKey)
+					) {
+						return "generatorPublicKey: string expected";
+					}
+					if (
+						message.blockSignature != undefined &&
+						message.hasOwnProperty("blockSignature") &&
+						!$util.isString(message.blockSignature)
+					) {
+						return "blockSignature: string expected";
+					}
 					return null;
 				};
 
 				BlockHeader.fromObject = function fromObject(object) {
-					if (object instanceof $root.peer.GetStatusResponse.State.BlockHeader) return object;
+					if (object instanceof $root.peer.GetStatusResponse.State.BlockHeader) {
+						return object;
+					}
 					var message = new $root.peer.GetStatusResponse.State.BlockHeader();
-					if (object.id != null) message.id = String(object.id);
-					if (object.idHex != null) message.idHex = String(object.idHex);
-					if (object.version != null) message.version = object.version >>> 0;
-					if (object.timestamp != null) message.timestamp = object.timestamp >>> 0;
-					if (object.previousBlock != null) message.previousBlock = String(object.previousBlock);
-					if (object.previousBlockHex != null) message.previousBlockHex = String(object.previousBlockHex);
-					if (object.height != null) message.height = object.height >>> 0;
-					if (object.numberOfTransactions != null)
+					if (object.id != undefined) {
+						message.id = String(object.id);
+					}
+					if (object.version != undefined) {
+						message.version = object.version >>> 0;
+					}
+					if (object.timestamp != undefined) {
+						message.timestamp = object.timestamp >>> 0;
+					}
+					if (object.previousBlock != undefined) {
+						message.previousBlock = String(object.previousBlock);
+					}
+					if (object.height != undefined) {
+						message.height = object.height >>> 0;
+					}
+					if (object.numberOfTransactions != undefined) {
 						message.numberOfTransactions = object.numberOfTransactions >>> 0;
-					if (object.totalAmount != null) message.totalAmount = String(object.totalAmount);
-					if (object.totalFee != null) message.totalFee = String(object.totalFee);
-					if (object.reward != null) message.reward = String(object.reward);
-					if (object.payloadLength != null) message.payloadLength = object.payloadLength >>> 0;
-					if (object.payloadHash != null) message.payloadHash = String(object.payloadHash);
-					if (object.generatorPublicKey != null)
+					}
+					if (object.totalAmount != undefined) {
+						message.totalAmount = String(object.totalAmount);
+					}
+					if (object.totalFee != undefined) {
+						message.totalFee = String(object.totalFee);
+					}
+					if (object.reward != undefined) {
+						message.reward = String(object.reward);
+					}
+					if (object.payloadLength != undefined) {
+						message.payloadLength = object.payloadLength >>> 0;
+					}
+					if (object.payloadHash != undefined) {
+						message.payloadHash = String(object.payloadHash);
+					}
+					if (object.generatorPublicKey != undefined) {
 						message.generatorPublicKey = String(object.generatorPublicKey);
-					if (object.blockSignature != null) message.blockSignature = String(object.blockSignature);
+					}
+					if (object.blockSignature != undefined) {
+						message.blockSignature = String(object.blockSignature);
+					}
 					return message;
 				};
 
 				BlockHeader.toObject = function toObject(message, options) {
-					if (!options) options = {};
+					if (!options) {
+						options = {};
+					}
 					var object = {};
 					if (options.defaults) {
 						object.id = "";
-						object.idHex = "";
 						object.version = 0;
 						object.timestamp = 0;
 						object.previousBlock = "";
-						object.previousBlockHex = "";
 						object.height = 0;
 						object.numberOfTransactions = 0;
 						object.totalAmount = "";
@@ -1846,31 +2490,45 @@ $root.peer = (function () {
 						object.generatorPublicKey = "";
 						object.blockSignature = "";
 					}
-					if (message.id != null && message.hasOwnProperty("id")) object.id = message.id;
-					if (message.idHex != null && message.hasOwnProperty("idHex")) object.idHex = message.idHex;
-					if (message.version != null && message.hasOwnProperty("version")) object.version = message.version;
-					if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+					if (message.id != undefined && message.hasOwnProperty("id")) {
+						object.id = message.id;
+					}
+					if (message.version != undefined && message.hasOwnProperty("version")) {
+						object.version = message.version;
+					}
+					if (message.timestamp != undefined && message.hasOwnProperty("timestamp")) {
 						object.timestamp = message.timestamp;
-					if (message.previousBlock != null && message.hasOwnProperty("previousBlock"))
+					}
+					if (message.previousBlock != undefined && message.hasOwnProperty("previousBlock")) {
 						object.previousBlock = message.previousBlock;
-					if (message.previousBlockHex != null && message.hasOwnProperty("previousBlockHex"))
-						object.previousBlockHex = message.previousBlockHex;
-					if (message.height != null && message.hasOwnProperty("height")) object.height = message.height;
-					if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
+					}
+					if (message.height != undefined && message.hasOwnProperty("height")) {
+						object.height = message.height;
+					}
+					if (message.numberOfTransactions != undefined && message.hasOwnProperty("numberOfTransactions")) {
 						object.numberOfTransactions = message.numberOfTransactions;
-					if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
+					}
+					if (message.totalAmount != undefined && message.hasOwnProperty("totalAmount")) {
 						object.totalAmount = message.totalAmount;
-					if (message.totalFee != null && message.hasOwnProperty("totalFee"))
+					}
+					if (message.totalFee != undefined && message.hasOwnProperty("totalFee")) {
 						object.totalFee = message.totalFee;
-					if (message.reward != null && message.hasOwnProperty("reward")) object.reward = message.reward;
-					if (message.payloadLength != null && message.hasOwnProperty("payloadLength"))
+					}
+					if (message.reward != undefined && message.hasOwnProperty("reward")) {
+						object.reward = message.reward;
+					}
+					if (message.payloadLength != undefined && message.hasOwnProperty("payloadLength")) {
 						object.payloadLength = message.payloadLength;
-					if (message.payloadHash != null && message.hasOwnProperty("payloadHash"))
+					}
+					if (message.payloadHash != undefined && message.hasOwnProperty("payloadHash")) {
 						object.payloadHash = message.payloadHash;
-					if (message.generatorPublicKey != null && message.hasOwnProperty("generatorPublicKey"))
+					}
+					if (message.generatorPublicKey != undefined && message.hasOwnProperty("generatorPublicKey")) {
 						object.generatorPublicKey = message.generatorPublicKey;
-					if (message.blockSignature != null && message.hasOwnProperty("blockSignature"))
+					}
+					if (message.blockSignature != undefined && message.hasOwnProperty("blockSignature")) {
 						object.blockSignature = message.blockSignature;
+					}
 					return object;
 				};
 
@@ -1887,9 +2545,13 @@ $root.peer = (function () {
 		GetStatusResponse.Config = (function () {
 			function Config(properties) {
 				this.plugins = {};
-				if (properties)
-					for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-						if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+				if (properties) {
+					for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+						if (properties[keys[index]] != undefined) {
+							this[keys[index]] = properties[keys[index]];
+						}
+					}
+				}
 			}
 
 			Config.prototype.version = "";
@@ -1903,28 +2565,33 @@ $root.peer = (function () {
 			};
 
 			Config.encode = function encode(message, writer) {
-				if (!writer) writer = $Writer.create();
-				if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+				if (!writer) {
+					writer = $Writer.create();
+				}
+				if (message.version != undefined && Object.hasOwnProperty.call(message, "version")) {
 					writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.version);
-				if (message.network != null && Object.hasOwnProperty.call(message, "network"))
+				}
+				if (message.network != undefined && Object.hasOwnProperty.call(message, "network")) {
 					$root.peer.GetStatusResponse.Config.Network.encode(
 						message.network,
 						writer.uint32(/* id 2, wireType 2 =*/ 18).fork(),
 					).ldelim();
-				if (message.plugins != null && Object.hasOwnProperty.call(message, "plugins"))
-					for (var keys = Object.keys(message.plugins), i = 0; i < keys.length; ++i) {
+				}
+				if (message.plugins != undefined && Object.hasOwnProperty.call(message, "plugins")) {
+					for (var keys = Object.keys(message.plugins), index = 0; index < keys.length; ++index) {
 						writer
 							.uint32(/* id 3, wireType 2 =*/ 26)
 							.fork()
 							.uint32(/* id 1, wireType 2 =*/ 10)
-							.string(keys[i]);
+							.string(keys[index]);
 						$root.peer.GetStatusResponse.Config.Plugin.encode(
-							message.plugins[keys[i]],
+							message.plugins[keys[index]],
 							writer.uint32(/* id 2, wireType 2 =*/ 18).fork(),
 						)
 							.ldelim()
 							.ldelim();
 					}
+				}
 				return writer;
 			};
 
@@ -1933,7 +2600,9 @@ $root.peer = (function () {
 			};
 
 			Config.decode = function decode(reader, length) {
-				if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = $Reader.create(reader);
+				}
 				var end = length === undefined ? reader.len : reader.pos + length,
 					message = new $root.peer.GetStatusResponse.Config(),
 					key,
@@ -1951,7 +2620,9 @@ $root.peer = (function () {
 							);
 							break;
 						case 3:
-							if (message.plugins === $util.emptyObject) message.plugins = {};
+							if (message.plugins === $util.emptyObject) {
+								message.plugins = {};
+							}
 							var end2 = reader.uint32() + reader.pos;
 							key = "";
 							value = null;
@@ -1983,47 +2654,69 @@ $root.peer = (function () {
 			};
 
 			Config.decodeDelimited = function decodeDelimited(reader) {
-				if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+				if (!(reader instanceof $Reader)) {
+					reader = new $Reader(reader);
+				}
 				return this.decode(reader, reader.uint32());
 			};
 
 			Config.verify = function verify(message) {
-				if (typeof message !== "object" || message === null) return "object expected";
-				if (message.version != null && message.hasOwnProperty("version"))
-					if (!$util.isString(message.version)) return "version: string expected";
-				if (message.network != null && message.hasOwnProperty("network")) {
-					var error = $root.peer.GetStatusResponse.Config.Network.verify(message.network);
-					if (error) return "network." + error;
+				if (typeof message !== "object" || message === null) {
+					return "object expected";
 				}
-				if (message.plugins != null && message.hasOwnProperty("plugins")) {
-					if (!$util.isObject(message.plugins)) return "plugins: object expected";
+				if (
+					message.version != undefined &&
+					message.hasOwnProperty("version") &&
+					!$util.isString(message.version)
+				) {
+					return "version: string expected";
+				}
+				if (message.network != undefined && message.hasOwnProperty("network")) {
+					var error = $root.peer.GetStatusResponse.Config.Network.verify(message.network);
+					if (error) {
+						return "network." + error;
+					}
+				}
+				if (message.plugins != undefined && message.hasOwnProperty("plugins")) {
+					if (!$util.isObject(message.plugins)) {
+						return "plugins: object expected";
+					}
 					var key = Object.keys(message.plugins);
-					for (var i = 0; i < key.length; ++i) {
-						var error = $root.peer.GetStatusResponse.Config.Plugin.verify(message.plugins[key[i]]);
-						if (error) return "plugins." + error;
+					for (const element of key) {
+						var error = $root.peer.GetStatusResponse.Config.Plugin.verify(message.plugins[element]);
+						if (error) {
+							return "plugins." + error;
+						}
 					}
 				}
 				return null;
 			};
 
 			Config.fromObject = function fromObject(object) {
-				if (object instanceof $root.peer.GetStatusResponse.Config) return object;
+				if (object instanceof $root.peer.GetStatusResponse.Config) {
+					return object;
+				}
 				var message = new $root.peer.GetStatusResponse.Config();
-				if (object.version != null) message.version = String(object.version);
-				if (object.network != null) {
-					if (typeof object.network !== "object")
-						throw TypeError(".peer.GetStatusResponse.Config.network: object expected");
+				if (object.version != undefined) {
+					message.version = String(object.version);
+				}
+				if (object.network != undefined) {
+					if (typeof object.network !== "object") {
+						throw new TypeError(".peer.GetStatusResponse.Config.network: object expected");
+					}
 					message.network = $root.peer.GetStatusResponse.Config.Network.fromObject(object.network);
 				}
 				if (object.plugins) {
-					if (typeof object.plugins !== "object")
-						throw TypeError(".peer.GetStatusResponse.Config.plugins: object expected");
+					if (typeof object.plugins !== "object") {
+						throw new TypeError(".peer.GetStatusResponse.Config.plugins: object expected");
+					}
 					message.plugins = {};
-					for (var keys = Object.keys(object.plugins), i = 0; i < keys.length; ++i) {
-						if (typeof object.plugins[keys[i]] !== "object")
-							throw TypeError(".peer.GetStatusResponse.Config.plugins: object expected");
-						message.plugins[keys[i]] = $root.peer.GetStatusResponse.Config.Plugin.fromObject(
-							object.plugins[keys[i]],
+					for (var keys = Object.keys(object.plugins), index = 0; index < keys.length; ++index) {
+						if (typeof object.plugins[keys[index]] !== "object") {
+							throw new TypeError(".peer.GetStatusResponse.Config.plugins: object expected");
+						}
+						message.plugins[keys[index]] = $root.peer.GetStatusResponse.Config.Plugin.fromObject(
+							object.plugins[keys[index]],
 						);
 					}
 				}
@@ -2031,24 +2724,32 @@ $root.peer = (function () {
 			};
 
 			Config.toObject = function toObject(message, options) {
-				if (!options) options = {};
+				if (!options) {
+					options = {};
+				}
 				var object = {};
-				if (options.objects || options.defaults) object.plugins = {};
+				if (options.objects || options.defaults) {
+					object.plugins = {};
+				}
 				if (options.defaults) {
 					object.version = "";
 					object.network = null;
 				}
-				if (message.version != null && message.hasOwnProperty("version")) object.version = message.version;
-				if (message.network != null && message.hasOwnProperty("network"))
+				if (message.version != undefined && message.hasOwnProperty("version")) {
+					object.version = message.version;
+				}
+				if (message.network != undefined && message.hasOwnProperty("network")) {
 					object.network = $root.peer.GetStatusResponse.Config.Network.toObject(message.network, options);
+				}
 				var keys2;
-				if (message.plugins && (keys2 = Object.keys(message.plugins)).length) {
+				if (message.plugins && (keys2 = Object.keys(message.plugins)).length > 0) {
 					object.plugins = {};
-					for (var j = 0; j < keys2.length; ++j)
-						object.plugins[keys2[j]] = $root.peer.GetStatusResponse.Config.Plugin.toObject(
-							message.plugins[keys2[j]],
+					for (const element of keys2) {
+						object.plugins[element] = $root.peer.GetStatusResponse.Config.Plugin.toObject(
+							message.plugins[element],
 							options,
 						);
+					}
 				}
 				return object;
 			};
@@ -2059,9 +2760,13 @@ $root.peer = (function () {
 
 			Config.Network = (function () {
 				function Network(properties) {
-					if (properties)
-						for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-							if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+					if (properties) {
+						for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+							if (properties[keys[index]] != undefined) {
+								this[keys[index]] = properties[keys[index]];
+							}
+						}
+					}
 				}
 
 				Network.prototype.name = "";
@@ -2079,20 +2784,27 @@ $root.peer = (function () {
 				};
 
 				Network.encode = function encode(message, writer) {
-					if (!writer) writer = $Writer.create();
-					if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+					if (!writer) {
+						writer = $Writer.create();
+					}
+					if (message.name != undefined && Object.hasOwnProperty.call(message, "name")) {
 						writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.name);
-					if (message.nethash != null && Object.hasOwnProperty.call(message, "nethash"))
+					}
+					if (message.nethash != undefined && Object.hasOwnProperty.call(message, "nethash")) {
 						writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.nethash);
-					if (message.explorer != null && Object.hasOwnProperty.call(message, "explorer"))
+					}
+					if (message.explorer != undefined && Object.hasOwnProperty.call(message, "explorer")) {
 						writer.uint32(/* id 3, wireType 2 =*/ 26).string(message.explorer);
-					if (message.token != null && Object.hasOwnProperty.call(message, "token"))
+					}
+					if (message.token != undefined && Object.hasOwnProperty.call(message, "token")) {
 						$root.peer.GetStatusResponse.Config.Network.Token.encode(
 							message.token,
 							writer.uint32(/* id 4, wireType 2 =*/ 34).fork(),
 						).ldelim();
-					if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+					}
+					if (message.version != undefined && Object.hasOwnProperty.call(message, "version")) {
 						writer.uint32(/* id 5, wireType 0 =*/ 40).uint32(message.version);
+					}
 					return writer;
 				};
 
@@ -2101,7 +2813,9 @@ $root.peer = (function () {
 				};
 
 				Network.decode = function decode(reader, length) {
-					if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+					if (!(reader instanceof $Reader)) {
+						reader = $Reader.create(reader);
+					}
 					var end = length === undefined ? reader.len : reader.pos + length,
 						message = new $root.peer.GetStatusResponse.Config.Network();
 					while (reader.pos < end) {
@@ -2134,44 +2848,79 @@ $root.peer = (function () {
 				};
 
 				Network.decodeDelimited = function decodeDelimited(reader) {
-					if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+					if (!(reader instanceof $Reader)) {
+						reader = new $Reader(reader);
+					}
 					return this.decode(reader, reader.uint32());
 				};
 
 				Network.verify = function verify(message) {
-					if (typeof message !== "object" || message === null) return "object expected";
-					if (message.name != null && message.hasOwnProperty("name"))
-						if (!$util.isString(message.name)) return "name: string expected";
-					if (message.nethash != null && message.hasOwnProperty("nethash"))
-						if (!$util.isString(message.nethash)) return "nethash: string expected";
-					if (message.explorer != null && message.hasOwnProperty("explorer"))
-						if (!$util.isString(message.explorer)) return "explorer: string expected";
-					if (message.token != null && message.hasOwnProperty("token")) {
-						var error = $root.peer.GetStatusResponse.Config.Network.Token.verify(message.token);
-						if (error) return "token." + error;
+					if (typeof message !== "object" || message === null) {
+						return "object expected";
 					}
-					if (message.version != null && message.hasOwnProperty("version"))
-						if (!$util.isInteger(message.version)) return "version: integer expected";
+					if (message.name != undefined && message.hasOwnProperty("name") && !$util.isString(message.name)) {
+						return "name: string expected";
+					}
+					if (
+						message.nethash != undefined &&
+						message.hasOwnProperty("nethash") &&
+						!$util.isString(message.nethash)
+					) {
+						return "nethash: string expected";
+					}
+					if (
+						message.explorer != undefined &&
+						message.hasOwnProperty("explorer") &&
+						!$util.isString(message.explorer)
+					) {
+						return "explorer: string expected";
+					}
+					if (message.token != undefined && message.hasOwnProperty("token")) {
+						var error = $root.peer.GetStatusResponse.Config.Network.Token.verify(message.token);
+						if (error) {
+							return "token." + error;
+						}
+					}
+					if (
+						message.version != undefined &&
+						message.hasOwnProperty("version") &&
+						!$util.isInteger(message.version)
+					) {
+						return "version: integer expected";
+					}
 					return null;
 				};
 
 				Network.fromObject = function fromObject(object) {
-					if (object instanceof $root.peer.GetStatusResponse.Config.Network) return object;
+					if (object instanceof $root.peer.GetStatusResponse.Config.Network) {
+						return object;
+					}
 					var message = new $root.peer.GetStatusResponse.Config.Network();
-					if (object.name != null) message.name = String(object.name);
-					if (object.nethash != null) message.nethash = String(object.nethash);
-					if (object.explorer != null) message.explorer = String(object.explorer);
-					if (object.token != null) {
-						if (typeof object.token !== "object")
-							throw TypeError(".peer.GetStatusResponse.Config.Network.token: object expected");
+					if (object.name != undefined) {
+						message.name = String(object.name);
+					}
+					if (object.nethash != undefined) {
+						message.nethash = String(object.nethash);
+					}
+					if (object.explorer != undefined) {
+						message.explorer = String(object.explorer);
+					}
+					if (object.token != undefined) {
+						if (typeof object.token !== "object") {
+							throw new TypeError(".peer.GetStatusResponse.Config.Network.token: object expected");
+						}
 						message.token = $root.peer.GetStatusResponse.Config.Network.Token.fromObject(object.token);
 					}
-					if (object.version != null) message.version = object.version >>> 0;
+					if (object.version != undefined) {
+						message.version = object.version >>> 0;
+					}
 					return message;
 				};
 
 				Network.toObject = function toObject(message, options) {
-					if (!options) options = {};
+					if (!options) {
+						options = {};
+					}
 					var object = {};
 					if (options.defaults) {
 						object.name = "";
@@ -2180,16 +2929,24 @@ $root.peer = (function () {
 						object.token = null;
 						object.version = 0;
 					}
-					if (message.name != null && message.hasOwnProperty("name")) object.name = message.name;
-					if (message.nethash != null && message.hasOwnProperty("nethash")) object.nethash = message.nethash;
-					if (message.explorer != null && message.hasOwnProperty("explorer"))
+					if (message.name != undefined && message.hasOwnProperty("name")) {
+						object.name = message.name;
+					}
+					if (message.nethash != undefined && message.hasOwnProperty("nethash")) {
+						object.nethash = message.nethash;
+					}
+					if (message.explorer != undefined && message.hasOwnProperty("explorer")) {
 						object.explorer = message.explorer;
-					if (message.token != null && message.hasOwnProperty("token"))
+					}
+					if (message.token != undefined && message.hasOwnProperty("token")) {
 						object.token = $root.peer.GetStatusResponse.Config.Network.Token.toObject(
 							message.token,
 							options,
 						);
-					if (message.version != null && message.hasOwnProperty("version")) object.version = message.version;
+					}
+					if (message.version != undefined && message.hasOwnProperty("version")) {
+						object.version = message.version;
+					}
 					return object;
 				};
 
@@ -2199,9 +2956,13 @@ $root.peer = (function () {
 
 				Network.Token = (function () {
 					function Token(properties) {
-						if (properties)
-							for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-								if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+						if (properties) {
+							for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+								if (properties[keys[index]] != undefined) {
+									this[keys[index]] = properties[keys[index]];
+								}
+							}
+						}
 					}
 
 					Token.prototype.name = "";
@@ -2213,11 +2974,15 @@ $root.peer = (function () {
 					};
 
 					Token.encode = function encode(message, writer) {
-						if (!writer) writer = $Writer.create();
-						if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+						if (!writer) {
+							writer = $Writer.create();
+						}
+						if (message.name != undefined && Object.hasOwnProperty.call(message, "name")) {
 							writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.name);
-						if (message.symbol != null && Object.hasOwnProperty.call(message, "symbol"))
+						}
+						if (message.symbol != undefined && Object.hasOwnProperty.call(message, "symbol")) {
 							writer.uint32(/* id 2, wireType 2 =*/ 18).string(message.symbol);
+						}
 						return writer;
 					};
 
@@ -2226,7 +2991,9 @@ $root.peer = (function () {
 					};
 
 					Token.decode = function decode(reader, length) {
-						if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+						if (!(reader instanceof $Reader)) {
+							reader = $Reader.create(reader);
+						}
 						var end = length === undefined ? reader.len : reader.pos + length,
 							message = new $root.peer.GetStatusResponse.Config.Network.Token();
 						while (reader.pos < end) {
@@ -2247,36 +3014,62 @@ $root.peer = (function () {
 					};
 
 					Token.decodeDelimited = function decodeDelimited(reader) {
-						if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+						if (!(reader instanceof $Reader)) {
+							reader = new $Reader(reader);
+						}
 						return this.decode(reader, reader.uint32());
 					};
 
 					Token.verify = function verify(message) {
-						if (typeof message !== "object" || message === null) return "object expected";
-						if (message.name != null && message.hasOwnProperty("name"))
-							if (!$util.isString(message.name)) return "name: string expected";
-						if (message.symbol != null && message.hasOwnProperty("symbol"))
-							if (!$util.isString(message.symbol)) return "symbol: string expected";
+						if (typeof message !== "object" || message === null) {
+							return "object expected";
+						}
+						if (
+							message.name != undefined &&
+							message.hasOwnProperty("name") &&
+							!$util.isString(message.name)
+						) {
+							return "name: string expected";
+						}
+						if (
+							message.symbol != undefined &&
+							message.hasOwnProperty("symbol") &&
+							!$util.isString(message.symbol)
+						) {
+							return "symbol: string expected";
+						}
 						return null;
 					};
 
 					Token.fromObject = function fromObject(object) {
-						if (object instanceof $root.peer.GetStatusResponse.Config.Network.Token) return object;
+						if (object instanceof $root.peer.GetStatusResponse.Config.Network.Token) {
+							return object;
+						}
 						var message = new $root.peer.GetStatusResponse.Config.Network.Token();
-						if (object.name != null) message.name = String(object.name);
-						if (object.symbol != null) message.symbol = String(object.symbol);
+						if (object.name != undefined) {
+							message.name = String(object.name);
+						}
+						if (object.symbol != undefined) {
+							message.symbol = String(object.symbol);
+						}
 						return message;
 					};
 
 					Token.toObject = function toObject(message, options) {
-						if (!options) options = {};
+						if (!options) {
+							options = {};
+						}
 						var object = {};
 						if (options.defaults) {
 							object.name = "";
 							object.symbol = "";
 						}
-						if (message.name != null && message.hasOwnProperty("name")) object.name = message.name;
-						if (message.symbol != null && message.hasOwnProperty("symbol")) object.symbol = message.symbol;
+						if (message.name != undefined && message.hasOwnProperty("name")) {
+							object.name = message.name;
+						}
+						if (message.symbol != undefined && message.hasOwnProperty("symbol")) {
+							object.symbol = message.symbol;
+						}
 						return object;
 					};
 
@@ -2292,9 +3085,13 @@ $root.peer = (function () {
 
 			Config.Plugin = (function () {
 				function Plugin(properties) {
-					if (properties)
-						for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-							if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+					if (properties) {
+						for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+							if (properties[keys[index]] != undefined) {
+								this[keys[index]] = properties[keys[index]];
+							}
+						}
+					}
 				}
 
 				Plugin.prototype.port = 0;
@@ -2308,13 +3105,21 @@ $root.peer = (function () {
 				};
 
 				Plugin.encode = function encode(message, writer) {
-					if (!writer) writer = $Writer.create();
-					if (message.port != null && Object.hasOwnProperty.call(message, "port"))
+					if (!writer) {
+						writer = $Writer.create();
+					}
+					if (message.port != undefined && Object.hasOwnProperty.call(message, "port")) {
 						writer.uint32(/* id 1, wireType 0 =*/ 8).uint32(message.port);
-					if (message.enabled != null && Object.hasOwnProperty.call(message, "enabled"))
+					}
+					if (message.enabled != undefined && Object.hasOwnProperty.call(message, "enabled")) {
 						writer.uint32(/* id 2, wireType 0 =*/ 16).bool(message.enabled);
-					if (message.estimateTotalCount != null && Object.hasOwnProperty.call(message, "estimateTotalCount"))
+					}
+					if (
+						message.estimateTotalCount != undefined &&
+						Object.hasOwnProperty.call(message, "estimateTotalCount")
+					) {
 						writer.uint32(/* id 3, wireType 0 =*/ 24).bool(message.estimateTotalCount);
+					}
 					return writer;
 				};
 
@@ -2323,7 +3128,9 @@ $root.peer = (function () {
 				};
 
 				Plugin.decode = function decode(reader, length) {
-					if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+					if (!(reader instanceof $Reader)) {
+						reader = $Reader.create(reader);
+					}
 					var end = length === undefined ? reader.len : reader.pos + length,
 						message = new $root.peer.GetStatusResponse.Config.Plugin();
 					while (reader.pos < end) {
@@ -2347,44 +3154,72 @@ $root.peer = (function () {
 				};
 
 				Plugin.decodeDelimited = function decodeDelimited(reader) {
-					if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+					if (!(reader instanceof $Reader)) {
+						reader = new $Reader(reader);
+					}
 					return this.decode(reader, reader.uint32());
 				};
 
 				Plugin.verify = function verify(message) {
-					if (typeof message !== "object" || message === null) return "object expected";
-					if (message.port != null && message.hasOwnProperty("port"))
-						if (!$util.isInteger(message.port)) return "port: integer expected";
-					if (message.enabled != null && message.hasOwnProperty("enabled"))
-						if (typeof message.enabled !== "boolean") return "enabled: boolean expected";
-					if (message.estimateTotalCount != null && message.hasOwnProperty("estimateTotalCount"))
-						if (typeof message.estimateTotalCount !== "boolean")
-							return "estimateTotalCount: boolean expected";
+					if (typeof message !== "object" || message === null) {
+						return "object expected";
+					}
+					if (message.port != undefined && message.hasOwnProperty("port") && !$util.isInteger(message.port)) {
+						return "port: integer expected";
+					}
+					if (
+						message.enabled != undefined &&
+						message.hasOwnProperty("enabled") &&
+						typeof message.enabled !== "boolean"
+					) {
+						return "enabled: boolean expected";
+					}
+					if (
+						message.estimateTotalCount != undefined &&
+						message.hasOwnProperty("estimateTotalCount") &&
+						typeof message.estimateTotalCount !== "boolean"
+					) {
+						return "estimateTotalCount: boolean expected";
+					}
 					return null;
 				};
 
 				Plugin.fromObject = function fromObject(object) {
-					if (object instanceof $root.peer.GetStatusResponse.Config.Plugin) return object;
+					if (object instanceof $root.peer.GetStatusResponse.Config.Plugin) {
+						return object;
+					}
 					var message = new $root.peer.GetStatusResponse.Config.Plugin();
-					if (object.port != null) message.port = object.port >>> 0;
-					if (object.enabled != null) message.enabled = Boolean(object.enabled);
-					if (object.estimateTotalCount != null)
+					if (object.port != undefined) {
+						message.port = object.port >>> 0;
+					}
+					if (object.enabled != undefined) {
+						message.enabled = Boolean(object.enabled);
+					}
+					if (object.estimateTotalCount != undefined) {
 						message.estimateTotalCount = Boolean(object.estimateTotalCount);
+					}
 					return message;
 				};
 
 				Plugin.toObject = function toObject(message, options) {
-					if (!options) options = {};
+					if (!options) {
+						options = {};
+					}
 					var object = {};
 					if (options.defaults) {
 						object.port = 0;
 						object.enabled = false;
 						object.estimateTotalCount = false;
 					}
-					if (message.port != null && message.hasOwnProperty("port")) object.port = message.port;
-					if (message.enabled != null && message.hasOwnProperty("enabled")) object.enabled = message.enabled;
-					if (message.estimateTotalCount != null && message.hasOwnProperty("estimateTotalCount"))
+					if (message.port != undefined && message.hasOwnProperty("port")) {
+						object.port = message.port;
+					}
+					if (message.enabled != undefined && message.hasOwnProperty("enabled")) {
+						object.enabled = message.enabled;
+					}
+					if (message.estimateTotalCount != undefined && message.hasOwnProperty("estimateTotalCount")) {
 						object.estimateTotalCount = message.estimateTotalCount;
+					}
 					return object;
 				};
 
@@ -2409,9 +3244,13 @@ $root.shared = (function () {
 
 	shared.Headers = (function () {
 		function Headers(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		Headers.prototype.version = "";
@@ -2421,9 +3260,12 @@ $root.shared = (function () {
 		};
 
 		Headers.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.version != undefined && Object.hasOwnProperty.call(message, "version")) {
 				writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.version);
+			}
 			return writer;
 		};
 
@@ -2432,7 +3274,9 @@ $root.shared = (function () {
 		};
 
 		Headers.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.shared.Headers();
 			while (reader.pos < end) {
@@ -2450,29 +3294,44 @@ $root.shared = (function () {
 		};
 
 		Headers.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		Headers.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.version != null && message.hasOwnProperty("version"))
-				if (!$util.isString(message.version)) return "version: string expected";
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (message.version != undefined && message.hasOwnProperty("version") && !$util.isString(message.version)) {
+				return "version: string expected";
+			}
 			return null;
 		};
 
 		Headers.fromObject = function fromObject(object) {
-			if (object instanceof $root.shared.Headers) return object;
+			if (object instanceof $root.shared.Headers) {
+				return object;
+			}
 			var message = new $root.shared.Headers();
-			if (object.version != null) message.version = String(object.version);
+			if (object.version != undefined) {
+				message.version = String(object.version);
+			}
 			return message;
 		};
 
 		Headers.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
-			if (options.defaults) object.version = "";
-			if (message.version != null && message.hasOwnProperty("version")) object.version = message.version;
+			if (options.defaults) {
+				object.version = "";
+			}
+			if (message.version != undefined && message.hasOwnProperty("version")) {
+				object.version = message.version;
+			}
 			return object;
 		};
 
@@ -2491,9 +3350,13 @@ $root.transactions = (function () {
 
 	transactions.PostTransactionsRequest = (function () {
 		function PostTransactionsRequest(properties) {
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		PostTransactionsRequest.prototype.transactions = $util.newBuffer([]);
@@ -2505,11 +3368,15 @@ $root.transactions = (function () {
 		};
 
 		PostTransactionsRequest.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.transactions != null && Object.hasOwnProperty.call(message, "transactions"))
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.transactions != undefined && Object.hasOwnProperty.call(message, "transactions")) {
 				writer.uint32(/* id 1, wireType 2 =*/ 10).bytes(message.transactions);
-			if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+			}
+			if (message.headers != undefined && Object.hasOwnProperty.call(message, "headers")) {
 				$root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/ 18).fork()).ldelim();
+			}
 			return writer;
 		};
 
@@ -2518,7 +3385,9 @@ $root.transactions = (function () {
 		};
 
 		PostTransactionsRequest.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.transactions.PostTransactionsRequest();
 			while (reader.pos < end) {
@@ -2539,66 +3408,87 @@ $root.transactions = (function () {
 		};
 
 		PostTransactionsRequest.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		PostTransactionsRequest.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.transactions != null && message.hasOwnProperty("transactions"))
-				if (
-					!(
-						(message.transactions && typeof message.transactions.length === "number") ||
-						$util.isString(message.transactions)
-					)
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (
+				message.transactions != undefined &&
+				message.hasOwnProperty("transactions") &&
+				!(
+					(message.transactions && typeof message.transactions.length === "number") ||
+					$util.isString(message.transactions)
 				)
-					return "transactions: buffer expected";
-			if (message.headers != null && message.hasOwnProperty("headers")) {
+			) {
+				return "transactions: buffer expected";
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				var error = $root.shared.Headers.verify(message.headers);
-				if (error) return "headers." + error;
+				if (error) {
+					return "headers." + error;
+				}
 			}
 			return null;
 		};
 
 		PostTransactionsRequest.fromObject = function fromObject(object) {
-			if (object instanceof $root.transactions.PostTransactionsRequest) return object;
+			if (object instanceof $root.transactions.PostTransactionsRequest) {
+				return object;
+			}
 			var message = new $root.transactions.PostTransactionsRequest();
-			if (object.transactions != null)
-				if (typeof object.transactions === "string")
+			if (object.transactions != undefined) {
+				if (typeof object.transactions === "string") {
 					$util.base64.decode(
 						object.transactions,
 						(message.transactions = $util.newBuffer($util.base64.length(object.transactions))),
 						0,
 					);
-				else if (object.transactions.length) message.transactions = object.transactions;
-			if (object.headers != null) {
-				if (typeof object.headers !== "object")
-					throw TypeError(".transactions.PostTransactionsRequest.headers: object expected");
+				} else if (object.transactions.length > 0) {
+					message.transactions = object.transactions;
+				}
+			}
+			if (object.headers != undefined) {
+				if (typeof object.headers !== "object") {
+					throw new TypeError(".transactions.PostTransactionsRequest.headers: object expected");
+				}
 				message.headers = $root.shared.Headers.fromObject(object.headers);
 			}
 			return message;
 		};
 
 		PostTransactionsRequest.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
 			if (options.defaults) {
-				if (options.bytes === String) object.transactions = "";
-				else {
+				if (options.bytes === String) {
+					object.transactions = "";
+				} else {
 					object.transactions = [];
-					if (options.bytes !== Array) object.transactions = $util.newBuffer(object.transactions);
+					if (options.bytes !== Array) {
+						object.transactions = $util.newBuffer(object.transactions);
+					}
 				}
 				object.headers = null;
 			}
-			if (message.transactions != null && message.hasOwnProperty("transactions"))
+			if (message.transactions != undefined && message.hasOwnProperty("transactions")) {
 				object.transactions =
 					options.bytes === String
 						? $util.base64.encode(message.transactions, 0, message.transactions.length)
 						: options.bytes === Array
 						? Array.prototype.slice.call(message.transactions)
 						: message.transactions;
-			if (message.headers != null && message.hasOwnProperty("headers"))
+			}
+			if (message.headers != undefined && message.hasOwnProperty("headers")) {
 				object.headers = $root.shared.Headers.toObject(message.headers, options);
+			}
 			return object;
 		};
 
@@ -2612,9 +3502,13 @@ $root.transactions = (function () {
 	transactions.PostTransactionsResponse = (function () {
 		function PostTransactionsResponse(properties) {
 			this.accept = [];
-			if (properties)
-				for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-					if (properties[keys[i]] != null) this[keys[i]] = properties[keys[i]];
+			if (properties) {
+				for (var keys = Object.keys(properties), index = 0; index < keys.length; ++index) {
+					if (properties[keys[index]] != undefined) {
+						this[keys[index]] = properties[keys[index]];
+					}
+				}
+			}
 		}
 
 		PostTransactionsResponse.prototype.accept = $util.emptyArray;
@@ -2624,10 +3518,14 @@ $root.transactions = (function () {
 		};
 
 		PostTransactionsResponse.encode = function encode(message, writer) {
-			if (!writer) writer = $Writer.create();
-			if (message.accept != null && message.accept.length)
-				for (var i = 0; i < message.accept.length; ++i)
-					writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.accept[i]);
+			if (!writer) {
+				writer = $Writer.create();
+			}
+			if (message.accept != undefined && message.accept.length > 0) {
+				for (var index = 0; index < message.accept.length; ++index) {
+					writer.uint32(/* id 1, wireType 2 =*/ 10).string(message.accept[index]);
+				}
+			}
 			return writer;
 		};
 
@@ -2636,14 +3534,18 @@ $root.transactions = (function () {
 		};
 
 		PostTransactionsResponse.decode = function decode(reader, length) {
-			if (!(reader instanceof $Reader)) reader = $Reader.create(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = $Reader.create(reader);
+			}
 			var end = length === undefined ? reader.len : reader.pos + length,
 				message = new $root.transactions.PostTransactionsResponse();
 			while (reader.pos < end) {
 				var tag = reader.uint32();
 				switch (tag >>> 3) {
 					case 1:
-						if (!(message.accept && message.accept.length)) message.accept = [];
+						if (!(message.accept && message.accept.length > 0)) {
+							message.accept = [];
+						}
 						message.accept.push(reader.string());
 						break;
 					default:
@@ -2655,39 +3557,59 @@ $root.transactions = (function () {
 		};
 
 		PostTransactionsResponse.decodeDelimited = function decodeDelimited(reader) {
-			if (!(reader instanceof $Reader)) reader = new $Reader(reader);
+			if (!(reader instanceof $Reader)) {
+				reader = new $Reader(reader);
+			}
 			return this.decode(reader, reader.uint32());
 		};
 
 		PostTransactionsResponse.verify = function verify(message) {
-			if (typeof message !== "object" || message === null) return "object expected";
-			if (message.accept != null && message.hasOwnProperty("accept")) {
-				if (!Array.isArray(message.accept)) return "accept: array expected";
-				for (var i = 0; i < message.accept.length; ++i)
-					if (!$util.isString(message.accept[i])) return "accept: string[] expected";
+			if (typeof message !== "object" || message === null) {
+				return "object expected";
+			}
+			if (message.accept != undefined && message.hasOwnProperty("accept")) {
+				if (!Array.isArray(message.accept)) {
+					return "accept: array expected";
+				}
+				for (var index = 0; index < message.accept.length; ++index) {
+					if (!$util.isString(message.accept[index])) {
+						return "accept: string[] expected";
+					}
+				}
 			}
 			return null;
 		};
 
 		PostTransactionsResponse.fromObject = function fromObject(object) {
-			if (object instanceof $root.transactions.PostTransactionsResponse) return object;
+			if (object instanceof $root.transactions.PostTransactionsResponse) {
+				return object;
+			}
 			var message = new $root.transactions.PostTransactionsResponse();
 			if (object.accept) {
-				if (!Array.isArray(object.accept))
-					throw TypeError(".transactions.PostTransactionsResponse.accept: array expected");
+				if (!Array.isArray(object.accept)) {
+					throw new TypeError(".transactions.PostTransactionsResponse.accept: array expected");
+				}
 				message.accept = [];
-				for (var i = 0; i < object.accept.length; ++i) message.accept[i] = String(object.accept[i]);
+				for (var index = 0; index < object.accept.length; ++index) {
+					message.accept[index] = String(object.accept[index]);
+				}
 			}
 			return message;
 		};
 
 		PostTransactionsResponse.toObject = function toObject(message, options) {
-			if (!options) options = {};
+			if (!options) {
+				options = {};
+			}
 			var object = {};
-			if (options.arrays || options.defaults) object.accept = [];
-			if (message.accept && message.accept.length) {
+			if (options.arrays || options.defaults) {
 				object.accept = [];
-				for (var j = 0; j < message.accept.length; ++j) object.accept[j] = message.accept[j];
+			}
+			if (message.accept && message.accept.length > 0) {
+				object.accept = [];
+				for (var index = 0; index < message.accept.length; ++index) {
+					object.accept[index] = message.accept[index];
+				}
 			}
 			return object;
 		};

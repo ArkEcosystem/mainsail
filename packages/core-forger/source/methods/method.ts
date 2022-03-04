@@ -39,7 +39,6 @@ export abstract class Method {
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength: 32 * transactions.length,
 				previousBlock: options.previousBlock.id,
-				previousBlockHex: options.previousBlock.idHex,
 				reward: options.reward,
 				timestamp: options.timestamp,
 				totalAmount: totals.amount,
