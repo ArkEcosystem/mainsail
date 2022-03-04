@@ -35,7 +35,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	public async make(data: any, keys: Contracts.Crypto.IKeyPair): Promise<Contracts.Crypto.IBlock | undefined> {
 		data.generatorPublicKey = keys.publicKey;
 
-		const payloadHash: Buffer = this.serializer.serialize(data, false);
+		const payloadHash: Buffer = await this.serializer.serialize(data, false);
 		const hash: Buffer = await this.hashFactory.sha256(payloadHash);
 
 		data.blockSignature = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));

@@ -88,7 +88,7 @@ export interface IBlockFactory {
 export interface IBlockSerializer {
 	size(block: IBlock): number;
 
-	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
+	serialize(block: IBlockData, includeSignature?: boolean): Promise<Buffer>;
 
-	serialize(block: IBlockData, includeSignature?: boolean): Buffer;
+	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
 }

@@ -38,6 +38,7 @@ export const Identifiers = {
 			PublicKeySerializer: Symbol.for("Crypto<Identity.PublicKeySerializer>"),
 			WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
 		},
+		Serializer: Symbol.for("Crypto<Serializer>"),
 		Signature: Symbol.for("Crypto<Signature>"),
 		Time: {
 			BlockTimeCalculator: Symbol.for("Crypto<Time.BlockTimeCalculator>"),

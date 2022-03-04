@@ -29,6 +29,9 @@
 				"package": "@arkecosystem/core-crypto-wif"
 			},
 			{
+				"package": "@arkecosystem/core-serializer"
+			},
+			{
 				"package": "@arkecosystem/core-crypto-block"
 			},
 			{

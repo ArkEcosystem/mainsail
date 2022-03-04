@@ -64,7 +64,7 @@ export class Block implements Contracts.Crypto.IBlock {
 	}
 
 	public async verifySignature(): Promise<boolean> {
-		const bytes: Buffer = this.serializer.serialize(this.data, false);
+		const bytes: Buffer = await this.serializer.serialize(this.data, false);
 		const hash: Buffer = await this.hashFactory.sha256(bytes);
 
 		if (!this.data.blockSignature) {

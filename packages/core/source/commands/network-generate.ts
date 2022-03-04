@@ -839,7 +839,7 @@ export class Command extends Commands.Command {
 				await this.app
 					.get<BaseContracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
 					.sha256(
-						this.app
+						await this.app
 							.get<BaseContracts.Crypto.IBlockSerializer>(Identifiers.Cryptography.Block.Serializer)
 							.serialize(block, false),
 					),

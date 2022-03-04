@@ -61,6 +61,7 @@
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-logger-pino": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
+		"@arkecosystem/core-serializer": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",

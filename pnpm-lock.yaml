@@ -157,6 +157,7 @@ importers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-logger-pino': workspace:*
       '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/core-transaction-pool': workspace:*
       '@arkecosystem/core-transactions': workspace:*
@@ -208,6 +209,7 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
       '@arkecosystem/core-p2p': link:../core-p2p
+      '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
       '@arkecosystem/core-transactions': link:../core-transactions
@@ -1352,6 +1354,20 @@ importers:
       '@types/hapi__sntp': 3.1.2
       '@types/ip': 1.1.0
       '@types/semver': 6.2.3
+
+  packages/core-serializer:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
+      bytebuffer: 5.0.1
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
+      bytebuffer: 5.0.1
 
   packages/core-state:
     specifiers:

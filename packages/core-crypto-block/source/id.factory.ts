@@ -12,6 +12,6 @@ export class IDFactory {
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer
 
 	public async make(data: Contracts.Crypto.IBlockData): Promise<string> {
-		return (await this.hashFactory.sha256(this.serializer.serialize(data))).toString("hex");
+		return (await this.hashFactory.sha256(await this.serializer.serialize(data))).toString("hex");
 	}
 }
