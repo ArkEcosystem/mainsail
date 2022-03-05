@@ -1,9 +1,8 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { NetworkStateStatus } from "@arkecosystem/core-p2p";
-import { injectable, inject } from "@arkecosystem/core-container";
+import { Enums, Services, Utils as AppUtils, Utils } from "@arkecosystem/core-kernel";
+import { DatabaseInteraction } from "@arkecosystem/core-state";
 
-import { Client } from "./client";
 import { Validator } from "./interfaces";
 
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
@@ -12,19 +11,41 @@ export class ForgerService {
 	@inject(Identifiers.Application)
 	private readonly app: Contracts.Kernel.Application;
 
+	@inject(Identifiers.BlockchainService)
+	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+
+	@inject(Identifiers.TransactionPoolCollator)
+	private readonly collator!: Contracts.TransactionPool.Collator;
+
+	@inject(Identifiers.EventDispatcherService)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.TransactionHandlerProvider)
 	private readonly handlerProvider: Contracts.Transactions.ITransactionHandlerProvider;
 
+	@inject(Identifiers.PeerNetworkMonitor)
+	private readonly peerNetworkMonitor!: Contracts.P2P.NetworkMonitor;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
+	@inject(Identifiers.TransactionPoolService)
+	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	private client!: Client;
+	@inject(Identifiers.DatabaseInteraction)
+	private readonly databaseInteraction!: DatabaseInteraction;
+
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots!: any;
+
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly serializer: Contracts.Crypto.IBlockSerializer;
+
+	@inject(Identifiers.Cryptography.Block.Deserializer)
+	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
 
 	private validators: Validator[] = [];
 
@@ -45,16 +66,11 @@ export class ForgerService {
 	}
 
 	public getRemainingSlotTime(): number | undefined {
-		return this.round ? this.getRoundRemainingSlotTime(this.round) : undefined;
+		return this.round ? this.#getRoundRemainingSlotTime(this.round) : undefined;
 	}
 
 	public getLastForgedBlock(): Contracts.Crypto.IBlock | undefined {
 		return this.lastForgedBlock;
-	}
-
-	public register(options): void {
-		this.client = this.app.resolve<Client>(Client);
-		this.client.register(options.hosts);
 	}
 
 	public async boot(validators: Validator[]): Promise<void> {
@@ -66,20 +82,18 @@ export class ForgerService {
 
 		let timeout = 2000;
 		try {
-			await this.loadRound();
+			await this.#loadRound();
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
-			timeout = Math.max(0, this.getRoundRemainingSlotTime(this.round));
+			timeout = Math.max(0, this.#getRoundRemainingSlotTime(this.round));
 		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {
-			this.checkLater(timeout);
+			this.#checkLater(timeout);
 		}
 	}
 
 	public async dispose(): Promise<void> {
 		this.isStopped = true;
-
-		this.client.dispose();
 	}
 
 	public async checkSlot(): Promise<void> {
@@ -88,36 +102,36 @@ export class ForgerService {
 				return;
 			}
 
-			await this.loadRound();
+			await this.#loadRound();
 
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
 
 			if (!this.round.canForge) {
 				// basically looping until we lock at beginning of next slot
-				return this.checkLater(200);
+				return this.#checkLater(200);
 			}
 
 			AppUtils.assert.defined<string>(this.round.currentForger.publicKey);
 
-			const validator: Validator | undefined = this.isActiveValidator(this.round.currentForger.publicKey);
+			const validator: Validator | undefined = this.#isActiveValidator(this.round.currentForger.publicKey);
 
 			if (!validator) {
 				AppUtils.assert.defined<string>(this.round.nextForger.publicKey);
 
-				if (this.isActiveValidator(this.round.nextForger.publicKey)) {
+				if (this.#isActiveValidator(this.round.nextForger.publicKey)) {
 					const username = this.usernames[this.round.nextForger.publicKey];
 
 					this.logger.info(
 						`Next forging validator ${username} (${this.round.nextForger.publicKey}) is active on this node.`,
 					);
 
-					await this.client.syncWithNetwork();
+					await this.blockchain.forceWakeup();
 				}
 
-				return this.checkLater(this.getRoundRemainingSlotTime(this.round));
+				return this.#checkLater(this.#getRoundRemainingSlotTime(this.round));
 			}
 
-			const networkState: Contracts.P2P.NetworkState = await this.client.getNetworkState();
+			const networkState: Contracts.P2P.NetworkState = await this.peerNetworkMonitor.getNetworkState();
 
 			if (networkState.getNodeHeight() !== this.round.lastBlock.height) {
 				this.logger.warning(
@@ -130,16 +144,16 @@ export class ForgerService {
 			if (
 				await this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("isForgingAllowed", { validator, forgerService: this, networkState })
+					.call("isForgingAllowed", { forgerService: this, networkState, validator })
 			) {
 				await this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("forgeNewBlock", { validator, forgerService: this, networkState, round: this.round });
+					.call("forgeNewBlock", { forgerService: this, networkState, round: this.round, validator });
 			}
 
 			this.logAppReady = true;
 
-			return this.checkLater(this.getRoundRemainingSlotTime(this.round));
+			return this.#checkLater(this.#getRoundRemainingSlotTime(this.round));
 		} catch (error) {
 			if (
 				error instanceof Exceptions.HostNoResponseError ||
@@ -162,11 +176,11 @@ export class ForgerService {
 					);
 				}
 
-				this.client.emitEvent(Enums.ForgerEvent.Failed, { error: error.message });
+				this.events.dispatch(Enums.ForgerEvent.Failed, { error: error.message });
 			}
 
 			// no idea when this will be ok, so waiting 2s before checking again
-			return this.checkLater(2000);
+			return this.#checkLater(2000);
 		}
 	}
 
@@ -178,7 +192,7 @@ export class ForgerService {
 		AppUtils.assert.defined<number>(networkState.getNodeHeight());
 		this.configuration.setHeight(networkState.getNodeHeight()!);
 
-		const transactions: Contracts.Crypto.ITransactionData[] = await this.getTransactionsForForging();
+		const transactions: Contracts.Crypto.ITransactionData[] = await this.#getTransactionsForForging();
 
 		const block: Contracts.Crypto.IBlock | undefined = await validator.forge(transactions, {
 			previousBlock: {
@@ -193,19 +207,19 @@ export class ForgerService {
 		AppUtils.assert.defined<string>(validator.publicKey);
 
 		const minimumMs = 2000;
-		const timeLeftInMs: number = this.getRoundRemainingSlotTime(round);
+		const timeLeftInMs: number = this.#getRoundRemainingSlotTime(round);
 		const prettyName = `${this.usernames[validator.publicKey]} (${validator.publicKey})`;
 
 		if (timeLeftInMs >= minimumMs) {
 			this.logger.info(`Forged new block ${block.data.id} by validator ${prettyName}`);
 
-			await this.client.broadcastBlock(block);
+			await this.#broadcastBlock(block);
 
 			this.lastForgedBlock = block;
-			this.client.emitEvent(Enums.BlockEvent.Forged, block.data);
+			this.events.dispatch(Enums.BlockEvent.Forged, block.data);
 
 			for (const transaction of transactions) {
-				this.client.emitEvent(Enums.TransactionEvent.Forged, transaction);
+				this.events.dispatch(Enums.TransactionEvent.Forged, transaction);
 			}
 		} else if (timeLeftInMs > 0) {
 			this.logger.warning(
@@ -216,85 +230,32 @@ export class ForgerService {
 		}
 	}
 
-	public async getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
-		const response = await this.client.getTransactions();
-		if (AppUtils.isEmpty(response)) {
+	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
+		const transactions: Contracts.Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
+
+		if (AppUtils.isEmpty(transactions)) {
 			this.logger.error("Could not get unconfirmed transactions from transaction pool.");
 			return [];
 		}
 
-		const transactions = [];
-		for (let index = 0; index < response.transactions.length; index++) {
-			transactions.push(
-				(await this.transactionFactory.fromBytesUnsafe(Buffer.from(response.transactions[index], "hex"))).data,
-			);
-		}
-
 		this.logger.debug(
 			`Received ${AppUtils.pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${AppUtils.pluralize("transaction", response.poolSize, true)} total`,
-		);
-		return transactions;
-	}
-
-	public isForgingAllowed(networkState: Contracts.P2P.NetworkState, validator: Validator): boolean {
-		switch (networkState.status) {
-			case NetworkStateStatus.Unknown: {
-				this.logger.info("Failed to get network state from client. Will not forge.");
-				return false;
-			}
-			case NetworkStateStatus.ColdStart: {
-				this.logger.info("Skipping slot because of cold start. Will not forge.");
-				return false;
-			}
-			case NetworkStateStatus.BelowMinimumPeers: {
-				this.logger.info("Network reach is not sufficient to get quorum. Will not forge.");
-				return false;
-			}
-			// No default
-		}
-
-		const overHeightBlockHeaders: Array<{
-			[id: string]: any;
-		}> = networkState.getOverHeightBlockHeaders();
-		if (overHeightBlockHeaders.length > 0) {
-			this.logger.info(
-				`Detected ${AppUtils.pluralize(
-					"distinct overheight block header",
-					overHeightBlockHeaders.length,
+				`from the pool containing ${AppUtils.pluralize(
+					"transaction",
+					this.transactionPool.getPoolSize(),
 					true,
-				)}.`,
-			);
+				)} total`,
+		);
 
-			for (const overHeightBlockHeader of overHeightBlockHeaders) {
-				if (overHeightBlockHeader.generatorPublicKey === validator.publicKey) {
-					AppUtils.assert.defined<string>(validator.publicKey);
-
-					const username: string = this.usernames[validator.publicKey];
-
-					this.logger.warning(
-						`Possible double forging validator: ${username} (${validator.publicKey}) - Block: ${overHeightBlockHeader.id}.`,
-					);
-				}
-			}
-		}
-
-		if (networkState.getQuorum() < 0.66) {
-			this.logger.info("Not enough quorum to forge next block. Will not forge.");
-			this.logger.debug(`Network State: ${networkState.toJson()}`);
-
-			return false;
-		}
-
-		return true;
+		return transactions.map((transaction: Contracts.Crypto.ITransaction) => transaction.data);
 	}
 
-	private isActiveValidator(publicKey: string): Validator | undefined {
+	#isActiveValidator(publicKey: string): Validator | undefined {
 		return this.validators.find((validator) => validator.publicKey === publicKey);
 	}
 
-	private async loadRound(): Promise<void> {
-		this.round = await this.client.getRound();
+	async #loadRound(): Promise<void> {
+		this.round = await this.#getRound();
 
 		this.usernames = this.round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
@@ -305,10 +266,10 @@ export class ForgerService {
 		}, {});
 
 		if (!this.initialized) {
-			this.printLoadedValidators();
+			this.#printLoadedValidators();
 
 			// @ts-ignore
-			this.client.emitEvent(Enums.ForgerEvent.Started, {
+			this.events.dispatch(Enums.ForgerEvent.Started, {
 				activeValidators: this.validators.map((validator) => validator.publicKey),
 			});
 
@@ -318,11 +279,11 @@ export class ForgerService {
 		this.initialized = true;
 	}
 
-	private checkLater(timeout: number): void {
+	#checkLater(timeout: number): void {
 		setTimeout(() => this.checkSlot(), timeout);
 	}
 
-	private printLoadedValidators(): void {
+	#printLoadedValidators(): void {
 		const activeValidators: Validator[] = this.validators.filter((validator) => {
 			AppUtils.assert.defined<string>(validator.publicKey);
 
@@ -356,10 +317,62 @@ export class ForgerService {
 		}
 	}
 
-	private getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
+	#getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
 		const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
 		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
 
 		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
+	}
+
+	async #broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
+		const { data } = await this.deserializer.deserialize(
+			await this.serializer.serializeWithTransactions({
+				...block.data,
+				transactions: block.transactions.map((tx) => tx.data),
+			}),
+		);
+
+		await this.blockchain.handleIncomingBlock(data, true);
+	}
+
+	async #getRound(): Promise<Contracts.P2P.CurrentRound> {
+		const lastBlock = this.blockchain.getLastBlock();
+
+		const height = lastBlock.data.height + 1;
+		const roundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
+
+		const reward = this.configuration.getMilestone(height).reward;
+		const validators: Contracts.P2P.ValidatorWallet[] = (
+			await this.databaseInteraction.getActiveValidators(roundInfo)
+		).map((wallet) => ({
+			...wallet.getData(),
+			validator: wallet.getAttribute("validator"),
+		}));
+
+		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+			this.app,
+			height,
+			this.configuration,
+		);
+
+		const timestamp = this.slots.getTime();
+		const forgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
+			timestamp,
+			height,
+			blockTimeLookup,
+			this.configuration,
+			this.slots,
+		);
+
+		return {
+			canForge: forgingInfo.canForge,
+			current: roundInfo.round,
+			currentForger: validators[forgingInfo.currentForger],
+			lastBlock: lastBlock.data,
+			nextForger: validators[forgingInfo.nextForger],
+			reward,
+			timestamp: forgingInfo.blockTimestamp,
+			validators,
+		};
 	}
 }

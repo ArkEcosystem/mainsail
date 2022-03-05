@@ -1,7 +1,7 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Types } from "@arkecosystem/core-kernel";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { plugin as hapiNesPlugin } from "../hapi-nes";
 import { AcceptPeerPlugin } from "./plugins/accept-peer";
@@ -10,9 +10,7 @@ import { CodecPlugin } from "./plugins/codec";
 import { IsAppReadyPlugin } from "./plugins/is-app-ready";
 import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
-import { WhitelistForgerPlugin } from "./plugins/whitelist-forger";
 import { BlocksRoute } from "./routes/blocks";
-import { InternalRoute } from "./routes/internal";
 import { PeerRoute } from "./routes/peer";
 import { TransactionsRoute } from "./routes/transactions";
 
@@ -44,13 +42,11 @@ export class Server {
 			plugin: hapiNesPlugin,
 		});
 
-		this.app.resolve(InternalRoute).register(this.server);
 		this.app.resolve(PeerRoute).register(this.server);
 		this.app.resolve(BlocksRoute).register(this.server);
 		this.app.resolve(TransactionsRoute).register(this.server);
 
 		// onPreAuth
-		this.app.resolve(WhitelistForgerPlugin).register(this.server);
 		this.app.resolve(RateLimitPlugin).register(this.server);
 		this.app.resolve(AwaitBlockPlugin).register(this.server);
 

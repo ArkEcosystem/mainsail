@@ -2,8 +2,6 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Server } from "@hapi/hapi";
 
-import { InternalRoute } from "../routes/internal";
-
 @injectable()
 export class AwaitBlockPlugin {
 	@inject(Identifiers.Application)
@@ -16,14 +14,8 @@ export class AwaitBlockPlugin {
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public register(server: Server): void {
-		const peerRoutesConfigByPath = this.app.resolve(InternalRoute).getRoutesConfigByPath();
-
 		server.ext({
 			method: async (request, h) => {
-				if (peerRoutesConfigByPath[request.path]) {
-					return h.continue;
-				}
-
 				if (this.stateStore.getBlockchain().value !== "newBlock") {
 					return h.continue;
 				}

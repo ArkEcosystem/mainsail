@@ -1,13 +1,5 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 
-export interface RelayHost {
-	hostname: string;
-
-	port: number;
-
-	socket?: any;
-}
-
 export interface Validator {
 	keys: Contracts.Crypto.IKeyPair | undefined;
 

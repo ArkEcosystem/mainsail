@@ -23,16 +23,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		const validators: Validator[] = await this.makeValidators();
 
-		const forgerService = this.app.get<ForgerService>(Identifiers.ForgerService);
-
-		forgerService.register(this.config().all());
-		await forgerService.boot(validators);
+		await this.app.get<ForgerService>(Identifiers.ForgerService).boot(validators);
 
 		this.startTracker(validators);
-
-		// // Don't keep bip38 password in memory
-		// this.config().set("app.flags.bip38", undefined);
-		// this.config().set("app.flags.password", undefined);
 	}
 
 	public async dispose(): Promise<void> {
@@ -52,18 +45,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): object {
 		return Joi.object({
 			bip38: Joi.string(),
-			hosts: Joi.array()
-				.items(
-					Joi.object({
-						hostname: Joi.string()
-							.ip({
-								version: ["ipv4", "ipv6"],
-							})
-							.required(),
-						port: Joi.number().integer().min(1).max(65_535).required(),
-					}),
-				)
-				.required(),
 			password: Joi.string(),
 			tracker: Joi.bool().required(),
 		}).unknown(true);
@@ -76,7 +57,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("isForgingAllowed", new IsForgingAllowedAction());
+			.bind("isForgingAllowed", this.app.resolve(IsForgingAllowedAction));
 	}
 
 	private registerProcessActions(): void {

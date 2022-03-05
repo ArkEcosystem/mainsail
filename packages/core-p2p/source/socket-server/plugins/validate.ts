@@ -4,7 +4,6 @@ import Boom from "@hapi/boom";
 
 import { isValidVersion } from "../../utils";
 import { BlocksRoute } from "../routes/blocks";
-import { InternalRoute } from "../routes/internal";
 import { PeerRoute } from "../routes/peer";
 import { TransactionsRoute } from "../routes/transactions";
 
@@ -15,7 +14,6 @@ export class ValidatePlugin {
 
 	public register(server) {
 		const allRoutesConfigByPath = {
-			...this.app.resolve(InternalRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PeerRoute).getRoutesConfigByPath(),
 			...this.app.resolve(BlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(TransactionsRoute).getRoutesConfigByPath(),

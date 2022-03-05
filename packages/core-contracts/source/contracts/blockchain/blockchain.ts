@@ -23,7 +23,7 @@ export interface Blockchain {
 
 	clearQueue(): void;
 
-	handleIncomingBlock(block: IBlockData, fromForger): void;
+	handleIncomingBlock(block: IBlockData, fromForger): Promise<void>;
 
 	enqueueBlocks(blocks: IBlockData[]);
 

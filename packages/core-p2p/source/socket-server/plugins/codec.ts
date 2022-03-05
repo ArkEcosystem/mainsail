@@ -1,9 +1,8 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Boom from "@hapi/boom";
 
 import { BlocksRoute } from "../routes/blocks";
-import { InternalRoute } from "../routes/internal";
 import { PeerRoute } from "../routes/peer";
 import { TransactionsRoute } from "../routes/transactions";
 
@@ -17,7 +16,6 @@ export class CodecPlugin {
 
 	public register(server) {
 		const allRoutesConfigByPath = {
-			...this.app.resolve(InternalRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PeerRoute).getRoutesConfigByPath(),
 			...this.app.resolve(BlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(TransactionsRoute).getRoutesConfigByPath(),

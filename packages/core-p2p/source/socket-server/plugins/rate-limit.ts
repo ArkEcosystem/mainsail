@@ -6,7 +6,6 @@ import Boom from "@hapi/boom";
 import { RateLimiter } from "../../rate-limiter";
 import { buildRateLimiter } from "../../utils/build-rate-limiter";
 import { BlocksRoute } from "../routes/blocks";
-import { InternalRoute } from "../routes/internal";
 import { PeerRoute } from "../routes/peer";
 import { TransactionsRoute } from "../routes/transactions";
 
@@ -30,7 +29,6 @@ export class RateLimitPlugin {
 		});
 
 		const allRoutesConfigByPath = {
-			...this.app.resolve(InternalRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PeerRoute).getRoutesConfigByPath(),
 			...this.app.resolve(BlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(TransactionsRoute).getRoutesConfigByPath(),

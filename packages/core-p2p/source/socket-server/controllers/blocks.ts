@@ -28,6 +28,7 @@ export class BlocksController extends Controller {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
+	// @TODO: extract this into
 	public async postBlock(
 		request: Hapi.Request,
 		h: Hapi.ResponseToolkit,
