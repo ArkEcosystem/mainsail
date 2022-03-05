@@ -3,6 +3,7 @@ import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
+import { GetCurrentRoundAction } from "./actions/get-current-round";
 import { DELEGATE_FACTORY } from "./bindings";
 import { ForgerService } from "./forger-service";
 import { ValidatorFactory } from "./validator-factory";
@@ -52,6 +53,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("isForgingAllowed", this.app.resolve(IsForgingAllowedAction));
+
+		this.app
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.bind("getCurrentRound", this.app.resolve(GetCurrentRoundAction));
 	}
 
 	private async makeValidators(): Promise<Contracts.Forger.Validator[]> {

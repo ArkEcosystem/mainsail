@@ -1,7 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Services, Utils as AppUtils, Utils } from "@arkecosystem/core-kernel";
-import { DatabaseInteraction } from "@arkecosystem/core-state";
+import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
 @injectable()
@@ -26,12 +25,6 @@ export class ForgerService {
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
-
-	@inject(Identifiers.DatabaseInteraction)
-	private readonly databaseInteraction!: DatabaseInteraction;
-
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: any;
 
 	private validators: Contracts.Forger.Validator[] = [];
 
@@ -175,7 +168,7 @@ export class ForgerService {
 	}
 
 	async #loadRound(): Promise<void> {
-		this.round = await this.#getRound();
+		this.round = await this.app.get<Services.Triggers.Triggers>(Identifiers.TriggerService).call("getCurrentRound");
 
 		this.usernames = this.round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
@@ -243,46 +236,5 @@ export class ForgerService {
 		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
 
 		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
-	}
-
-	async #getRound(): Promise<Contracts.P2P.CurrentRound> {
-		const lastBlock = this.blockchain.getLastBlock();
-
-		const height = lastBlock.data.height + 1;
-		const roundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
-
-		const reward = this.configuration.getMilestone(height).reward;
-		const validators: Contracts.P2P.ValidatorWallet[] = (
-			await this.databaseInteraction.getActiveValidators(roundInfo)
-		).map((wallet) => ({
-			...wallet.getData(),
-			validator: wallet.getAttribute("validator"),
-		}));
-
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			height,
-			this.configuration,
-		);
-
-		const timestamp = this.slots.getTime();
-		const forgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
-			timestamp,
-			height,
-			blockTimeLookup,
-			this.configuration,
-			this.slots,
-		);
-
-		return {
-			canForge: forgingInfo.canForge,
-			current: roundInfo.round,
-			currentForger: validators[forgingInfo.currentForger],
-			lastBlock: lastBlock.data,
-			nextForger: validators[forgingInfo.nextForger],
-			reward,
-			timestamp: forgingInfo.blockTimestamp,
-			validators,
-		};
 	}
 }
