@@ -6,7 +6,6 @@ import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
 import { DELEGATE_FACTORY } from "./bindings";
 import { ForgerService } from "./forger-service";
 import { Validator } from "./interfaces";
-import { CurrentValidatorProcessAction, LastForgedBlockRemoteAction, NextSlotProcessAction } from "./process-actions";
 import { ValidatorFactory } from "./validator-factory";
 import { ValidatorTracker } from "./validator-tracker";
 
@@ -16,8 +15,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(DELEGATE_FACTORY).to(ValidatorFactory).inSingletonScope();
 
 		this.registerActions();
-
-		this.registerProcessActions();
 	}
 
 	public async boot(): Promise<void> {
@@ -58,20 +55,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("isForgingAllowed", this.app.resolve(IsForgingAllowedAction));
-	}
-
-	private registerProcessActions(): void {
-		this.app
-			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
-			.register(this.app.resolve(CurrentValidatorProcessAction));
-
-		this.app
-			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
-			.register(this.app.resolve(NextSlotProcessAction));
-
-		this.app
-			.get<Contracts.Kernel.ProcessActionsService>(Identifiers.ProcessActionsService)
-			.register(this.app.resolve(LastForgedBlockRemoteAction));
 	}
 
 	private startTracker(validators: Validator[]): void {
