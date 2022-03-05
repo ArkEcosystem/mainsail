@@ -90,6 +90,9 @@
 			},
 			{
 				"package": "@arkecosystem/core-forger"
+			},
+			{
+				"package": "@arkecosystem/core-forger-tracker"
 			}
 		]
 	}

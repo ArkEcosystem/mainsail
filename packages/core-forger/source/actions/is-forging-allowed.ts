@@ -3,15 +3,13 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Types, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 
-import { Validator } from "../interfaces";
-
 @injectable()
 export class IsForgingAllowedAction extends Services.Triggers.Action {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
 	public async execute(arguments_: Types.ActionArguments): Promise<boolean> {
-		const validator: Validator = arguments_.validator;
+		const validator: Contracts.Forger.Validator = arguments_.validator;
 		const networkState: Contracts.P2P.NetworkState = arguments_.networkState;
 
 		switch (networkState.status) {

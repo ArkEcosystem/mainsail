@@ -3,8 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts
 import { Enums, Services, Utils as AppUtils, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
-import { Validator } from "./interfaces";
-
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
 @injectable()
 export class ForgerService {
@@ -47,7 +45,7 @@ export class ForgerService {
 	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
 
-	private validators: Validator[] = [];
+	private validators: Contracts.Forger.Validator[] = [];
 
 	private usernames: { [key: string]: string } = {};
 
@@ -73,7 +71,7 @@ export class ForgerService {
 		return this.lastForgedBlock;
 	}
 
-	public async boot(validators: Validator[]): Promise<void> {
+	public async boot(validators: Contracts.Forger.Validator[]): Promise<void> {
 		if (this.handlerProvider.isRegistrationRequired()) {
 			this.handlerProvider.registerHandlers();
 		}
@@ -113,7 +111,9 @@ export class ForgerService {
 
 			AppUtils.assert.defined<string>(this.round.currentForger.publicKey);
 
-			const validator: Validator | undefined = this.#isActiveValidator(this.round.currentForger.publicKey);
+			const validator: Contracts.Forger.Validator | undefined = this.#isActiveValidator(
+				this.round.currentForger.publicKey,
+			);
 
 			if (!validator) {
 				AppUtils.assert.defined<string>(this.round.nextForger.publicKey);
@@ -185,7 +185,7 @@ export class ForgerService {
 	}
 
 	public async forgeNewBlock(
-		validator: Validator,
+		validator: Contracts.Forger.Validator,
 		round: Contracts.P2P.CurrentRound,
 		networkState: Contracts.P2P.NetworkState,
 	): Promise<void> {
@@ -250,7 +250,7 @@ export class ForgerService {
 		return transactions.map((transaction: Contracts.Crypto.ITransaction) => transaction.data);
 	}
 
-	#isActiveValidator(publicKey: string): Validator | undefined {
+	#isActiveValidator(publicKey: string): Contracts.Forger.Validator | undefined {
 		return this.validators.find((validator) => validator.publicKey === publicKey);
 	}
 
@@ -284,7 +284,7 @@ export class ForgerService {
 	}
 
 	#printLoadedValidators(): void {
-		const activeValidators: Validator[] = this.validators.filter((validator) => {
+		const activeValidators: Contracts.Forger.Validator[] = this.validators.filter((validator) => {
 			AppUtils.assert.defined<string>(validator.publicKey);
 
 			return this.usernames.hasOwnProperty(validator.publicKey);

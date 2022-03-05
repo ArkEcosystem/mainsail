@@ -1,11 +1,10 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-import { Validator } from "../interfaces";
 import { Method } from "./method";
 
 @injectable()
-export class BIP39 extends Method implements Validator {
+export class BIP39 extends Method implements Contracts.Forger.Validator {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 

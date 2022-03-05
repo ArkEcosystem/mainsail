@@ -87,7 +87,11 @@ export const Identifiers = {
 	},
 	FilesystemManager: Symbol.for("Manager<Filesystem>"),
 	FilesystemService: Symbol.for("Service<Filesystem>"),
-	ForgerService: Symbol.for("Service<Forger>"),
+	Forger: {
+		Service: Symbol.for("Forger<Service>"),
+		Tracker: Symbol.for("Forger<Tracker>"),
+		Validators: Symbol.for("Forger<Validators>"),
+	},
 	LogManager: Symbol.for("Manager<Log>"),
 	LogService: Symbol.for("Service<Log>"),
 	MixinService: Symbol.for("Service<Mixin>"),

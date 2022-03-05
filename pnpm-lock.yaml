@@ -1182,6 +1182,41 @@ importers:
       sinon: 12.0.1
       uvu: 0.5.3
 
+  packages/core-forger-tracker:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-state': workspace:*
+      '@arkecosystem/utils': workspace:*
+      '@types/node-forge': 0.10.4
+      '@types/wif': 2.0.2
+      bip38: ^3.1.1
+      import-fresh: 3.3.0
+      joi: 17.4.2
+      node-forge: 1.2.1
+      sinon: ^12.0.1
+      uvu: ^0.5.3
+      wif: 2.0.6
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-p2p': link:../core-p2p
+      '@arkecosystem/utils': link:../utils
+      bip38: 3.1.1
+      joi: 17.4.2
+      node-forge: 1.2.1
+      wif: 2.0.6
+    devDependencies:
+      '@arkecosystem/core-state': link:../core-state
+      '@types/node-forge': 0.10.4
+      '@types/wif': 2.0.2
+      import-fresh: 3.3.0
+      sinon: 12.0.1
+      uvu: 0.5.3
+
   packages/core-kernel:
     specifiers:
       '@arkecosystem/core-container': workspace:*
@@ -4542,7 +4577,7 @@ packages:
   /@types/node-forge/0.10.4:
     resolution: {integrity: sha512-RpP7JCxlPA32n8FE0kjOpCsCrsX6VjiD0fjOCo4NwIn8IdcicHi4B2e+votWuOpOmwzUjMwRLqVIF95epGd5nA==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 17.0.18
     dev: true
 
   /@types/node/10.12.18:

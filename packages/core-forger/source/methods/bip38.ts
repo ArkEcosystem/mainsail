@@ -5,11 +5,10 @@ import bip38 from "bip38";
 import forge from "node-forge";
 import wif from "wif";
 
-import { Validator } from "../interfaces";
 import { Method } from "./method";
 
 @injectable()
-export class BIP38 extends Method implements Validator {
+export class BIP38 extends Method implements Contracts.Forger.Validator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 

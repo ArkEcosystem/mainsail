@@ -2,8 +2,6 @@ import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 
-import { Validator } from "./interfaces";
-
 @injectable()
 export class ValidatorTracker {
 	@inject(Identifiers.Application)
@@ -28,9 +26,9 @@ export class ValidatorTracker {
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeCalculator: any;
 
-	private validators: Validator[] = [];
+	private validators: Contracts.Forger.Validator[] = [];
 
-	public initialize(validators: Validator[]): this {
+	public initialize(validators: Contracts.Forger.Validator[]): this {
 		this.validators = validators;
 
 		return this;
