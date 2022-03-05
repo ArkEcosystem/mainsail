@@ -10,14 +10,6 @@ import { JsonObject, KeyValuePair, Primitive } from "../../../types";
 import { assert } from "../../../utils";
 import { ConfigRepository } from "../repository";
 
-const processSchema = {
-	flags: Joi.array().items(Joi.string()).optional(),
-	plugins: Joi.array()
-		.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
-		.required(),
-	services: Joi.object().optional(),
-};
-
 @injectable()
 export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.Application)
@@ -63,7 +55,11 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.validationService.validate(
 			this.loadFromLocation(["app.json", "app.js"]),
 			Joi.object({
-				core: Joi.object().keys(processSchema).required(),
+				flags: Joi.array().items(Joi.string()).optional(),
+				plugins: Joi.array()
+					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
+					.required(),
+				services: Joi.object().optional(),
 			}).unknown(true),
 		);
 
