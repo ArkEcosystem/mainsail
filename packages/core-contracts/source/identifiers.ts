@@ -90,6 +90,7 @@ export const Identifiers = {
 	Forger: {
 		Service: Symbol.for("Forger<Service>"),
 		Tracker: Symbol.for("Forger<Tracker>"),
+		Usernames: Symbol.for("Forger<Usernames>"),
 		Validators: Symbol.for("Forger<Validators>"),
 	},
 	LogManager: Symbol.for("Manager<Log>"),

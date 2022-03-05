@@ -47,7 +47,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	private registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("forgeNewBlock", new ForgeNewBlockAction());
+			.bind("forgeNewBlock", this.app.resolve(ForgeNewBlockAction));
 
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
