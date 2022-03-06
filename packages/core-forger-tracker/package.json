@@ -37,10 +37,5 @@
 	},
 	"engines": {
 		"node": ">=16.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"alias": "forger"
-		}
 	}
 }

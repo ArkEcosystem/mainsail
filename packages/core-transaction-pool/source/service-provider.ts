@@ -44,14 +44,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): object {
 		return Joi.object({
 			allowedSenders: Joi.array().items(Joi.string()).required(),
-			dynamicFees: Joi.object({
-				addonBytes: Joi.object()
-					.when("enabled", { is: true, then: Joi.required() })
-					.pattern(Joi.string(), Joi.number().integer().min(0).required()),
-				enabled: Joi.bool().required(),
-				minFeeBroadcast: Joi.number().integer().min(0).when("enabled", { is: true, then: Joi.required() }),
-				minFeePool: Joi.number().integer().min(0).when("enabled", { is: true, then: Joi.required() }),
-			}).required(),
 			enabled: Joi.bool().required(),
 			maxTransactionAge: Joi.number().integer().min(1).required(),
 			maxTransactionBytes: Joi.number().integer().min(1).required(),

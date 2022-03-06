@@ -50,8 +50,6 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	private loadApplication(): void {
-		const processType: string = this.app.get<KeyValuePair>(Identifiers.ConfigFlags).processType;
-
 		this.validationService.validate(
 			this.loadFromLocation(["app.json", "app.js"]),
 			Joi.object({
@@ -69,10 +67,10 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 		this.configRepository.set("app.flags", {
 			...this.app.get<JsonObject>(Identifiers.ConfigFlags),
-			...get(this.validationService.valid(), `${processType}.flags`, {}),
+			...get(this.validationService.valid(), "flags", {}),
 		});
 
-		this.configRepository.set("app.plugins", get(this.validationService.valid(), `${processType}.plugins`, []));
+		this.configRepository.set("app.plugins", get(this.validationService.valid(), "plugins", []));
 	}
 
 	private loadPeers(): void {

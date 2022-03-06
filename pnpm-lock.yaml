@@ -154,8 +154,11 @@ importers:
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-fees-static': workspace:*
       '@arkecosystem/core-forger': workspace:*
+      '@arkecosystem/core-forger-tracker': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-logger-pino': workspace:*
+      '@arkecosystem/core-networking-dns': workspace:*
+      '@arkecosystem/core-networking-ntp': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -207,8 +210,11 @@ importers:
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-fees-static': link:../core-fees-static
       '@arkecosystem/core-forger': link:../core-forger
+      '@arkecosystem/core-forger-tracker': link:../core-forger-tracker
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
+      '@arkecosystem/core-networking-dns': link:../core-networking-dns
+      '@arkecosystem/core-networking-ntp': link:../core-networking-ntp
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
@@ -1340,6 +1346,132 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       joi: 17.4.2
       winston: 3.6.0
+
+  packages/core-networking-dns:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
+      '@arkecosystem/core-database': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-state': workspace:*
+      '@arkecosystem/utils': workspace:*
+      '@hapi/boom': 9.0.0
+      '@hapi/bounce': 2.0.0
+      '@hapi/hapi': 20.1.5
+      '@hapi/hoek': 9.2.0
+      '@hapi/sntp': 4.0.0
+      '@hapi/teamwork': 5.1.0
+      '@types/better-sqlite3': 5.4.3
+      '@types/fs-extra': 8.1.2
+      '@types/hapi__sntp': 3.1.2
+      '@types/ip': 1.1.0
+      '@types/semver': 6.2.3
+      dayjs: 1.10.7
+      delay: 4.4.1
+      ip: 1.1.5
+      ipaddr.js: 2.0.1
+      joi: 17.4.2
+      pluralize: 8.0.0
+      pretty-ms: 7.0.1
+      protobufjs: 6.10.2
+      rate-limiter-flexible: 1.3.2
+      semver: 6.3.0
+      ws: 7.5.5
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-database': link:../core-database
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-state': link:../core-state
+      '@arkecosystem/utils': link:../utils
+      '@hapi/boom': 9.0.0
+      '@hapi/bounce': 2.0.0
+      '@hapi/hapi': 20.1.5
+      '@hapi/hoek': 9.2.0
+      '@hapi/sntp': 4.0.0
+      '@hapi/teamwork': 5.1.0
+      dayjs: 1.10.7
+      delay: 4.4.1
+      ip: 1.1.5
+      ipaddr.js: 2.0.1
+      joi: 17.4.2
+      pluralize: 8.0.0
+      pretty-ms: 7.0.1
+      protobufjs: 6.10.2
+      rate-limiter-flexible: 1.3.2
+      semver: 6.3.0
+      ws: 7.5.5
+    devDependencies:
+      '@types/better-sqlite3': 5.4.3
+      '@types/fs-extra': 8.1.2
+      '@types/hapi__sntp': 3.1.2
+      '@types/ip': 1.1.0
+      '@types/semver': 6.2.3
+
+  packages/core-networking-ntp:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
+      '@arkecosystem/core-database': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-state': workspace:*
+      '@arkecosystem/utils': workspace:*
+      '@hapi/boom': 9.0.0
+      '@hapi/bounce': 2.0.0
+      '@hapi/hapi': 20.1.5
+      '@hapi/hoek': 9.2.0
+      '@hapi/sntp': 4.0.0
+      '@hapi/teamwork': 5.1.0
+      '@types/better-sqlite3': 5.4.3
+      '@types/fs-extra': 8.1.2
+      '@types/hapi__sntp': 3.1.2
+      '@types/ip': 1.1.0
+      '@types/semver': 6.2.3
+      dayjs: 1.10.7
+      delay: 4.4.1
+      ip: 1.1.5
+      ipaddr.js: 2.0.1
+      joi: 17.4.2
+      pluralize: 8.0.0
+      pretty-ms: 7.0.1
+      protobufjs: 6.10.2
+      rate-limiter-flexible: 1.3.2
+      semver: 6.3.0
+      ws: 7.5.5
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-database': link:../core-database
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-state': link:../core-state
+      '@arkecosystem/utils': link:../utils
+      '@hapi/boom': 9.0.0
+      '@hapi/bounce': 2.0.0
+      '@hapi/hapi': 20.1.5
+      '@hapi/hoek': 9.2.0
+      '@hapi/sntp': 4.0.0
+      '@hapi/teamwork': 5.1.0
+      dayjs: 1.10.7
+      delay: 4.4.1
+      ip: 1.1.5
+      ipaddr.js: 2.0.1
+      joi: 17.4.2
+      pluralize: 8.0.0
+      pretty-ms: 7.0.1
+      protobufjs: 6.10.2
+      rate-limiter-flexible: 1.3.2
+      semver: 6.3.0
+      ws: 7.5.5
+    devDependencies:
+      '@types/better-sqlite3': 5.4.3
+      '@types/fs-extra': 8.1.2
+      '@types/hapi__sntp': 3.1.2
+      '@types/ip': 1.1.0
+      '@types/semver': 6.2.3
 
   packages/core-p2p:
     specifiers:

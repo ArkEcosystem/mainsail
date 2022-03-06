@@ -28,7 +28,6 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
-		flags.processType = "core";
 
 		await Utils.buildApplication({
 			flags,

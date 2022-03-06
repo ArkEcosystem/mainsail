@@ -1,7 +1,8 @@
-import * as console from "console";
+import { inject,injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import chalk, { Chalk } from "chalk";
+import * as console from "console";
 import pino, { PrettyOptions } from "pino";
 import PinoPretty from "pino-pretty";
 import pump from "pump";
@@ -11,15 +12,11 @@ import { createStream } from "rotating-file-stream";
 import split from "split2";
 import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.ConfigFlags)
-	private readonly configFlags!: { processType: string };
 
 	private readonly levelStyles: Record<string, Chalk> = {
 		alert: chalk.red,
@@ -201,7 +198,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return createStream(
 			(time: number | Date, index?: number): string => {
 				if (!time) {
-					return `${this.app.namespace()}-${this.configFlags.processType}-current.log`;
+					return `${this.app.namespace()}-current.log`;
 				}
 
 				if (typeof time === "number") {
@@ -214,7 +211,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 					filename += `.${index}`;
 				}
 
-				return `${this.app.namespace()}-${this.configFlags.processType}-${filename}.log.gz`;
+				return `${this.app.namespace()}-${filename}.log.gz`;
 			},
 			{
 				compress: "gzip",

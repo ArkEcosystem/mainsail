@@ -49,9 +49,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
 			disableDiscovery: Joi.bool(),
-			dns: Joi.array()
-				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
-				.required(),
 			getBlocksTimeout: Joi.number().integer().min(0).required(),
 			ignoreMinimumNetworkReach: Joi.bool(),
 			maxPeerSequentialErrors: Joi.number().integer().min(0).required(),
@@ -60,7 +57,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			networkStart: Joi.bool(),
-			ntp: Joi.array().items(Joi.string()).required(),
 			rateLimit: Joi.number().integer().min(1).required(),
 			rateLimitPostTransactions: Joi.number().integer().min(1).required(),
 			remoteAccess: Joi.array()

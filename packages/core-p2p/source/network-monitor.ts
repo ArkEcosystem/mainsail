@@ -2,12 +2,10 @@ import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-co
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
-import prettyMs from "pretty-ms";
 
 import { NetworkState } from "./network-state";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
-import { checkDNS, checkNTP } from "./utils";
 
 const defaultDownloadChunkSize = 400;
 
@@ -56,9 +54,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async boot(): Promise<void> {
-		await this.checkDNSConnectivity(this.config.dns);
-		await this.checkNTPConnectivity(this.config.ntp);
-
 		await this.populateSeedPeers();
 
 		if (this.config.skipDiscovery) {
@@ -538,28 +533,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		this.logger.debug(`Checking ports of ${Utils.pluralize("peer", peers.length, true)}.`);
 
 		Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
-	}
-
-	private async checkDNSConnectivity(options): Promise<void> {
-		try {
-			const host = await checkDNS(this.app, options);
-
-			this.logger.info(`Your network connectivity has been verified by ${host}`);
-		} catch (error) {
-			this.logger.error(error.message);
-		}
-	}
-
-	private async checkNTPConnectivity(options): Promise<void> {
-		try {
-			const { host, time } = await checkNTP(this.app, options);
-
-			this.logger.info(`Your NTP connectivity has been verified by ${host}`);
-
-			this.logger.info(`Local clock is off by ${time.t < 0 ? "-" : ""}${prettyMs(Math.abs(time.t))} from NTP`);
-		} catch (error) {
-			this.logger.error(error.message);
-		}
 	}
 
 	private async scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {

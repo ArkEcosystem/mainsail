@@ -23,7 +23,7 @@ export class Server {
 			bodyLimit: 2_097_152,
 			disableRequestLogging: true,
 			genReqId: () => v4(),
-			logger: true,
+			logger: false,
 		});
 
 		return this.#server;
