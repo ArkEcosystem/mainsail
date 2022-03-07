@@ -200,61 +200,6 @@ export class BlockRepository extends AbstractRepository<Block> {
 		});
 	}
 
-	public async deleteBlocks(blocks: Contracts.Crypto.IBlockData[]): Promise<void> {
-		const continuousChunk = blocks.every((block, index, array) =>
-			index === 0 ? true : block.height - array[index - 1].height === 1,
-		);
-
-		if (!continuousChunk) {
-			throw new Error("Blocks chunk to delete isn't continuous");
-		}
-
-		return this.manager.transaction(async (manager) => {
-			// eslint-disable-next-line unicorn/prefer-at
-			const lastBlockHeight: number = blocks[blocks.length - 1].height;
-			const targetBlockHeight: number = blocks[0].height - 1;
-			const roundInfo = Utils.roundCalculator.calculateRound(targetBlockHeight, this.configuration);
-			const targetRound = roundInfo.round;
-			const blockIds = blocks.map((b) => b.id);
-
-			const afterLastBlockCount = await manager
-				.createQueryBuilder()
-				.select()
-				.from(Block, "blocks")
-				.where("blocks.height > :lastBlockHeight", { lastBlockHeight })
-				.getCount();
-
-			if (afterLastBlockCount !== 0) {
-				throw new Error("Removing blocks from the middle");
-			}
-
-			await manager
-				.createQueryBuilder()
-				.delete()
-				.from(Transaction)
-				.where("block_id IN (:...blockIds)", { blockIds })
-				.execute();
-
-			const deleteBlocksResult = await manager
-				.createQueryBuilder()
-				.delete()
-				.from(Block)
-				.where("id IN (:...blockIds)", { blockIds })
-				.execute();
-
-			if (deleteBlocksResult.affected !== blockIds.length) {
-				throw new Error("Failed to delete all blocks from database");
-			}
-
-			await manager
-				.createQueryBuilder()
-				.delete()
-				.from(Round)
-				.where("round > :targetRound", { targetRound })
-				.execute();
-		});
-	}
-
 	public async deleteTopBlocks(count: number): Promise<void> {
 		await this.manager.transaction(async (manager) => {
 			const maxHeightRow = await manager

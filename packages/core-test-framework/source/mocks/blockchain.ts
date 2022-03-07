@@ -24,8 +24,6 @@ class BlockchainMock implements Partial<Blockchain> {
 	public isSynced(block?: any): boolean {
 		return mockIsSynced;
 	}
-
-	public async removeBlocks(nblocks: number): Promise<void> {}
 }
 
 export const instance = new BlockchainMock();

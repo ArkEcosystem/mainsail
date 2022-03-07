@@ -174,10 +174,6 @@ export class DatabaseService {
 		return this.transactionRepository.findOne(id);
 	}
 
-	public async deleteBlocks(blocks: Contracts.Crypto.IBlockData[]): Promise<void> {
-		return await this.blockRepository.deleteBlocks(blocks);
-	}
-
 	public async saveBlocks(blocks: Contracts.Crypto.IBlock[]): Promise<void> {
 		return await this.blockRepository.saveBlocks(blocks);
 	}

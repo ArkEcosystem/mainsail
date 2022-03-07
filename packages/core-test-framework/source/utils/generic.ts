@@ -53,7 +53,7 @@ export const resetBlockchain = async (app: Contracts.Kernel.Application) => {
 	const height: number = blockchain.getLastBlock().data.height;
 
 	if (height) {
-		await blockchain.removeBlocks(height - 1);
+		// await blockchain.removeBlocks(height - 1);
 	}
 
 	// app.get<Contracts.TransactionPool.Connection>(Identifiers.TransactionPoolService).flush();

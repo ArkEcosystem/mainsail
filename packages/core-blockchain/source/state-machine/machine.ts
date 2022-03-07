@@ -28,7 +28,6 @@ export const blockchainMachine: any = Machine({
 			on: {
 				FAILURE: "exit",
 				NETWORKSTART: "idle",
-				ROLLBACK: "rollback",
 				STARTED: "syncWithNetwork",
 				STOP: "stopped",
 			},
@@ -40,14 +39,6 @@ export const blockchainMachine: any = Machine({
 				PROCESSFINISHED: "idle",
 				STOP: "stopped",
 			},
-		},
-		rollback: {
-			on: {
-				FAILURE: "exit",
-				STOP: "stopped",
-				SUCCESS: "init",
-			},
-			onEntry: ["rollbackDatabase"],
 		},
 		/**
 		 * This state should be used for stopping the blockchain on purpose, not as

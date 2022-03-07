@@ -1,8 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
-import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
 import { StateMachine } from "./state-machine";
@@ -21,18 +19,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.DatabaseInteraction)
-	private readonly databaseInteraction!: DatabaseInteraction;
-
-	@inject(Identifiers.DatabaseService)
-	private readonly database!: DatabaseService;
-
-	@inject(Identifiers.DatabaseBlockRepository)
-	private readonly blockRepository!: Repositories.BlockRepository;
-
-	@inject(Identifiers.TransactionPoolService)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.StateMachine)
 	private readonly stateMachine!: StateMachine;
 
@@ -50,9 +36,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
-
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
@@ -260,111 +243,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			}
 		}
 		__createQueueJob(currentBlocksChunk);
-	}
-
-	public async removeBlocks(nblocks: number): Promise<void> {
-		try {
-			this.clearAndStopQueue();
-
-			const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
-
-			// If the current chain height is H and we will be removing blocks [N, H],
-			// then blocksToRemove[] will contain blocks [N - 1, H - 1].
-			const blocksToRemove: Contracts.Crypto.IBlockData[] = await this.database.getBlocks(
-				lastBlock.data.height - nblocks,
-				lastBlock.data.height,
-			);
-
-			const removedBlocks: Contracts.Crypto.IBlockData[] = [];
-			const removedTransactions: Contracts.Crypto.ITransaction[] = [];
-
-			const revertLastBlock = async () => {
-				const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
-
-				await this.databaseInteraction.revertBlock(lastBlock);
-				removedBlocks.push(lastBlock.data);
-				removedTransactions.push(...[...lastBlock.transactions].reverse());
-				blocksToRemove.pop();
-
-				let newLastBlock: Contracts.Crypto.IBlock;
-				// eslint-disable-next-line unicorn/prefer-at
-				if (blocksToRemove[blocksToRemove.length - 1].height === 1) {
-					newLastBlock = this.stateStore.getGenesisBlock();
-				} else {
-					// eslint-disable-next-line unicorn/prefer-at
-					const temporaryNewLastBlockData: Contracts.Crypto.IBlockData =
-						blocksToRemove[blocksToRemove.length - 1];
-
-					Utils.assert.defined<Contracts.Crypto.IBlockData>(temporaryNewLastBlockData);
-
-					const temporaryNewLastBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(
-						temporaryNewLastBlockData,
-						{
-							deserializeTransactionsUnchecked: true,
-						},
-					);
-
-					Utils.assert.defined<Contracts.Crypto.IBlockData>(temporaryNewLastBlock);
-
-					newLastBlock = temporaryNewLastBlock;
-				}
-
-				this.stateStore.setLastBlock(newLastBlock);
-				this.stateStore.setLastDownloadedBlock(newLastBlock.data);
-			};
-
-			const __removeBlocks = async (numberOfBlocks) => {
-				if (numberOfBlocks < 1) {
-					return;
-				}
-
-				const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
-
-				this.logger.info(`Undoing block ${lastBlock.data.height.toLocaleString()}`);
-
-				await revertLastBlock();
-				await __removeBlocks(numberOfBlocks - 1);
-			};
-
-			if (nblocks >= lastBlock.data.height) {
-				nblocks = lastBlock.data.height - 1;
-			}
-
-			const resetHeight: number = lastBlock.data.height - nblocks;
-			this.logger.info(
-				`Removing ${Utils.pluralize("block", nblocks, true)}. Reset to height ${resetHeight.toLocaleString()}`,
-			);
-
-			this.stateStore.setLastDownloadedBlock(lastBlock.data);
-
-			await __removeBlocks(nblocks);
-
-			await this.blockRepository.deleteBlocks(removedBlocks.reverse());
-			this.stateStore.setLastStoredBlockHeight(lastBlock.data.height - nblocks);
-
-			await this.transactionPool.readdTransactions(removedTransactions.reverse());
-
-			// Validate last block
-			const lastStoredBlock = await this.database.getLastBlock();
-
-			if (lastStoredBlock.data.id !== this.stateStore.getLastBlock().data.id) {
-				throw new Error(
-					`Last stored block (${lastStoredBlock.data.id}) is not the same as last block from state store (${
-						this.stateStore.getLastBlock().data.id
-					})`,
-				);
-			}
-		} catch (error) {
-			this.logger.error(error.stack);
-			this.logger.warning("Shutting down app, because state might be corrupted");
-			process.exit(1);
-		}
-	}
-
-	public async removeTopBlocks(count: number): Promise<void> {
-		this.logger.info(`Removing top ${Utils.pluralize("block", count, true)}`);
-
-		await this.blockRepository.deleteTopBlocks(count);
 	}
 
 	public resetLastDownloadedBlock(): void {

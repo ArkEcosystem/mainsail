@@ -27,10 +27,6 @@ export interface Blockchain {
 
 	enqueueBlocks(blocks: IBlockData[]);
 
-	removeBlocks(nblocks: number): Promise<void>;
-
-	removeTopBlocks(count: number): Promise<void>;
-
 	resetLastDownloadedBlock(): void;
 
 	forceWakeup(): void;
