@@ -37,7 +37,7 @@ export const getBlockTimeLookup = async (
 	height: number,
 	configuration: Contracts.Crypto.IConfiguration,
 ): Promise<(height: number) => number> => {
-	const databaseService = app.get<any>(Identifiers.DatabaseService);
+	const databaseService = app.get<any>(Identifiers.Database.Service);
 
 	const getBlockTimestampByHeight = async (height: number): Promise<number> => {
 		const blocks = await databaseService.findBlockByHeights([height]);

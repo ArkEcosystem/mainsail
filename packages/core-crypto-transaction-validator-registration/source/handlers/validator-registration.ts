@@ -14,86 +14,32 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionHistoryService)
-	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
 
 	public walletAttributes(): ReadonlyArray<string> {
-		return [
-			"validator.approval", // Used by the API
-			"validator.forgedFees", // Used by the API
-			"validator.forgedRewards", // Used by the API
-			"validator.forgedTotal", // Used by the API
-			"validator.lastBlock",
-			"validator.producedBlocks", // Used by the API
-			"validator.rank",
-			"validator.round",
-			"validator.username",
-			"validator.voteBalance",
-			"validator",
-		];
+		return ["validator.rank", "validator.round", "validator.username", "validator.voteBalance", "validator"];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
 		return ValidatorRegistrationTransaction;
 	}
 
-	public async bootstrap(): Promise<void> {
-		const criteria = {
-			type: this.getConstructor().type,
-			typeGroup: this.getConstructor().typeGroup,
-		};
-
-		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
+	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+		for (const transaction of this.allTransactions(transactions)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 			AppUtils.assert.defined<string>(transaction.asset?.validator?.username);
 
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 
 			wallet.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
-				forgedFees: BigNumber.ZERO,
-				forgedRewards: BigNumber.ZERO,
-				producedBlocks: 0,
 				rank: undefined,
 				username: transaction.asset.validator.username,
 				voteBalance: BigNumber.ZERO,
 			});
 
 			this.walletRepository.index(wallet);
-		}
-
-		const forgedBlocks = await this.blockRepository.getValidatorsForgedBlocks();
-		const lastForgedBlocks = await this.blockRepository.getLastForgedBlocks();
-		for (const block of forgedBlocks) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				block.generatorPublicKey,
-			);
-
-			// Genesis wallet is empty
-			if (!wallet.hasAttribute("validator")) {
-				continue;
-			}
-
-			const validator: Contracts.State.WalletValidatorAttributes = wallet.getAttribute("validator");
-			validator.forgedFees = validator.forgedFees.plus(block.totalFees);
-			validator.forgedRewards = validator.forgedRewards.plus(block.totalRewards);
-			validator.producedBlocks += +block.totalProduced;
-		}
-
-		for (const block of lastForgedBlocks) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				block.generatorPublicKey,
-			);
-
-			// Genesis wallet is empty
-			if (!wallet.hasAttribute("validator")) {
-				continue;
-			}
-
-			wallet.setAttribute("validator.lastBlock", block);
 		}
 	}
 
@@ -177,9 +123,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 
 		sender.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
-			forgedFees: BigNumber.ZERO,
-			forgedRewards: BigNumber.ZERO,
-			producedBlocks: 0,
 			round: 0,
 			username: transaction.data.asset.validator.username,
 			voteBalance: BigNumber.ZERO,

@@ -89,9 +89,6 @@ export type WalletFactory = (address: string) => Wallet;
 export interface WalletValidatorAttributes {
 	username: string;
 	voteBalance: BigNumber;
-	forgedFees: BigNumber;
-	forgedRewards: BigNumber;
-	producedBlocks: number;
 	rank?: number;
 	lastBlock?: IBlockData;
 	round?: number;

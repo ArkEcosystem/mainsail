@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Repositories } from "@arkecosystem/core-database";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -9,12 +8,6 @@ import { BigNumber } from "@arkecosystem/utils";
 export abstract class TransactionHandler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.DatabaseBlockRepository)
-	protected readonly blockRepository!: Repositories.BlockRepository;
-
-	@inject(Identifiers.DatabaseTransactionRepository)
-	protected readonly transactionRepository!: Repositories.TransactionRepository;
 
 	@inject(Identifiers.WalletRepository)
 	protected readonly walletRepository!: Contracts.State.WalletRepository;
@@ -192,6 +185,15 @@ export abstract class TransactionHandler {
 		}
 	}
 
+	protected allTransactions(transactions: Contracts.Crypto.ITransaction[]): Contracts.Crypto.ITransactionData[] {
+		return transactions
+			.filter(
+				({ data }) =>
+					data.type === this.getConstructor().type && data.typeGroup === this.getConstructor().typeGroup,
+			)
+			.map(({ data }) => data);
+	}
+
 	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;
 
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
@@ -200,7 +202,7 @@ export abstract class TransactionHandler {
 
 	public abstract isActivated(): Promise<boolean>;
 
-	public abstract bootstrap(): Promise<void>;
+	public abstract bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void>;
 
 	public abstract applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void>;
 

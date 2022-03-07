@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService } from "@arkecosystem/core-database";
+
 import { Enums } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "./round-state";
@@ -10,8 +10,8 @@ export class DatabaseInteraction {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly databaseService!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.BlockState)
 	@tagged("state", "blockchain")
@@ -103,24 +103,21 @@ export class DatabaseInteraction {
 	}
 
 	private async reset(): Promise<void> {
-		await this.databaseService.reset();
 		await this.createGenesisBlock();
 	}
 
 	private async initializeLastBlock(): Promise<void> {
-		let lastBlock: Contracts.Crypto.IBlock | undefined;
-
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
 		let lastHeight = 1;
-		const latest: Contracts.Crypto.IBlockData | undefined = await this.databaseService.findLatestBlock();
+		const latest: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
 		if (latest) {
-			lastHeight = latest.height;
+			lastHeight = latest.data.height;
 		}
 
 		this.configuration.setHeight(lastHeight);
 
-		lastBlock = await this.databaseService.getLastBlock();
+		let lastBlock: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
 
 		if (!lastBlock) {
 			this.logger.warning("No block found in database");

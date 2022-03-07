@@ -1,20 +1,14 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Repositories } from "@arkecosystem/core-database";
-import { Application, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Application, Enums, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import lmdb from "lmdb";
 
 // todo: review the implementation
 @injectable()
 export class StateBuilder {
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
-
-	@inject(Identifiers.DatabaseBlockRepository)
-	private blockRepository!: Repositories.BlockRepository;
-
-	@inject(Identifiers.DatabaseTransactionRepository)
-	private transactionRepository!: Repositories.TransactionRepository;
 
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
@@ -30,8 +24,11 @@ export class StateBuilder {
 	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.ConfigRepository)
-	private readonly configRepository!: Services.Config.ConfigRepository;
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+
+	@inject(Identifiers.Database.BlockStorage)
+	private readonly blockStorage: lmdb.Database;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
@@ -48,56 +45,54 @@ export class StateBuilder {
 			.getRegisteredHandlers();
 		const steps = registeredHandlers.length + 3;
 
-		try {
-			this.logger.info(`State Generation - Step 1 of ${steps}: Block Rewards`);
-			await this.buildBlockRewards();
+		for (const { value } of this.blockStorage.getRange({})) {
+			const { data, transactions } = await this.blockFactory.fromBytes(value);
 
-			this.logger.info(`State Generation - Step 2 of ${steps}: Fees & Nonces`);
-			await this.buildSentTransactions();
+			try {
+				this.logger.info(`State Generation - Step 1 of ${steps}: Block Rewards`);
+				await this.buildBlockRewards(data);
 
-			const capitalize = (key: string) => key[0].toUpperCase() + key.slice(1);
-			for (const [index, handler] of registeredHandlers.entries()) {
-				const ctorKey: string | undefined = handler.getConstructor().key;
-				const version = handler.getConstructor().version;
-				AppUtils.assert.defined<string>(ctorKey);
+				this.logger.info(`State Generation - Step 2 of ${steps}: Fees & Nonces`);
+				await this.buildSentTransactions(transactions);
+
+				const capitalize = (key: string) => key[0].toUpperCase() + key.slice(1);
+				for (const [index, handler] of registeredHandlers.entries()) {
+					const ctorKey: string | undefined = handler.getConstructor().key;
+					const version = handler.getConstructor().version;
+					AppUtils.assert.defined<string>(ctorKey);
+
+					this.logger.info(
+						`State Generation - Step ${3 + index} of ${steps}: ${capitalize(ctorKey)} v${version}`,
+					);
+					await handler.bootstrap(transactions);
+				}
+
+				this.logger.info(`State Generation - Step ${steps} of ${steps}: Vote Balances & Validator Ranking`);
+				this.dposState.buildVoteBalances();
+				this.dposState.buildValidatorRanking();
 
 				this.logger.info(
-					`State Generation - Step ${3 + index} of ${steps}: ${capitalize(ctorKey)} v${version}`,
+					`Number of registered validators: ${Object.keys(
+						this.walletRepository.allByUsername(),
+					).length.toLocaleString()}`,
 				);
-				await handler.bootstrap();
+
+				this.verifyWalletsConsistency();
+
+				await this.events.dispatch(Enums.StateEvent.BuilderFinished);
+			} catch (error) {
+				this.logger.error(error.stack);
 			}
-
-			this.logger.info(`State Generation - Step ${steps} of ${steps}: Vote Balances & Validator Ranking`);
-			this.dposState.buildVoteBalances();
-			this.dposState.buildValidatorRanking();
-
-			this.logger.info(
-				`Number of registered validators: ${Object.keys(
-					this.walletRepository.allByUsername(),
-				).length.toLocaleString()}`,
-			);
-
-			this.verifyWalletsConsistency();
-
-			this.events.dispatch(Enums.StateEvent.BuilderFinished);
-		} catch (error) {
-			this.logger.error(error.stack);
 		}
 	}
 
-	private async buildBlockRewards(): Promise<void> {
-		const blocks = await this.blockRepository.getBlockRewards();
-
-		for (const block of blocks) {
-			const wallet = await this.walletRepository.findByPublicKey(block.generatorPublicKey);
-			wallet.increaseBalance(BigNumber.make(block.rewards));
-		}
+	private async buildBlockRewards(block: Contracts.Crypto.IBlockData): Promise<void> {
+		const wallet = await this.walletRepository.findByPublicKey(block.generatorPublicKey);
+		wallet.increaseBalance(BigNumber.make(block.reward));
 	}
 
-	private async buildSentTransactions(): Promise<void> {
-		const transactions = await this.transactionRepository.getSentTransactions();
-
-		for (const transaction of transactions) {
+	private async buildSentTransactions(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+		for (const { data: transaction } of transactions) {
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 			wallet.setNonce(BigNumber.make(transaction.nonce));
 			wallet.decreaseBalance(BigNumber.make(transaction.amount).plus(transaction.fee));
@@ -113,38 +108,10 @@ export class StateBuilder {
 		);
 
 		for (const wallet of this.walletRepository.allByAddress()) {
-			if (
-				wallet.getBalance().isLessThan(0) &&
-				(wallet.getPublicKey() === undefined || !genesisPublicKeys[wallet.getPublicKey()!])
-			) {
-				// Senders of whitelisted transactions that result in a negative balance,
-				// also need to be special treated during bootstrap. Therefore, specific
-				// senderPublicKey/nonce pairs are allowed to be negative.
-				// Example:
-				//          https://explorer.ark.io/transaction/608c7aeba0895da4517496590896eb325a0b5d367e1b186b1c07d7651a568b9e
-				//          Results in a negative balance (-2 ARK) from height 93478 to 187315
-				const negativeBalanceExceptions: Record<string, Record<string, string>> = this.configRepository.get(
-					"crypto.exceptions.negativeBalances",
-					{},
-				);
+			if (wallet.getBalance().isLessThan(0) && !genesisPublicKeys[wallet.getPublicKey()!]) {
+				logNegativeBalance(wallet, "balance", wallet.getBalance());
 
-				const whitelistedNegativeBalances: Record<string, string> | undefined = wallet.getPublicKey()
-					? negativeBalanceExceptions[wallet.getPublicKey()!]
-					: undefined;
-
-				if (!whitelistedNegativeBalances) {
-					logNegativeBalance(wallet, "balance", wallet.getBalance());
-					throw new Error("Non-genesis wallet with negative balance.");
-				}
-
-				const allowedNegativeBalance = wallet
-					.getBalance()
-					.isEqualTo(whitelistedNegativeBalances[wallet.getNonce().toString()]);
-
-				if (!allowedNegativeBalance) {
-					logNegativeBalance(wallet, "balance", wallet.getBalance());
-					throw new Error("Non-genesis wallet with negative balance.");
-				}
+				throw new Error("Non-genesis wallet with negative balance.");
 			}
 
 			if (wallet.hasAttribute("validator.voteBalance")) {

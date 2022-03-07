@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
@@ -22,11 +21,11 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly database!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly database: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.DatabaseBlockRepository)
-	private readonly blockRepository!: Repositories.BlockRepository;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
@@ -147,7 +146,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 		if (acceptedBlocks.length > 0) {
 			try {
-				await this.blockRepository.saveBlocks(acceptedBlocks);
+				await this.databaseService.saveBlocks(acceptedBlocks);
 				// eslint-disable-next-line unicorn/prefer-at
 				this.stateStore.setLastStoredBlockHeight(acceptedBlocks[acceptedBlocks.length - 1].data.height);
 			} catch (error) {

@@ -14,9 +14,6 @@ export const registerRoundFactory = (factory: FactoryBuilder): void => {
 	// 		const wallet = new Wallets.Wallet(this.addressFactory.fromPublicKey(publicKey), knownAttributes);
 	// 		wallet.setPublicKey(publicKey);
 	// 		wallet.setAttribute("validator", {
-	// 			forgedFees: BigNumber.ZERO,
-	// 			forgedRewards: BigNumber.ZERO,
-	// 			producedBlocks: 0,
 	// 			rank: undefined,
 	// 			round: options.round || 1,
 	// 			username: `genesis_${index + 1}`,

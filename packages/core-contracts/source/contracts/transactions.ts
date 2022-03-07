@@ -37,7 +37,7 @@ export interface ITransactionHandler {
 
 	isActivated(): Promise<boolean>;
 
-	bootstrap(): Promise<void>;
+	bootstrap(transactions: ITransaction[]): Promise<void>;
 
 	applyToRecipient(transaction: ITransaction): Promise<void>;
 

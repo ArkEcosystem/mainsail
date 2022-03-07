@@ -1,6 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Repositories } from "@arkecosystem/core-database";
 import { Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -34,8 +33,8 @@ export class BlockProcessor {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@inject(Identifiers.DatabaseTransactionRepository)
-	private readonly transactionRepository!: Repositories.TransactionRepository;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
@@ -139,7 +138,7 @@ export class BlockProcessor {
 				return tx.id;
 			});
 
-			const forgedIds: string[] = await this.transactionRepository.getForgedTransactionsIds(transactionIds);
+			const forgedIds: string[] = await this.databaseService.getForgedTransactionsIds(transactionIds);
 
 			if (this.stateStore.getLastBlock().data.height !== this.stateStore.getLastStoredBlockHeight()) {
 				const transactionIdsSet = new Set<string>(transactionIds);

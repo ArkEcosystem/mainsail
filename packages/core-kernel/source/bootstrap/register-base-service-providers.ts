@@ -1,18 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-import {
-	Cache,
-	Filesystem,
-	Log,
-	Pipeline,
-	ProcessActions,
-	Queue,
-	Schedule,
-	Search,
-	Triggers,
-	Validation,
-} from "../services";
+import { Cache, Filesystem, Log, Pipeline, ProcessActions, Queue, Schedule, Triggers, Validation } from "../services";
 import { Bootstrapper } from "./interfaces";
 
 @injectable()
@@ -38,7 +27,5 @@ export class RegisterBaseServiceProviders implements Bootstrapper {
 		await this.app.resolve(Validation.ServiceProvider).register();
 
 		await this.app.resolve(Schedule.ServiceProvider).register();
-
-		await this.app.resolve(Search.ServiceProvider).register();
 	}
 }

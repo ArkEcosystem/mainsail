@@ -11,9 +11,6 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionHistoryService)
-	private readonly transactionHistoryService: Contracts.Shared.TransactionHistoryService;
-
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
@@ -32,14 +29,8 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		return MultiSignatureRegistrationTransaction;
 	}
 
-	public async bootstrap(): Promise<void> {
-		const criteria = {
-			type: this.getConstructor().type,
-			typeGroup: this.getConstructor().typeGroup,
-			version: this.getConstructor().version,
-		};
-
-		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
+	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+		for (const transaction of this.allTransactions(transactions)) {
 			AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(transaction.asset?.multiSignature);
 
 			const multiSignature: Contracts.State.WalletMultiSignatureAttributes = transaction.asset.multiSignature;

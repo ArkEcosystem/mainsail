@@ -8,6 +8,5 @@ export * as Pipeline from "./pipeline";
 export * as ProcessActions from "./process-actions";
 export * as Queue from "./queue";
 export * as Schedule from "./schedule";
-export * as Search from "./search";
 export * as Triggers from "./triggers";
 export * as Validation from "./validation";

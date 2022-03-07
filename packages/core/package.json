@@ -48,6 +48,7 @@
 		"@arkecosystem/core-forger": "workspace:*",
 		"@arkecosystem/core-forger-tracker": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/core-lmdb": "workspace:*",
 		"@arkecosystem/core-logger-pino": "workspace:*",
 		"@arkecosystem/core-networking-dns": "workspace:*",
 		"@arkecosystem/core-networking-ntp": "workspace:*",

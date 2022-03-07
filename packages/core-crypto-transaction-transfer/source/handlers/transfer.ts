@@ -23,10 +23,8 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		return TransferTransaction;
 	}
 
-	public async bootstrap(): Promise<void> {
-		const transactions = await this.transactionRepository.findReceivedTransactions();
-
-		for (const transaction of transactions) {
+	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+		for (const transaction of this.allTransactions(transactions)) {
 			const wallet: Contracts.State.Wallet = this.walletRepository.findByAddress(transaction.recipientId);
 			wallet.increaseBalance(BigNumber.make(transaction.amount));
 		}

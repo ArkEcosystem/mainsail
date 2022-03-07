@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/core-state",
+	"name": "@arkecosystem/core-lmdb",
 	"version": "0.0.1",
-	"description": "State Management for ARK Core",
+	"description": "Database Interface for ARK Core",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -12,27 +12,15 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"clean": "del distribution"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
-		"immutable": "4.0.0-rc.14",
-		"joi": "17.4.2",
 		"lmdb": "^2.2.4"
-	},
-	"devDependencies": {
-		"delay": "4.4.1"
 	},
 	"engines": {
 		"node": ">=16.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"alias": "state"
-		}
 	}
 }

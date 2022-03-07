@@ -1,14 +1,13 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService } from "@arkecosystem/core-database";
 
 @injectable()
 export class DatabaseInterceptor {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly databaseService!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
 		const block = this.stateStore.getLastBlocks().find((block) => block.data.id === id);
@@ -24,9 +23,7 @@ export class DatabaseInterceptor {
 		let commonBlocks: Contracts.Crypto.IBlockData[] = this.stateStore.getCommonBlocks(ids);
 
 		if (commonBlocks.length < ids.length) {
-			// ! do not query blocks that were found
-			// ! why method is called commonBlocks, but is just findByIds?
-			commonBlocks = (await this.databaseService.findBlockByID(ids)) as unknown as Contracts.Crypto.IBlockData[];
+			return this.databaseService.findBlocksByIds(ids);
 		}
 
 		return commonBlocks;
@@ -81,8 +78,8 @@ export class DatabaseInterceptor {
 			const blocksByHeights = await this.databaseService.findBlockByHeights(heightsToGetFromDB);
 
 			for (const blockFromDB of blocksByHeights) {
-				const index = toGetFromDB[blockFromDB.height];
-				blocks[index] = blockFromDB;
+				const index = toGetFromDB[blockFromDB.data.height];
+				blocks[index] = blockFromDB.data;
 			}
 		}
 

@@ -67,6 +67,9 @@
 			"package": "@arkecosystem/core-state"
 		},
 		{
+			"package": "@arkecosystem/core-lmdb"
+		},
+		{
 			"package": "@arkecosystem/core-database"
 		},
 		{

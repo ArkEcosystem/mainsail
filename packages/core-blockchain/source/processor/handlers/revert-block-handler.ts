@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService } from "@arkecosystem/core-database";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { BlockProcessorResult } from "../block-processor";
@@ -17,8 +16,8 @@ export class RevertBlockHandler implements BlockHandler {
 	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly database!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly database: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;

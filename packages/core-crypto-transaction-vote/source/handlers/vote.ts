@@ -14,9 +14,6 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionHistoryService)
-	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [ValidatorRegistrationTransactionHandler];
 	}
@@ -29,13 +26,8 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		return VoteTransaction;
 	}
 
-	public async bootstrap(): Promise<void> {
-		const criteria = {
-			type: this.getConstructor().type,
-			typeGroup: this.getConstructor().typeGroup,
-		};
-
-		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
+	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+		for (const transaction of this.allTransactions(transactions)) {
 			Utils.assert.defined<string>(transaction.senderPublicKey);
 			Utils.assert.defined<string[]>(transaction.asset?.votes);
 

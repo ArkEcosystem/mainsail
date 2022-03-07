@@ -1,17 +1,14 @@
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
-import { injectable, inject } from "@arkecosystem/core-container";
-
 import { Handlers } from "@arkecosystem/core-transactions";
+import { BigNumber } from "@arkecosystem/utils";
+
 import { MultiPaymentTransaction } from "../versions";
 
 @injectable()
 export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.TransactionHistoryService)
-	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
@@ -24,13 +21,8 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		return MultiPaymentTransaction;
 	}
 
-	public async bootstrap(): Promise<void> {
-		const criteria = {
-			type: this.getConstructor().type,
-			typeGroup: this.getConstructor().typeGroup,
-		};
-
-		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
+	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+		for (const transaction of this.allTransactions(transactions)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 			AppUtils.assert.defined<object>(transaction.asset?.payments);
 

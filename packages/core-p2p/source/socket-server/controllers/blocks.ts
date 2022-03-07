@@ -1,6 +1,6 @@
 import { inject, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
-import { DatabaseService } from "@arkecosystem/core-database";
+
 import { Providers, Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
@@ -16,8 +16,8 @@ export class BlocksController extends Controller {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly database!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly database: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
