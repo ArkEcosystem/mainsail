@@ -1,4 +1,4 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import chalk, { Chalk } from "chalk";

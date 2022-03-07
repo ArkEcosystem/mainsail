@@ -96,6 +96,9 @@ export const Identifiers = {
 	LogManager: Symbol.for("Manager<Log>"),
 	LogService: Symbol.for("Service<Log>"),
 	MixinService: Symbol.for("Service<Mixin>"),
+	P2P: {
+		Server: Symbol.for("P2P<Server>"),
+	},
 	P2PServer: Symbol.for("Server<P2P>"),
 	PaginationService: Symbol.for("Service<PaginationService>"),
 	PeerChunkCache: Symbol.for("Peer<ChunkCache>"),

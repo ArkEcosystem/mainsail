@@ -1,0 +1,43 @@
+{
+	"name": "@arkecosystem/core-libp2p",
+	"version": "0.0.1",
+	"description": "P2P API for ARK Core",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:proto": "pnpm run pbjs && pnpm run pbts",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
+		"pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
+		"@chainsafe/libp2p-noise": "^5.0.2",
+		"ipaddr.js": "2.0.1",
+		"libp2p": "^0.36.2",
+		"libp2p-bootstrap": "^0.14.0",
+		"libp2p-gossipsub": "^0.13.0",
+		"libp2p-mplex": "^1.0.0",
+		"libp2p-tcp": "^0.17.2",
+		"libp2p-websockets": "^0.16.2"
+	},
+	"engines": {
+		"node": ">=16.x"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "p2p"
+		}
+	}
+}
