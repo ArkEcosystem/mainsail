@@ -1,42 +1,34 @@
-import "jest-extended";
-
-import { walletFactory } from "@packages/core-state/source/wallets/wallet-factory";
-import { Container, Providers, Services } from "@packages/core-kernel";
-import { DposPreviousRoundStateProvider } from "@packages/core-kernel/source/contracts/state";
-import { PluginConfiguration } from "@packages/core-kernel/source/providers";
-import { dposPreviousRoundStateProvider } from "@packages/core-state/source";
-import { BuildDelegateRankingAction } from "@packages/core-state/source/actions";
-import { BlockState } from "@packages/core-state/source/block-state";
-import { defaults } from "@packages/core-state/source/defaults";
-import { DposState } from "@packages/core-state/source/dpos/dpos";
-import { StateBuilder } from "@packages/core-state/source/state-builder";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { TransactionValidator } from "@packages/core-state/source/transaction-validator";
-import {
-	WalletRepository,
-	WalletRepositoryClone,
-	WalletRepositoryCopyOnWrite,
-} from "@packages/core-state/source/wallets";
-import { registerIndexers } from "@packages/core-state/source/wallets/indexers";
-import { Sandbox } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
-import { Managers, Utils } from "@packages/crypto/source";
+import { walletFactory } from "../source/wallets/wallet-factory";
+import { Container, Providers, Services, Contracts } from "@arkecosystem/core-kernel";
+import { dposPreviousRoundStateProvider } from "../source";
+import { BuildDelegateRankingAction } from "../source/actions";
+import { BlockState } from "../source/block-state";
+import { defaults } from "../source/defaults";
+import { DposState } from "../source/dpos/dpos";
+import { StateBuilder } from "../source/state-builder";
+import { StateStore } from "../source/stores/state";
+import { TransactionValidator } from "../source/transaction-validator";
+import { WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
+import { registerIndexers } from "../source/wallets/indexers";
+import { Sandbox, Factories } from "@arkecosystem/core-test-framework";
+import { Managers, Utils } from "@arkecosystem/crypto";
+import { SinonSpy, spy } from "sinon";
 
 export interface Spies {
-	applySpy: jest.SpyInstance;
-	revertSpy: jest.SpyInstance;
+	applySpy: SinonSpy;
+	revertSpy: SinonSpy;
 	logger: {
-		error: jest.SpyInstance;
-		info: jest.SpyInstance;
-		notice: jest.SpyInstance;
-		debug: jest.SpyInstance;
-		warning: jest.SpyInstance;
+		error: SinonSpy;
+		info: SinonSpy;
+		notice: SinonSpy;
+		debug: SinonSpy;
+		warning: SinonSpy;
 	};
-	getBlockRewardsSpy: jest.SpyInstance;
-	getSentTransactionSpy: jest.SpyInstance;
-	getRegisteredHandlersSpy: jest.SpyInstance;
-	dispatchSpy: jest.SpyInstance;
-	dispatchSyncSpy: jest.SpyInstance;
+	getBlockRewardsSpy: SinonSpy;
+	getSentTransactionSpy: SinonSpy;
+	getRegisteredHandlersSpy: SinonSpy;
+	dispatchSpy: SinonSpy;
+	dispatchSyncSpy: SinonSpy;
 }
 
 export interface Setup {
@@ -44,11 +36,11 @@ export interface Setup {
 	walletRepo: WalletRepository;
 	walletRepoClone: WalletRepositoryClone;
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
-	factory: FactoryBuilder;
+	factory: Factories.FactoryBuilder;
 	blockState: BlockState;
 	stateStore: StateStore;
 	dPosState: DposState;
-	dposPreviousRound: DposPreviousRoundStateProvider;
+	dposPreviousRound: Contracts.State.DposPreviousRoundStateProvider;
 	stateBuilder: StateBuilder;
 	transactionValidator: TransactionValidator;
 	spies: Spies;
@@ -76,11 +68,11 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	const sandbox = new Sandbox();
 
 	const logger = {
-		error: jest.fn(),
-		info: jest.fn(),
-		notice: jest.fn(),
-		debug: jest.fn(),
-		warning: jest.fn(),
+		error: spy(),
+		info: spy(),
+		notice: spy(),
+		debug: spy(),
+		warning: spy(),
 	};
 
 	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
@@ -118,11 +110,11 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Container.Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 
 	sandbox.app
-		.get<PluginConfiguration>(Container.Identifiers.PluginConfiguration)
+		.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration)
 		.set("storage.maxLastBlocks", defaults.storage.maxLastBlocks);
 
 	sandbox.app
-		.get<PluginConfiguration>(Container.Identifiers.PluginConfiguration)
+		.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration)
 		.set("storage.maxLastTransactionIds", defaults.storage.maxLastTransactionIds);
 
 	sandbox.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
@@ -134,10 +126,10 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	const stateStore: StateStore = sandbox.app.get(Container.Identifiers.StateStore);
 
-	const applySpy: jest.SpyInstance = jest.fn();
-	const revertSpy: jest.SpyInstance = jest.fn();
+	const applySpy: SinonSpy = spy();
+	const revertSpy: SinonSpy = spy();
 
-	const getRegisteredHandlersSpy = jest.fn();
+	const getRegisteredHandlersSpy = spy();
 
 	@Container.injectable()
 	class MockHandler {
@@ -155,7 +147,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Container.Identifiers.TransactionHandlerRegistry).to(MockHandler);
 
-	const getBlockRewardsSpy = jest.fn();
+	const getBlockRewardsSpy = spy();
 
 	@Container.injectable()
 	class MockBlockRepository {
@@ -165,7 +157,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	const getSentTransactionSpy = jest.fn();
+	const getSentTransactionSpy = spy();
 
 	@Container.injectable()
 	class MockTransactionRepository {
@@ -175,8 +167,8 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	const dispatchSpy = jest.fn();
-	const dispatchSyncSpy = jest.fn();
+	const dispatchSpy = spy();
+	const dispatchSyncSpy = spy();
 
 	@Container.injectable()
 	class MockEventDispatcher {
@@ -268,10 +260,10 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 	sandbox.app
-		.bind<DposPreviousRoundStateProvider>(Container.Identifiers.DposPreviousRoundStateProvider)
+		.bind<Contracts.State.DposPreviousRoundStateProvider>(Container.Identifiers.DposPreviousRoundStateProvider)
 		.toProvider(dposPreviousRoundStateProvider);
 
-	const dposPreviousRound = sandbox.app.get<DposPreviousRoundStateProvider>(
+	const dposPreviousRound = sandbox.app.get<Contracts.State.DposPreviousRoundStateProvider>(
 		Container.Identifiers.DposPreviousRoundStateProvider,
 	);
 
@@ -294,11 +286,11 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		);
 	}
 
-	const factory = new FactoryBuilder();
+	const factory = new Factories.FactoryBuilder();
 
-	Factories.registerBlockFactory(factory);
-	Factories.registerTransactionFactory(factory);
-	Factories.registerWalletFactory(factory);
+	Factories.Factories.registerBlockFactory(factory);
+	Factories.Factories.registerTransactionFactory(factory);
+	Factories.Factories.registerWalletFactory(factory);
 
 	return {
 		sandbox,

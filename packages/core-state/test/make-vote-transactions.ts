@@ -1,5 +1,5 @@
-import { Transactions } from "@packages/crypto";
-import { ITransaction } from "@packages/crypto/distribution/interfaces";
+import { Transactions } from "@arkecosystem/crypto";
+import { ITransaction } from "@arkecosystem/crypto/distribution/interfaces";
 
 export const makeVoteTransactions = (length: number, voteAssets: string[]): ITransaction[] => {
 	const txs: ITransaction[] = [];

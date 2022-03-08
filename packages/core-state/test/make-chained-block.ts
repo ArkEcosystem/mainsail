@@ -1,4 +1,4 @@
-import { Interfaces } from "@packages/crypto";
+import { Interfaces } from "@arkecosystem/crypto";
 
 export const makeChainedBlocks = (length: number, blockFactory): Interfaces.IBlock[] => {
 	const entitites: Interfaces.IBlock[] = [];

@@ -1,4 +1,4 @@
-import { IBlock, ITransaction } from "@packages/crypto/distribution/interfaces";
+import { IBlock, ITransaction } from "@arkecosystem/crypto/distribution/interfaces";
 
 export const addTransactionsToBlock = (txs: ITransaction[], block: IBlock) => {
 	const { data } = block;
