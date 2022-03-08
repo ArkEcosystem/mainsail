@@ -44,10 +44,9 @@ export class ForgerService {
 
 	public getRemainingSlotTime(): number | undefined {
 		if (this.round) {
-			const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
-			const blocktime = this.configuration.getMilestone(this.round.lastBlock.height).blocktime;
+			const { blocktime } = this.configuration.getMilestone(this.round.lastBlock.height);
 
-			return epoch + this.round.timestamp * 1000 + blocktime * 1000 - Date.now();
+			return this.round.timestamp + blocktime * 1000 - Date.now();
 		}
 
 		return undefined;
