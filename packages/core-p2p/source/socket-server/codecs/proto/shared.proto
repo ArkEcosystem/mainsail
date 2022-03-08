@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package shared;
-
-message Headers {
-    string version = 1;
-}

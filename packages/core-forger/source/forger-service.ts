@@ -44,7 +44,10 @@ export class ForgerService {
 
 	public getRemainingSlotTime(): number | undefined {
 		if (this.round) {
-			return this.#getRoundRemainingSlotTime(this.round);
+			const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
+			const blocktime = this.configuration.getMilestone(this.round.lastBlock.height).blocktime;
+
+			return epoch + this.round.timestamp * 1000 + blocktime * 1000 - Date.now();
 		}
 
 		return undefined;
@@ -57,11 +60,12 @@ export class ForgerService {
 
 		this.validators = validators;
 
-		let timeout = 2000;
+		const timeout = 2000;
 		try {
 			await this.#loadRound();
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
-			timeout = Math.max(0, this.#getRoundRemainingSlotTime(this.round));
+			// @TODO
+			// timeout = Math.max(0, this.getRemainingSlotTime());
 		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {
@@ -107,7 +111,7 @@ export class ForgerService {
 					await this.blockchain.forceWakeup();
 				}
 
-				return this.#checkLater(this.#getRoundRemainingSlotTime(this.round));
+				return this.#checkLater(this.getRemainingSlotTime());
 			}
 
 			const networkState: Contracts.P2P.NetworkState = await this.peerNetworkMonitor.getNetworkState();
@@ -132,8 +136,10 @@ export class ForgerService {
 
 			this.logAppReady = true;
 
-			return this.#checkLater(this.#getRoundRemainingSlotTime(this.round));
+			return this.#checkLater(this.getRemainingSlotTime());
 		} catch (error) {
+			console.log(error);
+
 			if (
 				error instanceof Exceptions.HostNoResponseError ||
 				error instanceof Exceptions.RelayCommunicationError
@@ -229,12 +235,5 @@ export class ForgerService {
 				)}: ${inactiveValidators.join(", ")}`,
 			);
 		}
-	}
-
-	#getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
-		const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
-		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
-
-		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
 	}
 }

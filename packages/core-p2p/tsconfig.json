@@ -4,5 +4,5 @@
 		"outDir": "distribution",
 		"allowJs": true
 	},
-	"include": ["source/**/**.ts", "source/socket-server/codecs/proto/*.js"]
+	"include": ["source/**/**.ts", "source/server/codecs/proto/*.js"]
 }

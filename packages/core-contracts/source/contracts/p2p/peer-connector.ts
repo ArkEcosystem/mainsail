@@ -1,16 +1,11 @@
-import { Client } from "./nes-client";
 import { Peer } from "./peer";
 
 export interface PeerConnector {
-	all(): Client[];
+	all(): string[];
 
-	connection(peer: Peer): Client | undefined;
-
-	connect(peer: Peer, maxPayload?: number): Promise<Client>;
+	connect(peer: Peer, maxPayload?: number): Promise<void>;
 
 	disconnect(peer: Peer): void;
-
-	emit(peer: Peer, event: string, payload: any, timeout?: number): Promise<any>;
 
 	getError(peer: Peer): string | undefined;
 
