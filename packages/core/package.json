@@ -18,7 +18,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"run": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test --token=ark",
+		"run": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test --token=ark --network=testnet",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
