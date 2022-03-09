@@ -40,9 +40,7 @@ export class TransferTransaction extends Transaction {
 		buff.writeUInt32LE(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer } = await this.addressFactory.toBuffer(data.recipientId);
-
-			this.addressSerializer.serialize(buff, addressBuffer);
+			this.addressSerializer.serialize(buff, await this.addressFactory.toBuffer(data.recipientId));
 		}
 
 		return buff;

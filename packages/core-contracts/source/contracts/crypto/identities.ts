@@ -21,7 +21,7 @@ export interface IAddressFactory {
 
 	fromBuffer(buffer: Buffer): Promise<string>;
 
-	toBuffer(address: string): Promise<{ addressBuffer: Buffer; addressError?: string }>;
+	toBuffer(address: string): Promise<Buffer>;
 
 	validate(address: string): Promise<boolean>;
 }

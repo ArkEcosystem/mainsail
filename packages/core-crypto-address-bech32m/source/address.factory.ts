@@ -37,13 +37,8 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 		return bech32m.encode(this.configuration.get("network.address.bech32m"), [...new Uint8Array(buffer)]);
 	}
 
-	public async toBuffer(address: string): Promise<{
-		addressBuffer: Buffer;
-		addressError?: string;
-	}> {
-		return {
-			addressBuffer: Buffer.from(bech32m.decode(address).words),
-		};
+	public async toBuffer(address: string): Promise<Buffer> {
+		return Buffer.from(bech32m.decode(address).words);
 	}
 
 	public async validate(address: string): Promise<boolean> {

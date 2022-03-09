@@ -57,9 +57,7 @@ export class MultiPaymentTransaction extends Transaction {
 			for (const payment of data.asset.payments) {
 				buff.writeBigUInt64LE(payment.amount.toBigInt());
 
-				const { addressBuffer } = await this.addressFactory.toBuffer(payment.recipientId);
-
-				buff.writeBuffer(addressBuffer);
+				buff.writeBuffer(await this.addressFactory.toBuffer(payment.recipientId));
 			}
 
 			return buff;

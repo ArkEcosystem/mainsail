@@ -74,11 +74,9 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 			await context.app
 				.resolve(AddressFactory)
 				.fromBuffer(
-					(
-						await context.app
-							.resolve(AddressFactory)
-							.toBuffer("mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7a6xmtw")
-					).addressBuffer,
+					await context.app
+						.resolve(AddressFactory)
+						.toBuffer("mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7a6xmtw"),
 				),
 			"mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7a6xmtw",
 		);

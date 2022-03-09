@@ -37,11 +37,8 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 		return "";
 	}
 
-	public async toBuffer(address: string): Promise<{
-		addressBuffer: Buffer;
-		addressError?: string;
-	}> {
-		return { addressBuffer: Buffer.alloc(1) };
+	public async toBuffer(address: string): Promise<Buffer> {
+		return Buffer.alloc(1);
 	}
 
 	public async validate(address: string): Promise<boolean> {

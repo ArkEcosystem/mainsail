@@ -44,19 +44,13 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 		return base58.encodeCheck(buffer);
 	}
 
-	public async toBuffer(address: string): Promise<{
-		addressBuffer: Buffer;
-		addressError?: string;
-	}> {
-		const buffer: Buffer = base58.decodeCheck(address);
-		const result: { addressBuffer: Buffer; addressError?: string } = {
-			addressBuffer: buffer,
-		};
+	public async toBuffer(address: string): Promise<Buffer> {
+		const result: Buffer = base58.decodeCheck(address);
 
 		const pubKeyHash = this.configuration.get("network.address.base58");
 
-		if (buffer[0] !== pubKeyHash) {
-			result.addressError = `Expected address network byte ${pubKeyHash}, but got ${buffer[0]}.`;
+		if (result[0] !== pubKeyHash) {
+			throw new Error(`Expected address network byte ${pubKeyHash}, but got ${result[0]}.`);
 		}
 
 		return result;
