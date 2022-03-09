@@ -13,7 +13,8 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
@@ -25,7 +26,9 @@
 		"lmdb": "^2.2.4"
 	},
 	"devDependencies": {
-		"delay": "4.4.1"
+		"import-fresh": "3.3.0",
+		"sinon": "^13.0.1",
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

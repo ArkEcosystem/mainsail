@@ -13,7 +13,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
@@ -26,7 +26,10 @@
 	},
 	"devDependencies": {
 		"@types/better-sqlite3": "5.4.3",
-		"@types/fs-extra": "8.1.2"
+		"@types/fs-extra": "8.1.2",
+		"import-fresh": "3.3.0",
+		"sinon": "^13.0.1",
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

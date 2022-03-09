@@ -3,16 +3,55 @@ const { resolve } = require("path");
 const YAML = require("yaml");
 
 const workflow = {
-	name: "Unit",
-	on: {
-		push: {
-			branches: ["main", "develop"],
+	jobs: {
+		unit: {
+			concurrency: {
+				"cancel-in-progress": true,
+				group: `\${{ github.head_ref }}-unit`,
+			},
+			"runs-on": "ubuntu-latest",
+			steps: [
+				{
+					uses: "actions/checkout@v2",
+					with: {
+						ref: "${{ github.head_ref }}",
+					},
+				},
+				{
+					uses: "pnpm/action-setup@v2",
+					with: {
+						run_install: true,
+						version: "latest",
+					},
+				},
+				{
+					uses: "actions/setup-node@v2",
+					with: {
+						cache: "pnpm",
+						"node-version": "${{ matrix.node-version }}",
+					},
+				},
+				{
+					name: "Build",
+					run: "pnpm run build",
+				},
+			],
+			strategy: {
+				matrix: {
+					"node-version": ["16.x"],
+				},
+			},
 		},
+	},
+	name: "CI",
+	on: {
 		pull_request: {
 			types: ["ready_for_review", "synchronize", "opened"],
 		},
+		push: {
+			branches: ["main", "develop"],
+		},
 	},
-	jobs: {},
 };
 
 const directories = readdirSync(resolve("packages"), { withFileTypes: true })
@@ -27,48 +66,10 @@ for (const directory of directories) {
 		continue;
 	}
 
-	workflow.jobs[directory] = {
-		"runs-on": "ubuntu-latest",
-		strategy: {
-			matrix: {
-				"node-version": ["16.x"],
-			},
-		},
-		concurrency: {
-			group: `\${{ github.head_ref }}-unit-${directory}`,
-			"cancel-in-progress": true,
-		},
-		steps: [
-			{
-				uses: "actions/checkout@v2",
-				with: {
-					ref: "${{ github.head_ref }}",
-				},
-			},
-			{
-				uses: "pnpm/action-setup@v2",
-				with: {
-					version: "latest",
-					run_install: true,
-				},
-			},
-			{
-				uses: "actions/setup-node@v2",
-				with: {
-					"node-version": "${{ matrix.node-version }}",
-					cache: "pnpm",
-				},
-			},
-			{
-				name: "Build",
-				run: "pnpm run build",
-			},
-			{
-				name: "Test",
-				run: `cd packages/${directory} && pnpm run test`,
-			},
-		],
-	};
+	workflow.jobs.unit.steps.push({
+		name: `Test ${directory}`,
+		run: `cd packages/${directory} && pnpm run test`,
+	});
 }
 
 writeFileSync(resolve(".github/workflows/unit.yml"), YAML.stringify(workflow, { indent: 4 }));

@@ -1584,10 +1584,12 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
-      delay: 4.4.1
       immutable: 4.0.0-rc.14
+      import-fresh: 3.3.0
       joi: 17.4.2
       lmdb: ^2.2.4
+      sinon: ^13.0.1
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -1597,7 +1599,9 @@ importers:
       joi: 17.4.2
       lmdb: 2.2.4
     devDependencies:
-      delay: 4.4.1
+      import-fresh: 3.3.0
+      sinon: 13.0.1
+      uvu: 0.5.3
 
   packages/core-test-framework:
     specifiers:
@@ -1676,7 +1680,10 @@ importers:
       '@types/fs-extra': 8.1.2
       better-sqlite3: 7.4.3
       fs-extra: 8.1.0
+      import-fresh: 3.3.0
       joi: 17.4.2
+      sinon: ^13.0.1
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -1688,6 +1695,9 @@ importers:
     devDependencies:
       '@types/better-sqlite3': 5.4.3
       '@types/fs-extra': 8.1.2
+      import-fresh: 3.3.0
+      sinon: 13.0.1
+      uvu: 0.5.3
 
   packages/core-transaction-pool-api:
     specifiers:
@@ -14504,6 +14514,17 @@ packages:
       diff: 5.0.0
       nise: 5.1.1
       supports-color: 7.2.0
+
+  /sinon/13.0.1:
+    resolution: {integrity: sha512-8yx2wIvkBjIq/MGY1D9h1LMraYW+z1X0mb648KZnKSdvLasvDu7maa0dFaNYdTDczFgbjNw2tOmWdTk9saVfwQ==}
+    dependencies:
+      '@sinonjs/commons': 1.8.3
+      '@sinonjs/fake-timers': 9.1.0
+      '@sinonjs/samsam': 6.1.1
+      diff: 5.0.0
+      nise: 5.1.1
+      supports-color: 7.2.0
+    dev: true
 
   /sinon/9.2.4:
     resolution: {integrity: sha512-zljcULZQsJxVra28qIAL6ow1Z9tpattkCTEJR4RBP3TGc00FcttsP5pK284Nas5WjMZU5Yzy3kAIp3B3KRf5Yg==}
