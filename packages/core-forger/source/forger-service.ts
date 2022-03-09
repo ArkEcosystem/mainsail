@@ -43,7 +43,7 @@ export class ForgerService {
 		if (this.round) {
 			const { blocktime } = this.configuration.getMilestone(this.round.lastBlock.height);
 
-			return this.round.timestamp + blocktime * 1000 - Date.now();
+			return this.round.timestamp * 1000 + blocktime * 1000 - Date.now();
 		}
 
 		return undefined;

@@ -19,9 +19,7 @@ const getBlockChainedDetails = (
 	const isPlusOne: boolean = nextBlock.height === previousBlock.height + 1;
 
 	const previousSlot: number = slots.getSlotNumber(getTimeStampForBlock, previousBlock.timestamp);
-	console.log({ previousSlot, timestamp: previousBlock.timestamp });
 	const nextSlot: number = slots.getSlotNumber(getTimeStampForBlock, nextBlock.timestamp);
-	console.log({ nextSlot, timestamp: nextBlock.timestamp });
 	const isAfterPreviousSlot: boolean = previousSlot < nextSlot;
 
 	const isChained: boolean = followsPrevious && isPlusOne && isAfterPreviousSlot;
