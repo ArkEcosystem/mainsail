@@ -78,7 +78,7 @@ export class CryptoGenerator extends Generator {
 
 	// private generateMilestones(
 	// 	activeValidators: number,
-	// 	blocktime: number,
+	// 	blockTime: number,
 	// 	maxTransactions: number,
 	// 	maxPayload: number,
 	// 	rewardHeight: number,
@@ -92,7 +92,7 @@ export class CryptoGenerator extends Generator {
 	// 				maxTransactions,
 	// 				version: 0,
 	// 			},
-	// 			blocktime,
+	// 			blockTime,
 	// 			epoch: "2017-03-21T13:00:00.000Z",
 	// 			fees: {
 	// 				staticFees: {
@@ -349,7 +349,7 @@ export class CryptoGenerator extends Generator {
 	// 			resolve(this.destination, "milestones.json"),
 	// 			this.generateMilestones(
 	// 				this.options.crypto.flags.validators,
-	// 				this.options.crypto.flags.blocktime,
+	// 				this.options.crypto.flags.blockTime,
 	// 				this.options.crypto.flags.maxTxPerBlock,
 	// 				this.options.crypto.flags.maxBlockPayload,
 	// 				this.options.crypto.flags.rewardHeight,

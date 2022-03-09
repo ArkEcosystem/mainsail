@@ -1,13 +1,12 @@
 [
 	{
 		"activeValidators": 51,
-		"aip11": true,
 		"block": {
 			"maxPayload": 2097152,
 			"maxTransactions": 150,
-			"version": 0
+			"version": 1
 		},
-		"blocktime": 8,
+		"blockTime": 8,
 		"epoch": "2022-03-09T00:00:00.000Z",
 		"height": 1,
 		"multiPaymentLimit": 256,

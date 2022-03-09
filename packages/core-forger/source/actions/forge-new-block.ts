@@ -82,9 +82,9 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 	// @TODO: duplicate from forger-service.ts
 	#getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
 		const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
-		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
+		const blockTime = this.configuration.getMilestone(round.lastBlock.height).blockTime;
 
-		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
+		return epoch + round.timestamp * 1000 + blockTime * 1000 - Date.now();
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {

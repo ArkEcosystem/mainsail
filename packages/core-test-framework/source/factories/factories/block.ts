@@ -21,7 +21,7 @@ export const registerBlockFactory = (
 	// 	} else {
 	// 		previousBlock = options.config?.genesisBlock || this.configuration.get("genesisBlock");
 	// 	}
-	// 	const { blocktime, reward } = this.configuration.getMilestone(previousBlock.height);
+	// 	const { blockTime, reward } = this.configuration.getMilestone(previousBlock.height);
 	// 	const transactions = options.transactions || [];
 	// 	if (options.transactionsCount) {
 	// 		const signer = new Signer(options.config, options.nonce);
@@ -42,8 +42,8 @@ export const registerBlockFactory = (
 	// 	return ValidatorFactory.fromBIP39(options.passphrase || secrets[0]).forge(transactions, {
 	// 		previousBlock,
 	// 		timestamp:
-	// 			Crypto.Slots.getSlotNumber(blockTimestampLookup, Contracts.Crypto.Slots.getTime()) * options.blocktime ||
-	// 			blocktime,
+	// 			Crypto.Slots.getSlotNumber(blockTimestampLookup, Contracts.Crypto.Slots.getTime()) * options.blockTime ||
+	// 			blockTime,
 	// 		reward: options.reward || reward,
 	// 	})!;
 	// });

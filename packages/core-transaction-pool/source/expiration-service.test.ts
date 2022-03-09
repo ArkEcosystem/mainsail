@@ -1,7 +1,8 @@
 import { Container, Utils } from "@arkecosystem/core-kernel";
-import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
-import { ExpirationService } from "./";
 import { describe } from "@arkecosystem/core-test-framework";
+import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
+
+import { ExpirationService } from ".";
 
 describe<{
 	app: any;
@@ -10,9 +11,9 @@ describe<{
 	container: Container.Container;
 }>("ExpirationService", ({ it, assert, stub, beforeAll, beforeEach }) => {
 	beforeAll((context) => {
-		context.configuration = { getRequired: () => undefined };
-		context.stateStore = { getLastHeight: () => undefined };
-		context.app = { get: () => undefined };
+		context.configuration = { getRequired: () => {} };
+		context.stateStore = { getLastHeight: () => {} };
+		context.app = { get: () => {} };
 
 		context.container = new Container.Container();
 		context.container.bind(Container.Identifiers.Application).toConstantValue(context.app);
@@ -42,7 +43,7 @@ describe<{
 	});
 
 	it("canExpire - should return false when checking v2 transaction with 0 expiration", (context) => {
-		const transaction = { data: { version: 2, expiration: 0 } } as Interfaces.ITransaction;
+		const transaction = { data: { expiration: 0, version: 2 } } as Interfaces.ITransaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const result = expirationService.canExpire(transaction);
 
@@ -50,7 +51,7 @@ describe<{
 	});
 
 	it("canExpire - should return true when checking v2 transaction with expiration field", (context) => {
-		const transaction = { data: { version: 2, expiration: 100 } } as Interfaces.ITransaction;
+		const transaction = { data: { expiration: 100, version: 2 } } as Interfaces.ITransaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const result = expirationService.canExpire(transaction);
 
@@ -76,7 +77,7 @@ describe<{
 	it("isExpired - should return true if transaction expired when checking v2 transaction with expiration field", async (context) => {
 		stub(context.stateStore, "getLastHeight").returnValue(100);
 
-		const transaction = { data: { version: 2, expiration: 50 } } as Interfaces.ITransaction;
+		const transaction = { data: { expiration: 50, version: 2 } } as Interfaces.ITransaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expired = await expirationService.isExpired(transaction);
 
@@ -86,7 +87,7 @@ describe<{
 	it("isExpired - should return false if transaction not expired when checking v2 transaction with expiration field", async (context) => {
 		stub(context.stateStore, "getLastHeight").returnValue(100);
 
-		const transaction = { data: { version: 2, expiration: 150 } } as Interfaces.ITransaction;
+		const transaction = { data: { expiration: 150, version: 2 } } as Interfaces.ITransaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expired = await expirationService.isExpired(transaction);
 
@@ -96,7 +97,7 @@ describe<{
 	it("isExpired - should return true if transaction expires in next block when checking v2 transaciton with expiration field", async (context) => {
 		stub(context.stateStore, "getLastHeight").returnValue(100);
 
-		const transaction = { data: { version: 2, expiration: 101 } } as Interfaces.ITransaction;
+		const transaction = { data: { expiration: 101, version: 2 } } as Interfaces.ITransaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expired = await expirationService.isExpired(transaction);
 
@@ -104,7 +105,7 @@ describe<{
 	});
 
 	it("isExpired - should return true if transaction expired when checking v1 transaction", async (context) => {
-		stub(Managers.configManager, "get").returnValue([{ height: 1, blocktime: 60 }]);
+		stub(Managers.configManager, "get").returnValue([{ blockTime: 60, height: 1 }]);
 		stub(Crypto.Slots, "getTime").returnValue(60 * 180);
 
 		stub(context.configuration, "getRequired").returnValue(60);
@@ -118,7 +119,7 @@ describe<{
 	});
 
 	it("isExpired - should return false if transaction not expired when checking v1 transaction", async (context) => {
-		stub(Managers.configManager, "get").returnValue([{ height: 1, blocktime: 60 }]);
+		stub(Managers.configManager, "get").returnValue([{ blockTime: 60, height: 1 }]);
 		stub(Crypto.Slots, "getTime").returnValue(60 * 100);
 
 		stub(context.configuration, "getRequired").returnValue(60);
@@ -140,7 +141,7 @@ describe<{
 	});
 
 	it("getExpirationHeight - should return value stored in expiration field when checking v2 transaction with expiration field", async (context) => {
-		const transaction = { data: { version: 2, expiration: 100 } } as Interfaces.ITransaction;
+		const transaction = { data: { expiration: 100, version: 2 } } as Interfaces.ITransaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expirationHeight = await expirationService.getExpirationHeight(transaction);
 
@@ -148,7 +149,7 @@ describe<{
 	});
 
 	it("getExpirationHeight - should calculate expiration height when checking v1 transaction", async (context) => {
-		stub(Managers.configManager, "get").returnValue([{ height: 1, blocktime: 60 }]);
+		stub(Managers.configManager, "get").returnValue([{ blockTime: 60, height: 1 }]);
 		stub(Crypto.Slots, "getTime").returnValue(60 * 120);
 
 		stub(context.configuration, "getRequired").returnValue(60);

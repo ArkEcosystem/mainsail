@@ -43,7 +43,7 @@ export const schemas = {
 			timestamp: { minimum: 0, type: "integer" },
 			totalAmount: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
 			totalFee: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
-			version: { minimum: 0, type: "integer" },
+			version: { enum: [1] },
 		},
 		required: [
 			"id",

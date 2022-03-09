@@ -44,9 +44,9 @@ export abstract class Method {
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions,
-				version: 0,
+				version: 1,
 			},
 			keys,
-		)!; // todo: this method should never return undefined
+		);
 	}
 }

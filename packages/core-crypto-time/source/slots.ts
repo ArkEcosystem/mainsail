@@ -66,7 +66,7 @@ export class Slots implements Contracts.Crypto.Slots {
 		let totalSlotsFromLastSpan = 0;
 		let lastSpanEndTime = dayjs(this.configuration.getMilestone().epoch).unix();
 		let previousMilestoneHeight = 1;
-		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blockTime");
 
 		for (let index = 0; index < this.getMilestonesWhichAffectBlockTimes().length - 1; index++) {
 			if (height < nextMilestone.height) {
@@ -79,7 +79,7 @@ export class Slots implements Contracts.Crypto.Slots {
 
 			blockTime = nextMilestone.data;
 			previousMilestoneHeight = nextMilestone.height;
-			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blockTime");
 		}
 
 		const slotNumberUpUntilThisTimestamp = Math.floor((timestamp - lastSpanEndTime) / blockTime);
@@ -100,17 +100,17 @@ export class Slots implements Contracts.Crypto.Slots {
 	public getMilestonesWhichAffectBlockTimes(): Array<Contracts.Crypto.MilestoneSearchResult> {
 		const milestones: Array<Contracts.Crypto.MilestoneSearchResult> = [
 			{
-				data: this.configuration.getMilestone(1).blocktime,
+				data: this.configuration.getMilestone(1).blockTime,
 				found: true,
 				height: 1,
 			},
 		];
 
-		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blockTime");
 
 		while (nextMilestone.found) {
 			milestones.push(nextMilestone);
-			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blockTime");
 		}
 
 		return milestones;
@@ -122,7 +122,7 @@ export class Slots implements Contracts.Crypto.Slots {
 		let milestoneHeight = 1;
 		let lastSpanEndTime = dayjs(this.configuration.getMilestone().epoch).unix();
 
-		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blockTime");
 
 		for (let index = 0; index < this.getMilestonesWhichAffectBlockTimes().length - 1; index++) {
 			if (height < nextMilestone.height) {
@@ -135,7 +135,7 @@ export class Slots implements Contracts.Crypto.Slots {
 
 			blockTime = nextMilestone.data;
 			milestoneHeight = nextMilestone.height;
-			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blockTime");
 		}
 
 		return lastSpanEndTime + (slotNumber - totalSlotsFromLastSpan) * blockTime;

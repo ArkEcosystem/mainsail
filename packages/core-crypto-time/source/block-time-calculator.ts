@@ -22,8 +22,8 @@ export class BlockTimeCalculator {
 				continue;
 			}
 
-			if (!milestone || temporary.blocktime === milestone.blocktime) {
-				if (temporary.blocktime) {
+			if (!milestone || temporary.blockTime === milestone.blockTime) {
+				if (temporary.blockTime) {
 					milestone = temporary;
 				}
 			} else {
@@ -43,8 +43,8 @@ export class BlockTimeCalculator {
 
 		for (let index = milestones.length - 1; index >= 0; index--) {
 			const milestone = milestones[index];
-			if (milestone.height <= height && milestone.blocktime) {
-				return milestone.blocktime;
+			if (milestone.height <= height && milestone.blockTime) {
+				return milestone.blockTime;
 			}
 		}
 

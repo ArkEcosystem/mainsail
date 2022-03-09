@@ -30,7 +30,7 @@ export interface CryptoFlags {
 	network: string;
 	premine: string;
 	validators: number;
-	blocktime: number;
+	blockTime: number;
 	maxTxPerBlock: number;
 	maxBlockPayload: number;
 	rewardHeight: number;

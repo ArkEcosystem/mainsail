@@ -110,25 +110,19 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public async sign(passphrase: string): Promise<TBuilder> {
-		const keys: Contracts.Crypto.IKeyPair = await this.keyPairFactory.fromMnemonic(passphrase);
-		return this.signWithKeyPair(keys);
+		return this.signWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
 	public async signWithWif(wif: string): Promise<TBuilder> {
-		const keys: Contracts.Crypto.IKeyPair = await this.keyPairFactory.fromWIF(wif);
-
-		return this.signWithKeyPair(keys);
+		return this.signWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
 	public async multiSign(passphrase: string, index: number): Promise<TBuilder> {
-		const keys: Contracts.Crypto.IKeyPair = await this.keyPairFactory.fromMnemonic(passphrase);
-		return this.multiSignWithKeyPair(index, keys);
+		return this.multiSignWithKeyPair(index, await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
 	public async multiSignWithWif(index: number, wif: string): Promise<TBuilder> {
-		const keys = await this.keyPairFactory.fromWIF(wif);
-
-		return this.multiSignWithKeyPair(index, keys);
+		return this.multiSignWithKeyPair(index, await this.keyPairFactory.fromWIF(wif));
 	}
 
 	public async verify(): Promise<boolean> {

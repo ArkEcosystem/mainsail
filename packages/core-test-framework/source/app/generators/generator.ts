@@ -9,7 +9,7 @@ export abstract class Generator {
 		core: {},
 		crypto: {
 			flags: {
-				blocktime: 8,
+				blockTime: 8,
 				validators: 51,
 				distribute: true,
 				explorer: "http://uexplorer.ark.io",

@@ -116,7 +116,7 @@ export class Block implements Contracts.Crypto.IBlock {
 				result.errors.push("Invalid block version");
 			}
 
-			if (block.timestamp > this.slots.getTime() + this.configuration.getMilestone(block.height).blocktime) {
+			if (block.timestamp > this.slots.getTime() + this.configuration.getMilestone(block.height).blockTime) {
 				result.errors.push("Invalid block timestamp");
 			}
 

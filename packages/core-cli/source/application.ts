@@ -1,6 +1,7 @@
-import { Paths } from "./env-paths";
+import { tmpdir } from "os";
 import { resolve } from "path";
 
+import { Paths } from "./env-paths";
 import { Identifiers, interfaces } from "./ioc";
 
 export class Application {
@@ -46,5 +47,9 @@ export class Application {
 		const path: string = this.get<Paths>(Identifiers.ConsolePaths)[type];
 
 		return resolve(file ? `${path}/${file}` : path);
+	}
+
+	public dataPath(): string {
+		return tmpdir();
 	}
 }

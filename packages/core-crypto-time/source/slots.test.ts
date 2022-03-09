@@ -307,9 +307,9 @@ describe<{
 
 	it("should return the correct slot number given a timestamp within a known height", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 9, height: 1 },
-			{ blocktime: 8, height: 3 },
-			{ blocktime: 5, height: 4 },
+			{ blockTime: 9, height: 1 },
+			{ blockTime: 8, height: 3 },
+			{ blockTime: 5, height: 4 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
@@ -349,10 +349,10 @@ describe<{
 
 	it("getSlotTime", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 8, height: 1 },
-			{ blocktime: 9, height: 3 },
-			{ blocktime: 10, height: 6 },
-			{ blocktime: 8, height: 8 },
+			{ blockTime: 8, height: 1 },
+			{ blockTime: 9, height: 3 },
+			{ blockTime: 10, height: 6 },
+			{ blockTime: 8, height: 8 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
@@ -391,10 +391,10 @@ describe<{
 
 	it("getSlotInfo / should return correct values", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 8, height: 1 },
-			{ blocktime: 4, height: 2 },
-			{ blocktime: 3, height: 4 },
-			{ blocktime: 4, height: 6 },
+			{ blockTime: 8, height: 1 },
+			{ blockTime: 4, height: 2 },
+			{ blockTime: 3, height: 4 },
+			{ blockTime: 4, height: 6 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
@@ -656,9 +656,9 @@ describe<{
 
 	it("isForgingAllowed / returns true when over half the time in the block remains", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 8, height: 1 },
-			{ blocktime: 7, height: 3 },
-			{ blocktime: 5, height: 4 },
+			{ blockTime: 8, height: 1 },
+			{ blockTime: 7, height: 3 },
+			{ blockTime: 5, height: 4 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
@@ -692,9 +692,9 @@ describe<{
 
 	it("isForgingAllowed / returns false when under half the time in the block remains", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 8, height: 1 },
-			{ blocktime: 7, height: 3 },
-			{ blocktime: 5, height: 4 },
+			{ blockTime: 8, height: 1 },
+			{ blockTime: 7, height: 3 },
+			{ blockTime: 5, height: 4 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
@@ -739,9 +739,9 @@ describe<{
 
 	it("should calculate the slot time correctly when slots have been missed", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 4, height: 1 },
-			{ blocktime: 3, height: 4 },
-			{ blocktime: 4, height: 7 },
+			{ blockTime: 4, height: 1 },
+			{ blockTime: 3, height: 4 },
+			{ blockTime: 4, height: 7 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
@@ -799,9 +799,9 @@ describe<{
 
 	it("getSlotInfo / should return positive values when called without timestamp", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 4, epoch: "2017-03-21T13:00:00.000Z", height: 1 },
-			{ blocktime: 3, height: 4 },
-			{ blocktime: 4, height: 7 },
+			{ blockTime: 4, epoch: "2017-03-21T13:00:00.000Z", height: 1 },
+			{ blockTime: 3, height: 4 },
+			{ blockTime: 4, height: 7 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
@@ -835,9 +835,9 @@ describe<{
 
 	it("getSlotInfo / should calculate the next slot correctly when slots have been missed", async (context) => {
 		context.configuration.set("milestones", [
-			{ blocktime: 4, epoch: "2017-03-21T13:00:00.000Z", height: 1 },
-			{ blocktime: 3, height: 4 },
-			{ blocktime: 4, height: 7 },
+			{ blockTime: 4, epoch: "2017-03-21T13:00:00.000Z", height: 1 },
+			{ blockTime: 3, height: 4 },
+			{ blockTime: 4, height: 7 },
 		]);
 
 		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({

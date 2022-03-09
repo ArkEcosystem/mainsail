@@ -136,8 +136,8 @@ export class DatabaseInteraction {
 
 	private configureState(lastBlock: Contracts.Crypto.IBlock): void {
 		this.stateStore.setLastBlock(lastBlock);
-		const { blocktime, block } = this.configuration.getMilestone();
-		const blocksPerDay: number = Math.ceil(86_400 / blocktime);
+		const { blockTime, block } = this.configuration.getMilestone();
+		const blocksPerDay: number = Math.ceil(86_400 / blockTime);
 		this.stateBlockStore.resize(blocksPerDay);
 		this.stateTransactionStore.resize(blocksPerDay * block.maxTransactions);
 	}

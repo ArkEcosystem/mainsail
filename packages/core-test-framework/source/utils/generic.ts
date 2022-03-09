@@ -18,7 +18,7 @@ export const snoozeForBlock = async (
 	configuration: Contracts.Crypto.IConfiguration,
 	slots: Contracts.Crypto.Slots,
 ): Promise<void> => {
-	const blockTime: number = configuration.getMilestone(height).blocktime * 1000;
+	const blockTime: number = configuration.getMilestone(height).blockTime * 1000;
 	const remainingTimeInSlot: number = await slots.getTimeInMsUntilNextSlot();
 	const sleepTime: number = sleep * 1000;
 

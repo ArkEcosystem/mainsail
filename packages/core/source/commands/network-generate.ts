@@ -1,3 +1,4 @@
+import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as BaseContracts, Identifiers } from "@arkecosystem/core-contracts";
@@ -8,6 +9,8 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "@arkecosystem/core-cry
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTime } from "@arkecosystem/core-crypto-time";
+import { ServiceProvider as CoreDatabase } from "@arkecosystem/core-database";
+import { ServiceProvider as CoreLMDB } from "@arkecosystem/core-lmdb";
 import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionMultiPayment } from "@arkecosystem/core-crypto-transaction-multi-payment";
 import { ServiceProvider as CoreCryptoTransactionMultiSignatureRegistration } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
@@ -33,7 +36,6 @@ import dayjs from "dayjs";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
-import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -69,7 +71,7 @@ interface Options {
 	network: string;
 	premine: string;
 	validators: number;
-	blocktime: number;
+	blockTime: number;
 	maxTxPerBlock: number;
 	maxBlockPayload: number;
 	rewardHeight: number;
@@ -139,8 +141,8 @@ export class Command extends Commands.Command {
 			default: 51,
 		},
 		{
-			name: "blocktime",
-			description: "The network blocktime.",
+			name: "blockTime",
+			description: "The network blockTime.",
 			schema: Joi.number(),
 			promptType: "number",
 			default: 8,
@@ -309,32 +311,30 @@ export class Command extends Commands.Command {
 	}
 
 	public async initialize(): Promise<void> {
-		await this.app.resolve<CoreSerializer>(CoreSerializer).register();
-		await this.app.resolve<CoreValidation>(CoreValidation).register();
-		await this.app.resolve<CoreCryptoConfig>(CoreCryptoConfig).register();
-		await this.app.resolve<CoreCryptoTime>(CoreCryptoTime).register();
-		await this.app.resolve<CoreCryptoValidation>(CoreCryptoValidation).register();
-		await this.app.resolve<CoreCryptoHashBcrypto>(CoreCryptoHashBcrypto).register();
-		await this.app.resolve<CoreCryptoSignatureSchnorr>(CoreCryptoSignatureSchnorr).register();
-		await this.app.resolve<CoreCryptoKeyPairSchnorr>(CoreCryptoKeyPairSchnorr).register();
-		await this.app.resolve<CoreCryptoAddressBech32m>(CoreCryptoAddressBech32m).register();
-		await this.app.resolve<CoreCryptoWif>(CoreCryptoWif).register();
-		await this.app.resolve<CoreCryptoBlock>(CoreCryptoBlock).register();
-		await this.app.resolve<CoreFees>(CoreFees).register();
-		await this.app.resolve<CoreFeesStatic>(CoreFeesStatic).register();
-		await this.app.resolve<CoreCryptoTransaction>(CoreCryptoTransaction).register();
-		await this.app
-			.resolve<CoreCryptoTransactionValidatorRegistration>(CoreCryptoTransactionValidatorRegistration)
-			.register();
-		await this.app
-			.resolve<CoreCryptoTransactionValidatorResignation>(CoreCryptoTransactionValidatorResignation)
-			.register();
-		await this.app.resolve<CoreCryptoTransactionMultiPayment>(CoreCryptoTransactionMultiPayment).register();
-		await this.app
-			.resolve<CoreCryptoTransactionMultiSignatureRegistration>(CoreCryptoTransactionMultiSignatureRegistration)
-			.register();
-		await this.app.resolve<CoreCryptoTransactionTransfer>(CoreCryptoTransactionTransfer).register();
-		await this.app.resolve<CoreCryptoTransactionVote>(CoreCryptoTransactionVote).register();
+		this.app.bind(Identifiers.LogService).toConstantValue({});
+
+		await this.app.resolve(CoreSerializer).register();
+		await this.app.resolve(CoreValidation).register();
+		await this.app.resolve(CoreCryptoConfig).register();
+		await this.app.resolve(CoreCryptoTime).register();
+		await this.app.resolve(CoreCryptoValidation).register();
+		await this.app.resolve(CoreCryptoHashBcrypto).register();
+		await this.app.resolve(CoreCryptoSignatureSchnorr).register();
+		await this.app.resolve(CoreCryptoKeyPairSchnorr).register();
+		await this.app.resolve(CoreCryptoAddressBech32m).register();
+		await this.app.resolve(CoreCryptoWif).register();
+		await this.app.resolve(CoreCryptoBlock).register();
+		await this.app.resolve(CoreLMDB).register();
+		await this.app.resolve(CoreDatabase).register();
+		await this.app.resolve(CoreFees).register();
+		await this.app.resolve(CoreFeesStatic).register();
+		await this.app.resolve(CoreCryptoTransaction).register();
+		await this.app.resolve(CoreCryptoTransactionValidatorRegistration).register();
+		await this.app.resolve(CoreCryptoTransactionValidatorResignation).register();
+		await this.app.resolve(CoreCryptoTransactionMultiPayment).register();
+		await this.app.resolve(CoreCryptoTransactionMultiSignatureRegistration).register();
+		await this.app.resolve(CoreCryptoTransactionTransfer).register();
+		await this.app.resolve(CoreCryptoTransactionVote).register();
 	}
 
 	public async execute(): Promise<void> {
@@ -409,11 +409,6 @@ export class Command extends Commands.Command {
 
 	private async generateNetwork(flags: Options): Promise<void> {
 		try {
-			// @TODO
-			this.app
-				.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
-				.set("network.address.base58", flags.pubKeyHash);
-			// @TODO
 			this.app
 				.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 				.set("network.address.bech32m", "ark");
@@ -425,7 +420,7 @@ export class Command extends Commands.Command {
 
 			const validators: any[] = await this.generateCoreValidators(flags.validators, flags.pubKeyHash);
 
-			const genesisWallet = await this.createWallet(flags.pubKeyHash);
+			const genesisWallet = await this.createWallet();
 
 			await this.components.taskList([
 				{
@@ -465,7 +460,6 @@ export class Command extends Commands.Command {
 								network: {
 									// @ts-ignore
 									address: {
-										base58: 12,
 										bech32m: "ark",
 									},
 								},
@@ -519,13 +513,7 @@ export class Command extends Commands.Command {
 	private generateCryptoNetwork(nethash: string, options: Options) {
 		return {
 			address: {
-				base58: options.pubKeyHash,
 				bech32m: "ark",
-			},
-			aip20: 0,
-			bip32: {
-				private: 70_615_956,
-				public: 70_617_039,
 			},
 			client: {
 				explorer: options.explorer,
@@ -545,13 +533,12 @@ export class Command extends Commands.Command {
 		return [
 			{
 				activeValidators: options.validators,
-				aip11: true,
 				block: {
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
-					version: 0,
+					version: 1,
 				},
-				blocktime: options.blocktime,
+				blockTime: options.blockTime,
 				epoch: new Date(options.epoch).toISOString(),
 				height: 1,
 				multiPaymentLimit: 256,
@@ -570,7 +557,7 @@ export class Command extends Commands.Command {
 		validators,
 		options: Options,
 	): Promise<BaseContracts.Crypto.IBlockData> {
-		const premineWallet: Wallet = await this.createWallet(options.pubKeyHash);
+		const premineWallet: Wallet = await this.createWallet();
 
 		let transactions = [];
 
@@ -664,7 +651,7 @@ export class Command extends Commands.Command {
 		const wallets: Wallet[] = [];
 
 		for (let index = 0; index < activeValidators; index++) {
-			const validatorWallet: Wallet = await this.createWallet(pubKeyHash);
+			const validatorWallet: Wallet = await this.createWallet();
 			validatorWallet.username = `genesis_${index + 1}`;
 
 			wallets.push(validatorWallet);
@@ -673,7 +660,7 @@ export class Command extends Commands.Command {
 		return wallets;
 	}
 
-	private async createWallet(pubKeyHash: number): Promise<Wallet> {
+	private async createWallet(): Promise<Wallet> {
 		const passphrase = generateMnemonic(256);
 
 		const keys: BaseContracts.Crypto.IKeyPair = await this.app
@@ -831,7 +818,7 @@ export class Command extends Commands.Command {
 						totalAmount: totals.amount.toString(),
 						totalFee: totals.fee.toString(),
 						transactions,
-						version: 0,
+						version: 1,
 					},
 					keys,
 				)

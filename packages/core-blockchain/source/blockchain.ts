@@ -280,7 +280,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 		block = block || this.getLastBlock().data;
 
-		return this.slots.getTime() - block.timestamp < 3 * this.configuration.getMilestone(block.height).blocktime;
+		return this.slots.getTime() - block.timestamp < 3 * this.configuration.getMilestone(block.height).blockTime;
 	}
 
 	public getLastBlock(): Contracts.Crypto.IBlock {

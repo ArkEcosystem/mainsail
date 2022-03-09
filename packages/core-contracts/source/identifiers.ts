@@ -74,13 +74,9 @@ export const Identifiers = {
 		TransactionStorage: Symbol.for("Database<TransactionStorage>"),
 	},
 	// @deprecated
-	DatabaseBlockRepository: Symbol.for("Database<BlockRepository>"),
-	// @deprecated
 	DatabaseInteraction: Symbol.for("Database<DatabaseInteraction>"),
 	// @deprecated
 	DatabaseInterceptor: Symbol.for("State<DatabaseInterceptor>"),
-	// @deprecated
-	DatabaseTransactionRepository: Symbol.for("Database<TransactionRepository>"),
 	DposPreviousRoundStateProvider: Symbol("Provider<DposPreviousRoundState>"),
 	DposState: Symbol.for("State<DposState>"),
 	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),

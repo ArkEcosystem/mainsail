@@ -13,7 +13,7 @@ export class BlockTimeLookup {
 		const findBlockTimestampByHeight = async (height: number): Promise<number> =>
 			(await this.databaseService.findBlockByHeights([height]))[0].data.timestamp;
 
-		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blockTime");
 
 		// TODO: could cache this object here to reduce slow calls to DB.
 		const heightMappedToBlockTimestamp: Map<number, number> = new Map();
@@ -25,7 +25,7 @@ export class BlockTimeLookup {
 
 			heightMappedToBlockTimestamp.set(endSpanBlockHeight, await findBlockTimestampByHeight(endSpanBlockHeight));
 
-			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blockTime");
 		}
 
 		const result = heightMappedToBlockTimestamp.get(height);
