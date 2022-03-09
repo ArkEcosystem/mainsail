@@ -12,9 +12,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
-		"test": "uvu -r tsm source .test.ts",
-		"test:coverage": "c8 pnpm run test"
+		"clean": "del distribution"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",

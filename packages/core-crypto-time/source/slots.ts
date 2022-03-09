@@ -23,11 +23,7 @@ export class Slots {
 	private readonly calculator: BlockTimeCalculator;
 
 	public getTime(time?: number): number {
-		if (time === undefined) {
-			return dayjs().valueOf();
-		}
-
-		return time;
+		return time ?? dayjs().valueOf();
 	}
 
 	public getTimeInMsUntilNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
@@ -38,11 +34,8 @@ export class Slots {
 	}
 
 	public getSlotNumber(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): number {
-		if (timestamp === undefined) {
-			timestamp = this.getTime();
-		}
-
-		return this.getSlotInfo(getTimeStampForBlock, timestamp, this.getLatestHeight(height)).slotNumber;
+		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.getLatestHeight(height))
+			.slotNumber;
 	}
 
 	public getSlotTime(getTimeStampForBlock: GetBlockTimeStampLookup, slot: number, height?: number): number {
@@ -58,11 +51,8 @@ export class Slots {
 		timestamp?: number,
 		height?: number,
 	): boolean {
-		if (timestamp === undefined) {
-			timestamp = this.getTime();
-		}
-
-		return this.getSlotInfo(getTimeStampForBlock, timestamp, this.getLatestHeight(height)).forgingStatus;
+		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.getLatestHeight(height))
+			.forgingStatus;
 	}
 
 	public getSlotInfo(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): SlotInfo {
@@ -156,18 +146,14 @@ export class Slots {
 	}
 
 	private getLatestHeight(height: number | undefined): number {
-		if (!height) {
-			// TODO: is the config manager the best way to retrieve most recent height?
-			// Or should this class maintain its own cache?
-			const configConfiguredHeight = this.configuration.getHeight();
-
-			if (configConfiguredHeight) {
-				return configConfiguredHeight;
-			}
-
-			return 1;
+		if (height) {
+			return height;
 		}
 
-		return height;
+		if (this.configuration.getHeight()) {
+			return this.configuration.getHeight();
+		}
+
+		return 1;
 	}
 }

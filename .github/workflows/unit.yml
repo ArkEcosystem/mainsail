@@ -485,14 +485,14 @@ jobs:
               run: pnpm run build
             - name: Test
               run: cd packages/core-crypto-signature-schnorr && pnpm run test
-    core-database:
+    core-crypto-time:
         runs-on: ubuntu-latest
         strategy:
             matrix:
                 node-version:
                     - 16.x
         concurrency:
-            group: ${{ github.head_ref }}-unit-core-database
+            group: ${{ github.head_ref }}-unit-core-crypto-time
             cancel-in-progress: true
         steps:
             - uses: actions/checkout@v2
@@ -509,7 +509,7 @@ jobs:
             - name: Build
               run: pnpm run build
             - name: Test
-              run: cd packages/core-database && pnpm run test
+              run: cd packages/core-crypto-time && pnpm run test
     core-forger:
         runs-on: ubuntu-latest
         strategy:

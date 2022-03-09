@@ -67,6 +67,7 @@ export const assert = {
 	null: (value: unknown): void => uvu.ok(value === null),
 	number: (value: unknown): void => uvu.type(value, "number"),
 	object: (value: unknown): void => uvu.type(value, "object"),
+	positive: (value: unknown): void => uvu.ok(value > 0),
 	rejects: async (callback: Function, ...expected: (uvu.Message | Constructable)[]): Promise<void> => {
 		try {
 			await callback();

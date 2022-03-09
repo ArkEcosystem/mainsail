@@ -91,7 +91,7 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 		const transactions: Contracts.Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
 
 		if (AppUtils.isEmpty(transactions)) {
-			this.logger.error("Could not get unconfirmed transactions from transaction pool.");
+			// this.logger.error("Could not get unconfirmed transactions from transaction pool.");
 			return [];
 		}
 

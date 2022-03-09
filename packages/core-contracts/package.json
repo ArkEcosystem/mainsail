@@ -12,8 +12,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"clean": "del distribution"
 	},
 	"dependencies": {
 		"@arkecosystem/core-contracts": "workspace:*",

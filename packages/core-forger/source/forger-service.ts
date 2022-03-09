@@ -17,9 +17,6 @@ export class ForgerService {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.TransactionHandlerProvider)
-	private readonly handlerProvider: Contracts.Transactions.ITransactionHandlerProvider;
-
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly peerNetworkMonitor!: Contracts.P2P.NetworkMonitor;
 
@@ -53,18 +50,15 @@ export class ForgerService {
 	}
 
 	public async boot(validators: Contracts.Forger.Validator[]): Promise<void> {
-		if (this.handlerProvider.isRegistrationRequired()) {
-			this.handlerProvider.registerHandlers();
-		}
-
 		this.validators = validators;
 
-		const timeout = 2000;
+		let timeout = 2000;
 		try {
 			await this.#loadRound();
+
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
-			// @TODO
-			// timeout = Math.max(0, this.getRemainingSlotTime());
+
+			timeout = Math.max(0, this.getRemainingSlotTime());
 		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {

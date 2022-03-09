@@ -826,13 +826,18 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       dayjs: 1.10.7
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       dayjs: 1.10.7
+    devDependencies:
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      uvu: 0.5.3
 
   packages/core-crypto-transaction:
     specifiers:

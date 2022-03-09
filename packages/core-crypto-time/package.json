@@ -12,13 +12,18 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution"
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"dayjs": "1.10.7"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"
