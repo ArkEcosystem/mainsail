@@ -34,11 +34,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
-
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
@@ -261,7 +258,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async getNetworkState(): Promise<Contracts.P2P.NetworkState> {
 		await this.cleansePeers({ fast: true, forcePing: true });
 
-		return await NetworkState.analyze(this, this.repository, this.cryptoConfiguration, this.slots);
+		return await NetworkState.analyze(this, this.repository, this.slots);
 	}
 
 	public async refreshPeersAfterFork(): Promise<void> {

@@ -1,4 +1,39 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+
+// @TODO: replace calls to "getTimeStampForBlock"
+const findIndex = async (
+	height: number,
+	slotNumber: number,
+	app: Contracts.Kernel.Application,
+): Promise<[number, number]> => {
+	const configuration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
+	const blockTimeLookup: any = app.get(Identifiers.Cryptography.Time.BlockTimeLookup);
+	const slots: Contracts.Crypto.Slots = app.get(Identifiers.Cryptography.Time.Slots);
+
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
+
+	let lastSpanSlotNumber = 0;
+	let activeValidators = configuration.getMilestone(1).activeValidators;
+
+	const milestones = getMilestonesWhichAffectActiveValidatorCount(configuration);
+
+	for (let index = 0; index < milestones.length - 1; index++) {
+		if (height < nextMilestone.height) {
+			break;
+		}
+
+		const lastSpanEndTime = blockTimeLookup.getTimeStampForBlock(nextMilestone.height - 1);
+		lastSpanSlotNumber = (await slots.getSlotInfo(lastSpanEndTime, nextMilestone.height - 1)).slotNumber + 1;
+		activeValidators = nextMilestone.data;
+
+		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
+	}
+
+	const currentForger = (slotNumber - lastSpanSlotNumber) % activeValidators;
+	const nextForger = (currentForger + 1) % activeValidators;
+
+	return [currentForger, nextForger];
+};
 
 export interface MilestoneSearchResult {
 	found: boolean;
@@ -27,56 +62,17 @@ export const getMilestonesWhichAffectActiveValidatorCount = (
 	return milestones;
 };
 
-export const calculateForgingInfo = (
+export const calculateForgingInfo = async (
 	timestamp: number,
 	height: number,
-	getTimeStampForBlock: (blockheight: number) => number,
-	configuration: Contracts.Crypto.IConfiguration,
-	slots,
-): Contracts.Shared.ForgingInfo => {
-	const slotInfo = slots.getSlotInfo(getTimeStampForBlock, timestamp, height);
+	app: Contracts.Kernel.Application,
+): Promise<Contracts.Shared.ForgingInfo> => {
+	const slotInfo = await app
+		.get<Contracts.Crypto.Slots>(Identifiers.Cryptography.Time.Slots)
+		.getSlotInfo(timestamp, height);
 
-	const [currentForger, nextForger] = findIndex(
-		height,
-		slotInfo.slotNumber,
-		getTimeStampForBlock,
-		configuration,
-		slots,
-	);
+	const [currentForger, nextForger] = await findIndex(height, slotInfo.slotNumber, app);
 	const canForge = slotInfo.forgingStatus;
 
 	return { blockTimestamp: slotInfo.startTime, canForge, currentForger, nextForger };
-};
-
-const findIndex = (
-	height: number,
-	slotNumber: number,
-	getTimeStampForBlock: (blockheight: number) => number,
-	configuration: Contracts.Crypto.IConfiguration,
-	slots,
-): [number, number] => {
-	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
-
-	let lastSpanSlotNumber = 0;
-	let activeValidators = configuration.getMilestone(1).activeValidators;
-
-	const milestones = getMilestonesWhichAffectActiveValidatorCount(configuration);
-
-	for (let index = 0; index < milestones.length - 1; index++) {
-		if (height < nextMilestone.height) {
-			break;
-		}
-
-		const lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1);
-		lastSpanSlotNumber =
-			slots.getSlotInfo(getTimeStampForBlock, lastSpanEndTime, nextMilestone.height - 1).slotNumber + 1;
-		activeValidators = nextMilestone.data;
-
-		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
-	}
-
-	const currentForger = (slotNumber - lastSpanSlotNumber) % activeValidators;
-	const nextForger = (currentForger + 1) % activeValidators;
-
-	return [currentForger, nextForger];
 };

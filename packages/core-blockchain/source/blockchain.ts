@@ -38,7 +38,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	private queue!: Contracts.Kernel.Queue;
 
@@ -160,18 +160,12 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	}
 
 	public async handleIncomingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): Promise<void> {
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			block.height,
-			this.configuration,
-		);
-
-		const currentSlot: number = this.slots.getSlotNumber(blockTimeLookup);
-		const receivedSlot: number = this.slots.getSlotNumber(blockTimeLookup, block.timestamp);
+		const currentSlot: number = await this.slots.getSlotNumber();
+		const receivedSlot: number = await this.slots.getSlotNumber(block.timestamp);
 
 		if (fromForger) {
 			const minimumMs = 2000;
-			const timeLeftInMs: number = this.slots.getTimeInMsUntilNextSlot(blockTimeLookup);
+			const timeLeftInMs: number = await this.slots.getTimeInMsUntilNextSlot();
 
 			// console.log({
 			// 	currentSlot,

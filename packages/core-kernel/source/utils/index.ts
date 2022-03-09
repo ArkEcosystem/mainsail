@@ -1,6 +1,5 @@
 import { calculateForgingInfo } from "./calculate-forging-info";
 import { calculateTransactionExpiration } from "./expiration-calculator";
-import { getBlockTimeLookup } from "./get-blocktime-lookup";
 import { calculateRound, isNewRound } from "./round-calculator";
 import { calculate } from "./supply-calculator";
 export * from "./assert";
@@ -14,7 +13,7 @@ export * from "@arkecosystem/utils";
 export const expirationCalculator = { calculateTransactionExpiration };
 export const roundCalculator = { calculateRound, isNewRound };
 export const supplyCalculator = { calculate };
-export const forgingInfoCalculator = { calculateForgingInfo, getBlockTimeLookup };
+export const forgingInfoCalculator = { calculateForgingInfo };
 
 export { formatTimestamp } from "./format-timestamp";
 export { isBlacklisted } from "./is-blacklisted";

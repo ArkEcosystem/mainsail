@@ -22,7 +22,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	private corrupt = false;
 

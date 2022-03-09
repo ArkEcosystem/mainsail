@@ -50,6 +50,7 @@ export const Identifiers = {
 		},
 		Time: {
 			BlockTimeCalculator: Symbol.for("Crypto<Time.BlockTimeCalculator>"),
+			BlockTimeLookup: Symbol.for("Crypto<Time.BlockTimeLookup>"),
 			Slots: Symbol.for("Crypto<Time.Slots>"),
 		},
 		Transaction: {

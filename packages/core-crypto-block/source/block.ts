@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
@@ -18,7 +17,7 @@ export class Block implements Contracts.Crypto.IBlock {
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Slots;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;

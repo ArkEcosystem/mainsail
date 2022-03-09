@@ -9,35 +9,37 @@ import { BlockTimeCalculator } from "./block-time-calculator";
 import { Slots } from "./slots";
 
 const setup = (context) => {
-	const app = new Application(new Container());
+	context.app = new Application(new Container());
 
-	app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-	app.bind(Identifiers.Cryptography.Time.BlockTimeCalculator).to(BlockTimeCalculator).inSingletonScope();
+	context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+	context.app.bind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+		getBlockTimeLookup: (height: number) => {
+			switch (height) {
+				case 1:
+					return 1_646_784_000;
+				default:
+					throw new Error(`Test scenarios should not hit this line`);
+			}
+		},
+	});
+	context.app.bind(Identifiers.Cryptography.Time.BlockTimeCalculator).to(BlockTimeCalculator).inSingletonScope();
 
-	app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(
-		require("../../core/bin/config/testnet/crypto.json"),
-	);
+	context.app
+		.get<Configuration>(Identifiers.Cryptography.Configuration)
+		.setConfig(require("../../core/bin/config/testnet/crypto.json"));
 
-	context.configuration = app.get(Identifiers.Cryptography.Configuration);
-	context.slots = app.resolve(Slots);
+	context.configuration = context.app.get(Identifiers.Cryptography.Configuration);
+	context.slots = context.app.resolve(Slots);
 };
 
 const genesisTimestamp = (configuration: Configuration, seconds = 0): number =>
 	dayjs(configuration.getMilestone().epoch).unix() + seconds;
 
 describe<{
+	app: Application;
 	configuration: Configuration;
 	slots: Slots;
 }>("Constant Slot Time", ({ assert, beforeEach, it }) => {
-	const getTimeStampForBlock = (height: number) => {
-		switch (height) {
-			case 1:
-				return 1_646_784_000;
-			default:
-				throw new Error(`Test scenarios should not hit this line`);
-		}
-	};
-
 	beforeEach(setup);
 
 	it("return epoch time as number", (context) => {
@@ -45,77 +47,44 @@ describe<{
 		assert.is(context.slots.getTime(1_646_784_000), genesisTimestamp(context.configuration));
 	});
 
-	it("return slot number", (context) => {
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration), 1), 0);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 4), 1), 0);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 7), 1), 0);
+	it("return slot number", async (context) => {
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration), 1), 0);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 4), 1), 0);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 7), 1), 0);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 8), 2), 1);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 9), 2), 1);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 10), 2), 1);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 11), 2), 1);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 15), 2), 1);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 8), 2), 1);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 9), 2), 1);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 10), 2), 1);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 11), 2), 1);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 15), 2), 1);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 16), 3), 2);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 20), 3), 2);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 16), 3), 2);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 20), 3), 2);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 24), 4), 3);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 24), 4), 3);
 
-		assert.is(
-			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 8000), 1001),
-			1000,
-		);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 8000), 1001), 1000);
 
-		assert.is(
-			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 15_000), 1876),
-			1875,
-		);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 15_000), 1876), 1875);
 
-		assert.is(
-			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_000), 21_126),
-			21_125,
-		);
-		assert.is(
-			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_001), 21_126),
-			21_125,
-		);
-		assert.is(
-			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_005), 21_126),
-			21_125,
-		);
-		assert.is(
-			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_007), 21_126),
-			21_125,
-		);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 169_000), 21_126), 21_125);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 169_001), 21_126), 21_125);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 169_005), 21_126), 21_125);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 169_007), 21_126), 21_125);
 	});
 
-	it("returns slot time", (context) => {
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 1, 2), genesisTimestamp(context.configuration, 8));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 8, 9), genesisTimestamp(context.configuration, 64));
-		assert.is(
-			context.slots.getSlotTime(getTimeStampForBlock, 50, 51),
-			genesisTimestamp(context.configuration, 400),
-		);
-		assert.is(
-			context.slots.getSlotTime(getTimeStampForBlock, 8888, 8889),
-			genesisTimestamp(context.configuration, 71_104),
-		);
-		assert.is(
-			context.slots.getSlotTime(getTimeStampForBlock, 19_614, 19_615),
-			genesisTimestamp(context.configuration, 156_912),
-		);
-		assert.is(
-			context.slots.getSlotTime(getTimeStampForBlock, 19_700, 19_701),
-			genesisTimestamp(context.configuration, 157_600),
-		);
-		assert.is(
-			context.slots.getSlotTime(getTimeStampForBlock, 169_000, 1),
-			genesisTimestamp(context.configuration, 1_352_000),
-		);
+	it("returns slot time", async (context) => {
+		assert.is(await context.slots.getSlotTime(1, 2), genesisTimestamp(context.configuration, 8));
+		assert.is(await context.slots.getSlotTime(8, 9), genesisTimestamp(context.configuration, 64));
+		assert.is(await context.slots.getSlotTime(50, 51), genesisTimestamp(context.configuration, 400));
+		assert.is(await context.slots.getSlotTime(8888, 8889), genesisTimestamp(context.configuration, 71_104));
+		assert.is(await context.slots.getSlotTime(19_614, 19_615), genesisTimestamp(context.configuration, 156_912));
+		assert.is(await context.slots.getSlotTime(19_700, 19_701), genesisTimestamp(context.configuration, 157_600));
+		assert.is(await context.slots.getSlotTime(169_000, 1), genesisTimestamp(context.configuration, 1_352_000));
 	});
 
-	it("getSlotInfo / should return positive values when called without timestamp", (context) => {
-		const slotInfo = context.slots.getSlotInfo(getTimeStampForBlock);
+	it("getSlotInfo / should return positive values when called without timestamp", async (context) => {
+		const slotInfo = await context.slots.getSlotInfo();
 
 		assert.positive(slotInfo.startTime);
 		assert.positive(slotInfo.endTime);
@@ -124,7 +93,7 @@ describe<{
 		assert.boolean(slotInfo.forgingStatus);
 	});
 
-	it("getSlotInfo / should return correct values", (context) => {
+	it("getSlotInfo / should return correct values", async (context) => {
 		const expectedResults = [
 			{
 				blockTime: 8,
@@ -281,7 +250,7 @@ describe<{
 		];
 
 		for (const item of [...expectedResults, ...endSlotTimeResults, ...missedBlocks]) {
-			assert.equal(context.slots.getSlotInfo(getTimeStampForBlock, item.timestamp, item.height), {
+			assert.equal(await context.slots.getSlotInfo(item.timestamp, item.height), {
 				blockTime: item.blockTime,
 				endTime: item.endTime,
 				forgingStatus: item.forgingStatus,
@@ -291,92 +260,94 @@ describe<{
 		}
 	});
 
-	it("returns next slot", (context) => {
-		assert.number(context.slots.getNextSlot(getTimeStampForBlock));
+	it("returns next slot", async (context) => {
+		assert.number(await context.slots.getNextSlot());
 	});
 
-	it("returns next slot when height is defined in configManager", (context) => {
+	it("returns next slot when height is defined in configManager", async (context) => {
 		context.configuration.setHeight(12);
 
-		assert.number(context.slots.getNextSlot(getTimeStampForBlock));
+		assert.number(await context.slots.getNextSlot());
 	});
 
-	it("isForgingAllowed / returns boolean", (context) => {
-		assert.boolean(context.slots.isForgingAllowed(getTimeStampForBlock));
+	it("isForgingAllowed / returns boolean", async (context) => {
+		assert.boolean(await context.slots.isForgingAllowed());
 	});
 
-	it("isForgingAllowed / returns true when over half the time in the block remains", (context) => {
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, 0));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, 1));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, 3));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, 8));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, 16));
+	it("isForgingAllowed / returns true when over half the time in the block remains", async (context) => {
+		assert.true(await context.slots.isForgingAllowed(0));
+		assert.true(await context.slots.isForgingAllowed(1));
+		assert.true(await context.slots.isForgingAllowed(3));
+		assert.true(await context.slots.isForgingAllowed(8));
+		assert.true(await context.slots.isForgingAllowed(16));
 	});
 
-	it("isForgingAllowed / returns false when under half the time in the block remains", (context) => {
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, 4));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, 5));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, 6));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, 7));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, 15));
+	it("isForgingAllowed / returns false when under half the time in the block remains", async (context) => {
+		assert.false(await context.slots.isForgingAllowed(4));
+		assert.false(await context.slots.isForgingAllowed(5));
+		assert.false(await context.slots.isForgingAllowed(6));
+		assert.false(await context.slots.isForgingAllowed(7));
+		assert.false(await context.slots.isForgingAllowed(15));
 	});
 
-	it("getTimeInMsUntilNextSlot", (context) => {
-		const nextSlotTime = context.slots.getSlotTime(
-			getTimeStampForBlock,
-			context.slots.getNextSlot(getTimeStampForBlock),
-		);
+	it("getTimeInMsUntilNextSlot", async (context) => {
+		const nextSlotTime = await context.slots.getSlotTime(await context.slots.getNextSlot());
 		const now = context.slots.getTime();
 
-		assert.is(context.slots.getTimeInMsUntilNextSlot(getTimeStampForBlock), (nextSlotTime - now) * 1000);
+		assert.is(await context.slots.getTimeInMsUntilNextSlot(), (nextSlotTime - now) * 1000);
 	});
 });
 
 describe<{
+	app: Application;
 	configuration: Configuration;
 	slots: Slots;
 }>("Dynamic Slot Time", ({ assert, beforeEach, it }) => {
 	beforeEach(setup);
 
-	it("should return the correct slot number given a timestamp within a known height", (context) => {
+	it("should return the correct slot number given a timestamp within a known height", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 9, height: 1 },
 			{ blocktime: 8, height: 3 },
 			{ blocktime: 5, height: 4 },
 		]);
 
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return genesisTimestamp(context.configuration, 0);
-				case 2:
-					return genesisTimestamp(context.configuration, 9);
-				case 3:
-					return genesisTimestamp(context.configuration, 18);
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 2:
+						return genesisTimestamp(context.configuration, 9);
+					case 3:
+						return genesisTimestamp(context.configuration, 18);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 1), 1), 0);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 8), 1), 0);
+		context.slots = context.app.resolve(Slots);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 9), 2), 1);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 17), 2), 1);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 1), 1), 0);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 8), 1), 0);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 18), 3), 2);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 25), 3), 2);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 9), 2), 1);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 17), 2), 1);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 26), 4), 3);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 30), 4), 3);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 18), 3), 2);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 25), 3), 2);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 31), 5), 4);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 35), 5), 4);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 26), 4), 3);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 30), 4), 3);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 36), 6), 5);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 31), 5), 4);
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 35), 5), 4);
+
+		assert.is(await context.slots.getSlotNumber(genesisTimestamp(context.configuration, 36), 6), 5);
 	});
 
-	it("getSlotTime", (context) => {
+	it("getSlotTime", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 8, height: 1 },
 			{ blocktime: 9, height: 3 },
@@ -384,40 +355,41 @@ describe<{
 			{ blocktime: 8, height: 8 },
 		]);
 
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return genesisTimestamp(context.configuration, 0);
-				case 2:
-					return genesisTimestamp(context.configuration, 8);
-				case 3:
-					return genesisTimestamp(context.configuration, 16);
-				case 5:
-					return genesisTimestamp(context.configuration, 34);
-				case 6:
-					return genesisTimestamp(context.configuration, 43);
-				case 7:
-					return genesisTimestamp(context.configuration, 53);
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 2:
+						return genesisTimestamp(context.configuration, 8);
+					case 3:
+						return genesisTimestamp(context.configuration, 16);
+					case 5:
+						return genesisTimestamp(context.configuration, 34);
+					case 6:
+						return genesisTimestamp(context.configuration, 43);
+					case 7:
+						return genesisTimestamp(context.configuration, 53);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
 
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 0, 2), genesisTimestamp(context.configuration, 0));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 2, 3), genesisTimestamp(context.configuration, 16));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 3, 4), genesisTimestamp(context.configuration, 25));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 4, 5), genesisTimestamp(context.configuration, 34));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 5, 6), genesisTimestamp(context.configuration, 43));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 6, 7), genesisTimestamp(context.configuration, 53));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 7, 8), genesisTimestamp(context.configuration, 63));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 8, 9), genesisTimestamp(context.configuration, 71));
-		assert.is(
-			context.slots.getSlotTime(getTimeStampForBlock, 14, 15),
-			genesisTimestamp(context.configuration, 119),
-		);
+		context.slots = context.app.resolve(Slots);
+
+		assert.is(await context.slots.getSlotTime(0, 2), genesisTimestamp(context.configuration, 0));
+		assert.is(await context.slots.getSlotTime(2, 3), genesisTimestamp(context.configuration, 16));
+		assert.is(await context.slots.getSlotTime(3, 4), genesisTimestamp(context.configuration, 25));
+		assert.is(await context.slots.getSlotTime(4, 5), genesisTimestamp(context.configuration, 34));
+		assert.is(await context.slots.getSlotTime(5, 6), genesisTimestamp(context.configuration, 43));
+		assert.is(await context.slots.getSlotTime(6, 7), genesisTimestamp(context.configuration, 53));
+		assert.is(await context.slots.getSlotTime(7, 8), genesisTimestamp(context.configuration, 63));
+		assert.is(await context.slots.getSlotTime(8, 9), genesisTimestamp(context.configuration, 71));
+		assert.is(await context.slots.getSlotTime(14, 15), genesisTimestamp(context.configuration, 119));
 	});
 
-	it("getSlotInfo / should return correct values", (context) => {
+	it("getSlotInfo / should return correct values", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 8, height: 1 },
 			{ blocktime: 4, height: 2 },
@@ -425,22 +397,26 @@ describe<{
 			{ blocktime: 4, height: 6 },
 		]);
 
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return genesisTimestamp(context.configuration, 0);
-				case 2:
-					return genesisTimestamp(context.configuration, 8);
-				case 3:
-					return genesisTimestamp(context.configuration, 12);
-				case 4:
-					return genesisTimestamp(context.configuration, 16);
-				case 5:
-					return genesisTimestamp(context.configuration, 19);
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 2:
+						return genesisTimestamp(context.configuration, 8);
+					case 3:
+						return genesisTimestamp(context.configuration, 12);
+					case 4:
+						return genesisTimestamp(context.configuration, 16);
+					case 5:
+						return genesisTimestamp(context.configuration, 19);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
+
+		context.slots = context.app.resolve(Slots);
 
 		const expectedResults = [
 			{
@@ -668,7 +644,7 @@ describe<{
 		];
 
 		for (const item of [...expectedResults, ...endSlotTimeResults, ...missedBlocks]) {
-			assert.equal(context.slots.getSlotInfo(getTimeStampForBlock, item.timestamp, item.height), {
+			assert.equal(await context.slots.getSlotInfo(item.timestamp, item.height), {
 				blockTime: item.blockTime,
 				endTime: item.endTime,
 				forgingStatus: item.forgingStatus,
@@ -678,147 +654,114 @@ describe<{
 		}
 	});
 
-	it("isForgingAllowed / returns true when over half the time in the block remains", (context) => {
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return genesisTimestamp(context.configuration, 0);
-				case 2:
-					return genesisTimestamp(context.configuration, 8);
-				case 3:
-					return genesisTimestamp(context.configuration, 16);
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
+	it("isForgingAllowed / returns true when over half the time in the block remains", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 8, height: 1 },
 			{ blocktime: 7, height: 3 },
 			{ blocktime: 5, height: 4 },
 		]);
 
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 0), 1),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 1), 1),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 3), 1),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 8), 2),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 11), 2),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 16), 3),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 18), 3),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 23), 4),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 28), 5),
-		);
-		assert.true(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 29), 5),
-		);
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 2:
+						return genesisTimestamp(context.configuration, 8);
+					case 3:
+						return genesisTimestamp(context.configuration, 16);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
+
+		context.slots = context.app.resolve(Slots);
+
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 0), 1));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 1), 1));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 3), 1));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 8), 2));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 11), 2));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 16), 3));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 18), 3));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 23), 4));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 28), 5));
+		assert.true(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 29), 5));
 	});
 
-	it("isForgingAllowed / returns false when under half the time in the block remains", (context) => {
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return genesisTimestamp(context.configuration, 0);
-				case 2:
-					return genesisTimestamp(context.configuration, 8);
-				case 3:
-					return genesisTimestamp(context.configuration, 16);
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
+	it("isForgingAllowed / returns false when under half the time in the block remains", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 8, height: 1 },
 			{ blocktime: 7, height: 3 },
 			{ blocktime: 5, height: 4 },
 		]);
 
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 4), 1),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 5), 1),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 6), 1),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 7), 1),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 12), 2),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 15), 2),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 19), 3),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 22), 3),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 25), 4),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 26), 4),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 27), 4),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 30), 5),
-		);
-		assert.false(
-			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 32), 5),
-		);
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 2:
+						return genesisTimestamp(context.configuration, 8);
+					case 3:
+						return genesisTimestamp(context.configuration, 16);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
+
+		context.slots = context.app.resolve(Slots);
+
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 4), 1));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 5), 1));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 6), 1));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 7), 1));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 12), 2));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 15), 2));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 19), 3));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 22), 3));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 25), 4));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 26), 4));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 27), 4));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 30), 5));
+		assert.false(await context.slots.isForgingAllowed(genesisTimestamp(context.configuration, 32), 5));
 	});
 });
 
 describe<{
+	app: Application;
 	configuration: Configuration;
 	slots: Slots;
 }>("Missed Slots", ({ assert, beforeEach, it }) => {
 	beforeEach(setup);
 
-	it("should calculate the slot time correctly when slots have been missed", (context) => {
+	it("should calculate the slot time correctly when slots have been missed", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 4, height: 1 },
 			{ blocktime: 3, height: 4 },
 			{ blocktime: 4, height: 7 },
 		]);
 
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return genesisTimestamp(context.configuration, 0);
-				case 3:
-					return genesisTimestamp(context.configuration, 8);
-				case 4:
-					return genesisTimestamp(context.configuration, 12);
-				case 6:
-					return genesisTimestamp(context.configuration, 18);
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 3:
+						return genesisTimestamp(context.configuration, 8);
+					case 4:
+						return genesisTimestamp(context.configuration, 12);
+					case 6:
+						return genesisTimestamp(context.configuration, 18);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
+
+		context.slots = context.app.resolve(Slots);
 
 		const expectedResults = [
 			{ height: 1, slot: 0, slotTime: 0 },
@@ -848,35 +791,39 @@ describe<{
 
 		for (const item of [...expectedResults, ...missedBlocks]) {
 			assert.equal(
-				context.slots.getSlotTime(getTimeStampForBlock, item.slot, item.height),
+				await context.slots.getSlotTime(item.slot, item.height),
 				genesisTimestamp(context.configuration, item.slotTime),
 			);
 		}
 	});
 
-	it("getSlotInfo / should return positive values when called without timestamp", (context) => {
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return 0;
-				case 3:
-					return 16;
-				case 4:
-					return 20;
-				case 6:
-					return 29;
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
+	it("getSlotInfo / should return positive values when called without timestamp", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 4, epoch: "2017-03-21T13:00:00.000Z", height: 1 },
 			{ blocktime: 3, height: 4 },
 			{ blocktime: 4, height: 7 },
 		]);
 
-		const slotInfo = context.slots.getSlotInfo(getTimeStampForBlock);
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 3:
+						return genesisTimestamp(context.configuration, 16);
+					case 4:
+						return genesisTimestamp(context.configuration, 20);
+					case 6:
+						return genesisTimestamp(context.configuration, 29);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
+
+		context.slots = context.app.resolve(Slots);
+
+		const slotInfo = await context.slots.getSlotInfo();
 
 		assert.positive(slotInfo.startTime);
 		assert.positive(slotInfo.endTime);
@@ -886,27 +833,31 @@ describe<{
 		assert.boolean(slotInfo.forgingStatus);
 	});
 
-	it("getSlotInfo / should calculate the next slot correctly when slots have been missed", (context) => {
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return genesisTimestamp(context.configuration, 0);
-				case 3:
-					return genesisTimestamp(context.configuration, 16);
-				case 4:
-					return genesisTimestamp(context.configuration, 20);
-				case 6:
-					return genesisTimestamp(context.configuration, 29);
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
+	it("getSlotInfo / should calculate the next slot correctly when slots have been missed", async (context) => {
 		context.configuration.set("milestones", [
 			{ blocktime: 4, epoch: "2017-03-21T13:00:00.000Z", height: 1 },
 			{ blocktime: 3, height: 4 },
 			{ blocktime: 4, height: 7 },
 		]);
+
+		context.app.rebind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
+			getBlockTimeLookup: (height: number) => {
+				switch (height) {
+					case 1:
+						return genesisTimestamp(context.configuration, 0);
+					case 3:
+						return genesisTimestamp(context.configuration, 16);
+					case 4:
+						return genesisTimestamp(context.configuration, 20);
+					case 6:
+						return genesisTimestamp(context.configuration, 29);
+					default:
+						throw new Error(`Test scenarios should not hit this line`);
+				}
+			},
+		});
+
+		context.slots = context.app.resolve(Slots);
 
 		const expectedResults = [
 			{
@@ -1173,7 +1124,7 @@ describe<{
 		];
 
 		for (const item of [...expectedResults, ...offTimeResults, ...missedSlots, ...missedOffTimeResults]) {
-			assert.equal(context.slots.getSlotInfo(getTimeStampForBlock, item.timestamp, item.height), {
+			assert.equal(await context.slots.getSlotInfo(item.timestamp, item.height), {
 				blockTime: item.blockTime,
 				endTime: item.endTime,
 				forgingStatus: item.forgingStatus,

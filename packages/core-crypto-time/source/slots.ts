@@ -3,64 +3,64 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import dayjs from "dayjs";
 
 import { BlockTimeCalculator } from "./block-time-calculator";
-
-export interface SlotInfo {
-	startTime: number;
-	endTime: number;
-	blockTime: number;
-	slotNumber: number;
-	forgingStatus: boolean;
-}
-
-export type GetBlockTimeStampLookup = (blockheight: number) => number;
+import { BlockTimeLookup } from "./block-time-lookup";
 
 @injectable()
-export class Slots {
+export class Slots implements Contracts.Crypto.Slots {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly calculator: BlockTimeCalculator;
 
+	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
+	private readonly blockTimeLookup: BlockTimeLookup;
+
+	#transientBlockTimeLookup: Contracts.Crypto.GetBlockTimeStampLookup | undefined;
+
+	public withBlockTimeLookup(callback: Contracts.Crypto.GetBlockTimeStampLookup): Slots {
+		this.#transientBlockTimeLookup = callback;
+
+		return this;
+	}
+
 	public getTime(time?: number): number {
 		return time ?? dayjs().unix();
 	}
 
-	public getTimeInMsUntilNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
-		const nextSlotTime: number = this.getSlotTime(getTimeStampForBlock, this.getNextSlot(getTimeStampForBlock));
+	public async getTimeInMsUntilNextSlot(): Promise<number> {
+		const nextSlotTime: number = await this.getSlotTime(await this.getNextSlot());
 		const now: number = this.getTime();
 
 		return (nextSlotTime - now) * 1000;
 	}
 
-	public getSlotNumber(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): number {
-		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.getLatestHeight(height))
-			.slotNumber;
+	public async getSlotNumber(timestamp?: number, height?: number): Promise<number> {
+		const { slotNumber } = await this.getSlotInfo(timestamp ?? this.getTime(), this.#getLatestHeight(height));
+
+		this.#transientBlockTimeLookup = undefined;
+
+		return slotNumber;
 	}
 
-	public getSlotTime(getTimeStampForBlock: GetBlockTimeStampLookup, slot: number, height?: number): number {
-		return this.calculateSlotTime(slot, this.getLatestHeight(height), getTimeStampForBlock);
+	public async getSlotTime(slot: number, height?: number): Promise<number> {
+		return this.#calculateSlotTime(slot, this.#getLatestHeight(height));
 	}
 
-	public getNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
-		return this.getSlotNumber(getTimeStampForBlock) + 1;
+	public async getNextSlot(): Promise<number> {
+		return (await this.getSlotNumber()) + 1;
 	}
 
-	public isForgingAllowed(
-		getTimeStampForBlock: GetBlockTimeStampLookup,
-		timestamp?: number,
-		height?: number,
-	): boolean {
-		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.getLatestHeight(height))
-			.forgingStatus;
+	public async isForgingAllowed(timestamp?: number, height?: number): Promise<boolean> {
+		return (await this.getSlotInfo(timestamp ?? this.getTime(), this.#getLatestHeight(height))).forgingStatus;
 	}
 
-	public getSlotInfo(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): SlotInfo {
+	public async getSlotInfo(timestamp?: number, height?: number): Promise<Contracts.Crypto.SlotInfo> {
 		if (timestamp === undefined) {
 			timestamp = this.getTime();
 		}
 
-		height = this.getLatestHeight(height);
+		height = this.#getLatestHeight(height);
 
 		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
@@ -73,8 +73,8 @@ export class Slots {
 				break;
 			}
 
-			const spanStartTimestamp = getTimeStampForBlock(previousMilestoneHeight);
-			lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1) + blockTime;
+			const spanStartTimestamp = await this.#getBlockTimeLookup(previousMilestoneHeight);
+			lastSpanEndTime = (await this.#getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
 			blockTime = nextMilestone.data;
@@ -116,11 +116,7 @@ export class Slots {
 		return milestones;
 	}
 
-	private calculateSlotTime(
-		slotNumber: number,
-		height: number,
-		getTimeStampForBlock: GetBlockTimeStampLookup,
-	): number {
+	async #calculateSlotTime(slotNumber: number, height: number): Promise<number> {
 		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
 		let milestoneHeight = 1;
@@ -133,8 +129,8 @@ export class Slots {
 				break;
 			}
 
-			const spanStartTimestamp = getTimeStampForBlock(milestoneHeight);
-			lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1) + blockTime;
+			const spanStartTimestamp = await this.#getBlockTimeLookup(milestoneHeight);
+			lastSpanEndTime = (await this.#getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
 			blockTime = nextMilestone.data;
@@ -145,7 +141,7 @@ export class Slots {
 		return lastSpanEndTime + (slotNumber - totalSlotsFromLastSpan) * blockTime;
 	}
 
-	private getLatestHeight(height: number | undefined): number {
+	#getLatestHeight(height: number | undefined): number {
 		if (height) {
 			return height;
 		}
@@ -155,5 +151,13 @@ export class Slots {
 		}
 
 		return 1;
+	}
+
+	async #getBlockTimeLookup(height: number): Promise<number> {
+		if (typeof this.#transientBlockTimeLookup === "function") {
+			return this.#transientBlockTimeLookup(height);
+		}
+
+		return this.blockTimeLookup.getBlockTimeLookup(height);
 	}
 }

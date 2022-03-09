@@ -50,7 +50,7 @@ export class BlockProcessor {
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public async process(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		if (!(await this.verifyBlock(block))) {
@@ -65,17 +65,10 @@ export class BlockProcessor {
 			return this.app.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler).execute();
 		}
 
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			block.data.height,
-			this.configuration,
-		);
-
 		const isValidGenerator: boolean = await this.validateGenerator(block);
-		const isChained: boolean = AppUtils.isBlockChained(
+		const isChained: boolean = await AppUtils.isBlockChained(
 			this.blockchain.getLastBlock().data,
 			block.data,
-			blockTimeLookup,
 			this.slots,
 		);
 		if (!isChained) {
@@ -219,12 +212,6 @@ export class BlockProcessor {
 	}
 
 	private async validateGenerator(block: Contracts.Crypto.IBlock): Promise<boolean> {
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			block.data.height,
-			this.configuration,
-		);
-
 		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(
 			block.data.height,
 			this.configuration,
@@ -233,12 +220,10 @@ export class BlockProcessor {
 			roundInfo,
 		});
 
-		const forgingInfo: Contracts.Shared.ForgingInfo = AppUtils.forgingInfoCalculator.calculateForgingInfo(
+		const forgingInfo: Contracts.Shared.ForgingInfo = await AppUtils.forgingInfoCalculator.calculateForgingInfo(
 			block.data.timestamp,
 			block.data.height,
-			blockTimeLookup,
-			this.configuration,
-			this.slots,
+			this.app,
 		);
 
 		const forgingValidator: Contracts.State.Wallet = validators[forgingInfo.currentForger];

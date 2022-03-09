@@ -9,17 +9,16 @@ type BlockChainedDetails = {
 	isChained: boolean;
 };
 
-const getBlockChainedDetails = (
+const getBlockChainedDetails = async (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
-	slots,
-): BlockChainedDetails => {
+	slots: Contracts.Crypto.Slots,
+): Promise<BlockChainedDetails> => {
 	const followsPrevious: boolean = nextBlock.previousBlock === previousBlock.id;
 	const isPlusOne: boolean = nextBlock.height === previousBlock.height + 1;
 
-	const previousSlot: number = slots.getSlotNumber(getTimeStampForBlock, previousBlock.timestamp);
-	const nextSlot: number = slots.getSlotNumber(getTimeStampForBlock, nextBlock.timestamp);
+	const previousSlot: number = await slots.getSlotNumber(previousBlock.timestamp);
+	const nextSlot: number = await slots.getSlotNumber(nextBlock.timestamp);
 	const isAfterPreviousSlot: boolean = previousSlot < nextSlot;
 
 	const isChained: boolean = followsPrevious && isPlusOne && isAfterPreviousSlot;
@@ -27,20 +26,18 @@ const getBlockChainedDetails = (
 	return { followsPrevious, isAfterPreviousSlot, isChained, isPlusOne, nextSlot, previousSlot };
 };
 
-export const isBlockChained = (
+export const isBlockChained = async (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
-	slots,
-): boolean => getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock, slots).isChained;
+	slots: Contracts.Crypto.Slots,
+): Promise<boolean> => (await getBlockChainedDetails(previousBlock, nextBlock, slots)).isChained;
 
-export const getBlockNotChainedErrorMessage = (
+export const getBlockNotChainedErrorMessage = async (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
-	slots,
-): string => {
-	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock, slots);
+	slots: Contracts.Crypto.Slots,
+): Promise<string> => {
+	const details: BlockChainedDetails = await getBlockChainedDetails(previousBlock, nextBlock, slots);
 
 	if (details.isChained) {
 		throw new Error("Block had no chain error");

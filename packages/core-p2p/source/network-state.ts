@@ -42,18 +42,10 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	public static async analyze(
 		monitor: Contracts.P2P.NetworkMonitor,
 		repository: Contracts.P2P.PeerRepository,
-		cryptoConfiguration: Contracts.Crypto.IConfiguration,
-		slots,
+		slots: Contracts.Crypto.Slots,
 	): Promise<Contracts.P2P.NetworkState> {
 		// @ts-ignore - app exists but isn't on the interface for now
 		const lastBlock: Contracts.Crypto.IBlock = monitor.app.get<any>(Identifiers.BlockchainService).getLastBlock();
-
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			// @ts-ignore - app exists but isn't on the interface for now
-			monitor.app,
-			lastBlock.data.height,
-			cryptoConfiguration,
-		);
 
 		const peers: Contracts.P2P.Peer[] = repository.getPeers();
 		// @ts-ignore - app exists but isn't on the interface for now
@@ -73,7 +65,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			return new NetworkState(NetworkStateStatus.BelowMinimumPeers, lastBlock);
 		}
 
-		return this.analyzeNetwork(lastBlock, peers, blockTimeLookup, slots);
+		return this.analyzeNetwork(lastBlock, peers, slots);
 	}
 
 	public static parse(data: any): Contracts.P2P.NetworkState {
@@ -89,14 +81,9 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		return networkState;
 	}
 
-	private static analyzeNetwork(
-		lastBlock,
-		peers: Contracts.P2P.Peer[],
-		getTimeStampForBlock: (height: number) => number,
-		slots,
-	): Contracts.P2P.NetworkState {
+	private static analyzeNetwork(lastBlock, peers: Contracts.P2P.Peer[], slots): Contracts.P2P.NetworkState {
 		const networkState = new NetworkState(NetworkStateStatus.Default, lastBlock);
-		const currentSlot = slots.getSlotNumber(getTimeStampForBlock);
+		const currentSlot = slots.getSlotNumber();
 
 		for (const peer of peers) {
 			networkState.update(peer, currentSlot);

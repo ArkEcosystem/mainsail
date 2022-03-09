@@ -20,9 +20,6 @@ export class ValidatorTracker {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
-
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeCalculator: any;
 
@@ -49,18 +46,10 @@ export class ValidatorTracker {
 			(validator: Contracts.State.Wallet) => validator.getPublicKey(),
 		);
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			height,
-			this.configuration,
-		);
-
-		const forgingInfo: Contracts.Shared.ForgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
+		const forgingInfo: Contracts.Shared.ForgingInfo = await Utils.forgingInfoCalculator.calculateForgingInfo(
 			timestamp,
 			height,
-			blockTimeLookup,
-			this.configuration,
-			this.slots,
+			this.app,
 		);
 
 		// Determine Next Forgers...

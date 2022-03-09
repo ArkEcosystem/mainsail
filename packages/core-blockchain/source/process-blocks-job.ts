@@ -22,9 +22,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Database.Service)
-	private readonly database: Contracts.Database.IDatabaseService;
-
-	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.DatabaseInteraction)
@@ -46,7 +43,10 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
+
+	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
+	private readonly blockTimeLookup: any;
 
 	private blocks: Contracts.Crypto.IBlockData[] = [];
 
@@ -71,20 +71,9 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			this.blocks[0].height,
-			this.configuration,
-		);
-
-		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup, this.slots)) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], this.slots)) {
 			this.logger.warning(
-				Utils.getBlockNotChainedErrorMessage(
-					this.blockchain.getLastBlock().data,
-					this.blocks[0],
-					blockTimeLookup,
-					this.slots,
-				),
+				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.blocks[0], this.slots),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
 			this.blockchain.clearQueue();
@@ -98,12 +87,17 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
 		const acceptedBlockTimeLookup = (height: number) =>
-			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
+			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ??
+			this.blockTimeLookup.getBlockTimeLookup(height);
 
 		try {
 			for (const block of this.blocks) {
-				const currentSlot: number = this.slots.getSlotNumber(acceptedBlockTimeLookup);
-				const blockSlot: number = this.slots.getSlotNumber(acceptedBlockTimeLookup, block.timestamp);
+				const currentSlot: number = await this.slots
+					.withBlockTimeLookup(acceptedBlockTimeLookup)
+					.getSlotNumber();
+				const blockSlot: number = await this.slots
+					.withBlockTimeLookup(acceptedBlockTimeLookup)
+					.getSlotNumber(block.timestamp);
 
 				if (blockSlot > currentSlot) {
 					this.logger.error(
@@ -205,7 +199,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		// TODO: Remove, because next rounds are deleted on restore
-		await this.database.deleteRound(deleteRoundsAfter + 1);
+		await this.databaseService.deleteRound(deleteRoundsAfter + 1);
 		await this.databaseInteraction.restoreCurrentRound();
 
 		this.blockchain.clearQueue();

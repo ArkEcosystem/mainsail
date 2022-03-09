@@ -21,11 +21,8 @@ export class DownloadBlocks implements Action {
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
-
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public async handle(): Promise<void> {
 		const lastDownloadedBlock: Contracts.Crypto.IBlockData =
@@ -47,15 +44,7 @@ export class DownloadBlocks implements Action {
 
 		const empty: boolean = !blocks || blocks.length === 0;
 
-		const useLookupHeight = empty ? lastDownloadedBlock.height : blocks[0].height;
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			useLookupHeight,
-			this.configuration,
-		);
-
-		const chained: boolean =
-			!empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup, this.slots);
+		const chained: boolean = !empty && (await AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], this.slots));
 
 		if (chained) {
 			this.logger.info(

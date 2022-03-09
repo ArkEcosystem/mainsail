@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Slots } from "@arkecosystem/core-crypto-time";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { TransactionFactory } from "./factory";
@@ -30,7 +29,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	protected readonly verifier: Contracts.Crypto.ITransactionVerifier;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	protected readonly slots: Slots;
+	protected readonly slots: Contracts.Crypto.Slots;
 
 	public data: Contracts.Crypto.ITransactionData;
 

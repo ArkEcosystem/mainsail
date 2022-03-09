@@ -6,9 +6,6 @@ import assert from "assert";
 
 @injectable()
 export class RoundState {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
@@ -48,7 +45,7 @@ export class RoundState {
 	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	private blocksInCurrentRound: Contracts.Crypto.IBlock[] = [];
 	private forgingValidators: Contracts.State.Wallet[] = [];
@@ -138,14 +135,8 @@ export class RoundState {
 			return;
 		}
 
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			lastBlock.data.height,
-			this.configuration,
-		);
-
-		const lastSlot: number = this.slots.getSlotNumber(blockTimeLookup, lastBlock.data.timestamp);
-		const currentSlot: number = this.slots.getSlotNumber(blockTimeLookup, block.data.timestamp);
+		const lastSlot: number = await this.slots.getSlotNumber(lastBlock.data.timestamp);
+		const currentSlot: number = await this.slots.getSlotNumber(block.data.timestamp);
 
 		const missedSlots: number = Math.min(currentSlot - lastSlot - 1, this.forgingValidators.length);
 		for (let index = 0; index < missedSlots; index++) {
@@ -159,7 +150,7 @@ export class RoundState {
 				)} (${validator.getPublicKey()}) just missed a block.`,
 			);
 
-			this.events.dispatch(Enums.ForgerEvent.Missing, {
+			await this.events.dispatch(Enums.ForgerEvent.Missing, {
 				validator,
 			});
 		}
@@ -182,7 +173,7 @@ export class RoundState {
 
 			this.blocksInCurrentRound = [];
 
-			this.events.dispatch(Enums.RoundEvent.Applied);
+			await this.events.dispatch(Enums.RoundEvent.Applied);
 		}
 	}
 
@@ -219,7 +210,7 @@ export class RoundState {
 					)} (${wallet.getPublicKey()}) just missed a round.`,
 				);
 
-				this.events.dispatch(Enums.RoundEvent.Missed, {
+				await this.events.dispatch(Enums.RoundEvent.Missed, {
 					validator: wallet,
 				});
 			}

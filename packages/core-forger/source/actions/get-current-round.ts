@@ -9,16 +9,16 @@ export class GetCurrentRoundAction extends Services.Triggers.Action {
 	private readonly app: Contracts.Kernel.Application;
 
 	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+	private readonly blockchain: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.DatabaseInteraction)
-	private readonly databaseInteraction!: DatabaseInteraction;
+	private readonly databaseInteraction: DatabaseInteraction;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public async execute(): Promise<Contracts.P2P.CurrentRound> {
 		const lastBlock = this.blockchain.getLastBlock();
@@ -34,20 +34,8 @@ export class GetCurrentRoundAction extends Services.Triggers.Action {
 			validator: wallet.getAttribute("validator"),
 		}));
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			height,
-			this.configuration,
-		);
-
 		const timestamp = this.slots.getTime();
-		const forgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
-			timestamp,
-			height,
-			blockTimeLookup,
-			this.configuration,
-			this.slots,
-		);
+		const forgingInfo = await Utils.forgingInfoCalculator.calculateForgingInfo(timestamp, height, this.app);
 
 		return {
 			canForge: forgingInfo.canForge,
