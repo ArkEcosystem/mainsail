@@ -56,4 +56,10 @@ export class Stub extends Fake<SinonStub> {
 
 		return this;
 	}
+
+	public callsFakeNth(nth: number, value: (...arguments_: any[]) => any): Stub {
+		this.subject.onCall(nth).callsFake(value);
+
+		return this;
+	}
 }

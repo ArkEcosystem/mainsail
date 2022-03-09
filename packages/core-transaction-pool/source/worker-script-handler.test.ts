@@ -1,26 +1,26 @@
-import { Generators } from "@packages/core-test-framework";
-import { WorkerScriptHandler } from "@packages/core-transaction-pool/source/worker-script-handler";
-import { Identities, Managers, Transactions } from "@packages/crypto";
+import { Generators, describe } from "@arkecosystem/core-test-framework";
+import { WorkerScriptHandler } from "./worker-script-handler";
+import { Identities, Managers, Transactions } from "@arkecosystem/crypto";
 
-describe("WorkerScriptHandler.setConfig", () => {
-	it("should set crypto configuration", () => {
+describe("WorkerScriptHandler", ({ it, assert }) => {
+	it("setConfig - should set crypto configuration", () => {
 		const config = Generators.generateCryptoConfigRaw();
 		const workerScriptHandler = new WorkerScriptHandler();
+
 		workerScriptHandler.setConfig(config);
-		expect(Managers.configManager.get("genesisBlock.payloadHash")).toBe(config.genesisBlock.payloadHash);
-	});
-});
 
-describe("WorkerScriptHandler.setHeight", () => {
-	it("should set height", () => {
+		assert.equal(Managers.configManager.get("genesisBlock.payloadHash"), config.genesisBlock.payloadHash);
+	});
+
+	it("setHeight - should set height", () => {
 		const workerScriptHandler = new WorkerScriptHandler();
-		workerScriptHandler.setHeight(100);
-		expect(Managers.configManager.getHeight()).toBe(100);
-	});
-});
 
-describe("WorkerScriptHandler.getTransactionFromData", () => {
-	it("should return serialized transaction and its id", async () => {
+		workerScriptHandler.setHeight(100);
+
+		assert.equal(Managers.configManager.getHeight(), 100);
+	});
+
+	it("getTransactionFromData - should return serialized transaction and its id", async () => {
 		const workerScriptHandler = new WorkerScriptHandler();
 
 		const transaction = Transactions.BuilderFactory.transfer()
@@ -30,9 +30,10 @@ describe("WorkerScriptHandler.getTransactionFromData", () => {
 			.nonce("1")
 			.sign("sender's secret")
 			.build();
+
 		const result = await workerScriptHandler.getTransactionFromData(transaction.data);
 
-		expect(result).toEqual({
+		assert.equal(result, {
 			id: transaction.id,
 			serialized: transaction.serialized.toString("hex"),
 			isVerified: true,
