@@ -204,15 +204,11 @@ export class ForgerService {
 		});
 
 		if (activeValidators.length > 0) {
-			this.logger.info(
-				`Loaded ${AppUtils.pluralize("active validator", activeValidators.length, true)}: ${activeValidators
-					.map(({ publicKey }) => {
-						AppUtils.assert.defined<string>(publicKey);
+			for (const { publicKey } of activeValidators) {
+				this.logger.info(`Loaded validator ${this.usernames[publicKey]} (${publicKey})`);
+			}
 
-						return `${this.usernames[publicKey]} (${publicKey})`;
-					})
-					.join(", ")}`,
-			);
+			this.logger.info(`Loaded ${AppUtils.pluralize("validator", activeValidators.length, true)}.`);
 		}
 
 		if (this.validators.length > activeValidators.length) {
