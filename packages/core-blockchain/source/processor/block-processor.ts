@@ -2,6 +2,7 @@ import { Repositories } from "@arkecosystem/core-database";
 import { Container, Contracts, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
 import { Interfaces } from "@arkecosystem/crypto";
+import { BlockProcessorResult } from "./contracts";
 
 import {
 	AcceptBlockHandler,
@@ -12,15 +13,6 @@ import {
 	UnchainedHandler,
 	VerificationFailedHandler,
 } from "./handlers";
-
-export enum BlockProcessorResult {
-	Accepted,
-	DiscardedButCanBeBroadcasted,
-	Rejected,
-	Rollback,
-	Reverted,
-	Corrupted,
-}
 
 @Container.injectable()
 export class BlockProcessor {

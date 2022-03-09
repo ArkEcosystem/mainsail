@@ -1,8 +1,7 @@
 import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
 import { Interfaces } from "@arkecosystem/crypto";
 
-import { BlockProcessorResult } from "../block-processor";
-import { BlockHandler } from "../contracts";
+import { BlockHandler, BlockProcessorResult } from "../contracts";
 
 enum UnchainedBlockStatus {
 	NotReadyToAcceptNewHeight,

@@ -2,8 +2,7 @@ import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 import { Interfaces } from "@arkecosystem/crypto";
 
-import { BlockProcessorResult } from "../block-processor";
-import { BlockHandler } from "../contracts";
+import { BlockHandler, BlockProcessorResult } from "../contracts";
 import { RevertBlockHandler } from "./revert-block-handler";
 
 @Container.injectable()

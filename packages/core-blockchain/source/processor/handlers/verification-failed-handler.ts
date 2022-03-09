@@ -1,8 +1,7 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Interfaces } from "@arkecosystem/crypto";
 
-import { BlockProcessorResult } from "../block-processor";
-import { BlockHandler } from "../contracts";
+import { BlockHandler, BlockProcessorResult } from "../contracts";
 
 @Container.injectable()
 export class VerificationFailedHandler implements BlockHandler {

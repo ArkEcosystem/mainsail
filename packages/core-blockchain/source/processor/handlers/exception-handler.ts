@@ -2,8 +2,8 @@ import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import { Interfaces } from "@arkecosystem/crypto";
 
-import { BlockProcessorResult } from "../block-processor";
-import { BlockHandler } from "../contracts";
+import { BlockHandler, BlockProcessorResult } from "../contracts";
+
 import { AcceptBlockHandler } from "./accept-block-handler";
 
 @Container.injectable()
