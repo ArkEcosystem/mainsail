@@ -41,8 +41,13 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 		set(this.#config, key, value);
 
-		this.validateMilestones();
-		this.buildConstants();
+		try {
+			this.validateMilestones();
+
+			this.buildConstants();
+		} catch {
+			//
+		}
 	}
 
 	public get<T = any>(key: string): T {

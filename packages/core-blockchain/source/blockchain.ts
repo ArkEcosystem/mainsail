@@ -173,16 +173,16 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			const minimumMs = 2000;
 			const timeLeftInMs: number = this.slots.getTimeInMsUntilNextSlot(blockTimeLookup);
 
-			console.log({
-				currentSlot,
-				receivedSlot,
-				timeLeftInMs,
-				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-				minimumMs,
-				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-				discardSlot: currentSlot !== receivedSlot,
-				discardTime: timeLeftInMs < minimumMs,
-			});
+			// console.log({
+			// 	currentSlot,
+			// 	receivedSlot,
+			// 	timeLeftInMs,
+			// 	// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// 	minimumMs,
+			// 	// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			// 	discardSlot: currentSlot !== receivedSlot,
+			// 	discardTime: timeLeftInMs < minimumMs,
+			// });
 
 			if (currentSlot !== receivedSlot || timeLeftInMs < minimumMs) {
 				this.logger.info(`Discarded block ${block.height.toLocaleString()} because it was received too late.`);

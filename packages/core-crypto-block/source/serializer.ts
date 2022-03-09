@@ -10,7 +10,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	public size(block: Contracts.Crypto.IBlock): number {
 		const headerSize =
 			4 + // version
-			8 + // timestamp
+			4 + // timestamp
 			4 + // height
 			32 + // previousBlock
 			4 + // numberOfTransactions
@@ -38,7 +38,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 					type: "uint32",
 				},
 				timestamp: {
-					type: "uint64",
+					type: "uint32",
 				},
 				height: {
 					type: "uint32",
@@ -83,7 +83,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 					type: "uint32",
 				},
 				timestamp: {
-					type: "uint64",
+					type: "uint32",
 				},
 				height: {
 					type: "uint32",
@@ -117,6 +117,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 				},
 				transactions: {
 					type: "transactions",
+					required: false, // @TODO: this should always have a default value but doesn't right now
 				},
 			},
 		});

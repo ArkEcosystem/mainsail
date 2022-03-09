@@ -23,7 +23,7 @@ export class Slots {
 	private readonly calculator: BlockTimeCalculator;
 
 	public getTime(time?: number): number {
-		return time ?? dayjs().valueOf();
+		return time ?? dayjs().unix();
 	}
 
 	public getTimeInMsUntilNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
@@ -64,7 +64,7 @@ export class Slots {
 
 		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
-		let lastSpanEndTime = 0;
+		let lastSpanEndTime = dayjs(this.configuration.getMilestone().epoch).unix();
 		let previousMilestoneHeight = 1;
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
@@ -124,7 +124,7 @@ export class Slots {
 		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
 		let milestoneHeight = 1;
-		let lastSpanEndTime = 0;
+		let lastSpanEndTime = dayjs(this.configuration.getMilestone().epoch).unix();
 
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 

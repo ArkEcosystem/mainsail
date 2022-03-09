@@ -40,7 +40,13 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return (
 			await this.#map<Contracts.Crypto.IBlock>(
 				heights
-					.map((height: number) => this.blockStorage.get(this.blockStorageById.get(height)))
+					.map((height: number) => {
+						try {
+							return this.blockStorage.get(this.blockStorageById.get(height));
+						} catch {
+							return;
+						}
+					})
 					.filter(Boolean),
 				(block: Buffer) => this.blockFactory.fromBytes(block),
 			)
@@ -99,9 +105,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 			await this.blockStorage.ifNoExists(blockID, async () => {
 				await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
 
-				if (blockID) {
-					await this.blockStorageById.put(block.data.height, blockID);
-				}
+				await this.blockStorageById.put(block.data.height, blockID);
 
 				for (const transaction of block.transactions) {
 					await this.transactionStorage.put(transaction.data.id, transaction.serialized);

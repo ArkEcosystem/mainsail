@@ -1,6 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-
 import { Enums } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "./round-state";
@@ -129,7 +128,9 @@ export class DatabaseInteraction {
 
 	private async createGenesisBlock(): Promise<Contracts.Crypto.IBlock> {
 		const genesisBlock = this.stateStore.getGenesisBlock();
+
 		await this.databaseService.saveBlocks([genesisBlock]);
+
 		return genesisBlock;
 	}
 

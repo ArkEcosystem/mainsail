@@ -9,7 +9,7 @@ export class Block implements Contracts.Crypto.IBlock {
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Contracts.Crypto.IBlockSerializer; // @TODO: create contract for block serializer
+	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Contracts.Crypto.IHashFactory;

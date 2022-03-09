@@ -25,9 +25,11 @@ import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-cryp
 import { ServiceProvider as CoreCryptoWif } from "@arkecosystem/core-crypto-wif";
 import { ServiceProvider as CoreFees } from "@arkecosystem/core-fees";
 import { ServiceProvider as CoreFeesStatic } from "@arkecosystem/core-fees-static";
+import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 import { BigNumber } from "@arkecosystem/utils";
 import { generateMnemonic } from "bip39";
+import dayjs from "dayjs";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
@@ -307,6 +309,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async initialize(): Promise<void> {
+		await this.app.resolve<CoreSerializer>(CoreSerializer).register();
 		await this.app.resolve<CoreValidation>(CoreValidation).register();
 		await this.app.resolve<CoreCryptoConfig>(CoreCryptoConfig).register();
 		await this.app.resolve<CoreCryptoTime>(CoreCryptoTime).register();
@@ -562,7 +565,11 @@ export class Command extends Commands.Command {
 		];
 	}
 
-	private async generateCryptoGenesisBlock(genesisWallet, validators, options: Options) {
+	private async generateCryptoGenesisBlock(
+		genesisWallet,
+		validators,
+		options: Options,
+	): Promise<BaseContracts.Crypto.IBlockData> {
 		const premineWallet: Wallet = await this.createWallet(options.pubKeyHash);
 
 		let transactions = [];
@@ -778,8 +785,19 @@ export class Command extends Commands.Command {
 		return transaction;
 	}
 
-	private async createGenesisBlock(keys: BaseContracts.Crypto.IKeyPair, transactions, options: Options) {
-		transactions = transactions.sort((a, b) => {
+	private async createGenesisBlock(
+		keys: BaseContracts.Crypto.IKeyPair,
+		transactions,
+		options: Options,
+	): Promise<BaseContracts.Crypto.IBlockData> {
+		const totals: { amount: BigNumber; fee: BigNumber } = {
+			amount: BigNumber.ZERO,
+			fee: BigNumber.ZERO,
+		};
+
+		const payloadBuffers: Buffer[] = [];
+
+		const sortedTransactions = transactions.sort((a, b) => {
 			if (a.type === b.type) {
 				return a.amount - b.amount;
 			}
@@ -787,63 +805,38 @@ export class Command extends Commands.Command {
 			return a.type - b.type;
 		});
 
-		let payloadLength = 0;
-		let totalFee: BigNumber = BigNumber.ZERO;
-		let totalAmount: BigNumber = BigNumber.ZERO;
-		const allBytes: Buffer[] = [];
+		for (const transaction of sortedTransactions) {
+			totals.amount = totals.amount.plus(transaction.amount);
+			totals.fee = totals.fee.plus(transaction.fee);
 
-		for (const transaction of transactions) {
-			const bytes: Buffer = await this.app
-				.get<BaseContracts.Crypto.ITransactionSerializer>(Identifiers.Cryptography.Transaction.Serializer)
-				.getBytes(transaction);
-
-			allBytes.push(bytes);
-
-			payloadLength += bytes.length;
-			totalFee = totalFee.plus(transaction.fee);
-			totalAmount = totalAmount.plus(BigNumber.make(transaction.amount));
+			payloadBuffers.push(Buffer.from(transaction.id, "hex"));
 		}
 
-		const payloadHash: Buffer = await this.app
-			.get<BaseContracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
-			.sha256(Buffer.concat(allBytes));
-
-		const block: any = {
-			blockSignature: undefined,
-			generatorPublicKey: keys.publicKey,
-			height: 1,
-			id: undefined,
-			numberOfTransactions: transactions.length,
-			payloadHash: payloadHash.toString("hex"),
-			payloadLength,
-			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-			reward: "0",
-			timestamp: new Date(options.epoch).getTime(),
-			totalAmount: totalAmount.toString(),
-			totalFee: totalFee.toString(),
+		return {
+			...(
+				await this.app.get<BaseContracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make(
+					{
+						generatorPublicKey: keys.publicKey,
+						height: 1,
+						numberOfTransactions: transactions.length,
+						payloadHash: (
+							await this.app
+								.get<BaseContracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+								.sha256(payloadBuffers)
+						).toString("hex"),
+						payloadLength: 32 * transactions.length,
+						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+						reward: "0",
+						timestamp: dayjs(options.epoch).unix(),
+						totalAmount: totals.amount.toString(),
+						totalFee: totals.fee.toString(),
+						transactions,
+						version: 0,
+					},
+					keys,
+				)
+			).data,
 			transactions,
-			version: 0,
 		};
-
-		block.id = await this.app.get<any>(Identifiers.Cryptography.Block.IDFactory).make(block);
-
-		block.blockSignature = await this.signBlock(block, keys);
-
-		return block;
-	}
-
-	private async signBlock(block, keys: BaseContracts.Crypto.IKeyPair): Promise<string> {
-		return this.app
-			.get<BaseContracts.Crypto.ISignature>(Identifiers.Cryptography.Signature)
-			.sign(
-				await this.app
-					.get<BaseContracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
-					.sha256(
-						await this.app
-							.get<BaseContracts.Crypto.IBlockSerializer>(Identifiers.Cryptography.Block.Serializer)
-							.serialize(block, false),
-					),
-				Buffer.from(keys.privateKey, "hex"),
-			);
 	}
 }

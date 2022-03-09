@@ -26,7 +26,6 @@ export class RevertBlockHandler implements BlockHandler {
 		try {
 			await this.databaseInteraction.revertBlock(block);
 
-			// TODO: Check if same situation applies to fork revert
 			for (const transaction of block.transactions) {
 				await this.transactionPool.addTransaction(transaction);
 			}

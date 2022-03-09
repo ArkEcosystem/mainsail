@@ -1,10 +1,9 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
 import { Deserializer } from "./deserializer";
-import { Exceptions } from "@arkecosystem/core-contracts";
 import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
 

@@ -36,7 +36,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 					type: "uint32",
 				},
 				timestamp: {
-					type: "uint64",
+					type: "uint32",
 				},
 				height: {
 					type: "uint32",
