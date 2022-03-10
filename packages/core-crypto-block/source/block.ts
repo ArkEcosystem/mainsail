@@ -19,6 +19,9 @@ export class Block implements Contracts.Crypto.IBlock {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
+	private readonly transactionVerifier: Contracts.Crypto.ITransactionVerifier;
+
 	//  - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;
 	public data: Contracts.Crypto.IBlockData;
@@ -125,7 +128,14 @@ export class Block implements Contracts.Crypto.IBlock {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
 
-			const invalidTransactions: Contracts.Crypto.ITransaction[] = this.transactions.filter((tx) => !tx.verified);
+			const invalidTransactions: Contracts.Crypto.ITransaction[] = [];
+
+			for (const transaction of this.transactions) {
+				if (!(await this.transactionVerifier.verifyHash(transaction.data))) {
+					invalidTransactions.push(transaction);
+				}
+			}
+
 			if (invalidTransactions.length > 0) {
 				result.errors.push("One or more transactions are not verified:");
 

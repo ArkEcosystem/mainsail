@@ -7,10 +7,7 @@ export interface ITransaction {
 	readonly id: string | undefined;
 	readonly typeGroup: number | undefined;
 	readonly type: number;
-	readonly verified: boolean;
 	readonly key: string;
-
-	isVerified: boolean;
 
 	data: ITransactionData;
 	serialized: Buffer;
@@ -19,7 +16,6 @@ export interface ITransaction {
 	serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined>;
 	deserialize(buf: ByteBuffer): Promise<void>;
 
-	verify(options?: IVerifyOptions): Promise<boolean>;
 	verifySchema(strict?: boolean): ISchemaValidationResult;
 
 	toJson(): ITransactionJson;

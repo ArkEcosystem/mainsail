@@ -34,13 +34,11 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			this.ipcSubprocess.sendAction("setHeight", currentHeight);
 		}
 
-		const { id, serialized, isVerified } = await this.ipcSubprocess.sendRequest(
+		const { id, serialized } = await this.ipcSubprocess.sendRequest(
 			"getTransactionFromData",
 			transactionData instanceof Buffer ? transactionData.toString("hex") : transactionData,
 		);
-		const transaction = await this.transactionFactory.fromBytesUnsafe(Buffer.from(serialized, "hex"), id);
-		transaction.isVerified = isVerified;
 
-		return transaction;
+		return this.transactionFactory.fromBytesUnsafe(Buffer.from(serialized, "hex"), id);
 	}
 }

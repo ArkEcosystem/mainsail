@@ -4,7 +4,6 @@ import { ITransaction, ITransactionData } from "../crypto";
 export type SerializedTransaction = {
 	id: string;
 	serialized: string;
-	isVerified: boolean;
 };
 
 export interface WorkerScriptHandler {

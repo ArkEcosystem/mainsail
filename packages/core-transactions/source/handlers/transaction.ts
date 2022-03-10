@@ -29,10 +29,10 @@ export abstract class TransactionHandler {
 		);
 
 		if (senderWallet.hasMultiSignature()) {
-			transaction.isVerified = await this.verifySignatures(senderWallet, transaction.data);
+			return this.verifySignatures(senderWallet, transaction.data);
 		}
 
-		return transaction.isVerified;
+		return this.verifier.verifyHash(transaction.data);
 	}
 
 	public async throwIfCannotBeApplied(
@@ -47,87 +47,13 @@ export abstract class TransactionHandler {
 			throw new Exceptions.ColdWalletError();
 		}
 
-		return this.performGenericWalletChecks(transaction, sender);
-	}
+		this.#verifyTransactionNonceApply(sender, transaction);
 
-	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await this.applyToSender(transaction);
-		await this.applyToRecipient(transaction);
-	}
-
-	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await this.revertForSender(transaction);
-		await this.revertForRecipient(transaction);
-	}
-
-	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
-
-		const data: Contracts.Crypto.ITransactionData = transaction.data;
-
-		await this.throwIfCannotBeApplied(transaction, sender);
-
-		if (data.version) {
-			this.verifyTransactionNonceApply(sender, transaction);
-
-			AppUtils.assert.defined<BigNumber>(data.nonce);
-
-			sender.setNonce(data.nonce);
-		} else {
-			sender.increaseNonce();
-		}
-
-		const newBalance: BigNumber = sender.getBalance().minus(data.amount).minus(data.fee);
-
-		sender.setBalance(newBalance);
-	}
-
-	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
-
-		const data: Contracts.Crypto.ITransactionData = transaction.data;
-
-		sender.increaseBalance(data.amount.plus(data.fee));
-
-		// TODO: extract version specific code
-		this.verifyTransactionNonceRevert(sender, transaction);
-
-		sender.decreaseNonce();
-	}
-
-	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
-
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
-
-	public async verifySignatures(
-		wallet: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.ITransactionData,
-		multiSignature?: Contracts.Crypto.IMultiSignatureAsset,
-	): Promise<boolean> {
-		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
-	}
-
-	protected async performGenericWalletChecks(
-		transaction: Contracts.Crypto.ITransaction,
-		sender: Contracts.State.Wallet,
-	): Promise<void> {
-		const data: Contracts.Crypto.ITransactionData = transaction.data;
-
-		this.verifyTransactionNonceApply(sender, transaction);
-
-		if (sender.getBalance().minus(data.amount).minus(data.fee).isNegative()) {
+		if (sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative()) {
 			throw new Exceptions.InsufficientBalanceError();
 		}
 
-		if (data.senderPublicKey !== sender.getPublicKey()) {
+		if (transaction.data.senderPublicKey !== sender.getPublicKey()) {
 			throw new Exceptions.SenderWalletMismatchError();
 		}
 
@@ -155,7 +81,9 @@ export abstract class TransactionHandler {
 				throw new Exceptions.LegacyMultiSignatureError();
 			}
 
-			if (!this.verifySignatures(databaseSender, data, databaseSender.getAttribute("multiSignature"))) {
+			if (
+				!this.verifySignatures(databaseSender, transaction.data, databaseSender.getAttribute("multiSignature"))
+			) {
 				throw new Exceptions.InvalidMultiSignaturesError();
 			}
 		} else if (transaction.data.signatures && !isMultiSignatureRegistration) {
@@ -163,10 +91,71 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	protected verifyTransactionNonceApply(
+	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		await this.applyToSender(transaction);
+		await this.applyToRecipient(transaction);
+	}
+
+	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		await this.revertForSender(transaction);
+		await this.revertForRecipient(transaction);
+	}
+
+	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
+
+		const data: Contracts.Crypto.ITransactionData = transaction.data;
+
+		await this.throwIfCannotBeApplied(transaction, sender);
+
+		if (data.version) {
+			this.#verifyTransactionNonceApply(sender, transaction);
+
+			AppUtils.assert.defined<BigNumber>(data.nonce);
+
+			sender.setNonce(data.nonce);
+		} else {
+			sender.increaseNonce();
+		}
+
+		const newBalance: BigNumber = sender.getBalance().minus(data.amount).minus(data.fee);
+
+		sender.setBalance(newBalance);
+	}
+
+	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
+
+		const data: Contracts.Crypto.ITransactionData = transaction.data;
+
+		sender.increaseBalance(data.amount.plus(data.fee));
+
+		this.#verifyTransactionNonceRevert(sender, transaction);
+
+		sender.decreaseNonce();
+	}
+
+	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
+
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+
+	public async verifySignatures(
 		wallet: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.ITransaction,
-	): void {
+		transaction: Contracts.Crypto.ITransactionData,
+		multiSignature?: Contracts.Crypto.IMultiSignatureAsset,
+	): Promise<boolean> {
+		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
+	}
+
+	#verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
@@ -174,10 +163,7 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	protected verifyTransactionNonceRevert(
-		wallet: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.ITransaction,
-	): void {
+	#verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().isEqualTo(nonce)) {

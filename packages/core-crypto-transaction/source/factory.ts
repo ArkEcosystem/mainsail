@@ -48,7 +48,6 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 			};
 			const transaction: Contracts.Crypto.ITransaction = await this.deserializer.deserialize(buff, options);
 			transaction.data.id = id || (await this.utils.getId(transaction.data, options));
-			transaction.isVerified = true;
 
 			return transaction;
 		} catch (error) {
@@ -96,8 +95,6 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 			if (error) {
 				throw new Exceptions.TransactionSchemaError(error);
 			}
-
-			transaction.isVerified = await transaction.verify(options);
 
 			return transaction;
 		} catch (error) {

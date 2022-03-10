@@ -20,7 +20,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	public static version = 1;
 	public static key: string | undefined = undefined;
 
-	public isVerified = false;
 	// @ts-ignore - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
 	public data: Contracts.Crypto.ITransactionData;
 	// @ts-ignore - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
@@ -30,10 +29,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 
 	public static getSchema(): TransactionSchema {
 		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
-	}
-
-	public async verify(): Promise<boolean> {
-		return this.verifier.verifyHash(this.data);
 	}
 
 	public verifySchema(): Contracts.Crypto.ISchemaValidationResult {
@@ -69,10 +64,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 
 	public get typeGroup(): number | undefined {
 		return this.data.typeGroup;
-	}
-
-	public get verified(): boolean {
-		return this.isVerified;
 	}
 
 	public get key(): string {

@@ -24,6 +24,6 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 			typeof transactionData === "string"
 				? await this.transactionFactory.fromBytes(Buffer.from(transactionData, "hex"))
 				: await this.transactionFactory.fromData(transactionData);
-		return { id: tx.id, isVerified: tx.isVerified, serialized: tx.serialized.toString("hex") };
+		return { id: tx.id, serialized: tx.serialized.toString("hex") };
 	}
 }
