@@ -37,11 +37,11 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	#calculateMinFee(transaction: Contracts.Crypto.ITransaction): BigNumber {
-		const addonBytes = this.feeRegistry.get(transaction.key, transaction.data.version) || 0;
-		const satoshiPerByte = 3000; // @TODO
+		const addonBytes = this.feeRegistry.get(transaction.key, transaction.data.version) || BigNumber.ZERO;
+		const satoshiPerByte = 3000; // @TODO: make configurable
 
 		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
 
-		return BigNumber.make(addonBytes + transactionSizeInBytes).times(satoshiPerByte);
+		return addonBytes.plus(transactionSizeInBytes).times(satoshiPerByte);
 	}
 }

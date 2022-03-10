@@ -1,6 +1,7 @@
 export * as Blockchain from "./blockchain";
 export * as Crypto from "./crypto";
 export * as Database from "./database";
+export * as Fee from "./fees";
 export * as Forger from "./forger";
 export * as Kernel from "./kernel";
 export * as P2P from "./p2p";

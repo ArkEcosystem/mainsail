@@ -1,7 +1,8 @@
 import { injectable } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 import { Providers } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { ValidatorRegistrationTransactionHandler } from "./handlers";
 import { ValidatorRegistrationTransaction } from "./versions/1";
@@ -13,10 +14,31 @@ export * from "./versions";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const registry: TransactionRegistry = this.app.get(Identifiers.Cryptography.Transaction.Registry);
+		this.#registerFees();
 
-		registry.registerTransactionType(ValidatorRegistrationTransaction);
+		this.#registerType();
 
+		this.#registerHandler();
+	}
+
+	#registerFees(): void {
+		this.app.get<Contracts.Fee.IFeeRegistry>(Identifiers.Fee.Registry).set(
+			ValidatorRegistrationTransaction.key,
+			ValidatorRegistrationTransaction.version,
+			{
+				managed: BigNumber.make("400000"),
+				static: BigNumber.make("2500000000"),
+			}[this.app.get<string>(Identifiers.Fee.Type)],
+		);
+	}
+
+	#registerType(): void {
+		this.app
+			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+			.registerTransactionType(ValidatorRegistrationTransaction);
+	}
+
+	#registerHandler(): void {
 		this.app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);
 	}
 }

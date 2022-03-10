@@ -84,6 +84,7 @@ export const Identifiers = {
 	Fee: {
 		Matcher: Symbol.for("Fee<Matcher>"),
 		Registry: Symbol.for("Fee<Registry>"),
+		Type: Symbol.for("Fee<Type>"),
 	},
 	FilesystemManager: Symbol.for("Manager<Filesystem>"),
 	FilesystemService: Symbol.for("Service<Filesystem>"),

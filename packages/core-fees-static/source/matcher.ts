@@ -1,7 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { FeeRegistry } from "@arkecosystem/core-fees";
-import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
@@ -23,7 +22,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		const feeString = transaction.data.fee; // @TODO: formatSatoshi
 
 		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);
-		const staticFeeString = BigNumber.make(staticFee); // @TODO: formatSatoshi
+		const staticFeeString = staticFee; // @TODO: formatSatoshi
 
 		if (transaction.data.fee.isEqualTo(staticFee)) {
 			this.logger.debug(`${transaction} eligible for ${action} (fee ${feeString} = ${staticFeeString})`);
