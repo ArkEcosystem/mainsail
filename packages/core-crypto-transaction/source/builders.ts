@@ -3,7 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts
 import { BigNumber } from "@arkecosystem/utils";
 
 import { TransactionFactory } from "./factory";
-import { maxVendorFieldLength } from "./helpers";
 
 @injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
@@ -96,7 +95,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public vendorField(vendorField: string): TBuilder {
-		const limit: number = maxVendorFieldLength(this.configuration);
+		const limit: number = this.configuration.getMilestone().vendorFieldLength;
 
 		if (vendorField) {
 			if (Buffer.from(vendorField).length > limit) {

@@ -1,5 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { numberToHex } from "@arkecosystem/utils";
 import { secp256k1 } from "bcrypto";
 
 @injectable()
@@ -28,7 +29,7 @@ export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 			throw new Exceptions.InvalidMultiSignatureAssetError();
 		}
 
-		const minKey: string = await this.fromMnemonic(this.#numberToHex(min));
+		const minKey: string = await this.fromMnemonic(numberToHex(min));
 		const keys: string[] = [minKey, ...publicKeys];
 
 		return secp256k1
@@ -38,11 +39,5 @@ export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 
 	public async verify(publicKey: string): Promise<boolean> {
 		return secp256k1.publicKeyVerify(Buffer.from(publicKey, "hex"));
-	}
-
-	#numberToHex(number_: number, padding = 2): string {
-		const indexHex: string = Number(number_).toString(16);
-
-		return "0".repeat(padding - indexHex.length) + indexHex;
 	}
 }

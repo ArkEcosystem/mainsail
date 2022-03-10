@@ -5,6 +5,9 @@ import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -20,10 +23,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	async #throwIfCannot(action: string, transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		const feeString = transaction.data.fee; // @TODO
+		const feeString = this.#formatSatoshi(transaction.data.fee);
 
-		const minFee: BigNumber = this.#calculateMinFee(transaction);
-		const minFeeString = minFee; // @TODO
+		const minFee = this.#calculateMinFee(transaction);
+		const minFeeString = this.#formatSatoshi(minFee);
 
 		if (transaction.data.fee.isGreaterThanEqual(minFee)) {
 			this.logger.debug(`${transaction} eligible for ${action} (fee ${feeString} >= ${minFeeString})`);
@@ -43,5 +46,15 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
 
 		return addonBytes.plus(transactionSizeInBytes).times(satoshiPerByte);
+	}
+
+	#formatSatoshi(amount: BigNumber): string {
+		// @TODO: make 1e8 configurable
+		const localeString = (+amount / 1e8).toLocaleString("en", {
+			maximumFractionDigits: 8,
+			minimumFractionDigits: 0,
+		});
+
+		return `${localeString} ${this.configuration.get("network.client.symbol")}`;
 	}
 }

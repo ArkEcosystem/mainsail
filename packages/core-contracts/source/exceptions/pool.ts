@@ -73,12 +73,10 @@ export class TransactionPoolFullError extends PoolError {
 	public readonly required: any; // @TODO: BigNumber
 
 	public constructor(transaction: ITransaction, required: any) {
-		const formatSatoshi = (value) => value.toString();
-
-		const message =
-			`${transaction} fee ${formatSatoshi(transaction.data.fee)} ` +
-			`is lower than ${formatSatoshi(required)} already in pool`;
-		super(message, "ERR_POOL_FULL");
+		super(
+			`${transaction} fee ${transaction.data.fee.toString()} is lower than ${required.toString()} already in pool`,
+			"ERR_POOL_FULL",
+		);
 		this.required = required;
 	}
 }

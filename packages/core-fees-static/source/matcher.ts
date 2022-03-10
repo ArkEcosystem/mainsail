@@ -1,9 +1,13 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { FeeRegistry } from "@arkecosystem/core-fees";
+import { BigNumber } from "packages/utils/distribution";
 
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -19,10 +23,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	#throwIfCannot(action: string, transaction: Contracts.Crypto.ITransaction): void {
-		const feeString = transaction.data.fee; // @TODO: formatSatoshi
+		const feeString = this.#formatSatoshi(transaction.data.fee);
 
 		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);
-		const staticFeeString = staticFee; // @TODO: formatSatoshi
+		const staticFeeString = this.#formatSatoshi(staticFee);
 
 		if (transaction.data.fee.isEqualTo(staticFee)) {
 			this.logger.debug(`${transaction} eligible for ${action} (fee ${feeString} = ${staticFeeString})`);
@@ -39,5 +43,15 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		this.logger.notice(`${transaction} not eligible for ${action} (fee ${feeString} > ${staticFeeString})`);
 
 		throw new Exceptions.TransactionFeeToHighError(transaction);
+	}
+
+	#formatSatoshi(amount: BigNumber): string {
+		// @TODO: make 1e8 configurable
+		const localeString = (+amount / 1e8).toLocaleString("en", {
+			maximumFractionDigits: 8,
+			minimumFractionDigits: 0,
+		});
+
+		return `${localeString} ${this.configuration.get("network.client.symbol")}`;
 	}
 }
