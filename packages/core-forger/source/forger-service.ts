@@ -4,7 +4,7 @@ import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { getRemainingSlotTime } from "./utils";
 
-// todo: review the implementation - quite a mess right now with quite a few responsibilities
+// @TODO review the implementation - quite a mess right now with quite a few responsibilities
 @injectable()
 export class ForgerService {
 	@inject(Identifiers.Application)

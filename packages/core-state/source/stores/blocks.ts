@@ -3,7 +3,7 @@ import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 
-// todo: review its implementation and finally integrate it as planned in v2
+// @TODO review its implementation and finally integrate it as planned in v2
 @injectable()
 export class BlockStore implements Contracts.State.BlockStore {
 	private readonly byId: Utils.CappedMap<string, Contracts.Crypto.IBlockData>;

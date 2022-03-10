@@ -1,8 +1,8 @@
 import nm from "nanomatch";
 
-// todo: review the implementation
+// @TODO review the implementation
 export const isBlacklisted = (blacklist: string[], remoteAddress: string): boolean => {
-	if (!Array.isArray(blacklist) || !blacklist.length) {
+	if (!Array.isArray(blacklist) || blacklist.length === 0) {
 		return false;
 	}
 

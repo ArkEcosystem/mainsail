@@ -7,7 +7,7 @@ import { ValidationManager } from "../services/validation";
 import { assert } from "../utils";
 import { Bootstrapper } from "./interfaces";
 
-// todo: review the implementation
+// @TODO review the implementation
 
 @injectable()
 export class RegisterServiceProviders implements Bootstrapper {

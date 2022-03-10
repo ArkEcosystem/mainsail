@@ -21,7 +21,7 @@ export class RegisterBaseBindings implements Bootstrapper {
 		this.app.bind<string>(Identifiers.ApplicationNetwork).toConstantValue(flags.network);
 		this.app.bind<string>(Identifiers.ApplicationVersion).toConstantValue(version);
 
-		// @todo: implement a getter/setter that sets vars locally and in the process.env variables
+		// @@TODO implement a getter/setter that sets vars locally and in the process.env variables
 		process.env.CORE_ENV = flags.env;
 		// process.env.NODE_ENV = process.env.CORE_ENV;
 		process.env.CORE_TOKEN = flags.token;

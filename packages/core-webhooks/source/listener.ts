@@ -44,7 +44,7 @@ export class Listener {
 			const { statusCode } = await Utils.http.post(webhook.target, {
 				body: {
 					timestamp: +new Date(),
-					data: payload as any, // todo: utils currently expects a primitive as data
+					data: payload as any, // @TODO utils currently expects a primitive as data
 					event: webhook.event,
 				},
 				headers: {

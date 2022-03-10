@@ -8,7 +8,6 @@ export type InputValues = Record<string, InputValue>;
 export type InputArgument = { description: string; schema: AnySchema };
 export type InputArguments = Record<string, InputArgument>;
 
-// todo: go over these and sort out which are no longer needed
 export type AnyObject = Record<string, any>;
 
 export type Arguments = Record<string, string | number>;

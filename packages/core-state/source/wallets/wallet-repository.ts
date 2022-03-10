@@ -5,7 +5,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import { WalletIndex } from "./wallet-index";
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
 	@multiInject(Identifiers.WalletRepositoryIndexerIndex)

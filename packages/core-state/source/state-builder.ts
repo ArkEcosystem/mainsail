@@ -4,7 +4,7 @@ import { Application, Enums, Utils as AppUtils } from "@arkecosystem/core-kernel
 import { BigNumber } from "@arkecosystem/utils";
 import lmdb from "lmdb";
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class StateBuilder {
 	@inject(Identifiers.Application)

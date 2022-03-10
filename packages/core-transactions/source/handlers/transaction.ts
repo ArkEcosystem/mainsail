@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
-// todo: revisit the implementation, container usage and arguments after core-database rework
+// @TODO revisit the implementation, container usage and arguments after core-database rework
 @injectable()
 export abstract class TransactionHandler {
 	@inject(Identifiers.Application)

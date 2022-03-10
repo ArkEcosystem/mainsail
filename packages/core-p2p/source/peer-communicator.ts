@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
@@ -11,7 +11,7 @@ import { RateLimiter } from "./rate-limiter";
 import { replySchemas } from "./schemas";
 import { buildRateLimiter, isValidVersion } from "./utils";
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.Application)
@@ -72,9 +72,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 					transactions: block.transactions.map((tx) => tx.data),
 				}),
 			},
+			path: "blocks",
 			peer,
 			schema: replySchemas.postBlock,
-			path: "blocks",
 		});
 
 		if (response && response.height) {
@@ -95,9 +95,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			handle: async () => {
 				await this.#post({
 					json: { transactions },
+					path: "transactions",
 					peer,
 					schema: replySchemas.postTransactions,
-					path: "transactions",
 				});
 
 				await delay(Math.ceil(1000 / postTransactionsRateLimit));
@@ -119,8 +119,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 		// const getStatusTimeout = timeoutMsec < 5000 ? timeoutMsec : 5000;
 		const pingResponse: Contracts.P2P.PeerPingResponse = await this.#get({
-			peer,
 			path: "status",
+			peer,
 			schema: replySchemas.getStatus,
 		});
 
@@ -171,7 +171,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.PeerBroadcast[]> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
 
-		return this.#get({ peer, schema: replySchemas.getPeers, path: "peers" });
+		return this.#get({ path: "peers", peer, schema: replySchemas.getPeers });
 	}
 
 	public async hasCommonBlocks(peer: Contracts.P2P.Peer, ids: string[], timeoutMsec?: number): Promise<any> {
@@ -179,9 +179,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			json: {
 				ids,
 			},
+			path: "blocks/common",
 			peer,
 			schema: replySchemas.getCommonBlocks,
-			path: "blocks/common",
 		});
 
 		if (!body || !body.common) {
@@ -202,6 +202,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		// const maxPayload = headersOnly ? blockLimit * constants.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
 
 		const peerBlocks = await this.#get({
+			path: "blocks",
 			peer,
 			schema: replySchemas.getBlocks,
 			searchParams: {
@@ -210,7 +211,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				lastBlockHeight: fromBlockHeight,
 				serialized: true,
 			},
-			path: "blocks",
 		});
 
 		if (!peerBlocks || peerBlocks.length === 0) {

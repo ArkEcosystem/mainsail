@@ -1161,7 +1161,6 @@ importers:
       '@arkecosystem/utils': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
-      bip38: ^3.1.1
       import-fresh: 3.3.0
       joi: 17.4.2
       node-forge: 1.2.1
@@ -1174,7 +1173,6 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/utils': link:../utils
-      bip38: 3.1.1
       joi: 17.4.2
       node-forge: 1.2.1
       wif: 2.0.6
@@ -1196,7 +1194,6 @@ importers:
       '@arkecosystem/utils': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
-      bip38: ^3.1.1
       import-fresh: 3.3.0
       joi: 17.4.2
       node-forge: 1.2.1
@@ -1209,7 +1206,6 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/utils': link:../utils
-      bip38: 3.1.1
       joi: 17.4.2
       node-forge: 1.2.1
       wif: 2.0.6
@@ -6005,10 +6001,6 @@ packages:
     resolution: {integrity: sha512-1vObw81a8ylZO5ePrtMay0n018TcftpTA5HFKDaSuiUDBo8biRBtjIobw60OpwuvrGk+FsxKamqN4cnmj/eXdg==}
     dev: true
 
-  /bigi/1.4.2:
-    resolution: {integrity: sha1-nGZalfiLiwj8Bc/XMfVhhZ1yWCU=}
-    dev: false
-
   /bignumber.js/9.0.2:
     resolution: {integrity: sha512-GAcQvbpsM0pUb0zw1EI0KhQEZ+lRwR5fYaAp3vPOYuP7aDvGy6cVN6XHLauvF8SOga2y0dcLcjt3iQDTSEliyw==}
 
@@ -6039,19 +6031,6 @@ packages:
       tiny-secp256k1: 1.1.6
       typeforce: 1.18.0
       wif: 2.0.6
-
-  /bip38/3.1.1:
-    resolution: {integrity: sha512-d5AQWuXS95rdrEBnaKeZ9osMkvDR3QDULbAfoE7xRw0W8jfDrza9CsZwf+UhqjV6lbbfaWCrJIu5uObJlfo5Rw==}
-    dependencies:
-      bigi: 1.4.2
-      browserify-aes: 1.2.0
-      bs58check: 2.1.2
-      buffer-xor: 1.0.3
-      create-hash: 1.2.0
-      ecurve: 1.0.6
-      safe-buffer: 5.1.2
-      scryptsy: 2.1.0
-    dev: false
 
   /bip39/3.0.4:
     resolution: {integrity: sha512-YZKQlb752TrUWqHWj7XAwCSjYEgGAk+/Aas3V7NyjQeZYsztO8JnQUaCWhcnL4T+jL8nvB8typ2jRPzTlgugNw==}
@@ -7543,13 +7522,6 @@ packages:
     dependencies:
       jsbn: 0.1.1
       safer-buffer: 2.1.2
-
-  /ecurve/1.0.6:
-    resolution: {integrity: sha512-/BzEjNfiSuB7jIWKcS/z8FK9jNjmEWvUV2YZ4RLSmcDtP7Lq0m6FvDuSnJpBlDpGRpfRQeTLGLBI8H+kEv0r+w==}
-    dependencies:
-      bigi: 1.4.2
-      safe-buffer: 5.2.1
-    dev: false
 
   /ed2curve/0.3.0:
     resolution: {integrity: sha512-8w2fmmq3hv9rCrcI7g9hms2pMunQr1JINfcjwR9tAyZqhtyaMN991lF/ZfHfr5tzZQ8c7y7aBgZbjfbd0fjFwQ==}
@@ -14331,10 +14303,6 @@ packages:
 
   /scrypt-js/3.0.1:
     resolution: {integrity: sha512-cdwTTnqPu0Hyvf5in5asVdZocVDTNRmR7XEcJuIzMjJeSHybHl7vpB66AzwTaIg6CLSbtjcxc8fqcySfnTkccA==}
-    dev: false
-
-  /scryptsy/2.1.0:
-    resolution: {integrity: sha512-1CdSqHQowJBnMAFyPEBRfqag/YP9OF394FV+4YREIJX4ljD7OxvQRDayyoyyCk+senRjSkP6VnUNQmVQqB6g7w==}
     dev: false
 
   /scss-parser/1.0.5:

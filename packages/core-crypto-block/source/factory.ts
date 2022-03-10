@@ -28,8 +28,10 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: Contracts.Crypto.IValidator;
 
-	// @todo: add a proper type hint for data
-	public async make(data: any, keys: Contracts.Crypto.IKeyPair): Promise<Contracts.Crypto.IBlock | undefined> {
+	public async make(
+		data: Contracts.Crypto.IBlockData,
+		keys: Contracts.Crypto.IKeyPair,
+	): Promise<Contracts.Crypto.IBlock | undefined> {
 		data.generatorPublicKey = keys.publicKey;
 
 		const payloadHash: Buffer = await this.serializer.serialize(data, false);

@@ -1,10 +1,10 @@
-import { envPaths } from "../env-paths";
 import { PackageJson } from "type-fest";
 
 import { ActionFactory } from "../action-factory";
 import { ComponentFactory } from "../component-factory";
 import { Box } from "../components";
 import { Application, InputValue } from "../contracts";
+import { envPaths as environmentPaths } from "../env-paths";
 import { Input } from "../input";
 import { InputDefinition } from "../input/definition";
 import { Identifiers, inject, injectable, postConstruct } from "../ioc";
@@ -50,7 +50,7 @@ export abstract class Command {
 	protected input!: Input;
 
 	@postConstruct()
-	// todo: for some reason this isn't recognized in tests for being called
+	// @TODO for some reason this isn't recognized in tests for being called
 	public configure(): void {
 		// Do nothing...
 	}
@@ -161,7 +161,7 @@ export abstract class Command {
 			this.input.setFlag(
 				"network",
 				await this.app.resolve(DiscoverNetwork).discover(
-					envPaths.get(this.input.getFlag("token"), {
+					environmentPaths.get(this.input.getFlag("token"), {
 						suffix: "core",
 					}).config,
 				),

@@ -6,7 +6,7 @@ import { ProcessBlocksJob } from "./process-blocks-job";
 import { StateMachine } from "./state-machine";
 import { blockchainMachine } from "./state-machine/machine";
 
-// todo: reduce the overall complexity of this class and remove all helpers and getters that just serve as proxies
+// @TODO reduce the overall complexity of this class and remove all helpers and getters that just serve as proxies
 @injectable()
 export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@inject(Identifiers.Application)

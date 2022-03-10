@@ -6,7 +6,7 @@ import deepmerge from "deepmerge";
 import { ConfigRepository } from "../services/config";
 import { JsonObject } from "../types";
 
-// todo: review the implementation
+// @TODO review the implementation
 
 @injectable()
 export class PluginConfiguration {
@@ -90,7 +90,7 @@ export class PluginConfiguration {
 	}
 
 	private mergeWithGlobal(name: string): void {
-		// @todo: better name for storing pluginOptions
+		// @@TODO better name for storing pluginOptions
 		if (!this.configRepository.has(`app.pluginOptions.${name}`)) {
 			return;
 		}

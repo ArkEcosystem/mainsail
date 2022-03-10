@@ -4,8 +4,8 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
 import { OrderedMap, OrderedSet, Seq } from "immutable";
 
-// todo: extract block and transaction behaviours into their respective stores
-// todo: review the implementation
+// @TODO extract block and transaction behaviours into their respective stores
+// @TODO review the implementation
 @injectable()
 export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Application)

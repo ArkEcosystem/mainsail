@@ -29,7 +29,7 @@ export class UnchainedHandler implements BlockHandler {
 
 	private isValidGenerator = false;
 
-	// todo: remove the need for this method
+	// @TODO remove the need for this method
 	public initialize(isValidGenerator: boolean): this {
 		this.isValidGenerator = isValidGenerator;
 
@@ -76,7 +76,7 @@ export class UnchainedHandler implements BlockHandler {
 	private checkUnchainedBlock(block: Contracts.Crypto.IBlock): UnchainedBlockStatus {
 		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
-		// todo: clean up this if-else-if-else-if-else mess
+		// @TODO clean up this if-else-if-else-if-else mess
 		if (block.data.height > lastBlock.data.height + 1) {
 			this.logger.debug(
 				`Blockchain not ready to accept new block at height ${block.data.height.toLocaleString()}. Last block: ${lastBlock.data.height.toLocaleString()}`,

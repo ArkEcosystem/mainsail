@@ -3,7 +3,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import { assert } from "./assert";
 
-// todo: review the implementation
+// @TODO review the implementation
 export const calculate = (height: number, configuration: Contracts.Crypto.IConfiguration): string => {
 	const config: Contracts.Crypto.NetworkConfig | undefined = configuration.all();
 

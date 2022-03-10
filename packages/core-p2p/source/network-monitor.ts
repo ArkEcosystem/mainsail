@@ -9,7 +9,7 @@ import { PeerCommunicator } from "./peer-communicator";
 
 const defaultDownloadChunkSize = 400;
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.Application)

@@ -6,7 +6,7 @@ import { Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kerne
 import { PeerFactory } from "./contracts";
 import { DisconnectInvalidPeers } from "./listeners";
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.Application)

@@ -7,7 +7,7 @@ import { assert } from "../utils";
 import { Bootstrapper } from "./interfaces";
 import { ChangeServiceProviderState } from "./listeners";
 
-// todo: review the implementation
+// @TODO review the implementation
 
 @injectable()
 export class BootServiceProviders implements Bootstrapper {

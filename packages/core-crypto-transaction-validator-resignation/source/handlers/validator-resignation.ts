@@ -7,8 +7,6 @@ import { Handlers } from "@arkecosystem/core-transactions";
 
 import { ValidatorResignationTransaction } from "../versions";
 
-// todo: revisit the implementation, container usage and arguments after core-database rework
-// todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @injectable()
 export class ValidatorResignationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPoolQuery)

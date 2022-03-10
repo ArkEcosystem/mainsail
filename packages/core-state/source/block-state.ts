@@ -3,26 +3,29 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class BlockState implements Contracts.State.BlockState {
+	@inject(Identifiers.Application)
+	public readonly app: Contracts.Kernel.Application;
+
 	@inject(Identifiers.WalletRepository)
-	private walletRepository!: Contracts.State.WalletRepository;
+	private readonly walletRepository: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+	private readonly handlerRegistry: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	private readonly state: Contracts.State.StateStore;
 
 	@inject(Identifiers.LogService)
-	private logger!: Contracts.Kernel.Logger;
+	private readonly logger: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@multiInject(Identifiers.State.ValidatorMutator)
-	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
+	private readonly validatorMutators: Contracts.State.ValidatorMutator[];
 
 	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		if (block.data.height === 1) {
@@ -32,10 +35,10 @@ export class BlockState implements Contracts.State.BlockState {
 		const previousBlock = this.state.getLastBlock();
 		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
-		// if (!forgerWallet) {
-		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
-		//     this.app.terminate(msg);
-		// }
+		if (!forgerWallet) {
+			const message = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
+			this.app.terminate(message);
+		}
 		const appliedTransactions: Contracts.Crypto.ITransaction[] = [];
 		try {
 			for (const transaction of block.transactions) {

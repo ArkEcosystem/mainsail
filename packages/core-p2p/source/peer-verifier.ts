@@ -20,7 +20,7 @@ export class PeerVerificationResult {
 	}
 }
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Application)

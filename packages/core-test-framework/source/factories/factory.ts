@@ -134,7 +134,7 @@ export class Factory {
 
 		if (hooks) {
 			for (const hook of hooks) {
-				hook({ entity: value, options: {} }); // todo: support hook options?
+				hook({ entity: value, options: {} }); // @TODO support hook options?
 			}
 		}
 	}

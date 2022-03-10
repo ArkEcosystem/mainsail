@@ -19,7 +19,7 @@ export const actions = {
 	downloadFinished: DownloadFinished,
 	downloadPaused: DownloadPaused,
 	exitApp: ExitApp,
-	init: Initialize, // todo: rename the action from 'init' to 'initialize'
+	init: Initialize, // @TODO rename the action from 'init' to 'initialize'
 	stopped: Stopped,
 	syncingComplete: SyncingComplete,
 };

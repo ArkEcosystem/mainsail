@@ -18,7 +18,7 @@ interface IPassphrasePair {
 	passphrase: string;
 }
 
-// todo: replace this by the use of real factories
+// @TODO replace this by the use of real factories
 export class TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;

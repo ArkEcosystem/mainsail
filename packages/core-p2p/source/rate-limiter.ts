@@ -16,7 +16,7 @@ export interface RateLimiterConfigurations {
 	endpoints: EndpointRateLimiterConfiguration[];
 }
 
-// todo: review the implementation
+// @TODO review the implementation
 export class RateLimiter {
 	private global: RateLimiterMemory;
 	private endpoints: Map<string, RateLimiterMemory>;
@@ -81,7 +81,7 @@ export class RateLimiter {
 	}
 
 	public getRateLimitedEndpoints(): string[] {
-		return Array.from(this.endpoints.keys());
+		return [...this.endpoints.keys()];
 	}
 
 	public async isBlocked(ip: string): Promise<boolean> {
@@ -92,9 +92,9 @@ export class RateLimiter {
 	private buildRateLimiter(configuration: RateLimiterConfiguration, whitelist: string[]): RateLimiterMemory {
 		return new RLWrapperBlackAndWhite({
 			limiter: new RateLimiterMemory({
-				points: configuration.rateLimit,
-				duration: configuration.duration || 1,
 				blockDuration: configuration.blockDuration,
+				duration: configuration.duration || 1,
+				points: configuration.rateLimit,
 			}),
 			whiteList: whitelist,
 		});

@@ -19,7 +19,7 @@ export class Block implements Contracts.Crypto.IBlock {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
-	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined
+	//  - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;
 	public data: Contracts.Crypto.IBlockData;
 	public transactions: Contracts.Crypto.ITransaction[];

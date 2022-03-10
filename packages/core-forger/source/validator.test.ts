@@ -1,10 +1,10 @@
-import { BIP39 } from "./bip39";
 import { Identities } from "@arkecosystem/crypto";
-import { describe } from "../../../core-test-framework/source";
 
-import { dummy, optionsDefault, transactions } from "../../test/create-block-with-transactions";
+import { describe } from "../../core-test-framework/source";
+import { dummy, optionsDefault, transactions } from "../test/create-block-with-transactions";
+import { BIP39 } from "./bip39";
 
-const passphrase: string = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";
+const passphrase = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";
 
 describe("Methods -> BIP39", ({ assert, it }) => {
 	it("should be ok with a plain text passphrase", () => {

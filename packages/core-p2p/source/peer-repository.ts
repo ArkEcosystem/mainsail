@@ -3,7 +3,7 @@ import { Contracts } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { cidr } from "ip";
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class PeerRepository implements Contracts.P2P.PeerRepository {
 	private readonly peers: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();

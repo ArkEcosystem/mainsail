@@ -16,7 +16,7 @@ export class Application implements Contracts.Kernel.Application {
 	private booted = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
-		// todo: enable this after solving the event emitter limit issues
+		// @TODO enable this after solving the event emitter limit issues
 		// this.listenToShutdownSignals();
 
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application).toConstantValue(this);

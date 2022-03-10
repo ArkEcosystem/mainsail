@@ -1,7 +1,7 @@
-import os from "os";
 import * as ipAdd from "ipaddr.js";
+import os from "os";
 
-// todo: review the implementation of all methods
+// @TODO review the implementation of all methods
 export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolean => {
 	try {
 		const parsed = ipAdd.parse(ip);

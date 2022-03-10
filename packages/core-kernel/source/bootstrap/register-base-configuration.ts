@@ -19,7 +19,7 @@ export class RegisterBaseConfiguration implements Bootstrapper {
 		await this.app.get<ConfigManager>(Identifiers.ConfigManager).boot();
 
 		this.configRepository.set("app.flags", this.app.get<KeyValuePair>(Identifiers.ConfigFlags));
-		// @todo: better name for storing pluginOptions
+		// @@TODO better name for storing pluginOptions
 		this.configRepository.set("app.pluginOptions", this.app.get<KeyValuePair>(Identifiers.ConfigPlugins));
 	}
 }

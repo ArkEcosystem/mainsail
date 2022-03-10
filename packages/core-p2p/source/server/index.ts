@@ -12,7 +12,7 @@ import { GetStatusController } from "./controllers/get-status";
 import { PostBlockController } from "./controllers/post-block";
 import { PostTransactionsController } from "./controllers/post-transactions";
 
-// todo: review the implementation
+// @TODO review the implementation
 @injectable()
 export class Server {
 	@inject(Identifiers.Application)
