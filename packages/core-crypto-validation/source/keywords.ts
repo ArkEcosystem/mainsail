@@ -3,16 +3,6 @@ import { BigNumber } from "@arkecosystem/utils";
 import { Ajv } from "ajv";
 import ajvKeywords from "ajv-keywords";
 
-// @TODO: remove this
-export enum TransactionType {
-	Transfer = 0,
-	ValidatorRegistration = 2,
-	Vote = 3,
-	MultiSignature = 4,
-	MultiPayment = 6,
-	ValidatorResignation = 7,
-}
-
 export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
 	const maxBytes = (ajv: Ajv) => {
 		ajv.addKeyword("maxBytes", {

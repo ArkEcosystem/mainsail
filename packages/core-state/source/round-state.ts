@@ -1,8 +1,8 @@
+import assert from "assert";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import assert from "assert";
 
 @injectable()
 export class RoundState {
@@ -254,7 +254,6 @@ export class RoundState {
 		validators: Contracts.State.Wallet[],
 	): Promise<Contracts.State.Wallet[]> {
 		const seedSource: string = roundInfo.round.toString();
-		// @TODO
 		let currentSeed: Buffer = await this.hashFactory.sha256(Buffer.from(seedSource));
 
 		validators = validators.map((validator) => validator.clone());

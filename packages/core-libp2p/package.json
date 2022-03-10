@@ -21,6 +21,7 @@
 		"@arkecosystem/utils": "workspace:*",
 		"@chainsafe/libp2p-noise": "^5.0.2",
 		"ipaddr.js": "2.0.1",
+		"joi": "17.4.2",
 		"libp2p": "^0.36.2",
 		"libp2p-bootstrap": "^0.14.0",
 		"libp2p-gossipsub": "^0.13.0",

@@ -2,6 +2,8 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
+import { getRemainingSlotTime } from "./utils";
+
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
 @injectable()
 export class ForgerService {
@@ -39,16 +41,6 @@ export class ForgerService {
 		return this.round;
 	}
 
-	public getRemainingSlotTime(): number | undefined {
-		if (this.round) {
-			const { blockTime } = this.configuration.getMilestone(this.round.lastBlock.height);
-
-			return this.round.timestamp * 1000 + blockTime * 1000 - Date.now();
-		}
-
-		return undefined;
-	}
-
 	public async boot(validators: Contracts.Forger.Validator[]): Promise<void> {
 		this.validators = validators;
 
@@ -58,7 +50,7 @@ export class ForgerService {
 
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
 
-			timeout = Math.max(0, this.getRemainingSlotTime());
+			timeout = Math.max(0, getRemainingSlotTime(this.round, this.configuration));
 		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {
@@ -104,7 +96,7 @@ export class ForgerService {
 					await this.blockchain.forceWakeup();
 				}
 
-				return this.#checkLater(this.getRemainingSlotTime());
+				return this.#checkLater(getRemainingSlotTime(this.round, this.configuration));
 			}
 
 			const networkState: Contracts.P2P.NetworkState = await this.peerNetworkMonitor.getNetworkState();
@@ -129,7 +121,7 @@ export class ForgerService {
 
 			this.logAppReady = true;
 
-			return this.#checkLater(this.getRemainingSlotTime());
+			return this.#checkLater(getRemainingSlotTime(this.round, this.configuration));
 		} catch (error) {
 			console.log(error);
 

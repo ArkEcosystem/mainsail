@@ -16,7 +16,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 
 	public async fromPublicKey(publicKey: string): Promise<string> {
 		return bech32.encode(
-			this.configuration.get("network.address.bech32"),
+			this.configuration.getMilestone().address.bech32,
 			bech32.toWords(Buffer.from(publicKey, "hex")),
 		);
 	}

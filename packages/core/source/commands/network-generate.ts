@@ -1,4 +1,3 @@
-import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as BaseContracts, Identifiers } from "@arkecosystem/core-contracts";
@@ -9,8 +8,6 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "@arkecosystem/core-cry
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTime } from "@arkecosystem/core-crypto-time";
-import { ServiceProvider as CoreDatabase } from "@arkecosystem/core-database";
-import { ServiceProvider as CoreLMDB } from "@arkecosystem/core-lmdb";
 import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionMultiPayment } from "@arkecosystem/core-crypto-transaction-multi-payment";
 import { ServiceProvider as CoreCryptoTransactionMultiSignatureRegistration } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
@@ -26,8 +23,10 @@ import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@a
 import { ServiceProvider as CoreCryptoTransactionVote, VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@arkecosystem/core-crypto-wif";
+import { ServiceProvider as CoreDatabase } from "@arkecosystem/core-database";
 import { ServiceProvider as CoreFees } from "@arkecosystem/core-fees";
 import { ServiceProvider as CoreFeesStatic } from "@arkecosystem/core-fees-static";
+import { ServiceProvider as CoreLMDB } from "@arkecosystem/core-lmdb";
 import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 import { BigNumber } from "@arkecosystem/utils";
@@ -36,6 +35,7 @@ import dayjs from "dayjs";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
+import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -51,20 +51,6 @@ interface Flag {
 	schema: Joi.Schema;
 	promptType?: string;
 	default?: any;
-}
-
-interface DynamicFees {
-	enabled?: boolean;
-	minFeePool?: number;
-	minFeeBroadcast?: number;
-	addonBytes: {
-		transfer?: number;
-		validatorRegistration?: number;
-		vote?: number;
-		multiSignature?: number;
-		multiPayment?: number;
-		validatorResignation?: number;
-	};
 }
 
 interface Options {
@@ -93,7 +79,6 @@ interface Options {
 	coreDBDatabase?: string;
 
 	coreP2PPort: number;
-	coreAPIPort: number;
 	coreWebhooksPort: number;
 	coreMonitorPort: number;
 
@@ -231,39 +216,6 @@ export class Command extends Commands.Command {
 			default: 255,
 		},
 
-		// Static fee
-		{
-			name: "feeStaticTransfer",
-			description: "Fee for transfer transactions.",
-			schema: Joi.number(),
-			default: 10000000,
-		},
-		{
-			name: "feeStaticValidatorRegistration",
-			description: "Fee for validator registration transactions.",
-			schema: Joi.number(),
-			default: 2500000000,
-		},
-		{ name: "feeStaticVote", description: "Fee for vote transactions.", schema: Joi.number(), default: 100000000 },
-		{
-			name: "feeStaticMultiSignature",
-			description: "Fee for multi signature transactions.",
-			schema: Joi.number(),
-			default: 500000000,
-		},
-		{
-			name: "feeStaticMultiPayment",
-			description: "Fee for multi payment transactions.",
-			schema: Joi.number(),
-			default: 10000000,
-		},
-		{
-			name: "feeStaticValidatorResignation",
-			description: "Fee for validator resignation transactions.",
-			schema: Joi.number(),
-			default: 2500000000,
-		},
-
 		// Env
 		{ name: "coreDBHost", description: "Core database host.", schema: Joi.string(), default: "localhost" },
 		{ name: "coreDBPort", description: "Core database port.", schema: Joi.number(), default: 5432 },
@@ -272,7 +224,6 @@ export class Command extends Commands.Command {
 		{ name: "coreDBDatabase", description: "Core database database.", schema: Joi.string() },
 
 		{ name: "coreP2PPort", description: "Core P2P port.", schema: Joi.number(), default: 4000 },
-		{ name: "coreAPIPort", description: "Core API port.", schema: Joi.number(), default: 4003 },
 		{ name: "coreWebhooksPort", description: "Core Webhooks port.", schema: Joi.number(), default: 4004 },
 		{ name: "coreMonitorPort", description: "Core Webhooks port.", schema: Joi.number(), default: 4005 },
 
@@ -411,7 +362,10 @@ export class Command extends Commands.Command {
 		try {
 			this.app
 				.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
-				.set("network.address.bech32m", "ark");
+				// @ts-ignore
+				.setConfig({
+					milestones: [{ address: { bech32m: "ark" } }],
+				});
 
 			const paths = envPaths(flags.token, { suffix: "core" });
 			const configPath = flags.configPath ? flags.configPath : paths.config;
@@ -446,10 +400,6 @@ export class Command extends Commands.Command {
 						// Milestones
 						const milestones = this.generateCryptoMilestones(flags);
 
-						writeJSONSync(resolve(coreConfigDestination, "milestones.json"), milestones, {
-							spaces: 4,
-						});
-
 						this.app
 							.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 							.setConfig({
@@ -457,12 +407,7 @@ export class Command extends Commands.Command {
 								genesisBlock: {},
 								milestones,
 								// @ts-ignore
-								network: {
-									// @ts-ignore
-									address: {
-										bech32m: "ark",
-									},
-								},
+								network: {},
 							});
 
 						// Genesis Block
@@ -512,9 +457,6 @@ export class Command extends Commands.Command {
 
 	private generateCryptoNetwork(nethash: string, options: Options) {
 		return {
-			address: {
-				bech32m: "ark",
-			},
 			client: {
 				explorer: options.explorer,
 				symbol: options.symbol,
@@ -533,6 +475,9 @@ export class Command extends Commands.Command {
 		return [
 			{
 				activeValidators: options.validators,
+				address: {
+					bech32m: "ark",
+				},
 				block: {
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
@@ -543,6 +488,10 @@ export class Command extends Commands.Command {
 				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
+				satoshi: {
+					decimals: 8,
+					denomination: 1e8,
+				},
 				vendorFieldLength: options.vendorFieldLength,
 			},
 			{
@@ -599,9 +548,6 @@ export class Command extends Commands.Command {
 		result += "CORE_P2P_HOST=0.0.0.0\n";
 		result += `CORE_P2P_PORT=${options.coreP2PPort}\n\n`;
 
-		result += "CORE_API_HOST=0.0.0.0\n";
-		result += `CORE_API_PORT=${options.coreAPIPort}\n\n`;
-
 		result += "CORE_WEBHOOKS_HOST=0.0.0.0\n";
 		result += `CORE_WEBHOOKS_PORT=${options.coreWebhooksPort}\n\n`;
 
@@ -632,18 +578,6 @@ export class Command extends Commands.Command {
 	}
 
 	private generateApp(options: Options): any {
-		const dynamicFees: DynamicFees = {
-			addonBytes: {},
-			enabled: undefined,
-			minFeeBroadcast: undefined,
-			minFeePool: undefined,
-		};
-
-		if (Object.keys(dynamicFees.addonBytes).length === 0) {
-			// @ts-ignore
-			delete dynamicFees.addonBytes;
-		}
-
 		return readJSONSync(resolve(__dirname, "../../bin/config/testnet/app.json"));
 	}
 
@@ -689,6 +623,7 @@ export class Command extends Commands.Command {
 				await this.app
 					.resolve(TransferBuilder)
 					.network(pubKeyHash)
+					.fee("10000000")
 					.nonce(nonce.toFixed(0))
 					.recipientId(recipient.address)
 					.amount(amount)
@@ -724,6 +659,7 @@ export class Command extends Commands.Command {
 					await this.app
 						.resolve(ValidatorRegistrationBuilder)
 						.network(pubKeyHash)
+						.fee("2500000000")
 						.nonce("1") // validator registration tx is always the first one from sender
 						.usernameAsset(sender.username)
 						.fee(`${25 * 1e8}`)
@@ -745,6 +681,7 @@ export class Command extends Commands.Command {
 					await this.app
 						.resolve(VoteBuilder)
 						.network(pubKeyHash)
+						.fee("100000000")
 						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
 						.votesAsset([`+${sender.keys.publicKey}`])
 						.fee(`${1 * 1e8}`)

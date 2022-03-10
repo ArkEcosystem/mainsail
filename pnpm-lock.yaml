@@ -1113,11 +1113,13 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
+      joi: 17.4.2
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
+      joi: 17.4.2
 
   packages/core-fees-managed:
     specifiers:
@@ -1126,12 +1128,14 @@ importers:
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
+      joi: 17.4.2
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
+      joi: 17.4.2
 
   packages/core-fees-static:
     specifiers:
@@ -1292,6 +1296,7 @@ importers:
       '@arkecosystem/utils': workspace:*
       '@chainsafe/libp2p-noise': ^5.0.2
       ipaddr.js: 2.0.1
+      joi: 17.4.2
       libp2p: ^0.36.2
       libp2p-bootstrap: ^0.14.0
       libp2p-gossipsub: ^0.13.0
@@ -1305,6 +1310,7 @@ importers:
       '@arkecosystem/utils': link:../utils
       '@chainsafe/libp2p-noise': 5.0.2
       ipaddr.js: 2.0.1
+      joi: 17.4.2
       libp2p: 0.36.2
       libp2p-bootstrap: 0.14.0
       libp2p-gossipsub: 0.13.0

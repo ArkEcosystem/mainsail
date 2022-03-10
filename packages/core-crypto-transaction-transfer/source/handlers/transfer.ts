@@ -1,16 +1,17 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { Utils } from "@arkecosystem/core-kernel";
-import { Handlers, Utils as TransactionUtils } from "@arkecosystem/core-transactions";
+import { Handlers } from "@arkecosystem/core-transactions";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { TransferTransaction } from "../versions";
 
-// todo: revisit the implementation, container usage and arguments after core-database rework
-// todo: replace unnecessary function arguments with dependency injection to avoid passing around references
 @injectable()
 export class TransferTransactionHandler extends Handlers.TransactionHandler {
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
@@ -25,8 +26,9 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
 		for (const transaction of this.allTransactions(transactions)) {
-			const wallet: Contracts.State.Wallet = this.walletRepository.findByAddress(transaction.recipientId);
-			wallet.increaseBalance(BigNumber.make(transaction.amount));
+			this.walletRepository
+				.findByAddress(transaction.recipientId)
+				.increaseBalance(BigNumber.make(transaction.amount));
 		}
 	}
 
@@ -49,11 +51,9 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
 
-		// @TODO
-		if (!TransactionUtils.isRecipientOnActiveNetwork(recipientId, undefined, this.configuration)) {
-			const network: string = this.configuration.get<string>("network.pubKeyHash");
+		if (!(await this.addressFactory.validate(recipientId))) {
 			throw new Exceptions.PoolError(
-				`Recipient ${recipientId} is not on the same network: ${network} `,
+				`Recipient ${recipientId} is not on the same network`,
 				"ERR_INVALID_RECIPIENT",
 			);
 		}

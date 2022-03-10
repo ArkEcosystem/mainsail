@@ -1,3 +1,4 @@
+import { BigNumber } from "@arkecosystem/utils";
 import pluralize from "plur";
 
 import { ITransaction } from "../contracts/crypto";
@@ -70,9 +71,9 @@ export class SenderExceededMaximumTransactionCountError extends PoolError {
 }
 
 export class TransactionPoolFullError extends PoolError {
-	public readonly required: any; // @TODO: BigNumber
+	public readonly required: BigNumber;
 
-	public constructor(transaction: ITransaction, required: any) {
+	public constructor(transaction: ITransaction, required: BigNumber) {
 		super(
 			`${transaction} fee ${transaction.data.fee.toString()} is lower than ${required.toString()} already in pool`,
 			"ERR_POOL_FULL",

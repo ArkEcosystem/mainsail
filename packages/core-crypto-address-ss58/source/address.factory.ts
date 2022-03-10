@@ -16,7 +16,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	}
 
 	public async fromPublicKey(publicKey: string): Promise<string> {
-		return encodeAddress(Buffer.from(publicKey, "hex"), this.configuration.get("network.address.ss58"));
+		return encodeAddress(Buffer.from(publicKey, "hex"), this.configuration.getMilestone().address.ss58);
 	}
 
 	public async fromWIF(wif: string): Promise<string> {
@@ -44,8 +44,8 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 			encodeAddress(
 				isHex(address)
 					? hexToU8a(address)
-					: decodeAddress(address, this.configuration.get("network.address.ss58")),
-				this.configuration.get("network.address.ss58"),
+					: decodeAddress(address, this.configuration.getMilestone().address.ss58),
+				this.configuration.getMilestone().address.ss58,
 			);
 
 			return true;

@@ -27,7 +27,6 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	}
 
 	public set<T = any>(key: string, value: T): void {
-		// @TODO: remove this and throw if no config is set
 		if (!this.#config) {
 			this.#config = {
 				// @ts-ignore

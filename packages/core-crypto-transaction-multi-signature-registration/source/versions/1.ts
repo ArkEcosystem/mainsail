@@ -5,6 +5,9 @@ import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class MultiSignatureRegistrationTransaction extends Transaction {
+	@inject(Identifiers.Application)
+	public readonly app: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
 	private readonly publicKeySerializer: Contracts.Crypto.IPublicKeySerializer;
 
@@ -60,8 +63,9 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
-		// @TODO
-		const buff: ByteBuffer = ByteBuffer.fromSize(2 + publicKeys.length * 32);
+		const buff: ByteBuffer = ByteBuffer.fromSize(
+			2 + publicKeys.length * this.app.get<number>(Identifiers.Cryptography.Size.PublicKey),
+		);
 
 		buff.writeUint8(min);
 		buff.writeUint8(publicKeys.length);

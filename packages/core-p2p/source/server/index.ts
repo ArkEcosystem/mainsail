@@ -135,8 +135,7 @@ export class Server {
 					},
 					querystring: {
 						properties: {
-							// @TODO strings are block ids
-							ids: { items: { type: "string" }, maxItems: 10, minItems: 1, type: "array" },
+							ids: { items: { blockId: {} }, maxItems: 10, minItems: 1, type: "array" },
 						},
 						type: "object",
 					},

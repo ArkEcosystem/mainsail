@@ -3,7 +3,6 @@
 import { JsonObject } from "../types";
 import { Container } from "./container";
 
-// todo: remove this interface as it serves no purpose. Every package depends on core-kernel so it can import the application directly.
 export interface Application {
 	readonly container: Container.Container;
 
@@ -88,10 +87,4 @@ export interface PluginDependency {
 	version?: string;
 
 	required?: boolean | (() => Promise<boolean>);
-}
-
-export interface ExceptionHandler {
-	report(exception: any); // @TODO: exception
-
-	shouldReport(exception: any); // @TODO: exception
 }

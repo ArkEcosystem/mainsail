@@ -333,7 +333,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		// Throttle
 		const msBeforeReCheck = 1000;
 
-		// @TODO: we need to handle this other than the URL or you can get around it
 		while (await this.outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, url)) {
 			this.logger.debug(`Throttling outgoing requests to ${peer.ip}/${url} to avoid triggering their rate limit`);
 

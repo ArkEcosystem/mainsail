@@ -22,7 +22,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 		const buffer: Buffer = RIPEMD160.digest(Buffer.from(publicKey, "hex"));
 		const payload: Buffer = Buffer.alloc(21);
 
-		payload.writeUInt8(this.configuration.get("network.address.base58"), 0);
+		payload.writeUInt8(this.configuration.getMilestone().address.base58, 0);
 		buffer.copy(payload, 1);
 
 		return this.#encodeCheck(payload);
@@ -47,7 +47,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	public async toBuffer(address: string): Promise<Buffer> {
 		const result: Buffer = base58.decodeCheck(address);
 
-		const pubKeyHash = this.configuration.get("network.address.base58");
+		const pubKeyHash = this.configuration.getMilestone().address.base58;
 
 		if (result[0] !== pubKeyHash) {
 			throw new Error(`Expected address network byte ${pubKeyHash}, but got ${result[0]}.`);
@@ -58,7 +58,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 
 	public async validate(address: string): Promise<boolean> {
 		try {
-			return this.#decodeCheck(address)[0] === this.configuration.get("network.address.base58");
+			return this.#decodeCheck(address)[0] === this.configuration.getMilestone().address.base58;
 		} catch {
 			return false;
 		}

@@ -66,7 +66,7 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 	}
 
 	private deserializeSignatures(transaction: Contracts.Crypto.ITransactionData, buf: ByteBuffer): void {
-		// @TODO
+		// @TODO: take into account what the length of signatures is based on plugins
 		const canReadNonMultiSignature = () =>
 			buf.getRemainderLength() && (buf.getRemainderLength() % 64 === 0 || buf.getRemainderLength() % 65 !== 0);
 

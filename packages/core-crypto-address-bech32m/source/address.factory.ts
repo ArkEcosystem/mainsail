@@ -16,7 +16,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 
 	public async fromPublicKey(publicKey: string): Promise<string> {
 		return bech32m.encode(
-			this.configuration.get("network.address.bech32m"),
+			this.configuration.getMilestone().address.bech32m,
 			bech32m.toWords(Buffer.from(publicKey, "hex")),
 		);
 	}
@@ -34,7 +34,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	}
 
 	public async fromBuffer(buffer: Buffer): Promise<string> {
-		return bech32m.encode(this.configuration.get("network.address.bech32m"), [...new Uint8Array(buffer)]);
+		return bech32m.encode(this.configuration.getMilestone().address.bech32m, [...new Uint8Array(buffer)]);
 	}
 
 	public async toBuffer(address: string): Promise<Buffer> {

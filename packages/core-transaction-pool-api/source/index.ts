@@ -1,8 +1,8 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
+import { FastifyInstance, FastifyRequest } from "fastify";
 
 import { Handlers } from "./contracts";
-import { registerHandlers } from "./handlers";
 import { SubmitTransactionHandler } from "./handlers/submit";
 import { Server } from "./server";
 
@@ -12,11 +12,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.TransactionPoolServer).to(Server).inSingletonScope();
 
-		// @TODO: tidy up
-		registerHandlers(
-			this.app,
-			await this.app.get<Server>(Identifiers.TransactionPoolServer).initialize(this.config().all()),
-		);
+		await this.#registerHandlers();
 	}
 
 	public async boot(): Promise<void> {
@@ -25,5 +21,26 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async dispose(): Promise<void> {
 		// await this.app.get<Server>(Identifiers.TransactionPoolServer).dispose();
+	}
+
+	async #registerHandlers(): Promise<void> {
+		const server: FastifyInstance = await this.app
+			.get<Server>(Identifiers.TransactionPoolServer)
+			.initialize(this.config().all());
+
+		server.post(
+			"/",
+			{
+				schema: {
+					body: {
+						properties: {
+							//
+						},
+						type: "object",
+					},
+				},
+			},
+			async (request: FastifyRequest) => this.app.get<SubmitTransactionHandler>(Handlers.Store).invoke(request),
+		);
 	}
 }

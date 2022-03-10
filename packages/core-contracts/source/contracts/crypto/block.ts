@@ -1,3 +1,5 @@
+import { BigNumber } from "@arkecosystem/utils";
+
 import { IKeyPair } from "./identities";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
@@ -29,9 +31,9 @@ export interface IBlockData {
 	height: number;
 	previousBlock: string;
 	numberOfTransactions: number;
-	totalAmount: any; // @TODO: use BigNumber from ../../crypto/utils
-	totalFee: any; // @TODO: use BigNumber from ../../crypto/utils
-	reward: any; // @TODO: use BigNumber from ../../crypto/utils
+	totalAmount: BigNumber;
+	totalFee: BigNumber;
+	reward: BigNumber;
 	payloadLength: number;
 	payloadHash: string;
 	generatorPublicKey: string;

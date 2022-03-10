@@ -5,6 +5,9 @@ import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 
 @injectable()
 export class IsForgingAllowedAction extends Services.Triggers.Action {
+	@inject(Identifiers.Application)
+	private readonly app: Contracts.Kernel.Application;
+
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -44,8 +47,9 @@ export class IsForgingAllowedAction extends Services.Triggers.Action {
 				if (overHeightBlockHeader.generatorPublicKey === validator.publicKey) {
 					AppUtils.assert.defined<string>(validator.publicKey);
 
-					// @TODO
-					const username = ""; // this.usernames[validator.publicKey];
+					const username: string = this.app.get<Record<string, string>>(Identifiers.Forger.Usernames)[
+						validator.publicKey
+					];
 
 					this.logger.warning(
 						`Possible double forging validator: ${username} (${validator.publicKey}) - Block: ${overHeightBlockHeader.id}.`,

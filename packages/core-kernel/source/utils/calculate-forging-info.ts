@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-// @TODO: replace calls to "getTimeStampForBlock"
 const findIndex = async (
 	height: number,
 	slotNumber: number,

@@ -1,10 +1,13 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class VoteTransaction extends Transaction {
+	@inject(Identifiers.Application)
+	public readonly app!: Contracts.Kernel.Application;
+
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.Vote;
 	public static key = "vote";
@@ -56,8 +59,9 @@ export class VoteTransaction extends Transaction {
 		data.asset = { votes: [] };
 
 		for (let index = 0; index < votelength; index++) {
-			// @TODO: deserialising votes requires length+1 unless we drop the prefix and use separate arrays
-			let vote: string = buf.readBytes(33).toString("hex"); // 33=schnorr,34=ecdsa
+			let vote: string = buf
+				.readBytes(this.app.get<number>(Identifiers.Cryptography.Size.PublicKey) + 1)
+				.toString("hex");
 			vote = (vote[1] === "1" ? "+" : "-") + vote.slice(2);
 
 			if (data.asset && data.asset.votes) {

@@ -4,6 +4,7 @@ import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 import { Providers } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
+import { MultiSignatureRegistrationTransactionHandler } from "./handlers";
 import { MultiSignatureRegistrationTransaction } from "./versions/1";
 
 export * from "./builder";
@@ -37,6 +38,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerHandler(): void {
-		this.app.bind(Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransaction);
+		this.app.bind(Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransactionHandler);
 	}
 }

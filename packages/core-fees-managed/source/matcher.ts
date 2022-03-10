@@ -1,6 +1,7 @@
-import { inject, injectable } from "@arkecosystem/core-container";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { FeeRegistry } from "@arkecosystem/core-fees";
+import { Providers } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
@@ -13,6 +14,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 
 	@inject(Identifiers.Fee.Registry)
 	private readonly feeRegistry: FeeRegistry;
+
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-fees-managed")
+	private readonly pluginConfiguration: Providers.PluginConfiguration;
 
 	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await this.#throwIfCannot("pool", transaction);
@@ -41,7 +46,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 
 	#calculateMinFee(transaction: Contracts.Crypto.ITransaction): BigNumber {
 		const addonBytes = this.feeRegistry.get(transaction.key, transaction.data.version) || BigNumber.ZERO;
-		const satoshiPerByte = 3000; // @TODO: make configurable
+		const satoshiPerByte: number = this.pluginConfiguration.get("satoshiPerByte");
 
 		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
 
@@ -49,9 +54,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	#formatSatoshi(amount: BigNumber): string {
-		// @TODO: make 1e8 configurable
-		const localeString = (+amount / 1e8).toLocaleString("en", {
-			maximumFractionDigits: 8,
+		const { decimals, denomination } = this.configuration.getMilestone().satoshi;
+
+		const localeString = (+amount / denomination).toLocaleString("en", {
+			maximumFractionDigits: decimals,
 			minimumFractionDigits: 0,
 		});
 

@@ -1,4 +1,4 @@
-import { ByteBuffer } from "@arkecosystem/utils";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import { IKeyPair } from "./identities";
 import { ISchemaValidationResult } from "./validator";
@@ -16,8 +16,8 @@ export interface ITransaction {
 	serialized: Buffer;
 	timestamp: number;
 
-	serialize(options?: ISerializeOptions): Promise<any | undefined>; // @TODO: use ByteBuffer from ../../crypto/utils
-	deserialize(buf: any): Promise<void>; // @TODO: use ByteBuffer from ../../crypto/utils
+	serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined>;
+	deserialize(buf: ByteBuffer): Promise<void>;
 
 	verify(options?: IVerifyOptions): Promise<boolean>;
 	verifySchema(strict?: boolean): ISchemaValidationResult;
@@ -49,11 +49,11 @@ export interface ITransactionData {
 	typeGroup?: number;
 	type: number;
 	timestamp: number;
-	nonce?: any; // @TODO: use ByteBuffer from ../../crypto/utils
+	nonce?: BigNumber;
 	senderPublicKey: string | undefined;
 
-	fee: any; // @TODO: use ByteBuffer from ../../crypto/utils
-	amount: any; // @TODO: use ByteBuffer from ../../crypto/utils
+	fee: BigNumber;
+	amount: BigNumber;
 
 	expiration?: number;
 	recipientId?: string;
@@ -98,7 +98,7 @@ export interface ITransactionJson {
 	sequence?: number;
 }
 export interface IMultiPaymentItem {
-	amount: any; // @TODO: use ByteBuffer from ../../crypto/utils
+	amount: BigNumber;
 	recipientId: string;
 }
 

@@ -1,5 +1,10 @@
-import { IMultiSignatureAsset, ITransaction, ITransactionData, TransactionConstructor } from "./crypto";
-
+import {
+	IMultiSignatureAsset,
+	ITransaction,
+	ITransactionData,
+	TransactionConstructor,
+	TransactionTypeGroup,
+} from "./crypto";
 import { EventDispatcher } from "./kernel";
 import { Wallet } from "./state";
 
@@ -64,7 +69,7 @@ export interface ITransactionHandlerProvider {
 	registerHandlers(): void;
 }
 
-// @TODO
+// @TODO: move this out of contracts, it's an implementation
 export class InternalTransactionType {
 	private static types: Map<string, InternalTransactionType> = new Map();
 
@@ -91,23 +96,6 @@ export class InternalTransactionType {
 
 		return `${this.typeGroup}/${this.type}`;
 	}
-}
-
-export enum TransactionType {
-	Transfer = 0,
-	ValidatorRegistration = 2,
-	Vote = 3,
-	MultiSignature = 4,
-	MultiPayment = 6,
-	ValidatorResignation = 7,
-}
-
-export enum TransactionTypeGroup {
-	Test = 0,
-	Core = 1,
-
-	// Everything above is available to anyone
-	Reserved = 1000,
 }
 
 export interface ITransactionTypeFactory {

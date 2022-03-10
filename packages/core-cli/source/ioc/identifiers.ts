@@ -1,73 +1,47 @@
 import { Identifiers as ID } from "@arkecosystem/core-contracts";
 
 export const Identifiers = {
-	// Actions
-	AbortMissingProcess: Symbol.for("Action<AbortMissingProcess>"),
-
 	AbortErroredProcess: Symbol.for("Action<AbortErroredProcess>"),
-
-	// Factories
-	ActionFactory: Symbol.for("Factory<Action>"),
-
+	AbortMissingProcess: Symbol.for("Action<AbortMissingProcess>"),
 	AbortRunningProcess: Symbol.for("Action<AbortRunningProcess>"),
-
-	// @TODO
-	Application: ID.Application,
-
 	AbortStoppedProcess: Symbol.for("Action<AbortStoppedProcess>"),
-
-	ApplicationPaths: Symbol.for("Paths<Application>"),
-
 	AbortUnknownProcess: Symbol.for("Action<AbortUnknownProcess>"),
-
-	Commands: Symbol.for("Commands"),
-
-	// Components
+	ActionFactory: Symbol.for("Factory<Action>"),
 	AppHeader: Symbol.for("Component<AppHeader>"),
-
-	ComponentFactory: Symbol.for("Factory<Component>"),
-
+	Application: ID.Application,
+	ApplicationPaths: Symbol.for("Paths<Application>"),
 	Ask: Symbol.for("Component<Ask>"),
-
-	Config: Symbol.for("Config"),
-
 	AskDate: Symbol.for("Component<AskDate>"),
-
-	ConsolePaths: Symbol.for("Paths<Console>"),
-
 	AskHidden: Symbol.for("Component<AskHidden>"),
-
-	Environment: Symbol.for("Environment"),
-
 	AskNumber: Symbol.for("Component<AskNumber>"),
-
-	Input: Symbol.for("Input"),
-
 	AskPassword: Symbol.for("Component<AskPassword>"),
-
-	// Input
-	InputValidator: Symbol.for("Input<Validator>"),
 	AutoComplete: Symbol.for("Component<AutoComplete>"),
-	Installer: Symbol.for("Installer"),
 	Box: Symbol.for("Component<Box>"),
-	Logger: Symbol.for("Logger"),
 	Clear: Symbol.for("Component<Clear>"),
-	Output: Symbol.for("Output"),
+	Commands: Symbol.for("Commands"),
+	ComponentFactory: Symbol.for("Factory<Component>"),
+	Config: Symbol.for("Config"),
 	Confirm: Symbol.for("Component<Confirm>"),
-	Package: Symbol.for("Package"),
+	ConsolePaths: Symbol.for("Paths<Console>"),
 	DaemonizeProcess: Symbol.for("Action<DaemonizeProcess>"),
-	PluginManager: Symbol.for("PluginManager"),
+	Environment: Symbol.for("Environment"),
 	Error: Symbol.for("Component<Error>"),
-	ProcessManager: Symbol.for("ProcessManager"),
 	Fatal: Symbol.for("Component<Fatal>"),
-	Updater: Symbol.for("Updater"),
 	Info: Symbol.for("Component<Info>"),
+	Input: Symbol.for("Input"),
 	InputFactory: Symbol.for("Factory<Input>"),
+	InputValidator: Symbol.for("Input<Validator>"),
+	Installer: Symbol.for("Installer"),
 	Listing: Symbol.for("Component<Listing>"),
 	Log: Symbol.for("Component<Log>"),
-	ProcessFactory: Symbol.for("Factory<Process>"),
+	Logger: Symbol.for("Logger"),
 	MultiSelect: Symbol.for("Component<MultiSelect>"),
 	NewLine: Symbol.for("Component<NewLine>"),
+	Output: Symbol.for("Output"),
+	Package: Symbol.for("Package"),
+	PluginManager: Symbol.for("PluginManager"),
+	ProcessFactory: Symbol.for("Factory<Process>"),
+	ProcessManager: Symbol.for("ProcessManager"),
 	Prompt: Symbol.for("Component<Prompt>"),
 	RestartProcess: Symbol.for("Action<RestartProcess>"),
 	RestartRunningProcess: Symbol.for("Action<RestartRunningProcess>"),
@@ -79,5 +53,6 @@ export const Identifiers = {
 	TaskList: Symbol.for("Component<TaskList>"),
 	Title: Symbol.for("Component<Title>"),
 	Toggle: Symbol.for("Component<Toggle>"),
+	Updater: Symbol.for("Updater"),
 	Warning: Symbol.for("Component<Warning>"),
 };

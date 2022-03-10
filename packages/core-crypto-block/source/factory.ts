@@ -3,20 +3,18 @@ import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts
 import { BigNumber } from "@arkecosystem/utils";
 
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
-import { Deserializer } from "./deserializer";
 import { IDFactory } from "./id.factory";
-import { Serializer } from "./serializer";
 
 @injectable()
 export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Serializer; // @TODO: create contract for block serializer
+	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly deserializer: Deserializer; // @TODO: create contract for block deserializer
+	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
 
 	@inject(INTERNAL_FACTORY)
-	private readonly blockFactory: InternalFactory; // @TODO: create contract for block deserializer
+	private readonly blockFactory: InternalFactory;
 
 	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;

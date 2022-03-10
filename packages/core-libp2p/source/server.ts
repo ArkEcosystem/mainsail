@@ -1,12 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { NOISE } from "@chainsafe/libp2p-noise";
 import libp2p from "libp2p";
-import Bootstrap from "libp2p-bootstrap";
-import Gossipsub from "libp2p-gossipsub";
-// import MPLEX from 'libp2p-mplex';
-import TCP from "libp2p-tcp";
-import WS from "libp2p-websockets";
 
 @injectable()
 export class Server {
@@ -18,34 +12,8 @@ export class Server {
 
 	private server: libp2p;
 
-	public async register(): Promise<void> {
-		this.server = await libp2p.create({
-			addresses: {
-				listen: ["/ip4/0.0.0.0/tcp/0"], // @TODO: grab from config
-			},
-			config: {
-				peerDiscovery: {
-					autoDial: true,
-					[Bootstrap.tag]: {
-						enabled: true,
-						list: [], // @TODO: grab from config
-					},
-				},
-				pubsub: {
-					emitSelf: true, // @TODO: only true for debug/test/dev, add a flag
-					enabled: true,
-				},
-			},
-			// @ts-ignore
-			modules: {
-				connEncryption: [NOISE],
-				// peerDiscovery: [Bootstrap],
-				pubsub: Gossipsub,
-				// @TODO: this errors because the interface and implementation don't match
-				// streamMuxer: [MPLEX],
-				transport: [TCP, WS],
-			},
-		});
+	public async register(options: libp2p.Libp2pOptions): Promise<void> {
+		this.server = await libp2p.create(options);
 	}
 
 	public async boot(): Promise<void> {
@@ -78,11 +46,11 @@ export class Server {
 		}
 	}
 
-	public listen(event: string, listener: (...args: any[]) => void): void {
+	public listen(event: string, listener: (...arguments_: any[]) => void): void {
 		this.server.pubsub.on(event, listener);
 	}
 
-	public unlisten(event: string, listener: (...args: any[]) => void): void {
+	public unlisten(event: string, listener: (...arguments_: any[]) => void): void {
 		this.server.pubsub.off(event, listener);
 	}
 

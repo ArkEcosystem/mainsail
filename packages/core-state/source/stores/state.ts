@@ -1,7 +1,7 @@
+import assert from "assert";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
-import assert from "assert";
 import { OrderedMap, OrderedSet, Seq } from "immutable";
 
 // todo: extract block and transaction behaviours into their respective stores
@@ -194,7 +194,7 @@ export class StateStore implements Contracts.State.StateStore {
 
 		if (this.configuration.isNewMilestone()) {
 			this.logger.notice("Milestone change");
-			// @TODO
+
 			void this.app
 				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)
 				.dispatch(Enums.CryptoEvent.MilestoneChanged);

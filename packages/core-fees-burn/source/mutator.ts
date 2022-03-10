@@ -1,11 +1,16 @@
-import { inject, injectable } from "@arkecosystem/core-container";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 @injectable()
 export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 	@inject(Identifiers.WalletRepository)
 	private readonly walletRepository: Contracts.State.WalletRepository;
+
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-fees-managed")
+	private readonly pluginConfiguration: Providers.PluginConfiguration;
 
 	public async apply(wallet: Contracts.State.Wallet, block: Contracts.Crypto.IBlockData): Promise<void> {
 		const amount: BigNumber = this.#calculate(block);
@@ -42,7 +47,7 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 	}
 
 	#calculate(block: Contracts.Crypto.IBlockData): BigNumber {
-		const burnPercentage = 100; // @TODO: make configurable
+		const burnPercentage: number = this.pluginConfiguration.get("percentage");
 
 		let fee: BigNumber = block.totalFee;
 
