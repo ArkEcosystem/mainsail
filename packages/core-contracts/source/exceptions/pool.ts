@@ -97,15 +97,6 @@ export class TransactionFailedToVerifyError extends PoolError {
 	}
 }
 
-export class TransactionFromFutureError extends PoolError {
-	public secondsInFuture: number;
-
-	public constructor(transaction: ITransaction, secondsInFuture: number) {
-		super(`${transaction} is ${pluralize("second", secondsInFuture)} in future`, "ERR_FROM_FUTURE");
-		this.secondsInFuture = secondsInFuture;
-	}
-}
-
 export class TransactionFromWrongNetworkError extends PoolError {
 	public currentNetwork: number;
 

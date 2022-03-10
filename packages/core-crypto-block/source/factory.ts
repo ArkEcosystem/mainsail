@@ -2,19 +2,19 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { INTERNAL_FACTORY, InternalFactory } from "./container";
+import { Block } from "./block";
 import { IDFactory } from "./id.factory";
 
 @injectable()
 export class BlockFactory implements Contracts.Crypto.IBlockFactory {
+	@inject(Identifiers.Application)
+	private readonly app: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
-
-	@inject(INTERNAL_FACTORY)
-	private readonly blockFactory: InternalFactory;
 
 	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
@@ -77,10 +77,10 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
-		const block: Contracts.Crypto.IBlock = await this.blockFactory({
-			...(await this.deserializer.deserialize(serialized, false, options)),
-			id: data.id,
-		});
+		const block: Contracts.Crypto.IBlock = await this.app
+			.resolve(Block)
+			.init(await this.deserializer.deserialize(serialized, false, options));
+
 		block.serialized = serialized.toString("hex");
 
 		return block;
@@ -96,7 +96,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			deserialized.data = validated;
 		}
 
-		const block: Contracts.Crypto.IBlock = await this.blockFactory(deserialized);
+		const block: Contracts.Crypto.IBlock = await this.app.resolve(Block).init(deserialized);
 		block.serialized = serialized.toString("hex");
 
 		return block;

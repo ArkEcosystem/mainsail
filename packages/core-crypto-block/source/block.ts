@@ -7,27 +7,17 @@ export class Block implements Contracts.Crypto.IBlock {
 	public serialized: string;
 	public data: Contracts.Crypto.IBlockData;
 	public transactions: Contracts.Crypto.ITransaction[];
-	public verification: Contracts.Crypto.IBlockVerification;
 
 	public async init({
 		data,
 		transactions,
-		id,
 	}: {
 		data: Contracts.Crypto.IBlockData;
 		transactions: Contracts.Crypto.ITransaction[];
-		id?: string;
 	}) {
 		this.data = data;
-
-		// fix on real timestamp, this is overloading transaction
-		// timestamp with block timestamp for storage only
-		// also add sequence to keep database sequence
 		this.transactions = transactions.map((transaction, index) => {
-			transaction.data.blockId = this.data.id;
-			transaction.data.blockHeight = this.data.height;
 			transaction.data.sequence = index;
-			transaction.timestamp = this.data.timestamp;
 			return transaction;
 		});
 
