@@ -80,14 +80,14 @@ export abstract class Command {
 
 	public async run(): Promise<void> {
 		try {
-			await this.detectConfig();
+			await this.#detectConfig();
 
 			if (this.requiresNetwork) {
-				await this.detectNetwork();
+				await this.#detectNetwork();
 			}
 
 			// Check for configuration again after network was chosen
-			await this.detectConfig();
+			await this.#detectConfig();
 
 			if (this.input.hasFlag("token") && this.input.hasFlag("network")) {
 				this.app
@@ -143,7 +143,7 @@ export abstract class Command {
 		return this.input.hasFlag(name);
 	}
 
-	private async detectConfig(): Promise<void> {
+	async #detectConfig(): Promise<void> {
 		const config = await this.app
 			.resolve(DiscoverConfig)
 			.discover(this.input.getFlag("token"), this.input.getFlag("network"));
@@ -154,7 +154,7 @@ export abstract class Command {
 		}
 	}
 
-	private async detectNetwork(): Promise<void> {
+	async #detectNetwork(): Promise<void> {
 		const requiresNetwork: boolean = Object.keys(this.definition.getFlags()).includes("network");
 
 		if (requiresNetwork && !this.input.hasFlag("network")) {

@@ -9,13 +9,13 @@ export class Config {
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	private file!: string;
+	#file!: string;
 
-	private store: object = {};
+	#store: object = {};
 
 	@postConstruct()
 	public initialize(): void {
-		this.file = this.app.getConsolePath("config", "config.json");
+		this.#file = this.app.getConsolePath("config", "config.json");
 
 		this.restoreDefaults();
 
@@ -23,32 +23,32 @@ export class Config {
 	}
 
 	public all(): object {
-		return this.store;
+		return this.#store;
 	}
 
 	public get<T>(key: string): T {
-		return this.store[key];
+		return this.#store[key];
 	}
 
 	public set<T>(key: string, value: T): void {
-		this.store[key] = value;
+		this.#store[key] = value;
 
 		this.save();
 	}
 
 	public forget(key: string): void {
-		delete this.store[key];
+		delete this.#store[key];
 
 		this.save();
 	}
 
 	public has(key: string): boolean {
-		return Object.keys(this.store).includes(key);
+		return Object.keys(this.#store).includes(key);
 	}
 
 	public load(): any {
 		try {
-			this.store = readJsonSync(this.file);
+			this.#store = readJsonSync(this.#file);
 		} catch {
 			this.restoreDefaults();
 
@@ -57,14 +57,14 @@ export class Config {
 	}
 
 	public save(): void {
-		ensureFileSync(this.file);
+		ensureFileSync(this.#file);
 
-		writeJsonSync(this.file, this.store);
+		writeJsonSync(this.#file, this.#store);
 	}
 
 	public restoreDefaults(): void {
-		if (this.store.constructor !== Object) {
-			this.store = {};
+		if (this.#store.constructor !== Object) {
+			this.#store = {};
 		}
 
 		if (!this.has("token")) {
@@ -72,7 +72,7 @@ export class Config {
 		}
 
 		if (!this.has("channel")) {
-			this.set("channel", this.getRegistryChannel(this.app.get<PackageJson>(Identifiers.Package).version));
+			this.set("channel", this.#getRegistryChannel(this.app.get<PackageJson>(Identifiers.Package).version));
 		}
 
 		if (!this.has("plugins")) {
@@ -82,7 +82,7 @@ export class Config {
 		this.save();
 	}
 
-	private getRegistryChannel(version: string): string {
+	#getRegistryChannel(version: string): string {
 		const channels: string[] = ["next"];
 
 		let channel = "latest";

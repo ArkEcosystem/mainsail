@@ -15,7 +15,7 @@ export class PluginManager implements Contracts.PluginManager {
 	public async list(token: string, network: string): Promise<Contracts.Plugin[]> {
 		const plugins: Contracts.Plugin[] = [];
 
-		const path = this.getPluginsPath(token, network);
+		const path = this.#getPluginsPath(token, network);
 
 		const packagePaths = glob
 			.sync("{@*/*/package.json,*/package.json}", { cwd: path })
@@ -37,8 +37,8 @@ export class PluginManager implements Contracts.PluginManager {
 	public async install(token: string, network: string, pkg: string, version?: string): Promise<void> {
 		for (const Instance of [File, Git, NPM]) {
 			const source: Source = new Instance({
-				data: this.getPluginsPath(token, network),
-				temp: this.getTempPath(token, network),
+				data: this.#getPluginsPath(token, network),
+				temp: this.#getTempPath(token, network),
 			});
 
 			if (await source.exists(pkg, version)) {
@@ -51,8 +51,8 @@ export class PluginManager implements Contracts.PluginManager {
 
 	public async update(token: string, network: string, pkg: string): Promise<void> {
 		const paths = {
-			data: this.getPluginsPath(token, network),
-			temp: this.getTempPath(token, network),
+			data: this.#getPluginsPath(token, network),
+			temp: this.#getTempPath(token, network),
 		};
 		const directory: string = join(paths.data, pkg);
 
@@ -68,7 +68,7 @@ export class PluginManager implements Contracts.PluginManager {
 	}
 
 	public async remove(token: string, network: string, pkg): Promise<void> {
-		const directory: string = join(this.getPluginsPath(token, network), pkg);
+		const directory: string = join(this.#getPluginsPath(token, network), pkg);
 
 		if (!existsSync(directory)) {
 			throw new Error(`The package [${pkg}] does not exist.`);
@@ -77,11 +77,11 @@ export class PluginManager implements Contracts.PluginManager {
 		removeSync(directory);
 	}
 
-	private getPluginsPath(token: string, network: string): string {
+	#getPluginsPath(token: string, network: string): string {
 		return join(this.environment.getPaths(token, network).data, "plugins");
 	}
 
-	private getTempPath(token: string, network: string): string {
+	#getTempPath(token: string, network: string): string {
 		return join(this.environment.getPaths(token, network).temp, "plugins");
 	}
 }

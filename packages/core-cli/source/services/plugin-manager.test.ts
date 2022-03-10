@@ -3,10 +3,12 @@ import { join } from "path";
 import { setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../core-test-framework";
+import { Identifiers } from "../ioc";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";
 
 describe<{
+	cli: Console;
 	pluginManager: PluginManager;
 }>("DiscoverPlugins", ({ beforeEach, afterAll, assert, it, stub, spyFn }) => {
 	const token = "ark";
@@ -14,17 +16,19 @@ describe<{
 	const packageName = "dummyPackageName";
 
 	beforeEach((context) => {
-		const cli = new Console();
+		context.cli = new Console();
 
-		context.pluginManager = cli.app.resolve(PluginManager);
+		context.pluginManager = context.cli.app.resolve(PluginManager);
 	});
 
 	afterAll(() => setGracefulCleanup());
 
-	it("#discover - should discover packages containing package.json", async ({ pluginManager }) => {
+	it("#discover - should discover packages containing package.json", async ({ cli, pluginManager }) => {
 		const pluginsPath: string = join(__dirname, "../../test/plugins");
 
-		stub(pluginManager, "getPluginsPath").returnValue(pluginsPath);
+		stub(cli.app.get(Identifiers.Environment), "getPaths").returnValue({
+			data: join(__dirname, "../../test"),
+		});
 
 		const plugins = await pluginManager.list(token, network);
 

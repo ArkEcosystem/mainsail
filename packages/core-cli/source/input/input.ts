@@ -19,30 +19,30 @@ export class Input {
 
 	public interactive = true;
 
-	private definition!: InputDefinition;
+	#definition!: InputDefinition;
 
-	private rawArgs: string[] = [];
+	#rawArgs: string[] = [];
 
-	private rawFlags: object = {};
+	#rawFlags: object = {};
 
 	public parse(argv: string[], definition: InputDefinition): void {
-		this.definition = definition;
+		this.#definition = definition;
 
 		const { args, flags } = InputParser.parseArgv(argv);
 
-		this.rawArgs = args;
-		this.rawFlags = flags;
+		this.#rawArgs = args;
+		this.#rawFlags = flags;
 	}
 
 	public bind(): void {
-		const keys: string[] = Object.keys(this.definition.getArguments());
-		const values: string[] = [...this.rawArgs].slice(1);
+		const keys: string[] = Object.keys(this.#definition.getArguments());
+		const values: string[] = [...this.#rawArgs].slice(1);
 
 		for (const [i, key] of keys.entries()) {
 			this.args[key] = values[i];
 		}
 
-		this.flags = this.rawFlags;
+		this.flags = this.#rawFlags;
 	}
 
 	public validate(): void {
@@ -57,10 +57,10 @@ export class Input {
 		};
 
 		if (Object.keys(this.args).length > 0) {
-			this.args = this.validator.validate(this.args, definitionToSchema(this.definition.getArguments()));
+			this.args = this.validator.validate(this.args, definitionToSchema(this.#definition.getArguments()));
 		}
 
-		this.flags = this.validator.validate(this.flags, definitionToSchema(this.definition.getFlags()));
+		this.flags = this.validator.validate(this.flags, definitionToSchema(this.#definition.getFlags()));
 	}
 
 	public getArguments(values?: object) {

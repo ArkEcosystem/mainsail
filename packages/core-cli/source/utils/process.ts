@@ -19,46 +19,46 @@ export class Process {
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	private processName!: string;
+	#processName!: string;
 
 	public initialize(token: string, suffix: string): void {
-		this.processName = `${token}-${suffix}`;
+		this.#processName = `${token}-${suffix}`;
 	}
 
 	public stop(daemon: boolean): void {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
-		this.app.get<AbortUnknownProcess>(Identifiers.AbortUnknownProcess).execute(this.processName);
-		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.processName);
+		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
+		this.app.get<AbortUnknownProcess>(Identifiers.AbortUnknownProcess).execute(this.#processName);
+		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.#processName);
 
-		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Stopping ${this.processName}`);
+		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Stopping ${this.#processName}`);
 
 		spinner.start();
 
-		this.processManager[daemon ? "delete" : "stop"](this.processName);
+		this.processManager[daemon ? "delete" : "stop"](this.#processName);
 
 		spinner.succeed();
 	}
 
 	public restart(): void {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
-		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.processName);
+		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
+		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.#processName);
 
-		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Restarting ${this.processName}`);
+		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Restarting ${this.#processName}`);
 
 		spinner.start();
 
-		this.processManager.restart(this.processName);
+		this.processManager.restart(this.#processName);
 
 		spinner.succeed();
 	}
 
 	public status(): void {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
+		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
 
 		this.app
 			.get<Table>(Identifiers.Table)
 			.render(["ID", "Name", "Version", "Status", "Uptime", "CPU", "RAM"], (table) => {
-				const app: ProcessDescription | undefined = this.processManager.describe(this.processName);
+				const app: ProcessDescription | undefined = this.processManager.describe(this.#processName);
 
 				Utils.assert.defined<ProcessDescription>(app);
 
@@ -75,9 +75,9 @@ export class Process {
 	}
 
 	public async log(showErrors: boolean, lines: number): Promise<void> {
-		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
+		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.#processName);
 
-		const proc: Record<string, any> | undefined = this.processManager.describe(this.processName);
+		const proc: Record<string, any> | undefined = this.processManager.describe(this.#processName);
 
 		Utils.assert.defined<Record<string, any>>(proc);
 
@@ -86,7 +86,7 @@ export class Process {
 		this.app.get<Clear>(Identifiers.Clear).render();
 
 		console.log(
-			`Tailing last ${lines} lines for [${this.processName}] process (change the value with --lines option)`,
+			`Tailing last ${lines} lines for [${this.#processName}] process (change the value with --lines option)`,
 		);
 
 		console.log((await readLastLines.read(file, lines)).trim());

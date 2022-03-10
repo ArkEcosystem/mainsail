@@ -29,18 +29,18 @@ export class Updater implements Contracts_Updater {
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	private updateCheckInterval: any = ONE_DAY;
+	#updateCheckInterval: any = ONE_DAY;
 
-	private latestVersion: string | undefined;
+	#latestVersion: string | undefined;
 
 	public async check(): Promise<boolean> {
-		this.latestVersion = this.config.get("latestVersion");
+		this.#latestVersion = this.config.get("latestVersion");
 
-		if (this.latestVersion) {
+		if (this.#latestVersion) {
 			this.config.forget("latestVersion"); // ? shouldn't it be moved after lastUpdateCheck
 		}
 
-		if (Date.now() - this.config.get<number>("lastUpdateCheck") < this.updateCheckInterval) {
+		if (Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval) {
 			return false;
 		}
 
@@ -54,13 +54,13 @@ export class Updater implements Contracts_Updater {
 
 		this.config.set("latestVersion", latestVersion);
 
-		this.latestVersion = latestVersion;
+		this.#latestVersion = latestVersion;
 
 		return true;
 	}
 
 	public async update(updateProcessManager = false, force = false): Promise<boolean> {
-		if (this.latestVersion === undefined) {
+		if (this.#latestVersion === undefined) {
 			return false;
 		}
 
@@ -68,8 +68,8 @@ export class Updater implements Contracts_Updater {
 			const confirm = await this.app
 				.get<Confirm>(Identifiers.Confirm)
 				.render(
-					`Update available ${dim(this.packageVersion)} ${reset(" → ")} ${green(
-						this.latestVersion,
+					`Update available ${dim(this.#packageVersion)} ${reset(" → ")} ${green(
+						this.#latestVersion,
 					)}. Would you like to update?`,
 				);
 
@@ -78,11 +78,11 @@ export class Updater implements Contracts_Updater {
 			}
 		}
 
-		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Installing ${this.latestVersion}`);
+		const spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Installing ${this.#latestVersion}`);
 
 		spinner.start();
 
-		this.installer.install(this.packageName, this.packageChannel);
+		this.installer.install(this.#packageName, this.#packageChannel);
 
 		if (updateProcessManager) {
 			this.processManager.update();
@@ -95,11 +95,11 @@ export class Updater implements Contracts_Updater {
 
 	public async getLatestVersion(): Promise<string | undefined> {
 		try {
-			const latest: string | undefined = await latestVersion(this.packageName, {
-				version: this.packageChannel,
+			const latest: string | undefined = await latestVersion(this.#packageName, {
+				version: this.#packageChannel,
 			});
 
-			if (lte(latest, this.packageVersion)) {
+			if (lte(latest, this.#packageVersion)) {
 				return undefined;
 			}
 
@@ -107,21 +107,21 @@ export class Updater implements Contracts_Updater {
 		} catch {
 			this.app
 				.get<Warning>(Identifiers.Warning)
-				.render(`We were unable to find any releases for the "${this.packageChannel}" channel.`);
+				.render(`We were unable to find any releases for the "${this.#packageChannel}" channel.`);
 
 			return undefined;
 		}
 	}
 
-	private get packageName(): string {
+	get #packageName(): string {
 		return this.pkg.name;
 	}
 
-	private get packageVersion(): string {
+	get #packageVersion(): string {
 		return this.pkg.version;
 	}
 
-	private get packageChannel(): string {
+	get #packageChannel(): string {
 		return this.config.get("channel");
 	}
 }

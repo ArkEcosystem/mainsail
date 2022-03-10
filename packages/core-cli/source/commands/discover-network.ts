@@ -10,7 +10,7 @@ export class DiscoverNetwork {
 			throw new Error(`The [${path}] directory does not exist.`);
 		}
 
-		const folders: string[] = readdirSync(path).filter((folder) => this.isValidNetwork(folder));
+		const folders: string[] = readdirSync(path).filter((folder) => this.#isValidNetwork(folder));
 
 		if (!folders || folders.length === 0) {
 			throw new Error(
@@ -33,7 +33,7 @@ export class DiscoverNetwork {
 		const response = await prompts([
 			{
 				choices: folders
-					.filter((folder) => this.isValidNetwork(folder))
+					.filter((folder) => this.#isValidNetwork(folder))
 					.map((folder) => ({ title: folder, value: folder })),
 				message: "What network do you want to operate on?",
 				name: "network",
@@ -50,14 +50,14 @@ export class DiscoverNetwork {
 			throw new Error("You'll need to confirm the network to continue.");
 		}
 
-		if (!this.isValidNetwork(response.network)) {
+		if (!this.#isValidNetwork(response.network)) {
 			throw new Error(`The given network "${response.network}" is not valid.`);
 		}
 
 		return response.network;
 	}
 
-	private isValidNetwork(network: string): boolean {
+	#isValidNetwork(network: string): boolean {
 		return ["livenet", "testnet"].includes(network);
 	}
 }

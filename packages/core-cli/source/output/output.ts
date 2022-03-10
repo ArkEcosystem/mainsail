@@ -9,9 +9,9 @@ enum OutputVerbosity {
 
 @injectable()
 export class Output {
-	private verbosity: number = OutputVerbosity.Normal;
+	#verbosity: number = OutputVerbosity.Normal;
 
-	private realStdout: Function = process.stdout.write;
+	#realStdout: Function = process.stdout.write;
 
 	public mute() {
 		// @ts-ignore - We don't care about the type error, we just want to noop it.
@@ -20,30 +20,30 @@ export class Output {
 
 	public unmute() {
 		// @ts-ignore - We don't care about the type error, we just want to restore it.
-		process.stdout.write = this.realStdout;
+		process.stdout.write = this.#realStdout;
 	}
 
 	public setVerbosity(level: number): void {
-		this.verbosity = level;
+		this.#verbosity = level;
 	}
 
 	public getVerbosity(): number {
-		return this.verbosity;
+		return this.#verbosity;
 	}
 
 	public isQuiet(): boolean {
-		return OutputVerbosity.Quiet === this.verbosity;
+		return OutputVerbosity.Quiet === this.#verbosity;
 	}
 
 	public isNormal(): boolean {
-		return OutputVerbosity.Normal === this.verbosity;
+		return OutputVerbosity.Normal === this.#verbosity;
 	}
 
 	public isVerbose(): boolean {
-		return OutputVerbosity.Verbose <= this.verbosity;
+		return OutputVerbosity.Verbose <= this.#verbosity;
 	}
 
 	public isDebug(): boolean {
-		return OutputVerbosity.Debug <= this.verbosity;
+		return OutputVerbosity.Debug <= this.#verbosity;
 	}
 }

@@ -74,26 +74,18 @@ describe<{
 	});
 
 	it("#restoreDefaults - should restore the defaults if the config has been corrupted", ({ config }) => {
-		config.store = [];
+		config.forget("token");
+		config.forget("channel");
+		config.forget("plugins");
 
-		assert.array(config.store);
 		assert.undefined(config.get("token"));
 		assert.undefined(config.get("channel"));
 		assert.undefined(config.get("plugins"));
 
 		config.restoreDefaults();
 
-		assert.object(config.store);
 		assert.equal(config.get("token"), "ark");
 		assert.equal(config.get("channel"), "next");
 		assert.equal(config.get("plugins"), []);
-	});
-
-	it("#getRegistryChannel - should return latest", ({ config }) => {
-		assert.equal(config.getRegistryChannel("3.0.0"), "latest");
-	});
-
-	it("#getRegistryChannel - should return next", ({ config }) => {
-		assert.equal(config.getRegistryChannel("3.0.0-next.9"), "next");
 	});
 });

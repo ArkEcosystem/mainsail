@@ -8,7 +8,7 @@ import { castFlagsToString } from "../utils";
 export class ProcessManager {
 	public list(): ProcessDescription[] {
 		try {
-			const { stdout } = this.shellSync("pm2 jlist");
+			const { stdout } = this.#shellSync("pm2 jlist");
 
 			if (!stdout) {
 				return [];
@@ -51,7 +51,7 @@ export class ProcessManager {
 			command += ` -- ${opts.args}`;
 		}
 
-		return this.shellSync(command);
+		return this.#shellSync(command);
 	}
 
 	public stop(id: ProcessIdentifier, flags: Record<string, any> = {}): ExecaSyncReturnValue {
@@ -61,7 +61,7 @@ export class ProcessManager {
 			command += ` ${castFlagsToString(flags)}`;
 		}
 
-		return this.shellSync(command);
+		return this.#shellSync(command);
 	}
 
 	public restart(id: ProcessIdentifier, flags: Record<string, any> = { "update-env": true }): ExecaSyncReturnValue {
@@ -71,39 +71,39 @@ export class ProcessManager {
 			command += ` ${castFlagsToString(flags)}`;
 		}
 
-		return this.shellSync(command);
+		return this.#shellSync(command);
 	}
 
 	public reload(id: ProcessIdentifier): ExecaSyncReturnValue {
-		return this.shellSync(`pm2 reload ${id}`);
+		return this.#shellSync(`pm2 reload ${id}`);
 	}
 
 	public reset(id: ProcessIdentifier): ExecaSyncReturnValue {
-		return this.shellSync(`pm2 reset ${id}`);
+		return this.#shellSync(`pm2 reset ${id}`);
 	}
 
 	public delete(id: ProcessIdentifier): ExecaSyncReturnValue {
-		return this.shellSync(`pm2 delete ${id}`);
+		return this.#shellSync(`pm2 delete ${id}`);
 	}
 
 	public flush(): ExecaSyncReturnValue {
-		return this.shellSync("pm2 flush");
+		return this.#shellSync("pm2 flush");
 	}
 
 	public reloadLogs(): ExecaSyncReturnValue {
-		return this.shellSync("pm2 reloadLogs");
+		return this.#shellSync("pm2 reloadLogs");
 	}
 
 	public ping(): ExecaSyncReturnValue {
-		return this.shellSync("pm2 ping");
+		return this.#shellSync("pm2 ping");
 	}
 
 	public update(): ExecaSyncReturnValue {
-		return this.shellSync("pm2 update");
+		return this.#shellSync("pm2 update");
 	}
 
 	public async trigger(id: ProcessIdentifier, processActionName: string, param?: string): Promise<ExecaReturnValue> {
-		return this.shell(`pm2 trigger ${id} ${processActionName} ${param}`);
+		return this.#shell(`pm2 trigger ${id} ${processActionName} ${param}`);
 	}
 
 	public status(id: ProcessIdentifier): ProcessState | undefined {
@@ -152,7 +152,7 @@ export class ProcessManager {
 
 	public has(id: ProcessIdentifier): boolean {
 		try {
-			const { stdout } = this.shellSync(`pm2 id ${id} | awk '{ print $2 }'`);
+			const { stdout } = this.#shellSync(`pm2 id ${id} | awk '{ print $2 }'`);
 
 			return !!stdout && !isNaN(Number(stdout));
 		} catch {
@@ -164,11 +164,11 @@ export class ProcessManager {
 		return !this.has(id);
 	}
 
-	private async shell(command: string): Promise<ExecaReturnValue> {
+	async #shell(command: string): Promise<ExecaReturnValue> {
 		return execa.run(command, { shell: true });
 	}
 
-	private shellSync(command: string): ExecaSyncReturnValue {
+	#shellSync(command: string): ExecaSyncReturnValue {
 		return execa.sync(command, { shell: true });
 	}
 }

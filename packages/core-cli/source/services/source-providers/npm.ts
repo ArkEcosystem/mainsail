@@ -13,7 +13,7 @@ export class NPM extends AbstractSource {
 
 	public async exists(value: string, version?: string): Promise<boolean> {
 		try {
-			await this.getPackage(value, version);
+			await this.#getPackage(value, version);
 
 			return true;
 		} catch {
@@ -26,16 +26,16 @@ export class NPM extends AbstractSource {
 	}
 
 	protected async preparePackage(value: string, version?: string): Promise<void> {
-		const { name, tarball }: { name: string; tarball: string } = await this.getPackage(value, version);
+		const { name, tarball }: { name: string; tarball: string } = await this.#getPackage(value, version);
 
-		const tarballPath: string = `${this.tempPath}/${name}.tgz`;
+		const tarballPath = `${this.tempPath}/${name}.tgz`;
 
-		await this.downloadPackage(tarball, tarballPath);
+		await this.#downloadPackage(tarball, tarballPath);
 
-		await this.extractPackage(name, tarballPath);
+		await this.#extractPackage(name, tarballPath);
 	}
 
-	private async getPackage(value: string, version?: string): Promise<{ name: string; tarball: string }> {
+	async #getPackage(value: string, version?: string): Promise<{ name: string; tarball: string }> {
 		const registry = process.env.CORE_NPM_REGISTRY || "https://registry.npmjs.org";
 		const { body } = await got(`${registry}/${value}`);
 
@@ -54,7 +54,7 @@ export class NPM extends AbstractSource {
 		};
 	}
 
-	private async downloadPackage(source: string, dest: string): Promise<void> {
+	async #downloadPackage(source: string, dest: string): Promise<void> {
 		removeSync(dest);
 
 		ensureFileSync(dest);
@@ -62,7 +62,7 @@ export class NPM extends AbstractSource {
 		await promisify(stream.pipeline)(got.stream(source), createWriteStream(dest));
 	}
 
-	private async extractPackage(name: string, file: string): Promise<void> {
+	async #extractPackage(name: string, file: string): Promise<void> {
 		await extract({
 			gzip: true,
 			file,
