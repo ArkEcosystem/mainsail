@@ -1,13 +1,13 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { performance } from "perf_hooks";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { conditions } from "./conditions";
 import { Database } from "./database";
 import { WebhookEvent } from "./events";
 import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Listener {
@@ -26,7 +26,7 @@ export class Listener {
 			return;
 		}
 
-		const webhooks: Webhook[] = this.getWebhooks(name, data);
+		const webhooks: Webhook[] = this.#getWebhooks(name, data);
 
 		const promises: Promise<void>[] = [];
 
@@ -37,15 +37,16 @@ export class Listener {
 		await Promise.all(promises);
 	}
 
-	public async broadcast(webhook: Webhook, payload: object, timeout: number = 1500): Promise<void> {
+	public async broadcast(webhook: Webhook, payload: object, timeout = 1500): Promise<void> {
 		const start = performance.now();
 
 		try {
 			const { statusCode } = await Utils.http.post(webhook.target, {
 				body: {
-					timestamp: +new Date(),
-					data: payload as any, // @TODO utils currently expects a primitive as data
+					data: payload as any,
+					// @TODO utils currently expects a primitive as data
 					event: webhook.event,
+					timestamp: Date.now(),
 				},
 				headers: {
 					Authorization: webhook.token,
@@ -57,32 +58,32 @@ export class Listener {
 				`Webhooks Job ${webhook.id} completed! Event [${webhook.event}] has been transmitted to [${webhook.target}] with a status of [${statusCode}].`,
 			);
 
-			await this.dispatchWebhookEvent(start, webhook, payload);
+			await this.#dispatchWebhookEvent(start, webhook, payload);
 		} catch (error) {
 			this.logger.error(`Webhooks Job ${webhook.id} failed: ${error.message}`);
 
-			await this.dispatchWebhookEvent(start, webhook, payload, error);
+			await this.#dispatchWebhookEvent(start, webhook, payload, error);
 		}
 	}
 
-	private async dispatchWebhookEvent(start: number, webhook: Webhook, payload: object, err?: Error) {
-		if (err) {
+	async #dispatchWebhookEvent(start: number, webhook: Webhook, payload: object, error?: Error) {
+		if (error) {
 			this.events.dispatch(WebhookEvent.Failed, {
+				error: error,
 				executionTime: performance.now() - start,
-				webhook: webhook,
 				payload: payload,
-				error: err,
+				webhook: webhook,
 			});
 		} else {
 			this.events.dispatch(WebhookEvent.Broadcasted, {
 				executionTime: performance.now() - start,
-				webhook: webhook,
 				payload: payload,
+				webhook: webhook,
 			});
 		}
 	}
 
-	private getWebhooks(event: string, payload: object): Webhook[] {
+	#getWebhooks(event: string, payload: object): Webhook[] {
 		return this.app
 			.get<Database>(InternalIdentifiers.Database)
 			.findByEvent(event)
@@ -91,7 +92,7 @@ export class Listener {
 					return false;
 				}
 
-				if (!webhook.conditions || (Array.isArray(webhook.conditions) && !webhook.conditions.length)) {
+				if (!webhook.conditions || (Array.isArray(webhook.conditions) && webhook.conditions.length === 0)) {
 					return true;
 				}
 
@@ -102,7 +103,7 @@ export class Listener {
 						if (satisfies(payload[condition.key], condition.value)) {
 							return true;
 						}
-					} catch (error) {
+					} catch {
 						return false;
 					}
 				}

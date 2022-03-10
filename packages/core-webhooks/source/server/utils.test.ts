@@ -1,7 +1,7 @@
 import { Enums } from "@arkecosystem/core-kernel";
 import { notFound } from "@hapi/boom";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../../core-test-framework";
 import { Webhook } from "../interfaces";
 import { respondWithResource } from "./utils";
 

@@ -4,7 +4,7 @@ import { Application, Services } from "@arkecosystem/core-kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Database } from "../../source/database";
-import { Identifiers as WebhookIdentifiers } from "../../source/identifiers";
+import { InternalIdentifiers as WebhookIdentifiers } from "../../source/identifiers";
 import { Server } from "../../source/server/server";
 
 export type Context = {

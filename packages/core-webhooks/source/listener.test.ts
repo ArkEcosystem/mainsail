@@ -1,13 +1,14 @@
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Utils } from "@arkecosystem/core-kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
-import { Container } from "@arkecosystem/core-container";
 
 import { describe } from "../../core-test-framework/source";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { conditions } from "./conditions";
 import { Database } from "./database";
 import { WebhookEvent } from "./events";
-import { Identifiers } from "./identifiers";
+import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
 
@@ -44,11 +45,11 @@ describe<{
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
-		app.bind<Database>(Identifiers.Database).to(Database).inSingletonScope();
+		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
 
 		app.bind(Identifiers.LogService).toConstantValue(logger);
 
-		context.database = app.get<Database>(Identifiers.Database);
+		context.database = app.get<Database>(InternalIdentifiers.Database);
 		context.database.boot();
 
 		context.listener = app.resolve<Listener>(Listener);

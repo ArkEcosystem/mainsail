@@ -1,11 +1,11 @@
+import { Container } from "@arkecosystem/core-container";
 import { Application } from "@arkecosystem/core-kernel/source/application";
-import { Container } from "@arkecosystem/core-kernel/source/ioc";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../core-test-framework";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { Database } from "./database";
-import { Identifiers } from "./identifiers";
+import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 
 describe<{
@@ -15,9 +15,9 @@ describe<{
 		const app = new Application(new Container());
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
-		app.bind<Database>(Identifiers.Database).to(Database).inSingletonScope();
+		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
 
-		const database = app.get<Database>(Identifiers.Database);
+		const database = app.get<Database>(InternalIdentifiers.Database);
 		database.boot();
 
 		context.database = database;

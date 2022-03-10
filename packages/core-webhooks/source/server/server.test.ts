@@ -1,6 +1,6 @@
 import { Enums } from "@arkecosystem/core-kernel";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../../core-test-framework";
 import { Context, ServerHelper } from "../../test/helpers/server";
 
 describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) => {

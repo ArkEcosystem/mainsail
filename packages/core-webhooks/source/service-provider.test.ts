@@ -1,9 +1,10 @@
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Providers } from "@arkecosystem/core-kernel";
 import { NullEventDispatcher } from "@arkecosystem/core-kernel/source/services/events/drivers/null";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
-import { Container } from "@arkecosystem/core-container";
 
 import { describe } from "../../core-test-framework/source";
 import { defaults } from "./defaults";
@@ -25,12 +26,9 @@ const init = (context: Context) => {
 	app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.StateStore).toConstantValue({});
 	app.bind(Identifiers.BlockchainService).toConstantValue({});
-	app.bind(Identifiers.DatabaseBlockRepository).toConstantValue({});
-	app.bind(Identifiers.DatabaseTransactionRepository).toConstantValue({});
 	app.bind(Identifiers.WalletRepository).toConstantValue({});
 	app.bind(Identifiers.PeerNetworkMonitor).toConstantValue({});
 	app.bind(Identifiers.PeerRepository).toConstantValue({});
-	app.bind(Identifiers.DatabaseRoundRepository).toConstantValue({});
 	app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 	app.bind(Identifiers.TransactionPoolProcessorFactory).toConstantValue({});
 	app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
@@ -38,7 +36,6 @@ const init = (context: Context) => {
 	app.bind(Identifiers.TransactionHistoryService).toConstantValue({});
 	app.bind(Identifiers.TransactionHandlerRegistry).toConstantValue({});
 	app.bind(Identifiers.StandardCriteriaService).toConstantValue({});
-	app.bind(Identifiers.PaginationService).toConstantValue({});
 	app.bind(Identifiers.EventDispatcherService).to(NullEventDispatcher);
 	app.bind(Identifiers.LogService).toConstantValue(logger);
 	app.bind("path.cache").toConstantValue(dirSync().name);

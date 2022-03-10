@@ -1,5 +1,5 @@
 import { Context, ServerHelper } from "../../../test/helpers/server";
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../../../core-test-framework";
 
 describe<Context>("Whitelist", ({ beforeEach, afterEach, afterAll, it, assert }) => {
 	const serverOptions = {

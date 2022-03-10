@@ -1,6 +1,6 @@
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Types } from "@arkecosystem/core-kernel";
 import Joi from "joi";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Database } from "./database";
 import { InternalIdentifiers } from "./identifiers";
@@ -17,10 +17,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// Setup Server...
 		this.app.bind(InternalIdentifiers.Server).to(Server).inSingletonScope();
 
-		this.app.get<Server>(InternalIdentifiers.Server).register(this.config().get<Types.JsonObject>("server")!);
+		await this.app.get<Server>(InternalIdentifiers.Server).register(this.config().get<Types.JsonObject>("server")!);
 
 		// Setup Listeners...
-		this.startListeners();
+		this.#startListeners();
 	}
 
 	public async boot(): Promise<void> {
@@ -51,7 +51,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	private startListeners(): void {
+	#startListeners(): void {
 		this.app
 			.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)
 			.listen("*", this.app.resolve(Listener));

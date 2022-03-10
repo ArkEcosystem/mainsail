@@ -1,9 +1,9 @@
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { ensureFileSync, existsSync } from "fs-extra";
 import lowdb from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import { v4 as uuidv4 } from "uuid";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Webhook } from "./interfaces";
 
@@ -12,7 +12,7 @@ export class Database {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	private database: lowdb.LowdbSync<any>;
+	#database: lowdb.LowdbSync<any>;
 
 	public boot() {
 		const adapterFile: string = this.app.cachePath("webhooks.json");
@@ -21,13 +21,12 @@ export class Database {
 			ensureFileSync(adapterFile);
 		}
 
-		this.database = lowdb(new FileSync(adapterFile));
-		this.database.defaults({ webhooks: [] }).write();
+		this.#database = lowdb(new FileSync(adapterFile));
+		this.#database.defaults({ webhooks: [] }).write();
 	}
 
 	public all(): Webhook[] {
-		// @ts-ignore
-		return this.database.get("webhooks", []).value();
+		return this.#database.get("webhooks", []).value();
 	}
 
 	public hasById(id: string): boolean {
@@ -35,31 +34,26 @@ export class Database {
 	}
 
 	public findById(id: string): Webhook | undefined {
-		// @ts-ignore
-		return this.database.get("webhooks").find({ id }).value();
+		return this.#database.get("webhooks").find({ id }).value();
 	}
 
 	public findByEvent(event: string): Webhook[] {
-		// @ts-ignore
-		return this.database.get("webhooks").filter({ event }).value();
+		return this.#database.get("webhooks").filter({ event }).value();
 	}
 
 	public create(data: Webhook): Webhook | undefined {
 		data.id = uuidv4();
 
-		// @ts-ignore
-		this.database.get("webhooks").push(data).write();
+		this.#database.get("webhooks").push(data).write();
 
 		return this.findById(data.id);
 	}
 
 	public update(id: string, data: Webhook): Webhook {
-		// @ts-ignore
-		return this.database.get("webhooks").find({ id }).assign(data).write();
+		return this.#database.get("webhooks").find({ id }).assign(data).write();
 	}
 
 	public destroy(id: string): void {
-		// @ts-ignore
-		this.database.get("webhooks").remove({ id }).write();
+		this.#database.get("webhooks").remove({ id }).write();
 	}
 }
