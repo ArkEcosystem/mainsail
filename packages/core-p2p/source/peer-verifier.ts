@@ -1,8 +1,9 @@
+/* eslint-disable unicorn/prefer-at */
+import assert from "assert";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
-import assert from "assert";
 import pluralize from "pluralize";
 import { inspect } from "util";
 
@@ -44,6 +45,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+
+	@inject(Identifiers.Cryptography.Block.Verifier)
+	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
 
 	private logPrefix!: string;
 
@@ -117,7 +121,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 				}
 			} else {
 				const claimedBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
-				if (claimedBlock?.verifySignature()) {
+				if (claimedBlock && (await this.blockVerifier.verifySignature(claimedBlock))) {
 					return true;
 				}
 			}
@@ -241,7 +245,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 
 			const ourBlocksPrint = ourBlocks.map((b) => `{ height=${b.height}, id=${b.id} }`).join(", ");
-			// eslint-disable-next-line unicorn/prefer-at
 			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[
 				ourBlocks.length - 1
 			].height.toLocaleString()}]`;
@@ -415,7 +418,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 
-		if (!block.verifySignature()) {
+		if (!(await this.blockVerifier.verifySignature(block))) {
 			this.log(
 				Severity.DEBUG_EXTRA,
 				`failure: peer's block at height ${expectedHeight} does not pass crypto-validation`,

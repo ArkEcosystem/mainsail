@@ -13,14 +13,8 @@ export interface IBlock {
 	serialized: string;
 	data: IBlockData;
 	transactions: ITransaction[];
-	verification: IBlockVerification;
 
 	getHeader(): IBlockData;
-	verifySignature(): Promise<boolean>;
-	verify(): Promise<IBlockVerification>;
-
-	toString(): string;
-	toJson(): IBlockJson;
 }
 
 export interface IBlockData {
@@ -89,4 +83,10 @@ export interface IBlockSerializer {
 	serialize(block: IBlockData, includeSignature?: boolean): Promise<Buffer>;
 
 	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
+}
+
+export interface IBlockVerifier {
+	verify(block: IBlock): Promise<IBlockVerification>;
+
+	verifySignature(block: IBlock): Promise<boolean>;
 }

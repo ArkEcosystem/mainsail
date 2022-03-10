@@ -44,6 +44,9 @@ export class BlockProcessor {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
+	@inject(Identifiers.Cryptography.Block.Verifier)
+	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
+
 	public async process(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		if (!(await this.verifyBlock(block))) {
 			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
@@ -80,7 +83,9 @@ export class BlockProcessor {
 	}
 
 	private async verifyBlock(block: Contracts.Crypto.IBlock): Promise<boolean> {
-		if (block.verification.containsMultiSignatures) {
+		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
+
+		if (verification.containsMultiSignatures) {
 			try {
 				for (const transaction of block.transactions) {
 					const registry = this.app.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
@@ -92,22 +97,21 @@ export class BlockProcessor {
 					await handler.verify(transaction);
 				}
 
-				block.verification = await block.verify();
+				// @TODO: check if we can remove this duplicate verification
+				verification = await this.blockVerifier.verify(block);
 			} catch (error) {
 				this.logger.warning(`Failed to verify block, because: ${error.message}`);
-				block.verification.verified = false;
 			}
 		}
 
-		const { verified } = block.verification;
-		if (!verified) {
+		if (!verification.verified) {
 			this.logger.warning(
 				`Block ${block.data.height.toLocaleString()} (${
 					block.data.id
 				}) disregarded because verification failed`,
 			);
 
-			this.logger.warning(JSON.stringify(block.verification, undefined, 4));
+			this.logger.warning(JSON.stringify(verification, undefined, 4));
 
 			return false;
 		}
