@@ -1,15 +1,13 @@
-import { SinonSpy, spy } from "sinon";
+import { SinonSpy } from "sinon";
 
 import { Fake } from "./fake";
 
 export class Spy extends Fake<SinonSpy> {
-	public constructor(target?: object, method?: string) {
-		super();
+	public call<T>(): T {
+		return this.subject();
+	}
 
-		if (target && method) {
-			this.subject = spy(target, method as never);
-		} else {
-			this.subject = spy();
-		}
+	public toFunction(): SinonSpy {
+		return this.subject;
 	}
 }

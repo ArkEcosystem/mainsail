@@ -303,20 +303,20 @@ describe<{
 		const resolved = spyFn();
 		const checkBootResolved = async () => {
 			await blockchain.boot();
-			resolved();
+			resolved.call();
 		};
 		checkBootResolved();
 
 		// will not resolve after 2 seconds while context.stateStore.started is false
 		await delay(2000);
-		assert.true(resolved.notCalled);
+		resolved.neverCalled();
 
 		// will resolve after 1 second when context.stateStore.started is true
 		isStartedStub.restore();
 		stub(context.stateStore, "isStarted").returnValue(true);
 		await delay(1100);
 
-		assert.true(resolved.calledOnce);
+		resolved.calledOnce();
 	});
 
 	it("boot should call cleansePeers and set listener on ForgerEvent.Missing and RoundEvent.Applied", async (context) => {

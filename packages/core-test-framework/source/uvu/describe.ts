@@ -29,9 +29,9 @@ interface CallbackArguments<T> {
 	schema: typeof schema;
 	skip: Function;
 	spy: (owner?: object, method?: string) => Spy;
-	spyFn: sinon.SinonSpyStatic;
+	spyFn: () => Spy;
 	stub: (owner: object, method: string) => Stub;
-	stubFn: sinon.SinonStubStatic;
+	stubFn: () => Stub;
 }
 
 type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
@@ -60,8 +60,8 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			stub.restore();
 		}
 
-		for (const stub of spies) {
-			stub.restore();
+		for (const spy of spies) {
+			spy.restore();
 		}
 
 		clocks = [];
@@ -91,21 +91,21 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		schema,
 		skip: suite.skip,
 		spy: (owner: object, method: string) => {
-			const result: Spy = new Spy(owner, method);
+			const result: Spy = new Spy(sinon.spy(owner, method as never));
 
 			spies.push(result);
 
 			return result;
 		},
-		spyFn: sinon.spy,
+		spyFn: () => new Spy(sinon.spy()),
 		stub: (owner: object, method: string) => {
-			const result: Stub = new Stub(owner, method);
+			const result: Stub = new Stub(sinon.stub(owner, method as never));
 
 			stubs.push(result);
 
 			return result;
 		},
-		stubFn: sinon.stub,
+		stubFn: () => new Stub(sinon.stub()),
 	});
 
 	suite.run();

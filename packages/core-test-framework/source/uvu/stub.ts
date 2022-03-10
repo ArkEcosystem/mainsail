@@ -1,14 +1,8 @@
-import { SinonStub, stub } from "sinon";
+import { SinonStub } from "sinon";
 
 import { Fake } from "./fake";
 
 export class Stub extends Fake<SinonStub> {
-	public constructor(target: object, method: string) {
-		super();
-
-		this.subject = stub(target, method as never);
-	}
-
 	public returnValue(value: unknown): Stub {
 		this.subject.returns(value);
 
