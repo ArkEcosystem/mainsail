@@ -1,8 +1,9 @@
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Providers, Services } from "@arkecosystem/core-kernel";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
-import { Container } from "@arkecosystem/core-container";
 
 import { describe } from "../../core-test-framework/source";
 import { ServiceProvider } from "./service-provider";

@@ -18,7 +18,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	private readonly levelStyles: Record<string, Chalk> = {
+	readonly #levelStyles: Record<string, Chalk> = {
 		alert: chalk.red,
 		critical: chalk.red,
 		debug: chalk.magenta,
@@ -29,17 +29,17 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		warning: chalk.yellow,
 	};
 
-	private stream!: PassThrough;
+	#stream!: PassThrough;
 
-	private combinedFileStream?: Writable;
+	#combinedFileStream?: Writable;
 
-	private logger!: pino.Logger;
+	#logger!: pino.Logger;
 
-	private silentConsole = false;
+	#silentConsole = false;
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
-		this.stream = new PassThrough();
-		this.logger = pino(
+		this.#stream = new PassThrough();
+		this.#logger = pino(
 			{
 				base: null,
 				// @ts-ignore
@@ -62,15 +62,15 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				safe: true,
 				useOnlyCustomLevels: true,
 			},
-			this.stream,
+			this.#stream,
 		);
 
-		if (this.isValidLevel(options.levels.console)) {
+		if (this.#isValidLevel(options.levels.console)) {
 			pump(
-				this.stream,
+				this.#stream,
 				split(),
 				// @ts-ignore - Object literal may only specify known properties, and 'colorize' does not exist in type 'PrettyOptions'.
-				this.createPrettyTransport(options.levels.console, { colorize: true }),
+				this.#createPrettyTransport(options.levels.console, { colorize: true }),
 				process.stdout,
 
 				(error) => {
@@ -79,69 +79,68 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			);
 		}
 
-		if (this.isValidLevel(options.levels.file)) {
-			this.combinedFileStream = pumpify(
+		if (this.#isValidLevel(options.levels.file)) {
+			this.#combinedFileStream = pumpify(
 				split(),
-				// @ts-ignore - Object literal may only specify known properties, and 'colorize' does not exist in type 'PrettyOptions'.
-				this.createPrettyTransport(options.levels.file, { colorize: false }),
-				this.getFileStream(options.fileRotator),
+				this.#createPrettyTransport(options.levels.file, { colorize: false }),
+				this.#getFileStream(options.fileRotator),
 			);
 
-			this.combinedFileStream.on("error", (error) => {
+			this.#combinedFileStream.on("error", (error) => {
 				console.error("File stream closed due to an error:", error);
 			});
 
-			this.stream.pipe(this.combinedFileStream);
+			this.#stream.pipe(this.#combinedFileStream);
 		}
 
 		return this;
 	}
 
 	public emergency(message: any): void {
-		this.log("emergency", message);
+		this.#log("emergency", message);
 	}
 
 	public alert(message: any): void {
-		this.log("alert", message);
+		this.#log("alert", message);
 	}
 
 	public critical(message: any): void {
-		this.log("critical", message);
+		this.#log("critical", message);
 	}
 
 	public error(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public warning(message: any): void {
-		this.log("warning", message);
+		this.#log("warning", message);
 	}
 
 	public notice(message: any): void {
-		this.log("notice", message);
+		this.#log("notice", message);
 	}
 
 	public info(message: any): void {
-		this.log("info", message);
+		this.#log("info", message);
 	}
 
 	public debug(message: any): void {
-		this.log("debug", message);
+		this.#log("debug", message);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
-		this.silentConsole = suppress;
+		this.#silentConsole = suppress;
 	}
 
 	public async dispose(): Promise<void> {
-		if (this.combinedFileStream) {
-			this.stream.unpipe(this.combinedFileStream);
+		if (this.#combinedFileStream) {
+			this.#stream.unpipe(this.#combinedFileStream);
 
-			if (!this.combinedFileStream.destroyed) {
-				this.combinedFileStream.end();
+			if (!this.#combinedFileStream.destroyed) {
+				this.#combinedFileStream.end();
 
 				return new Promise<void>((resolve) => {
-					this.combinedFileStream.on("finish", () => {
+					this.#combinedFileStream.on("finish", () => {
 						resolve();
 					});
 				});
@@ -149,8 +148,8 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		}
 	}
 
-	private log(level: string, message: any): void {
-		if (this.silentConsole) {
+	#log(level: string, message: any): void {
+		if (this.#silentConsole) {
 			return;
 		}
 
@@ -162,18 +161,18 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		this.logger[level](message);
+		this.#logger[level](message);
 	}
 
-	private createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
+	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
 		const pinoPretty = PinoPretty({
 			levelFirst: false,
 			translateTime: "yyyy-mm-dd HH:MM:ss.l",
 			...prettyOptions,
 		});
 
-		const getLevel = (level: string): number => this.logger.levels.values[level];
-		const formatLevel = (level: string): string => this.levelStyles[level](level.toUpperCase());
+		const getLevel = (level: string): number => this.#logger.levels.values[level];
+		const formatLevel = (level: string): string => this.#levelStyles[level](level.toUpperCase());
 
 		return new Transform({
 			transform(chunk, enc, callback) {
@@ -194,7 +193,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		});
 	}
 
-	private getFileStream(options: { interval: string }): Writable {
+	#getFileStream(options: { interval: string }): Writable {
 		return createStream(
 			(time: number | Date, index?: number): string => {
 				if (!time) {
@@ -224,7 +223,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		);
 	}
 
-	private isValidLevel(level: string): boolean {
+	#isValidLevel(level: string): boolean {
 		return ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"].includes(level);
 	}
 }
