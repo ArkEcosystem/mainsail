@@ -27,9 +27,6 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 
 			if (publicKeys.length <= 16) {
 				publicKeys.push(publicKey);
-				this.data.fee = MultiSignatureRegistrationTransaction.staticFee(this.configuration, {
-					data: this.data,
-				});
 			}
 		}
 
@@ -47,9 +44,6 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 	public multiSignatureAsset(multiSignature: Contracts.Crypto.IMultiSignatureAsset): MultiSignatureBuilder {
 		if (this.data.asset && this.data.asset.multiSignature) {
 			this.data.asset.multiSignature = multiSignature;
-			this.data.fee = MultiSignatureRegistrationTransaction.staticFee(this.configuration, {
-				data: this.data,
-			});
 		}
 
 		return this;

@@ -13,7 +13,6 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 
 		this.data.type = ValidatorRegistrationTransaction.type;
 		this.data.typeGroup = ValidatorRegistrationTransaction.typeGroup;
-		this.data.fee = ValidatorRegistrationTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;

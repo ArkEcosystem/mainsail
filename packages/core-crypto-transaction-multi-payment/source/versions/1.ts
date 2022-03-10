@@ -11,9 +11,6 @@ export class MultiPaymentTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.MultiPayment;
 	public static key = "multiPayment";
-	public static version = 1;
-
-	protected static defaultStaticFee: BigNumber = BigNumber.make("10000000");
 
 	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {

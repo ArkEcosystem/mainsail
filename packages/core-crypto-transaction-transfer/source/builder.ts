@@ -13,7 +13,6 @@ export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 
 		this.data.type = TransferTransaction.type;
 		this.data.typeGroup = TransferTransaction.typeGroup;
-		this.data.fee = TransferTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;

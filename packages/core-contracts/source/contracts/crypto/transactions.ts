@@ -9,7 +9,6 @@ export interface ITransaction {
 	readonly type: number;
 	readonly verified: boolean;
 	readonly key: string;
-	readonly staticFee: any; // @TODO: use BigNumber from ../../crypto/utils
 
 	isVerified: boolean;
 

@@ -13,7 +13,6 @@ export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorRes
 
 		this.data.type = ValidatorResignationTransaction.type;
 		this.data.typeGroup = ValidatorResignationTransaction.typeGroup;
-		this.data.fee = ValidatorResignationTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.senderPublicKey = undefined;
 	}

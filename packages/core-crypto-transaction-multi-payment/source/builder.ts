@@ -13,7 +13,6 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 
 		this.data.type = MultiPaymentTransaction.type;
 		this.data.typeGroup = MultiPaymentTransaction.typeGroup;
-		this.data.fee = MultiPaymentTransaction.staticFee(this.configuration);
 		this.data.vendorField = undefined;
 		this.data.asset = {
 			payments: [],

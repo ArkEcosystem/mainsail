@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionSchema } from "./schemas";
 
@@ -20,8 +20,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	public static version = 1;
 	public static key: string | undefined = undefined;
 
-	protected static defaultStaticFee: BigNumber = BigNumber.ZERO;
-
 	public isVerified = false;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public data: Contracts.Crypto.ITransactionData;
@@ -32,23 +30,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 
 	public static getSchema(): TransactionSchema {
 		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
-	}
-
-	public static staticFee(
-		configuration: Contracts.Crypto.IConfiguration,
-		feeContext: { height?: number; data?: Contracts.Crypto.ITransactionData } = {},
-	): BigNumber {
-		const milestones = configuration.getMilestone(feeContext.height);
-
-		if (milestones.fees && milestones.fees.staticFees && this.key) {
-			const fee: any = milestones.fees.staticFees[this.key];
-
-			if (fee !== undefined) {
-				return BigNumber.make(fee);
-			}
-		}
-
-		return this.defaultStaticFee;
 	}
 
 	public async verify(): Promise<boolean> {
@@ -69,24 +50,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 		delete data.timestamp;
 
 		return data;
-	}
-
-	public async toString(): Promise<string> {
-		const parts: string[] = [];
-
-		if (this.data.senderPublicKey && this.data.nonce) {
-			parts.push(`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey)}#${this.data.nonce}`);
-		} else if (this.data.senderPublicKey) {
-			parts.push(`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey)}`);
-		}
-
-		if (this.data.id) {
-			parts.push(this.data.id.slice(-8));
-		}
-
-		parts.push(`${this.key[0].toUpperCase()}${this.key.slice(1)} v${this.data.version}`);
-
-		return parts.join(" ");
 	}
 
 	public hasVendorField(): boolean {
@@ -114,9 +77,5 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 
 	public get key(): string {
 		return (this as any).__proto__.constructor.key;
-	}
-
-	public get staticFee(): BigNumber {
-		return (this as any).__proto__.constructor.staticFee(this.configuration, { data: this.data });
 	}
 }

@@ -1,16 +1,13 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class ValidatorResignationTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.ValidatorResignation;
 	public static key = "validatorResignation";
-	public static version = 1;
-
-	protected static defaultStaticFee: BigNumber = BigNumber.make("2500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
