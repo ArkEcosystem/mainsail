@@ -41,7 +41,7 @@ export class Console {
 
 		const cmd = this.app.resolve<Commands.Command>(command);
 
-		const castedFlags = Utils.castFlagsToString(this.flags)
+		const castedFlags = Utils.Flags.castFlagsToString(this.flags)
 			.split("--")
 			.filter(Boolean)
 			.map((flag: string) => `--${flag}`.trim());

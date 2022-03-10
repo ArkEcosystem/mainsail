@@ -24,13 +24,13 @@ export class Command extends Commands.Command {
 		const flags = { ...this.getFlags() };
 		flags.processType = "relay";
 
-		await Utils.buildApplication({
+		await Utils.Builder.buildApplication({
 			flags,
 			plugins: {
 				"@arkecosystem/core-blockchain": {
 					networkStart: flags.networkStart,
 				},
-				"@arkecosystem/core-p2p": Utils.buildPeerFlags(flags),
+				"@arkecosystem/core-p2p": Utils.Builder.buildPeerFlags(flags),
 			},
 		});
 

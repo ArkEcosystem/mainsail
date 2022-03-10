@@ -29,7 +29,7 @@ export class Command extends Commands.Command {
 
 		await this.actions.daemonizeProcess(
 			{
-				args: `relay:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
+				args: `relay:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `${flags.token}-relay`,
 				script: resolve(__dirname, "../../bin/run"),
 			},

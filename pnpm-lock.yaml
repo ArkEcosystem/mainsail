@@ -139,6 +139,7 @@ importers:
       '@arkecosystem/core-logger-pino': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-state': workspace:*
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/core-transaction-pool': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/core-webhooks': workspace:*
@@ -160,6 +161,7 @@ importers:
       prompts: 2.4.0
       tar: 6.1.11
       type-fest: 0.21.3
+      uvu: ^0.5.3
       wif: 2.0.6
     dependencies:
       '@arkecosystem/core-api': link:../core-api
@@ -171,6 +173,7 @@ importers:
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-state': link:../core-state
+      '@arkecosystem/core-test-framework': link:../core-test-framework
       '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/core-webhooks': link:../core-webhooks
@@ -192,6 +195,7 @@ importers:
       prompts: 2.4.0
       tar: 6.1.11
       type-fest: 0.21.3
+      uvu: 0.5.3
       wif: 2.0.6
 
   packages/core-api:

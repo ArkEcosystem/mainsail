@@ -30,14 +30,14 @@ export class Command extends Commands.Command {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 		flags.processType = "core";
 
-		await Utils.buildApplication({
+		await Utils.Builder.buildApplication({
 			flags,
 			plugins: {
 				"@arkecosystem/core-blockchain": {
 					networkStart: flags.networkStart,
 				},
 				"@arkecosystem/core-forger": await buildBIP38(flags, this.app.getCorePath("config")),
-				"@arkecosystem/core-p2p": Utils.buildPeerFlags(flags),
+				"@arkecosystem/core-p2p": Utils.Builder.buildPeerFlags(flags),
 			},
 		});
 

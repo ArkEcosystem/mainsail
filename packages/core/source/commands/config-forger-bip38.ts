@@ -32,7 +32,8 @@ export class Command extends Commands.Command {
 				message: "Please enter your delegate plain text passphrase. Referred to as BIP39.",
 				name: "bip39",
 				type: "password",
-				validate: /* istanbul ignore next */ (value) =>
+				validate: (value) =>
+					/* c8 ignore next 3 */
 					!validateMnemonic(value) && !this.getFlag("skipValidation")
 						? "Failed to verify the given passphrase as BIP39 compliant."
 						: true,
@@ -41,7 +42,8 @@ export class Command extends Commands.Command {
 				message: "Please enter your custom password that encrypts the BIP39. Referred to as BIP38.",
 				name: "password",
 				type: "password",
-				validate: /* istanbul ignore next */ (value) =>
+				validate: (value) =>
+					/* c8 ignore next */
 					typeof value !== "string" ? "The BIP38 password has to be a string." : true,
 			},
 		]);
@@ -51,7 +53,8 @@ export class Command extends Commands.Command {
 				message: "Confirm custom password that encrypts the BIP39. Referred to as BIP38.",
 				name: "passwordConfirmation",
 				type: "password",
-				validate: /* istanbul ignore next */ (value) =>
+				validate: (value) =>
+					/* c8 ignore next */
 					value !== response.password ? "Confirm password does not match BIP38 password." : true,
 			},
 		]);

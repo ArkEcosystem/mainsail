@@ -25,7 +25,7 @@ export class Command extends Commands.Command {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 		flags.processType = "forger";
 
-		await Utils.buildApplication({
+		await Utils.Builder.buildApplication({
 			flags,
 			plugins: {
 				"@arkecosystem/core-forger": await buildBIP38(flags, this.app.getCorePath("config")),

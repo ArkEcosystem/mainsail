@@ -59,7 +59,8 @@ ${blue().bold("Arguments")}
 ${blue().bold("Available Commands")}
 ${commandsAsString.join("\n")}`,
 				{
-					borderStyle: boxen.BorderStyle.Classic,
+					// @ts-ignore
+					borderStyle: "classic",
 					padding: 1,
 				},
 			),

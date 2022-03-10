@@ -24,6 +24,7 @@ interface CallbackArguments<T> {
 	each: (name: string, callback: Callback<any>, datasets: unknown[]) => void;
 	it: Test<T>;
 	loader: typeof loader;
+	match: sinon.SinonMatch;
 	nock: typeof nock;
 	only: Function;
 	schema: typeof schema;
@@ -86,6 +87,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		each: each(suite),
 		it: suite,
 		loader,
+		match: sinon.match,
 		nock,
 		only: suite.only,
 		schema,

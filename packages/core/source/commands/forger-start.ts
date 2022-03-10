@@ -36,7 +36,7 @@ export class Command extends Commands.Command {
 
 		await this.actions.daemonizeProcess(
 			{
-				args: `forger:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
+				args: `forger:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `${flags.token}-forger`,
 				script: resolve(__dirname, "../../bin/run"),
 			},

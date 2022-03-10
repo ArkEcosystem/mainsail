@@ -2,7 +2,7 @@ import { execa, ExecaSyncReturnValue, ExecaReturnValue } from "../execa";
 
 import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts";
 import { injectable } from "../ioc";
-import { castFlagsToString } from "../utils";
+import { Flags } from "../utils";
 
 @injectable()
 export class ProcessManager {
@@ -40,11 +40,11 @@ export class ProcessManager {
 		let command = `pm2 start ${opts.script}`;
 
 		if (opts.node_args) {
-			command += ` --node-args="${castFlagsToString(opts.node_args)}"`;
+			command += ` --node-args="${Flags.castFlagsToString(opts.node_args)}"`;
 		}
 
 		if (flags !== undefined && Object.keys(flags).length > 0) {
-			command += ` ${castFlagsToString(flags)}`;
+			command += ` ${Flags.castFlagsToString(flags)}`;
 		}
 
 		if (opts.args) {
@@ -58,7 +58,7 @@ export class ProcessManager {
 		let command = `pm2 stop ${id}`;
 
 		if (Object.keys(flags).length > 0) {
-			command += ` ${castFlagsToString(flags)}`;
+			command += ` ${Flags.castFlagsToString(flags)}`;
 		}
 
 		return this.shellSync(command);
@@ -68,7 +68,7 @@ export class ProcessManager {
 		let command = `pm2 restart ${id}`;
 
 		if (Object.keys(flags).length > 0) {
-			command += ` ${castFlagsToString(flags)}`;
+			command += ` ${Flags.castFlagsToString(flags)}`;
 		}
 
 		return this.shellSync(command);

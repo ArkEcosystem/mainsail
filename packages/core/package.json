@@ -31,7 +31,9 @@
 		"relay:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet pnpm run ark relay:run",
 		"relay:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet pnpm run ark relay:run",
 		"relay:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark relay:run -- --env=test",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 -r html pnpm run test",
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@arkecosystem/core-api": "workspace:*",
@@ -43,6 +45,7 @@
 		"@arkecosystem/core-logger-pino": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/core-webhooks": "workspace:*",
@@ -64,6 +67,7 @@
 		"prompts": "2.4.0",
 		"tar": "6.1.11",
 		"type-fest": "0.21.3",
+		"uvu": "^0.5.3",
 		"wif": "2.0.6"
 	},
 	"peerDependencies": {
