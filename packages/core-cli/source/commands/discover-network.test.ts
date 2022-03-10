@@ -24,9 +24,9 @@ describe<{
 	});
 
 	it("should choose the first network if only a single network is found", async ({ cmd, configPath }) => {
-		ensureDirSync(`${configPath}/mainnet`);
+		ensureDirSync(`${configPath}/livenet`);
 
-		assert.equal(await cmd.discover(configPath), "mainnet");
+		assert.equal(await cmd.discover(configPath), "livenet");
 	});
 
 	it("should throw if the given path does not exist", async ({ cmd }) => {
@@ -34,17 +34,17 @@ describe<{
 	});
 
 	it("should choose the selected network if multiple networks are found", async ({ cmd, configPath }) => {
-		ensureDirSync(`${configPath}/mainnet`);
-		ensureDirSync(`${configPath}/devnet`);
+		ensureDirSync(`${configPath}/livenet`);
+		ensureDirSync(`${configPath}/testnet`);
 
-		prompts.inject(["devnet", true]);
+		prompts.inject(["testnet", true]);
 
-		assert.equal(await cmd.discover(configPath), "devnet");
+		assert.equal(await cmd.discover(configPath), "testnet");
 	});
 
 	it("should throw if multiple networks are found && skipPrompts = false", async ({ cmd, configPath }) => {
-		ensureDirSync(`${configPath}/mainnet`);
-		ensureDirSync(`${configPath}/devnet`);
+		ensureDirSync(`${configPath}/livenet`);
+		ensureDirSync(`${configPath}/testnet`);
 
 		await assert.rejects(
 			() => cmd.discover(configPath, false),
@@ -53,17 +53,17 @@ describe<{
 	});
 
 	it("should throw if the network selection is not confirmed", async ({ cmd, configPath }) => {
-		ensureDirSync(`${configPath}/mainnet`);
-		ensureDirSync(`${configPath}/devnet`);
+		ensureDirSync(`${configPath}/livenet`);
+		ensureDirSync(`${configPath}/testnet`);
 
-		prompts.inject(["devnet", false]);
+		prompts.inject(["testnet", false]);
 
 		await assert.rejects(() => cmd.discover(configPath), "You'll need to confirm the network to continue.");
 	});
 
 	it("should throw if the network selection is not valid", async ({ cmd, configPath }) => {
-		ensureDirSync(`${configPath}/mainnet`);
-		ensureDirSync(`${configPath}/devnet`);
+		ensureDirSync(`${configPath}/livenet`);
+		ensureDirSync(`${configPath}/testnet`);
 
 		prompts.inject(["randomnet", true]);
 

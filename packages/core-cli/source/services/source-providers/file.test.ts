@@ -1,4 +1,4 @@
-import { InvalidPackageJson, MissingPackageFolder } from "@arkecosystem/core-errors";
+import { Exceptions } from "@arkecosystem/core-contracts";
 import fs from "fs-extra";
 import { join } from "path";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
@@ -53,7 +53,7 @@ describe<{
 		const fileName: string = join(__dirname, "../../../test/files", "invalid-utils-0.9.1.tgz");
 
 		// Act
-		await assert.rejects(() => source.install(fileName), MissingPackageFolder);
+		await assert.rejects(() => source.install(fileName), Exceptions.MissingPackageFolder);
 	});
 
 	it("#install - should throw error if .tgz doesn't contains package.json", async ({ source }) => {
@@ -61,7 +61,7 @@ describe<{
 		const fileName: string = join(__dirname, "../../../test/files", "missing-utils-0.9.1.tgz");
 
 		// Act
-		await assert.rejects(() => source.install(fileName), InvalidPackageJson);
+		await assert.rejects(() => source.install(fileName), Exceptions.InvalidPackageJson);
 	});
 
 	it("#update - should successfully update the plugin", async ({ source, dataPath, temporaryPath }) => {
