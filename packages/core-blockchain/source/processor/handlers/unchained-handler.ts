@@ -2,8 +2,7 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 
-import { BlockProcessorResult } from "../block-processor";
-import { BlockHandler } from "../contracts";
+import { BlockHandler, BlockProcessorResult } from "../contracts";
 
 enum UnchainedBlockStatus {
 	NotReadyToAcceptNewHeight,

@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
+import { BlockProcessorResult } from "./contracts";
 import {
 	AcceptBlockHandler,
 	AlreadyForgedHandler,
@@ -12,15 +13,6 @@ import {
 	UnchainedHandler,
 	VerificationFailedHandler,
 } from "./handlers";
-
-export enum BlockProcessorResult {
-	Accepted,
-	DiscardedButCanBeBroadcasted,
-	Rejected,
-	Rollback,
-	Reverted,
-	Corrupted,
-}
 
 @injectable()
 export class BlockProcessor {
