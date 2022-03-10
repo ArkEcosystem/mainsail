@@ -19,9 +19,9 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"@polkadot/util": "^8.4.1",
-		"@polkadot/util-crypto": "^8.4.1",
-		"bytebuffer": "5.0.1"
+		"@polkadot/util-crypto": "^8.4.1"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-crypto-config": "workspace:*",

@@ -20,7 +20,7 @@
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"bytebuffer": "5.0.1",
+		"@arkecosystem/utils": "workspace:*",
 		"ethers": "^5.5.4"
 	},
 	"devDependencies": {

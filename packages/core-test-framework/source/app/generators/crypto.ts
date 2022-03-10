@@ -1,9 +1,9 @@
 // import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 // import { Types } from "@arkecosystem/core-kernel";
 // import { BigNumber } from "@arkecosystem/utils";
-// import ByteBuffer from "bytebuffer";
-import { resolve } from "path";
+// import { ByteBuffer } from "@arkecosystem/utils";
 import { ensureDirSync, existsSync } from "fs-extra";
+import { resolve } from "path";
 import { dirSync } from "tmp";
 
 import { CryptoConfigPaths } from "../contracts";

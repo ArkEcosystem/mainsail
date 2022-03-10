@@ -1,7 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
+import { ByteBuffer } from "@arkecosystem/utils";
 import { sign, verify } from "@noble/bls12-381";
-import ByteBuffer from "bytebuffer";
 
 @injectable()
 export class Signature implements Contracts.Crypto.ISignature {
@@ -14,14 +14,10 @@ export class Signature implements Contracts.Crypto.ISignature {
 	}
 
 	public serialize(buffer: ByteBuffer, signature: string): void {
-		buffer.append(signature, "hex");
+		buffer.writeBytes(Buffer.from(signature, "hex"));
 	}
 
 	public deserialize(buffer: ByteBuffer): Buffer {
-		if (typeof buffer.readBytes === "function") {
-			return buffer.readBytes(96);
-		}
-
-		return buffer.readBuffer(96);
+		return buffer.readBytes(96);
 	}
 }

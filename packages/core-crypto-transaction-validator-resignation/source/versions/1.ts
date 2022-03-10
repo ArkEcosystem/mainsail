@@ -24,7 +24,7 @@ export class ValidatorResignationTransaction extends Transaction {
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
-		return new ByteBuffer(Buffer.alloc(0));
+		return ByteBuffer.fromSize(0);
 	}
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {

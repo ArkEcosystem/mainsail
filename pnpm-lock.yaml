@@ -363,7 +363,6 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/utils': workspace:*
       ajv: 6.12.6
-      bytebuffer: 5.0.1
       dayjs: 1.10.7
       inversify: 5.1.1
       joi: 17.4.2
@@ -374,7 +373,6 @@ importers:
       '@arkecosystem/core-contracts': 'link:'
       '@arkecosystem/utils': link:../utils
       ajv: 6.12.6
-      bytebuffer: 5.0.1
       dayjs: 1.10.7
       inversify: 5.1.1
       joi: 17.4.2
@@ -396,17 +394,17 @@ importers:
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       bcrypto: 5.4.0
       bstring: 0.3.9
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       bcrypto: 5.4.0
       bstring: 0.3.9
-      bytebuffer: 5.0.1
     devDependencies:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-crypto-key-pair-ecdsa': link:../core-crypto-key-pair-ecdsa
@@ -421,15 +419,15 @@ importers:
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@scure/base': ^1.0.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       '@scure/base': 1.0.0
-      bytebuffer: 5.0.1
     devDependencies:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-crypto-key-pair-ecdsa': link:../core-crypto-key-pair-ecdsa
@@ -444,15 +442,15 @@ importers:
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@scure/base': ^1.0.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       '@scure/base': 1.0.0
-      bytebuffer: 5.0.1
     devDependencies:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-crypto-key-pair-ecdsa': link:../core-crypto-key-pair-ecdsa
@@ -467,7 +465,7 @@ importers:
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      bytebuffer: 5.0.1
+      '@arkecosystem/utils': workspace:*
       ethers: ^5.5.4
       uvu: ^0.5.3
     dependencies:
@@ -475,7 +473,7 @@ importers:
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-kernel': link:../core-kernel
-      bytebuffer: 5.0.1
+      '@arkecosystem/utils': link:../utils
       ethers: 5.5.4
     devDependencies:
       '@arkecosystem/core-crypto-key-pair-ecdsa': link:../core-crypto-key-pair-ecdsa
@@ -490,17 +488,17 @@ importers:
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@polkadot/util': ^8.4.1
       '@polkadot/util-crypto': ^8.4.1
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       '@polkadot/util': 8.4.1
       '@polkadot/util-crypto': 8.4.1
-      bytebuffer: 5.0.1
     devDependencies:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-crypto-key-pair-ecdsa': link:../core-crypto-key-pair-ecdsa
@@ -534,7 +532,6 @@ importers:
       buffer: 6.0.3
       buffer-xor: 2.0.2
       builtin-modules: 3.2.0
-      bytebuffer: 5.0.1
       dayjs: 1.10.7
       deepmerge: 4.2.2
       fast-memoize: 2.5.2
@@ -563,7 +560,6 @@ importers:
       bstring: 0.3.9
       buffer-xor: 2.0.2
       builtin-modules: 3.2.0
-      bytebuffer: 5.0.1
       dayjs: 1.10.7
       deepmerge: 4.2.2
       fast-memoize: 2.5.2
@@ -649,11 +645,11 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@noble/bls12-381': ^1.2.0
       '@scure/bip39': ^1.0.0
       bcrypto: ^5.4.0
       bls12-381-keygen: ^0.2.1
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
       wif: ^2.0.6
     dependencies:
@@ -661,11 +657,11 @@ importers:
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       '@noble/bls12-381': 1.2.0
       '@scure/bip39': 1.0.0
       bcrypto: 5.4.0
       bls12-381-keygen: 0.2.1
-      bytebuffer: 5.0.1
       wif: 2.0.6
     devDependencies:
       uvu: 0.5.3
@@ -676,8 +672,8 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
       wif: ^2.0.6
     dependencies:
@@ -685,8 +681,8 @@ importers:
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
       wif: 2.0.6
     devDependencies:
       uvu: 0.5.3
@@ -697,10 +693,10 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@noble/ed25519': ^1.6.0
       '@noble/hashes': ^1.0.0
       '@scure/bip39': ^1.0.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
       wif: ^2.0.6
     dependencies:
@@ -708,10 +704,10 @@ importers:
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       '@noble/ed25519': 1.6.0
       '@noble/hashes': 1.0.0
       '@scure/bip39': 1.0.0
-      bytebuffer: 5.0.1
       wif: 2.0.6
     devDependencies:
       uvu: 0.5.3
@@ -722,8 +718,8 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
       wif: ^2.0.6
     dependencies:
@@ -731,8 +727,8 @@ importers:
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
       wif: 2.0.6
     devDependencies:
       uvu: 0.5.3
@@ -742,15 +738,15 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@noble/bls12-381': ^1.2.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       '@noble/bls12-381': 1.2.0
-      bytebuffer: 5.0.1
     devDependencies:
       uvu: 0.5.3
 
@@ -759,15 +755,15 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
     devDependencies:
       uvu: 0.5.3
 
@@ -776,15 +772,15 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       '@noble/ed25519': ^1.6.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       '@noble/ed25519': 1.6.0
-      bytebuffer: 5.0.1
     devDependencies:
       uvu: 0.5.3
 
@@ -793,15 +789,15 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
     devDependencies:
       uvu: 0.5.3
 
@@ -810,15 +806,15 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/utils': workspace:*
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/utils': link:../utils
       bcrypto: 5.4.0
-      bytebuffer: 5.0.1
     devDependencies:
       uvu: 0.5.3
 
@@ -866,7 +862,6 @@ importers:
       buffer: 6.0.3
       buffer-xor: 2.0.2
       builtin-modules: 3.2.0
-      bytebuffer: 5.0.1
       dayjs: 1.10.7
       deepmerge: 4.2.2
       fast-memoize: 2.5.2
@@ -895,7 +890,6 @@ importers:
       bstring: 0.3.9
       buffer-xor: 2.0.2
       builtin-modules: 3.2.0
-      bytebuffer: 5.0.1
       dayjs: 1.10.7
       deepmerge: 4.2.2
       fast-memoize: 2.5.2
@@ -1570,13 +1564,11 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
-      bytebuffer: 5.0.1
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
-      bytebuffer: 5.0.1
 
   packages/core-state:
     specifiers:
@@ -1618,7 +1610,6 @@ importers:
       '@types/sinon': ^10.0.6
       bip39: 3.0.4
       bs58: 4.0.1
-      bytebuffer: 5.0.1
       chance: 1.1.8
       concordance: ~5.0.4
       env-paths: 2.2.0
@@ -1647,7 +1638,6 @@ importers:
       '@arkecosystem/utils': link:../utils
       bip39: 3.0.4
       bs58: 4.0.1
-      bytebuffer: 5.0.1
       chance: 1.1.8
       concordance: 5.0.4
       env-paths: 2.2.0
@@ -1734,7 +1724,6 @@ importers:
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
-      bytebuffer: 5.0.1
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
@@ -1743,7 +1732,6 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
     devDependencies:
-      bytebuffer: 5.0.1
       uvu: 0.5.3
 
   packages/core-validation:
@@ -6261,12 +6249,6 @@ packages:
   /builtins/1.0.3:
     resolution: {integrity: sha1-y5T662HIaWRR2zZTThQi+U8K7og=}
     dev: true
-
-  /bytebuffer/5.0.1:
-    resolution: {integrity: sha1-WC7qSxqHO20CCkjVjfhfC7ps/d0=}
-    engines: {node: '>=0.8'}
-    dependencies:
-      long: 3.2.0
 
   /bytes/3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -11765,10 +11747,6 @@ packages:
       safe-stable-stringify: 2.3.1
       triple-beam: 1.3.0
     dev: false
-
-  /long/3.2.0:
-    resolution: {integrity: sha1-2CG3E4yhy1gcFymQ7xTbIAtcR0s=}
-    engines: {node: '>=0.6'}
 
   /long/4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}

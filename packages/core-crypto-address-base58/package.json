@@ -19,9 +19,9 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"bcrypto": "5.4.0",
-		"bstring": "0.3.9",
-		"bytebuffer": "5.0.1"
+		"bstring": "0.3.9"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-crypto-config": "workspace:*",

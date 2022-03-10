@@ -41,26 +41,26 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 	}
 
 	public deserializeCommon(transaction: Contracts.Crypto.ITransactionData, buf: ByteBuffer): void {
-		buf.jump(1); // Skip 0xFF marker
-		transaction.version = buf.readUInt8();
-		transaction.network = buf.readUInt8();
-		transaction.typeGroup = buf.readUInt32LE();
-		transaction.type = buf.readUInt16LE();
-		transaction.nonce = BigNumber.make(buf.readBigUInt64LE());
+		buf.skip(1); // Skip 0xFF marker
+		transaction.version = buf.readUint8();
+		transaction.network = buf.readUint8();
+		transaction.typeGroup = buf.readUint32();
+		transaction.type = buf.readUint16();
+		transaction.nonce = BigNumber.make(buf.readUint64());
 		transaction.senderPublicKey = this.publicKeySerializer.deserialize(buf).toString("hex");
-		transaction.fee = BigNumber.make(buf.readBigUInt64LE().toString());
+		transaction.fee = BigNumber.make(buf.readUint64().toString());
 		transaction.amount = BigNumber.ZERO;
 	}
 
 	private deserializeVendorField(transaction: Contracts.Crypto.ITransaction, buf: ByteBuffer): void {
-		const vendorFieldLength: number = buf.readUInt8();
+		const vendorFieldLength: number = buf.readUint8();
 
 		if (vendorFieldLength > 0) {
 			if (transaction.hasVendorField()) {
-				const vendorFieldBuffer: Buffer = buf.readBuffer(vendorFieldLength);
+				const vendorFieldBuffer: Buffer = buf.readBytes(vendorFieldLength);
 				transaction.data.vendorField = vendorFieldBuffer.toString("utf8");
 			} else {
-				buf.jump(vendorFieldLength);
+				buf.skip(vendorFieldLength);
 			}
 		}
 	}
@@ -82,7 +82,7 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 		// 		const count: number = buf.getRemainderLength() / 65;
 		// 		const publicKeyIndexes: { [index: number]: boolean } = {};
 		// 		for (let index = 0; index < count; index++) {
-		// 			const multiSignaturePart: string = buf.readBuffer(65).toString("hex");
+		// 			const multiSignaturePart: string = buf.readBytes(65).toString("hex");
 		// 			const publicKeyIndex: number = Number.parseInt(multiSignaturePart.slice(0, 2), 16);
 
 		// 			if (!publicKeyIndexes[publicKeyIndex]) {
@@ -104,6 +104,6 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 			serialized = Buffer.from(serialized, "hex");
 		}
 
-		return new ByteBuffer(serialized);
+		return ByteBuffer.fromBuffer(serialized);
 	}
 }

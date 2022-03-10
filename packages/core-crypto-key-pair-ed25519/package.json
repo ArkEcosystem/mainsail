@@ -20,10 +20,10 @@
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"@noble/ed25519": "^1.6.0",
 		"@noble/hashes": "^1.0.0",
 		"@scure/bip39": "^1.0.0",
-		"bytebuffer": "5.0.1",
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {

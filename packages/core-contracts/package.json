@@ -18,7 +18,6 @@
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"ajv": "6.12.6",
-		"bytebuffer": "5.0.1",
 		"dayjs": "1.10.7",
 		"inversify": "5.1.1",
 		"joi": "17.4.2",

@@ -2,7 +2,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
-import ByteBuffer from "bytebuffer";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 import { IDFactory } from "./id.factory";
 
@@ -25,11 +25,9 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		const block = {} as Contracts.Crypto.IBlockData;
 		let transactions: Contracts.Crypto.ITransaction[] = [];
 
-		const buf: ByteBuffer = new ByteBuffer(serialized.length, true);
-		buf.append(serialized);
-		buf.reset();
+		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		await this.serializer.deserialize<Contracts.Crypto.IBlockData>(buf, block, {
+		await this.serializer.deserialize<Contracts.Crypto.IBlockData>(buffer, block, {
 			length: 512,
 			schema: {
 				version: {
@@ -71,10 +69,10 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 			},
 		});
 
-		headerOnly = headerOnly || buf.remaining() === 0;
+		headerOnly = headerOnly || buffer.getRemainderLength() === 0;
 
 		if (!headerOnly) {
-			transactions = await this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
+			transactions = await this.deserializeTransactions(block, buffer, options.deserializeTransactionsUnchecked);
 		}
 
 		block.id = await this.idFactory.make(block);

@@ -77,13 +77,13 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
 		// @TODO
-		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 32));
+		const buff: ByteBuffer = ByteBuffer.fromSize(2 + publicKeys.length * 32);
 
-		buff.writeUInt8(min);
-		buff.writeUInt8(publicKeys.length);
+		buff.writeUint8(min);
+		buff.writeUint8(publicKeys.length);
 
 		for (const publicKey of publicKeys) {
-			buff.writeBuffer(Buffer.from(publicKey, "hex"));
+			buff.writeBytes(Buffer.from(publicKey, "hex"));
 		}
 
 		return buff;
@@ -93,9 +93,9 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		const { data } = this;
 
 		const multiSignature: Contracts.Crypto.IMultiSignatureAsset = { min: 0, publicKeys: [] };
-		multiSignature.min = buf.readUInt8();
+		multiSignature.min = buf.readUint8();
 
-		const count = buf.readUInt8();
+		const count = buf.readUint8();
 		for (let index = 0; index < count; index++) {
 			const publicKey = this.publicKeySerializer.deserialize(buf).toString("hex");
 			multiSignature.publicKeys.push(publicKey);

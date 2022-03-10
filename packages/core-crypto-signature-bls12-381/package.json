@@ -19,8 +19,8 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@noble/bls12-381": "^1.2.0",
-		"bytebuffer": "5.0.1"
+		"@arkecosystem/utils": "workspace:*",
+		"@noble/bls12-381": "^1.2.0"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.3"

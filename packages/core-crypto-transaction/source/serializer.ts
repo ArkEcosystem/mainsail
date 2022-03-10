@@ -27,8 +27,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		transaction: Contracts.Crypto.ITransaction,
 		options: Contracts.Crypto.ISerializeOptions = {},
 	): Promise<Buffer> {
-		const buff: ByteBuffer = new ByteBuffer(
-			Buffer.alloc(this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192),
+		const buff: ByteBuffer = ByteBuffer.fromSize(
+			this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192,
 		);
 
 		this.serializeCommon(transaction.data, buff);
@@ -40,7 +40,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 			throw new Error();
 		}
 
-		buff.writeBuffer(serialized.getResult());
+		buff.writeBytes(serialized.getResult());
 
 		this.serializeSignatures(transaction.data, buff, options);
 
@@ -56,21 +56,21 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 			transaction.typeGroup = Contracts.Crypto.TransactionTypeGroup.Core;
 		}
 
-		buff.writeUInt8(0xff);
-		buff.writeUInt8(transaction.version);
-		buff.writeUInt8(transaction.network || this.configuration.get("network.pubKeyHash"));
-		buff.writeUInt32LE(transaction.typeGroup);
-		buff.writeUInt16LE(transaction.type);
+		buff.writeUint8(0xff);
+		buff.writeUint8(transaction.version);
+		buff.writeUint8(transaction.network || this.configuration.get("network.pubKeyHash"));
+		buff.writeUint32(transaction.typeGroup);
+		buff.writeUint16(transaction.type);
 
 		if (transaction.nonce) {
-			buff.writeBigInt64LE(transaction.nonce.toBigInt());
+			buff.writeUint64(transaction.nonce.toBigInt());
 		}
 
 		if (transaction.senderPublicKey) {
-			buff.writeBuffer(Buffer.from(transaction.senderPublicKey, "hex"));
+			buff.writeBytes(Buffer.from(transaction.senderPublicKey, "hex"));
 		}
 
-		buff.writeBigInt64LE(transaction.fee.toBigInt());
+		buff.writeUint64(transaction.fee.toBigInt());
 	}
 
 	private serializeVendorField(transaction: Contracts.Crypto.ITransaction, buff: ByteBuffer): void {
@@ -78,10 +78,10 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 
 		if (transaction.hasVendorField() && data.vendorField) {
 			const vf: Buffer = Buffer.from(data.vendorField, "utf8");
-			buff.writeUInt8(vf.length);
-			buff.writeBuffer(vf);
+			buff.writeUint8(vf.length);
+			buff.writeBytes(vf);
 		} else {
-			buff.writeUInt8(0x00);
+			buff.writeUint8(0x00);
 		}
 	}
 
@@ -91,11 +91,11 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		options: Contracts.Crypto.ISerializeOptions = {},
 	): void {
 		if (transaction.signature && !options.excludeSignature) {
-			buff.writeBuffer(Buffer.from(transaction.signature, "hex"));
+			buff.writeBytes(Buffer.from(transaction.signature, "hex"));
 		}
 
 		if (transaction.signatures && !options.excludeMultiSignature) {
-			buff.writeBuffer(Buffer.from(transaction.signatures.join(""), "hex"));
+			buff.writeBytes(Buffer.from(transaction.signatures.join(""), "hex"));
 		}
 	}
 }

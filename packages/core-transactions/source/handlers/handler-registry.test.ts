@@ -1,7 +1,7 @@
 import { Application, Container, Services } from "@arkecosystem/core-kernel";
 import { describe } from "../../core-test-framework/source";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import ByteBuffer from "bytebuffer";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";

@@ -19,8 +19,8 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@scure/base": "^1.0.0",
-		"bytebuffer": "5.0.1"
+		"@arkecosystem/utils": "workspace:*",
+		"@scure/base": "^1.0.0"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-crypto-config": "workspace:*",

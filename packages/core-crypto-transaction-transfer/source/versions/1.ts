@@ -35,9 +35,9 @@ export class TransferTransaction extends Transaction {
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
-		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(64));
-		buff.writeBigUInt64LE(data.amount.toBigInt());
-		buff.writeUInt32LE(data.expiration || 0);
+		const buff: ByteBuffer = ByteBuffer.fromSize(64);
+		buff.writeUint64(data.amount.toBigInt());
+		buff.writeUint32(data.expiration || 0);
 
 		if (data.recipientId) {
 			this.addressSerializer.serialize(buff, await this.addressFactory.toBuffer(data.recipientId));
@@ -48,8 +48,8 @@ export class TransferTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
-		data.expiration = buf.readUInt32LE();
+		data.amount = BigNumber.make(buf.readUint64().toString());
+		data.expiration = buf.readUint32();
 		data.recipientId = await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf));
 	}
 }

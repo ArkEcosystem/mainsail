@@ -1,14 +1,14 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
-import ByteBuffer from "bytebuffer";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class AddressSerializer implements Contracts.Crypto.IAddressSerializer {
 	public serialize(buffer: ByteBuffer, address: Buffer): void {
-		buffer.writeBuffer(address);
+		buffer.writeBytes(address);
 	}
 
 	public deserialize(buffer: ByteBuffer): Buffer {
-		return buffer.readBuffer(21);
+		return buffer.readBytes(21);
 	}
 }

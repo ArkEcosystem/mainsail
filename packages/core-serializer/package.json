@@ -18,8 +18,7 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
-		"bytebuffer": "5.0.1"
+		"@arkecosystem/utils": "workspace:*"
 	},
 	"engines": {
 		"node": ">=16.x"

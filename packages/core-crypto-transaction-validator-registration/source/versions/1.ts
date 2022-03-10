@@ -42,11 +42,11 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 
 		if (data.asset && data.asset.validator) {
 			const validatorBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
-			const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(validatorBytes.length + 1));
+			const buff: ByteBuffer = ByteBuffer.fromSize(validatorBytes.length + 1);
 
-			buff.writeUInt8(validatorBytes.length);
-			// buffer.writeBuffer(validatorBytes, "hex");
-			buff.writeBuffer(validatorBytes);
+			buff.writeUint8(validatorBytes.length);
+			// buffer.writeBytes(validatorBytes, "hex");
+			buff.writeBytes(validatorBytes);
 
 			return buff;
 		}
@@ -56,11 +56,11 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		const usernameLength = buf.readUInt8();
+		const usernameLength = buf.readUint8();
 
 		data.asset = {
 			validator: {
-				username: buf.readBuffer(usernameLength).toString("utf8"),
+				username: buf.readBytes(usernameLength).toString("utf8"),
 			},
 		};
 	}

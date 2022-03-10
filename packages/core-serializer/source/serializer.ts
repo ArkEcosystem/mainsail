@@ -1,7 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { BigNumber } from "@arkecosystem/utils";
-import ByteBuffer from "bytebuffer";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class Serializer implements Contracts.Serializer.ISerializer {
@@ -27,10 +26,10 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		data: T,
 		configuration: Contracts.Serializer.SerializationConfiguration,
 	): Promise<Buffer> {
-		let result: ByteBuffer = new ByteBuffer(configuration.length, true);
+		const result: ByteBuffer = ByteBuffer.fromSize(configuration.length);
 
 		if (configuration.skip > 0) {
-			result = result.skip(configuration.skip);
+			result.skip(configuration.skip);
 		}
 
 		for (const [property, schema] of Object.entries(configuration.schema)) {
@@ -51,7 +50,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "hash") {
-				result.append(data[property], "hex");
+				result.writeBytes(Buffer.from(data[property], "hex"));
 			}
 
 			if (schema.type === "address") {
@@ -71,12 +70,12 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 					const serialized: Buffer = await this.transactionUtils.toBytes(transaction);
 
 					result.writeUint32(serialized.length);
-					result.append(serialized);
+					result.writeBytes(serialized);
 				}
 			}
 		}
 
-		return result.flip().toBuffer();
+		return result.toBuffer();
 	}
 
 	public async deserialize<T>(
@@ -117,7 +116,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				target[property] = [];
 
 				for (let index = 0; index < (target as any).numberOfTransactions; index++) {
-					target[property].push(source.readBytes(source.readUint32()).toBuffer());
+					target[property].push(source.readBytes(source.readUint32()));
 				}
 			}
 		}

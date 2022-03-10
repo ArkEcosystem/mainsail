@@ -32,7 +32,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 
 	public async serialize(block: Contracts.Crypto.IBlockData, includeSignature = true): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IBlockData>(block, {
-			length: 512,
+			length: 1024 * 100, // @TODO: set a max length without tx
 			schema: {
 				version: {
 					type: "uint32",
@@ -77,7 +77,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 
 	public async serializeWithTransactions(block: Contracts.Crypto.IBlockData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IBlockData>(block, {
-			length: 1024,
+			length: 1024 * 100, // @TODO: set a max length with tx
 			schema: {
 				version: {
 					type: "uint32",

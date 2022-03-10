@@ -51,13 +51,13 @@ export class MultiPaymentTransaction extends Transaction {
 		const { data } = this;
 
 		if (data.asset && data.asset.payments) {
-			const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + data.asset.payments.length * 29));
-			buff.writeUInt16LE(data.asset.payments.length);
+			const buff: ByteBuffer = ByteBuffer.fromSize(2 + data.asset.payments.length * 29);
+			buff.writeUint16(data.asset.payments.length);
 
 			for (const payment of data.asset.payments) {
-				buff.writeBigUInt64LE(payment.amount.toBigInt());
+				buff.writeUint64(payment.amount.toBigInt());
 
-				buff.writeBuffer(await this.addressFactory.toBuffer(payment.recipientId));
+				buff.writeBytes(await this.addressFactory.toBuffer(payment.recipientId));
 			}
 
 			return buff;
@@ -69,11 +69,11 @@ export class MultiPaymentTransaction extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 		const payments: Contracts.Crypto.IMultiPaymentItem[] = [];
-		const total: number = buf.readUInt16LE();
+		const total: number = buf.readUint16();
 
 		for (let index = 0; index < total; index++) {
 			payments.push({
-				amount: BigNumber.make(buf.readBigUInt64LE().toString()),
+				amount: BigNumber.make(buf.readUint64().toString()),
 				recipientId: await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf)),
 			});
 		}

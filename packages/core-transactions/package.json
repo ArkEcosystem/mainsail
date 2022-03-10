@@ -24,7 +24,6 @@
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"bytebuffer": "5.0.1",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

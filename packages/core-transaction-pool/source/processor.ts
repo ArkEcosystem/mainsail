@@ -92,7 +92,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.ITransaction> {
 		try {
 			const transactionCommon = {} as Contracts.Crypto.ITransactionData;
-			const txByteBuffer = new ByteBuffer(transactionData);
+			const txByteBuffer = ByteBuffer.fromBuffer(transactionData);
 			this.deserializer.deserializeCommon(transactionCommon, txByteBuffer);
 
 			return this.transactionFactory.fromBytes(transactionData);
