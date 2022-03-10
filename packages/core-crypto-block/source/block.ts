@@ -1,36 +1,18 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 
-@injectable()
-export class Block implements Contracts.Crypto.IBlock {
-	//  - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
-	public serialized: string;
-	public data: Contracts.Crypto.IBlockData;
-	public transactions: Contracts.Crypto.ITransaction[];
+interface BlockArguments {
+	data: Contracts.Crypto.IBlockData;
+	serialized: string;
+	transactions: Contracts.Crypto.ITransaction[];
+}
 
-	public async init({
+export const sealBlock = ({ data, serialized, transactions }: BlockArguments): Contracts.Crypto.IBlock =>
+	Object.seal({
 		data,
-		transactions,
-	}: {
-		data: Contracts.Crypto.IBlockData;
-		transactions: Contracts.Crypto.ITransaction[];
-	}) {
-		this.data = data;
-		this.transactions = transactions.map((transaction, index) => {
+		header: data,
+		serialized,
+		transactions: transactions.map((transaction, index) => {
 			transaction.data.sequence = index;
 			return transaction;
-		});
-
-		delete this.data.transactions;
-
-		return this;
-	}
-
-	public getHeader(): Contracts.Crypto.IBlockData {
-		const header: Contracts.Crypto.IBlockData = Object.assign({}, this.data);
-
-		delete header.transactions;
-
-		return header;
-	}
-}
+		}),
+	});

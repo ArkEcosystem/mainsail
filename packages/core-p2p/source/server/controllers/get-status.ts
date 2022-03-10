@@ -24,7 +24,7 @@ export class GetStatusController {
 			state: {
 				currentSlot: slotInfo.slotNumber,
 				forgingAllowed: slotInfo.forgingStatus,
-				header: lastBlock.getHeader(),
+				header: lastBlock.header,
 				height: lastBlock.data.height,
 			},
 		};

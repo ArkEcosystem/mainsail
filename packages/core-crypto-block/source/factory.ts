@@ -2,14 +2,11 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Block } from "./block";
+import { sealBlock } from "./block";
 import { IDFactory } from "./id.factory";
 
 @injectable()
 export class BlockFactory implements Contracts.Crypto.IBlockFactory {
-	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
@@ -77,13 +74,11 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
-		const block: Contracts.Crypto.IBlock = await this.app
-			.resolve(Block)
-			.init(await this.deserializer.deserialize(serialized, false, options));
 
-		block.serialized = serialized.toString("hex");
-
-		return block;
+		return sealBlock({
+			...(await this.deserializer.deserialize(serialized, false, options)),
+			serialized: serialized.toString("hex"),
+		});
 	}
 
 	private async fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.IBlock> {
@@ -96,10 +91,10 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			deserialized.data = validated;
 		}
 
-		const block: Contracts.Crypto.IBlock = await this.app.resolve(Block).init(deserialized);
-		block.serialized = serialized.toString("hex");
-
-		return block;
+		return sealBlock({
+			...deserialized,
+			serialized: serialized.toString("hex"),
+		});
 	}
 
 	async #applySchema(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockData | undefined> {

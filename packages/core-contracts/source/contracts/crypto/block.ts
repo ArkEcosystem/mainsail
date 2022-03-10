@@ -10,11 +10,10 @@ export interface IBlockVerification {
 }
 
 export interface IBlock {
-	serialized: string;
 	data: IBlockData;
+	header: Exclude<IBlockData, "transactions">;
+	serialized: string;
 	transactions: ITransaction[];
-
-	getHeader(): IBlockData;
 }
 
 export interface IBlockData {
