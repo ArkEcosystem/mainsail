@@ -1391,123 +1391,31 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-state': workspace:*
       '@arkecosystem/utils': workspace:*
-      '@hapi/boom': 9.0.0
-      '@hapi/bounce': 2.0.0
-      '@hapi/hapi': 20.1.5
-      '@hapi/hoek': 9.2.0
-      '@hapi/sntp': 4.0.0
-      '@hapi/teamwork': 5.1.0
-      '@types/better-sqlite3': 5.4.3
-      '@types/fs-extra': 8.1.2
-      '@types/hapi__sntp': 3.1.2
-      '@types/ip': 1.1.0
-      '@types/semver': 6.2.3
-      dayjs: 1.10.7
-      delay: 4.4.1
-      ip: 1.1.5
-      ipaddr.js: 2.0.1
       joi: 17.4.2
-      pluralize: 8.0.0
-      pretty-ms: 7.0.1
-      protobufjs: 6.10.2
-      rate-limiter-flexible: 1.3.2
-      semver: 6.3.0
-      ws: 7.5.5
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/utils': link:../utils
-      '@hapi/boom': 9.0.0
-      '@hapi/bounce': 2.0.0
-      '@hapi/hapi': 20.1.5
-      '@hapi/hoek': 9.2.0
-      '@hapi/sntp': 4.0.0
-      '@hapi/teamwork': 5.1.0
-      dayjs: 1.10.7
-      delay: 4.4.1
-      ip: 1.1.5
-      ipaddr.js: 2.0.1
       joi: 17.4.2
-      pluralize: 8.0.0
-      pretty-ms: 7.0.1
-      protobufjs: 6.10.2
-      rate-limiter-flexible: 1.3.2
-      semver: 6.3.0
-      ws: 7.5.5
-    devDependencies:
-      '@types/better-sqlite3': 5.4.3
-      '@types/fs-extra': 8.1.2
-      '@types/hapi__sntp': 3.1.2
-      '@types/ip': 1.1.0
-      '@types/semver': 6.2.3
 
   packages/core-networking-ntp:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-state': workspace:*
       '@arkecosystem/utils': workspace:*
-      '@hapi/boom': 9.0.0
-      '@hapi/bounce': 2.0.0
-      '@hapi/hapi': 20.1.5
-      '@hapi/hoek': 9.2.0
       '@hapi/sntp': 4.0.0
-      '@hapi/teamwork': 5.1.0
-      '@types/better-sqlite3': 5.4.3
-      '@types/fs-extra': 8.1.2
-      '@types/hapi__sntp': 3.1.2
-      '@types/ip': 1.1.0
-      '@types/semver': 6.2.3
-      dayjs: 1.10.7
-      delay: 4.4.1
-      ip: 1.1.5
-      ipaddr.js: 2.0.1
       joi: 17.4.2
-      pluralize: 8.0.0
-      pretty-ms: 7.0.1
-      protobufjs: 6.10.2
-      rate-limiter-flexible: 1.3.2
-      semver: 6.3.0
-      ws: 7.5.5
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/utils': link:../utils
-      '@hapi/boom': 9.0.0
-      '@hapi/bounce': 2.0.0
-      '@hapi/hapi': 20.1.5
-      '@hapi/hoek': 9.2.0
       '@hapi/sntp': 4.0.0
-      '@hapi/teamwork': 5.1.0
-      dayjs: 1.10.7
-      delay: 4.4.1
-      ip: 1.1.5
-      ipaddr.js: 2.0.1
       joi: 17.4.2
-      pluralize: 8.0.0
-      pretty-ms: 7.0.1
-      protobufjs: 6.10.2
-      rate-limiter-flexible: 1.3.2
-      semver: 6.3.0
-      ws: 7.5.5
-    devDependencies:
-      '@types/better-sqlite3': 5.4.3
-      '@types/fs-extra': 8.1.2
-      '@types/hapi__sntp': 3.1.2
-      '@types/ip': 1.1.0
-      '@types/semver': 6.2.3
 
   packages/core-p2p:
     specifiers:
@@ -3497,10 +3405,6 @@ packages:
       '@hapi/boom': 9.1.4
       '@hapi/hoek': 9.2.1
       '@hapi/validate': 1.1.3
-
-  /@hapi/hoek/9.2.0:
-    resolution: {integrity: sha512-sqKVVVOe5ivCaXDWivIJYVSaEgdQK9ul7a4Kity5Iw7u9+wBAPbX1RMSnLLmp7O4Vzj0WOWwMAJsTL00xwaNug==}
-    dev: false
 
   /@hapi/hoek/9.2.1:
     resolution: {integrity: sha512-gfta+H8aziZsm8pZa0vj04KO6biEiisppNgA1kbJvFrrWu9Vm7eaUEy76DIxsuTaWvti5fkJVhllWc6ZTE+Mdw==}
@@ -15960,19 +15864,6 @@ packages:
 
   /ws/7.4.6:
     resolution: {integrity: sha512-YmhHDO4MzaDLB+M9ym/mDA5z0naX8j7SIlT8f8z+I0VtzsRbekxEutHSme7NPS2qE8StCYQNUnfWdXta/Yu85A==}
-    engines: {node: '>=8.3.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
-
-  /ws/7.5.5:
-    resolution: {integrity: sha512-BAkMFcAzl8as1G/hArkxOxq3G7pjUqQ3gzYbLL0/5zNkph70e+lCoxBGnm6AW1+/aiNeV4fnKqZ8m4GZewmH2w==}
     engines: {node: '>=8.3.0'}
     peerDependencies:
       bufferutil: ^4.0.1
