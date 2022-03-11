@@ -11,7 +11,6 @@ export interface ITransaction {
 
 	data: ITransactionData;
 	serialized: Buffer;
-	timestamp: number;
 
 	serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined>;
 	deserialize(buf: ByteBuffer): Promise<void>;

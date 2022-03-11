@@ -17,23 +17,8 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	public static version = 1;
 	public static key: string | undefined = undefined;
 
-	// @ts-ignore - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
 	public data: Contracts.Crypto.ITransactionData;
-	// @ts-ignore - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: Buffer;
-	// @ts-ignore - @TODO this is public but not initialised on creation, either make it private or declare it as undefined
-	public timestamp: number;
-
-	public static getSchema(): TransactionSchema {
-		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
-	}
-
-	public hasVendorField(): boolean {
-		return false;
-	}
-
-	public abstract serialize(): Promise<ByteBuffer | undefined>;
-	public abstract deserialize(buf: ByteBuffer): Promise<void>;
 
 	public get id(): string | undefined {
 		return this.data.id;
@@ -50,4 +35,15 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	public get key(): string {
 		return (this as any).__proto__.constructor.key;
 	}
+
+	public static getSchema(): TransactionSchema {
+		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
+	}
+
+	public hasVendorField(): boolean {
+		return false;
+	}
+
+	public abstract serialize(): Promise<ByteBuffer | undefined>;
+	public abstract deserialize(buf: ByteBuffer): Promise<void>;
 }
