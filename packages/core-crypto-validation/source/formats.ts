@@ -14,6 +14,7 @@ export const registerFormats = (configuration: Contracts.Crypto.IConfiguration) 
 		});
 	};
 
+	// @TODO: plugins should register this rule
 	const validPeer = (ajv: Ajv) => {
 		ajv.addFormat("peer", (ip: string) => {
 			try {

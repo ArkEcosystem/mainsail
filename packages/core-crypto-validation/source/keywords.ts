@@ -64,6 +64,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		});
 	};
 
+	// @TODO: revisit the need for the genesis check
 	const bignum = (ajv: Ajv) => {
 		const instanceOf = ajvKeywords.get("instanceof").definition;
 		instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
@@ -117,6 +118,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		});
 	};
 
+	// @TODO: plugins should register this rule
 	const blockId = (ajv: Ajv) => {
 		ajv.addKeyword("blockId", {
 			compile(schema) {
