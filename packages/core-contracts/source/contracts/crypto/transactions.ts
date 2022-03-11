@@ -109,28 +109,9 @@ export interface IMultiSignatureAsset {
 	publicKeys: string[];
 }
 
-export interface IDeserializeOptions {
-	acceptLegacyVersion?: boolean;
-	disableVersionCheck?: boolean;
-}
-
-export interface IVerifyOptions {
-	disableVersionCheck?: boolean;
-}
-
 export interface ISerializeOptions {
-	acceptLegacyVersion?: boolean;
-	disableVersionCheck?: boolean;
 	excludeSignature?: boolean;
 	excludeMultiSignature?: boolean;
-
-	// WORKAROUND: A handful of mainnet transactions have an invalid
-	// recipient. Due to a refactor of the Address network byte
-	// validation it is no longer trivially possible to handle them.
-	// If an invalid address is encountered during transfer serialization,
-	// this error field is used to bubble up the error and defer the
-	// `AddressNetworkByteError` until the actual id is available to call `isException`.
-	addressError?: string;
 }
 
 export interface TransactionServiceProvider {
@@ -140,7 +121,7 @@ export interface TransactionServiceProvider {
 export interface ITransactionVerifier {
 	verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): Promise<boolean>;
 
-	verifyHash(data: ITransactionData, disableVersionCheck?: boolean): Promise<boolean>;
+	verifyHash(data: ITransactionData): Promise<boolean>;
 
 	verifySchema(data: ITransactionData, strict?: boolean): ISchemaValidationResult;
 }
@@ -157,7 +138,7 @@ export interface ITransactionSerializer {
 }
 
 export interface ITransactionDeserializer {
-	deserialize(serialized: string | Buffer, options?: IDeserializeOptions): Promise<ITransaction>;
+	deserialize(serialized: string | Buffer): Promise<ITransaction>;
 
 	deserializeCommon(transaction: ITransactionData, buf: ByteBuffer): void;
 }
@@ -165,11 +146,11 @@ export interface ITransactionDeserializer {
 export interface ITransactionFactory {
 	fromHex(hex: string): Promise<ITransaction>;
 
-	fromBytes(buff: Buffer, strict?: boolean, options?: IDeserializeOptions): Promise<ITransaction>;
+	fromBytes(buff: Buffer, strict?: boolean): Promise<ITransaction>;
 
 	fromJson(json: ITransactionJson): Promise<ITransaction>;
 
-	fromData(data: ITransactionData, strict?: boolean, options?: IDeserializeOptions): Promise<ITransaction>;
+	fromData(data: ITransactionData, strict?: boolean): Promise<ITransaction>;
 }
 
 export type TransactionConstructor = any;

@@ -18,10 +18,7 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureSerializer: Contracts.Crypto.ISignature;
 
-	public async deserialize(
-		serialized: string | Buffer,
-		options: Contracts.Crypto.IDeserializeOptions = {},
-	): Promise<Contracts.Crypto.ITransaction> {
+	public async deserialize(serialized: string | Buffer): Promise<Contracts.Crypto.ITransaction> {
 		const data = {} as Contracts.Crypto.ITransactionData;
 
 		const buff: ByteBuffer = this.getByteBuffer(serialized);

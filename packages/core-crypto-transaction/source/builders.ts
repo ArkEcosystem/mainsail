@@ -34,17 +34,12 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 
 	protected signWithSenderAsRecipient = false;
 
-	private disableVersionCheck = false;
-
 	public async build(data: Partial<Contracts.Crypto.ITransactionData> = {}): Promise<Contracts.Crypto.ITransaction> {
-		return this.factory.fromData({ ...this.data, ...data }, false, {
-			disableVersionCheck: this.disableVersionCheck,
-		});
+		return this.factory.fromData({ ...this.data, ...data }, false);
 	}
 
 	public version(version: number): TBuilder {
 		this.data.version = version;
-		this.disableVersionCheck = true;
 		return this.instance();
 	}
 
@@ -125,7 +120,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public async verify(): Promise<boolean> {
-		return this.verifier.verifyHash(this.data, this.disableVersionCheck);
+		return this.verifier.verifyHash(this.data);
 	}
 
 	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
@@ -159,9 +154,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			this.data.recipientId = await this.addressFactory.fromPublicKey(keys.publicKey);
 		}
 
-		this.data.signature = await this.signer.sign(this.getSigningObject(), keys, {
-			disableVersionCheck: this.disableVersionCheck,
-		});
+		this.data.signature = await this.signer.sign(this.getSigningObject(), keys);
 
 		return this.instance();
 	}

@@ -26,12 +26,8 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 		return this.fromSerialized(hex);
 	}
 
-	public async fromBytes(
-		buff: Buffer,
-		strict = true,
-		options: Contracts.Crypto.IDeserializeOptions = {},
-	): Promise<Contracts.Crypto.ITransaction> {
-		return this.fromSerialized(buff.toString("hex"), strict, options);
+	public async fromBytes(buff: Buffer, strict = true): Promise<Contracts.Crypto.ITransaction> {
+		return this.fromSerialized(buff.toString("hex"), strict);
 	}
 
 	public async fromJson(json: Contracts.Crypto.ITransactionJson): Promise<Contracts.Crypto.ITransaction> {
@@ -45,7 +41,6 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 	public async fromData(
 		data: Contracts.Crypto.ITransactionData,
 		strict?: boolean,
-		options: Contracts.Crypto.IDeserializeOptions = {},
 	): Promise<Contracts.Crypto.ITransaction> {
 		const { value, error } = this.verifier.verifySchema(data, strict);
 
@@ -57,17 +52,13 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 
 		await this.serializer.serialize(transaction);
 
-		return this.fromBytes(transaction.serialized, strict, options);
+		return this.fromBytes(transaction.serialized, strict);
 	}
 
-	private async fromSerialized(
-		serialized: string,
-		strict = true,
-		options: Contracts.Crypto.IDeserializeOptions = {},
-	): Promise<Contracts.Crypto.ITransaction> {
+	private async fromSerialized(serialized: string, strict = true): Promise<Contracts.Crypto.ITransaction> {
 		try {
-			const transaction = await this.deserializer.deserialize(serialized, options);
-			transaction.data.id = await this.utils.getId(transaction.data, options);
+			const transaction = await this.deserializer.deserialize(serialized);
+			transaction.data.id = await this.utils.getId(transaction.data);
 
 			const { error } = this.verifier.verifySchema(transaction.data, strict);
 

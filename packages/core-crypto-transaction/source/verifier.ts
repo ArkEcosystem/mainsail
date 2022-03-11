@@ -72,7 +72,7 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 		return verified;
 	}
 
-	public async verifyHash(data: Contracts.Crypto.ITransactionData, disableVersionCheck = false): Promise<boolean> {
+	public async verifyHash(data: Contracts.Crypto.ITransactionData): Promise<boolean> {
 		const { signature, senderPublicKey } = data;
 
 		if (!signature || !senderPublicKey) {
@@ -80,7 +80,6 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 		}
 
 		const hash: Buffer = await this.utils.toHash(data, {
-			disableVersionCheck,
 			excludeSignature: true,
 		});
 
