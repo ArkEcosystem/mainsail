@@ -47,6 +47,8 @@ export abstract class TransactionHandler {
 			throw new Exceptions.ColdWalletError();
 		}
 
+		// @TODO: enforce fees here to support dynamic cases
+
 		this.#verifyTransactionNonceApply(sender, transaction);
 
 		if (sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative()) {
