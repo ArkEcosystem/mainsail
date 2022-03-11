@@ -1,14 +1,14 @@
 import { Application } from "@arkecosystem/core-kernel";
 
 import { describe } from "../../../core-test-framework";
-import { buildApplication, buildPeerFlags } from "./builder";
+import { Builder } from "./builder";
 
 describe("buildApplication", ({ it, stub }) => {
 	it("should build an application instance and call bootstrap and boot", async () => {
 		const spyBootstrap = stub(Application.prototype, "bootstrap");
 		const spyBoot = stub(Application.prototype, "boot");
 
-		await buildApplication({});
+		await Builder.buildApplication({});
 
 		spyBootstrap.calledOnce();
 		spyBoot.calledOnce();
@@ -18,7 +18,7 @@ describe("buildApplication", ({ it, stub }) => {
 		const spyBootstrap = stub(Application.prototype, "bootstrap");
 		const spyBoot = stub(Application.prototype, "boot");
 
-		await buildApplication();
+		await Builder.buildApplication();
 
 		spyBootstrap.neverCalled();
 		spyBoot.neverCalled();
@@ -34,7 +34,7 @@ describe("buildPeerFlags", ({ it, assert }) => {
 			skipDiscovery: "skipDiscovery",
 		};
 
-		assert.equal(buildPeerFlags(flags), flags);
+		assert.equal(Builder.buildPeerFlags(flags), flags);
 	});
 
 	it("should handle seed mode", () => {
@@ -45,7 +45,7 @@ describe("buildPeerFlags", ({ it, assert }) => {
 			skipDiscovery: "skipDiscovery",
 		};
 
-		assert.equal(buildPeerFlags({ ...flags, launchMode: "seed" }), {
+		assert.equal(Builder.buildPeerFlags({ ...flags, launchMode: "seed" }), {
 			...flags,
 			ignoreMinimumNetworkReach: true,
 			skipDiscovery: true,

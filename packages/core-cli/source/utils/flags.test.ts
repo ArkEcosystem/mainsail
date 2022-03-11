@@ -1,10 +1,10 @@
 import { describe } from "../../../core-test-framework";
-import { castFlagsToString } from "./flags";
+import { Flags } from "./flags";
 
 describe("castFlagsToString", ({ it, assert }) => {
 	it("should handle strings", () => {
 		assert.equal(
-			castFlagsToString({
+			Flags.castFlagsToString({
 				key: "value",
 			}),
 			"--key='value'",
@@ -13,7 +13,7 @@ describe("castFlagsToString", ({ it, assert }) => {
 
 	it("should handle strings with spaces", () => {
 		assert.equal(
-			castFlagsToString({
+			Flags.castFlagsToString({
 				key: "hello world",
 			}),
 			"--key='hello world'",
@@ -22,7 +22,7 @@ describe("castFlagsToString", ({ it, assert }) => {
 
 	it("should handle integers", () => {
 		assert.equal(
-			castFlagsToString({
+			Flags.castFlagsToString({
 				key: 1,
 			}),
 			"--key=1",
@@ -31,7 +31,7 @@ describe("castFlagsToString", ({ it, assert }) => {
 
 	it("should handle booleans", () => {
 		assert.equal(
-			castFlagsToString({
+			Flags.castFlagsToString({
 				key: true,
 			}),
 			"--key",
@@ -40,7 +40,7 @@ describe("castFlagsToString", ({ it, assert }) => {
 
 	it("should ignore keys", () => {
 		assert.equal(
-			castFlagsToString(
+			Flags.castFlagsToString(
 				{
 					ignore: "value",
 					key: "value",

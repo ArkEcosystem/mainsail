@@ -26,13 +26,13 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
-		await Utils.buildApplication({
+		await Utils.Builder.buildApplication({
 			flags,
 			plugins: {
 				"@arkecosystem/core-blockchain": {
 					networkStart: flags.networkStart,
 				},
-				"@arkecosystem/core-p2p": Utils.buildPeerFlags(flags),
+				"@arkecosystem/core-p2p": Utils.Builder.buildPeerFlags(flags),
 			},
 		});
 

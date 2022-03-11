@@ -19,7 +19,9 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test --token=ark --network=testnet",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 -r html pnpm run test",
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@arkecosystem/core-blockchain": "workspace:*",
@@ -55,6 +57,7 @@
 		"@arkecosystem/core-p2p": "workspace:*",
 		"@arkecosystem/core-serializer": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/core-transaction-pool-api": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
@@ -77,6 +80,7 @@
 		"prompts": "2.4.0",
 		"tar": "6.1.11",
 		"type-fest": "0.21.3",
+		"uvu": "^0.5.3",
 		"wif": "2.0.6"
 	},
 	"peerDependencies": {

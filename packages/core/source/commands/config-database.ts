@@ -45,7 +45,9 @@ export class Command extends Commands.Command {
 				message: "What port do you want to use?",
 				name: "port",
 				type: "text",
-				validate: (value) => (value < 1 || value > 65_535 ? `The port must be in the range of 1-65535.` : true),
+				validate: (value) =>
+					/* c8 ignore next */
+					value < 1 || value > 65_535 ? `The port must be in the range of 1-65535.` : true,
 			},
 			{
 				initial: `${this.getFlag("token")}_${this.getFlag("network")}`,

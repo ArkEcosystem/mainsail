@@ -163,6 +163,7 @@ importers:
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/core-transaction-pool': workspace:*
       '@arkecosystem/core-transaction-pool-api': workspace:*
       '@arkecosystem/core-transactions': workspace:*
@@ -185,6 +186,7 @@ importers:
       prompts: 2.4.0
       tar: 6.1.11
       type-fest: 0.21.3
+      uvu: ^0.5.3
       wif: 2.0.6
     dependencies:
       '@arkecosystem/core-blockchain': link:../core-blockchain
@@ -220,6 +222,7 @@ importers:
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
+      '@arkecosystem/core-test-framework': link:../core-test-framework
       '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
       '@arkecosystem/core-transaction-pool-api': link:../core-transaction-pool-api
       '@arkecosystem/core-transactions': link:../core-transactions
@@ -242,6 +245,7 @@ importers:
       prompts: 2.4.0
       tar: 6.1.11
       type-fest: 0.21.3
+      uvu: 0.5.3
       wif: 2.0.6
 
   packages/core-blockchain:
