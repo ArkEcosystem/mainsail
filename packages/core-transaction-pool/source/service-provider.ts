@@ -1,6 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { fork } from "child_process";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import {
@@ -18,8 +17,6 @@ import { SenderMempool } from "./sender-mempool";
 import { SenderState } from "./sender-state";
 import { Service } from "./service";
 import { Storage } from "./storage";
-import { Worker } from "./worker";
-import { WorkerPool } from "./worker-pool";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -51,9 +48,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			maxTransactionsPerRequest: Joi.number().integer().min(1).required(),
 			maxTransactionsPerSender: Joi.number().integer().min(1).required(),
 			storage: Joi.string().required(),
-			workerPool: Joi.object({
-				workerCount: Joi.number().integer().min(1).required(),
-			}).required(),
 		}).unknown(true);
 	}
 
@@ -71,14 +65,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPoolSenderState).to(SenderState);
 		this.app.bind(Identifiers.TransactionPoolService).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPoolStorage).to(Storage).inSingletonScope();
-
-		this.app.bind(Identifiers.TransactionPoolWorkerPool).to(WorkerPool).inSingletonScope();
-		this.app.bind(Identifiers.TransactionPoolWorker).to(Worker);
-		this.app.bind(Identifiers.TransactionPoolWorkerFactory).toAutoFactory(Identifiers.TransactionPoolWorker);
-		this.app.bind(Identifiers.TransactionPoolWorkerIpcSubprocessFactory).toFactory(() => () => {
-			const subprocess = fork(`${__dirname}/worker-script.js`);
-			return new AppUtils.IpcSubprocess<Contracts.TransactionPool.WorkerScriptHandler>(subprocess);
-		});
 	}
 
 	private registerActions(): void {

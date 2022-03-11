@@ -14,7 +14,4 @@ export const defaults = {
 	// then it will be removed.
 	maxTransactionAge: 2700,
 	maxTransactionBytes: 2000000, // TODO think of a value that makes sense ?
-	workerPool: {
-		workerCount: 3,
-	},
 };

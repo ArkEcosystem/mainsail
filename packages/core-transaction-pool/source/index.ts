@@ -10,5 +10,3 @@ export * from "./service";
 export * from "./service-provider";
 export * from "./storage";
 export * from "./utils";
-export * from "./worker";
-export * from "./worker-pool";

@@ -8,4 +8,3 @@ export * from "./sender-mempool";
 export * from "./sender-state";
 export * from "./service";
 export * from "./storage";
-export * from "./worker";
