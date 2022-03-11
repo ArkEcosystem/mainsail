@@ -29,7 +29,7 @@ export class Command extends Commands.Command {
 		if (hasNewVersion) {
 			await this.updater.update(this.getFlag("updateProcessManager"), this.getFlag("force"));
 
-			if (this.hasRestartFlag()) {
+			if (this.#hasRestartFlag()) {
 				if (this.hasFlag("restart")) {
 					this.actions.restartRunningProcess(`${this.getFlag("token")}-core`);
 					this.actions.restartRunningProcess(`${this.getFlag("token")}-relay`);
@@ -57,7 +57,7 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	private hasRestartFlag(): boolean {
+	#hasRestartFlag(): boolean {
 		return Utils.hasSomeProperty(this.getFlags(), ["restart", "restartCore", "restartRelay", "restartForger"]);
 	}
 }

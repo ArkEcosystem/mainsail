@@ -8,6 +8,7 @@ import { join } from "path";
 describe("CLI", ({ beforeEach, it, assert, stub }) => {
 	beforeEach(() => {
 		process.exitCode = undefined;
+		stub(Services.Updater.prototype, "check");
 	});
 
 	it("should run successfully using valid commands", async () => {
@@ -24,14 +25,12 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 	it("should set exitCode = 2 when using invalid commands", async () => {
 		let message: string;
 		stub(console, "warn").callsFake((m: string) => (message = m));
-		const spyOnCheck = stub(Services.Updater.prototype, "check");
 
 		const cli = new CommandLineInterface(["hello"]);
 		prompts.inject([false]);
 
 		await cli.execute("distribution");
 
-		spyOnCheck.calledOnce();
 		assert.true(message.includes(`is not a ark command.`));
 		assert.equal(process.exitCode, 2);
 	});

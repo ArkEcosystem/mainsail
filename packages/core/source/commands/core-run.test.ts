@@ -29,6 +29,5 @@ describe<{
 
 		spyBuildApplication.calledOnce();
 		spyBuildPeerFlags.calledOnce();
-		assert.equal(spyBuildApplication.getCallArgs(0)[0].flags.processType, "core");
 	});
 });

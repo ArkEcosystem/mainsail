@@ -103,7 +103,7 @@ export class Command extends Commands.Command {
 	public requiresNetwork = false;
 
 	/*eslint-disable */
-	private flagSettings: Flag[] = [
+	#flagSettings: Flag[] = [
 		{
 			name: "network",
 			description: "The name of the network.",
@@ -248,7 +248,7 @@ export class Command extends Commands.Command {
 	/*eslint-enable */
 
 	public configure(): void {
-		for (const flag of this.flagSettings) {
+		for (const flag of this.#flagSettings) {
 			const flagSchema: Joi.Schema = flag.schema;
 
 			if (flag.default !== undefined) {
@@ -291,11 +291,11 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = this.getFlags();
 
-		const allFlagsSet = !this.flagSettings
+		const allFlagsSet = !this.#flagSettings
 			.filter((flag) => flag.promptType)
 			.find((flag) => flags[flag.name] === undefined);
 
-		const defaults = this.flagSettings.reduce<any>((accumulator: any, flag: Flag) => {
+		const defaults = this.#flagSettings.reduce<any>((accumulator: any, flag: Flag) => {
 			accumulator[flag.name] = flag.default;
 
 			return accumulator;
@@ -307,11 +307,11 @@ export class Command extends Commands.Command {
 		};
 
 		if (flags.force || allFlagsSet) {
-			return this.generateNetwork(options as Options);
+			return this.#generateNetwork(options as Options);
 		}
 
 		const response = await prompts(
-			this.flagSettings
+			this.#flagSettings
 				.filter((flag) => flag.promptType) // Show prompt only for flags with defined promptType
 				.map(
 					(flag) =>
@@ -339,7 +339,7 @@ export class Command extends Commands.Command {
 			throw new Error("You'll need to confirm the input to continue.");
 		}
 
-		for (const flag of this.flagSettings.filter((flag) => flag.promptType)) {
+		for (const flag of this.#flagSettings.filter((flag) => flag.promptType)) {
 			if (flag.promptType === "text" && options[flag.name] !== "undefined") {
 				continue;
 			}
@@ -355,10 +355,10 @@ export class Command extends Commands.Command {
 			throw new Error(`Flag ${flag.name} is required.`);
 		}
 
-		await this.generateNetwork(options);
+		await this.#generateNetwork(options);
 	}
 
-	private async generateNetwork(flags: Options): Promise<void> {
+	async #generateNetwork(flags: Options): Promise<void> {
 		try {
 			this.app
 				.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
@@ -372,9 +372,9 @@ export class Command extends Commands.Command {
 
 			const coreConfigDestination = join(configPath, flags.network);
 
-			const validators: any[] = await this.generateCoreValidators(flags.validators, flags.pubKeyHash);
+			const validators: any[] = await this.#generateCoreValidators(flags.validators, flags.pubKeyHash);
 
-			const genesisWallet = await this.createWallet();
+			const genesisWallet = await this.#createWallet();
 
 			await this.components.taskList([
 				{
@@ -398,7 +398,7 @@ export class Command extends Commands.Command {
 				{
 					task: async () => {
 						// Milestones
-						const milestones = this.generateCryptoMilestones(flags);
+						const milestones = this.#generateCryptoMilestones(flags);
 
 						this.app
 							.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
@@ -411,14 +411,14 @@ export class Command extends Commands.Command {
 							});
 
 						// Genesis Block
-						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, validators, flags);
+						const genesisBlock = await this.#generateCryptoGenesisBlock(genesisWallet, validators, flags);
 
 						writeJSONSync(
 							resolve(coreConfigDestination, "crypto.json"),
 							{
 								genesisBlock,
 								milestones,
-								network: this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
+								network: this.#generateCryptoNetwork(genesisBlock.payloadHash, flags),
 							},
 							{
 								spaces: 4,
@@ -429,7 +429,7 @@ export class Command extends Commands.Command {
 				},
 				{
 					task: async () => {
-						writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), {
+						writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.#generatePeers(flags), {
 							spaces: 4,
 						});
 
@@ -439,9 +439,12 @@ export class Command extends Commands.Command {
 							{ spaces: 4 },
 						);
 
-						writeFileSync(resolve(coreConfigDestination, ".env"), this.generateEnvironmentVariables(flags));
+						writeFileSync(
+							resolve(coreConfigDestination, ".env"),
+							this.#generateEnvironmentVariables(flags),
+						);
 
-						writeJSONSync(resolve(coreConfigDestination, "app.json"), this.generateApp(flags), {
+						writeJSONSync(resolve(coreConfigDestination, "app.json"), this.#generateApp(flags), {
 							spaces: 4,
 						});
 					},
@@ -455,7 +458,7 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	private generateCryptoNetwork(nethash: string, options: Options) {
+	#generateCryptoNetwork(nethash: string, options: Options) {
 		return {
 			client: {
 				explorer: options.explorer,
@@ -471,7 +474,7 @@ export class Command extends Commands.Command {
 		};
 	}
 
-	private generateCryptoMilestones(options: Options) {
+	#generateCryptoMilestones(options: Options) {
 		return [
 			{
 				activeValidators: options.validators,
@@ -501,18 +504,18 @@ export class Command extends Commands.Command {
 		];
 	}
 
-	private async generateCryptoGenesisBlock(
+	async #generateCryptoGenesisBlock(
 		genesisWallet,
 		validators,
 		options: Options,
 	): Promise<BaseContracts.Crypto.IBlockData> {
-		const premineWallet: Wallet = await this.createWallet();
+		const premineWallet: Wallet = await this.#createWallet();
 
 		let transactions = [];
 
 		if (options.distribute) {
 			transactions = transactions.concat(
-				...(await this.createTransferTransactions(
+				...(await this.#createTransferTransactions(
 					premineWallet,
 					validators,
 					options.premine,
@@ -521,19 +524,24 @@ export class Command extends Commands.Command {
 			);
 		} else {
 			transactions = transactions.concat(
-				await this.createTransferTransaction(premineWallet, genesisWallet, options.premine, options.pubKeyHash),
+				await this.#createTransferTransaction(
+					premineWallet,
+					genesisWallet,
+					options.premine,
+					options.pubKeyHash,
+				),
 			);
 		}
 
 		transactions = transactions.concat(
-			...(await this.buildValidatorTransactions(validators, options.pubKeyHash)),
-			...(await this.buildVoteTransactions(validators, options.pubKeyHash)),
+			...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
+			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
 		);
 
-		return this.createGenesisBlock(premineWallet.keys, transactions, options);
+		return this.#createGenesisBlock(premineWallet.keys, transactions, options);
 	}
 
-	private generateEnvironmentVariables(options: Options): string {
+	#generateEnvironmentVariables(options: Options): string {
 		let result = "";
 
 		result += "CORE_LOG_LEVEL=info\n";
@@ -557,7 +565,7 @@ export class Command extends Commands.Command {
 		return result;
 	}
 
-	private generatePeers(options: Options): { list: { ip: string; port: number }[] } {
+	#generatePeers(options: Options): { list: { ip: string; port: number }[] } {
 		if (options.peers === "") {
 			return { list: [] };
 		}
@@ -577,15 +585,15 @@ export class Command extends Commands.Command {
 		return { list };
 	}
 
-	private generateApp(options: Options): any {
+	#generateApp(options: Options): any {
 		return readJSONSync(resolve(__dirname, "../../bin/config/testnet/app.json"));
 	}
 
-	private async generateCoreValidators(activeValidators: number, pubKeyHash: number): Promise<Wallet[]> {
+	async #generateCoreValidators(activeValidators: number, pubKeyHash: number): Promise<Wallet[]> {
 		const wallets: Wallet[] = [];
 
 		for (let index = 0; index < activeValidators; index++) {
-			const validatorWallet: Wallet = await this.createWallet();
+			const validatorWallet: Wallet = await this.#createWallet();
 			validatorWallet.username = `genesis_${index + 1}`;
 
 			wallets.push(validatorWallet);
@@ -594,7 +602,7 @@ export class Command extends Commands.Command {
 		return wallets;
 	}
 
-	private async createWallet(): Promise<Wallet> {
+	async #createWallet(): Promise<Wallet> {
 		const passphrase = generateMnemonic(256);
 
 		const keys: BaseContracts.Crypto.IKeyPair = await this.app
@@ -611,14 +619,8 @@ export class Command extends Commands.Command {
 		};
 	}
 
-	private async createTransferTransaction(
-		sender: Wallet,
-		recipient: Wallet,
-		amount: string,
-		pubKeyHash: number,
-		nonce = 1,
-	) {
-		return this.formatGenesisTransaction(
+	async #createTransferTransaction(sender: Wallet, recipient: Wallet, amount: string, pubKeyHash: number, nonce = 1) {
+		return this.#formatGenesisTransaction(
 			(
 				await this.app
 					.resolve(TransferBuilder)
@@ -633,28 +635,23 @@ export class Command extends Commands.Command {
 		);
 	}
 
-	private async createTransferTransactions(
-		sender: Wallet,
-		recipients: Wallet[],
-		totalPremine: string,
-		pubKeyHash: number,
-	) {
+	async #createTransferTransactions(sender: Wallet, recipients: Wallet[], totalPremine: string, pubKeyHash: number) {
 		const amount: string = BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
 
 		const result = [];
 
 		for (const [index, recipient] of recipients.entries()) {
-			result.push(await this.createTransferTransaction(sender, recipient, amount, pubKeyHash, index + 1));
+			result.push(await this.#createTransferTransaction(sender, recipient, amount, pubKeyHash, index + 1));
 		}
 
 		return result;
 	}
 
-	private async buildValidatorTransactions(senders: Wallet[], pubKeyHash: number) {
+	async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number) {
 		const result = [];
 
 		for (const [index, sender] of senders.entries()) {
-			result[index] = await this.formatGenesisTransaction(
+			result[index] = await this.#formatGenesisTransaction(
 				(
 					await this.app
 						.resolve(ValidatorRegistrationBuilder)
@@ -672,11 +669,11 @@ export class Command extends Commands.Command {
 		return result;
 	}
 
-	private async buildVoteTransactions(senders: Wallet[], pubKeyHash: number) {
+	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number) {
 		const result = [];
 
 		for (const [index, sender] of senders.entries()) {
-			result[index] = await this.formatGenesisTransaction(
+			result[index] = await this.#formatGenesisTransaction(
 				(
 					await this.app
 						.resolve(VoteBuilder)
@@ -694,7 +691,7 @@ export class Command extends Commands.Command {
 		return result;
 	}
 
-	private async formatGenesisTransaction(transaction, wallet: Wallet) {
+	async #formatGenesisTransaction(transaction, wallet: Wallet) {
 		Object.assign(transaction, {
 			fee: BigNumber.ZERO,
 			timestamp: 0,
@@ -709,7 +706,7 @@ export class Command extends Commands.Command {
 		return transaction;
 	}
 
-	private async createGenesisBlock(
+	async #createGenesisBlock(
 		keys: BaseContracts.Crypto.IKeyPair,
 		transactions,
 		options: Options,

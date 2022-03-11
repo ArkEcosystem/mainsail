@@ -21,7 +21,7 @@ export class Command extends Commands.Command {
 		this.actions.abortRunningProcess(`${this.getFlag("token")}-relay`);
 
 		if (this.getFlag("false")) {
-			return this.removeFiles();
+			return this.#removeFiles();
 		}
 
 		try {
@@ -30,14 +30,14 @@ export class Command extends Commands.Command {
 					"Clearing the transaction pool will remove all queued transactions from your node. Are you sure you want to clear?",
 				)
 			) {
-				this.removeFiles();
+				this.#removeFiles();
 			}
 		} catch (error) {
 			this.components.fatal(error.message);
 		}
 	}
 
-	private removeFiles() {
+	#removeFiles() {
 		removeSync(this.app.getCorePath("data", "transaction-pool"));
 	}
 }

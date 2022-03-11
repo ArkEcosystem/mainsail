@@ -1,8 +1,8 @@
-import { resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import Joi from "joi";
+import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -24,7 +24,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		if (this.hasFlag("network")) {
-			return this.performPublishment(this.getFlags());
+			return this.#performPublishment(this.getFlags());
 		}
 
 		const response = await this.components.prompt([
@@ -49,10 +49,10 @@ export class Command extends Commands.Command {
 			this.components.fatal("You'll need to confirm the network to continue.");
 		}
 
-		await this.performPublishment({ ...response, ...this.getFlags() });
+		await this.#performPublishment({ ...response, ...this.getFlags() });
 	}
 
-	private async performPublishment(flags: Contracts.AnyObject): Promise<void> {
+	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app
 			.rebind(Container.Identifiers.ApplicationPaths)
 			.toConstantValue(this.environment.getPaths(flags.token, flags.network));

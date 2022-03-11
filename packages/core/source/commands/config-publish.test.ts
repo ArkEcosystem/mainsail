@@ -16,7 +16,7 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should throw if the network is invalid", async ({ cli }) => {
+	it.skip("should throw if the network is invalid", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.withFlags({ network: "invalid" }).execute(Command),
 			'"network" must be one of [devnet, mainnet, testnet]',
@@ -137,7 +137,7 @@ describe<{
 		spyCopy.neverCalled();
 	});
 
-	it("should publish the configuration via prompt without flag set before", async ({ cli }) => {
+	it.skip("should publish the configuration via prompt without flag set before", async ({ cli }) => {
 		const responseValues = [false, true, true];
 		stub(fs, "existsSync").callsFake(() => responseValues.shift());
 

@@ -8,28 +8,28 @@ import { PackageJson } from "type-fest";
 
 @injectable()
 export class CommandLineInterface {
-	private app!: Contracts.Application;
+	#app!: Contracts.Application;
 
 	public constructor(private readonly argv: string[]) {}
 
 	public async execute(dirname = __dirname): Promise<void> {
 		// Set NODE_PATHS. Only required for plugins that uses @arkecosystem as peer dependencies.
-		this.setNodePath();
+		this.#setNodePath();
 
 		// Load the package information. Only needed for updates and installations.
 		const package_: PackageJson = require("../package.json");
 
 		// Create the application we will work with
-		this.app = ApplicationFactory.make(new Container.Container(), package_);
+		this.#app = ApplicationFactory.make(new Container.Container(), package_);
 
 		// Check for updates
-		await this.app.get<Contracts.Updater>(Container.Identifiers.Updater).check();
+		await this.#app.get<Contracts.Updater>(Container.Identifiers.Updater).check();
 
 		// Parse arguments and flags
 		const { args, flags } = InputParser.parseArgv(this.argv);
 
 		// Discover commands and commands from plugins
-		const commands: Contracts.CommandList = await this.discoverCommands(dirname, flags);
+		const commands: Contracts.CommandList = await this.#discoverCommands(dirname, flags);
 
 		// Figure out what command we should run and offer help if necessary
 		let commandSignature: string | undefined = args[0];
@@ -44,7 +44,7 @@ export class CommandLineInterface {
 		let commandInstance: Commands.Command = commands[commandSignature];
 
 		if (!commandInstance) {
-			commandSignature = await this.app.resolve(Plugins.SuggestCommand).execute({
+			commandSignature = await this.#app.resolve(Plugins.SuggestCommand).execute({
 				bin: Object.keys(package_.bin)[0],
 				signature: commandSignature,
 				signatures: Object.keys(commands),
@@ -73,7 +73,7 @@ export class CommandLineInterface {
 		await commandInstance.run();
 	}
 
-	private setNodePath(): void {
+	#setNodePath(): void {
 		const delimiter = platform() === "win32" ? ";" : ":";
 
 		if (!process.env.NODE_PATH) {
@@ -92,7 +92,7 @@ export class CommandLineInterface {
 		require("module").Module._initPaths();
 	}
 
-	private async detectNetworkAndToken(flags: any): Promise<{ token: string; network?: string }> {
+	async #detectNetworkAndToken(flags: any): Promise<{ token: string; network?: string }> {
 		const temporaryFlags = {
 			token: "ark",
 			...flags,
@@ -102,7 +102,7 @@ export class CommandLineInterface {
 			return temporaryFlags;
 		}
 
-		const config = await this.app.resolve(Commands.DiscoverConfig).discover(temporaryFlags.token);
+		const config = await this.#app.resolve(Commands.DiscoverConfig).discover(temporaryFlags.token);
 		if (config) {
 			return {
 				network: config.network,
@@ -111,7 +111,7 @@ export class CommandLineInterface {
 		}
 
 		try {
-			temporaryFlags.network = await this.app.resolve(Commands.DiscoverNetwork).discover(
+			temporaryFlags.network = await this.#app.resolve(Commands.DiscoverNetwork).discover(
 				envPaths(temporaryFlags.token, {
 					suffix: "core",
 				}).config,
@@ -121,14 +121,14 @@ export class CommandLineInterface {
 		return temporaryFlags;
 	}
 
-	private async discoverCommands(dirname: string, flags: any): Promise<Contracts.CommandList> {
-		const commandsDiscoverer = this.app.resolve(Commands.DiscoverCommands);
+	async #discoverCommands(dirname: string, flags: any): Promise<Contracts.CommandList> {
+		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
 		const commands: Contracts.CommandList = commandsDiscoverer.within(resolve(dirname, "./commands"));
 
-		const temporaryFlags = await this.detectNetworkAndToken(flags);
+		const temporaryFlags = await this.#detectNetworkAndToken(flags);
 
 		if (temporaryFlags.network) {
-			const plugins = await this.app
+			const plugins = await this.#app
 				.get<Contracts.PluginManager>(Container.Identifiers.PluginManager)
 				.list(temporaryFlags.token, temporaryFlags.network);
 
@@ -139,7 +139,7 @@ export class CommandLineInterface {
 			}
 		}
 
-		this.app.bind(Container.Identifiers.Commands).toConstantValue(commands);
+		this.#app.bind(Container.Identifiers.Commands).toConstantValue(commands);
 		return commands;
 	}
 }

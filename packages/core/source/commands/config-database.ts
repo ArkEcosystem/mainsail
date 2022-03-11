@@ -11,7 +11,7 @@ export class Command extends Commands.Command {
 
 	public description = "Update the Database configuration.";
 
-	private readonly validFlags: string[] = ["host", "port", "database", "username", "password"];
+	readonly #validFlags: string[] = ["host", "port", "database", "username", "password"];
 
 	public configure(): void {
 		this.definition
@@ -27,8 +27,8 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const environmentFile = this.app.getCorePath("config", ".env");
 
-		if (this.validFlags.some((flag: string) => this.hasFlag(flag))) {
-			this.environment.updateVariables(environmentFile, this.confirm(this.getFlags()));
+		if (this.#validFlags.some((flag: string) => this.hasFlag(flag))) {
+			this.environment.updateVariables(environmentFile, this.#confirm(this.getFlags()));
 
 			return;
 		}
@@ -78,13 +78,13 @@ export class Command extends Commands.Command {
 			this.components.fatal("You'll need to confirm the input to continue.");
 		}
 
-		this.environment.updateVariables(environmentFile, this.confirm(response));
+		this.environment.updateVariables(environmentFile, this.#confirm(response));
 	}
 
-	private confirm(flags: Contracts.AnyObject): Contracts.AnyObject {
+	#confirm(flags: Contracts.AnyObject): Contracts.AnyObject {
 		const variables: Contracts.AnyObject = {};
 
-		for (const option of this.validFlags) {
+		for (const option of this.#validFlags) {
 			if (flags[option] !== undefined) {
 				variables[`CORE_DB_${option.toUpperCase()}`] = flags[option];
 			}
