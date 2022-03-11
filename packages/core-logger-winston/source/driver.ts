@@ -24,35 +24,35 @@ export class Logger implements Contracts.Kernel.Logger {
 	}
 
 	public emergency(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public alert(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public critical(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public error(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public warning(message: any): void {
-		this.log("warn", message);
+		this.#log("warn", message);
 	}
 
 	public notice(message: any): void {
-		this.log("info", message);
+		this.#log("info", message);
 	}
 
 	public info(message: any): void {
-		this.log("info", message);
+		this.#log("info", message);
 	}
 
 	public debug(message: any): void {
-		this.log("debug", message);
+		this.#log("debug", message);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
@@ -63,7 +63,7 @@ export class Logger implements Contracts.Kernel.Logger {
 		//
 	}
 
-	private log(level: string, message: any): void {
+	#log(level: string, message: any): void {
 		if (Utils.isEmpty(message)) {
 			return;
 		}
