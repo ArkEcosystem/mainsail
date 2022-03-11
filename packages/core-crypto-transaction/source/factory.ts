@@ -34,27 +34,6 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 		return this.fromSerialized(buff.toString("hex"), strict, options);
 	}
 
-	/**
-	 * Deserializes a transaction from `buffer` with the given `id`. It is faster
-	 * than `fromBytes` at the cost of vital safety checks (validation, verification and id calculation).
-	 *
-	 * NOTE: Only use this internally when it is safe to assume the buffer has already been
-	 * verified.
-	 */
-	public async fromBytesUnsafe(buff: Buffer, id?: string): Promise<Contracts.Crypto.ITransaction> {
-		try {
-			const options: Contracts.Crypto.IDeserializeOptions | Contracts.Crypto.ISerializeOptions = {
-				acceptLegacyVersion: true,
-			};
-			const transaction: Contracts.Crypto.ITransaction = await this.deserializer.deserialize(buff, options);
-			transaction.data.id = id || (await this.utils.getId(transaction.data, options));
-
-			return transaction;
-		} catch (error) {
-			throw new Exceptions.InvalidTransactionBytesError(error.message);
-		}
-	}
-
 	public async fromJson(json: Contracts.Crypto.ITransactionJson): Promise<Contracts.Crypto.ITransaction> {
 		const data: Contracts.Crypto.ITransactionData = { ...json } as unknown as Contracts.Crypto.ITransactionData;
 		data.amount = BigNumber.make(data.amount);

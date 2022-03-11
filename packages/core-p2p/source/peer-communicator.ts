@@ -229,9 +229,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			}
 
 			for (let index = 0; index < block.transactions.length; index++) {
-				const { data } = await this.transactionFactory.fromBytesUnsafe(
-					Buffer.from(block.transactions[index], "hex"),
-				);
+				const { data } = await this.transactionFactory.fromBytes(Buffer.from(block.transactions[index], "hex"));
 				data.blockId = block.id;
 
 				block.transactions[index] = data;

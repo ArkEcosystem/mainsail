@@ -242,7 +242,7 @@ export class RoundState {
 
 		for (let index = 0; index < blocks.length; index++) {
 			// @ts-ignore
-			blocks[index] = await this.blockFactory.fromData(blocks[index], { deserializeTransactionsUnchecked: true });
+			blocks[index] = await this.blockFactory.fromData(blocks[index]);
 		}
 
 		// @ts-ignore

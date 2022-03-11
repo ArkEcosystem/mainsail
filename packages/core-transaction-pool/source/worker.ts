@@ -39,6 +39,6 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			transactionData instanceof Buffer ? transactionData.toString("hex") : transactionData,
 		);
 
-		return this.transactionFactory.fromBytesUnsafe(Buffer.from(serialized, "hex"), id);
+		return this.transactionFactory.fromBytes(Buffer.from(serialized, "hex"), id);
 	}
 }

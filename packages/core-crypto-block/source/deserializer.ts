@@ -20,7 +20,6 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 	public async deserialize(
 		serialized: Buffer,
 		headerOnly = false,
-		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): Promise<{ data: Contracts.Crypto.IBlockData; transactions: Contracts.Crypto.ITransaction[] }> {
 		const block = {} as Contracts.Crypto.IBlockData;
 		let transactions: Contracts.Crypto.ITransaction[] = [];
@@ -72,7 +71,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		headerOnly = headerOnly || buffer.getRemainderLength() === 0;
 
 		if (!headerOnly) {
-			transactions = await this.deserializeTransactions(block, buffer, options.deserializeTransactionsUnchecked);
+			transactions = await this.deserializeTransactions(block, buffer);
 		}
 
 		block.id = await this.idFactory.make(block);
@@ -83,7 +82,6 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 	private async deserializeTransactions(
 		block: Contracts.Crypto.IBlockData,
 		buf: ByteBuffer,
-		deserializeTransactionsUnchecked = false,
 	): Promise<Contracts.Crypto.ITransaction[]> {
 		await this.serializer.deserialize<Contracts.Crypto.IBlockData>(buf, block, {
 			schema: {
@@ -102,9 +100,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		const transactions: Contracts.Crypto.ITransaction[] = [];
 
 		for (let index = 0; index < block.transactions.length; index++) {
-			const transaction = deserializeTransactionsUnchecked
-				? await this.transactionFactory.fromBytesUnsafe(block.transactions[index] as any)
-				: await this.transactionFactory.fromBytes(block.transactions[index] as any);
+			const transaction = await this.transactionFactory.fromBytes(block.transactions[index] as any);
 
 			transactions.push(transaction);
 

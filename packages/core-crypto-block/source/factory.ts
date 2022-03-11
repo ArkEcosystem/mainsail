@@ -67,16 +67,13 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		return this.fromData(data);
 	}
 
-	public async fromData(
-		data: Contracts.Crypto.IBlockData,
-		options: { deserializeTransactionsUnchecked?: boolean } = {},
-	): Promise<Contracts.Crypto.IBlock | undefined> {
+	public async fromData(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock | undefined> {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
 
 		return sealBlock({
-			...(await this.deserializer.deserialize(serialized, false, options)),
+			...(await this.deserializer.deserialize(serialized, false)),
 			serialized: serialized.toString("hex"),
 		});
 	}

@@ -167,8 +167,6 @@ export interface ITransactionFactory {
 
 	fromBytes(buff: Buffer, strict?: boolean, options?: IDeserializeOptions): Promise<ITransaction>;
 
-	fromBytesUnsafe(buff: Buffer, id?: string): Promise<ITransaction>;
-
 	fromJson(json: ITransactionJson): Promise<ITransaction>;
 
 	fromData(data: ITransactionData, strict?: boolean, options?: IDeserializeOptions): Promise<ITransaction>;
