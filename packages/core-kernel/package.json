@@ -13,7 +13,8 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
@@ -45,7 +46,9 @@
 		"@types/functional-red-black-tree": "1.0.1",
 		"@types/got": "9.6.12",
 		"@types/log-process-errors": "4.1.0",
-		"@types/semver": "6.2.3"
+		"@types/semver": "6.2.3",
+		"sinon": "^13.0.1",
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

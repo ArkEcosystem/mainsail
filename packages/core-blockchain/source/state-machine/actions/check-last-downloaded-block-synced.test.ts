@@ -161,7 +161,7 @@ describe<{
 		setP2pUpdateCounterSpy.calledWith(1);
 	});
 
-	it.only("should dispatch SYNCED when stateStore.getLastDownloadedBlock && blockchain.isSynced()", async (context) => {
+	it("should dispatch SYNCED when stateStore.getLastDownloadedBlock && blockchain.isSynced()", async (context) => {
 		const checkLastDownloadedBlockSynced =
 			context.container.resolve<CheckLastDownloadedBlockSynced>(CheckLastDownloadedBlockSynced);
 

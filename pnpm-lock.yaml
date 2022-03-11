@@ -390,12 +390,6 @@ importers:
       reflect-metadata: 0.1.13
       type-fest: 0.21.3
 
-  packages/core-contracts/__tests__/__stubs__/stub-plugin:
-    specifiers: {}
-
-  packages/core-contracts/__tests__/__stubs__/stub-plugin-with-defaults:
-    specifiers: {}
-
   packages/core-crypto-address-base58:
     specifiers:
       '@arkecosystem/core-container': workspace:*
@@ -1250,7 +1244,9 @@ importers:
       nsfw: 2.1.2
       reflect-metadata: 0.1.13
       semver: 6.3.0
+      sinon: ^13.0.1
       type-fest: 0.21.3
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -1281,11 +1277,13 @@ importers:
       '@types/got': 9.6.12
       '@types/log-process-errors': 4.1.0
       '@types/semver': 6.2.3
+      sinon: 13.0.1
+      uvu: 0.5.3
 
-  packages/core-kernel/__tests__/__stubs__/stub-plugin:
+  packages/core-kernel/test/stubs/stub-plugin:
     specifiers: {}
 
-  packages/core-kernel/__tests__/__stubs__/stub-plugin-with-defaults:
+  packages/core-kernel/test/stubs/stub-plugin-with-defaults:
     specifiers: {}
 
   packages/core-libp2p:
