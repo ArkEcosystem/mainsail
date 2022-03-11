@@ -12,9 +12,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	private readonly verifier: Contracts.Crypto.ITransactionVerifier;
-
 	public static type: number | undefined = undefined;
 	public static typeGroup: number | undefined = undefined;
 	public static version = 1;
@@ -29,22 +26,6 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 
 	public static getSchema(): TransactionSchema {
 		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
-	}
-
-	public verifySchema(): Contracts.Crypto.ISchemaValidationResult {
-		return this.verifier.verifySchema(this.data);
-	}
-
-	public toJson(): Contracts.Crypto.ITransactionJson {
-		const data: Contracts.Crypto.ITransactionJson = JSON.parse(JSON.stringify(this.data));
-
-		if (data.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core) {
-			delete data.typeGroup;
-		}
-
-		delete data.timestamp;
-
-		return data;
 	}
 
 	public hasVendorField(): boolean {

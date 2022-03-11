@@ -16,10 +16,6 @@ export interface ITransaction {
 	serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined>;
 	deserialize(buf: ByteBuffer): Promise<void>;
 
-	verifySchema(strict?: boolean): ISchemaValidationResult;
-
-	toJson(): ITransactionJson;
-
 	hasVendorField(): boolean;
 }
 
