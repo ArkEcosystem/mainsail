@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas } from "@arkecosystem/core-crypto-validation";
 
 import { Transaction } from "./types";
@@ -15,7 +15,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
-	private readonly transactionTypes: Map<
+	readonly #transactionTypes: Map<
 		Contracts.Transactions.InternalTransactionType,
 		Map<number, TransactionConstructor>
 	> = new Map();
@@ -24,7 +24,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 
 	@postConstruct()
 	public postConstruct() {
-		this.transactionTypeFactory.initialize(this.transactionTypes);
+		this.transactionTypeFactory.initialize(this.#transactionTypes);
 	}
 
 	public registerTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
@@ -37,7 +37,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 
-		for (const registeredConstructors of this.transactionTypes.values()) {
+		for (const registeredConstructors of this.#transactionTypes.values()) {
 			if (registeredConstructors.size > 0) {
 				const first = [...registeredConstructors.values()][0];
 				if (
@@ -55,13 +55,13 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			}
 		}
 
-		if (!this.transactionTypes.has(internalType)) {
-			this.transactionTypes.set(internalType, new Map());
-		} else if (this.transactionTypes.get(internalType)?.has(constructor.version)) {
+		if (!this.#transactionTypes.has(internalType)) {
+			this.#transactionTypes.set(internalType, new Map());
+		} else if (this.#transactionTypes.get(internalType)?.has(constructor.version)) {
 			throw new Exceptions.TransactionVersionAlreadyRegisteredError(constructor.name, constructor.version);
 		}
 
-		this.transactionTypes.get(internalType)!.set(constructor.version, constructor);
+		this.#transactionTypes.get(internalType)!.set(constructor.version, constructor);
 		this.#updateSchemas(constructor.getSchema());
 	}
 
@@ -74,13 +74,13 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
-		if (!this.transactionTypes.has(internalType)) {
+		if (!this.#transactionTypes.has(internalType)) {
 			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
 
 		this.#updateSchemas(constructor.getSchema(), true);
 
-		const constructors = this.transactionTypes.get(internalType)!;
+		const constructors = this.#transactionTypes.get(internalType)!;
 		if (!constructors.has(version)) {
 			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
@@ -88,7 +88,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		constructors.delete(version);
 
 		if (constructors.size === 0) {
-			this.transactionTypes.delete(internalType);
+			this.#transactionTypes.delete(internalType);
 		}
 	}
 

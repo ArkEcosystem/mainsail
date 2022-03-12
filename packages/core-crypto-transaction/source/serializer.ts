@@ -31,8 +31,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 			this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192,
 		);
 
-		this.serializeCommon(transaction.data, buff);
-		this.serializeVendorField(transaction, buff);
+		this.#serializeCommon(transaction.data, buff);
+		this.#serializeVendorField(transaction, buff);
 
 		const serialized: ByteBuffer | undefined = await transaction.serialize(options);
 
@@ -42,7 +42,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 
 		buff.writeBytes(serialized.getResult());
 
-		this.serializeSignatures(transaction.data, buff, options);
+		this.#serializeSignatures(transaction.data, buff, options);
 
 		const bufferBuffer = buff.getResult();
 		transaction.serialized = bufferBuffer;
@@ -50,7 +50,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		return bufferBuffer;
 	}
 
-	private serializeCommon(transaction: Contracts.Crypto.ITransactionData, buff: ByteBuffer): void {
+	#serializeCommon(transaction: Contracts.Crypto.ITransactionData, buff: ByteBuffer): void {
 		transaction.version = transaction.version || 0x01;
 		if (transaction.typeGroup === undefined) {
 			transaction.typeGroup = Contracts.Crypto.TransactionTypeGroup.Core;
@@ -73,7 +73,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		buff.writeUint64(transaction.fee.toBigInt());
 	}
 
-	private serializeVendorField(transaction: Contracts.Crypto.ITransaction, buff: ByteBuffer): void {
+	#serializeVendorField(transaction: Contracts.Crypto.ITransaction, buff: ByteBuffer): void {
 		const { data }: Contracts.Crypto.ITransaction = transaction;
 
 		if (transaction.hasVendorField() && data.vendorField) {
@@ -85,7 +85,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		}
 	}
 
-	private serializeSignatures(
+	#serializeSignatures(
 		transaction: Contracts.Crypto.ITransactionData,
 		buff: ByteBuffer,
 		options: Contracts.Crypto.ISerializeOptions = {},

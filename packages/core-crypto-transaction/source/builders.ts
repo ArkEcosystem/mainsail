@@ -104,19 +104,19 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public async sign(passphrase: string): Promise<TBuilder> {
-		return this.signWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
+		return this.#signWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
 	public async signWithWif(wif: string): Promise<TBuilder> {
-		return this.signWithKeyPair(await this.keyPairFactory.fromWIF(wif));
+		return this.#signWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
 	public async multiSign(passphrase: string, index: number): Promise<TBuilder> {
-		return this.multiSignWithKeyPair(index, await this.keyPairFactory.fromMnemonic(passphrase));
+		return this.#multiSignWithKeyPair(index, await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
 	public async multiSignWithWif(index: number, wif: string): Promise<TBuilder> {
-		return this.multiSignWithKeyPair(index, await this.keyPairFactory.fromWIF(wif));
+		return this.#multiSignWithKeyPair(index, await this.keyPairFactory.fromWIF(wif));
 	}
 
 	public async verify(): Promise<boolean> {
@@ -147,29 +147,29 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return struct;
 	}
 
-	private async signWithKeyPair(keys: Contracts.Crypto.IKeyPair): Promise<TBuilder> {
+	async #signWithKeyPair(keys: Contracts.Crypto.IKeyPair): Promise<TBuilder> {
 		this.data.senderPublicKey = keys.publicKey;
 
 		if (this.signWithSenderAsRecipient) {
 			this.data.recipientId = await this.addressFactory.fromPublicKey(keys.publicKey);
 		}
 
-		this.data.signature = await this.signer.sign(this.getSigningObject(), keys);
+		this.data.signature = await this.signer.sign(this.#getSigningObject(), keys);
 
 		return this.instance();
 	}
 
-	private async multiSignWithKeyPair(index: number, keys: Contracts.Crypto.IKeyPair): Promise<TBuilder> {
+	async #multiSignWithKeyPair(index: number, keys: Contracts.Crypto.IKeyPair): Promise<TBuilder> {
 		if (!this.data.signatures) {
 			this.data.signatures = [];
 		}
 
-		await this.signer.multiSign(this.getSigningObject(), keys, index);
+		await this.signer.multiSign(this.#getSigningObject(), keys, index);
 
 		return this.instance();
 	}
 
-	private getSigningObject(): Contracts.Crypto.ITransactionData {
+	#getSigningObject(): Contracts.Crypto.ITransactionData {
 		const data: Contracts.Crypto.ITransactionData = {
 			...this.data,
 		};

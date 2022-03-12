@@ -10,12 +10,12 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	private transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;
+	#transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;
 
 	public initialize(
 		transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>,
 	) {
-		this.transactionTypes = transactionTypes;
+		this.#transactionTypes = transactionTypes;
 	}
 
 	public create(data: Contracts.Crypto.ITransactionData): Contracts.Crypto.ITransaction {
@@ -36,15 +36,15 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 
-		if (!this.transactionTypes.has(internalType)) {
+		if (!this.#transactionTypes.has(internalType)) {
 			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
 
 		// Either there is a match for the provided version or use the first available constructor as a fallback
-		const constructor: Contracts.Crypto.TransactionConstructor | undefined = this.transactionTypes
+		const constructor: Contracts.Crypto.TransactionConstructor | undefined = this.#transactionTypes
 			.get(internalType)
 			?.get(version || 1);
 
-		return constructor ?? [...this.transactionTypes.get(internalType)!.values()][0];
+		return constructor ?? [...this.#transactionTypes.get(internalType)!.values()][0];
 	}
 }

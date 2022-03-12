@@ -21,16 +21,16 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 	public async deserialize(serialized: string | Buffer): Promise<Contracts.Crypto.ITransaction> {
 		const data = {} as Contracts.Crypto.ITransactionData;
 
-		const buff: ByteBuffer = this.getByteBuffer(serialized);
+		const buff: ByteBuffer = this.#getByteBuffer(serialized);
 		this.deserializeCommon(data, buff);
 
 		const instance: Contracts.Crypto.ITransaction = this.transactionTypeFactory.create(data);
-		this.deserializeVendorField(instance, buff);
+		this.#deserializeVendorField(instance, buff);
 
 		// Deserialize type specific parts
 		await instance.deserialize(buff);
 
-		this.deserializeSignatures(data, buff);
+		this.#deserializeSignatures(data, buff);
 
 		instance.serialized = buff.getResult();
 
@@ -49,7 +49,7 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 		transaction.amount = BigNumber.ZERO;
 	}
 
-	private deserializeVendorField(transaction: Contracts.Crypto.ITransaction, buf: ByteBuffer): void {
+	#deserializeVendorField(transaction: Contracts.Crypto.ITransaction, buf: ByteBuffer): void {
 		const vendorFieldLength: number = buf.readUint8();
 
 		if (vendorFieldLength > 0) {
@@ -62,7 +62,7 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 		}
 	}
 
-	private deserializeSignatures(transaction: Contracts.Crypto.ITransactionData, buf: ByteBuffer): void {
+	#deserializeSignatures(transaction: Contracts.Crypto.ITransactionData, buf: ByteBuffer): void {
 		// @TODO: take into account what the length of signatures is based on plugins
 		const canReadNonMultiSignature = () =>
 			buf.getRemainderLength() && (buf.getRemainderLength() % 64 === 0 || buf.getRemainderLength() % 65 !== 0);
@@ -96,7 +96,7 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 		// }
 	}
 
-	private getByteBuffer(serialized: Buffer | string): ByteBuffer {
+	#getByteBuffer(serialized: Buffer | string): ByteBuffer {
 		if (!(serialized instanceof Buffer)) {
 			serialized = Buffer.from(serialized, "hex");
 		}
