@@ -21,144 +21,144 @@ export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	private blockchain: any = {};
-	private genesisBlock?: Contracts.Crypto.IBlock;
-	private lastDownloadedBlock?: Contracts.Crypto.IBlockData;
-	private lastStoredBlockHeight = 1;
-	private blockPing?: Contracts.State.BlockPing;
-	private started = false;
-	private forkedBlock?: Contracts.Crypto.IBlock;
-	private wakeUpTimeout?: NodeJS.Timeout;
-	private noBlockCounter = 0;
-	private p2pUpdateCounter = 0;
-	private numberOfBlocksToRollback = 0;
-	private networkStart = false;
-	private restoredDatabaseIntegrity = false;
+	#blockchain: any = {};
+	#genesisBlock?: Contracts.Crypto.IBlock;
+	#lastDownloadedBlock?: Contracts.Crypto.IBlockData;
+	#lastStoredBlockHeight = 1;
+	#blockPing?: Contracts.State.BlockPing;
+	#started = false;
+	#forkedBlock?: Contracts.Crypto.IBlock;
+	#wakeUpTimeout?: NodeJS.Timeout;
+	#noBlockCounter = 0;
+	#p2pUpdateCounter = 0;
+	#numberOfBlocksToRollback = 0;
+	#networkStart = false;
+	#restoredDatabaseIntegrity = false;
 
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
-	private lastBlocks: OrderedMap<number, Contracts.Crypto.IBlock> = OrderedMap<number, Contracts.Crypto.IBlock>();
+	#lastBlocks: OrderedMap<number, Contracts.Crypto.IBlock> = OrderedMap<number, Contracts.Crypto.IBlock>();
 	// Stores the last n incoming transaction ids. The amount of transaction ids
 	// can be configured with the option `state.maxLastTransactionIds`.
-	private cachedTransactionIds: OrderedSet<string> = OrderedSet();
+	#cachedTransactionIds: OrderedSet<string> = OrderedSet();
 
 	public getBlockchain(): any {
-		return this.blockchain;
+		return this.#blockchain;
 	}
 
 	public setBlockchain(blockchain: any): void {
-		this.blockchain = blockchain;
+		this.#blockchain = blockchain;
 	}
 
 	public getGenesisBlock(): Contracts.Crypto.IBlock {
-		Utils.assert.defined<Contracts.Crypto.IBlock>(this.genesisBlock);
+		Utils.assert.defined<Contracts.Crypto.IBlock>(this.#genesisBlock);
 
-		return this.genesisBlock;
+		return this.#genesisBlock;
 	}
 
 	public setGenesisBlock(block: Contracts.Crypto.IBlock): void {
-		this.genesisBlock = block;
+		this.#genesisBlock = block;
 	}
 
 	public getLastDownloadedBlock(): Contracts.Crypto.IBlockData | undefined {
-		return this.lastDownloadedBlock;
+		return this.#lastDownloadedBlock;
 	}
 
 	public setLastDownloadedBlock(block: Contracts.Crypto.IBlockData): void {
-		this.lastDownloadedBlock = block;
+		this.#lastDownloadedBlock = block;
 	}
 
 	public getLastStoredBlockHeight(): number {
-		return this.lastStoredBlockHeight;
+		return this.#lastStoredBlockHeight;
 	}
 
 	public setLastStoredBlockHeight(height: number): void {
-		this.lastStoredBlockHeight = height;
+		this.#lastStoredBlockHeight = height;
 	}
 
 	public getBlockPing(): Contracts.State.BlockPing | undefined {
-		return this.blockPing;
+		return this.#blockPing;
 	}
 
 	public isStarted(): boolean {
-		return this.started;
+		return this.#started;
 	}
 
 	public setStarted(started: boolean): void {
-		this.started = started;
+		this.#started = started;
 	}
 
 	public getForkedBlock(): Contracts.Crypto.IBlock | undefined {
-		return this.forkedBlock;
+		return this.#forkedBlock;
 	}
 
 	public setForkedBlock(block: Contracts.Crypto.IBlock): void {
-		this.forkedBlock = block;
+		this.#forkedBlock = block;
 	}
 
 	public clearForkedBlock(): void {
-		this.forkedBlock = undefined;
+		this.#forkedBlock = undefined;
 	}
 
 	public getNoBlockCounter(): number {
-		return this.noBlockCounter;
+		return this.#noBlockCounter;
 	}
 
 	public setNoBlockCounter(noBlockCounter: number): void {
-		this.noBlockCounter = noBlockCounter;
+		this.#noBlockCounter = noBlockCounter;
 	}
 
 	public getP2pUpdateCounter(): number {
-		return this.p2pUpdateCounter;
+		return this.#p2pUpdateCounter;
 	}
 
 	public setP2pUpdateCounter(p2pUpdateCounter: number): void {
-		this.p2pUpdateCounter = p2pUpdateCounter;
+		this.#p2pUpdateCounter = p2pUpdateCounter;
 	}
 
 	public getNumberOfBlocksToRollback(): number {
-		return this.numberOfBlocksToRollback;
+		return this.#numberOfBlocksToRollback;
 	}
 
 	public setNumberOfBlocksToRollback(numberOfBlocksToRollback: number): void {
-		this.numberOfBlocksToRollback = numberOfBlocksToRollback;
+		this.#numberOfBlocksToRollback = numberOfBlocksToRollback;
 	}
 
 	public getNetworkStart(): boolean {
-		return this.networkStart;
+		return this.#networkStart;
 	}
 
 	public setNetworkStart(networkStart: boolean): void {
-		this.networkStart = networkStart;
+		this.#networkStart = networkStart;
 	}
 
 	public getRestoredDatabaseIntegrity(): boolean {
-		return this.restoredDatabaseIntegrity;
+		return this.#restoredDatabaseIntegrity;
 	}
 
 	public setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void {
-		this.restoredDatabaseIntegrity = restoredDatabaseIntegrity;
+		this.#restoredDatabaseIntegrity = restoredDatabaseIntegrity;
 	}
 
 	public reset(blockchainMachine): void {
-		this.blockchain = blockchainMachine.initialState;
+		this.#blockchain = blockchainMachine.initialState;
 	}
 
 	public isWakeUpTimeoutSet(): boolean {
-		return !!this.wakeUpTimeout;
+		return !!this.#wakeUpTimeout;
 	}
 
 	public setWakeUpTimeout(callback: Function, timeout: number): void {
-		this.wakeUpTimeout = setTimeout(() => {
+		this.#wakeUpTimeout = setTimeout(() => {
 			this.clearWakeUpTimeout();
 			callback();
 		}, timeout);
 	}
 
 	public clearWakeUpTimeout(): void {
-		if (this.wakeUpTimeout) {
-			clearTimeout(this.wakeUpTimeout);
-			this.wakeUpTimeout = undefined;
+		if (this.#wakeUpTimeout) {
+			clearTimeout(this.#wakeUpTimeout);
+			this.#wakeUpTimeout = undefined;
 		}
 	}
 
@@ -171,7 +171,7 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public getLastBlock(): Contracts.Crypto.IBlock {
-		const lastBlock: Contracts.Crypto.IBlock | undefined = this.lastBlocks.last();
+		const lastBlock: Contracts.Crypto.IBlock | undefined = this.#lastBlocks.last();
 
 		Utils.assert.defined<Contracts.Crypto.IBlock>(lastBlock);
 
@@ -181,14 +181,14 @@ export class StateStore implements Contracts.State.StateStore {
 	public setLastBlock(block: Contracts.Crypto.IBlock): void {
 		// Only keep blocks which are below the new block height (i.e. rollback)
 		if (
-			this.lastBlocks.last() &&
-			this.lastBlocks.last<Contracts.Crypto.IBlock>().data.height !== block.data.height - 1
+			this.#lastBlocks.last() &&
+			this.#lastBlocks.last<Contracts.Crypto.IBlock>().data.height !== block.data.height - 1
 		) {
-			assert(block.data.height - 1 <= this.lastBlocks.last<Contracts.Crypto.IBlock>().data.height);
-			this.lastBlocks = this.lastBlocks.filter((b) => b.data.height < block.data.height);
+			assert(block.data.height - 1 <= this.#lastBlocks.last<Contracts.Crypto.IBlock>().data.height);
+			this.#lastBlocks = this.#lastBlocks.filter((b) => b.data.height < block.data.height);
 		}
 
-		this.lastBlocks = this.lastBlocks.set(block.data.height, block);
+		this.#lastBlocks = this.#lastBlocks.set(block.data.height, block);
 
 		this.configuration.setHeight(block.data.height);
 
@@ -201,24 +201,24 @@ export class StateStore implements Contracts.State.StateStore {
 		}
 
 		// Delete oldest block if size exceeds the maximum
-		if (this.lastBlocks.size > this.getMaxLastBlocks()) {
-			this.lastBlocks = this.lastBlocks.delete(this.lastBlocks.first<Contracts.Crypto.IBlock>().data.height);
+		if (this.#lastBlocks.size > this.getMaxLastBlocks()) {
+			this.#lastBlocks = this.#lastBlocks.delete(this.#lastBlocks.first<Contracts.Crypto.IBlock>().data.height);
 		}
 
-		this.noBlockCounter = 0;
-		this.p2pUpdateCounter = 0;
+		this.#noBlockCounter = 0;
+		this.#p2pUpdateCounter = 0;
 	}
 
 	public getLastBlocks(): Contracts.Crypto.IBlock[] {
-		return this.lastBlocks.valueSeq().reverse().toArray();
+		return this.#lastBlocks.valueSeq().reverse().toArray();
 	}
 
 	public getLastBlocksData(headersOnly?: boolean): Seq<number, Contracts.Crypto.IBlockData> {
-		return this.mapToBlockData(this.lastBlocks.valueSeq().reverse(), headersOnly);
+		return this.#mapToBlockData(this.#lastBlocks.valueSeq().reverse(), headersOnly);
 	}
 
 	public getLastBlockIds(): string[] {
-		return this.lastBlocks
+		return this.#lastBlocks
 			.valueSeq()
 			.reverse()
 			.map((b) => {
@@ -234,11 +234,11 @@ export class StateStore implements Contracts.State.StateStore {
 
 		Utils.assert.defined<number>(tail);
 
-		const blocks = this.lastBlocks
+		const blocks = this.#lastBlocks
 			.valueSeq()
 			.filter((block) => block.data.height >= start && block.data.height <= tail);
 
-		return this.mapToBlockData(blocks, headersOnly).toArray() as Contracts.Crypto.IBlockData[];
+		return this.#mapToBlockData(blocks, headersOnly).toArray() as Contracts.Crypto.IBlockData[];
 	}
 
 	public getCommonBlocks(ids: string[]): Contracts.Crypto.IBlockData[] {
@@ -265,7 +265,7 @@ export class StateStore implements Contracts.State.StateStore {
 		const added: Contracts.Crypto.ITransactionData[] = transactions.filter((tx) => {
 			Utils.assert.defined<string>(tx.id);
 
-			if (this.cachedTransactionIds.has(tx.id)) {
+			if (this.#cachedTransactionIds.has(tx.id)) {
 				notAdded.push(tx);
 
 				return false;
@@ -274,7 +274,7 @@ export class StateStore implements Contracts.State.StateStore {
 			return true;
 		});
 
-		this.cachedTransactionIds = this.cachedTransactionIds.withMutations((cache) => {
+		this.#cachedTransactionIds = this.#cachedTransactionIds.withMutations((cache) => {
 			for (const tx of added) {
 				Utils.assert.defined<string>(tx.id);
 
@@ -285,29 +285,29 @@ export class StateStore implements Contracts.State.StateStore {
 		// Cap the Set of last transaction ids to maxLastTransactionIds
 		const maxLastTransactionIds = this.pluginConfiguration.getRequired<number>("storage.maxLastTransactionIds");
 
-		if (this.cachedTransactionIds.size > maxLastTransactionIds) {
-			this.cachedTransactionIds = this.cachedTransactionIds.takeLast(maxLastTransactionIds);
+		if (this.#cachedTransactionIds.size > maxLastTransactionIds) {
+			this.#cachedTransactionIds = this.#cachedTransactionIds.takeLast(maxLastTransactionIds);
 		}
 
 		return { added, notAdded };
 	}
 
 	public clearCachedTransactionIds(): void {
-		this.cachedTransactionIds = this.cachedTransactionIds.clear();
+		this.#cachedTransactionIds = this.#cachedTransactionIds.clear();
 	}
 
 	public getCachedTransactionIds(): string[] {
-		return this.cachedTransactionIds.toArray();
+		return this.#cachedTransactionIds.toArray();
 	}
 
 	public pingBlock(incomingBlock: Contracts.Crypto.IBlockData): boolean {
-		if (!this.blockPing) {
+		if (!this.#blockPing) {
 			return false;
 		}
 
-		if (this.blockPing.block.height === incomingBlock.height && this.blockPing.block.id === incomingBlock.id) {
-			this.blockPing.count++;
-			this.blockPing.last = Date.now();
+		if (this.#blockPing.block.height === incomingBlock.height && this.#blockPing.block.id === incomingBlock.id) {
+			this.#blockPing.count++;
+			this.#blockPing.last = Date.now();
 
 			return true;
 		}
@@ -316,15 +316,15 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public pushPingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): void {
-		if (this.blockPing) {
+		if (this.#blockPing) {
 			this.logger.info(
-				`Previous block ${this.blockPing.block.height.toLocaleString()} pinged blockchain ${
-					this.blockPing.count
+				`Previous block ${this.#blockPing.block.height.toLocaleString()} pinged blockchain ${
+					this.#blockPing.count
 				} times`,
 			);
 		}
 
-		this.blockPing = {
+		this.#blockPing = {
 			block,
 			count: fromForger ? 0 : 1,
 			first: Date.now(),
@@ -334,7 +334,7 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	// Map Block instances to block data.
-	private mapToBlockData(
+	#mapToBlockData(
 		blocks: Seq<number, Contracts.Crypto.IBlock>,
 		headersOnly?: boolean,
 	): Seq<number, Contracts.Crypto.IBlockData> {

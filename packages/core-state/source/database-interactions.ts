@@ -54,10 +54,10 @@ export class DatabaseInteraction {
 			this.stateStore.setGenesisBlock(genesisBlock);
 
 			if (process.env.CORE_RESET_DATABASE) {
-				await this.reset();
+				await this.#reset();
 			}
 
-			await this.initializeLastBlock();
+			await this.#initializeLastBlock();
 		} catch (error) {
 			this.logger.error(error.stack);
 
@@ -72,7 +72,7 @@ export class DatabaseInteraction {
 		await this.roundState.applyBlock(block);
 
 		for (const transaction of block.transactions) {
-			await this.emitTransactionEvents(transaction);
+			await this.#emitTransactionEvents(transaction);
 		}
 
 		this.events.dispatch(Enums.BlockEvent.Applied, block.data);
@@ -101,11 +101,11 @@ export class DatabaseInteraction {
 		return this.roundState.getActiveValidators(roundInfo, validators);
 	}
 
-	private async reset(): Promise<void> {
-		await this.createGenesisBlock();
+	async #reset(): Promise<void> {
+		await this.#createGenesisBlock();
 	}
 
-	private async initializeLastBlock(): Promise<void> {
+	async #initializeLastBlock(): Promise<void> {
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
 		let lastHeight = 1;
@@ -120,13 +120,13 @@ export class DatabaseInteraction {
 
 		if (!lastBlock) {
 			this.logger.warning("No block found in database");
-			lastBlock = await this.createGenesisBlock();
+			lastBlock = await this.#createGenesisBlock();
 		}
 
-		this.configureState(lastBlock);
+		this.#configureState(lastBlock);
 	}
 
-	private async createGenesisBlock(): Promise<Contracts.Crypto.IBlock> {
+	async #createGenesisBlock(): Promise<Contracts.Crypto.IBlock> {
 		const genesisBlock = this.stateStore.getGenesisBlock();
 
 		await this.databaseService.saveBlocks([genesisBlock]);
@@ -134,7 +134,7 @@ export class DatabaseInteraction {
 		return genesisBlock;
 	}
 
-	private configureState(lastBlock: Contracts.Crypto.IBlock): void {
+	#configureState(lastBlock: Contracts.Crypto.IBlock): void {
 		this.stateStore.setLastBlock(lastBlock);
 		const { blockTime, block } = this.configuration.getMilestone();
 		const blocksPerDay: number = Math.ceil(86_400 / blockTime);
@@ -142,7 +142,7 @@ export class DatabaseInteraction {
 		this.stateTransactionStore.resize(blocksPerDay * block.maxTransactions);
 	}
 
-	private async emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// ! no reason to pass this.emitter

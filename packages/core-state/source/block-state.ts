@@ -29,7 +29,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		if (block.data.height === 1) {
-			await this.initGenesisForgerWallet(block.data.generatorPublicKey);
+			await this.#initGenesisForgerWallet(block.data.generatorPublicKey);
 		}
 
 		const previousBlock = this.state.getLastBlock();
@@ -45,7 +45,7 @@ export class BlockState implements Contracts.State.BlockState {
 				await this.applyTransaction(transaction);
 				appliedTransactions.push(transaction);
 			}
-			await this.applyBlockToForger(forgerWallet, block.data);
+			await this.#applyBlockToForger(forgerWallet, block.data);
 
 			this.state.setLastBlock(block);
 		} catch (error) {
@@ -71,7 +71,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 		const revertedTransactions: Contracts.Crypto.ITransaction[] = [];
 		try {
-			await this.revertBlockFromForger(forgerWallet, block.data);
+			await this.#revertBlockFromForger(forgerWallet, block.data);
 
 			for (const transaction of [...block.transactions].reverse()) {
 				await this.revertTransaction(transaction);
@@ -106,7 +106,7 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 
 		// @ts-ignore - Apply vote balance updates
-		await this.applyVoteBalances(sender, recipient, transaction.data);
+		await this.#applyVoteBalances(sender, recipient, transaction.data);
 	}
 
 	public async revertTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
@@ -128,39 +128,39 @@ export class BlockState implements Contracts.State.BlockState {
 		await transactionHandler.revert(transaction);
 
 		// @ts-ignore - Revert vote balance updates
-		await this.revertVoteBalances(sender, recipient, data);
+		await this.#revertVoteBalances(sender, recipient, data);
 	}
 
 	// WALLETS
-	private async applyVoteBalances(
+	async #applyVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
 		transaction: Contracts.Crypto.ITransactionData,
 	): Promise<void> {
-		return this.updateVoteBalances(sender, recipient, transaction, false);
+		return this.#updateVoteBalances(sender, recipient, transaction, false);
 	}
 
-	private async revertVoteBalances(
+	async #revertVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
 		transaction: Contracts.Crypto.ITransactionData,
 	): Promise<void> {
-		return this.updateVoteBalances(sender, recipient, transaction, true);
+		return this.#updateVoteBalances(sender, recipient, transaction, true);
 	}
 
-	private async applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
+	async #applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
 		for (const validatorMutator of this.validatorMutators) {
 			await validatorMutator.apply(forgerWallet, blockData);
 		}
 	}
 
-	private async revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
+	async #revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
 		for (const validatorMutator of this.validatorMutators) {
 			await validatorMutator.revert(forgerWallet, blockData);
 		}
 	}
 
-	private async updateVoteBalances(
+	async #updateVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
 		transaction: Contracts.Crypto.ITransactionData,
@@ -174,7 +174,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 			const senderValidatordAmount = sender
 				.getBalance()
-				// balance already includes reverted fee when updateVoteBalances is called
+				// balance already includes reverted fee when #updateVoteBalances is called
 				.minus(revert ? transaction.fee : BigNumber.ZERO);
 
 			for (let index = 0; index < transaction.asset.votes.length; index++) {
@@ -264,7 +264,7 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 	}
 
-	private async initGenesisForgerWallet(forgerPublicKey: string) {
+	async #initGenesisForgerWallet(forgerPublicKey: string) {
 		if (this.walletRepository.hasByPublicKey(forgerPublicKey)) {
 			return;
 		}

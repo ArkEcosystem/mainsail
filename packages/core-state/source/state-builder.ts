@@ -50,10 +50,10 @@ export class StateBuilder {
 
 			try {
 				this.logger.info(`State Generation - Step 1 of ${steps}: Block Rewards`);
-				await this.buildBlockRewards(data);
+				await this.#buildBlockRewards(data);
 
 				this.logger.info(`State Generation - Step 2 of ${steps}: Fees & Nonces`);
-				await this.buildSentTransactions(transactions);
+				await this.#buildSentTransactions(transactions);
 
 				const capitalize = (key: string) => key[0].toUpperCase() + key.slice(1);
 				for (const [index, handler] of registeredHandlers.entries()) {
@@ -77,7 +77,7 @@ export class StateBuilder {
 					).length.toLocaleString()}`,
 				);
 
-				this.verifyWalletsConsistency();
+				this.#verifyWalletsConsistency();
 
 				await this.events.dispatch(Enums.StateEvent.BuilderFinished);
 			} catch (error) {
@@ -86,12 +86,12 @@ export class StateBuilder {
 		}
 	}
 
-	private async buildBlockRewards(block: Contracts.Crypto.IBlockData): Promise<void> {
+	async #buildBlockRewards(block: Contracts.Crypto.IBlockData): Promise<void> {
 		const wallet = await this.walletRepository.findByPublicKey(block.generatorPublicKey);
 		wallet.increaseBalance(BigNumber.make(block.reward));
 	}
 
-	private async buildSentTransactions(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+	async #buildSentTransactions(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
 		for (const { data: transaction } of transactions) {
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 			wallet.setNonce(BigNumber.make(transaction.nonce));
@@ -99,7 +99,7 @@ export class StateBuilder {
 		}
 	}
 
-	private verifyWalletsConsistency(): void {
+	#verifyWalletsConsistency(): void {
 		const logNegativeBalance = (wallet, type, balance) =>
 			this.logger.warning(`Wallet ${wallet.address} has a negative ${type} of '${balance}'`);
 

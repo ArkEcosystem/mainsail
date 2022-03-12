@@ -47,42 +47,42 @@ export class RoundState {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
-	private blocksInCurrentRound: Contracts.Crypto.IBlock[] = [];
-	private forgingValidators: Contracts.State.Wallet[] = [];
+	#blocksInCurrentRound: Contracts.Crypto.IBlock[] = [];
+	#forgingValidators: Contracts.State.Wallet[] = [];
 
 	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-		this.blocksInCurrentRound.push(block);
+		this.#blocksInCurrentRound.push(block);
 
-		await this.applyRound(block.data.height);
+		await this.#applyRound(block.data.height);
 	}
 
 	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-		if (this.blocksInCurrentRound.length === 0) {
-			this.blocksInCurrentRound = await this.getBlocksForRound();
+		if (this.#blocksInCurrentRound.length === 0) {
+			this.#blocksInCurrentRound = await this.#getBlocksForRound();
 		}
 
 		assert(
 			// eslint-disable-next-line unicorn/prefer-at
-			this.blocksInCurrentRound[this.blocksInCurrentRound.length - 1]!.data.id === block.data.id,
+			this.#blocksInCurrentRound[this.#blocksInCurrentRound.length - 1]!.data.id === block.data.id,
 			`Last block in blocksInCurrentRound doesn't match block with id ${block.data.id}`,
 		);
 
-		await this.revertRound(block.data.height);
-		this.blocksInCurrentRound.pop();
+		await this.#revertRound(block.data.height);
+		this.#blocksInCurrentRound.pop();
 	}
 
 	// TODO: Check if can restore from state
 	public async restore(): Promise<void> {
 		const block = this.stateStore.getLastBlock();
-		const roundInfo = this.getRound(block.data.height);
+		const roundInfo = this.#getRound(block.data.height);
 
-		this.blocksInCurrentRound = await this.getBlocksForRound();
+		this.#blocksInCurrentRound = await this.#getBlocksForRound();
 
-		await this.setForgingValidatorsOfRound(roundInfo);
+		await this.#setForgingValidatorsOfRound(roundInfo);
 
 		await this.databaseService.deleteRound(roundInfo.round + 1);
 
-		await this.applyRound(block.data.height);
+		await this.#applyRound(block.data.height);
 	}
 
 	public async getActiveValidators(
@@ -90,17 +90,17 @@ export class RoundState {
 		validators?: Contracts.State.Wallet[],
 	): Promise<Contracts.State.Wallet[]> {
 		if (!roundInfo) {
-			roundInfo = this.getRound();
+			roundInfo = this.#getRound();
 		}
 
 		if (
-			this.forgingValidators.length > 0 &&
-			this.forgingValidators[0].getAttribute<number>("validator.round") === roundInfo.round
+			this.#forgingValidators.length > 0 &&
+			this.#forgingValidators[0].getAttribute<number>("validator.round") === roundInfo.round
 		) {
-			return this.forgingValidators;
+			return this.#forgingValidators;
 		}
 
-		// When called during applyRound we already know the validators, so we don't have to query the database.
+		// When called during #applyRound we already know the validators, so we don't have to query the database.
 		if (!validators) {
 			const validatorsRound = await this.databaseService.getRound(roundInfo.round);
 
@@ -125,7 +125,7 @@ export class RoundState {
 		}
 
 		// @TODO: why is validators undefined here and blowing up
-		return this.shuffleValidators(roundInfo, validators ?? []);
+		return this.#shuffleValidators(roundInfo, validators ?? []);
 	}
 
 	public async detectMissedBlocks(block: Contracts.Crypto.IBlock): Promise<void> {
@@ -138,11 +138,11 @@ export class RoundState {
 		const lastSlot: number = await this.slots.getSlotNumber(lastBlock.data.timestamp);
 		const currentSlot: number = await this.slots.getSlotNumber(block.data.timestamp);
 
-		const missedSlots: number = Math.min(currentSlot - lastSlot - 1, this.forgingValidators.length);
+		const missedSlots: number = Math.min(currentSlot - lastSlot - 1, this.#forgingValidators.length);
 		for (let index = 0; index < missedSlots; index++) {
 			const missedSlot: number = lastSlot + index + 1;
 			const validator: Contracts.State.Wallet =
-				this.forgingValidators[missedSlot % this.forgingValidators.length];
+				this.#forgingValidators[missedSlot % this.#forgingValidators.length];
 
 			this.logger.debug(
 				`Validator ${validator.getAttribute(
@@ -156,46 +156,46 @@ export class RoundState {
 		}
 	}
 
-	private async applyRound(height: number): Promise<void> {
+	async #applyRound(height: number): Promise<void> {
 		if (height === 1 || AppUtils.roundCalculator.isNewRound(height + 1, this.configuration)) {
-			const roundInfo = this.getRound(height + 1);
+			const roundInfo = this.#getRound(height + 1);
 
 			this.logger.info(`Starting Round ${roundInfo.round.toLocaleString()}`);
 
-			await this.detectMissedRound();
+			await this.#detectMissedRound();
 
 			this.dposState.buildValidatorRanking();
 			this.dposState.setValidatorsRound(roundInfo);
 
-			await this.setForgingValidatorsOfRound(roundInfo, [...this.dposState.getRoundValidators()]);
+			await this.#setForgingValidatorsOfRound(roundInfo, [...this.dposState.getRoundValidators()]);
 
 			await this.databaseService.saveRound(this.dposState.getRoundValidators());
 
-			this.blocksInCurrentRound = [];
+			this.#blocksInCurrentRound = [];
 
 			await this.events.dispatch(Enums.RoundEvent.Applied);
 		}
 	}
 
-	private async revertRound(height: number): Promise<void> {
-		const roundInfo = this.getRound(height);
+	async #revertRound(height: number): Promise<void> {
+		const roundInfo = this.#getRound(height);
 		const { round, nextRound } = roundInfo;
 
 		if (nextRound === round + 1) {
 			this.logger.info(`Back to previous round: ${round.toLocaleString()}`);
 
-			await this.setForgingValidatorsOfRound(
+			await this.#setForgingValidatorsOfRound(
 				roundInfo,
-				await this.calcPreviousActiveValidators(roundInfo, this.blocksInCurrentRound),
+				await this.#calcPreviousActiveValidators(roundInfo, this.#blocksInCurrentRound),
 			);
 
 			await this.databaseService.deleteRound(nextRound);
 		}
 	}
 
-	private async detectMissedRound(): Promise<void> {
-		for (const validator of this.forgingValidators) {
-			const isBlockProduced = this.blocksInCurrentRound.some(
+	async #detectMissedRound(): Promise<void> {
+		for (const validator of this.#forgingValidators) {
+			const isBlockProduced = this.#blocksInCurrentRound.some(
 				(blockGenerator) => blockGenerator.data.generatorPublicKey === validator.getPublicKey(),
 			);
 
@@ -217,9 +217,9 @@ export class RoundState {
 		}
 	}
 
-	private async getBlocksForRound(): Promise<Contracts.Crypto.IBlock[]> {
+	async #getBlocksForRound(): Promise<Contracts.Crypto.IBlock[]> {
 		const lastBlock = this.stateStore.getLastBlock();
-		const roundInfo = this.getRound(lastBlock.data.height);
+		const roundInfo = this.#getRound(lastBlock.data.height);
 
 		const maxBlocks = lastBlock.data.height - roundInfo.roundHeight + 1;
 
@@ -249,7 +249,7 @@ export class RoundState {
 		return blocks;
 	}
 
-	private async shuffleValidators(
+	async #shuffleValidators(
 		roundInfo: Contracts.Shared.RoundInfo,
 		validators: Contracts.State.Wallet[],
 	): Promise<Contracts.State.Wallet[]> {
@@ -270,7 +270,7 @@ export class RoundState {
 		return validators;
 	}
 
-	private getRound(height?: number): Contracts.Shared.RoundInfo {
+	#getRound(height?: number): Contracts.Shared.RoundInfo {
 		if (!height) {
 			height = this.stateStore.getLastBlock().data.height;
 		}
@@ -278,17 +278,17 @@ export class RoundState {
 		return AppUtils.roundCalculator.calculateRound(height, this.configuration);
 	}
 
-	private async setForgingValidatorsOfRound(
+	async #setForgingValidatorsOfRound(
 		roundInfo: Contracts.Shared.RoundInfo,
 		validators?: Contracts.State.Wallet[],
 	): Promise<void> {
 		// ! it's this.getActiveValidators(roundInfo, validators);
 		// ! only last part of that function which reshuffles validators is used
 		const result = await this.triggers.call("getActiveValidators", { roundInfo, validators });
-		this.forgingValidators = (result as Contracts.State.Wallet[]) || [];
+		this.#forgingValidators = (result as Contracts.State.Wallet[]) || [];
 	}
 
-	private async calcPreviousActiveValidators(
+	async #calcPreviousActiveValidators(
 		roundInfo: Contracts.Shared.RoundInfo,
 		blocks: Contracts.Crypto.IBlock[],
 	): Promise<Contracts.State.Wallet[]> {

@@ -11,14 +11,14 @@ export class WalletRepositoryClone extends WalletRepository {
 	@tagged("state", "blockchain")
 	private readonly blockchainWalletRepository!: Contracts.State.WalletRepository;
 
-	private readonly forgetIndexes: Record<string, Contracts.State.WalletIndex> = {};
+	readonly #forgetIndexes: Record<string, Contracts.State.WalletIndex> = {};
 
 	@postConstruct()
 	public initialize(): void {
 		super.initialize();
 
 		for (const { name, indexer, autoIndex } of this.indexerIndexes) {
-			this.forgetIndexes[name] = new WalletIndex(indexer, autoIndex);
+			this.#forgetIndexes[name] = new WalletIndex(indexer, autoIndex);
 		}
 	}
 
@@ -39,7 +39,7 @@ export class WalletRepositoryClone extends WalletRepository {
 	}
 
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
-		this.cloneAllByIndex(indexName);
+		this.#cloneAllByIndex(indexName);
 		return this.getIndex(indexName).values();
 	}
 
@@ -105,7 +105,7 @@ export class WalletRepositoryClone extends WalletRepository {
 	public hasByIndex(indexName: string, key: string): boolean {
 		return (
 			this.getIndex(indexName).has(key) ||
-			(this.blockchainWalletRepository.getIndex(indexName).has(key) && !this.getForgetIndex(indexName).has(key))
+			(this.blockchainWalletRepository.getIndex(indexName).has(key) && !this.#getForgetIndex(indexName).has(key))
 		);
 	}
 
@@ -127,13 +127,13 @@ export class WalletRepositoryClone extends WalletRepository {
 
 			this.getIndex(index).forget(key);
 
-			this.getForgetIndex(index).set(key, wallet);
+			this.#getForgetIndex(index).set(key, wallet);
 		}
 	}
 
 	public reset(): void {
 		super.reset();
-		for (const walletIndex of Object.values(this.forgetIndexes)) {
+		for (const walletIndex of Object.values(this.#forgetIndexes)) {
 			walletIndex.clear();
 		}
 	}
@@ -151,20 +151,20 @@ export class WalletRepositoryClone extends WalletRepository {
 
 			for (const key of indexKeys[indexName]) {
 				if (!walletKeys.includes(key)) {
-					this.getForgetIndex(indexName).set(key, wallet);
+					this.#getForgetIndex(indexName).set(key, wallet);
 				}
 			}
 		}
 	}
 
-	private getForgetIndex(name: string): Contracts.State.WalletIndex {
-		if (!this.forgetIndexes[name]) {
+	#getForgetIndex(name: string): Contracts.State.WalletIndex {
+		if (!this.#forgetIndexes[name]) {
 			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
-		return this.forgetIndexes[name];
+		return this.#forgetIndexes[name];
 	}
 
-	private cloneAllByIndex(indexName: string) {
+	#cloneAllByIndex(indexName: string) {
 		for (const wallet of this.blockchainWalletRepository.getIndex(indexName).values()) {
 			this.findByAddress(wallet.getAddress());
 		}

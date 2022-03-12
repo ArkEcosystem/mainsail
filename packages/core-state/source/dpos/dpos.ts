@@ -11,15 +11,15 @@ export class DposState implements Contracts.State.DposState {
 	@inject(Identifiers.WalletRepository)
 	private walletRepository!: Contracts.State.WalletRepository;
 
-	private roundInfo: Contracts.Shared.RoundInfo | null = null;
+	#roundInfo: Contracts.Shared.RoundInfo | null = null;
 
-	private activeValidators: Contracts.State.Wallet[] = [];
+	#activeValidators: Contracts.State.Wallet[] = [];
 
-	private roundValidators: Contracts.State.Wallet[] = [];
+	#roundValidators: Contracts.State.Wallet[] = [];
 
 	public getRoundInfo(): Contracts.Shared.RoundInfo {
-		AppUtils.assert.defined<Contracts.Shared.RoundInfo>(this.roundInfo);
-		return this.roundInfo;
+		AppUtils.assert.defined<Contracts.Shared.RoundInfo>(this.#roundInfo);
+		return this.#roundInfo;
 	}
 
 	public getAllValidators(): readonly Contracts.State.Wallet[] {
@@ -27,11 +27,11 @@ export class DposState implements Contracts.State.DposState {
 	}
 
 	public getActiveValidators(): readonly Contracts.State.Wallet[] {
-		return this.activeValidators;
+		return this.#activeValidators;
 	}
 
 	public getRoundValidators(): readonly Contracts.State.Wallet[] {
-		return this.roundValidators;
+		return this.#roundValidators;
 	}
 
 	// Only called during integrity verification on boot.
@@ -50,17 +50,17 @@ export class DposState implements Contracts.State.DposState {
 	}
 
 	public buildValidatorRanking(): void {
-		this.activeValidators = [];
+		this.#activeValidators = [];
 
 		for (const validator of this.walletRepository.allByUsername()) {
 			if (validator.hasAttribute("validator.resigned")) {
 				validator.forgetAttribute("validator.rank");
 			} else {
-				this.activeValidators.push(validator);
+				this.#activeValidators.push(validator);
 			}
 		}
 
-		this.activeValidators.sort((a, b) => {
+		this.#activeValidators.sort((a, b) => {
 			const voteBalanceA: BigNumber = a.getAttribute("validator.voteBalance");
 			const voteBalanceB: BigNumber = b.getAttribute("validator.voteBalance");
 
@@ -84,24 +84,25 @@ export class DposState implements Contracts.State.DposState {
 			return diff;
 		});
 
-		for (let index = 0; index < this.activeValidators.length; index++) {
-			this.activeValidators[index].setAttribute("validator.rank", index + 1);
+		for (let index = 0; index < this.#activeValidators.length; index++) {
+			this.#activeValidators[index].setAttribute("validator.rank", index + 1);
 		}
 	}
 
 	public setValidatorsRound(roundInfo: Contracts.Shared.RoundInfo): void {
-		if (this.activeValidators.length < roundInfo.maxValidators) {
+		if (this.#activeValidators.length < roundInfo.maxValidators) {
 			throw new Error(
-				`Expected to find ${roundInfo.maxValidators} validators but only found ${this.activeValidators.length}.` +
-					`This indicates an issue with the genesis block & validators.`,
+				`Expected to find ${roundInfo.maxValidators} validators but only found ${
+					this.#activeValidators.length
+				}.` + `This indicates an issue with the genesis block & validators.`,
 			);
 		}
 
-		this.roundInfo = roundInfo;
-		this.roundValidators = [];
+		this.#roundInfo = roundInfo;
+		this.#roundValidators = [];
 		for (let index = 0; index < roundInfo.maxValidators; index++) {
-			this.activeValidators[index].setAttribute("validator.round", roundInfo.round);
-			this.roundValidators.push(this.activeValidators[index]);
+			this.#activeValidators[index].setAttribute("validator.round", roundInfo.round);
+			this.#roundValidators.push(this.#activeValidators[index]);
 		}
 		this.logger.debug(
 			`Loaded ${roundInfo.maxValidators} active ` + AppUtils.pluralize("validator", roundInfo.maxValidators),
