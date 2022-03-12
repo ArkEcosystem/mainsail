@@ -15,21 +15,21 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 	@inject(Identifiers.Cryptography.Transaction.Registry)
 	private readonly transactionRegistry: Contracts.Crypto.ITransactionRegistry;
 
-	private registered = false;
+	#registered = false;
 
 	public isRegistrationRequired(): boolean {
-		return this.registered === false;
+		return this.#registered === false;
 	}
 
 	public registerHandlers(): void {
 		for (const handlerConstructor of this.handlerConstructors) {
-			this.registerHandler(handlerConstructor);
+			this.#registerHandler(handlerConstructor);
 		}
 
-		this.registered = true;
+		this.#registered = true;
 	}
 
-	private registerHandler(handlerConstructor: TransactionHandlerConstructor) {
+	#registerHandler(handlerConstructor: TransactionHandlerConstructor) {
 		const handler = new handlerConstructor();
 		const transactionConstructor = handler.getConstructor();
 
@@ -41,12 +41,12 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 			transactionConstructor.typeGroup,
 		);
 
-		if (this.hasOtherHandlerHandling(handlerConstructor, internalType, transactionConstructor.version)) {
+		if (this.#hasOtherHandlerHandling(handlerConstructor, internalType, transactionConstructor.version)) {
 			throw new Exceptions.AlreadyRegisteredError(internalType);
 		}
 
 		for (const dependency of handler.dependencies()) {
-			if (this.hasOtherHandler(handlerConstructor, dependency) === false) {
+			if (this.#hasOtherHandler(handlerConstructor, dependency) === false) {
 				throw new Exceptions.UnsatisfiedDependencyError(internalType);
 			}
 		}
@@ -62,7 +62,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 		}
 	}
 
-	private hasOtherHandlerHandling(
+	#hasOtherHandlerHandling(
 		handlerConstructor: TransactionHandlerConstructor,
 		internalType: Contracts.Transactions.InternalTransactionType,
 		version: number,
@@ -91,10 +91,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 		return false;
 	}
 
-	private hasOtherHandler(
-		handlerConstructor: TransactionHandlerConstructor,
-		dependency: TransactionHandlerConstructor,
-	) {
+	#hasOtherHandler(handlerConstructor: TransactionHandlerConstructor, dependency: TransactionHandlerConstructor) {
 		return this.handlerConstructors.some(
 			(otherHandlerConstructor) =>
 				otherHandlerConstructor !== handlerConstructor && otherHandlerConstructor === dependency,
