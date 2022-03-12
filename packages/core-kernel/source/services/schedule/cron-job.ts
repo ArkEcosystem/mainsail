@@ -35,122 +35,122 @@ export class CronJob implements Job {
 	}
 
 	public everyMinute(): this {
-		return this.setMinute("*");
+		return this.#setMinute("*");
 	}
 
 	public everyFiveMinutes(): this {
-		return this.setMinute("*/5");
+		return this.#setMinute("*/5");
 	}
 
 	public everyTenMinutes(): this {
-		return this.setMinute("*/10");
+		return this.#setMinute("*/10");
 	}
 
 	public everyFifteenMinutes(): this {
-		return this.setMinute("*/15");
+		return this.#setMinute("*/15");
 	}
 
 	public everyThirtyMinutes(): this {
-		return this.setMinute("*/30");
+		return this.#setMinute("*/30");
 	}
 
 	public hourly(): this {
-		return this.setMinute("0");
+		return this.#setMinute("0");
 	}
 
 	public hourlyAt(minute: string): this {
-		return this.setMinute(minute);
+		return this.#setMinute(minute);
 	}
 
 	public daily(): this {
-		return this.setMinute("0").setHour("0");
+		return this.#setMinute("0").#setHour("0");
 	}
 
 	public dailyAt(hour: string, minute: string): this {
-		return this.setMinute(minute).setHour(hour);
+		return this.#setMinute(minute).#setHour(hour);
 	}
 
 	public weekdays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("1-5");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("1-5");
 	}
 
 	public weekends(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("6,0");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("6,0");
 	}
 
 	public mondays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("MON");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("MON");
 	}
 
 	public tuesdays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("TUE");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("TUE");
 	}
 
 	public wednesdays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("WED");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("WED");
 	}
 
 	public thursdays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("THU");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("THU");
 	}
 
 	public fridays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("FRI");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("FRI");
 	}
 
 	public saturdays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("SAT");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("SAT");
 	}
 
 	public sundays(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("SUN");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("SUN");
 	}
 
 	public weekly(): this {
-		return this.setMinute("0").setHour("0").setDayWeek("0");
+		return this.#setMinute("0").#setHour("0").#setDayWeek("0");
 	}
 
 	public weeklyOn(day: string, hour: string, minute: string): this {
-		return this.setMinute(minute).setHour(hour).setDayWeek(day);
+		return this.#setMinute(minute).#setHour(hour).#setDayWeek(day);
 	}
 
 	public monthly(): this {
-		return this.setMinute("0").setHour("0").setDayMonth("1");
+		return this.#setMinute("0").#setHour("0").#setDayMonth("1");
 	}
 
 	public monthlyOn(day: string, hour: string, minute: string): this {
-		return this.setMinute(minute).setHour(hour).setDayMonth(day);
+		return this.#setMinute(minute).#setHour(hour).#setDayMonth(day);
 	}
 
 	public quarterly(): this {
-		return this.setMinute("0").setHour("0").setDayMonth("1").setMonth("*/3");
+		return this.#setMinute("0").#setHour("0").#setDayMonth("1").#setMonth("*/3");
 	}
 
 	public yearly(): this {
-		return this.setMinute("0").setHour("0").setDayMonth("1").setMonth("1");
+		return this.#setMinute("0").#setHour("0").#setDayMonth("1").#setMonth("1");
 	}
 
-	private setMinute(value: string): this {
-		return this.spliceIntoPosition(0, value);
+	#setMinute(value: string): this {
+		return this.#spliceIntoPosition(0, value);
 	}
 
-	private setHour(value: string): this {
-		return this.spliceIntoPosition(1, value);
+	#setHour(value: string): this {
+		return this.#spliceIntoPosition(1, value);
 	}
 
-	private setDayMonth(value: string): this {
-		return this.spliceIntoPosition(2, value);
+	#setDayMonth(value: string): this {
+		return this.#spliceIntoPosition(2, value);
 	}
 
-	private setMonth(value: string): this {
-		return this.spliceIntoPosition(3, value);
+	#setMonth(value: string): this {
+		return this.#spliceIntoPosition(3, value);
 	}
 
-	private setDayWeek(value: string): this {
-		return this.spliceIntoPosition(4, value);
+	#setDayWeek(value: string): this {
+		return this.#spliceIntoPosition(4, value);
 	}
 
-	private spliceIntoPosition(position: number, value: string): this {
+	#spliceIntoPosition(position: number, value: string): this {
 		const segments: string[] = this.expression.split(" ");
 		segments[position] = value;
 

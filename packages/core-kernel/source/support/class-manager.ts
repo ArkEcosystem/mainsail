@@ -10,37 +10,37 @@ export abstract class ClassManager {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	private defaultDriver: string;
+	#defaultDriver: string;
 
 	// @TODO revisit the implementation of the class and see if it can be removed
 	//
-	// private drivers: Map<string, Class> = new Map<string, Class>();
+	// #drivers: Map<string, Class> = new Map<string, Class>();
 
 	public constructor() {
-		this.defaultDriver = this.getDefaultDriver();
+		this.#defaultDriver = this.getDefaultDriver();
 	}
 
 	public async driver<T>(name?: string): Promise<T> {
-		return this.createDriver<T>(name || this.defaultDriver);
+		return this.#createDriver<T>(name || this.#defaultDriver);
 	}
 
 	// @TODO revisit the implementation of the class and see if it can be removed
 	//
 	// public async extend(name: string, driver: Class): Promise<void> {
-	//     this.drivers.set(name, driver);
+	//     this.#drivers.set(name, driver);
 	// }
 
 	public setDefaultDriver(name: string): void {
-		this.defaultDriver = name;
+		this.#defaultDriver = name;
 	}
 
 	// @TODO revisit the implementation of the class and see if it can be removed
 	//
 	// public getDrivers(): Class[] {
-	//     return Object.values(this.drivers);
+	//     return Object.values(this.#drivers);
 	// }
 
-	private async createDriver<T>(name: string): Promise<T> {
+	async #createDriver<T>(name: string): Promise<T> {
 		const creatorFunction = `create${pascalCase(name)}Driver`;
 
 		if (typeof this[creatorFunction] !== "function") {

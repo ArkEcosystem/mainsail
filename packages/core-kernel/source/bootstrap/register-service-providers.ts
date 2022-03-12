@@ -29,10 +29,10 @@ export class RegisterServiceProviders implements Bootstrapper {
 
 			try {
 				// Does the configuration conform to the given rules?
-				await this.validateConfiguration(serviceProvider);
+				await this.#validateConfiguration(serviceProvider);
 
 				// Are all dependencies installed with the correct versions?
-				if (await this.satisfiesDependencies(serviceProvider)) {
+				if (await this.#satisfiesDependencies(serviceProvider)) {
 					await serviceProviders.register(name);
 				}
 			} catch (error) {
@@ -50,7 +50,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 		}
 	}
 
-	private async validateConfiguration(serviceProvider: ServiceProvider): Promise<void> {
+	async #validateConfiguration(serviceProvider: ServiceProvider): Promise<void> {
 		const configSchema: object = serviceProvider.configSchema();
 
 		if (Object.keys(configSchema).length > 0) {
@@ -76,7 +76,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 		}
 	}
 
-	private async satisfiesDependencies(serviceProvider: ServiceProvider): Promise<boolean> {
+	async #satisfiesDependencies(serviceProvider: ServiceProvider): Promise<boolean> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProviderRepository,
 		);

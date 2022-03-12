@@ -15,12 +15,12 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	private jobs: Contracts.Kernel.QueueJob[] = [];
+	#jobs: Contracts.Kernel.QueueJob[] = [];
 
-	private running = false;
-	private started = false;
+	#running = false;
+	#started = false;
 
-	private onProcessedCallbacks: (() => void)[] = [];
+	#onProcessedCallbacks: (() => void)[] = [];
 
 	public constructor() {
 		super();
@@ -32,15 +32,15 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	}
 
 	public async start(): Promise<void> {
-		this.started = true;
+		this.#started = true;
 
-		this.processJobs();
+		this.#processJobs();
 	}
 
 	public async stop(): Promise<void> {
-		this.started = false;
+		this.#started = false;
 
-		const promise = this.waitUntilProcessed();
+		const promise = this.#waitUntilProcessed();
 
 		await this.clear();
 
@@ -48,9 +48,9 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	}
 
 	public async pause(): Promise<void> {
-		this.started = false;
+		this.#started = false;
 
-		await this.waitUntilProcessed();
+		await this.#waitUntilProcessed();
 	}
 
 	public async resume(): Promise<void> {
@@ -58,13 +58,13 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	}
 
 	public async clear(): Promise<void> {
-		this.jobs = [];
+		this.#jobs = [];
 	}
 
 	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
-		this.jobs.push(job);
+		this.#jobs.push(job);
 
-		this.processJobs();
+		this.#processJobs();
 	}
 
 	public async later(delay: number, job: Contracts.Kernel.QueueJob): Promise<void> {
@@ -73,58 +73,58 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 
 	public async bulk(jobs: Contracts.Kernel.QueueJob[]): Promise<void> {
 		for (const job of jobs) {
-			this.jobs.push(job);
+			this.#jobs.push(job);
 		}
 	}
 
 	public size(): number {
-		return this.jobs.length;
+		return this.#jobs.length;
 	}
 
 	public isStarted(): boolean {
-		return this.started;
+		return this.#started;
 	}
 
 	public isRunning(): boolean {
-		return this.running;
+		return this.#running;
 	}
 
-	private waitUntilProcessed(): Promise<void> {
+	#waitUntilProcessed(): Promise<void> {
 		return new Promise((resolve) => {
-			if (this.running) {
+			if (this.#running) {
 				const onProcessed = () => {
 					resolve();
 				};
 
-				this.onProcessedCallbacks.push(onProcessed);
+				this.#onProcessedCallbacks.push(onProcessed);
 			} else {
 				resolve();
 			}
 		});
 	}
 
-	private resolveOnProcessed(): void {
-		while (this.onProcessedCallbacks.length > 0) {
-			const onProcessed = this.onProcessedCallbacks.shift()!;
+	#resolveOnProcessed(): void {
+		while (this.#onProcessedCallbacks.length > 0) {
+			const onProcessed = this.#onProcessedCallbacks.shift()!;
 
 			onProcessed();
 		}
 	}
 
-	private async processJobs(): Promise<void> {
+	async #processJobs(): Promise<void> {
 		// Prevent entering if already processing
 		if (this.isRunning()) {
 			return;
 		}
 
-		while (this.jobs.length > 0) {
-			if (!this.started) {
+		while (this.#jobs.length > 0) {
+			if (!this.#started) {
 				break;
 			}
 
-			this.running = true;
+			this.#running = true;
 
-			const job = this.jobs.shift()!;
+			const job = this.#jobs.shift()!;
 
 			const start = performance.now();
 			try {
@@ -150,11 +150,11 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 			}
 		}
 
-		this.running = false;
+		this.#running = false;
 
-		this.resolveOnProcessed();
+		this.#resolveOnProcessed();
 
-		if (this.jobs.length === 0) {
+		if (this.#jobs.length === 0) {
 			this.emit("drain");
 		}
 	}

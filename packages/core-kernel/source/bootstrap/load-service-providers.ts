@@ -37,7 +37,7 @@ export class LoadServiceProviders implements Bootstrapper {
 
 		assert.defined<PluginEntry[]>(plugins);
 
-		const installedPlugins = await this.discoverPlugins(this.app.dataPath("plugins"));
+		const installedPlugins = await this.#discoverPlugins(this.app.dataPath("plugins"));
 
 		for (const plugin of plugins) {
 			const installedPlugin = installedPlugins.find((installedPlugin) => installedPlugin.name === plugin.package);
@@ -45,7 +45,7 @@ export class LoadServiceProviders implements Bootstrapper {
 
 			const serviceProvider: ServiceProvider = this.app.resolve(require(packageId).ServiceProvider);
 			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageId));
-			serviceProvider.setConfig(this.discoverConfiguration(serviceProvider, plugin.options, packageId));
+			serviceProvider.setConfig(this.#discoverConfiguration(serviceProvider, plugin.options, packageId));
 
 			this.serviceProviderRepository.set(plugin.package, serviceProvider);
 
@@ -57,7 +57,7 @@ export class LoadServiceProviders implements Bootstrapper {
 		}
 	}
 
-	private discoverConfiguration(
+	#discoverConfiguration(
 		serviceProvider: ServiceProvider,
 		options: JsonObject,
 		packageId: string,
@@ -78,7 +78,7 @@ export class LoadServiceProviders implements Bootstrapper {
 		return this.app.resolve(PluginConfiguration).discover(serviceProviderName, packageId).merge(options);
 	}
 
-	private async discoverPlugins(path: string): Promise<Plugin[]> {
+	async #discoverPlugins(path: string): Promise<Plugin[]> {
 		const plugins: Plugin[] = [];
 
 		const packagePaths = glob

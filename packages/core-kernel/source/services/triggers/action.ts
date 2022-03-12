@@ -4,26 +4,26 @@ import { ActionArguments } from "../../types";
 
 @injectable()
 export abstract class Action<T = any> {
-	private readonly beforeHooks: Set<Function> = new Set<Function>();
+	readonly #beforeHooks: Set<Function> = new Set<Function>();
 
-	private readonly errorHooks: Set<Function> = new Set<Function>();
+	readonly #errorHooks: Set<Function> = new Set<Function>();
 
-	private readonly afterHooks: Set<Function> = new Set<Function>();
+	readonly #afterHooks: Set<Function> = new Set<Function>();
 
 	public before(function_: Function): this {
-		this.beforeHooks.add(function_);
+		this.#beforeHooks.add(function_);
 
 		return this;
 	}
 
 	public error(function_: Function): this {
-		this.errorHooks.add(function_);
+		this.#errorHooks.add(function_);
 
 		return this;
 	}
 
 	public after(function_: Function): this {
-		this.afterHooks.add(function_);
+		this.#afterHooks.add(function_);
 
 		return this;
 	}

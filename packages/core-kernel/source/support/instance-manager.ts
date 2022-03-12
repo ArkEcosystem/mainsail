@@ -8,22 +8,22 @@ export abstract class InstanceManager<T> {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	private defaultDriver: string;
+	#defaultDriver: string;
 
-	private drivers: Map<string, T> = new Map<string, T>();
+	#drivers: Map<string, T> = new Map<string, T>();
 
 	public constructor() {
-		this.defaultDriver = this.getDefaultDriver();
+		this.#defaultDriver = this.getDefaultDriver();
 	}
 
 	public async boot(): Promise<void> {
-		await this.createDriver(this.defaultDriver);
+		await this.#createDriver(this.#defaultDriver);
 	}
 
 	public driver(name?: string): T {
-		name = name || this.defaultDriver;
+		name = name || this.#defaultDriver;
 
-		const driver: T | undefined = this.drivers.get(name);
+		const driver: T | undefined = this.#drivers.get(name);
 
 		if (!driver) {
 			throw new Exceptions.DriverCannotBeResolved(name);
@@ -33,25 +33,25 @@ export abstract class InstanceManager<T> {
 	}
 
 	public async extend(name: string, callback: (app: Contracts.Kernel.Application) => Promise<T>): Promise<void> {
-		this.drivers.set(name, await callback(this.app));
+		this.#drivers.set(name, await callback(this.app));
 	}
 
 	public setDefaultDriver(name: string): void {
-		this.defaultDriver = name;
+		this.#defaultDriver = name;
 	}
 
 	public getDrivers(): T[] {
-		return [...this.drivers.values()];
+		return [...this.#drivers.values()];
 	}
 
-	private async createDriver(name: string): Promise<void> {
+	async #createDriver(name: string): Promise<void> {
 		const creatorFunction = `create${pascalCase(name)}Driver`;
 
 		if (typeof this[creatorFunction] !== "function") {
 			throw new TypeError(`${name} driver is not supported by ${this.constructor.name}.`);
 		}
 
-		this.drivers.set(name, await this[creatorFunction](this.app));
+		this.#drivers.set(name, await this[creatorFunction](this.app));
 	}
 
 	protected abstract getDefaultDriver(): string;

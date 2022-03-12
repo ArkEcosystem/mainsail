@@ -5,10 +5,10 @@ import { assert } from "../../utils";
 
 @injectable()
 export class MixinService {
-	private readonly mixins: Map<string, Function> = new Map<string, Function>();
+	readonly #mixins: Map<string, Function> = new Map<string, Function>();
 
 	public get(name: string): Function {
-		const mixin: Function | undefined = this.mixins.get(name);
+		const mixin: Function | undefined = this.#mixins.get(name);
 
 		assert.defined<Function>(mixin);
 
@@ -16,15 +16,15 @@ export class MixinService {
 	}
 
 	public set(name: string, macro: Function) {
-		this.mixins.set(name, macro);
+		this.#mixins.set(name, macro);
 	}
 
 	public forget(name: string): boolean {
-		return this.mixins.delete(name);
+		return this.#mixins.delete(name);
 	}
 
 	public has(name: string): boolean {
-		return this.mixins.has(name);
+		return this.#mixins.has(name);
 	}
 
 	public apply<T>(names: string | string[], value: Constructor): Constructor<T> {

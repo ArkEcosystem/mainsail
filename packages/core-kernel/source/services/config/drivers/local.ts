@@ -37,21 +37,21 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	public async loadConfiguration(): Promise<void> {
 		try {
-			this.loadApplication();
+			this.#loadApplication();
 
-			this.loadPeers();
+			this.#loadPeers();
 
-			this.loadValidators();
+			this.#loadValidators();
 
-			this.loadCryptography();
+			this.#loadCryptography();
 		} catch (error) {
 			throw new Exceptions.ApplicationConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
-	private loadApplication(): void {
+	#loadApplication(): void {
 		this.validationService.validate(
-			this.loadFromLocation(["app.json", "app.js"]),
+			this.#loadFromLocation(["app.json", "app.js"]),
 			Joi.object({
 				flags: Joi.array().items(Joi.string()).optional(),
 				plugins: Joi.array()
@@ -73,9 +73,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.configRepository.set("app.plugins", get(this.validationService.valid(), "plugins", []));
 	}
 
-	private loadPeers(): void {
+	#loadPeers(): void {
 		this.validationService.validate(
-			this.loadFromLocation(["peers.json"]),
+			this.#loadFromLocation(["peers.json"]),
 			Joi.object({
 				list: Joi.array()
 					.items(
@@ -98,9 +98,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.configRepository.set("peers", this.validationService.valid());
 	}
 
-	private loadValidators(): void {
+	#loadValidators(): void {
 		this.validationService.validate(
-			this.loadFromLocation(["validators.json"]),
+			this.#loadFromLocation(["validators.json"]),
 			Joi.object({
 				secrets: Joi.array().items(Joi.string()).optional(),
 			}),
@@ -113,15 +113,15 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.configRepository.set("validators", this.validationService.valid());
 	}
 
-	private loadCryptography(): void {
+	#loadCryptography(): void {
 		if (!existsSync(this.app.configPath("crypto.json"))) {
 			return;
 		}
 
-		this.configRepository.set("crypto", this.loadFromLocation(["crypto.json"]));
+		this.configRepository.set("crypto", this.#loadFromLocation(["crypto.json"]));
 	}
 
-	private loadFromLocation(files: string[]): KeyValuePair {
+	#loadFromLocation(files: string[]): KeyValuePair {
 		for (const file of files) {
 			const fullPath: string = this.app.configPath(file);
 

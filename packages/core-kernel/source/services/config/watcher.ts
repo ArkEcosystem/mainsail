@@ -7,12 +7,12 @@ export class Watcher {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	private watcher!: NSFW;
+	#watcher!: NSFW;
 
 	public async boot(): Promise<void> {
 		const configFiles: string[] = [".env", "validators.json", "peers.json", "plugins.js", "plugins.json"];
 
-		this.watcher = await nsfw(this.app.configPath(), (events) => {
+		this.#watcher = await nsfw(this.app.configPath(), (events) => {
 			for (const event of events) {
 				if (event.action === ActionType.MODIFIED && configFiles.includes(event.file)) {
 					this.app.reboot();
@@ -21,10 +21,10 @@ export class Watcher {
 			}
 		});
 
-		await this.watcher.start();
+		await this.#watcher.start();
 	}
 
 	public async dispose(): Promise<void> {
-		return this.watcher.stop();
+		return this.#watcher.stop();
 	}
 }

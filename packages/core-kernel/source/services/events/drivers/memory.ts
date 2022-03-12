@@ -17,13 +17,13 @@ class OnceListener implements Contracts.Kernel.EventListener {
 
 @injectable()
 export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
-	private readonly listeners: Map<Contracts.Kernel.EventName, Set<Contracts.Kernel.EventListener>> = new Map<
+	readonly #listeners: Map<Contracts.Kernel.EventName, Set<Contracts.Kernel.EventListener>> = new Map<
 		Contracts.Kernel.EventName,
 		Set<Contracts.Kernel.EventListener>
 	>();
 
 	public listen(event: Contracts.Kernel.EventName, listener: Contracts.Kernel.EventListener): () => void {
-		this.getListenersByEvent(event).add(listener);
+		this.#getListenersByEvent(event).add(listener);
 
 		return this.forget.bind(this, event, listener);
 	}
@@ -51,10 +51,10 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 
 	public forget(event: Contracts.Kernel.EventName, listener?: Contracts.Kernel.EventListener): boolean {
 		if (event && listener) {
-			return this.getListenersByEvent(event).delete(listener);
+			return this.#getListenersByEvent(event).delete(listener);
 		}
 
-		return this.listeners.delete(event);
+		return this.#listeners.delete(event);
 	}
 
 	public forgetMany(
@@ -66,24 +66,24 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 	}
 
 	public flush(): void {
-		this.listeners.clear();
+		this.#listeners.clear();
 	}
 
 	public getListeners(event?: Contracts.Kernel.EventName): Contracts.Kernel.EventListener[] {
-		return [...this.getListenersByPattern(event || "*").values()];
+		return [...this.#getListenersByPattern(event || "*").values()];
 	}
 
 	public hasListeners(event: Contracts.Kernel.EventName): boolean {
-		return this.getListenersByPattern(event).length > 0;
+		return this.#getListenersByPattern(event).length > 0;
 	}
 
 	public countListeners(event?: Contracts.Kernel.EventName): number {
 		if (event) {
-			return this.getListenersByPattern(event).length;
+			return this.#getListenersByPattern(event).length;
 		}
 
 		let totalCount = 0;
-		for (const values of this.listeners.values()) {
+		for (const values of this.#listeners.values()) {
 			totalCount += values.size;
 		}
 
@@ -95,7 +95,7 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 
 		const resolvers: Array<Promise<void>> = [];
 
-		for (const listener of this.getListenersByPattern(event)) {
+		for (const listener of this.#getListenersByPattern(event)) {
 			resolvers.push(new Promise((resolve) => resolve(listener.handle({ data, name: event }))));
 		}
 
@@ -105,13 +105,13 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 	public async dispatchSeq<T = any>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
 		await Promise.resolve();
 
-		for (const listener of this.getListenersByPattern(event)) {
+		for (const listener of this.#getListenersByPattern(event)) {
 			await listener.handle({ data, name: event });
 		}
 	}
 
 	public dispatchSync<T = any>(event: Contracts.Kernel.EventName, data?: T): void {
-		for (const listener of this.getListenersByPattern(event)) {
+		for (const listener of this.#getListenersByPattern(event)) {
 			listener.handle({ data, name: event });
 		}
 	}
@@ -134,29 +134,29 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		}
 	}
 
-	private getListenersByEvent(name: Contracts.Kernel.EventName): Set<Contracts.Kernel.EventListener> {
-		if (!this.listeners.has(name)) {
-			this.listeners.set(name, new Set<Contracts.Kernel.EventListener>());
+	#getListenersByEvent(name: Contracts.Kernel.EventName): Set<Contracts.Kernel.EventListener> {
+		if (!this.#listeners.has(name)) {
+			this.#listeners.set(name, new Set<Contracts.Kernel.EventListener>());
 		}
 
-		const listener: Set<Contracts.Kernel.EventListener> | undefined = this.listeners.get(name);
+		const listener: Set<Contracts.Kernel.EventListener> | undefined = this.#listeners.get(name);
 
 		assert.defined<Set<Contracts.Kernel.EventListener>>(listener);
 
 		return listener;
 	}
 
-	private getListenersByPattern(event: Contracts.Kernel.EventName): Contracts.Kernel.EventListener[] {
+	#getListenersByPattern(event: Contracts.Kernel.EventName): Contracts.Kernel.EventListener[] {
 		// @ts-ignore
-		const matches: Contracts.Kernel.EventName[] = mm([...this.listeners.keys()], event);
+		const matches: Contracts.Kernel.EventName[] = mm([...this.#listeners.keys()], event);
 
 		let eventListeners: Contracts.Kernel.EventListener[] = [];
-		if (this.listeners.has("*")) {
-			eventListeners = [...eventListeners, ...this.getListenersByEvent("*")];
+		if (this.#listeners.has("*")) {
+			eventListeners = [...eventListeners, ...this.#getListenersByEvent("*")];
 		}
 
 		for (const match of matches) {
-			const matchListeners: Set<Contracts.Kernel.EventListener> | undefined = this.getListenersByEvent(match);
+			const matchListeners: Set<Contracts.Kernel.EventListener> | undefined = this.#getListenersByEvent(match);
 
 			if (matchListeners && matchListeners.size > 0) {
 				eventListeners = [...eventListeners, ...matchListeners];

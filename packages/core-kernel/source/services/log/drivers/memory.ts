@@ -12,7 +12,7 @@ dayjs.extend(utc);
 
 @injectable()
 export class MemoryLogger implements Contracts.Kernel.Logger {
-	private readonly levelStyles: Record<string, Chalk> = {
+	readonly #levelStyles: Record<string, Chalk> = {
 		alert: chalk.red,
 		critical: chalk.red,
 		debug: chalk.magenta,
@@ -23,54 +23,54 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 		warning: chalk.yellow,
 	};
 
-	private silentConsole = false;
+	#silentConsole = false;
 
-	private lastTimestamp: Dayjs = dayjs().utc();
+	#lastTimestamp: Dayjs = dayjs().utc();
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		return this;
 	}
 
 	public emergency(message: any): void {
-		this.log("emergency", message);
+		this.#log("emergency", message);
 	}
 
 	public alert(message: any): void {
-		this.log("alert", message);
+		this.#log("alert", message);
 	}
 
 	public critical(message: any): void {
-		this.log("critical", message);
+		this.#log("critical", message);
 	}
 
 	public error(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public warning(message: any): void {
-		this.log("warning", message);
+		this.#log("warning", message);
 	}
 
 	public notice(message: any): void {
-		this.log("notice", message);
+		this.#log("notice", message);
 	}
 
 	public info(message: any): void {
-		this.log("info", message);
+		this.#log("info", message);
 	}
 
 	public debug(message: any): void {
-		this.log("debug", message);
+		this.#log("debug", message);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
-		this.silentConsole = suppress;
+		this.#silentConsole = suppress;
 	}
 
 	public async dispose(): Promise<void> {}
 
-	private log(level: any, message: any): void {
-		if (this.silentConsole) {
+	#log(level: any, message: any): void {
+		if (this.#silentConsole) {
 			return;
 		}
 
@@ -82,18 +82,18 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		level = level ? this.levelStyles[level](`[${level.toUpperCase()}] `) : "";
+		level = level ? this.#levelStyles[level](`[${level.toUpperCase()}] `) : "";
 
 		const timestamp: string = dayjs.utc().format("YYYY-MM-DD HH:MM:ss.SSS");
-		const timestampDiff: string = this.getTimestampDiff();
+		const timestampDiff: string = this.#getTimestampDiff();
 
 		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);
 	}
 
-	private getTimestampDiff(): string {
-		const diff: number = dayjs().diff(this.lastTimestamp);
+	#getTimestampDiff(): string {
+		const diff: number = dayjs().diff(this.#lastTimestamp);
 
-		this.lastTimestamp = dayjs.utc();
+		this.#lastTimestamp = dayjs.utc();
 
 		return chalk.yellow(` +${diff ? prettyTime(diff) : "0ms"}`);
 	}

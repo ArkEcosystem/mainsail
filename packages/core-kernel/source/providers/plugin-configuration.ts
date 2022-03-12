@@ -13,31 +13,31 @@ export class PluginConfiguration {
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
-	private items: JsonObject = {};
+	#items: JsonObject = {};
 
 	public from(name: string, config: JsonObject): this {
-		this.items = config;
+		this.#items = config;
 
-		this.mergeWithGlobal(name);
+		this.#mergeWithGlobal(name);
 
 		return this;
 	}
 
 	public discover(name: string, packageId: string): this {
 		try {
-			this.items = require(`${packageId}/distribution/defaults.js`).defaults;
+			this.#items = require(`${packageId}/distribution/defaults.js`).defaults;
 		} catch {
 			// Failed to discover the defaults configuration file. This can be intentional.
 		}
 
-		this.mergeWithGlobal(name);
+		this.#mergeWithGlobal(name);
 
 		return this;
 	}
 
 	public merge(values: JsonObject | undefined): this {
 		if (values) {
-			this.items = deepmerge(this.items, values, {
+			this.#items = deepmerge(this.#items, values, {
 				arrayMerge: (destination, source) => source,
 			});
 		}
@@ -46,7 +46,7 @@ export class PluginConfiguration {
 	}
 
 	public all(): JsonObject {
-		return this.items;
+		return this.#items;
 	}
 
 	public get<T>(key: string, defaultValue?: T): T | undefined {
@@ -54,7 +54,7 @@ export class PluginConfiguration {
 			throw new TypeError(`DEPRECATED get(${key}, ${defaultValue}), use getOptional instead`);
 		}
 
-		return get(this.items, key);
+		return get(this.#items, key);
 	}
 
 	public getRequired<T>(key: string): T {
@@ -62,7 +62,7 @@ export class PluginConfiguration {
 			throw new Error(`Missing required ${key} configuration value`);
 		}
 
-		return get(this.items, key);
+		return get(this.#items, key);
 	}
 
 	public getOptional<T>(key: string, defaultValue: T): T {
@@ -70,26 +70,26 @@ export class PluginConfiguration {
 			return defaultValue;
 		}
 
-		return get(this.items, key);
+		return get(this.#items, key);
 	}
 
 	public set<T>(key: string, value: T): boolean {
-		set(this.items, key, value);
+		set(this.#items, key, value);
 
 		return this.has(key);
 	}
 
 	public unset<T>(key: string): boolean {
-		unset(this.items, key);
+		unset(this.#items, key);
 
 		return this.has(key);
 	}
 
 	public has(key: string): boolean {
-		return has(this.items, key);
+		return has(this.#items, key);
 	}
 
-	private mergeWithGlobal(name: string): void {
+	#mergeWithGlobal(name: string): void {
 		// @@TODO better name for storing pluginOptions
 		if (!this.configRepository.has(`app.pluginOptions.${name}`)) {
 			return;

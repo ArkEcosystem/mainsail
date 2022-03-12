@@ -8,26 +8,26 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	@inject(Identifiers.EventDispatcherService)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
-	private readonly store: Map<K, T> = new Map<K, T>();
+	readonly #store: Map<K, T> = new Map<K, T>();
 
 	public async make(): Promise<Contracts.Kernel.CacheStore<K, T>> {
 		return this;
 	}
 
 	public async all(): Promise<Array<[K, T]>> {
-		return [...this.store.entries()];
+		return [...this.#store.entries()];
 	}
 
 	public async keys(): Promise<K[]> {
-		return [...this.store.keys()];
+		return [...this.#store.keys()];
 	}
 
 	public async values(): Promise<T[]> {
-		return [...this.store.values()];
+		return [...this.#store.values()];
 	}
 
 	public async get(key: K): Promise<T | undefined> {
-		const value: T | undefined = this.store.get(key);
+		const value: T | undefined = this.#store.get(key);
 
 		value
 			? this.eventDispatcher.dispatch(CacheEvent.Hit, { key, value })
@@ -37,11 +37,11 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async getMany(keys: K[]): Promise<Array<T | undefined>> {
-		return keys.map((key: K) => this.store.get(key));
+		return keys.map((key: K) => this.#store.get(key));
 	}
 
 	public async put(key: K, value: T, seconds?: number): Promise<boolean> {
-		this.store.set(key, value);
+		this.#store.set(key, value);
 
 		this.eventDispatcher.dispatch(CacheEvent.Written, { key, seconds, value });
 
@@ -53,7 +53,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async has(key: K): Promise<boolean> {
-		return this.store.has(key);
+		return this.#store.has(key);
 	}
 
 	public async hasMany(keys: K[]): Promise<boolean[]> {
@@ -61,7 +61,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async missing(key: K): Promise<boolean> {
-		return !this.store.has(key);
+		return !this.#store.has(key);
 	}
 
 	public async missingMany(keys: K[]): Promise<boolean[]> {
@@ -77,7 +77,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async forget(key: K): Promise<boolean> {
-		this.store.delete(key);
+		this.#store.delete(key);
 
 		this.eventDispatcher.dispatch(CacheEvent.Forgotten, { key });
 
@@ -89,11 +89,11 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async flush(): Promise<boolean> {
-		this.store.clear();
+		this.#store.clear();
 
 		this.eventDispatcher.dispatch(CacheEvent.Flushed);
 
-		return this.store.size === 0;
+		return this.#store.size === 0;
 	}
 
 	public async getPrefix(): Promise<string> {

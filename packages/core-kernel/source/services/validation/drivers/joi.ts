@@ -6,26 +6,26 @@ import { JsonObject } from "../../../types";
 
 @injectable()
 export class JoiValidator implements Contracts.Kernel.Validator {
-	private data!: JsonObject;
+	#data!: JsonObject;
 
-	private resultValue: JsonObject | undefined;
+	#resultValue: JsonObject | undefined;
 
-	private resultError: ValidationErrorItem[] | undefined;
+	#resultError: ValidationErrorItem[] | undefined;
 
 	public validate(data: JsonObject, schema: object): void {
-		this.data = data;
+		this.#data = data;
 
-		const { error, value } = (schema as AnySchema).validate(this.data);
+		const { error, value } = (schema as AnySchema).validate(this.#data);
 
-		this.resultValue = error ? undefined : value;
+		this.#resultValue = error ? undefined : value;
 
 		if (error) {
-			this.resultError = error.details;
+			this.#resultError = error.details;
 		}
 	}
 
 	public passes(): boolean {
-		return !this.resultError;
+		return !this.#resultError;
 	}
 
 	public fails(): boolean {
@@ -33,25 +33,25 @@ export class JoiValidator implements Contracts.Kernel.Validator {
 	}
 
 	public failed(): Record<string, string[]> {
-		return this.groupErrors("type");
+		return this.#groupErrors("type");
 	}
 
 	public errors(): Record<string, string[]> {
-		return this.groupErrors("message");
+		return this.#groupErrors("message");
 	}
 
 	public valid(): JsonObject | undefined {
-		return this.resultValue;
+		return this.#resultValue;
 	}
 
 	public invalid(): JsonObject {
 		const errors: JsonObject = {};
 
-		if (!this.resultError) {
+		if (!this.#resultError) {
 			return errors;
 		}
 
-		for (const error of this.resultError) {
+		for (const error of this.#resultError) {
 			if (error.context && error.context.key) {
 				errors[error.context.key] = error.context.value;
 			}
@@ -61,17 +61,17 @@ export class JoiValidator implements Contracts.Kernel.Validator {
 	}
 
 	public attributes(): JsonObject {
-		return this.data;
+		return this.#data;
 	}
 
-	private groupErrors(attribute: string): Record<string, string[]> {
+	#groupErrors(attribute: string): Record<string, string[]> {
 		const errors: Record<string, string[]> = {};
 
-		if (!this.resultError) {
+		if (!this.#resultError) {
 			return errors;
 		}
 
-		for (const error of this.resultError) {
+		for (const error of this.#resultError) {
 			const errorKey: string | number = error.path[0];
 
 			if (!Array.isArray(errors[errorKey])) {

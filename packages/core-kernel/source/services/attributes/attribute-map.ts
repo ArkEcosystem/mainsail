@@ -5,18 +5,18 @@ import { assert } from "../../utils";
 import { AttributeSet } from "./attribute-set";
 
 export class AttributeMap {
-	private attributes: object = {};
+	#attributes: object = {};
 
 	public constructor(private readonly knownAttributes: AttributeSet) {}
 
 	public all(): object {
-		return this.attributes;
+		return this.#attributes;
 	}
 
 	public get<T>(key: string, defaultValue?: T): T {
-		this.assertKnown(key);
+		this.#assertKnown(key);
 
-		const value: T | undefined = get(this.attributes, key) ?? defaultValue;
+		const value: T | undefined = get(this.#attributes, key) ?? defaultValue;
 
 		assert.defined<T>(value);
 
@@ -24,40 +24,40 @@ export class AttributeMap {
 	}
 
 	public set<T>(key: string, value: T): boolean {
-		this.assertKnown(key);
+		this.#assertKnown(key);
 
-		set(this.attributes, key, value);
+		set(this.#attributes, key, value);
 
 		return this.has(key);
 	}
 
 	public forget(key: string): boolean {
-		this.assertKnown(key);
+		this.#assertKnown(key);
 
-		unset(this.attributes, key);
+		unset(this.#attributes, key);
 
 		return !this.has(key);
 	}
 
 	public flush(): boolean {
-		this.attributes = {};
+		this.#attributes = {};
 
-		return Object.keys(this.attributes).length === 0;
+		return Object.keys(this.#attributes).length === 0;
 	}
 
 	public has(key: string): boolean {
-		this.assertKnown(key);
+		this.#assertKnown(key);
 
-		return has(this.attributes, key);
+		return has(this.#attributes, key);
 	}
 
 	public clone(): AttributeMap {
 		const cloned = new AttributeMap(this.knownAttributes);
-		cloned.attributes = cloneDeep(this.attributes);
+		cloned.#attributes = cloneDeep(this.#attributes);
 		return cloned;
 	}
 
-	private assertKnown(key: string): void {
+	#assertKnown(key: string): void {
 		strictEqual(this.knownAttributes.has(key), true, `Unknown attribute: ${key}`);
 	}
 }

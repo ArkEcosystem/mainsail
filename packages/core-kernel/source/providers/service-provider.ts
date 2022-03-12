@@ -10,9 +10,9 @@ export abstract class ServiceProvider {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	private packageConfiguration!: PluginConfiguration;
+	#packageConfiguration!: PluginConfiguration;
 
-	private packageManifest!: PluginManifest;
+	#packageManifest!: PluginManifest;
 
 	public async boot(): Promise<void> {
 		//
@@ -23,43 +23,43 @@ export abstract class ServiceProvider {
 	}
 
 	public manifest(): PluginManifest {
-		return this.packageManifest;
+		return this.#packageManifest;
 	}
 
 	public setManifest(manifest: PluginManifest): void {
-		this.packageManifest = manifest;
+		this.#packageManifest = manifest;
 	}
 
 	public name(): string | undefined {
-		if (this.packageManifest) {
-			return this.packageManifest.get("name");
+		if (this.#packageManifest) {
+			return this.#packageManifest.get("name");
 		}
 
 		return undefined;
 	}
 
 	public version(): string | undefined {
-		if (this.packageManifest) {
-			return this.packageManifest.get("version");
+		if (this.#packageManifest) {
+			return this.#packageManifest.get("version");
 		}
 
 		return undefined;
 	}
 
 	public alias(): string | undefined {
-		if (this.packageManifest) {
-			return this.packageManifest.get("arkecosystem.core.alias");
+		if (this.#packageManifest) {
+			return this.#packageManifest.get("arkecosystem.core.alias");
 		}
 
 		return undefined;
 	}
 
 	public config(): PluginConfiguration {
-		return this.packageConfiguration;
+		return this.#packageConfiguration;
 	}
 
 	public setConfig(config: PluginConfiguration): void {
-		this.packageConfiguration = config;
+		this.#packageConfiguration = config;
 	}
 
 	public configDefaults(): JsonObject {
@@ -71,8 +71,8 @@ export abstract class ServiceProvider {
 	}
 
 	public dependencies(): Contracts.Kernel.PluginDependency[] {
-		if (this.packageManifest) {
-			return this.packageManifest.get("arkecosystem.core.dependencies", []);
+		if (this.#packageManifest) {
+			return this.#packageManifest.get("arkecosystem.core.dependencies", []);
 		}
 
 		return [];
@@ -87,8 +87,8 @@ export abstract class ServiceProvider {
 	}
 
 	public async required(): Promise<boolean> {
-		if (this.packageManifest) {
-			return this.packageManifest.get("arkecosystem.core.required", false);
+		if (this.#packageManifest) {
+			return this.#packageManifest.get("arkecosystem.core.required", false);
 		}
 
 		return false;

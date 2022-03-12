@@ -13,7 +13,7 @@ import { JsonObject, KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
 
 export class Application implements Contracts.Kernel.Application {
-	private booted = false;
+	#booted = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
 		// @TODO enable this after solving the event emitter limit issues
@@ -32,19 +32,19 @@ export class Application implements Contracts.Kernel.Application {
 		this.bind<KeyValuePair>(Identifiers.ConfigFlags).toConstantValue(options.flags);
 		this.bind<KeyValuePair>(Identifiers.ConfigPlugins).toConstantValue(options.plugins || {});
 
-		await this.registerEventDispatcher();
+		await this.#registerEventDispatcher();
 
-		await this.bootstrapWith("app");
+		await this.#bootstrapWith("app");
 	}
 
 	public async boot(): Promise<void> {
-		await this.bootstrapWith("serviceProviders");
+		await this.#bootstrapWith("serviceProviders");
 
-		this.booted = true;
+		this.#booted = true;
 	}
 
 	public async reboot(): Promise<void> {
-		await this.disposeServiceProviders();
+		await this.#disposeServiceProviders();
 
 		await this.boot();
 	}
@@ -84,43 +84,43 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public dataPath(path = ""): string {
-		return join(this.getPath("data"), path);
+		return join(this.#getPath("data"), path);
 	}
 
 	public useDataPath(path: string): void {
-		this.usePath("data", path);
+		this.#usePath("data", path);
 	}
 
 	public configPath(path = ""): string {
-		return join(this.getPath("config"), path);
+		return join(this.#getPath("config"), path);
 	}
 
 	public useConfigPath(path: string): void {
-		this.usePath("config", path);
+		this.#usePath("config", path);
 	}
 
 	public cachePath(path = ""): string {
-		return join(this.getPath("cache"), path);
+		return join(this.#getPath("cache"), path);
 	}
 
 	public useCachePath(path: string): void {
-		this.usePath("cache", path);
+		this.#usePath("cache", path);
 	}
 
 	public logPath(path = ""): string {
-		return join(this.getPath("log"), path);
+		return join(this.#getPath("log"), path);
 	}
 
 	public useLogPath(path: string): void {
-		this.usePath("log", path);
+		this.#usePath("log", path);
 	}
 
 	public tempPath(path = ""): string {
-		return join(this.getPath("temp"), path);
+		return join(this.#getPath("temp"), path);
 	}
 
 	public useTempPath(path: string): void {
-		this.usePath("temp", path);
+		this.#usePath("temp", path);
 	}
 
 	public environmentFile(): string {
@@ -148,7 +148,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public isBooted(): boolean {
-		return this.booted;
+		return this.#booted;
 	}
 
 	public enableMaintenance(): void {
@@ -178,7 +178,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public async terminate(reason?: string, error?: Error): Promise<void> {
-		this.booted = false;
+		this.#booted = false;
 
 		if (reason) {
 			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice(reason);
@@ -188,7 +188,7 @@ export class Application implements Contracts.Kernel.Application {
 			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack);
 		}
 
-		await this.disposeServiceProviders();
+		await this.#disposeServiceProviders();
 	}
 
 	public bind<T>(
@@ -231,7 +231,7 @@ export class Application implements Contracts.Kernel.Application {
 		return this.container.resolve(constructorFunction);
 	}
 
-	private async bootstrapWith(type: string): Promise<void> {
+	async #bootstrapWith(type: string): Promise<void> {
 		const bootstrappers: Constructor<Bootstrapper>[] = Object.values(Bootstrappers[type]);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
 
@@ -244,11 +244,11 @@ export class Application implements Contracts.Kernel.Application {
 		}
 	}
 
-	private async registerEventDispatcher(): Promise<void> {
+	async #registerEventDispatcher(): Promise<void> {
 		await this.resolve(EventServiceProvider).register();
 	}
 
-	private async disposeServiceProviders(): Promise<void> {
+	async #disposeServiceProviders(): Promise<void> {
 		const serviceProviders: ServiceProvider[] = this.get<ServiceProviderRepository>(
 			Identifiers.ServiceProviderRepository,
 		).allLoadedProviders();
@@ -262,7 +262,7 @@ export class Application implements Contracts.Kernel.Application {
 		}
 	}
 
-	private getPath(type: string): string {
+	#getPath(type: string): string {
 		const path: string = this.get<string>(`path.${type}`);
 
 		if (!existsSync(path)) {
@@ -272,7 +272,7 @@ export class Application implements Contracts.Kernel.Application {
 		return path;
 	}
 
-	private usePath(type: string, path: string): void {
+	#usePath(type: string, path: string): void {
 		if (!existsSync(path)) {
 			throw new Exceptions.DirectoryCannotBeFound(path);
 		}
@@ -281,7 +281,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	//
-	// private listenToShutdownSignals(): void {
+	// #listenToShutdownSignals(): void {
 	//     for (const signal in ShutdownSignal) {
 	//         process.on(signal as any, async code => {
 	//             await this.terminate(signal);
