@@ -21,7 +21,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	private corrupt = false;
+	#corrupt = false;
 
 	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
@@ -47,7 +47,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		if (await this.triggers.call("verifyTransaction", { handler, transaction })) {
-			if (this.corrupt) {
+			if (this.#corrupt) {
 				throw new Exceptions.RetryTransactionError(transaction);
 			}
 
@@ -69,7 +69,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 			await this.triggers.call("revertTransaction", { handler, transaction });
 		} catch (error) {
-			this.corrupt = true;
+			this.#corrupt = true;
 			throw error;
 		}
 	}

@@ -11,38 +11,38 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@inject(Identifiers.TransactionPoolSenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
-	private concurrency = 0;
+	#concurrency = 0;
 
-	private readonly lock: AppUtils.Lock = new AppUtils.Lock();
+	readonly #lock: AppUtils.Lock = new AppUtils.Lock();
 
-	private readonly transactions: Contracts.Crypto.ITransaction[] = [];
+	readonly #transactions: Contracts.Crypto.ITransaction[] = [];
 
 	public isDisposable(): boolean {
-		return this.transactions.length === 0 && this.concurrency === 0;
+		return this.#transactions.length === 0 && this.#concurrency === 0;
 	}
 
 	public getSize(): number {
-		return this.transactions.length;
+		return this.#transactions.length;
 	}
 
 	public getFromEarliest(): Iterable<Contracts.Crypto.ITransaction> {
-		return [...this.transactions];
+		return [...this.#transactions];
 	}
 
 	public getFromLatest(): Iterable<Contracts.Crypto.ITransaction> {
-		return [...this.transactions].reverse();
+		return [...this.#transactions].reverse();
 	}
 
 	public async addTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		try {
-			this.concurrency++;
+			this.#concurrency++;
 
-			await this.lock.runExclusive(async () => {
+			await this.#lock.runExclusive(async () => {
 				AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 				const maxTransactionsPerSender: number =
 					this.configuration.getRequired<number>("maxTransactionsPerSender");
-				if (this.transactions.length >= maxTransactionsPerSender) {
+				if (this.#transactions.length >= maxTransactionsPerSender) {
 					const allowedSenders: string[] = this.configuration.getOptional<string[]>("allowedSenders", []);
 					if (!allowedSenders.includes(transaction.data.senderPublicKey)) {
 						throw new Exceptions.SenderExceededMaximumTransactionCountError(
@@ -53,25 +53,25 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 				}
 
 				await this.senderState.apply(transaction);
-				this.transactions.push(transaction);
+				this.#transactions.push(transaction);
 			});
 		} finally {
-			this.concurrency--;
+			this.#concurrency--;
 		}
 	}
 
 	public async removeTransaction(id: string): Promise<Contracts.Crypto.ITransaction[]> {
 		try {
-			this.concurrency++;
+			this.#concurrency++;
 
-			return await this.lock.runExclusive(async () => {
-				const index = this.transactions.findIndex((t) => t.id === id);
+			return await this.#lock.runExclusive(async () => {
+				const index = this.#transactions.findIndex((t) => t.id === id);
 				if (index === -1) {
 					return [];
 				}
 
-				const removedTransactions: Contracts.Crypto.ITransaction[] = this.transactions
-					.splice(index, this.transactions.length - index)
+				const removedTransactions: Contracts.Crypto.ITransaction[] = this.#transactions
+					.splice(index, this.#transactions.length - index)
 					.reverse();
 
 				try {
@@ -80,28 +80,28 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 					}
 					return removedTransactions;
 				} catch {
-					const otherRemovedTransactions = this.transactions.splice(0, this.transactions.length).reverse();
+					const otherRemovedTransactions = this.#transactions.splice(0, this.#transactions.length).reverse();
 					return [...removedTransactions, ...otherRemovedTransactions];
 				}
 			});
 		} finally {
-			this.concurrency--;
+			this.#concurrency--;
 		}
 	}
 
 	public async removeForgedTransaction(id: string): Promise<Contracts.Crypto.ITransaction[]> {
 		try {
-			this.concurrency++;
+			this.#concurrency++;
 
-			const index: number = this.transactions.findIndex((t) => t.id === id);
+			const index: number = this.#transactions.findIndex((t) => t.id === id);
 
 			if (index !== -1) {
-				return this.transactions.splice(0, index + 1);
+				return this.#transactions.splice(0, index + 1);
 			} else {
 				return []; // TODO: implement this.reboot();
 			}
 		} finally {
-			this.concurrency--;
+			this.#concurrency--;
 		}
 	}
 }

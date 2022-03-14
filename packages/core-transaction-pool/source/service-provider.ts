@@ -20,8 +20,8 @@ import { Storage } from "./storage";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.registerServices();
-		this.registerActions();
+		this.#registerServices();
+		this.#registerActions();
 	}
 
 	public async boot(): Promise<void> {
@@ -51,7 +51,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	private registerServices(): void {
+	#registerServices(): void {
 		this.app.bind(Identifiers.TransactionPoolCollator).to(Collator);
 		this.app.bind(Identifiers.TransactionPoolExpirationService).to(ExpirationService);
 		this.app.bind(Identifiers.TransactionPoolMempool).to(Mempool).inSingletonScope();
@@ -67,7 +67,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPoolStorage).to(Storage).inSingletonScope();
 	}
 
-	private registerActions(): void {
+	#registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("applyTransaction", new ApplyTransactionAction());

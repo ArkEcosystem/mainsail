@@ -35,9 +35,9 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
-	private readonly lock: AppUtils.Lock = new AppUtils.Lock();
+	readonly #lock: AppUtils.Lock = new AppUtils.Lock();
 
-	private disposed = false;
+	#disposed = false;
 
 	public async boot(): Promise<void> {
 		this.events.listen(Enums.StateEvent.BuilderFinished, this);
@@ -54,7 +54,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		this.events.forget(Enums.StateEvent.BuilderFinished, this);
 		this.events.forget(Enums.BlockEvent.Applied, this);
 
-		this.disposed = true;
+		this.#disposed = true;
 	}
 
 	public async handle({ name }): Promise<void> {
@@ -81,8 +81,8 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	public async addTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await this.lock.runNonExclusive(async () => {
-			if (this.disposed) {
+		await this.#lock.runNonExclusive(async () => {
+			if (this.#disposed) {
 				return;
 			}
 
@@ -102,7 +102,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			try {
 				await this.feeMatcher.throwIfCannotEnterPool(transaction);
-				await this.addTransactionToMempool(transaction);
+				await this.#addTransactionToMempool(transaction);
 				this.logger.debug(`${transaction} added to pool`);
 				this.events.dispatch(Enums.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
@@ -118,8 +118,8 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	public async readdTransactions(previouslyForgedTransactions: Contracts.Crypto.ITransaction[] = []): Promise<void> {
-		await this.lock.runExclusive(async () => {
-			if (this.disposed) {
+		await this.#lock.runExclusive(async () => {
+			if (this.#disposed) {
 				return;
 			}
 
@@ -140,7 +140,7 @@ export class Service implements Contracts.TransactionPool.Service {
 					AppUtils.assert.defined<string>(previouslyForgedTransaction.id);
 					AppUtils.assert.defined<string>(previouslyForgedTransaction.data.senderPublicKey);
 
-					await this.addTransactionToMempool(previouslyForgedTransaction);
+					await this.#addTransactionToMempool(previouslyForgedTransaction);
 
 					this.storage.addTransaction({
 						height: this.stateStore.getLastHeight(),
@@ -170,7 +170,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				if (height > expiredHeight) {
 					try {
 						const previouslyStoredTransaction = await this.transactionFactory.fromBytes(serialized);
-						await this.addTransactionToMempool(previouslyStoredTransaction);
+						await this.#addTransactionToMempool(previouslyStoredTransaction);
 						previouslyStoredSuccesses++;
 					} catch (error) {
 						this.storage.removeTransaction(id);
@@ -203,8 +203,8 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	public async removeTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await this.lock.runNonExclusive(async () => {
-			if (this.disposed) {
+		await this.#lock.runNonExclusive(async () => {
+			if (this.#disposed) {
 				return;
 			}
 
@@ -237,8 +237,8 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	public async removeForgedTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await this.lock.runNonExclusive(async () => {
-			if (this.disposed) {
+		await this.#lock.runNonExclusive(async () => {
+			if (this.#disposed) {
 				return;
 			}
 
@@ -268,20 +268,20 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	public async cleanUp(): Promise<void> {
-		await this.lock.runNonExclusive(async () => {
-			if (this.disposed) {
+		await this.#lock.runNonExclusive(async () => {
+			if (this.#disposed) {
 				return;
 			}
 
-			await this.removeOldTransactions();
-			await this.removeExpiredTransactions();
-			await this.removeLowestPriorityTransactions();
+			await this.#removeOldTransactions();
+			await this.#removeExpiredTransactions();
+			await this.#removeLowestPriorityTransactions();
 		});
 	}
 
 	public async flush(): Promise<void> {
-		await this.lock.runExclusive(async () => {
-			if (this.disposed) {
+		await this.#lock.runExclusive(async () => {
+			if (this.#disposed) {
 				return;
 			}
 
@@ -290,7 +290,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	private async removeOldTransactions(): Promise<void> {
+	async #removeOldTransactions(): Promise<void> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 		const lastHeight: number = this.stateStore.getLastHeight();
 		const expiredHeight: number = lastHeight - maxTransactionAge;
@@ -307,7 +307,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 	}
 
-	private async removeExpiredTransactions(): Promise<void> {
+	async #removeExpiredTransactions(): Promise<void> {
 		for (const transaction of this.poolQuery.getAll()) {
 			AppUtils.assert.defined<string>(transaction.id);
 			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -328,7 +328,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 	}
 
-	private async removeLowestPriorityTransaction(): Promise<void> {
+	async #removeLowestPriorityTransaction(): Promise<void> {
 		if (this.getPoolSize() === 0) {
 			return;
 		}
@@ -351,23 +351,23 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 	}
 
-	private async removeLowestPriorityTransactions(): Promise<void> {
+	async #removeLowestPriorityTransactions(): Promise<void> {
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
 		while (this.getPoolSize() > maxTransactionsInPool) {
-			await this.removeLowestPriorityTransaction();
+			await this.#removeLowestPriorityTransaction();
 		}
 	}
 
-	private async addTransactionToMempool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	async #addTransactionToMempool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
-			await this.removeOldTransactions();
-			await this.removeExpiredTransactions();
-			await this.removeLowestPriorityTransactions();
+			await this.#removeOldTransactions();
+			await this.#removeExpiredTransactions();
+			await this.#removeLowestPriorityTransactions();
 		}
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
@@ -376,7 +376,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				throw new Exceptions.TransactionPoolFullError(transaction, lowest.data.fee);
 			}
 
-			await this.removeLowestPriorityTransaction();
+			await this.#removeLowestPriorityTransaction();
 		}
 
 		await this.mempool.addTransaction(transaction);

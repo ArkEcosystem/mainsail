@@ -42,8 +42,8 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				try {
 					const transaction =
 						transactionData instanceof Buffer
-							? await this.getTransactionFromBuffer(transactionData)
-							: await this.getTransactionFromData(transactionData);
+							? await this.#getTransactionFromBuffer(transactionData)
+							: await this.#getTransactionFromData(transactionData);
 					await this.pool.addTransaction(transaction);
 					accept.push(entryId);
 
@@ -89,7 +89,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		};
 	}
 
-	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.ITransaction> {
+	async #getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.ITransaction> {
 		try {
 			const transactionCommon = {} as Contracts.Crypto.ITransactionData;
 			const txByteBuffer = ByteBuffer.fromBuffer(transactionData);
@@ -101,7 +101,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		}
 	}
 
-	private async getTransactionFromData(
+	async #getTransactionFromData(
 		transactionData: Contracts.Crypto.ITransactionData,
 	): Promise<Contracts.Crypto.ITransaction> {
 		try {
