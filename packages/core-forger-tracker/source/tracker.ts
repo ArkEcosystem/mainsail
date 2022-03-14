@@ -23,10 +23,10 @@ export class ValidatorTracker {
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeCalculator: any;
 
-	private validators: Contracts.Forger.Validator[] = [];
+	#validators: Contracts.Forger.Validator[] = [];
 
 	public initialize(validators: Contracts.Forger.Validator[]): this {
-		this.validators = validators;
+		this.#validators = validators;
 
 		return this;
 	}
@@ -77,14 +77,14 @@ export class ValidatorTracker {
 		const nextForgersUsernames = [];
 
 		for (let index = 0; index < nextForgers.slice(0, 5).length; index++) {
-			nextForgersUsernames[index] = await this.getUsername(nextForgers[index]);
+			nextForgersUsernames[index] = await this.#getUsername(nextForgers[index]);
 		}
 
 		this.logger.debug(`Next Forgers: ${JSON.stringify(nextForgersUsernames)}`);
 
 		const secondsToNextRound: number = (maxValidators - forgingInfo.currentForger - 1) * blockTime;
 
-		for (const validator of this.validators) {
+		for (const validator of this.#validators) {
 			let indexInNextForgers = 0;
 			for (const [index, nextForger] of nextForgers.entries()) {
 				if (nextForger === validator.publicKey) {
@@ -94,22 +94,22 @@ export class ValidatorTracker {
 			}
 
 			if (indexInNextForgers === 0) {
-				this.logger.debug(`${this.getUsername(validator.publicKey)} will forge next.`);
+				this.logger.debug(`${this.#getUsername(validator.publicKey)} will forge next.`);
 			} else if (indexInNextForgers <= maxValidators - forgingInfo.nextForger) {
 				this.logger.debug(
-					`${this.getUsername(validator.publicKey)} will forge in ${Utils.prettyTime(
+					`${this.#getUsername(validator.publicKey)} will forge in ${Utils.prettyTime(
 						indexInNextForgers * blockTime * 1000,
 					)}.`,
 				);
 			} else {
-				this.logger.debug(`${this.getUsername(validator.publicKey)} has already forged.`);
+				this.logger.debug(`${this.#getUsername(validator.publicKey)} has already forged.`);
 			}
 		}
 
 		this.logger.debug(`Round ${round.round} will end in ${Utils.prettyTime(secondsToNextRound * 1000)}.`);
 	}
 
-	private async getUsername(publicKey: string): Promise<string> {
+	async #getUsername(publicKey: string): Promise<string> {
 		return (await this.walletRepository.findByPublicKey(publicKey)).getAttribute("validator.username");
 	}
 }
