@@ -1,4 +1,4 @@
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 export const block1 = {
 	data: {

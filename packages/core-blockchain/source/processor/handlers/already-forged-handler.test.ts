@@ -1,26 +1,26 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { BlockProcessorResult } from "../contracts";
 import { AlreadyForgedHandler } from "./already-forged-handler";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain: any;
 	application: any;
 }>("AlreadyForgedHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.blockchain = {
-			resetLastDownloadedBlock: () => undefined,
+			resetLastDownloadedBlock: () => {},
 		};
 		context.application = {
-			get: () => undefined,
+			get: () => {},
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 	});
 
 	it("should call blockchain.resetLastDownloadedBlock and return DiscardedButCanBeBroadcasted", async (context) => {
@@ -29,7 +29,7 @@ describe<{
 		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
 
 		const block = {};
-		const result = await alreadyForgedHandler.execute(block as Interfaces.IBlock);
+		const result = await alreadyForgedHandler.execute(block as Contracts.Crypto.IBlock);
 
 		assert.equal(result, BlockProcessorResult.DiscardedButCanBeBroadcasted);
 		resetLastDownloadedBlockSpy.calledOnce();

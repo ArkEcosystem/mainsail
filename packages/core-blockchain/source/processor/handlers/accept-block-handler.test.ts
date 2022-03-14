@@ -1,12 +1,12 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { BlockProcessorResult } from "../contracts";
 import { AcceptBlockHandler } from "./accept-block-handler";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	logger: any;
 	blockchain: any;
 	state: any;
@@ -18,58 +18,58 @@ describe<{
 }>("AcceptBlockHandler", ({ assert, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
-			warning: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
+			debug: () => {},
+			info: () => {},
+			warning: () => {},
 		};
 		context.blockchain = {
-			resetLastDownloadedBlock: () => undefined,
-			resetWakeUp: () => undefined,
+			resetLastDownloadedBlock: () => {},
+			resetWakeUp: () => {},
 		};
 		context.state = {
-			setLastBlock: () => undefined,
-			getLastBlock: () => undefined,
-			getLastDownloadedBlock: () => undefined,
-			setLastDownloadedBlock: () => undefined,
+			clearForkedBlock: () => {},
+			getForkedBlock: () => {},
+			getLastBlock: () => {},
+			getLastDownloadedBlock: () => {},
 			isStarted: () => false,
-			getForkedBlock: () => undefined,
-			setForkedBlock: () => undefined,
-			clearForkedBlock: () => undefined,
+			setForkedBlock: () => {},
+			setLastBlock: () => {},
+			setLastDownloadedBlock: () => {},
 		};
 		context.transactionPool = {
-			removeForgedTransaction: () => undefined,
+			removeForgedTransaction: () => {},
 		};
 		context.databaseInteractions = {
-			walletRepository: {
-				getNonce: () => undefined,
-			},
-			applyBlock: () => undefined,
-			getTopBlocks: () => undefined,
-			getLastBlock: () => undefined,
-			loadBlocksFromCurrentRound: () => undefined,
-			revertBlock: () => undefined,
-			deleteRound: () => undefined,
+			applyBlock: () => {},
+			deleteRound: () => {},
 			getActiveDelegates: () => [],
+			getLastBlock: () => {},
+			getTopBlocks: () => {},
+			loadBlocksFromCurrentRound: () => {},
+			revertBlock: () => {},
+			walletRepository: {
+				getNonce: () => {},
+			},
 		};
 		context.revertBlockHandler = {
-			execute: () => undefined,
+			execute: () => {},
 		};
 		context.application = {
-			get: () => undefined,
-			resolve: () => undefined,
+			get: () => {},
+			resolve: () => {},
 		};
 		context.block = {
-			data: { id: "1222", height: 5544 },
+			data: { height: 5544, id: "1222" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.state);
-		context.container.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
-		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.state);
+		context.container.bind(Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
+		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
 	});
 
 	it("execute should apply block to database, transaction pool, blockchain and state", async (context) => {
@@ -80,7 +80,7 @@ describe<{
 		const resetWakeUpSpy = spy(context.blockchain, "resetWakeUp");
 		const removeForgedTransactionSpy = spy(context.transactionPool, "removeForgedTransaction");
 
-		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.is(result, BlockProcessorResult.Accepted);
 		applyBlockSpy.calledOnce();
@@ -97,7 +97,7 @@ describe<{
 		stub(context.state, "getForkedBlock").returnValue({ data: { height: context.block.data.height } });
 		const clearForkedBlockSpy = spy(context.state, "clearForkedBlock");
 
-		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.is(result, BlockProcessorResult.Accepted);
 		clearForkedBlockSpy.calledOnce();
@@ -108,7 +108,7 @@ describe<{
 
 		stub(context.state, "getLastDownloadedBlock").returnValue({ height: context.block.data.height - 1 });
 		const setLastDownloadedBlockSpy = spy(context.state, "setLastDownloadedBlock");
-		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.is(result, BlockProcessorResult.Accepted);
 
@@ -128,7 +128,7 @@ describe<{
 
 		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
 
-		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.is(result, BlockProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
@@ -146,7 +146,7 @@ describe<{
 		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
 		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
 
-		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.is(result, BlockProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
@@ -165,7 +165,7 @@ describe<{
 		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
 		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
 
-		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.is(result, BlockProcessorResult.Corrupted);
 

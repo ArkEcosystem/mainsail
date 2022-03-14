@@ -1,8 +1,10 @@
-import { Application, Container, Providers, Services } from "@arkecosystem/core-kernel";
-import { AnySchema } from "joi";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application, Providers, Services } from "@arkecosystem/core-kernel";
 import importFresh from "import-fresh";
-import { describe } from "../../core-test-framework";
+import { AnySchema } from "joi";
 
+import { describe } from "../../core-test-framework";
 import { ServiceProvider } from "./service-provider";
 
 const loadDefaults = (): { defaults: Record<string, any> } => importFresh("./defaults");
@@ -10,23 +12,20 @@ const loadDefaults = (): { defaults: Record<string, any> } => importFresh("./def
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-}>("ServiceProvider", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
+}>("ServiceProvider", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 
-		context.app.bind(Container.Identifiers.StateStore).toConstantValue({ reset: () => undefined });
-		context.app.bind(Container.Identifiers.DatabaseService).toConstantValue({});
-		context.app.bind(Container.Identifiers.DatabaseInteraction).toConstantValue({});
-		context.app.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue({});
-		context.app.bind(Container.Identifiers.TransactionPoolService).toConstantValue({});
-		context.app.bind(Container.Identifiers.LogService).toConstantValue({});
-		context.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue({});
-		context.app.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue({});
-		context.app
-			.bind(Container.Identifiers.PluginConfiguration)
-			.to(Providers.PluginConfiguration)
-			.inSingletonScope();
-		context.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		context.app.bind(Identifiers.StateStore).toConstantValue({ reset: () => {} });
+		context.app.bind(Identifiers.Database.Service).toConstantValue({});
+		context.app.bind(Identifiers.DatabaseInteraction).toConstantValue({});
+		context.app.bind(Identifiers.Database.BlockStorage).toConstantValue({});
+		context.app.bind(Identifiers.TransactionPoolService).toConstantValue({});
+		context.app.bind(Identifiers.LogService).toConstantValue({});
+		context.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
+		context.app.bind(Identifiers.Database.TransactionStorage).toConstantValue({});
+		context.app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
+		context.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
@@ -35,33 +34,35 @@ describe<{
 		const pluginConfiguration = context.app.resolve<Providers.PluginConfiguration>(Providers.PluginConfiguration);
 		context.serviceProvider.setConfig(pluginConfiguration);
 
-		assert.false(context.app.isBound(Container.Identifiers.StateMachine));
-		assert.false(context.app.isBound(Container.Identifiers.BlockchainService));
-		assert.false(context.app.isBound(Container.Identifiers.BlockProcessor));
+		assert.false(context.app.isBound(Identifiers.StateMachine));
+		assert.false(context.app.isBound(Identifiers.BlockchainService));
+		assert.false(context.app.isBound(Identifiers.BlockProcessor));
 
 		await context.serviceProvider.register();
 
-		assert.true(context.app.isBound(Container.Identifiers.StateMachine));
-		assert.true(context.app.isBound(Container.Identifiers.BlockchainService));
-		assert.true(context.app.isBound(Container.Identifiers.BlockProcessor));
+		assert.true(context.app.isBound(Identifiers.StateMachine));
+		assert.true(context.app.isBound(Identifiers.BlockchainService));
+		assert.true(context.app.isBound(Identifiers.BlockProcessor));
 	});
 
 	it("boot should call boot on blockchain service", async (context) => {
-		const blockchainService = { boot: spyFn() };
-		context.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchainService);
+		const blockchainService = { boot: () => {} };
+		const spyBoot = stub(blockchainService, "boot");
+		context.app.bind(Identifiers.BlockchainService).toConstantValue(blockchainService);
 
 		await context.serviceProvider.boot();
 
-		assert.true(blockchainService.boot.calledOnce);
+		spyBoot.calledOnce();
 	});
 
 	it("dispose should call dispose on blockchain service", async (context) => {
-		const blockchainService = { dispose: spyFn() };
-		context.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchainService);
+		const blockchainService = { dispose: () => {} };
+		const spyDispose = stub(blockchainService, "dispose");
+		context.app.bind(Identifiers.BlockchainService).toConstantValue(blockchainService);
 
 		await context.serviceProvider.dispose();
 
-		assert.true(blockchainService.dispose.calledOnce);
+		spyDispose.calledOnce();
 	});
 
 	it("required should return true", async (context) => {
@@ -96,7 +97,7 @@ describe<{
 		delete defaults.databaseRollback;
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback" is required');
+		assert.equal(result.error.message, '"databaseRollback" is required');
 	});
 
 	it("databaseRollback.maxBlockRewind is required && is integer && >= 1", async (context) => {
@@ -104,22 +105,22 @@ describe<{
 		defaults.databaseRollback.maxBlockRewind = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.maxBlockRewind" must be a number');
+		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" must be a number');
 
 		defaults.databaseRollback.maxBlockRewind = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.maxBlockRewind" must be an integer');
+		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" must be an integer');
 
 		defaults.databaseRollback.maxBlockRewind = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.maxBlockRewind" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" must be greater than or equal to 1');
 
 		delete defaults.databaseRollback.maxBlockRewind;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.maxBlockRewind" is required');
+		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" is required');
 	});
 
 	it("databaseRollback.steps is required && is integer && >= 1", async (context) => {
@@ -127,22 +128,22 @@ describe<{
 		defaults.databaseRollback.steps = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.steps" must be a number');
+		assert.equal(result.error.message, '"databaseRollback.steps" must be a number');
 
 		defaults.databaseRollback.steps = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.steps" must be an integer');
+		assert.equal(result.error.message, '"databaseRollback.steps" must be an integer');
 
 		defaults.databaseRollback.steps = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.steps" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"databaseRollback.steps" must be greater than or equal to 1');
 
 		delete defaults.databaseRollback.steps;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"databaseRollback.steps" is required');
+		assert.equal(result.error.message, '"databaseRollback.steps" is required');
 	});
 
 	it("networkStart is optional && is boolean", async (context) => {
@@ -150,7 +151,7 @@ describe<{
 		defaults.networkStart = 123;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"networkStart" must be a boolean');
+		assert.equal(result.error.message, '"networkStart" must be a boolean');
 
 		delete defaults.networkStart;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);

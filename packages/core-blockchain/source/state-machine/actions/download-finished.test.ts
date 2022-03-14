@@ -1,10 +1,11 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { DownloadFinished } from "./download-finished";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain: any;
 	stateStore: any;
 	application: any;
@@ -13,32 +14,32 @@ describe<{
 }>("DownloadFinished", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.queue = {
-			size: () => undefined,
 			isRunning: () => true,
+			size: () => {},
 		};
 		context.blockchain = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 			getQueue: () => context.queue,
 		};
 		context.stateStore = {
 			getNetworkStart: () => false,
-			setNetworkStart: () => undefined,
+			setNetworkStart: () => {},
 		};
 		context.application = {
-			resolve: () => undefined,
+			resolve: () => {},
 		};
 		context.logger = {
-			warn: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warn: () => {},
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 	});
 
 	describe("handle", () => {

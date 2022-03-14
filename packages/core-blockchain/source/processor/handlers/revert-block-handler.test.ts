@@ -1,12 +1,12 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { BlockProcessorResult } from "../contracts";
 import { RevertBlockHandler } from "./revert-block-handler";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	logger: any;
 	state: any;
 	transactionPool: any;
@@ -18,43 +18,43 @@ describe<{
 }>("AcceptBlockHandler", ({ assert, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
-			warning: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
 		};
 		context.state = {
-			getLastBlocks: () => undefined,
-			setLastBlock: () => undefined,
+			getLastBlocks: () => {},
+			setLastBlock: () => {},
 		};
 		context.transactionPool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 		};
 		context.databaseInteractions = {
-			revertBlock: () => undefined,
+			revertBlock: () => {},
 		};
 		context.databaseService = {
-			getLastBlock: () => undefined,
+			getLastBlock: () => {},
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.state);
-		context.container.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
-		context.container.bind(Container.Identifiers.DatabaseService).toConstantValue(context.databaseService);
-		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
+		context.container = new Container();
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.state);
+		context.container.bind(Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
+		context.container.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
+		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
 
 		context.block = {
-			data: { id: "1222", height: 5544 },
+			data: { height: 5544, id: "1222" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 		context.previousBlock = {
-			data: { id: "1221", height: 5543 },
+			data: { height: 5543, id: "1221" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 
 		context.randomBlock = {
-			data: { id: "123", height: 5540 },
+			data: { height: 5540, id: "123" },
 			transactions: [{ id: "11" }, { id: "12" }],
 		};
 	});
@@ -68,7 +68,7 @@ describe<{
 		const getLastBlockSpy = spy(context.databaseService, "getLastBlock");
 		const setLastBlockSpy = spy(context.state, "setLastBlock");
 
-		const result = await revertBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await revertBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.equal(result, BlockProcessorResult.Reverted);
 		revertBlockSpy.calledOnce();
@@ -90,7 +90,7 @@ describe<{
 		const addTransactionSpy = spy(context.transactionPool, "addTransaction");
 		const setLastBlockSpy = spy(context.state, "setLastBlock");
 
-		const result = await revertBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await revertBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.equal(result, BlockProcessorResult.Reverted);
 		revertBlockSpy.calledOnce();
@@ -109,7 +109,7 @@ describe<{
 		stub(context.state, "getLastBlocks").returnValue([]);
 		stub(context.databaseInteractions, "revertBlock").rejectedValue(new Error("oops"));
 
-		const result = await revertBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await revertBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.equal(result, BlockProcessorResult.Corrupted);
 	});
@@ -123,7 +123,7 @@ describe<{
 		const addTransactionSpy = spy(context.transactionPool, "addTransaction");
 		const setLastBlockSpy = spy(context.state, "setLastBlock");
 
-		const result = await revertBlockHandler.execute(context.block as Interfaces.IBlock);
+		const result = await revertBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
 		assert.equal(result, BlockProcessorResult.Corrupted);
 		revertBlockSpy.calledOnce();

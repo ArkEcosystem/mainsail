@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { describe, Sandbox } from "../../../core-test-framework";
 import delay from "delay";
 
@@ -25,8 +25,8 @@ describe<{
 		};
 
 		sandbox = new Sandbox();
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(context.logService);
-		sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logService);
+		sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 	});
 
 	it("should use blockchainMachine.transition to get next state and return it", (context) => {
@@ -64,14 +64,17 @@ describe<{
 		};
 		const mockNextState = { state: "next", actions: [nextAction] };
 		stub(blockchainMachine, "transition").returnValue(mockNextState);
-		const handle = spyFn();
-		stub(sandbox.app, "resolve").returnValue({ handle });
+		const action = {
+			handle: () => {},
+		};
+		const spyHandle = stub(action, "handle");
+		stub(sandbox.app, "resolve").returnValue(action);
 
 		const nextState = stateMachine.transition("EVENT");
 		await delay(100); // just to give time for setImmediate to launch
 
 		assert.equal(nextState, mockNextState);
-		assert.true(handle.calledOnce);
+		spyHandle.calledOnce();
 	});
 
 	it("should return state if defined", (context) => {

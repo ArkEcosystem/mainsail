@@ -1,35 +1,36 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { Stopped } from "./stopped";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	logger: any;
 	application: any;
 }>("Stopped", ({ beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.logger = {
-			warning: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
+			debug: () => {},
+			info: () => {},
+			warning: () => {},
 		};
 
 		context.application = {
-			get: () => undefined,
+			get: () => {},
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 	});
 
-	it("should log 'The blockchain has been stopped'", (context) => {
+	it("should log 'The blockchain has been stopped'", async (context) => {
 		const stopped = context.container.resolve<Stopped>(Stopped);
 
 		const infoLoggerSpy = spy(context.logger, "info");
 
-		stopped.handle();
+		await stopped.handle();
 
 		infoLoggerSpy.calledOnce();
 		infoLoggerSpy.calledWith("The blockchain has been stopped");

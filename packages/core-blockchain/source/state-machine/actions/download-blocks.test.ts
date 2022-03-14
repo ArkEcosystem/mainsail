@@ -1,11 +1,12 @@
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import delay from "delay";
-import { describe } from "../../../../core-test-framework";
 
+import { describe } from "../../../../core-test-framework";
 import { DownloadBlocks } from "./download-blocks";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain;
 	lastBlock;
 	stateStore;
@@ -13,57 +14,52 @@ describe<{
 	peerNetworkMonitor;
 	application;
 	queue: any;
+	slots: any;
 }>("DownloadBlocks", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.queue = {
-			size: () => undefined,
+			size: () => {},
 		};
 		context.blockchain = {
-			isStopped: () => false,
-			dispatch: () => undefined,
+			clearQueue: () => {},
+			dispatch: () => {},
+			enqueueBlocks: () => {},
 			getQueue: () => context.queue,
-			clearQueue: () => undefined,
-			enqueueBlocks: () => undefined,
+			isStopped: () => false,
 		};
 		context.lastBlock = {
-			data: { id: "1234", height: 3333, timestamp: 11111 },
+			data: { height: 3333, id: "1234", timestamp: 11_111 },
 		};
 		context.stateStore = {
 			getLastBlock: () => context.lastBlock,
-			getLastDownloadedBlock: () => undefined,
-			setLastDownloadedBlock: () => undefined,
+			getLastDownloadedBlock: () => {},
 			getNoBlockCounter: () => 0,
-			setNoBlockCounter: () => undefined,
+			setLastDownloadedBlock: () => {},
+			setNoBlockCounter: () => {},
 		};
 		context.logger = {
-			warning: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
 		};
 		context.peerNetworkMonitor = {
-			downloadBlocksFromHeight: () => undefined,
+			downloadBlocksFromHeight: () => {},
+		};
+
+		context.slots = {
+			getSlotNumber: () => {},
 		};
 
 		context.application = {};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
-
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return 0;
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
-		stub(Utils.forgingInfoCalculator, "getBlockTimeLookup").returnValue(getTimeStampForBlock);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
+		context.container.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(context.slots);
 	});
 
 	it("should do nothing when blockchain.isStopped", async (context) => {
@@ -89,7 +85,7 @@ describe<{
 		const handle = downloadBlocks.handle();
 
 		stub(context.stateStore, "getLastDownloadedBlock").returnValue({
-			data: { id: "987", height: 233, timestamp: 111 },
+			data: { height: 233, id: "987", timestamp: 111 },
 		});
 
 		await handle;
@@ -115,6 +111,7 @@ describe<{
 	it("should dispatch NOBLOCK when downloadBlocksFromHeight returns no chained block", async (context) => {
 		const downloadBlocks = context.container.resolve<DownloadBlocks>(DownloadBlocks);
 
+		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(context.queue, "size").returnValue(0);
 		stub(context.peerNetworkMonitor, "downloadBlocksFromHeight").returnValue([{ height: 11 }]);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
@@ -137,6 +134,7 @@ describe<{
 				timestamp: context.lastBlock.data.timestamp + 20,
 			},
 		]);
+		stub(context.slots, "getSlotNumber").returnValueNth(0, 1).returnValueNth(1, 2);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const enqueueBlocksSpy = spy(context.blockchain, "enqueueBlocks");
 

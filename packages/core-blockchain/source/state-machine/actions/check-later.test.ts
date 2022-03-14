@@ -1,10 +1,11 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { CheckLater } from "./check-later";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain: any;
 	stateStore: any;
 	application: any;
@@ -12,37 +13,37 @@ describe<{
 	beforeEach((context) => {
 		context.blockchain = {
 			isStopped: () => false,
-			setWakeUp: () => undefined,
+			setWakeUp: () => {},
 		};
 		context.stateStore = {
 			isWakeUpTimeoutSet: () => false,
 		};
 		context.application = {
-			resolve: () => undefined,
+			resolve: () => {},
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 	});
 
-	it("should call blockchain.setWakeUp() when !blockchain.isStopped && !stateStore.wakeUpTimeout", (context) => {
+	it("should call blockchain.setWakeUp() when !blockchain.isStopped && !stateStore.wakeUpTimeout", async (context) => {
 		const checkLater = context.container.resolve<CheckLater>(CheckLater);
 
 		const setWakeUpSpy = spy(context.blockchain, "setWakeUp");
-		checkLater.handle();
+		await checkLater.handle();
 
 		setWakeUpSpy.calledOnce();
 	});
 
-	it("should do nothing otherwise", (context) => {
+	it("should do nothing otherwise", async (context) => {
 		const checkLater = context.container.resolve<CheckLater>(CheckLater);
 
 		const setWakeUpSpy = spy(context.blockchain, "setWakeUp");
 
 		stub(context.blockchain, "isStopped").returnValue(true);
-		checkLater.handle();
+		await checkLater.handle();
 
 		setWakeUpSpy.neverCalled();
 	});

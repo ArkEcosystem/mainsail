@@ -212,6 +212,7 @@ export class BlockProcessor {
 			block.data.height,
 			this.configuration,
 		);
+		console.log("Test 2");
 		const validators: Contracts.State.Wallet[] = await this.triggers.call("getActiveValidators", {
 			roundInfo,
 		});

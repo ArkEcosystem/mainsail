@@ -14,7 +14,8 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"test": "uvu -r tsm source .test.ts",
-		"test:coverage": "c8 pnpm run test"
+		"test:coverage": "c8 pnpm run test",
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
@@ -26,6 +27,7 @@
 		"xstate": "4.23.4"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@types/async": "3.2.7",
 		"delay": "4.4.1",
 		"import-fresh": "3.3.0",

@@ -1,11 +1,13 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Managers } from "@arkecosystem/crypto";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
+// import { Managers } from "@arkecosystem/crypto";
 import { describe } from "../../../../core-test-framework";
 
 import { Initialize } from "./initialize";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	application: any;
 	logger: any;
 	blockchain: any;
@@ -15,6 +17,7 @@ describe<{
 	databaseInteractions: any;
 	peerNetworkMonitor: any;
 	stateBuilder: any;
+	configuration: any;
 }>("Initialize", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
@@ -60,21 +63,26 @@ describe<{
 			run: () => undefined,
 		};
 
+		context.configuration = {
+			get: () => {},
+		};
+
 		const appGet = {
-			[Container.Identifiers.PeerNetworkMonitor]: context.peerNetworkMonitor,
-			[Container.Identifiers.StateBuilder]: context.stateBuilder,
+			[Identifiers.PeerNetworkMonitor]: context.peerNetworkMonitor,
+			[Identifiers.StateBuilder]: context.stateBuilder,
 		};
 		context.application = { get: (key) => appGet[key] };
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Container.Identifiers.DatabaseService).toConstantValue(context.databaseService);
-		context.container.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
-		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
+		context.container.bind(Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
+		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
+		context.container.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 	});
 
 	it("when stateStore.getRestoredDatabaseIntegrity should initialize state, database, transaction pool and peer network monitor", async (context) => {
@@ -86,6 +94,7 @@ describe<{
 				height: 5554,
 			},
 		};
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
@@ -117,6 +126,7 @@ describe<{
 				height: 5554,
 			},
 		};
+
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.databaseService, "verifyBlockchain").returnValue(false);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
@@ -137,6 +147,7 @@ describe<{
 				height: 5554,
 			},
 		};
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.databaseService, "verifyBlockchain").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
@@ -158,6 +169,7 @@ describe<{
 				payloadHash: "6d84d08bd299ed97c212c886c98a57e36545c8f5d645ca7eeae63a8bd62d8988",
 			},
 		};
+		stub(context.configuration, "get").returnValue("dummyPayloadHash");
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
@@ -176,9 +188,13 @@ describe<{
 			data: {
 				id: "345",
 				height: 1,
-				payloadHash: Managers.configManager.get("network.nethash"),
+				payloadHash: "6d84d08bd299ed97c212c886c98a57e36545c8f5d645ca7eeae63a8bd62d8988",
 			},
 		};
+		stub(context.configuration, "get").returnValue(
+			"6d84d08bd299ed97c212c886c98a57e36545c8f5d645ca7eeae63a8bd62d8988",
+		);
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
@@ -199,9 +215,9 @@ describe<{
 			data: {
 				id: "345",
 				height: 334,
-				payloadHash: Managers.configManager.get("network.nethash"),
 			},
 		};
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.stateStore, "getNetworkStart").returnValue(true);
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
@@ -221,9 +237,9 @@ describe<{
 			data: {
 				id: "345",
 				height: 334,
-				payloadHash: Managers.configManager.get("network.nethash"),
 			},
 		};
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.stateStore, "getNetworkStart").returnValue(false);
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
@@ -249,6 +265,7 @@ describe<{
 	it("when something throws an exception should dispatch FAILURE", async (context) => {
 		const initialize = context.container.resolve<Initialize>(Initialize);
 
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.stateStore, "getLastBlock").callsFake(() => new Error("oops"));
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");

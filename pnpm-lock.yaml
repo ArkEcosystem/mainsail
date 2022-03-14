@@ -252,6 +252,7 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/utils': workspace:*
@@ -271,6 +272,7 @@ importers:
       joi: 17.4.2
       xstate: 4.23.4
     devDependencies:
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@types/async': 3.2.7
       delay: 4.4.1
       import-fresh: 3.3.0
@@ -1280,11 +1282,6 @@ importers:
       sinon: 13.0.1
       uvu: 0.5.3
 
-  packages/core-kernel/test/stubs/stub-plugin:
-    specifiers: {}
-
-  packages/core-kernel/test/stubs/stub-plugin-with-defaults:
-    specifiers: {}
 
   packages/core-libp2p:
     specifiers:

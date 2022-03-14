@@ -1,10 +1,11 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { CheckLastDownloadedBlockSynced } from "./check-last-downloaded-block-synced";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain: any;
 	stateStore: any;
 	peerNetworkMonitor: any;
@@ -13,41 +14,41 @@ describe<{
 }>("CheckLastDownloadedBlockSynced", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.queue = {
-			size: () => undefined,
 			isRunning: () => true,
+			size: () => {},
 		};
 		context.blockchain = {
-			isSynced: () => undefined,
-			dispatch: () => undefined,
+			dispatch: () => {},
 			getQueue: () => context.queue,
+			isSynced: () => {},
 		};
 		context.stateStore = {
-			noBlockCounter: undefined,
-			p2pUpdateCounter: undefined,
-			numberOfBlocksToRollback: undefined,
-			getLastDownloadedBlock: () => undefined,
-			getNoBlockCounter: () => 0,
-			setNoBlockCounter: () => undefined,
-			getP2pUpdateCounter: () => 0,
-			setP2pUpdateCounter: () => undefined,
-			setNumberOfBlocksToRollback: () => undefined,
+			getLastDownloadedBlock: () => {},
 			getNetworkStart: () => false,
+			getNoBlockCounter: () => 0,
+			getP2pUpdateCounter: () => 0,
+			noBlockCounter: undefined,
+			numberOfBlocksToRollback: undefined,
+			p2pUpdateCounter: undefined,
+			setNoBlockCounter: () => {},
+			setNumberOfBlocksToRollback: () => {},
+			setP2pUpdateCounter: () => {},
 		};
 		context.peerNetworkMonitor = {
-			checkNetworkHealth: () => undefined,
+			checkNetworkHealth: () => {},
 		};
 		context.logger = {
-			warn: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warn: () => {},
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
+		context.container = new Container();
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
 
 		process.env.CORE_ENV = "";
 	});

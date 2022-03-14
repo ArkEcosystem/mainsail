@@ -1,83 +1,98 @@
-import { Container, Services } from "@arkecosystem/core-kernel";
-import { Crypto, Interfaces, Networks } from "@arkecosystem/crypto";
-import { describe, Sandbox } from "../../core-test-framework";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 
-import { ProcessBlockAction } from "./actions";
+import { describe, Sandbox } from "../../core-test-framework";
+import { Blocks } from "../test/fixtures";
 import { ProcessBlocksJob } from "./process-blocks-job";
 import { BlockProcessorResult } from "./processor";
-
-import { Blocks } from "../test/fixtures";
 
 describe<{
 	sandbox: Sandbox;
 	processBlocksJob: ProcessBlocksJob;
+	configuration: any;
+	blockFactory: any;
+	slots: any;
+	triggers: any;
 
-	lastBlock: Interfaces.IBlockData;
-	currentBlock: Interfaces.IBlockData;
-}>("ProcessBlocksJob", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
+	lastBlock: Contracts.Crypto.IBlockData;
+	currentBlock: Contracts.Crypto.IBlockData;
+}>("ProcessBlocksJob", ({ assert, beforeEach, it, spy, stub }) => {
 	const blockchainService: any = {
-		getLastBlock: () => undefined,
-		clearQueue: () => undefined,
-		resetLastDownloadedBlock: () => undefined,
-		forkBlock: () => undefined,
+		clearQueue: () => {},
+		forkBlock: () => {},
+		getLastBlock: () => {},
+		resetLastDownloadedBlock: () => {},
 	};
 	const stateMachine: any = {
-		getState: () => undefined,
+		getState: () => {},
 	};
 	const blockProcessor: any = {
-		process: () => undefined,
-		validateGenerator: () => undefined,
+		process: () => {},
+		validateGenerator: () => {},
 	};
 	const stateStore: any = {
-		setLastStoredBlockHeight: () => undefined,
-		isStarted: () => undefined,
 		// stateStore: () => undefined,
-		getLastBlock: () => undefined,
-		setLastBlock: () => undefined,
+		getLastBlock: () => {},
+
+		isStarted: () => {},
+
+		setLastBlock: () => {},
+		setLastStoredBlockHeight: () => {},
 	};
 	const databaseService: any = {
-		getLastBlock: () => undefined,
-		deleteRound: () => undefined,
-	};
-	const databaseBlockRepository: any = {
-		saveBlocks: () => undefined,
+		deleteRound: () => {},
+		getLastBlock: () => {},
+		saveBlocks: () => {},
 	};
 	const databaseInteraction: any = {
-		loadBlocksFromCurrentRound: () => undefined,
-		restoreCurrentRound: () => undefined,
+		loadBlocksFromCurrentRound: () => {},
+		restoreCurrentRound: () => {},
 	};
 	const peerNetworkMonitor: any = {
-		broadcastBlock: () => undefined,
+		broadcastBlock: () => {},
 	};
 	const logService: any = {
-		debug: spyFn(),
-		warning: spyFn(),
-		error: spyFn(),
-		info: spyFn(),
+		debug: () => {},
+		error: () => {},
+		info: () => {},
+		warning: () => {},
 	};
 
 	beforeEach((context) => {
+		context.configuration = {};
+		context.blockFactory = {
+			fromData: (blockData) => ({
+				data: blockData,
+			}),
+		};
+		context.slots = {
+			getSlotNumber: async () => {},
+			withBlockTimeLookup: () => {},
+		};
+
+		context.triggers = {
+			call: () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchainService);
-		context.sandbox.app.bind(Container.Identifiers.StateMachine).toConstantValue(stateMachine);
-		context.sandbox.app.bind(Container.Identifiers.BlockProcessor).toConstantValue(blockProcessor);
-		context.sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-		context.sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
-		context.sandbox.app
-			.bind(Container.Identifiers.DatabaseBlockRepository)
-			.toConstantValue(databaseBlockRepository);
-		context.sandbox.app.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteraction);
-		context.sandbox.app.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
-		context.sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logService);
+		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchainService);
+		context.sandbox.app.bind(Identifiers.StateMachine).toConstantValue(stateMachine);
+		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(blockProcessor);
+		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(databaseService);
+		context.sandbox.app.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteraction);
+		context.sandbox.app.bind(Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
+		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logService);
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
+		context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(context.blockFactory);
+		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(context.slots);
+		context.sandbox.app.bind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({});
 
-		context.sandbox.app
-			.bind(Container.Identifiers.TriggerService)
-			.to(Services.Triggers.Triggers)
-			.inSingletonScope();
-		context.sandbox.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-			.bind("processBlock", new ProcessBlockAction());
+		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
+		// context.sandbox.app
+		// 	.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+		// 	.bind("processBlock", new ProcessBlockAction());
 
 		context.processBlocksJob = context.sandbox.app.resolve(ProcessBlocksJob);
 
@@ -85,15 +100,11 @@ describe<{
 		context.currentBlock = { ...Blocks.block3.data, transactions: [] };
 	});
 
-	// afterEach(() => {
-	// 	jest.clearAllMocks();
-	// });
-
 	it("should set and get blocks", async (context) => {
 		const blocks = [
 			{ ...Blocks.block2.data, transactions: [] },
 			{ ...Blocks.block3.data, transactions: [] },
-		] as Interfaces.IBlockData[];
+		] as Contracts.Crypto.IBlockData[];
 
 		context.processBlocksJob.setBlocks(blocks);
 
@@ -105,12 +116,15 @@ describe<{
 	});
 
 	it("should process a new chained block", async (context) => {
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
+		stub(context.triggers, "call").resolvedValue(BlockProcessorResult.Accepted);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock }); // TODO: Use stateStore
 		stub(blockProcessor, "process").returnValue(BlockProcessorResult.Accepted);
 		stub(blockProcessor, "validateGenerator").returnValue(BlockProcessorResult.Accepted);
 		stub(stateStore, "isStarted").returnValue(true);
 
-		const saveBlocksSpy = spy(databaseBlockRepository, "saveBlocks");
+		const saveBlocksSpy = spy(databaseService, "saveBlocks");
 		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
 
 		context.processBlocksJob.setBlocks([context.currentBlock]);
@@ -134,23 +148,25 @@ describe<{
 	});
 
 	it("should not process the remaining blocks if one is not accepted (BlockProcessorResult.Rollback)", async (context) => {
-		stub(blockchainService, "getLastBlock").returnValue({ data: Networks.testnet.genesisBlock });
-		const processStub = stub(blockProcessor, "process").returnValue(BlockProcessorResult.Rollback);
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
+		stub(blockchainService, "getLastBlock").returnValue({ data: { height: 1 } });
+		const callStub = stub(context.triggers, "call").returnValue(BlockProcessorResult.Rollback);
 		const forkBlockSpy = spy(blockchainService, "forkBlock");
 
 		context.processBlocksJob.setBlocks([context.lastBlock, context.currentBlock]);
 		await context.processBlocksJob.handle();
 
-		processStub.calledOnce();
+		callStub.calledOnce();
 		forkBlockSpy.calledOnce(); // because Rollback
 	});
 
 	it("should not process the remaining blocks if one is not accepted (BlockProcessorResult.Rejected)", async (context) => {
-		const genesisBlock = Networks.testnet.genesisBlock;
-		stub(blockchainService, "getLastBlock").returnValue({ data: genesisBlock });
-		const processStub = stub(blockProcessor, "process").returnValue(BlockProcessorResult.Rejected);
-		stub(stateStore, "getLastBlock").returnValue({ data: genesisBlock });
-		stub(databaseService, "getLastBlock").returnValue({ data: genesisBlock });
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
+		stub(blockchainService, "getLastBlock").returnValue({ data: { height: 1 } });
+		const callStub = stub(context.triggers, "call").returnValue(BlockProcessorResult.Rejected);
+		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
 
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
 		spy(databaseInteraction, "loadBlocksFromCurrentRound");
@@ -159,34 +175,37 @@ describe<{
 		context.processBlocksJob.setBlocks([context.lastBlock, context.currentBlock]);
 		await context.processBlocksJob.handle();
 
-		processStub.calledOnce();
+		callStub.calledOnce();
 		clearQueueSpy.calledOnce();
 		resetLastDownloadedBlockSpy.calledOnce();
 	});
 
 	it("should not process the remaining blocks if second is not accepted (BlockProcessorResult.Rejected)", async (context) => {
-		const genesisBlock = Networks.testnet.genesisBlock;
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(blockchainService, "getLastBlock")
-			.returnValueNth(0, { data: genesisBlock })
-			.returnValueNth(1, { data: genesisBlock })
+			.returnValueNth(0, { data: { height: 1 } })
+			.returnValueNth(1, { data: { height: 1 } })
 			.returnValueNth(2, Blocks.block2);
-		const processStub = stub(blockProcessor, "process")
+
+		const callStub = stub(context.triggers, "call")
 			.returnValueNth(0, BlockProcessorResult.Accepted)
 			.returnValueNth(1, BlockProcessorResult.Rejected);
-		stub(stateStore, "getLastBlock").returnValue({ data: genesisBlock });
-		stub(databaseService, "getLastBlock").returnValue({ data: genesisBlock });
+
+		stub(stateStore, "getLastBlock").returnValue({ data: { height: 1 } });
+		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
 
 		spy(stateStore, "setLastBlock");
 		spy(databaseInteraction, "loadBlocksFromCurrentRound");
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
 		const resetLastDownloadedBlockSpy = spy(blockchainService, "resetLastDownloadedBlock");
-		const saveBlocksSpy = spy(databaseBlockRepository, "saveBlocks");
+		const saveBlocksSpy = spy(databaseService, "saveBlocks");
 		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
 
 		context.processBlocksJob.setBlocks([context.lastBlock, context.currentBlock]);
 		await context.processBlocksJob.handle();
 
-		processStub.calledTimes(2);
+		callStub.calledTimes(2);
 		saveBlocksSpy.calledOnce();
 		clearQueueSpy.calledOnce();
 		resetLastDownloadedBlockSpy.calledOnce();
@@ -196,12 +215,13 @@ describe<{
 
 	it("should not process the remaining blocks if one is not accepted (BlockProcessorResult.Corrupted)", async (context) => {
 		const exitSpy = stub(process, "exit");
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
 
-		const genesisBlock = Networks.testnet.genesisBlock;
-		stub(blockchainService, "getLastBlock").returnValue({ data: genesisBlock });
-		const processStub = stub(blockProcessor, "process").returnValue(BlockProcessorResult.Corrupted);
-		stub(stateStore, "getLastBlock").returnValue({ data: genesisBlock });
-		stub(databaseService, "getLastBlock").returnValue({ data: genesisBlock });
+		stub(blockchainService, "getLastBlock").returnValue({ data: { height: 1 } });
+		const callStub = stub(context.triggers, "call").returnValue(BlockProcessorResult.Corrupted);
+		stub(stateStore, "getLastBlock").returnValue({ data: { height: 1 } });
+		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
 
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
 		spy(databaseInteraction, "loadBlocksFromCurrentRound");
@@ -210,7 +230,7 @@ describe<{
 		context.processBlocksJob.setBlocks([context.lastBlock, context.currentBlock]);
 		await context.processBlocksJob.handle();
 
-		processStub.calledOnce();
+		callStub.calledOnce();
 		clearQueueSpy.neverCalled();
 		resetLastDownloadedBlockSpy.neverCalled();
 		exitSpy.calledOnce();
@@ -218,14 +238,18 @@ describe<{
 
 	it("should revert block when blockRepository saveBlocks fails", async (context) => {
 		const revertBlockHandler = {
-			execute: stubFn().returns(BlockProcessorResult.Reverted),
+			execute: () => {},
 		};
 
+		stub(revertBlockHandler, "execute").resolvedValue(BlockProcessorResult.Reverted);
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(context.sandbox.app, "resolve").returnValue(revertBlockHandler);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(blockProcessor, "process").returnValue(BlockProcessorResult.Accepted);
-		stub(databaseBlockRepository, "saveBlocks").rejectedValue(new Error("oops"));
+		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
+		stub(databaseService, "saveBlocks").rejectedValue(new Error("oops"));
 
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
 		const resetLastDownloadedBlockSpy = spy(blockchainService, "resetLastDownloadedBlock");
@@ -248,13 +272,18 @@ describe<{
 		const exitSpy = stub(process, "exit");
 
 		const revertBlockHandler = {
-			execute: stubFn().returns(BlockProcessorResult.Corrupted),
+			execute: () => {},
 		};
+
+		stub(revertBlockHandler, "execute").resolvedValue(BlockProcessorResult.Corrupted);
+		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(context.sandbox.app, "resolve").returnValue(revertBlockHandler);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(blockProcessor, "process").returnValue(BlockProcessorResult.Accepted);
-		stub(databaseBlockRepository, "saveBlocks").rejectedValue(new Error("oops"));
+		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
+		stub(databaseService, "saveBlocks").rejectedValue(new Error("oops"));
 
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
 		const resetLastDownloadedBlockSpy = spy(blockchainService, "resetLastDownloadedBlock");
@@ -278,33 +307,18 @@ describe<{
 	it("should broadcast a block if state is newBlock", async (context) => {
 		stub(stateMachine, "getState").returnValue("newBlock");
 
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return 0;
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
-		let slotInfo = Crypto.Slots.getSlotInfo(getTimeStampForBlock);
-
-		// Wait until we get a timestamp at the first half of a slot (allows for computation time)
-		while (!slotInfo.forgingStatus) {
-			slotInfo = Crypto.Slots.getSlotInfo(getTimeStampForBlock);
-		}
-
 		const block = {
 			...context.currentBlock,
-			timestamp: slotInfo.startTime,
 		};
 
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(stateStore, "isStarted").returnValue(true);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(blockProcessor, "process").returnValue(BlockProcessorResult.Accepted);
+		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
 
-		const saveBlocksSpy = spy(databaseBlockRepository, "saveBlocks");
+		const saveBlocksSpy = spy(databaseService, "saveBlocks");
 		const broadcastBlockSpy = spy(peerNetworkMonitor, "broadcastBlock");
 		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
 
@@ -320,33 +334,18 @@ describe<{
 	it("should skip broadcasting if state is downloadFinished", async (context) => {
 		stub(stateMachine, "getState").returnValue("downloadFinished");
 
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return 0;
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
-		let slotInfo = Crypto.Slots.getSlotInfo(getTimeStampForBlock);
-
-		// Wait until we get a timestamp at the first half of a slot (allows for computation time)
-		while (!slotInfo.forgingStatus) {
-			slotInfo = Crypto.Slots.getSlotInfo(getTimeStampForBlock);
-		}
-
 		const block = {
 			...context.currentBlock,
-			timestamp: slotInfo.startTime,
 		};
 
+		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
+		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(stateStore, "isStarted").returnValue(true);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(blockProcessor, "process").returnValue(BlockProcessorResult.Accepted);
+		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
 
-		const saveBlocksSpy = spy(databaseBlockRepository, "saveBlocks");
+		const saveBlocksSpy = spy(databaseService, "saveBlocks");
 		const broadcastBlockSpy = spy(peerNetworkMonitor, "broadcastBlock");
 		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
 
