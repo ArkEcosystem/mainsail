@@ -10,11 +10,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Forger.Service).to(ForgerService).inSingletonScope();
 
-		this.registerActions();
+		this.#registerActions();
 	}
 
 	public async boot(): Promise<void> {
-		const validators: Contracts.Forger.Validator[] = await this.makeValidators();
+		const validators: Contracts.Forger.Validator[] = await this.#makeValidators();
 
 		this.app.bind(Identifiers.Forger.Validators).toConstantValue(validators);
 
@@ -25,7 +25,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.app.get<ForgerService>(Identifiers.Forger.Service).dispose();
 	}
 
-	private registerActions(): void {
+	#registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("forgeNewBlock", this.app.resolve(ForgeNewBlockAction));
@@ -39,7 +39,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind("getCurrentRound", this.app.resolve(GetCurrentRoundAction));
 	}
 
-	private async makeValidators(): Promise<Contracts.Forger.Validator[]> {
+	async #makeValidators(): Promise<Contracts.Forger.Validator[]> {
 		const validators: Set<Contracts.Forger.Validator> = new Set<Contracts.Forger.Validator>();
 
 		for (const secret of this.app.config("validators.secrets")) {

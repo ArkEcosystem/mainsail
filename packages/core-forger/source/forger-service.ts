@@ -25,32 +25,32 @@ export class ForgerService {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	private validators: Contracts.Forger.Validator[] = [];
+	#validators: Contracts.Forger.Validator[] = [];
 
-	private usernames: { [key: string]: string } = {};
+	#usernames: { [key: string]: string } = {};
 
-	private isStopped = false;
+	#isStopped = false;
 
-	private round: Contracts.P2P.CurrentRound | undefined;
+	#round: Contracts.P2P.CurrentRound | undefined;
 
-	private initialized = false;
+	#initialized = false;
 
-	private logAppReady = true;
+	#logAppReady = true;
 
 	public getRound(): Contracts.P2P.CurrentRound | undefined {
-		return this.round;
+		return this.#round;
 	}
 
 	public async boot(validators: Contracts.Forger.Validator[]): Promise<void> {
-		this.validators = validators;
+		this.#validators = validators;
 
 		let timeout = 2000;
 		try {
 			await this.#loadRound();
 
-			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
+			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.#round);
 
-			timeout = Math.max(0, getRemainingSlotTime(this.round, this.configuration));
+			timeout = Math.max(0, getRemainingSlotTime(this.#round, this.configuration));
 		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {
@@ -59,53 +59,55 @@ export class ForgerService {
 	}
 
 	public async dispose(): Promise<void> {
-		this.isStopped = true;
+		this.#isStopped = true;
 	}
 
 	public async checkSlot(): Promise<void> {
 		try {
-			if (this.isStopped) {
+			if (this.#isStopped) {
 				return;
 			}
 
 			await this.#loadRound();
 
-			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
+			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.#round);
 
-			if (!this.round.canForge) {
+			if (!this.#round.canForge) {
 				// basically looping until we lock at beginning of next slot
 				return this.#checkLater(200);
 			}
 
-			AppUtils.assert.defined<string>(this.round.currentForger.publicKey);
+			AppUtils.assert.defined<string>(this.#round.currentForger.publicKey);
 
 			const validator: Contracts.Forger.Validator | undefined = this.#isActiveValidator(
-				this.round.currentForger.publicKey,
+				this.#round.currentForger.publicKey,
 			);
 
 			if (!validator) {
-				AppUtils.assert.defined<string>(this.round.nextForger.publicKey);
+				AppUtils.assert.defined<string>(this.#round.nextForger.publicKey);
 
-				if (this.#isActiveValidator(this.round.nextForger.publicKey)) {
-					const username = this.usernames[this.round.nextForger.publicKey];
+				if (this.#isActiveValidator(this.#round.nextForger.publicKey)) {
+					const username = this.#usernames[this.#round.nextForger.publicKey];
 
 					this.logger.info(
-						`Next forging validator ${username} (${this.round.nextForger.publicKey}) is active on this node.`,
+						`Next forging validator ${username} (${
+							this.#round.nextForger.publicKey
+						}) is active on this node.`,
 					);
 
 					await this.blockchain.forceWakeup();
 				}
 
-				return this.#checkLater(getRemainingSlotTime(this.round, this.configuration));
+				return this.#checkLater(getRemainingSlotTime(this.#round, this.configuration));
 			}
 
 			const networkState: Contracts.P2P.NetworkState = await this.peerNetworkMonitor.getNetworkState();
 
-			if (networkState.getNodeHeight() !== this.round.lastBlock.height) {
+			if (networkState.getNodeHeight() !== this.#round.lastBlock.height) {
 				this.logger.warning(
 					`The NetworkState height (${networkState
 						.getNodeHeight()
-						?.toLocaleString()}) and round height (${this.round.lastBlock.height.toLocaleString()}) are out of sync. This indicates delayed blocks on the network.`,
+						?.toLocaleString()}) and round height (${this.#round.lastBlock.height.toLocaleString()}) are out of sync. This indicates delayed blocks on the network.`,
 				);
 			}
 
@@ -116,12 +118,12 @@ export class ForgerService {
 			) {
 				await this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("forgeNewBlock", { forgerService: this, networkState, round: this.round, validator });
+					.call("forgeNewBlock", { forgerService: this, networkState, round: this.#round, validator });
 			}
 
-			this.logAppReady = true;
+			this.#logAppReady = true;
 
-			return this.#checkLater(getRemainingSlotTime(this.round, this.configuration));
+			return this.#checkLater(getRemainingSlotTime(this.#round, this.configuration));
 		} catch (error) {
 			console.log(error);
 
@@ -130,9 +132,9 @@ export class ForgerService {
 				error instanceof Exceptions.RelayCommunicationError
 			) {
 				if (error.message.includes("blockchain isn't ready") || error.message.includes("App is not ready")) {
-					if (this.logAppReady) {
+					if (this.#logAppReady) {
 						this.logger.info("Waiting for relay to become ready.");
-						this.logAppReady = false;
+						this.#logAppReady = false;
 					}
 				} else {
 					this.logger.warning(error.message);
@@ -140,9 +142,9 @@ export class ForgerService {
 			} else {
 				this.logger.error(error.stack);
 
-				if (this.round) {
+				if (this.#round) {
 					this.logger.info(
-						`Round: ${this.round.current.toLocaleString()}, height: ${this.round.lastBlock.height.toLocaleString()}`,
+						`Round: ${this.#round.current.toLocaleString()}, height: ${this.#round.lastBlock.height.toLocaleString()}`,
 					);
 				}
 
@@ -155,13 +157,15 @@ export class ForgerService {
 	}
 
 	#isActiveValidator(publicKey: string): Contracts.Forger.Validator | undefined {
-		return this.validators.find((validator) => validator.publicKey === publicKey);
+		return this.#validators.find((validator) => validator.publicKey === publicKey);
 	}
 
 	async #loadRound(): Promise<void> {
-		this.round = await this.app.get<Services.Triggers.Triggers>(Identifiers.TriggerService).call("getCurrentRound");
+		this.#round = await this.app
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.call("getCurrentRound");
 
-		this.usernames = this.round.validators.reduce((accumulator, wallet) => {
+		this.#usernames = this.#round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
 
 			return Object.assign(accumulator, {
@@ -169,19 +173,19 @@ export class ForgerService {
 			});
 		}, {});
 
-		this.app.rebind(Identifiers.Forger.Usernames).toConstantValue(this.usernames);
+		this.app.rebind(Identifiers.Forger.Usernames).toConstantValue(this.#usernames);
 
-		if (!this.initialized) {
+		if (!this.#initialized) {
 			this.#printLoadedValidators();
 
 			await this.events.dispatch(Enums.ForgerEvent.Started, {
-				activeValidators: this.validators.map((validator) => validator.publicKey),
+				activeValidators: this.#validators.map((validator) => validator.publicKey),
 			});
 
 			this.logger.info(`Forger Manager started.`);
 		}
 
-		this.initialized = true;
+		this.#initialized = true;
 	}
 
 	#checkLater(timeout: number): void {
@@ -189,22 +193,22 @@ export class ForgerService {
 	}
 
 	#printLoadedValidators(): void {
-		const activeValidators: Contracts.Forger.Validator[] = this.validators.filter((validator) => {
+		const activeValidators: Contracts.Forger.Validator[] = this.#validators.filter((validator) => {
 			AppUtils.assert.defined<string>(validator.publicKey);
 
-			return this.usernames.hasOwnProperty(validator.publicKey);
+			return this.#usernames.hasOwnProperty(validator.publicKey);
 		});
 
 		if (activeValidators.length > 0) {
 			for (const { publicKey } of activeValidators) {
-				this.logger.info(`Loaded validator ${this.usernames[publicKey]} (${publicKey})`);
+				this.logger.info(`Loaded validator ${this.#usernames[publicKey]} (${publicKey})`);
 			}
 
 			this.logger.info(`Loaded ${AppUtils.pluralize("validator", activeValidators.length, true)}.`);
 		}
 
-		if (this.validators.length > activeValidators.length) {
-			const inactiveValidators: (string | undefined)[] = this.validators
+		if (this.#validators.length > activeValidators.length) {
+			const inactiveValidators: (string | undefined)[] = this.#validators
 				.filter((validator) => !activeValidators.includes(validator))
 				.map((validator) => validator.publicKey);
 
