@@ -6,26 +6,26 @@ import { stringify } from "./stringify";
 import { unset } from "./unset";
 
 export class Collection<T> {
-	private collection: Record<string, T> = {};
+	#collection: Record<string, T> = {};
 
 	public all(): Record<string, T> {
-		return this.collection;
+		return this.#collection;
 	}
 
 	public entries(): Array<[string, T]> {
-		return Object.entries(this.collection);
+		return Object.entries(this.#collection);
 	}
 
 	public keys(): string[] {
-		return Object.keys(this.collection);
+		return Object.keys(this.#collection);
 	}
 
 	public values(): T[] {
-		return Object.values(this.collection);
+		return Object.values(this.#collection);
 	}
 
 	public pull(key: string): T | undefined {
-		const item = get<Record<string, T>, T>(this.collection, key);
+		const item = get<Record<string, T>, T>(this.#collection, key);
 
 		this.forget(key);
 
@@ -33,23 +33,23 @@ export class Collection<T> {
 	}
 
 	public get(key: string): T | undefined {
-		return get<Record<string, T>, T>(this.collection, key);
+		return get<Record<string, T>, T>(this.#collection, key);
 	}
 
 	public set(key: string, value: T): void {
-		set(this.collection, key, value);
+		set(this.#collection, key, value);
 	}
 
 	public forget(key: string): void {
-		unset(this.collection, key);
+		unset(this.#collection, key);
 	}
 
 	public flush(): void {
-		this.collection = {};
+		this.#collection = {};
 	}
 
 	public has(key: string): boolean {
-		return has(this.collection, key);
+		return has(this.#collection, key);
 	}
 
 	public missing(key: string): boolean {
@@ -57,7 +57,7 @@ export class Collection<T> {
 	}
 
 	public count(): number {
-		return Object.keys(this.collection).length;
+		return Object.keys(this.#collection).length;
 	}
 
 	public isEmpty(): boolean {

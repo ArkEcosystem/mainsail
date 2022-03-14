@@ -1,14 +1,17 @@
 export class CappedMap<K, V> {
 	protected store: Map<K, V> = new Map<K, V>();
+	#maxSize: number;
 
-	public constructor(private maxSize: number) {}
+	public constructor(maxSize: number) {
+		this.#maxSize = maxSize;
+	}
 
 	public get(key: K): V | undefined {
 		return this.store.get(key);
 	}
 
 	public set(key: K, value: V): void {
-		if (this.store.size >= this.maxSize) {
+		if (this.store.size >= this.#maxSize) {
 			this.store.delete(Array.from(this.store)[0][0]);
 		}
 
@@ -34,10 +37,10 @@ export class CappedMap<K, V> {
 	}
 
 	public resize(maxSize: number): void {
-		this.maxSize = maxSize;
+		this.#maxSize = maxSize;
 
-		if (this.store.size > this.maxSize) {
-			this.store = new Map<K, V>(Array.from(this.store).slice(-Math.max(0, this.maxSize)));
+		if (this.store.size > this.#maxSize) {
+			this.store = new Map<K, V>(Array.from(this.store).slice(-Math.max(0, this.#maxSize)));
 		}
 	}
 

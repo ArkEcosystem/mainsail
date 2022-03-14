@@ -3,15 +3,21 @@ import assert from "assert";
 type ProbeCallback = (indexesToProbe: number[]) => Promise<number | undefined>;
 
 export class NSect {
-	constructor(private readonly nAry: number, private readonly probe: ProbeCallback) {}
+	readonly #nAry: number;
+	readonly #probe: ProbeCallback;
+
+	public constructor(nAry: number, probe: ProbeCallback) {
+		this.#nAry = nAry;
+		this.#probe = probe;
+	}
 
 	public async find(low: number, high: number): Promise<number | undefined> {
 		let highestMatching: number | undefined;
 
 		for (;;) {
-			const indexesToProbe: number[] = this.calcProbes(low, high);
+			const indexesToProbe: number[] = this.#calcProbes(low, high);
 
-			const temp: number | undefined = await this.probe(indexesToProbe);
+			const temp: number | undefined = await this.#probe(indexesToProbe);
 
 			if (temp === undefined) {
 				break;
@@ -19,7 +25,7 @@ export class NSect {
 
 			highestMatching = temp;
 
-			if (low + this.nAry >= high) {
+			if (low + this.#nAry >= high) {
 				// The range is narrowed so much that we probed every element in the range.
 				// No need to narrow further - highestMatching contains the definitive result.
 				break;
@@ -75,14 +81,14 @@ export class NSect {
 		return highestMatching;
 	}
 
-	private calcProbes(low: number, high: number): number[] {
+	#calcProbes(low: number, high: number): number[] {
 		assert(low <= high, `${low} <= ${high}`);
 
 		const diff: number = high - low;
 		const p: Set<number> = new Set<number>();
 
-		for (let i = 0; i < this.nAry + 1; i++) {
-			const h: number = low + Math.round((diff * i) / this.nAry);
+		for (let i = 0; i < this.#nAry + 1; i++) {
+			const h: number = low + Math.round((diff * i) / this.#nAry);
 			p.add(h);
 		}
 

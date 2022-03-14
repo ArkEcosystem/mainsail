@@ -5,10 +5,10 @@ export class BigNumber {
 	public static readonly ONE: BigNumber = new BigNumber(1);
 	public static readonly SATOSHI: BigNumber = new BigNumber(1e8);
 
-	private readonly value: bigint;
+	readonly #value: bigint;
 
 	public constructor(value: BigNumberType) {
-		this.value = this.toBigNumber(value);
+		this.#value = this.#toBigNumber(value);
 	}
 
 	public static make(value: BigNumberType): BigNumber {
@@ -16,19 +16,19 @@ export class BigNumber {
 	}
 
 	public plus(other: BigNumberType): BigNumber {
-		return new BigNumber(this.value + this.toBigNumber(other));
+		return new BigNumber(this.#value + this.#toBigNumber(other));
 	}
 
 	public minus(other: BigNumberType): BigNumber {
-		return new BigNumber(this.value - this.toBigNumber(other));
+		return new BigNumber(this.#value - this.#toBigNumber(other));
 	}
 
 	public times(other: BigNumberType): BigNumber {
-		return new BigNumber(this.value * this.toBigNumber(other));
+		return new BigNumber(this.#value * this.#toBigNumber(other));
 	}
 
 	public dividedBy(other: BigNumberType): BigNumber {
-		return new BigNumber(this.value / this.toBigNumber(other));
+		return new BigNumber(this.#value / this.#toBigNumber(other));
 	}
 
 	public div(other: BigNumberType): BigNumber {
@@ -36,17 +36,17 @@ export class BigNumber {
 	}
 
 	public isZero(): boolean {
-		return this.value === BigInt(0);
+		return this.#value === BigInt(0);
 	}
 
 	public comparedTo(other: BigNumberType): number {
-		const b = this.toBigNumber(other);
+		const b = this.#toBigNumber(other);
 
-		if (this.value > b) {
+		if (this.#value > b) {
 			return 1;
 		}
 
-		if (this.value < b) {
+		if (this.#value < b) {
 			return -1;
 		}
 
@@ -54,35 +54,35 @@ export class BigNumber {
 	}
 
 	public isLessThan(other: BigNumberType): boolean {
-		return this.value < this.toBigNumber(other);
+		return this.#value < this.#toBigNumber(other);
 	}
 
 	public isLessThanEqual(other: BigNumberType): boolean {
-		return this.value <= this.toBigNumber(other);
+		return this.#value <= this.#toBigNumber(other);
 	}
 
 	public isGreaterThan(other: BigNumberType): boolean {
-		return this.value > this.toBigNumber(other);
+		return this.#value > this.#toBigNumber(other);
 	}
 
 	public isGreaterThanEqual(other: BigNumberType): boolean {
-		return this.value >= this.toBigNumber(other);
+		return this.#value >= this.#toBigNumber(other);
 	}
 
 	public isEqualTo(other: BigNumberType): boolean {
-		return this.value === this.toBigNumber(other);
+		return this.#value === this.#toBigNumber(other);
 	}
 
 	public isNegative(): boolean {
-		return this.value < 0;
+		return this.#value < 0;
 	}
 
 	public toFixed(): string {
-		return this.value.toString();
+		return this.#value.toString();
 	}
 
 	public toString(base: number = 10): string {
-		return this.value.toString(base);
+		return this.#value.toString(base);
 	}
 
 	public toJSON(): string {
@@ -90,12 +90,12 @@ export class BigNumber {
 	}
 
 	public toBigInt(): bigint {
-		return this.value;
+		return this.#value;
 	}
 
-	private toBigNumber(value: BigNumberType): bigint {
+	#toBigNumber(value: BigNumberType): bigint {
 		if (value instanceof BigNumber) {
-			value = value.value;
+			value = value.#value;
 		}
 
 		return BigInt(value as any);
