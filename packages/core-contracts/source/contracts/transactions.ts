@@ -71,7 +71,7 @@ export interface ITransactionHandlerProvider {
 
 // @TODO: move this out of contracts, it's an implementation
 export class InternalTransactionType {
-	private static types: Map<string, InternalTransactionType> = new Map();
+	static #types: Map<string, InternalTransactionType> = new Map();
 
 	private constructor(public readonly type: number, public readonly typeGroup: number) {}
 
@@ -82,11 +82,11 @@ export class InternalTransactionType {
 
 		const compositeType = `${typeGroup}-${type}`;
 
-		if (!this.types.has(compositeType)) {
-			this.types.set(compositeType, new InternalTransactionType(type, typeGroup));
+		if (!this.#types.has(compositeType)) {
+			this.#types.set(compositeType, new InternalTransactionType(type, typeGroup));
 		}
 
-		return this.types.get(compositeType)!;
+		return this.#types.get(compositeType)!;
 	}
 
 	public toString(): string {
