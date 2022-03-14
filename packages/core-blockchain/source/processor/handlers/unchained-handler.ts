@@ -27,11 +27,11 @@ export class UnchainedHandler implements BlockHandler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	private isValidGenerator = false;
+	#isValidGenerator = false;
 
 	// @TODO remove the need for this method
 	public initialize(isValidGenerator: boolean): this {
-		this.isValidGenerator = isValidGenerator;
+		this.#isValidGenerator = isValidGenerator;
 
 		return this;
 	}
@@ -41,7 +41,7 @@ export class UnchainedHandler implements BlockHandler {
 
 		this.blockchain.clearQueue();
 
-		const status: UnchainedBlockStatus = this.checkUnchainedBlock(block);
+		const status: UnchainedBlockStatus = this.#checkUnchainedBlock(block);
 
 		switch (status) {
 			case UnchainedBlockStatus.DoubleForging: {
@@ -73,7 +73,7 @@ export class UnchainedHandler implements BlockHandler {
 		}
 	}
 
-	private checkUnchainedBlock(block: Contracts.Crypto.IBlock): UnchainedBlockStatus {
+	#checkUnchainedBlock(block: Contracts.Crypto.IBlock): UnchainedBlockStatus {
 		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
 		// @TODO clean up this if-else-if-else-if-else mess
@@ -97,7 +97,7 @@ export class UnchainedHandler implements BlockHandler {
 			);
 			return UnchainedBlockStatus.InvalidTimestamp;
 		} else {
-			if (this.isValidGenerator) {
+			if (this.#isValidGenerator) {
 				this.logger.warning(`Detect double forging by ${block.data.generatorPublicKey}`);
 				return UnchainedBlockStatus.DoubleForging;
 			}

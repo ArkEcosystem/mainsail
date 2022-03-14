@@ -13,7 +13,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.BlockchainService).to(Blockchain).inSingletonScope();
 		this.app.bind(Identifiers.BlockProcessor).to(BlockProcessor).inSingletonScope();
 
-		this.registerActions();
+		this.#registerActions();
 	}
 
 	public async boot(): Promise<void> {
@@ -40,7 +40,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	private registerActions(): void {
+	#registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("processBlock", new ProcessBlockAction());

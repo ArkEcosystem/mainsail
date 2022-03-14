@@ -48,32 +48,32 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
 	private readonly blockTimeLookup: any;
 
-	private blocks: Contracts.Crypto.IBlockData[] = [];
+	#blocks: Contracts.Crypto.IBlockData[] = [];
 
 	public getBlocks(): Contracts.Crypto.IBlockData[] {
-		return this.blocks;
+		return this.#blocks;
 	}
 
 	public setBlocks(blocks: Contracts.Crypto.IBlockData[]): void {
-		this.blocks = blocks;
+		this.#blocks = blocks;
 	}
 
 	public async handle(): Promise<void> {
-		if (this.blocks.length === 0) {
+		if (this.#blocks.length === 0) {
 			return;
 		}
 
 		const lastHeight = this.blockchain.getLastBlock().data.height;
-		const fromHeight = this.blocks[0].height;
+		const fromHeight = this.#blocks[0].height;
 		// eslint-disable-next-line unicorn/prefer-at
-		const toHeight = this.blocks[this.blocks.length - 1].height;
+		const toHeight = this.#blocks[this.#blocks.length - 1].height;
 		this.logger.debug(
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
 
-		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], this.slots)) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.#blocks[0], this.slots)) {
 			this.logger.warning(
-				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.blocks[0], this.slots),
+				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.#blocks[0], this.slots),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
 			this.blockchain.clearQueue();
@@ -91,7 +91,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			this.blockTimeLookup.getBlockTimeLookup(height);
 
 		try {
-			for (const block of this.blocks) {
+			for (const block of this.#blocks) {
 				const currentSlot: number = await this.slots
 					.withBlockTimeLookup(acceptedBlockTimeLookup)
 					.getSlotNumber();
@@ -119,7 +119,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 				if (lastProcessResult === BlockProcessorResult.Accepted) {
 					acceptedBlocks.push(blockInstance);
 				} else if (lastProcessResult === BlockProcessorResult.Corrupted) {
-					await this.handleCorrupted();
+					await this.#handleCorrupted();
 					return;
 				} else {
 					if (lastProcessResult === BlockProcessorResult.Rollback) {
@@ -150,7 +150,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 					}`,
 				);
 
-				await this.revertBlocks(acceptedBlocks);
+				await this.#revertBlocks(acceptedBlocks);
 
 				return;
 			}
@@ -174,7 +174,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		return;
 	}
 
-	private async revertBlocks(blocksToRevert: Contracts.Crypto.IBlock[]): Promise<void> {
+	async #revertBlocks(blocksToRevert: Contracts.Crypto.IBlock[]): Promise<void> {
 		// Rounds are saved while blocks are being processed and may now be out of sync with the last
 		// block that was written into the database.
 
@@ -194,7 +194,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 				(await this.app.resolve<RevertBlockHandler>(RevertBlockHandler).execute(block)) ===
 				BlockProcessorResult.Corrupted
 			) {
-				await this.handleCorrupted();
+				await this.#handleCorrupted();
 			}
 		}
 
@@ -206,7 +206,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		this.blockchain.resetLastDownloadedBlock();
 	}
 
-	private async handleCorrupted() {
+	async #handleCorrupted() {
 		this.logger.error("Shutting down app, because state is corrupted");
 		process.exit(1);
 	}

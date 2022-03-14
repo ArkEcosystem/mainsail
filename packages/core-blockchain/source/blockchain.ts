@@ -40,16 +40,16 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
-	private queue!: Contracts.Kernel.Queue;
+	#queue!: Contracts.Kernel.Queue;
 
-	private stopped!: boolean;
-	private booted = false;
-	private missedBlocks = 0;
-	private lastCheckNetworkHealthTs = 0;
+	#stopped!: boolean;
+	#booted = false;
+	#missedBlocks = 0;
+	#lastCheckNetworkHealthTs = 0;
 
 	@postConstruct()
 	public async initialize(): Promise<void> {
-		this.stopped = false;
+		this.#stopped = false;
 
 		// flag to force a network start
 		this.stateStore.setNetworkStart(this.pluginConfiguration.getOptional("options.networkStart", false));
@@ -60,13 +60,13 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			);
 		}
 
-		this.queue = await this.app.get<Types.QueueFactory>(Identifiers.QueueFactory)();
+		this.#queue = await this.app.get<Types.QueueFactory>(Identifiers.QueueFactory)();
 
-		this.queue.on("drain", () => {
+		this.#queue.on("drain", () => {
 			this.dispatch("PROCESSFINISHED");
 		});
 
-		this.queue.on("jobError", (job, error) => {
+		this.#queue.on("jobError", (job, error) => {
 			const blocks = (job as ProcessBlocksJob).getBlocks();
 
 			this.logger.error(
@@ -80,15 +80,15 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	}
 
 	public isStopped(): boolean {
-		return this.stopped;
+		return this.#stopped;
 	}
 
 	public isBooted(): boolean {
-		return this.booted;
+		return this.#booted;
 	}
 
 	public getQueue(): Contracts.Kernel.Queue {
-		return this.queue;
+		return this.#queue;
 	}
 
 	public dispatch(event: string): void {
@@ -106,7 +106,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			return true;
 		}
 
-		while (!this.stateStore.isStarted() && !this.stopped) {
+		while (!this.stateStore.isStarted() && !this.#stopped) {
 			await Utils.sleep(1000);
 		}
 
@@ -117,23 +117,23 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 		this.events.listen(Enums.ForgerEvent.Missing, { handle: this.checkMissingBlocks });
 
-		this.events.listen(Enums.RoundEvent.Applied, { handle: this.resetMissedBlocks });
+		this.events.listen(Enums.RoundEvent.Applied, { handle: this.#resetMissedBlocks });
 
-		this.booted = true;
+		this.#booted = true;
 
 		return true;
 	}
 
 	public async dispose(): Promise<void> {
-		if (!this.stopped) {
+		if (!this.#stopped) {
 			this.logger.info("Stopping Blockchain Manager");
 
-			this.stopped = true;
+			this.#stopped = true;
 			this.stateStore.clearWakeUpTimeout();
 
 			this.dispatch("STOP");
 
-			await this.queue.stop();
+			await this.#queue.stop();
 		}
 	}
 
@@ -151,12 +151,12 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	public clearAndStopQueue(): void {
 		this.stateStore.setLastDownloadedBlock(this.getLastBlock().data);
 
-		this.queue.pause();
+		this.#queue.pause();
 		this.clearQueue();
 	}
 
 	public clearQueue(): void {
-		this.queue.clear();
+		this.#queue.clear();
 	}
 
 	public async handleIncomingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): Promise<void> {
@@ -212,8 +212,8 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			const processBlocksJob = this.app.resolve<ProcessBlocksJob>(ProcessBlocksJob);
 			processBlocksJob.setBlocks(blocks);
 
-			this.queue.push(processBlocksJob);
-			this.queue.resume();
+			this.#queue.push(processBlocksJob);
+			this.#queue.resume();
 		};
 
 		const lastDownloadedHeight: number = this.getLastDownloadedBlock().height;
@@ -308,16 +308,16 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	}
 
 	public async checkMissingBlocks(): Promise<void> {
-		this.missedBlocks++;
-		if (this.missedBlocks >= this.configuration.getMilestone().activeValidators / 3 - 1 && Math.random() <= 0.8) {
-			this.resetMissedBlocks();
+		this.#missedBlocks++;
+		if (this.#missedBlocks >= this.configuration.getMilestone().activeValidators / 3 - 1 && Math.random() <= 0.8) {
+			this.#resetMissedBlocks();
 
 			// do not check network health here more than every 10 minutes
 			const nowTs = Date.now();
-			if (nowTs - this.lastCheckNetworkHealthTs < 10 * 60 * 1000) {
+			if (nowTs - this.#lastCheckNetworkHealthTs < 10 * 60 * 1000) {
 				return;
 			}
-			this.lastCheckNetworkHealthTs = nowTs;
+			this.#lastCheckNetworkHealthTs = nowTs;
 
 			const networkStatus = await this.networkMonitor.checkNetworkHealth();
 
@@ -328,7 +328,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		}
 	}
 
-	private resetMissedBlocks(): void {
-		this.missedBlocks = 0;
+	#resetMissedBlocks(): void {
+		this.#missedBlocks = 0;
 	}
 }
