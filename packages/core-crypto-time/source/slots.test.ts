@@ -16,7 +16,7 @@ const setup = (context) => {
 		getBlockTimeLookup: (height: number) => {
 			switch (height) {
 				case 1:
-					return 1_646_784_000;
+					return 1_646_870_400;
 				default:
 					throw new Error(`Test scenarios should not hit this line`);
 			}
@@ -44,7 +44,7 @@ describe<{
 
 	it("return epoch time as number", (context) => {
 		assert.number(context.slots.getTime());
-		assert.is(context.slots.getTime(1_646_784_000), genesisTimestamp(context.configuration));
+		assert.is(context.slots.getTime(1_646_870_400), genesisTimestamp(context.configuration));
 	});
 
 	it("return slot number", async (context) => {
