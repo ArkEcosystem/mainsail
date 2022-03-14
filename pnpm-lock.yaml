@@ -807,23 +807,6 @@ importers:
     devDependencies:
       uvu: 0.5.3
 
-  packages/core-crypto-signature-schnorr-legacy:
-    specifiers:
-      '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/utils': workspace:*
-      bcrypto: 5.4.0
-      uvu: ^0.5.3
-    dependencies:
-      '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/utils': link:../utils
-      bcrypto: 5.4.0
-    devDependencies:
-      uvu: 0.5.3
-
   packages/core-crypto-time:
     specifiers:
       '@arkecosystem/core-container': workspace:*
@@ -1282,6 +1265,11 @@ importers:
       sinon: 13.0.1
       uvu: 0.5.3
 
+  packages/core-kernel/test/stubs/stub-plugin:
+    specifiers: {}
+
+  packages/core-kernel/test/stubs/stub-plugin-with-defaults:
+    specifiers: {}
 
   packages/core-libp2p:
     specifiers:
