@@ -1,11 +1,10 @@
 import { inject } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
-import { DatabaseInterceptor } from "@arkecosystem/core-state";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { FastifyRequest } from "fastify";
 
 export class GetCommonBlocksController {
-	@inject(Identifiers.DatabaseInterceptor)
-	private readonly databaseInterceptor!: DatabaseInterceptor;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
@@ -14,7 +13,7 @@ export class GetCommonBlocksController {
 		common: Contracts.Crypto.IBlockData;
 		lastBlockHeight: number;
 	}> {
-		const commonBlocks: Contracts.Crypto.IBlockData[] = await this.databaseInterceptor.getCommonBlocks(
+		const commonBlocks: Contracts.Crypto.IBlockData[] = await this.databaseService.findBlocksByIds(
 			(request.body as any).ids,
 		);
 

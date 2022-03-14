@@ -3,7 +3,6 @@ import assert from "assert";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
-import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import pluralize from "pluralize";
 import { inspect } from "util";
 
@@ -34,8 +33,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.DatabaseInterceptor)
-	private readonly databaseInterceptor!: DatabaseInterceptor;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.PeerCommunicator)
 	private communicator!: Contracts.P2P.PeerCommunicator;
@@ -168,19 +167,19 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return false;
 		}
 
-		const blocks = await this.databaseInterceptor.getBlocksByHeight([claimedHeight]);
+		const blocks = await this.databaseService.findBlockByHeights([claimedHeight]);
 
 		assert.strictEqual(
 			blocks.length,
 			1,
-			`databaseInterceptor.getBlocksByHeight([ ${claimedHeight} ]) returned ${blocks.length} results: ` +
+			`databaseService.findBlockByHeights([ ${claimedHeight} ]) returned ${blocks.length} results: ` +
 				this.anyToString(blocks) +
 				` (our chain is at height ${ourHeight})`,
 		);
 
 		const ourBlockAtHisHeight = blocks[0];
 
-		if (ourBlockAtHisHeight.id === claimedState.header.id) {
+		if (ourBlockAtHisHeight.data.id === claimedState.header.id) {
 			if (claimedHeight === ourHeight) {
 				this.log(
 					Severity.DEBUG_EXTRA,
@@ -201,7 +200,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		this.log(
 			Severity.DEBUG,
 			`peer's latest block (height=${claimedHeight}, id=${claimedState.header.id}), is different than the ` +
-				`block at the same height in our chain (id=${ourBlockAtHisHeight.id}). Peer has ` +
+				`block at the same height in our chain (id=${ourBlockAtHisHeight.data.id}). Peer has ` +
 				(claimedHeight < ourHeight ? `a shorter and` : `an equal-height but`) +
 				` different chain.`,
 		);
@@ -225,7 +224,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const nAry = 8;
 
 		const probe = async (heightsToProbe: number[]): Promise<number | undefined> => {
-			const ourBlocks = await this.databaseInterceptor.getBlocksByHeight(heightsToProbe);
+			const ourBlocks = await this.databaseService.findBlockByHeights(heightsToProbe);
 
 			assert.strictEqual(ourBlocks.length, heightsToProbe.length);
 
@@ -233,10 +232,10 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			const probesHeightById = {};
 
 			for (const b of ourBlocks) {
-				Utils.assert.defined<string>(b.id);
+				Utils.assert.defined<string>(b.data.id);
 
-				probesIdByHeight[b.height] = b.id;
-				probesHeightById[b.id] = b.height;
+				probesIdByHeight[b.data.height] = b.data.id;
+				probesHeightById[b.data.id] = b.data.height;
 			}
 
 			// Make sure getBlocksByHeight() returned a block for every height we asked.
@@ -244,10 +243,10 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 				assert.strictEqual(typeof probesIdByHeight[height], "string");
 			}
 
-			const ourBlocksPrint = ourBlocks.map((b) => `{ height=${b.height}, id=${b.id} }`).join(", ");
-			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[
+			const ourBlocksPrint = ourBlocks.map((b) => `{ height=${b.data.height}, id=${b.data.id} }`).join(", ");
+			const rangePrint = `[${ourBlocks[0].data.height.toLocaleString()}, ${ourBlocks[
 				ourBlocks.length - 1
-			].height.toLocaleString()}]`;
+			].data.height.toLocaleString()}]`;
 
 			const msRemaining = this.throwIfPastDeadline(deadline);
 

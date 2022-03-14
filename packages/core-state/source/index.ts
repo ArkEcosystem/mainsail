@@ -1,7 +1,6 @@
-export * from "./service-provider";
-export * as Wallets from "./wallets";
+export * as Actions from "./actions";
 export { DatabaseInteraction } from "./database-interactions";
-export { DatabaseInterceptor } from "./database-interceptor";
+export * from "./service-provider";
 export { StateBuilder } from "./state-builder";
 export * as Stores from "./stores";
-export * as Actions from "./actions";
+export * as Wallets from "./wallets";

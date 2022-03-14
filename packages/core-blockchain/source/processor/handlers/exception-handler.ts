@@ -1,10 +1,8 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
-import { DatabaseInterceptor } from "@arkecosystem/core-state";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
-
 import { AcceptBlockHandler } from "./accept-block-handler";
 
 @injectable()
@@ -18,8 +16,8 @@ export class ExceptionHandler implements BlockHandler {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.DatabaseInterceptor)
-	private readonly databaseInterceptor!: DatabaseInterceptor;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		Utils.assert.defined<string>(block.data.id);
@@ -27,7 +25,7 @@ export class ExceptionHandler implements BlockHandler {
 		const id: string = block.data.id;
 
 		// Ensure the block has not been forged yet, as an exceptional block bypasses all other checks.
-		const forgedBlock: Contracts.Crypto.IBlock | undefined = await this.databaseInterceptor.getBlock(id);
+		const forgedBlock: Contracts.Crypto.IBlock | undefined = await this.databaseService.getBlock(id);
 
 		if (forgedBlock || block.data.height !== this.blockchain.getLastBlock().data.height + 1) {
 			this.blockchain.resetLastDownloadedBlock();
