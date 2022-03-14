@@ -42,11 +42,11 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	}
 
 	public async fromHex(hex: string): Promise<Contracts.Crypto.IBlock> {
-		return this.fromSerialized(Buffer.from(hex, "hex"));
+		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
 
 	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.IBlock> {
-		return this.fromSerialized(buff);
+		return this.#fromSerialized(buff);
 	}
 
 	public async fromJson(json: Contracts.Crypto.IBlockJson): Promise<Contracts.Crypto.IBlock | undefined> {
@@ -78,7 +78,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		});
 	}
 
-	private async fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.IBlock> {
+	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.IBlock> {
 		const deserialized: { data: Contracts.Crypto.IBlockData; transactions: Contracts.Crypto.ITransaction[] } =
 			await this.deserializer.deserialize(serialized);
 

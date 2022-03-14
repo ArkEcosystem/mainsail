@@ -71,7 +71,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		headerOnly = headerOnly || buffer.getRemainderLength() === 0;
 
 		if (!headerOnly) {
-			transactions = await this.deserializeTransactions(block, buffer);
+			transactions = await this.#deserializeTransactions(block, buffer);
 		}
 
 		block.id = await this.idFactory.make(block);
@@ -79,7 +79,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		return { data: block, transactions };
 	}
 
-	private async deserializeTransactions(
+	async #deserializeTransactions(
 		block: Contracts.Crypto.IBlockData,
 		buf: ByteBuffer,
 	): Promise<Contracts.Crypto.ITransaction[]> {
