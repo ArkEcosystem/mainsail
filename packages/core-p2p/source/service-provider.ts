@@ -16,11 +16,11 @@ import { TransactionBroadcaster } from "./transaction-broadcaster";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.registerFactories();
+		this.#registerFactories();
 
-		this.registerServices();
+		this.#registerServices();
 
-		this.registerActions();
+		this.#registerActions();
 	}
 
 	public async bootWhen(): Promise<boolean> {
@@ -30,7 +30,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		this.app.get<EventListener>(Identifiers.PeerEventListener).initialize();
 
-		await this.buildServer();
+		await this.#buildServer();
 
 		return this.app.get<Server>(Identifiers.P2PServer).boot();
 	}
@@ -75,13 +75,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	private registerFactories(): void {
+	#registerFactories(): void {
 		this.app
 			.bind(Identifiers.PeerFactory)
 			.toFactory<Peer>(() => (ip: string) => new Peer(ip, Number(this.config().get<number>("server.port"))!));
 	}
 
-	private registerServices(): void {
+	#registerServices(): void {
 		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
@@ -101,7 +101,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind<Server>(Identifiers.P2PServer).to(Server).inSingletonScope();
 	}
 
-	private async buildServer(): Promise<void> {
+	async #buildServer(): Promise<void> {
 		const server: Server = this.app.get<Server>(Identifiers.P2PServer);
 		const serverConfig = this.config().get<Types.JsonObject>("server");
 		Utils.assert.defined<Types.JsonObject>(serverConfig);
@@ -109,7 +109,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await server.initialize("P2P Server", serverConfig);
 	}
 
-	private registerActions(): void {
+	#registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));

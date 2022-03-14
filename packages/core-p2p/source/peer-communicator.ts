@@ -42,13 +42,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
 
-	private outgoingRateLimiter!: RateLimiter;
+	#outgoingRateLimiter!: RateLimiter;
 
-	private postTransactionsQueueByIp: Map<string, Contracts.Kernel.Queue> = new Map();
+	#postTransactionsQueueByIp: Map<string, Contracts.Kernel.Queue> = new Map();
 
 	@postConstruct()
 	public initialize(): void {
-		this.outgoingRateLimiter = buildRateLimiter({
+		this.#outgoingRateLimiter = buildRateLimiter({
 			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
 
 			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
@@ -60,7 +60,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		});
 
 		this.events.listen(Enums.PeerEvent.Disconnect, {
-			handle: ({ data }) => this.postTransactionsQueueByIp.delete(data.peer.ip),
+			handle: ({ data }) => this.#postTransactionsQueueByIp.delete(data.peer.ip),
 		});
 	}
 
@@ -85,11 +85,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
-		if (!this.postTransactionsQueueByIp.get(peer.ip)) {
-			this.postTransactionsQueueByIp.set(peer.ip, await this.createQueue());
+		if (!this.#postTransactionsQueueByIp.get(peer.ip)) {
+			this.#postTransactionsQueueByIp.set(peer.ip, await this.createQueue());
 		}
 
-		const queue = this.postTransactionsQueueByIp.get(peer.ip)!;
+		const queue = this.#postTransactionsQueueByIp.get(peer.ip)!;
 		queue.resume();
 		queue.push({
 			handle: async () => {
@@ -129,7 +129,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		if (process.env.CORE_SKIP_PEER_STATE_VERIFICATION !== "true") {
-			if (!this.validatePeerConfig(peer, pingResponse.config)) {
+			if (!this.#validatePeerConfig(peer, pingResponse.config)) {
 				throw new Exceptions.PeerVerificationFailedError();
 			}
 
@@ -240,7 +240,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return peerBlocks;
 	}
 
-	private validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
+	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
 		if (config.network.nethash !== this.configuration.get("network.nethash")) {
 			return false;
 		}
@@ -331,14 +331,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		// Throttle
 		const msBeforeReCheck = 1000;
 
-		while (await this.outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, url)) {
+		while (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, url)) {
 			this.logger.debug(`Throttling outgoing requests to ${peer.ip}/${url} to avoid triggering their rate limit`);
 
 			await delay(msBeforeReCheck);
 		}
 
 		try {
-			await this.outgoingRateLimiter.consume(peer.ip, url);
+			await this.#outgoingRateLimiter.consume(peer.ip, url);
 		} catch {
 			//@ts-ignore
 		}

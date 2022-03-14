@@ -18,8 +18,8 @@ export interface RateLimiterConfigurations {
 
 // @TODO review the implementation
 export class RateLimiter {
-	private global: RateLimiterMemory;
-	private endpoints: Map<string, RateLimiterMemory>;
+	#global: RateLimiterMemory;
+	#endpoints: Map<string, RateLimiterMemory>;
 
 	public constructor({
 		whitelist,
@@ -30,19 +30,19 @@ export class RateLimiter {
 	}) {
 		configurations.endpoints = configurations.endpoints || [];
 
-		this.global = this.buildRateLimiter(configurations.global, whitelist);
-		this.endpoints = new Map();
+		this.#global = this.#buildRateLimiter(configurations.global, whitelist);
+		this.#endpoints = new Map();
 
 		for (const configuration of configurations.endpoints) {
-			this.endpoints.set(configuration.endpoint, this.buildRateLimiter(configuration, whitelist));
+			this.#endpoints.set(configuration.endpoint, this.#buildRateLimiter(configuration, whitelist));
 		}
 	}
 
 	public async consume(ip: string, endpoint?: string): Promise<void> {
-		await this.global.consume(ip);
+		await this.#global.consume(ip);
 
-		if (endpoint && this.endpoints.has(endpoint)) {
-			const rateLimiter: RateLimiterMemory | undefined = this.endpoints.get(endpoint);
+		if (endpoint && this.#endpoints.has(endpoint)) {
+			const rateLimiter: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
 
 			Utils.assert.defined<RateLimiterMemory>(rateLimiter);
 
@@ -61,13 +61,13 @@ export class RateLimiter {
 	}
 
 	public async hasExceededRateLimitNoConsume(ip: string, endpoint?: string): Promise<boolean> {
-		const global = await this.global.get(ip);
+		const global = await this.#global.get(ip);
 		if (global !== null && global.remainingPoints <= 0) {
 			return true;
 		}
 
-		if (endpoint && this.endpoints.has(endpoint)) {
-			const endpointLimiters: RateLimiterMemory | undefined = this.endpoints.get(endpoint);
+		if (endpoint && this.#endpoints.has(endpoint)) {
+			const endpointLimiters: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
 
 			Utils.assert.defined<RateLimiterMemory>(endpointLimiters);
 
@@ -81,15 +81,15 @@ export class RateLimiter {
 	}
 
 	public getRateLimitedEndpoints(): string[] {
-		return [...this.endpoints.keys()];
+		return [...this.#endpoints.keys()];
 	}
 
 	public async isBlocked(ip: string): Promise<boolean> {
-		const res = await this.global.get(ip);
+		const res = await this.#global.get(ip);
 		return res !== null && res.remainingPoints <= 0;
 	}
 
-	private buildRateLimiter(configuration: RateLimiterConfiguration, whitelist: string[]): RateLimiterMemory {
+	#buildRateLimiter(configuration: RateLimiterConfiguration, whitelist: string[]): RateLimiterMemory {
 		return new RLWrapperBlackAndWhite({
 			limiter: new RateLimiterMemory({
 				blockDuration: configuration.blockDuration,

@@ -39,11 +39,11 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
-	private coldStart = false;
+	#coldStart = false;
 
-	private downloadChunkSize: number = defaultDownloadChunkSize;
+	#downloadChunkSize: number = defaultDownloadChunkSize;
 
-	private initializing = true;
+	#initializing = true;
 
 	@postConstruct()
 	public initialize(): void {
@@ -51,7 +51,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async boot(): Promise<void> {
-		await this.populateSeedPeers();
+		await this.#populateSeedPeers();
 
 		if (this.config.skipDiscovery) {
 			this.logger.warning("Skipped peer discovery because the relay is in skip-discovery mode.");
@@ -69,7 +69,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		// Give time to cooldown rate limits after peer verifier finished.
 		await Utils.sleep(1000);
 
-		this.initializing = false;
+		this.#initializing = false;
 	}
 
 	public async updateNetworkStatus(initialRun?: boolean): Promise<void> {
@@ -78,7 +78,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		if (this.config.networkStart) {
-			this.coldStart = true;
+			this.#coldStart = true;
 			this.logger.warning("Entering cold start because the relay is in genesis-start mode.");
 		}
 
@@ -97,15 +97,15 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		let nextRunDelaySeconds = 600;
 
-		if (!this.hasMinimumPeers()) {
-			await this.populateSeedPeers();
+		if (!this.#hasMinimumPeers()) {
+			await this.#populateSeedPeers();
 
 			nextRunDelaySeconds = 60;
 
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
 		}
 
-		this.scheduleUpdateNetworkStatus(nextRunDelaySeconds);
+		this.#scheduleUpdateNetworkStatus(nextRunDelaySeconds);
 	}
 
 	public async cleansePeers({
@@ -165,7 +165,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			this.logger.debug(`Removed ${Utils.pluralize("peer", peerCount, true)} because of "${key}"`);
 		}
 
-		if (this.initializing) {
+		if (this.#initializing) {
 			this.logger.info(
 				`${max - unresponsivePeers} of ${Utils.pluralize("peer", max, true)} on the network are responsive`,
 			);
@@ -214,7 +214,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 				),
 		);
 
-		if (pingAll || !this.hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
+		if (pingAll || !this.#hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
 			await Promise.all(
 				theirPeers.map((p) =>
 					this.app
@@ -222,22 +222,22 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						.call("validateAndAcceptPeer", { options: { lessVerbose: true }, peer: p }),
 				),
 			);
-			this.pingPeerPorts(pingAll);
+			this.#pingPeerPorts(pingAll);
 
 			return true;
 		}
 
-		this.pingPeerPorts();
+		this.#pingPeerPorts();
 
 		return false;
 	}
 
 	public isColdStart(): boolean {
-		return this.coldStart;
+		return this.#coldStart;
 	}
 
 	public completeColdStart(): void {
-		this.coldStart = false;
+		this.#coldStart = false;
 	}
 
 	public getNetworkHeight(): number {
@@ -351,7 +351,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		if (!networkHeight || networkHeight <= fromBlockHeight) {
 			chunksMissingToSync = 1;
 		} else {
-			chunksMissingToSync = Math.ceil((networkHeight - fromBlockHeight) / this.downloadChunkSize);
+			chunksMissingToSync = Math.ceil((networkHeight - fromBlockHeight) / this.#downloadChunkSize);
 		}
 		const chunksToDownload: number = Math.min(chunksMissingToSync, peersNotForked.length, maxParallelDownloads);
 
@@ -364,11 +364,11 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		let chunksHumanReadable = "";
 
 		for (let index = 0; index < chunksToDownload; index++) {
-			const height: number = fromBlockHeight + this.downloadChunkSize * index;
+			const height: number = fromBlockHeight + this.#downloadChunkSize * index;
 			const isLastChunk: boolean = index === chunksToDownload - 1;
 			const blocksRange = `[${(height + 1).toLocaleString()}, ${(isLastChunk
 				? ".."
-				: height + this.downloadChunkSize
+				: height + this.#downloadChunkSize
 			).toLocaleString()}]`;
 
 			//@ts-ignore
@@ -400,7 +400,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 					peerPrint = `${peer.ip}:${peer.port}`;
 					try {
 						blocks = await this.communicator.getPeerBlocks(peer, {
-							blockLimit: this.downloadChunkSize,
+							blockLimit: this.#downloadChunkSize,
 							fromBlockHeight: height,
 						});
 
@@ -465,9 +465,9 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		// Save any downloaded chunks that are higher than a failed chunk for later reuse.
 		for (index++; index < chunksToDownload; index++) {
 			if (downloadResults[index]) {
-				const height: number = fromBlockHeight + this.downloadChunkSize * index;
+				const height: number = fromBlockHeight + this.#downloadChunkSize * index;
 				const blocksRange = `[${(height + 1).toLocaleString()}, ${(
-					height + this.downloadChunkSize
+					height + this.#downloadChunkSize
 				).toLocaleString()}]`;
 
 				this.chunkCache.set(blocksRange, downloadResults[index]);
@@ -475,8 +475,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		// if we did not manage to download any block, reduce chunk size for next time
-		this.downloadChunkSize =
-			downloadedBlocks.length === 0 ? Math.ceil(this.downloadChunkSize / 10) : defaultDownloadChunkSize;
+		this.#downloadChunkSize =
+			downloadedBlocks.length === 0 ? Math.ceil(this.#downloadChunkSize / 10) : defaultDownloadChunkSize;
 
 		return downloadedBlocks;
 	}
@@ -521,7 +521,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		await Promise.all(peers.map((peer) => this.communicator.postBlock(peer, block)));
 	}
 
-	private async pingPeerPorts(pingAll?: boolean): Promise<void> {
+	async #pingPeerPorts(pingAll?: boolean): Promise<void> {
 		let peers = this.repository.getPeers();
 		if (!pingAll) {
 			peers = Utils.shuffle(peers).slice(0, Math.floor(peers.length / 2));
@@ -532,7 +532,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
 	}
 
-	private async scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
+	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
 		if (this.nextUpdateNetworkStatusScheduled) {
 			return;
 		}
@@ -546,7 +546,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		this.updateNetworkStatus();
 	}
 
-	private hasMinimumPeers(): boolean {
+	#hasMinimumPeers(): boolean {
 		if (this.config.ignoreMinimumNetworkReach) {
 			this.logger.warning("Ignored the minimum network reach because the relay is in seed mode.");
 
@@ -556,11 +556,11 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		return Object.keys(this.repository.getPeers()).length >= this.config.minimumNetworkReach;
 	}
 
-	private async populateSeedPeers(): Promise<any> {
+	async #populateSeedPeers(): Promise<any> {
 		const peerList: Contracts.P2P.PeerData[] = this.app.config("peers").list;
 
 		try {
-			const peersFromUrl = await this.loadPeersFromUrlList();
+			const peersFromUrl = await this.#loadPeersFromUrlList();
 			for (const peer of peersFromUrl) {
 				if (!peerList.find((p) => p.ip === peer.ip)) {
 					peerList.push({
@@ -593,7 +593,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		);
 	}
 
-	private async loadPeersFromUrlList(): Promise<Array<{ ip: string; port: number }>> {
+	async #loadPeersFromUrlList(): Promise<Array<{ ip: string; port: number }>> {
 		const urls: string[] = this.app.config("peers").sources || [];
 
 		for (const url of urls) {

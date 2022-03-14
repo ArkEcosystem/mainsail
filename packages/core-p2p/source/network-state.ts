@@ -27,15 +27,15 @@ class QuorumDetails {
 
 // @TODO review the implementation
 export class NetworkState implements Contracts.P2P.NetworkState {
-	private nodeHeight?: number;
-	private lastBlockId?: string;
-	private quorumDetails: QuorumDetails;
+	#nodeHeight?: number;
+	#lastBlockId?: string;
+	#quorumDetails: QuorumDetails;
 
 	public constructor(public readonly status: NetworkStateStatus, lastBlock?: Contracts.Crypto.IBlock) {
-		this.quorumDetails = new QuorumDetails();
+		this.#quorumDetails = new QuorumDetails();
 
 		if (lastBlock) {
-			this.setLastBlock(lastBlock);
+			this.#setLastBlock(lastBlock);
 		}
 	}
 
@@ -65,7 +65,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			return new NetworkState(NetworkStateStatus.BelowMinimumPeers, lastBlock);
 		}
 
-		return this.analyzeNetwork(lastBlock, peers, slots);
+		return this.#analyzeNetwork(lastBlock, peers, slots);
 	}
 
 	public static parse(data: any): Contracts.P2P.NetworkState {
@@ -74,30 +74,30 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		}
 
 		const networkState = new NetworkState(data.status);
-		networkState.nodeHeight = data.nodeHeight;
-		networkState.lastBlockId = data.lastBlockId;
-		Object.assign(networkState.quorumDetails, data.quorumDetails);
+		networkState.#nodeHeight = data.#nodeHeight;
+		networkState.#lastBlockId = data.#lastBlockId;
+		Object.assign(networkState.#quorumDetails, data.#quorumDetails);
 
 		return networkState;
 	}
 
-	private static analyzeNetwork(lastBlock, peers: Contracts.P2P.Peer[], slots): Contracts.P2P.NetworkState {
+	static #analyzeNetwork(lastBlock, peers: Contracts.P2P.Peer[], slots): Contracts.P2P.NetworkState {
 		const networkState = new NetworkState(NetworkStateStatus.Default, lastBlock);
 		const currentSlot = slots.getSlotNumber();
 
 		for (const peer of peers) {
-			networkState.update(peer, currentSlot);
+			networkState.#update(peer, currentSlot);
 		}
 
 		return networkState;
 	}
 
 	public getNodeHeight(): number | undefined {
-		return this.nodeHeight;
+		return this.#nodeHeight;
 	}
 
 	public getLastBlockId(): string | undefined {
-		return this.lastBlockId;
+		return this.#lastBlockId;
 	}
 
 	public getQuorum(): number {
@@ -105,11 +105,11 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			return 1;
 		}
 
-		return this.quorumDetails.getQuorum();
+		return this.#quorumDetails.getQuorum();
 	}
 
 	public getOverHeightBlockHeaders(): { [id: string]: any } {
-		return Object.values(this.quorumDetails.peersOverHeightBlockHeaders);
+		return Object.values(this.#quorumDetails.peersOverHeightBlockHeaders);
 	}
 
 	public toJson(): string {
@@ -120,34 +120,34 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		return JSON.stringify(data, undefined, 2);
 	}
 
-	private setLastBlock(lastBlock: Contracts.Crypto.IBlock): void {
-		this.nodeHeight = lastBlock.data.height;
-		this.lastBlockId = lastBlock.data.id;
+	#setLastBlock(lastBlock: Contracts.Crypto.IBlock): void {
+		this.#nodeHeight = lastBlock.data.height;
+		this.#lastBlockId = lastBlock.data.id;
 	}
 
-	private update(peer: Contracts.P2P.Peer, currentSlot: number): void {
+	#update(peer: Contracts.P2P.Peer, currentSlot: number): void {
 		Utils.assert.defined<number>(peer.state.height);
-		Utils.assert.defined<number>(this.nodeHeight);
-		if (peer.state.height > this.nodeHeight) {
-			this.quorumDetails.peersNoQuorum++;
-			this.quorumDetails.peersOverHeight++;
-			this.quorumDetails.peersOverHeightBlockHeaders[peer.state.header.id] = peer.state.header;
+		Utils.assert.defined<number>(this.#nodeHeight);
+		if (peer.state.height > this.#nodeHeight) {
+			this.#quorumDetails.peersNoQuorum++;
+			this.#quorumDetails.peersOverHeight++;
+			this.#quorumDetails.peersOverHeightBlockHeaders[peer.state.header.id] = peer.state.header;
 		} else {
 			if (peer.isForked()) {
-				this.quorumDetails.peersNoQuorum++;
-				this.quorumDetails.peersForked++;
+				this.#quorumDetails.peersNoQuorum++;
+				this.#quorumDetails.peersForked++;
 			} else {
-				this.quorumDetails.peersQuorum++;
+				this.#quorumDetails.peersQuorum++;
 			}
 		}
 
 		// Just statistics in case something goes wrong.
 		if (peer.state.currentSlot !== currentSlot) {
-			this.quorumDetails.peersDifferentSlot++;
+			this.#quorumDetails.peersDifferentSlot++;
 		}
 
 		if (!peer.state.forgingAllowed) {
-			this.quorumDetails.peersForgingNotAllowed++;
+			this.#quorumDetails.peersForgingNotAllowed++;
 		}
 	}
 }
