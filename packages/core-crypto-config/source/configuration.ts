@@ -18,8 +18,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			network: config.network,
 		};
 
-		this.validateMilestones();
-		this.buildConstants();
+		this.#validateMilestones();
+		this.#buildConstants();
 	}
 
 	public all(): Contracts.Crypto.NetworkConfig | undefined {
@@ -41,9 +41,9 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		set(this.#config, key, value);
 
 		try {
-			this.validateMilestones();
+			this.#validateMilestones();
 
-			this.buildConstants();
+			this.#buildConstants();
 		} catch {
 			//
 		}
@@ -131,7 +131,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestones;
 	}
 
-	private buildConstants(): void {
+	#buildConstants(): void {
 		if (!this.#config) {
 			throw new Error();
 		}
@@ -158,7 +158,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		}
 	}
 
-	private validateMilestones(): void {
+	#validateMilestones(): void {
 		if (!this.#config) {
 			throw new Error();
 		}

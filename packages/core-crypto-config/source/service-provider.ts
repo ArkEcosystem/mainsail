@@ -8,7 +8,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		try {
-			const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
+			const config: Contracts.Crypto.NetworkConfig = this.#fromConfigRepository();
 
 			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
@@ -18,7 +18,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 	}
 
-	private fromConfigRepository(): Contracts.Crypto.NetworkConfig {
+	#fromConfigRepository(): Contracts.Crypto.NetworkConfig {
 		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
 
 		return {
