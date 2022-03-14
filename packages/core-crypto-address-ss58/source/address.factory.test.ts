@@ -1,11 +1,11 @@
-import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-container";
+import { Application } from "@arkecosystem/core-kernel";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { Application } from "@arkecosystem/core-kernel";
-import { Container } from "@arkecosystem/core-container";
+import { describe } from "../../core-test-framework";
 
-import { describe } from "../../core-test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =
@@ -16,14 +16,14 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		context.app.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
-			milestones: [],
-			network: {
-				// @ts-ignore
-				address: {
-					ss58: 0,
+		context.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
+			milestones: [
+				{
+					address: {
+						ss58: 0,
+					},
 				},
-			},
+			],
 		});
 	});
 

@@ -17,13 +17,13 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		context.app.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
-			milestones: [],
-			network: {
-				// @ts-ignore
-				address: {
-					bech32: "mod",
+			milestones: [
+				{
+					address: {
+						bech32: "mod",
+					},
 				},
-			},
+			],
 		});
 	});
 
