@@ -60,16 +60,22 @@ const directories = readdirSync(resolve("packages"), { withFileTypes: true })
 	.sort();
 
 for (const directory of directories) {
-	if (require(`../packages/${directory}/package.json`)["scripts"]["test"] === undefined) {
-		console.log(`Package [${directory}] has no [test] script.`);
+	try {
+		if (require(`../packages/${directory}/package.json`)["scripts"]["test"] === undefined) {
+			console.log(`Package [${directory}] has no [test] script.`);
+
+			continue;
+		}
+
+		workflow.jobs.unit.steps.push({
+			name: `Test ${directory}`,
+			run: `cd packages/${directory} && pnpm run test`,
+		});
+	} catch (error) {
+		console.error(error);
 
 		continue;
 	}
-
-	workflow.jobs.unit.steps.push({
-		name: `Test ${directory}`,
-		run: `cd packages/${directory} && pnpm run test`,
-	});
 }
 
 writeFileSync(resolve(".github/workflows/unit.yml"), YAML.stringify(workflow, { indent: 4 }));
