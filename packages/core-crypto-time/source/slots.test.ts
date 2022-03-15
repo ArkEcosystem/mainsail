@@ -4,7 +4,7 @@ import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Application } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../core-test-framework";
 import { BlockTimeCalculator } from "./block-time-calculator";
 import { Slots } from "./slots";
 
