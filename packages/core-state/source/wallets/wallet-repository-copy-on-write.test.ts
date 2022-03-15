@@ -1,9 +1,10 @@
 import { Contracts } from "@arkecosystem/core-kernel";
+import { describe } from "@arkecosystem/core-test-framework";
+import { Utils } from "@arkecosystem/crypto";
+
+import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from "./";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
-import { Utils } from "@arkecosystem/crypto";
-import { setUp } from "../../test/setup";
-import { describe } from "@arkecosystem/core-test-framework";
 
 describe<{
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;

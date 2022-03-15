@@ -1,17 +1,18 @@
 import { Application, Container, Utils } from "@arkecosystem/core-kernel";
 import { RoundInfo } from "@arkecosystem/core-kernel/source/contracts/shared";
 import { DposPreviousRoundStateProvider } from "@arkecosystem/core-kernel/source/contracts/state";
-import { DposState } from "./dpos";
-import { WalletRepository } from "../wallets";
+import { describe, Factories } from "@arkecosystem/core-test-framework";
 import { Interfaces } from "@arkecosystem/crypto";
+
 import { buildDelegateAndVoteWallets } from "../../test/build-delegate-and-vote-balances";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { makeVoteTransactions } from "../../test/make-vote-transactions";
-import { addTransactionsToBlock } from "../../test/transactions";
 import { setUp } from "../../test/setup";
-import { describe, Factories } from "@arkecosystem/core-test-framework";
-import { StateStore } from "../stores";
+import { addTransactionsToBlock } from "../../test/transactions";
 import { BlockState } from "../block-state";
+import { StateStore } from "../stores";
+import { WalletRepository } from "../wallets";
+import { DposState } from "./dpos";
 
 describe<{
 	app: Application;
@@ -64,7 +65,7 @@ describe<{
 	it("should get round delegates", async (context) => {
 		const previousRound = await context.dposPreviousRoundStateProv([], context.round);
 
-		assert.containValues(previousRound.getRoundDelegates(), context.walletRepo.allByUsername() as any);
+		assert.containValues(previousRound.getRoundDelegates(), context.walletRepo.allByUsername());
 	});
 
 	it("should revert blocks", async (context) => {

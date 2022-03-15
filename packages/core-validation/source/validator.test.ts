@@ -1,11 +1,12 @@
+import { describe, Factories, Generators } from "@arkecosystem/core-test-framework";
+import ajv from "ajv";
+
 import { IBlock, ITransactionData } from "../interfaces";
 import { configManager } from "../managers";
 import { TransactionTypeFactory } from "../transactions";
 import { TransactionSchema } from "../transactions/types/schemas";
 import { BigNumber } from "../utils";
 import { validator } from "../validation";
-import { describe, Factories, Generators } from "@arkecosystem/core-test-framework";
-import ajv from "ajv";
 
 describe("validator", ({ it, assert }) => {
 	it("transaction - should expect a timestamp if version = 1 or absent", () => {
@@ -32,7 +33,7 @@ describe("validator", ({ it, assert }) => {
 			"data must have required property 'timestamp'",
 		);
 
-		transaction.timestamp = 12222;
+		transaction.timestamp = 12_222;
 		assert.undefined(validator.validate("transferSigned", transaction).error);
 	});
 
@@ -66,7 +67,7 @@ describe("validator", ({ it, assert }) => {
 			amount: BigNumber.make(1000),
 			fee: BigNumber.make(2000),
 			recipientId: "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh",
-			timestamp: 141738,
+			timestamp: 141_738,
 			asset: {},
 			senderPublicKey: "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
 			signature:

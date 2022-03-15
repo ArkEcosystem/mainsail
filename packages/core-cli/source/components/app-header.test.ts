@@ -1,5 +1,5 @@
-import os from "os";
 import { red, white } from "kleur";
+import os from "os";
 
 import { Console, describe } from "../../../core-test-framework";
 import { Identifiers } from "../ioc";

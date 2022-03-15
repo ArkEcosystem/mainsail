@@ -1,12 +1,11 @@
 import { describe } from "../../../core-test-framework";
-
-import { Kernel } from "../contracts";
 import { Application } from "../application";
+import { Kernel } from "../contracts";
 import { KernelEvent } from "../enums";
 import { Container, Identifiers, interfaces } from "../ioc";
+import { MemoryEventDispatcher } from "../services/events";
 import { ServiceProvider } from "./service-provider";
 import { ServiceProviderRepository } from "./service-provider-repository";
-import { MemoryEventDispatcher } from "../services/events";
 
 class StubListener implements Kernel.EventListener {
 	public constructor(private readonly method?) {}

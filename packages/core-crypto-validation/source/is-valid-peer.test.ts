@@ -1,5 +1,6 @@
-import os from "os";
 import { describe } from "@arkecosystem/core-test-framework";
+import os from "os";
+
 import { isValidPeer } from "./is-valid-peer";
 
 describe("isValidPeer", ({ it, assert }) => {

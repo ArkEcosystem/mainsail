@@ -1,5 +1,6 @@
-import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError, WalletsError } from "./errors";
 import { describe } from "@arkecosystem/core-test-framework";
+
+import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError, WalletsError } from "./errors";
 
 describe("WalletErrors", ({ it, assert }) => {
 	it("should construct base wallet error", () => {

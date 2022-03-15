@@ -1,11 +1,12 @@
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
 import { Services } from "@arkecosystem/core-kernel";
-import { Wallet, WalletEvent } from "../wallets";
-import { getWalletAttributeSet } from "@arkecosystem/core-test-framework/source/internal/wallet-attributes";
-import { setUp } from "../../test/setup";
 import { describe } from "@arkecosystem/core-test-framework";
+import { getWalletAttributeSet } from "@arkecosystem/core-test-framework/source/internal/wallet-attributes";
+import { Utils } from "@arkecosystem/crypto";
 import { SinonSpy } from "sinon";
+
+import { setUp } from "../../test/setup";
+import { Wallet, WalletEvent } from "../wallets";
 
 describe<{
 	attributeMap: Services.Attributes.AttributeMap;

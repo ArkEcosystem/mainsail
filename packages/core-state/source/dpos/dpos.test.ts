@@ -1,12 +1,13 @@
-import { Utils, Contracts } from "@arkecosystem/core-kernel";
-import { DposState } from "./dpos";
-import { WalletRepository } from "../wallets";
+import { Contracts, Utils } from "@arkecosystem/core-kernel";
+import { describe } from "@arkecosystem/core-test-framework";
 import { Utils as CryptoUtils } from "@arkecosystem/crypto/source";
 import { SATOSHI } from "@arkecosystem/crypto/source/constants";
+import { SinonSpy } from "sinon";
+
 import { buildDelegateAndVoteWallets } from "../../test/build-delegate-and-vote-balances";
 import { setUp } from "../../test/setup";
-import { SinonSpy } from "sinon";
-import { describe } from "@arkecosystem/core-test-framework";
+import { WalletRepository } from "../wallets";
+import { DposState } from "./dpos";
 
 describe<{
 	dposState: DposState;
@@ -135,7 +136,7 @@ describe<{
 
 		assert.equal(context.dposState.getRoundInfo(), context.round);
 		assert.equal(context.dposState.getAllDelegates(), context.walletRepo.allByUsername());
-		assert.containValues(context.dposState.getActiveDelegates(), context.walletRepo.allByUsername() as any);
-		assert.containValues(context.dposState.getRoundDelegates(), context.walletRepo.allByUsername() as any);
+		assert.containValues(context.dposState.getActiveDelegates(), context.walletRepo.allByUsername());
+		assert.containValues(context.dposState.getRoundDelegates(), context.walletRepo.allByUsername());
 	});
 });

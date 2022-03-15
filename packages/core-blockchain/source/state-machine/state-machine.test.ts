@@ -1,7 +1,7 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Sandbox } from "../../../core-test-framework";
 import delay from "delay";
 
+import { describe, Sandbox } from "../../../core-test-framework";
 import { blockchainMachine } from "./machine";
 import { StateMachine } from "./state-machine";
 

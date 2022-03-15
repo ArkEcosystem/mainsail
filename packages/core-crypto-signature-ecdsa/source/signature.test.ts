@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework/source";
-
 import { Signature } from "./signature";
 
 describe("Signature", ({ assert, it }) => {

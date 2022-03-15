@@ -1,6 +1,6 @@
-import { execa } from "../execa";
 import { rcompare, satisfies } from "semver";
 
+import { execa } from "../execa";
 import { injectable } from "../ioc";
 
 @injectable()

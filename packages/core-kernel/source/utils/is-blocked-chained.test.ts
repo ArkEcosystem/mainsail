@@ -1,6 +1,6 @@
 import { Crypto, Interfaces } from "@arkecosystem/crypto";
-import { describe } from "../../../core-test-framework";
 
+import { describe } from "../../../core-test-framework";
 import { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained";
 
 const mockGetBlockTimeLookup = (height: number) => {

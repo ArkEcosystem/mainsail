@@ -1,6 +1,6 @@
 import { Interfaces, Managers, Networks } from "@arkecosystem/crypto";
-import { describe } from "../../../core-test-framework";
 
+import { describe } from "../../../core-test-framework";
 import { getBlockTimeLookup } from "./get-blocktime-lookup";
 
 const milestones = [

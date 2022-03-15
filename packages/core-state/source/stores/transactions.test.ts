@@ -1,6 +1,7 @@
-import { TransactionStore } from "./transactions";
 import { describe, Factories } from "@arkecosystem/core-test-framework";
 import { Interfaces } from "@arkecosystem/crypto";
+
+import { TransactionStore } from "./transactions";
 
 describe<{
 	factory: Factories.FactoryBuilder;

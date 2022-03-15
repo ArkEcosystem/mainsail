@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import semver from "semver";
 
 import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../providers";

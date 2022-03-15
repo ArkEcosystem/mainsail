@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { isBlacklisted } from "./is-blacklisted";
 
 describe("isBlacklisted", ({ assert, it }) => {

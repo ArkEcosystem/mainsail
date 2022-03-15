@@ -1,6 +1,6 @@
 import { Interfaces, Managers, Networks } from "@arkecosystem/crypto";
-import { describe } from "../../../core-test-framework";
 
+import { describe } from "../../../core-test-framework";
 import { calculateForgingInfo, getMilestonesWhichAffectActiveDelegateCount } from "./calculate-forging-info";
 
 const mockGetBlockTimeLookup = (height: number) => {

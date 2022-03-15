@@ -1,5 +1,5 @@
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { inject, injectable, tagged, postConstruct } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { WalletIndex } from "./wallet-index";

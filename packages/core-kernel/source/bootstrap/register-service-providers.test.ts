@@ -1,13 +1,4 @@
 import { describe } from "../../../../core-test-framework";
-
-import { Application } from "../../application";
-import { RegisterServiceProviders } from "./register-service-providers";
-import { ServiceProviderCannotBeRegistered } from "../../exceptions/plugins";
-import { Container, Identifiers } from "../../ioc";
-import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../../providers";
-import { MemoryEventDispatcher } from "../../services/events";
-import { ServiceProvider as ValidationServiceProvider } from "../../services/validation";
-
 import {
 	InvalidConfigurationServiceProvider,
 	OptionalDependencyCannotBeFoundServiceProvider,
@@ -21,6 +12,13 @@ import {
 	StubServiceProvider,
 	ValidConfigurationServiceProvider,
 } from "../../../test/stubs/bootstrap/service-providers";
+import { Application } from "../../application";
+import { ServiceProviderCannotBeRegistered } from "../../exceptions/plugins";
+import { Container, Identifiers } from "../../ioc";
+import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../../providers";
+import { MemoryEventDispatcher } from "../../services/events";
+import { ServiceProvider as ValidationServiceProvider } from "../../services/validation";
+import { RegisterServiceProviders } from "./register-service-providers";
 
 describe<{
 	app: Application;

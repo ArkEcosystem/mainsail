@@ -1,7 +1,8 @@
+import { describe, Factories } from "@arkecosystem/core-test-framework";
+
+import { setUp } from "../../test/setup";
 import { Wallets } from "../";
 import { WalletIndex } from "./";
-import { setUp } from "../../test/setup";
-import { describe, Factories } from "@arkecosystem/core-test-framework";
 
 describe<{
 	factory: Factories.FactoryBuilder;

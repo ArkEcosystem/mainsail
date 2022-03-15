@@ -1,5 +1,5 @@
-import { join } from "path";
 import { ensureDirSync, writeJSON } from "fs-extra";
+import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../core-test-framework";

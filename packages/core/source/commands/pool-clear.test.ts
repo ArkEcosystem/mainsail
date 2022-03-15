@@ -1,7 +1,8 @@
 import { Console, describe } from "@arkecosystem/core-test-framework";
-import { Command } from "./pool-clear";
 import fs from "fs-extra";
 import prompts from "prompts";
+
+import { Command } from "./pool-clear";
 
 describe<{
 	cli: Console;

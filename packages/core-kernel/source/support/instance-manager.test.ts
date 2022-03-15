@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { InstanceManager } from "./instance-manager";
 
 interface MyDriver {}

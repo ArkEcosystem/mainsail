@@ -1,12 +1,12 @@
 import { resolve } from "path";
-import { describe } from "../../../../core-test-framework";
 
+import { describe } from "../../../../core-test-framework";
 import { Application } from "../../application";
-import { LoadServiceProviders } from "./load-service-providers";
 import { Container, Identifiers } from "../../ioc";
 import { ServiceProvider, ServiceProviderRepository } from "../../providers";
 import { ConfigRepository } from "../../services/config";
 import { MemoryEventDispatcher } from "../../services/events";
+import { LoadServiceProviders } from "./load-service-providers";
 
 class StubServiceProvider extends ServiceProvider {
 	public async register(): Promise<void> {}

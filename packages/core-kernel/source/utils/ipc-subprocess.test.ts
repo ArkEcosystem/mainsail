@@ -1,6 +1,6 @@
-import { describe } from "../../../core-test-framework";
 import sinon from "sinon";
 
+import { describe } from "../../../core-test-framework";
 import { IpcSubprocess } from "./ipc-subprocess";
 
 type MyRpcInterface = {
@@ -20,13 +20,13 @@ describe<{
 	it("should subscribe to subprocess message event", (context) => {
 		const onSpy = spy(context.subprocess, "on");
 
-		new IpcSubprocess<MyRpcInterface>(context.subprocess as any);
+		new IpcSubprocess<MyRpcInterface>(context.subprocess);
 
 		onSpy.calledWith("message", sinon.match.func);
 	});
 
 	it("should return pending promises count", (context) => {
-		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess as any);
+		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess);
 
 		ipcSubprocess.sendRequest("myRpcRequestMethod", 1, 2);
 
@@ -36,7 +36,7 @@ describe<{
 	it("should call subprocess send method", (context) => {
 		const sendSpy = spy(context.subprocess, "send");
 
-		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess as any);
+		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess);
 		ipcSubprocess.sendAction("myRpcActionMethod", 1, 2);
 
 		sendSpy.calledWith({
@@ -48,7 +48,7 @@ describe<{
 	it("should return result when reply message arrives", async (context) => {
 		const sendSpy = spy(context.subprocess, "send");
 
-		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess as any);
+		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess);
 
 		const promise = ipcSubprocess.sendRequest("myRpcRequestMethod", 1, 2);
 
@@ -62,7 +62,7 @@ describe<{
 	it("should rethrow error when reply message arrives", async (context) => {
 		const sendSpy = spy(context.subprocess, "send");
 
-		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess as any);
+		const ipcSubprocess = new IpcSubprocess<MyRpcInterface>(context.subprocess);
 
 		const promise = ipcSubprocess.sendRequest("myRpcRequestMethod", 1, 2);
 

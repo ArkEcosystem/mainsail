@@ -1,8 +1,9 @@
 import { describe } from "@arkecosystem/core-test-framework";
+
+import { blockWithExceptions, dummyBlock } from "../../test/fixtures/block";
 import { BlockFactory, Serializer } from "../blocks";
 import { IBlockData } from "../interfaces";
 import { configManager } from "../managers";
-import { blockWithExceptions, dummyBlock } from "../../test/fixtures/block";
 
 describe<{
 	expectBlock: ({ data }: { data: IBlockData }) => void;
@@ -37,16 +38,16 @@ describe<{
 
 	it("fromData - should throw on invalid input data - block property has an unexpected value", () => {
 		const b1 = Object.assign({}, blockWithExceptions, { timestamp: "abcd" });
-		assert.throws(() => BlockFactory.fromData(b1 as any));
+		assert.throws(() => BlockFactory.fromData(b1));
 
 		const b2 = Object.assign({}, blockWithExceptions, { totalAmount: "abcd" });
-		assert.throws(() => BlockFactory.fromData(b2 as any));
+		assert.throws(() => BlockFactory.fromData(b2));
 	});
 
 	it("fromData - should throw on invalid input data - required block property is missing", () => {
 		const b = Object.assign({}, blockWithExceptions);
 		delete b.generatorPublicKey;
-		assert.throws(() => BlockFactory.fromData(b as any));
+		assert.throws(() => BlockFactory.fromData(b));
 	});
 
 	it("fromData - should throw on invalid transaction data", () => {
@@ -55,7 +56,7 @@ describe<{
 
 		delete b.transactions[1].id;
 
-		assert.throws(() => BlockFactory.fromData(b as any));
+		assert.throws(() => BlockFactory.fromData(b));
 
 		// Revert changes...
 		b.transactions[1].id = txId;

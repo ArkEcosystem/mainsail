@@ -1,7 +1,7 @@
+import { interfaces } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { Application, Types } from "@arkecosystem/core-kernel";
 import { Paths } from "env-paths";
-import { interfaces } from "@arkecosystem/core-container";
 
 export interface Wallet {
 	address: string;

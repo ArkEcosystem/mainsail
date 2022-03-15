@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework/source";
-
 import { HashFactory } from "./hash.factory";
 
 describe("HashFactory", ({ assert, it }) => {

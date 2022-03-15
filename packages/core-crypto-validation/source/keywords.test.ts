@@ -1,7 +1,8 @@
-import { Managers, Utils, Validation } from "../";
-import { TransactionType } from "../enums";
 import { describe } from "@arkecosystem/core-test-framework";
 import Ajv from "ajv";
+
+import { Managers, Utils, Validation } from "../";
+import { TransactionType } from "../enums";
 
 describe<{
 	ajv: Ajv;
@@ -148,13 +149,13 @@ describe<{
 		const schema = { bignumber: { type: "number", minimum: 100, maximum: 2000 } };
 		const validate = context.ajv.compile(schema);
 
-		for (const value of [100, 1e2, 1020.0, 500, 2000]) {
+		for (const value of [100, 1e2, 1020, 500, 2000]) {
 			assert.true(validate(value));
 			assert.true(validate(String(value)));
 			assert.true(validate(Utils.BigNumber.make(value)));
 		}
 
-		for (const value of [1e8, 1999.000001, 1 / 1e8, -100, -500, -2000.1]) {
+		for (const value of [1e8, 1999.000_001, 1 / 1e8, -100, -500, -2000.1]) {
 			assert.false(validate(value));
 			assert.false(validate(String(value)));
 		}

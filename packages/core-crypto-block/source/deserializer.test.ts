@@ -1,6 +1,7 @@
 import { describe } from "@arkecosystem/core-test-framework";
-import { Deserializer } from "./deserializer";
+
 import { dummyBlock2 } from "../../test/fixtures/block";
+import { Deserializer } from "./deserializer";
 
 describe("block deserializer", ({ it, assert }) => {
 	it("should correctly deserialize a block", () => {

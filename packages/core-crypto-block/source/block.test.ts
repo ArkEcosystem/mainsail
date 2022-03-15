@@ -1,14 +1,15 @@
 import { describe, TransactionFactory } from "@arkecosystem/core-test-framework";
+import ByteBuffer from "bytebuffer";
+
 import { BIP39 } from "../../../core-forger/source/methods/bip39";
+import { dummyBlock, dummyBlock2, dummyBlockSize } from "../../test/fixtures/block";
 import { Managers, Utils } from "../";
 import { Block, BlockFactory, Deserializer, Serializer } from "../blocks";
 import { Slots } from "../crypto";
+import { NetworkConfig } from "../interfaces";
 import { configManager } from "../managers";
 import * as networks from "../networks";
 import { NetworkName } from "../types";
-import ByteBuffer from "bytebuffer";
-import { dummyBlock, dummyBlock2, dummyBlockSize } from "../../test/fixtures/block";
-import { NetworkConfig } from "../interfaces";
 
 const data = {
 	id: "187940162505562345",
@@ -20,7 +21,7 @@ const data = {
 	payloadHash: "578e820911f24e039733b45e4882b73e301f813a0d2c31330dafda84534ffa23",
 	payloadLength: 1,
 	previousBlock: "12123",
-	timestamp: 111150,
+	timestamp: 111_150,
 	reward: Utils.BigNumber.ONE,
 	totalAmount: Utils.BigNumber.make(10),
 	totalFee: Utils.BigNumber.ONE,
@@ -94,7 +95,7 @@ describe<{
 	it("constructor - should fail to verify a block with too much transactions", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "11111111",
 				idHex: "11111111",
@@ -117,7 +118,7 @@ describe<{
 	it("constructor - should fail to verify a block with duplicate transactions", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "11111111",
 				idHex: "11111111",
@@ -144,7 +145,7 @@ describe<{
 				maxTransactions: 200,
 				maxPayload: dummyBlockSize - 1,
 			},
-			reward: 200000000,
+			reward: 200_000_000,
 			vendorFieldLength: 64,
 			epoch: "2017-03-21T13:00:00.000Z",
 		}));
@@ -159,7 +160,7 @@ describe<{
 				maxTransactions: 200,
 				maxPayload: dummyBlockSize,
 			},
-			reward: 200000000,
+			reward: 200_000_000,
 			vendorFieldLength: 64,
 			epoch: "2017-03-21T13:00:00.000Z",
 		}));
@@ -172,7 +173,7 @@ describe<{
 	it("constructor - should verify a block with expiring transactions", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "11111111",
 				idHex: "11111111",
@@ -196,7 +197,7 @@ describe<{
 	it("constructor - should fail to verify a block with expired transactions", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "11111111",
 				idHex: "11111111",
@@ -220,7 +221,7 @@ describe<{
 	it("constructor - should fail to verify a block with expired transaction timestamp", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "11111111",
 				idHex: "11111111",
@@ -233,7 +234,7 @@ describe<{
 			.transfer("ANYiQJSPSoDT8U9Quh5vU8timD2RM7RS38", 1)
 			.withNetwork("testnet")
 			.withVersion(1)
-			.withTimestamp(optionsDefault.timestamp - 21601)
+			.withTimestamp(optionsDefault.timestamp - 21_601)
 			.withPassphrase("super cool passphrase")
 			.create();
 
@@ -247,7 +248,7 @@ describe<{
 	it("constructor - should verify a block with future transaction timestamp if within blocktime", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "11111111",
 				idHex: "11111111",
@@ -277,7 +278,7 @@ describe<{
 	it("constructor - should fail to verify a block with future transaction timestamp", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "11111111",
 				idHex: "11111111",
@@ -308,10 +309,10 @@ describe<{
 	it("constructor - should reject block with future transaction timestamp if milestone is not active", () => {
 		const delegate = new BIP39("super cool passphrase");
 		const optionsDefault = {
-			timestamp: 12345689,
+			timestamp: 12_345_689,
 			previousBlock: {
 				id: "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538",
-				height: 8999999,
+				height: 8_999_999,
 			},
 			reward: Utils.BigNumber.make(0),
 		};
@@ -348,8 +349,8 @@ describe<{
 		const block = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -368,8 +369,8 @@ describe<{
 		const blockHighS = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -390,8 +391,8 @@ describe<{
 		const block = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -410,8 +411,8 @@ describe<{
 		const blockInvalidSignatureLength = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -432,8 +433,8 @@ describe<{
 		const block = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -452,8 +453,8 @@ describe<{
 		const blockInvalidR = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -474,8 +475,8 @@ describe<{
 		const block = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -494,8 +495,8 @@ describe<{
 		const blockLongFormSig = BlockFactory.fromData({
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			version: 0,
-			timestamp: 102041016,
-			height: 5470549,
+			timestamp: 102_041_016,
+			height: 5_470_549,
 			reward: Utils.BigNumber.make("200000000"),
 			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			numberOfTransactions: 0,
@@ -555,11 +556,11 @@ describe<{
 
 		const data2 = { ...data };
 		const header = BlockFactory.fromData(data2).getHeader();
-		const bignumProperties = ["reward", "totalAmount", "totalFee"];
+		const bignumProperties = new Set(["reward", "totalAmount", "totalFee"]);
 
 		for (const key of Object.keys(data)) {
 			if (key !== "transactions") {
-				if (bignumProperties.includes(key)) {
+				if (bignumProperties.has(key)) {
 					assert.equal(header[key], Utils.BigNumber.make(data2[key]));
 				} else {
 					assert.equal(header[key], data2[key]);
@@ -677,9 +678,9 @@ describe<{
 			configManager.getMilestone().aip11 = network === "testnet";
 		},
 		[
-			["mainnet", 468048],
-			["devnet", 14492],
-			["testnet", 46488],
+			["mainnet", 468_048],
+			["devnet", 14_492],
+			["testnet", 46_488],
 		],
 	);
 
@@ -701,14 +702,14 @@ describe<{
 
 		const issue = {
 			version: 0,
-			timestamp: 25029544,
-			height: 3084276,
+			timestamp: 25_029_544,
+			height: 3_084_276,
 			previousBlockHex: "63b315f3663e4299",
 			previousBlock: "7184109965722665625",
 			numberOfTransactions: 2,
 			totalAmount: Utils.BigNumber.make(0),
-			totalFee: Utils.BigNumber.make(600000000),
-			reward: Utils.BigNumber.make(200000000),
+			totalFee: Utils.BigNumber.make(600_000_000),
+			reward: Utils.BigNumber.make(200_000_000),
 			payloadLength: 64,
 			payloadHash: "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538",
 			generatorPublicKey: "02fa6902e91e127d6d3410f6abc271a79ae24029079caa0db5819757e3c1c1c5a4",
@@ -720,8 +721,8 @@ describe<{
 					id: "7a1a43098cd253db395514220f69e3b99afaabb2bfcf5ecfa3b99727b367344b",
 					network: 0x17,
 					type: 1,
-					timestamp: 25028279,
-					fee: Utils.BigNumber.make(500000000),
+					timestamp: 25_028_279,
+					fee: Utils.BigNumber.make(500_000_000),
 					amount: Utils.BigNumber.make(0),
 					senderPublicKey: "02aadc3e0993c1d3447db27741745eb9c2c6522cccf02fc8efe3bf2d49708243dd",
 					signature:
@@ -735,9 +736,9 @@ describe<{
 				{
 					type: 3,
 					network: 0x17,
-					timestamp: 25028325,
+					timestamp: 25_028_325,
 					senderPublicKey: "02aadc3e0993c1d3447db27741745eb9c2c6522cccf02fc8efe3bf2d49708243dd",
-					fee: Utils.BigNumber.make(100000000),
+					fee: Utils.BigNumber.make(100_000_000),
 					amount: Utils.BigNumber.make(0),
 					asset: {
 						votes: ["+020431436cf94f3c6a6ba566fe9e42678db8486590c732ca6c3803a10a86f50b92"],
@@ -768,7 +769,7 @@ describe<{
 			payloadHash: "578e820911f24e039733b45e4882b73e301f813a0d2c31330dafda84534ffa23",
 			payloadLength: 1,
 			previousBlock: "12123",
-			timestamp: 111150,
+			timestamp: 111_150,
 			reward: Utils.BigNumber.ONE,
 			totalAmount: Utils.BigNumber.make(10),
 			totalFee: Utils.BigNumber.ONE,
@@ -790,7 +791,7 @@ describe<{
 			payloadHash: "578e820911f24e039733b45e4882b73e301f813a0d2c31330dafda84534ffa23",
 			payloadLength: 1,
 			previousBlock: "12123",
-			timestamp: 111150,
+			timestamp: 111_150,
 			reward: Utils.BigNumber.ONE,
 			totalAmount: Utils.BigNumber.make(10),
 			totalFee: Utils.BigNumber.ONE,

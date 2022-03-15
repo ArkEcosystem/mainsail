@@ -1,6 +1,7 @@
-import { configManager } from "./";
-import { devnet, testnet, mainnet } from "../networks";
 import { describe } from "@arkecosystem/core-test-framework";
+
+import { devnet, mainnet, testnet } from "../networks";
+import { configManager } from "./";
 
 describe<{
 	config: any;
@@ -52,19 +53,19 @@ describe<{
 	});
 
 	it("should get milestone for height", () => {
-		assert.equal(configManager.getMilestone(21600), devnet.milestones[2]);
+		assert.equal(configManager.getMilestone(21_600), devnet.milestones[2]);
 	});
 
 	it("should get milestone for this.height if height is not provided as parameter", () => {
-		configManager.setHeight(21600);
+		configManager.setHeight(21_600);
 
 		assert.equal(configManager.getMilestone(), devnet.milestones[2]);
 	});
 
 	it("should set the height", () => {
-		configManager.setHeight(21600);
+		configManager.setHeight(21_600);
 
-		assert.equal(configManager.getHeight(), 21600);
+		assert.equal(configManager.getHeight(), 21_600);
 	});
 
 	it("should determine if a new milestone is becoming active", () => {
@@ -73,11 +74,11 @@ describe<{
 			assert.true(configManager.isNewMilestone());
 		}
 
-		configManager.setHeight(999999);
+		configManager.setHeight(999_999);
 		assert.false(configManager.isNewMilestone());
 
 		configManager.setHeight(1);
-		assert.false(configManager.isNewMilestone(999999));
+		assert.false(configManager.isNewMilestone(999_999));
 	});
 
 	it("getNextMilestoneByKey - should throw an error if no milestones are set", () => {
@@ -92,7 +93,7 @@ describe<{
 		configManager.setConfig(devnet);
 		const expected = {
 			found: true,
-			height: 1750000,
+			height: 1_750_000,
 			data: 255,
 		};
 		assert.equal(configManager.getNextMilestoneWithNewKey(1, "vendorFieldLength"), expected);
@@ -102,10 +103,10 @@ describe<{
 		configManager.setConfig(devnet);
 		const expected = {
 			found: false,
-			height: 1750000,
+			height: 1_750_000,
 			data: null,
 		};
-		assert.equal(configManager.getNextMilestoneWithNewKey(1750000, "vendorFieldLength"), expected);
+		assert.equal(configManager.getNextMilestoneWithNewKey(1_750_000, "vendorFieldLength"), expected);
 	});
 
 	it("getNextMilestoneByKey - should get all milestones", () => {

@@ -1,7 +1,7 @@
-import assert from "assert";
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
+import assert from "assert";
 
 // @TODO review its implementation and finally integrate it as planned in v2
 @injectable()

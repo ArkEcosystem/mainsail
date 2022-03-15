@@ -1,9 +1,3 @@
-import { Application, Container, Enums as KernelEnums } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@arkecosystem/core-state";
-import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
-import { Mempool } from "@arkecosystem/core-transaction-pool";
-import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-
 import {
 	InsufficientBalanceError,
 	NotEnoughDelegatesError,
@@ -11,6 +5,12 @@ import {
 	WalletAlreadyResignedError,
 	WalletNotADelegateError,
 } from "@arkecosystem/core-errors";
+import { Application, Container, Enums as KernelEnums } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
+import { Mempool } from "@arkecosystem/core-transaction-pool";
+import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";

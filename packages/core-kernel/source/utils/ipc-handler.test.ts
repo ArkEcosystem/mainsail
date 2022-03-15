@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { IpcHandler } from "./ipc-handler";
 
 type MyRpcInterface = {
@@ -74,7 +73,7 @@ describe("IpcHandler", ({ it, spy }) => {
 			try {
 				// @ts-ignore
 				await myHandler.myRpcRequestMethod.getCall(0).proxy();
-			} catch (error) {}
+			} catch {}
 
 			myRpcRequestMethodSpy.calledWith(1, 2);
 			processSendSpy.calledWith({ id: 1, error: "hello" });

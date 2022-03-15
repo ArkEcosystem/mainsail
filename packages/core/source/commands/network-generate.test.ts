@@ -1,9 +1,9 @@
 import { Console, describe } from "@arkecosystem/core-test-framework";
+import { BigNumber } from "@arkecosystem/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";
 import prompts from "prompts";
-import { BigNumber } from "@arkecosystem/utils";
 
 import { Command } from "./network-generate";
 
@@ -88,9 +88,9 @@ describe<{
 						block: match.object,
 						blockTime: 9,
 						epoch: match.string,
-						height: 23000,
+						height: 23_000,
 						multiPaymentLimit: 256,
-						reward: 200000000,
+						reward: 200_000_000,
 						satoshi: match.object,
 						vendorFieldLength: 255,
 					}),
@@ -242,7 +242,7 @@ describe<{
 			"51",
 			"9",
 			"122",
-			123444,
+			123_444,
 			"23000",
 			"200000000",
 			168,
@@ -276,7 +276,7 @@ describe<{
 			"47",
 			"9",
 			"122",
-			123444,
+			123_444,
 			"23000",
 			"66000",
 			168,
@@ -391,9 +391,9 @@ describe<{
 						block: match.object,
 						blockTime: 9,
 						epoch: match.string,
-						height: 23000,
+						height: 23_000,
 						multiPaymentLimit: 256,
-						reward: 66000,
+						reward: 66_000,
 						satoshi: match.object,
 						vendorFieldLength: 64,
 					}),

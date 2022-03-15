@@ -1,11 +1,12 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { StateStore } from "./";
 import { Factories } from "@arkecosystem/core-test-framework";
+import { describe } from "@arkecosystem/core-test-framework";
 import { Interfaces } from "@arkecosystem/crypto";
+import { SinonSpy } from "sinon";
+
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { setUp } from "../../test/setup";
-import { SinonSpy } from "sinon";
-import { describe } from "@arkecosystem/core-test-framework";
+import { StateStore } from "./";
 
 describe<{
 	blocks: Interfaces.IBlock[];
@@ -336,8 +337,8 @@ describe<{
 		assert.length(ids, 10);
 		assert.length(commonBlocks, 10);
 
-		for (let i = 0; i < commonBlocks.length; i++) {
-			assert.equal(commonBlocks[i].height, context.blocks[98 - i].data.height);
+		for (const [i, commonBlock] of commonBlocks.entries()) {
+			assert.equal(commonBlock.height, context.blocks[98 - i].data.height);
 		}
 	});
 
@@ -363,7 +364,7 @@ describe<{
 
 	it("cacheTransactions - should not add more than 10000 unique transaction ids", (context) => {
 		const transactions = [];
-		for (let i = 0; i < 10000; i++) {
+		for (let i = 0; i < 10_000; i++) {
 			transactions.push({ id: i.toString() });
 		}
 
@@ -372,14 +373,14 @@ describe<{
 			notAdded: [],
 		});
 
-		assert.length(context.stateStorage.getCachedTransactionIds(), 10000);
+		assert.length(context.stateStorage.getCachedTransactionIds(), 10_000);
 		assert.equal(context.stateStorage.getCachedTransactionIds()[0], "0");
 
 		assert.equal(context.stateStorage.cacheTransactions([{ id: "10000" } as any]), {
 			added: [{ id: "10000" }],
 			notAdded: [],
 		});
-		assert.length(context.stateStorage.getCachedTransactionIds(), 10000);
+		assert.length(context.stateStorage.getCachedTransactionIds(), 10_000);
 		assert.equal(context.stateStorage.getCachedTransactionIds()[0], "1");
 	});
 
@@ -416,7 +417,7 @@ describe<{
 
 	it("pingBlock - should return true if block pinged == current blockPing and should update stats", async (context) => {
 		const timer = clock();
-		const currentTime = new Date().getTime();
+		const currentTime = Date.now();
 
 		// @ts-ignore
 		context.stateStorage.blockPing = {
@@ -438,7 +439,7 @@ describe<{
 	});
 
 	it("pingBlock - should return false if block pinged != current blockPing", (context) => {
-		const currentTime = new Date().getTime();
+		const currentTime = Date.now();
 		// @ts-ignore
 		context.stateStorage.blockPing = {
 			count: 1,
@@ -471,8 +472,8 @@ describe<{
 		// @ts-ignore
 		context.stateStorage.blockPing = {
 			count: 1,
-			first: new Date().getTime(),
-			last: new Date().getTime(),
+			first: Date.now(),
+			last: Date.now(),
 			block: context.blocks[3].data,
 		};
 
@@ -493,8 +494,8 @@ describe<{
 		// @ts-ignore
 		context.stateStorage.blockPing = {
 			count: 0,
-			first: new Date().getTime(),
-			last: new Date().getTime(),
+			first: Date.now(),
+			last: Date.now(),
 			block: context.blocks[3].data,
 		};
 

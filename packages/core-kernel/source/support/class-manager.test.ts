@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { ClassManager } from "./class-manager";
 
 class MyMemoryDriver {}

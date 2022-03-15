@@ -1,4 +1,5 @@
 import { describe, Generators } from "@arkecosystem/core-test-framework";
+
 import { ARKTOSHI } from "../constants";
 import { TransactionType, TransactionTypeGroup } from "../enums";
 import { PublicKey } from "../identities";
@@ -646,7 +647,7 @@ describe<{
 			version: 1,
 			network: 23,
 			type: 4,
-			timestamp: 53253482,
+			timestamp: 53_253_482,
 			senderPublicKey: "0333421e69d3531a1c43c43cd4b9344e5a10640644a5fd35618b6306f3a4d7f208",
 			fee: "2000000000",
 			amount: "0",

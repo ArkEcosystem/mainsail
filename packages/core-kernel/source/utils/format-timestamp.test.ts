@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { formatTimestamp } from "./format-timestamp";
 
 describe("Format Timestamp", ({ assert, it }) => {

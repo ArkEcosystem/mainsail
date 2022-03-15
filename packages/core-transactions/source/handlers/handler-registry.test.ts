@@ -1,13 +1,13 @@
+import { InvalidTransactionTypeError } from "@arkecosystem/core-errors";
 import { Application, Container, Services } from "@arkecosystem/core-kernel";
-import { describe } from "../../core-test-framework/source";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import { ByteBuffer } from "@arkecosystem/utils";
 
+import { describe } from "../../core-test-framework/source";
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
-import { InvalidTransactionTypeError } from "@arkecosystem/core-errors";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct

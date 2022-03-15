@@ -1,7 +1,7 @@
-import { envPaths } from "../env-paths";
 import { readJSON } from "fs-extra";
 import { join } from "path";
 
+import { envPaths } from "../env-paths";
 import { injectable } from "../ioc";
 
 interface Config {

@@ -1,13 +1,4 @@
 import { describe } from "../../../../core-test-framework";
-
-import { Application } from "../../application";
-import { BootServiceProviders } from "./boot-service-providers";
-import { BlockEvent, KernelEvent } from "../../enums";
-import { ServiceProviderCannotBeBooted } from "../../exceptions/plugins";
-import { Container, Identifiers } from "../../ioc";
-import { ServiceProvider, ServiceProviderRepository } from "../../providers";
-import { MemoryEventDispatcher } from "../../services/events";
-
 import {
 	DeferredBootServiceProvider,
 	DeferredDisposeServiceProvider,
@@ -15,6 +6,13 @@ import {
 	FaultyBootServiceProvider,
 	RequiredFaultyBootServiceProvider,
 } from "../../../test/stubs/bootstrap/service-providers";
+import { Application } from "../../application";
+import { BlockEvent, KernelEvent } from "../../enums";
+import { ServiceProviderCannotBeBooted } from "../../exceptions/plugins";
+import { Container, Identifiers } from "../../ioc";
+import { ServiceProvider, ServiceProviderRepository } from "../../providers";
+import { MemoryEventDispatcher } from "../../services/events";
+import { BootServiceProviders } from "./boot-service-providers";
 
 describe<{
 	app: Application;

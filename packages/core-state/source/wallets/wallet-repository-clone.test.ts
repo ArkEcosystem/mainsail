@@ -1,5 +1,7 @@
-import { Utils } from "@arkecosystem/crypto";
 import { Container, Contracts, Services } from "@arkecosystem/core-kernel";
+import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { Utils } from "@arkecosystem/crypto";
+
 import {
 	addressesIndexer,
 	publicKeysIndexer,
@@ -9,7 +11,6 @@ import {
 	WalletRepositoryClone,
 } from "./";
 import { walletFactory } from "./wallet-factory";
-import { Sandbox, describe } from "@arkecosystem/core-test-framework";
 
 describe<{
 	walletRepositoryBlockchain: WalletRepository;

@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { Lock } from "./lock";
 
 describe("Lock", ({ assert, it }) => {

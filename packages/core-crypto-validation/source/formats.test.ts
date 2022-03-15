@@ -1,6 +1,7 @@
-import { Managers, Validation } from "../";
 import { describe } from "@arkecosystem/core-test-framework";
 import Ajv from "ajv";
+
+import { Managers, Validation } from "../";
 
 describe<{
 	ajv: Ajv;

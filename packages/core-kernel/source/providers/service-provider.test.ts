@@ -1,6 +1,6 @@
 import { resolve } from "path";
-import { describe } from "../../../core-test-framework";
 
+import { describe } from "../../../core-test-framework";
 import { Application } from "../application";
 import { Container } from "../ioc";
 import { PluginConfiguration } from "./plugin-configuration";

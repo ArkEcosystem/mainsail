@@ -1,8 +1,8 @@
-import { envPaths, Paths } from "../env-paths";
 import { parseFileSync, stringifySync } from "envfile";
 import { existsSync, writeFileSync } from "fs-extra";
 import { resolve } from "path";
 
+import { envPaths, Paths } from "../env-paths";
 import { injectable } from "../ioc";
 
 @injectable()
