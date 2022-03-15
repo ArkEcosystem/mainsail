@@ -2,7 +2,7 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Services, Types, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
-import { getRemainingSlotTime } from "../utils";
+import { Utils } from "../utils";
 
 @injectable()
 export class ForgeNewBlockAction extends Services.Triggers.Action {
@@ -55,7 +55,7 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 		AppUtils.assert.defined<string>(validator.publicKey);
 
 		const minimumMs = 2000;
-		const timeLeftInMs: number = getRemainingSlotTime(round, this.configuration);
+		const timeLeftInMs: number = Utils.getRemainingSlotTime(round, this.configuration);
 		const prettyName = `${this.app.get<object>(Identifiers.Forger.Usernames)[validator.publicKey]} (${
 			validator.publicKey
 		})`;
