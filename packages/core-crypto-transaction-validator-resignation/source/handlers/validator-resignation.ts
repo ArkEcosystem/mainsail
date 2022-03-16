@@ -36,7 +36,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		}
 	}
 	public async isActivated(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 === true;
+		return true;
 	}
 
 	public async throwIfCannotBeApplied(

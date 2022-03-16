@@ -38,7 +38,7 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 	}
 
 	public async isActivated(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 === true;
+		return true;
 	}
 
 	public async throwIfCannotBeApplied(

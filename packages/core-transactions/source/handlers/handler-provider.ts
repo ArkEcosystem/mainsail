@@ -94,7 +94,8 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 	#hasOtherHandler(handlerConstructor: TransactionHandlerConstructor, dependency: TransactionHandlerConstructor) {
 		return this.handlerConstructors.some(
 			(otherHandlerConstructor) =>
-				otherHandlerConstructor !== handlerConstructor && otherHandlerConstructor === dependency,
+				otherHandlerConstructor.name !== handlerConstructor.name &&
+				otherHandlerConstructor.name === dependency.name,
 		);
 	}
 }

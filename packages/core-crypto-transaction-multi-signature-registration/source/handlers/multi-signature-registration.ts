@@ -48,7 +48,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 	}
 
 	public async isActivated(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 === true;
+		return true;
 	}
 
 	public async throwIfCannotBeApplied(

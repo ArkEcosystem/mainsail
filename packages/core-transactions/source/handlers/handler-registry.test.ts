@@ -1,52 +1,92 @@
-import { InvalidTransactionTypeError } from "@arkecosystem/core-errors";
-import { Application, Container, Services } from "@arkecosystem/core-kernel";
-import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { Application, Services } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { describe } from "../../../core-test-framework/source";
 
-import { describe } from "../../core-test-framework/source";
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
-import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
+import { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
+import {
+	schemas,
+	Transaction,
+	TransactionRegistry,
+	TransactionTypeFactory,
+} from "@arkecosystem/core-crypto-transaction";
+import { MultiPaymentTransactionHandler } from "../../../core-crypto-transaction-multi-payment/source/handlers";
+import { MultiSignatureRegistrationTransactionHandler } from "../../../core-crypto-transaction-multi-signature-registration/source/handlers";
+import { TransferTransactionHandler } from "../../../core-crypto-transaction-transfer/source/handlers";
+import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
+import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
+import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
+import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
+import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
+import { Signature } from "../../../core-crypto-signature-schnorr/source/signature";
+import { HashFactory } from "../../../core-crypto-hash-bcrypto/source/hash.factory";
+import { Slots } from "../../../core-crypto-time/source/slots";
+import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
+import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
+import { Configuration } from "../../../core-crypto-config";
+import { Validator } from "../../../core-validation/source/validator";
+import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
+import { Serializer, Utils, Verifier } from "@arkecosystem/core-crypto-transaction/source";
 
-const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
-const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
-const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE = 9;
+const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
+const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;
 
 const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
-const { schemas } = Transactions;
+const TEST_DEACTIVATED_TRANSACTION_TYPE = 102;
 
-abstract class TestTransaction extends Transactions.Transaction {
+abstract class TestTransaction extends Transaction {
 	public static type: number = TEST_TRANSACTION_TYPE;
-	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test";
 
-	deserialize(buf: ByteBuffer): void {}
+	async deserialize(buf: ByteBuffer): Promise<void> {}
 
-	serialize(): ByteBuffer | undefined {
+	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
 	}
 
-	public static getSchema(): Transactions.schemas.TransactionSchema {
+	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
 			$id: "test",
 		});
 	}
 }
 
-abstract class TestWithDependencyTransaction extends Transactions.Transaction {
-	public static type: number = DEPENDANT_TEST_TRANSACTION_TYPE;
-	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
-	public static key = "test_with_dependency";
+abstract class TestDeactivatedTransaction extends Transaction {
+	public static type: number = TEST_DEACTIVATED_TRANSACTION_TYPE;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
+	public static key = "deactivated_test";
 
-	deserialize(buf: ByteBuffer): void {}
+	async deserialize(buf: ByteBuffer): Promise<void> {}
 
-	serialize(): ByteBuffer | undefined {
+	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
 	}
 
-	public static getSchema(): Transactions.schemas.TransactionSchema {
+	public static getSchema(): schemas.TransactionSchema {
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "test",
+		});
+	}
+}
+
+abstract class TestWithDependencyTransaction extends Transaction {
+	public static type: number = DEPENDANT_TEST_TRANSACTION_TYPE;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
+	public static key = "test_with_dependency";
+
+	async deserialize(buf: ByteBuffer): Promise<void> {}
+
+	async serialize(): Promise<ByteBuffer | undefined> {
+		return undefined;
+	}
+
+	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
 			$id: "test_with_dependency",
 		});
@@ -62,7 +102,7 @@ class TestTransactionHandler extends TransactionHandler {
 		return [];
 	}
 
-	getConstructor(): Transactions.TransactionConstructor {
+	getConstructor(): Contracts.Crypto.TransactionConstructor {
 		return TestTransaction;
 	}
 
@@ -74,9 +114,35 @@ class TestTransactionHandler extends TransactionHandler {
 		return true;
 	}
 
-	async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
-	async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+}
+
+class TestDeactivatedTransactionHandler extends TransactionHandler {
+	dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
+		return [];
+	}
+
+	walletAttributes(): ReadonlyArray<string> {
+		return [];
+	}
+
+	getConstructor(): Contracts.Crypto.TransactionConstructor {
+		return TestDeactivatedTransaction;
+	}
+
+	async bootstrap(): Promise<void> {
+		return;
+	}
+
+	async isActivated(): Promise<boolean> {
+		return false;
+	}
+
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 }
 
 class TestWithDependencyTransactionHandler extends TransactionHandler {
@@ -88,7 +154,7 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 		return [];
 	}
 
-	getConstructor(): Transactions.TransactionConstructor {
+	getConstructor(): Contracts.Crypto.TransactionConstructor {
 		return TestWithDependencyTransaction;
 	}
 
@@ -97,19 +163,20 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 	}
 
 	async isActivated(): Promise<boolean> {
-		return true;
+		return false;
 	}
 
-	async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
-	async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 }
 
 describe<{
 	app: Application;
-}>("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
+}>("Registry", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container.Container());
+		const app = new Application(new Container());
+
 		app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.LogService).toConstantValue({});
@@ -117,21 +184,27 @@ describe<{
 		app.bind<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
 			.to(Services.Attributes.AttributeSet)
 			.inSingletonScope();
-		app.bind(Identifiers.DatabaseBlockRepository).toConstantValue({});
-		app.bind(Identifiers.DatabaseTransactionRepository).toConstantValue({});
 		app.bind(Identifiers.WalletRepository).toConstantValue({});
 		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 
-		app.bind(Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
+		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
+		app.bind(Identifiers.Cryptography.Validator).to(Validator);
+		app.bind(Identifiers.Cryptography.Transaction.TypeFactory).to(TransactionTypeFactory);
+		app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
+		app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory);
+		app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory);
+		app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
+		app.bind(Identifiers.Cryptography.Signature).to(Signature);
+		app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
+		app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
+		app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
+
+		app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(VoteTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(MultiPaymentTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(ValidatorResignationTransactionHandler);
 
 		app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
 		app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
@@ -139,90 +212,58 @@ describe<{
 			ServiceProvider.getTransactionHandlerConstructorsBinding(),
 		);
 
+		app.bind(Identifiers.Cryptography.Time.Slots).to(Slots).inSingletonScope();
+		app.bind(Identifiers.Cryptography.Time.BlockTimeCalculator).to(BlockTimeCalculator).inSingletonScope();
+		app.bind(Identifiers.Cryptography.Time.BlockTimeLookup).to(BlockTimeLookup).inSingletonScope();
+		app.bind(Identifiers.Database.Service).toConstantValue({});
+
+		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+
 		context.app = app;
-
-		Managers.configManager.getMilestone().aip11 = false;
-	});
-
-	afterEach(() => {
-		Managers.configManager.getMilestone().aip11 = undefined;
-		try {
-			Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
-		} catch {}
 	});
 
 	it("should register core transaction types", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
 		await assert.resolves(() =>
 			Promise.all([
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Transfer,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.Transfer,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Transfer,
-						Enums.TransactionTypeGroup.Core,
-					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.DelegateRegistration,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.ValidatorRegistration,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.DelegateRegistration,
-						Enums.TransactionTypeGroup.Core,
-					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Vote,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.Vote,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Vote,
-						Enums.TransactionTypeGroup.Core,
-					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.MultiSignature,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.MultiSignature,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.MultiSignature,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.MultiPayment,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-					2,
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.MultiPayment,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.ValidatorRegistration,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.DelegateRegistration,
-						Enums.TransactionTypeGroup.Core,
-					),
-					2,
 				),
 			]),
 		);
@@ -233,12 +274,12 @@ describe<{
 			Identifiers.TransactionHandlerProvider,
 		);
 
-		transactionHandlerProvider.isRegistrationRequired = () => false;
-		const stubRegisterHandlers = stub(transactionHandlerProvider, "registerHandlers");
+		stub(transactionHandlerProvider, "isRegistrationRequired").returnValue(false);
+		const registerHandlersSpy = spy(transactionHandlerProvider, "registerHandlers");
 
 		await context.app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
 
-		stubRegisterHandlers.neverCalled();
+		registerHandlersSpy.neverCalled();
 	});
 
 	it("should register a custom type", async (context) => {
@@ -266,23 +307,27 @@ describe<{
 
 	it("should be able to return handler by data", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const keys = Identities.Keys.fromPassphrase("secret");
-		const data: Crypto.ITransactionData = {
-			amount: Utils.BigNumber.make("200000000"),
+		const keys = await context.app
+			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.fromMnemonic("secret");
+		const slots = await context.app.get<Contracts.Crypto.Slots>(Identifiers.Cryptography.Time.Slots);
+
+		const data: Contracts.Crypto.ITransactionData = {
+			amount: BigNumber.make("200000000"),
 			asset: {
 				test: 256,
 			},
-			fee: Utils.BigNumber.make("10000000"),
-			nonce: Utils.BigNumber.ONE,
+			fee: BigNumber.make("10000000"),
+			nonce: BigNumber.ONE,
 			recipientId: "APyFYXxXtUrvZFnEuwLopfst94GMY5Zkeq",
 			senderPublicKey: keys.publicKey,
-			timestamp: Crypto.Slots.getTime(),
+			timestamp: slots.getTime(),
 			type: TEST_TRANSACTION_TYPE,
-			typeGroup: Enums.TransactionTypeGroup.Test,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 1,
 		};
 
@@ -299,7 +344,7 @@ describe<{
 	});
 
 	it("should return all registered core handlers", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -308,7 +353,7 @@ describe<{
 
 	it("should return all registered core and custom handlers", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -316,109 +361,86 @@ describe<{
 	});
 
 	it("should return all active core handlers", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE,
-		);
-
-		Managers.configManager.getMilestone().aip11 = true;
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE,
-		);
+		assert.length(await transactionHandlerRegistry.getActivatedHandlers(), NUMBER_OF_ACTIVE_CORE_HANDLERS);
 	});
 
 	it("should return all active core and custom handlers", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE + 1,
-		);
-
-		Managers.configManager.getMilestone().aip11 = true;
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE + 1,
-		);
+		assert.length(await transactionHandlerRegistry.getActivatedHandlers(), NUMBER_OF_ACTIVE_CORE_HANDLERS + 1);
 	});
 
 	it("should return a registered custom handler", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const internalTransactionType = Transactions.InternalTransactionType.from(
+		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			TEST_TRANSACTION_TYPE,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 		assert.instance(
 			transactionHandlerRegistry.getRegisteredHandlerByType(internalTransactionType),
 			TestTransactionHandler,
 		);
 
-		const invalidInternalTransactionType = Transactions.InternalTransactionType.from(
+		const invalidInternalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			999,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 
 		await assert.rejects(() => {
 			transactionHandlerRegistry.getRegisteredHandlerByType(invalidInternalTransactionType);
-		}, InvalidTransactionTypeError);
+		}, Exceptions.InvalidTransactionTypeError);
 	});
 
-	it("should return a activated custom handler", async (context) => {
+	it("should return an activated custom handler", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const internalTransactionType = Transactions.InternalTransactionType.from(
+		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			TEST_TRANSACTION_TYPE,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 		assert.instance(
 			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType),
 			TestTransactionHandler,
 		);
 
-		const invalidInternalTransactionType = Transactions.InternalTransactionType.from(
+		const invalidInternalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			999,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 		await assert.rejects(
 			() => transactionHandlerRegistry.getActivatedHandlerByType(invalidInternalTransactionType),
-			InvalidTransactionTypeError,
+			Exceptions.InvalidTransactionTypeError,
 		);
 	});
 
 	it("should not return deactivated custom handler", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		context.app.bind(Identifiers.TransactionHandler).to(TestDeactivatedTransactionHandler);
+
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
-		const internalTransactionType = Transactions.InternalTransactionType.from(
-			Enums.TransactionType.DelegateResignation,
-			Enums.TransactionTypeGroup.Core,
+		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
+			TEST_DEACTIVATED_TRANSACTION_TYPE,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 
-		Managers.configManager.getMilestone().aip11 = false;
 		await assert.rejects(
-			() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
+			() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 1),
 			"DeactivatedTransactionHandlerError",
-		);
-
-		Managers.configManager.getMilestone().aip11 = true;
-		assert.instance(
-			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
-			Two.DelegateResignationTransactionHandler,
 		);
 	});
 });

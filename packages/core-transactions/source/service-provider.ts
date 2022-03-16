@@ -2,8 +2,7 @@ import { interfaces, Selectors } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services } from "@arkecosystem/core-kernel";
 
-import { TransactionHandlerConstructor } from "./handlers";
-import { TransactionHandlerProvider } from "./handlers/handler-provider";
+import { TransactionHandlerConstructor, TransactionHandlerProvider } from "./handlers";
 import { TransactionHandlerRegistry } from "./handlers/handler-registry";
 
 export class ServiceProvider extends Providers.ServiceProvider {
