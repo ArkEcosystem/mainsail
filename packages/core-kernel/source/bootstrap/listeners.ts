@@ -25,8 +25,8 @@ export class ChangeServiceProviderState implements Contracts.Kernel.EventListene
 			return this.#changeState();
 		}
 
-		if (name === KernelEvent.ServiceProviderBooted && data.#name !== this.#name) {
-			return this.#changeState(data.#name);
+		if (name === KernelEvent.ServiceProviderBooted && data.name !== this.#name) {
+			return this.#changeState(data.name);
 		}
 	}
 
