@@ -7,6 +7,10 @@ export abstract class Fake<T> {
 		this.subject = subject;
 	}
 
+	public call<U>(): U {
+		return this.subject();
+	}
+
 	public called(): void {
 		assert.ok(this.subject.called);
 	}
@@ -53,5 +57,8 @@ export abstract class Fake<T> {
 
 	public reset(): void {
 		this.subject.resetHistory();
+	}
+	public toFunction(): T {
+		return this.subject;
 	}
 }
