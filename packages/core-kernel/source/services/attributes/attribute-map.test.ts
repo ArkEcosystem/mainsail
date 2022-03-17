@@ -1,5 +1,4 @@
 import { describe } from "../../../../core-test-framework";
-
 import { AttributeMap } from "./attribute-map";
 import { AttributeSet } from "./attribute-set";
 

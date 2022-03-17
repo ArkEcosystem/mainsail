@@ -1,10 +1,10 @@
+import { Contracts } from "@arkecosystem/core-contracts";
+
 import { describe } from "../../../../../core-test-framework";
-
 import { NullEventDispatcher } from "./null";
-import { EventListener, EventName } from "../../../contracts/kernel";
 
-class MyEventListener implements EventListener {
-	public handle(payload: { name: EventName; data: any }): void {}
+class MyEventListener implements Contracts.Kernel.EventListener {
+	public handle(payload: { name: Contracts.Kernel.EventName; data: any }): void {}
 }
 
 describe("NullEventDispatcher", ({ assert, it }) => {
@@ -20,7 +20,7 @@ describe("NullEventDispatcher", ({ assert, it }) => {
 			["event1", new MyEventListener()],
 			["event2", new MyEventListener()],
 		]);
-		assert.equal(Array.from(result.keys()), ["event1", "event2"]);
+		assert.equal([...result.keys()], ["event1", "event2"]);
 		assert.is(typeof result.get("event1"), "function");
 		assert.is(typeof result.get("event2"), "function");
 	});

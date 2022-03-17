@@ -2,11 +2,8 @@ import { resolve } from "path";
 import { describe } from "../../../../../core-test-framework";
 
 import { Application } from "../../../application";
-import {
-	ApplicationConfigurationCannotBeLoaded,
-	EnvironmentConfigurationCannotBeLoaded,
-} from "../../../exceptions/config";
-import { Container, Identifiers } from "../../../ioc";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { LocalConfigLoader } from "./local";
 import { ConfigRepository } from "../repository";
 import { MemoryEventDispatcher } from "../../events";
@@ -32,7 +29,7 @@ describe<{
 
 		await assert.rejects(
 			() => context.configLoader.loadEnvironmentVariables(),
-			EnvironmentConfigurationCannotBeLoaded,
+			Exceptions.EnvironmentConfigurationCannotBeLoaded,
 		);
 	});
 
@@ -41,7 +38,7 @@ describe<{
 
 		await assert.rejects(
 			() => context.configLoader.loadConfiguration(),
-			ApplicationConfigurationCannotBeLoaded,
+			Exceptions.ApplicationConfigurationCannotBeLoaded,
 			"Unable to load the application configuration file. Failed to discovery any files matching [app.json, app.js].",
 		);
 	});
@@ -51,7 +48,10 @@ describe<{
 			.rebind("path.config")
 			.toConstantValue(resolve(__dirname, "../../../../test/stubs/config-invalid-app"));
 
-		await assert.rejects(() => context.configLoader.loadConfiguration(), ApplicationConfigurationCannotBeLoaded);
+		await assert.rejects(
+			() => context.configLoader.loadConfiguration(),
+			Exceptions.ApplicationConfigurationCannotBeLoaded,
+		);
 	});
 
 	it("should throw if it fails to validate the application peers configuration", async (context) => {
@@ -59,7 +59,10 @@ describe<{
 			.rebind("path.config")
 			.toConstantValue(resolve(__dirname, "../../../../test/stubs/config-invalid-peers"));
 
-		await assert.rejects(() => context.configLoader.loadConfiguration(), ApplicationConfigurationCannotBeLoaded);
+		await assert.rejects(
+			() => context.configLoader.loadConfiguration(),
+			Exceptions.ApplicationConfigurationCannotBeLoaded,
+		);
 	});
 
 	it("should throw if it fails to validate the application delegates configuration", async (context) => {
@@ -67,7 +70,10 @@ describe<{
 			.rebind("path.config")
 			.toConstantValue(resolve(__dirname, "../../../../test/stubs/config-invalid-delegates"));
 
-		await assert.rejects(() => context.configLoader.loadConfiguration(), ApplicationConfigurationCannotBeLoaded);
+		await assert.rejects(
+			() => context.configLoader.loadConfiguration(),
+			Exceptions.ApplicationConfigurationCannotBeLoaded,
+		);
 	});
 
 	it("should load the application configuration without cryptography", async (context) => {
@@ -75,12 +81,18 @@ describe<{
 
 		await context.configLoader.loadConfiguration();
 
-		assert.rejects(() =>
+		await assert.rejects(() =>
 			context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.genesisBlock"),
 		);
-		assert.rejects(() => context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.exceptions"));
-		assert.rejects(() => context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.milestones"));
-		assert.rejects(() => context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.network"));
+		await assert.rejects(() =>
+			context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.exceptions"),
+		);
+		await assert.rejects(() =>
+			context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.milestones"),
+		);
+		await assert.rejects(() =>
+			context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.network"),
+		);
 	});
 
 	it("should load the application configuration with cryptography", async (context) => {
@@ -91,7 +103,6 @@ describe<{
 		await context.configLoader.loadConfiguration();
 
 		assert.defined(context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.genesisBlock"));
-		assert.defined(context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.exceptions"));
 		assert.defined(context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.milestones"));
 		assert.defined(context.app.get<ConfigRepository>(Identifiers.ConfigRepository).get("crypto.network"));
 	});

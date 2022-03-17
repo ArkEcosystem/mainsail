@@ -1,36 +1,39 @@
-import { describe, Sandbox } from "../../../../core-test-framework";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 
+import crypto from "../../../../core/bin/config/testnet/crypto.json";
+import { describe, Sandbox } from "../../../../core-test-framework";
 import { BlockEvent, ScheduleEvent } from "../../enums";
-import { Identifiers } from "../../ioc";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
-import sinon from "sinon";
-
-const delay = async (timeout) => {
-	await new Promise<void>((resolve) => {
-		setTimeout(() => {
-			resolve();
-		}, timeout);
-	});
-};
-
-const expectFinishedEventData = () => {
-	return sinon.match({
-		executionTime: sinon.match.number,
-		blockCount: sinon.match.number,
-	});
-};
 
 describe<{
 	sandbox: Sandbox;
 	job: BlockJob;
 	eventDispatcher: MemoryEventDispatcher;
-}>("BlockJob", ({ assert, beforeEach, it, spy, spyFn }) => {
+}>("BlockJob", ({ assert, beforeEach, it, spy, spyFn, match }) => {
+	const expectFinishedEventData = () =>
+		match({
+			blockCount: match.number,
+			executionTime: match.number,
+		});
+
+	const delay = async (timeout) => {
+		await new Promise<void>((resolve) => {
+			setTimeout(() => {
+				resolve();
+			}, timeout);
+		});
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 		context.eventDispatcher = context.sandbox.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher);
 
 		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 		context.job = context.sandbox.app.resolve<BlockJob>(BlockJob);
 	});
@@ -38,11 +41,13 @@ describe<{
 	it("should execute on cron", async (context) => {
 		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		context.job.cron(3).execute(fn);
+		context.job.cron(3).execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 3 });
@@ -54,7 +59,7 @@ describe<{
 
 		await delay(100);
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
 		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
@@ -63,11 +68,13 @@ describe<{
 	it("should execute every block", async (context) => {
 		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		context.job.everyBlock().execute(fn);
+		context.job.everyBlock().execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
@@ -75,7 +82,7 @@ describe<{
 
 		await delay(100);
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
 		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
@@ -84,11 +91,13 @@ describe<{
 	it("should execute every five blocks", async (context) => {
 		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		context.job.everyFiveBlocks().execute(fn);
+		context.job.everyFiveBlocks().execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 5 });
@@ -100,7 +109,7 @@ describe<{
 
 		await delay(100);
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
 		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
@@ -109,11 +118,13 @@ describe<{
 	it("should execute every ten blocks", async (context) => {
 		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		context.job.everyTenBlocks().execute(fn);
+		context.job.everyTenBlocks().execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 10 });
@@ -125,7 +136,7 @@ describe<{
 
 		await delay(100);
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
 		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
@@ -134,11 +145,13 @@ describe<{
 	it("should execute every fifteen blocks", async (context) => {
 		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		context.job.everyFifteenBlocks().execute(fn);
+		context.job.everyFifteenBlocks().execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 15 });
@@ -150,7 +163,7 @@ describe<{
 
 		await delay(100);
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
 		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
@@ -159,11 +172,13 @@ describe<{
 	it("should execute every thirty blocks", async (context) => {
 		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		context.job.everyThirtyBlocks().execute(fn);
+		context.job.everyThirtyBlocks().execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 30 });
@@ -175,7 +190,7 @@ describe<{
 
 		await delay(100);
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
 		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
@@ -184,11 +199,13 @@ describe<{
 	it("should execute every round", async (context) => {
 		const spyOnDispatch = spy(context.eventDispatcher, "dispatch");
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		context.job.everyRound().execute(fn);
+		context.job.everyRound().execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 51 });
@@ -200,7 +217,7 @@ describe<{
 
 		await delay(100);
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
 		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());

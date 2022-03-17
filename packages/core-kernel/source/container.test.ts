@@ -1,6 +1,6 @@
-import { Container, injectable } from "./ioc";
-import { describe } from "../../core-test-framework";
+import { Container, injectable } from "@arkecosystem/core-container";
 
+import { describe } from "../../core-test-framework";
 import { container } from "./container";
 
 @injectable()

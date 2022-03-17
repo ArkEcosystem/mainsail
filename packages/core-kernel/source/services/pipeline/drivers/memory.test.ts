@@ -1,7 +1,8 @@
-import { describe } from "../../../../../core-test-framework";
+import { Container, injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../../core-test-framework";
 import { Application } from "../../../application";
-import { Container, Contracts } from "../../../index";
 import { MemoryPipeline } from "./memory";
 
 describe<{
@@ -9,7 +10,7 @@ describe<{
 	pipeline: Contracts.Kernel.Pipeline;
 }>("Pipeline", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 		context.pipeline = new MemoryPipeline();
 	});
 
@@ -56,14 +57,14 @@ describe<{
 	});
 
 	it("should apply all stages (async)", async (context) => {
-		@Container.injectable()
+		@injectable()
 		class RemoveDash implements Contracts.Kernel.Stage {
 			async process(payload: string) {
 				return payload.replace("_", "");
 			}
 		}
 
-		@Container.injectable()
+		@injectable()
 		class RemoveUnderscore implements Contracts.Kernel.Stage {
 			async process(payload: string) {
 				return payload.replace("-", " ");
@@ -79,14 +80,14 @@ describe<{
 	});
 
 	it("should apply all stages (sync)", (context) => {
-		@Container.injectable()
+		@injectable()
 		class RemoveDash implements Contracts.Kernel.Stage {
 			process(payload: string) {
 				return payload.replace("_", "");
 			}
 		}
 
-		@Container.injectable()
+		@injectable()
 		class RemoveUnderscore implements Contracts.Kernel.Stage {
 			process(payload: string) {
 				return payload.replace("-", " ");

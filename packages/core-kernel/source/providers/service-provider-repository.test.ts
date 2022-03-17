@@ -1,13 +1,14 @@
+import { Container } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+
 import { describe } from "../../../core-test-framework";
 import { Application } from "../application";
-import { Kernel } from "../contracts";
 import { KernelEvent } from "../enums";
-import { Container, Identifiers, interfaces } from "../ioc";
 import { MemoryEventDispatcher } from "../services/events";
 import { ServiceProvider } from "./service-provider";
 import { ServiceProviderRepository } from "./service-provider-repository";
 
-class StubListener implements Kernel.EventListener {
+class StubListener implements Contracts.Kernel.EventListener {
 	public constructor(private readonly method?) {}
 
 	public handle(): void {
@@ -25,7 +26,7 @@ class StubServiceProvider extends ServiceProvider {
 
 describe<{
 	app: Application;
-	container: interfaces.Container;
+	container: Container;
 	serviceProviderRepository: ServiceProviderRepository;
 }>("ServiceProviderRepository", ({ assert, beforeEach, it, spy, spyFn }) => {
 	beforeEach((context) => {
@@ -128,11 +129,11 @@ describe<{
 		const fired = spyFn();
 		context.app
 			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
-			.listenOnce(KernelEvent.ServiceProviderRegistered, new StubListener(fired));
+			.listenOnce(KernelEvent.ServiceProviderRegistered, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.register("stub");
 
-		assert.true(fired.calledOnce);
+		fired.calledOnce();
 		spyRegister.calledOnce();
 	});
 
@@ -144,11 +145,11 @@ describe<{
 		const fired = spyFn();
 		context.app
 			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
-			.listenOnce(KernelEvent.ServiceProviderBooted, new StubListener(fired));
+			.listenOnce(KernelEvent.ServiceProviderBooted, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.boot("stub");
 
-		assert.true(fired.calledOnce);
+		fired.calledOnce();
 		spyBoot.calledOnce();
 		assert.true(context.serviceProviderRepository.loaded("stub"));
 		assert.false(context.serviceProviderRepository.failed("stub"));
@@ -163,11 +164,11 @@ describe<{
 		const fired = spyFn();
 		context.app
 			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
-			.listenOnce(KernelEvent.ServiceProviderDisposed, new StubListener(fired));
+			.listenOnce(KernelEvent.ServiceProviderDisposed, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.dispose("stub");
 
-		assert.true(fired.calledOnce);
+		fired.calledOnce();
 		spyDispose.calledOnce();
 		assert.false(context.serviceProviderRepository.loaded("stub"));
 		assert.false(context.serviceProviderRepository.failed("stub"));

@@ -14,7 +14,8 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"test": "uvu -r tsm source .test.ts",
-		"test:coverage": "c8 pnpm run test"
+		"test:coverage": "c8 pnpm run test",
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
@@ -41,13 +42,14 @@
 		"type-fest": "0.21.3"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-crypto-time": "workspace:*",
 		"@types/cron": "1.7.3",
 		"@types/fs-extra": "8.1.2",
 		"@types/functional-red-black-tree": "1.0.1",
 		"@types/got": "9.6.12",
 		"@types/log-process-errors": "4.1.0",
 		"@types/semver": "6.2.3",
-		"sinon": "^13.0.1",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

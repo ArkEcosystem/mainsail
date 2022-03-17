@@ -1,14 +1,13 @@
-import { describe } from "../../core-test-framework";
+import { Container, injectable, interfaces } from "@arkecosystem/core-container";
+import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { resolve } from "path";
+import { dirSync } from "tmp";
 
+import { describe } from "../../core-test-framework";
 import { Application } from "./application";
-import { NetworkCannotBeDetermined } from "./exceptions/config";
-import { DirectoryCannotBeFound } from "./exceptions/filesystem";
-import { Container, Identifiers, injectable, interfaces } from "./ioc";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
-import { resolve } from "path";
-import { dirSync } from "tmp";
 
 @injectable()
 class StubClass {}
@@ -36,9 +35,9 @@ describe<{
 		context.app = new Application(context.container);
 
 		context.logger = {
-			error: () => undefined,
-			notice: () => undefined,
-			debug: () => undefined,
+			debug: () => {},
+			error: () => {},
+			notice: () => {},
 		};
 
 		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
@@ -48,50 +47,50 @@ describe<{
 		delete process.env.CORE_PATH_CONFIG;
 	});
 
-	it.skip("should bootstrap the application", async (context) => {
+	it("should bootstrap the application", async (context) => {
 		console.error(resolve(__dirname, "../test/stubs/config"));
 		await context.app.bootstrap({
 			flags: {
-				token: "ark",
 				network: "testnet",
 				paths: { config: resolve(__dirname, "../test/stubs/config") },
+				token: "ark",
 			},
 		});
 
 		assert.equal(context.app.dirPrefix(), "ark/testnet");
 	});
 
-	it.skip("should bootstrap the application with a config path from process.env", async (context) => {
+	it("should bootstrap the application with a config path from process.env", async (context) => {
 		process.env.CORE_PATH_CONFIG = resolve(__dirname, "../test/stubs/config");
 
 		await context.app.bootstrap({
-			flags: { token: "ark", network: "testnet" },
+			flags: { network: "testnet", token: "ark" },
 		});
 
 		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);
 	});
 
-	it.skip("should fail to bootstrap the application if no token is provided", async (context) => {
+	it("should fail to bootstrap the application if no token is provided", async (context) => {
 		await assert.rejects(
 			() =>
 				context.app.bootstrap({
 					flags: { network: "testnet", paths: { config: resolve(__dirname, "../test/stubs/config") } },
 				}),
-			NetworkCannotBeDetermined,
+			Exceptions.NetworkCannotBeDetermined,
 		);
 	});
 
-	it.skip("should fail to bootstrap the application if no network is provided", async (context) => {
+	it("should fail to bootstrap the application if no network is provided", async (context) => {
 		await assert.rejects(
 			() =>
 				context.app.bootstrap({
-					flags: { token: "ark", paths: { config: resolve(__dirname, "../test/stubs/config") } },
+					flags: { paths: { config: resolve(__dirname, "../test/stubs/config") }, token: "ark" },
 				}),
-			NetworkCannotBeDetermined,
+			Exceptions.NetworkCannotBeDetermined,
 		);
 	});
 
-	it.skip("should boot the application", async (context) => {
+	it("should boot the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
@@ -203,11 +202,11 @@ describe<{
 	});
 
 	it("should fail to set a path if it does not exist", (context) => {
-		context.app.bind("path.data").toConstantValue(undefined);
+		context.app.bind("path.data").toConstantValue();
 
-		assert.rejects(() => context.app.dataPath(), DirectoryCannotBeFound);
+		assert.throws(() => context.app.dataPath(), new Exceptions.DirectoryCannotBeFound());
 
-		assert.rejects(() => context.app.useDataPath(undefined), DirectoryCannotBeFound);
+		assert.throws(() => context.app.useDataPath(), new Exceptions.DirectoryCannotBeFound());
 	});
 
 	it("should set and get the given data path", (context) => {
@@ -393,7 +392,7 @@ describe<{
 		assert.false(context.app.isDownForMaintenance());
 	});
 
-	it.skip("should terminate the application", async (context) => {
+	it("should terminate the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
@@ -442,7 +441,7 @@ describe<{
 		assert.false(context.app.isBooted());
 	});
 
-	it.skip("should terminate the application with an error", async (context) => {
+	it("should terminate the application with an error", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
@@ -506,11 +505,11 @@ describe<{
 		assert.is(context.app.get("key"), "value");
 	});
 
-	it("should get tagged value from the IoC container", (context) => {
+	it("should get tagged value from the IoC container", async (context) => {
 		context.app.bind("animal").toConstantValue("bear").whenTargetTagged("order", "carnivora");
 		context.app.bind("animal").toConstantValue("dolphin").whenTargetTagged("order", "cetacea");
 
-		assert.rejects(() => context.app.get("animal"));
+		assert.throws(() => context.app.get("animal"));
 		assert.is(context.app.getTagged("animal", "order", "carnivora"), "bear");
 		assert.is(context.app.getTagged("animal", "order", "cetacea"), "dolphin");
 	});

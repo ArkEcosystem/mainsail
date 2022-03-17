@@ -1,5 +1,4 @@
 import { describe } from "../../../../../core-test-framework";
-
 import { NullFilesystem } from "./null";
 
 describe("NullFilesystem", ({ assert, it }) => {
@@ -18,7 +17,7 @@ describe("NullFilesystem", ({ assert, it }) => {
 	it("should return empty buffer", async () => {
 		const driver = new NullFilesystem();
 		const result = await driver.get("filename");
-		assert.equal(result, new Buffer(0));
+		assert.equal(result, Buffer.alloc(0));
 	});
 
 	it("should return false", async () => {

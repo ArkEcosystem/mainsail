@@ -1,11 +1,12 @@
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { writeFileSync } from "fs";
 import { dirSync, setGracefulCleanup } from "tmp";
-import { describe } from "../../../../core-test-framework";
 
+import { describe } from "../../../../core-test-framework";
 import { Application } from "../../application";
-import { Container, Identifiers } from "../../ioc";
-import { Watcher } from "./watcher";
 import { MemoryEventDispatcher } from "../events";
+import { Watcher } from "./watcher";
 
 const configPath: string = dirSync().name;
 

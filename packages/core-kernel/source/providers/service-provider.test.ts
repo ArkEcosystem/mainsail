@@ -1,8 +1,8 @@
+import { Container } from "@arkecosystem/core-container";
 import { resolve } from "path";
 
 import { describe } from "../../../core-test-framework";
 import { Application } from "../application";
-import { Container } from "../ioc";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";
 import { ServiceProvider } from "./service-provider";

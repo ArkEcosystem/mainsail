@@ -6,7 +6,7 @@ const findIndex = async (
 	app: Contracts.Kernel.Application,
 ): Promise<[number, number]> => {
 	const configuration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
-	const blockTimeLookup: any = app.get(Identifiers.Cryptography.Time.BlockTimeLookup);
+	const blockTimeLookup: any = app.get(Identifiers.Cryptography.Time.BlockTimeLookup); // TODO: Add contract
 	const slots: Contracts.Crypto.Slots = app.get(Identifiers.Cryptography.Time.Slots);
 
 	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
@@ -21,7 +21,7 @@ const findIndex = async (
 			break;
 		}
 
-		const lastSpanEndTime = blockTimeLookup.getTimeStampForBlock(nextMilestone.height - 1);
+		const lastSpanEndTime = blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1);
 		lastSpanSlotNumber = (await slots.getSlotInfo(lastSpanEndTime, nextMilestone.height - 1)).slotNumber + 1;
 		activeValidators = nextMilestone.data;
 

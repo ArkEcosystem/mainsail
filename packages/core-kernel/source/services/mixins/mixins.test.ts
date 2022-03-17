@@ -1,7 +1,6 @@
 import { describe } from "../../../../core-test-framework";
-
-import { MixinService } from "./mixins";
 import { Constructor } from "../../types/container";
+import { MixinService } from "./mixins";
 
 class User {
 	name: string;
@@ -21,8 +20,8 @@ function Tagged<TBase extends Constructor>(Base: TBase) {
 	return class extends Base {
 		tag: string | null;
 
-		constructor(...args: any[]) {
-			super(...args);
+		constructor(...arguments_: any[]) {
+			super(...arguments_);
 			this.tag = "i am tagged";
 		}
 	};

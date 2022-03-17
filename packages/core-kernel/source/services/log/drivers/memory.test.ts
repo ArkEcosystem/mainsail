@@ -1,13 +1,13 @@
-import { describe } from "../../../../../core-test-framework";
-
-import { Application } from "../../../application";
-import { Logger } from "../../../contracts/kernel";
-import { Container } from "inversify";
-import { MemoryLogger } from "./memory";
+import { Contracts } from "@arkecosystem/core-contracts";
 import capcon from "capture-console";
+import { Container } from "inversify";
+
+import { describe } from "../../../../../core-test-framework";
+import { Application } from "../../../application";
+import { MemoryLogger } from "./memory";
 
 describe<{
-	logger: Logger;
+	logger: Contracts.Kernel.Logger;
 	message: string | undefined;
 }>("Logger", ({ afterAll, afterEach, assert, beforeAll, beforeEach, it }) => {
 	beforeEach(async (context) => {
@@ -22,7 +22,7 @@ describe<{
 		capcon.startCapture(console._stderr, (stderr) => (context.message = stderr.toString()));
 		const app = new Application(new Container());
 
-		context.logger = await app.resolve<Logger>(MemoryLogger).make();
+		context.logger = await app.resolve<Contracts.Kernel.Logger>(MemoryLogger).make();
 	});
 
 	afterEach((context) => {
@@ -36,7 +36,7 @@ describe<{
 	});
 
 	it("should not be logged if empty", (context) => {
-		context.logger.info(undefined);
+		context.logger.info();
 
 		assert.undefined(context.message);
 	});
@@ -44,7 +44,7 @@ describe<{
 	it("should modify the message if it is not a string", (context) => {
 		context.logger.info(["Hello World"]);
 
-		assert.string(context.message!.trim());
+		assert.string(context.message.trim());
 	});
 
 	it("should log a message with the [emergency] level", (context) => {
@@ -101,13 +101,6 @@ describe<{
 
 		assert.match(context.message, /debug/);
 		assert.match(context.message, /debug_message/);
-	});
-
-	it("should log a message with the [undefined] level", (context) => {
-		// @ts-ignore
-		context.logger.log("", "message");
-
-		assert.match(context.message, /message/);
 	});
 
 	it("should suppress console output", (context) => {

@@ -8,7 +8,6 @@ export * from "@arkecosystem/utils";
 export const roundCalculator = { calculateRound, isNewRound };
 export const forgingInfoCalculator = { calculateForgingInfo };
 
-export { formatTimestamp } from "./format-timestamp";
 export { isBlacklisted } from "./is-blacklisted";
 export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained";
 export { isWhitelisted } from "./is-whitelisted";

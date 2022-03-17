@@ -1,25 +1,25 @@
-import { describe, Sandbox } from "../../../../core-test-framework";
-
-import { Container, Enums } from "../../index";
-import { CronJob } from "./cron-job";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import moment from "moment-timezone";
-import sinon from "sinon";
+
+import { describe, Sandbox } from "../../../../core-test-framework";
+import { Enums } from "../../index";
+import { CronJob } from "./cron-job";
 
 const days: Record<string, string> = {
-	monday: "2019-08-19 00:00:00",
-	tuesday: "2019-08-20 00:00:00",
-	wednesday: "2019-08-21 00:00:00",
-	thursday: "2019-08-22 00:00:00",
 	friday: "2019-08-23 00:00:00",
+	monday: "2019-08-19 00:00:00",
 	saturday: "2019-08-24 00:00:00",
 	sunday: "2019-08-25 00:00:00",
+	thursday: "2019-08-22 00:00:00",
+	tuesday: "2019-08-20 00:00:00",
+	wednesday: "2019-08-21 00:00:00",
 };
 describe<{
 	sandbox: Sandbox;
 	job: CronJob;
 	timeFaker: any;
 	mockEventDispatcher: any;
-}>("CronJob", ({ assert, beforeEach, clock, it, spy, spyFn }) => {
+}>("CronJob", ({ assert, beforeEach, clock, it, spy, spyFn, match }) => {
 	const expectExecutionAfterDelay = (context: any, callback: CronJob, minutes: number): void => {
 		const dispatchSpy = spy(context.mockEventDispatcher, "dispatch");
 
@@ -27,24 +27,26 @@ describe<{
 			now: 0,
 		});
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		callback.execute(fn);
+		callback.execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
 		const delay: number = minutes * 60 * 1000;
-		for (let i = 0; i < 3; i++) {
+		for (let index = 0; index < 3; index++) {
 			fakeTimers.tick(delay);
 		}
 
-		assert.true(fn.calledThrice);
+		function_.calledTimes(3);
 
 		dispatchSpy.calledWith(
 			Enums.ScheduleEvent.CronJobFinished,
-			sinon.match({
-				executionTime: sinon.match.number,
-				expression: sinon.match.string,
+			match({
+				executionTime: match.number,
+				expression: match.string,
 			}),
 		);
 	};
@@ -56,37 +58,37 @@ describe<{
 			now: moment(day).subtract(1, "second").valueOf(),
 		});
 
-		const fn = spyFn();
+		const function_ = spyFn();
 
-		callback.execute(fn);
+		callback.execute(() => {
+			function_.call();
+		});
 
-		assert.true(fn.notCalled);
+		function_.neverCalled();
 
-		for (let i = 0; i < 3; i++) {
+		for (let index = 0; index < 3; index++) {
 			fakeTimers.tick(1000);
 		}
 
-		assert.true(fn.calledOnce);
+		function_.calledOnce();
 
 		dispatchSpy.calledWith(
 			Enums.ScheduleEvent.CronJobFinished,
-			sinon.match({
-				executionTime: sinon.match.number,
-				expression: sinon.match.string,
+			match({
+				executionTime: match.number,
+				expression: match.string,
 			}),
 		);
 	};
 
 	beforeEach((context) => {
 		context.mockEventDispatcher = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 		};
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app
-			.bind(Container.Identifiers.EventDispatcherService)
-			.toConstantValue(context.mockEventDispatcher);
+		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.mockEventDispatcher);
 
 		context.job = context.sandbox.app.resolve<CronJob>(CronJob);
 	});
@@ -168,7 +170,7 @@ describe<{
 	});
 
 	it("should execute weekly", (context) => {
-		expectExecutionAfterDelay(context, context.job.weekly(), 10080);
+		expectExecutionAfterDelay(context, context.job.weekly(), 10_080);
 	});
 
 	it("should execute weekly on", (context) => {
@@ -176,7 +178,7 @@ describe<{
 	});
 
 	it("should execute monthly", (context) => {
-		expectExecutionAfterDelay(context, context.job.monthly(), 43200);
+		expectExecutionAfterDelay(context, context.job.monthly(), 43_200);
 	});
 
 	it("should execute monthly on", (context) => {
@@ -184,10 +186,10 @@ describe<{
 	});
 
 	it("should execute quarterly", (context) => {
-		expectExecutionAfterDelay(context, context.job.quarterly(), 43200 * 3);
+		expectExecutionAfterDelay(context, context.job.quarterly(), 43_200 * 4);
 	});
 
 	it("should execute yearly", (context) => {
-		expectExecutionAfterDelay(context, context.job.yearly(), 525600);
+		expectExecutionAfterDelay(context, context.job.yearly(), 525_600);
 	});
 });

@@ -1,11 +1,11 @@
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { sleep } from "@arkecosystem/utils";
-import { describe, Sandbox } from "../../../../../core-test-framework";
-
-import { Container, Contracts, Enums } from "../../../index";
-import { MemoryQueue } from "./memory";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
-import sinon from "sinon";
+
+import { describe, Sandbox } from "../../../../../core-test-framework";
+import { QueueEvent } from "../../../enums";
+import { MemoryQueue } from "./memory";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
 
@@ -23,27 +23,27 @@ describe<{
 	eventDispatcher: any;
 	logger: any;
 	jobMethod: any;
-}>("MemoryQueue", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
+}>("MemoryQueue", ({ assert, beforeEach, it, spy, spyFn, stubFn, match }) => {
 	beforeEach((context) => {
 		context.eventDispatcher = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 		};
 		context.logger = {
-			warning: () => undefined,
+			warning: () => {},
 		};
-		context.jobMethod = () => undefined;
+		context.jobMethod = () => {};
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.driver = context.sandbox.app.resolve<MemoryQueue>(MemoryQueue);
 	});
 
 	it("Start should process job", async (context) => {
-		const jobMethodSpy = spy(context, "jobMethod");
+		const jobMethodSpy = spyFn();
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodSpy.call()));
 		await sleep(50);
 
 		jobMethodSpy.neverCalled();
@@ -55,20 +55,20 @@ describe<{
 	});
 
 	it("Start should process on push if already started", async (context) => {
-		const jobMethodSpy = spy(context, "jobMethod");
+		const jobMethodSpy = spyFn();
 
 		await context.driver.start();
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodSpy.call()));
 		await sleep(50);
 
 		jobMethodSpy.calledOnce();
 	});
 
 	it("Start should remain started after all jobs are processed", async (context) => {
-		const jobMethodSpy = spy(context, "jobMethod");
+		const jobMethodSpy = spyFn();
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodSpy.call()));
 
 		await context.driver.start();
 		await sleep(50);
@@ -91,7 +91,10 @@ describe<{
 			methodFinish2 = performance.now();
 		};
 
-		const onDrain = spyFn();
+		let onDrainCount = 0;
+		const onDrain = () => {
+			onDrainCount++;
+		};
 		context.driver.on("drain", onDrain);
 
 		await context.driver.push(new DummyJob(jobMethod1));
@@ -109,11 +112,11 @@ describe<{
 		assert.gt(methodFinish2 - methodFinish1, 4);
 		assert.lt(methodFinish2 - methodFinish1, 6);
 
-		assert.true(onDrain.calledOnce);
+		assert.equal(onDrainCount, 1);
 	});
 
 	it("Clear should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 
@@ -123,12 +126,12 @@ describe<{
 	});
 
 	it("Clear should clear all jobs when started and keep current job running", async (context) => {
-		const jobMethodStub = stub(context, "jobMethod").callsFake(async () => {
+		const jobMethodStub = stubFn().callsFake(async () => {
 			await sleep(10);
 		});
 
-		await context.driver.push(new DummyJob(context.jobMethod));
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(async () => await jobMethodStub.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethodStub.call()));
 
 		assert.is(context.driver.size(), 2);
 
@@ -146,7 +149,7 @@ describe<{
 	});
 
 	it("Stop should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 
@@ -157,12 +160,12 @@ describe<{
 	});
 
 	it("Stop should clear all jobs when started and wait till current is processed", async (context) => {
-		const jobMethodStub = stub(context, "jobMethod").callsFake(async () => {
+		const jobMethodStub = stubFn().callsFake(async () => {
 			await sleep(10);
 		});
 
-		await context.driver.push(new DummyJob(context.jobMethod));
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(async () => await jobMethodStub.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethodStub.call()));
 
 		assert.is(context.driver.size(), 2);
 
@@ -176,12 +179,12 @@ describe<{
 	});
 
 	it("Stop should resolve multiple stop promises", async (context) => {
-		const jobMethodStub = stub(context, "jobMethod").callsFake(async () => {
+		const jobMethodStub = stubFn().callsFake(async () => {
 			await sleep(10);
 		});
 
-		await context.driver.push(new DummyJob(context.jobMethod));
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(async () => await jobMethodStub.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethodStub.call()));
 
 		assert.is(context.driver.size(), 2);
 
@@ -201,13 +204,13 @@ describe<{
 	});
 
 	it("Stop should not process new jobs after stop", async (context) => {
-		const jobMethodSpy = spy(context, "jobMethod");
+		const jobMethodSpy = spyFn();
 
 		await context.driver.start();
 		await context.driver.stop();
 
-		await context.driver.push(new DummyJob(context.jobMethod));
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodSpy.call()));
+		await context.driver.push(new DummyJob(() => jobMethodSpy.call()));
 
 		await sleep(10);
 
@@ -226,8 +229,8 @@ describe<{
 			await sleep(50);
 		});
 
-		await context.driver.push(new DummyJob(jobMethod1));
-		await context.driver.push(new DummyJob(jobMethod2));
+		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
 
 		assert.is(context.driver.size(), 2);
 
@@ -235,8 +238,8 @@ describe<{
 
 		await context.driver.pause();
 
-		assert.true(jobMethod1.calledOnce);
-		assert.true(jobMethod2.notCalled);
+		jobMethod1.calledOnce();
+		jobMethod2.neverCalled();
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isRunning());
@@ -253,8 +256,8 @@ describe<{
 			await sleep(50);
 		});
 
-		await context.driver.push(new DummyJob(jobMethod1));
-		await context.driver.push(new DummyJob(jobMethod2));
+		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
 
 		assert.is(context.driver.size(), 2);
 
@@ -262,8 +265,8 @@ describe<{
 
 		await context.driver.pause();
 
-		assert.true(jobMethod1.calledOnce);
-		assert.true(jobMethod2.notCalled);
+		jobMethod1.calledOnce();
+		jobMethod2.neverCalled();
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isRunning());
@@ -273,7 +276,7 @@ describe<{
 	});
 
 	it("Pause should not process new jobs after pause", async (context) => {
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 
@@ -284,7 +287,7 @@ describe<{
 		assert.false(context.driver.isRunning());
 		assert.false(context.driver.isStarted());
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isRunning());
@@ -299,8 +302,8 @@ describe<{
 			await sleep(50);
 		});
 
-		await context.driver.push(new DummyJob(jobMethod1));
-		await context.driver.push(new DummyJob(jobMethod2));
+		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
 
 		assert.is(context.driver.size(), 2);
 
@@ -311,8 +314,8 @@ describe<{
 
 		await assert.resolves(() => pause1);
 
-		assert.true(jobMethod1.calledOnce);
-		assert.true(jobMethod2.notCalled);
+		jobMethod1.calledOnce();
+		jobMethod2.neverCalled();
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isRunning());
@@ -322,7 +325,7 @@ describe<{
 	it("Resume should resume processing after pause", async (context) => {
 		await context.driver.pause();
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isStarted());
@@ -338,7 +341,7 @@ describe<{
 	it("Resume should resume processing after stop", async (context) => {
 		await context.driver.stop();
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isStarted());
@@ -365,10 +368,10 @@ describe<{
 		});
 
 		const onDrain = spyFn();
-		context.driver.on("drain", onDrain);
+		context.driver.on("drain", () => onDrain.call());
 
-		await context.driver.push(new DummyJob(jobMethod1));
-		await context.driver.push(new DummyJob(jobMethod2));
+		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
 
 		const start1 = context.driver.start();
 		const resume1 = context.driver.resume();
@@ -382,7 +385,7 @@ describe<{
 		assert.gt(methodFinish2 - methodFinish1, 40);
 		assert.lt(methodFinish2 - methodFinish1, 60);
 
-		assert.true(onDrain.calledOnce);
+		onDrain.calledOnce();
 	});
 
 	it("Resume should not interfere with another resume", async (context) => {
@@ -399,10 +402,10 @@ describe<{
 		});
 
 		const onDrain = spyFn();
-		context.driver.on("drain", onDrain);
+		context.driver.on("drain", () => onDrain.call());
 
-		await context.driver.push(new DummyJob(jobMethod1));
-		await context.driver.push(new DummyJob(jobMethod2));
+		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
+		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
 
 		const resume1 = context.driver.resume();
 		const resume2 = context.driver.resume();
@@ -416,11 +419,11 @@ describe<{
 		assert.gt(methodFinish2 - methodFinish1, 40);
 		assert.lt(methodFinish2 - methodFinish1, 60);
 
-		assert.true(onDrain.calledOnce);
+		onDrain.calledOnce();
 	});
 
 	it("Later should push job with delay", async (context) => {
-		await context.driver.later(50, new DummyJob(context.jobMethod));
+		await context.driver.later(50, new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 0);
 
@@ -430,18 +433,18 @@ describe<{
 	});
 
 	it("Bulk should push multiple jobs", async (context) => {
-		await context.driver.bulk([new DummyJob(context.jobMethod), new DummyJob(context.jobMethod)]);
+		await context.driver.bulk([new DummyJob(() => {}), new DummyJob(() => {})]);
 
 		assert.is(context.driver.size(), 2);
 	});
 
 	it("EventEmitter should emit jobDone", async (context) => {
 		const onJobDone = spyFn();
-		context.driver.on("jobDone", onJobDone);
+		context.driver.on("jobDone", (...arguments_) => onJobDone.call(...arguments_));
 
-		const jobMethodStub = stub(context, "jobMethod").returnValue("dummy_data");
-		const job1 = new DummyJob(context.jobMethod);
-		const job2 = new DummyJob(context.jobMethod);
+		const jobMethodStub = stubFn().resolvedValue("dummy_data");
+		const job1 = new DummyJob(async () => jobMethodStub.call());
+		const job2 = new DummyJob(async () => jobMethodStub.call());
 
 		await context.driver.push(job1);
 		await context.driver.push(job2);
@@ -450,27 +453,27 @@ describe<{
 		await sleep(10);
 
 		jobMethodStub.calledTimes(2);
-		assert.true(onJobDone.calledTwice);
-		assert.true(onJobDone.calledWith(job1, "dummy_data"));
-		assert.true(onJobDone.calledWith(job2, "dummy_data"));
+		onJobDone.calledTimes(2);
+		onJobDone.calledWith(job1, "dummy_data");
+		onJobDone.calledWith(job2, "dummy_data");
 	});
 
 	it("EventEmitter should emit jobError and continue processing", async (context) => {
 		const onJobDone = spyFn();
-		context.driver.on("jobDone", onJobDone);
+		context.driver.on("jobDone", (...arguments_) => onJobDone.call(...arguments_));
 
 		const onJobError = spyFn();
-		context.driver.on("jobError", onJobError);
+		context.driver.on("jobError", (...arguments_) => onJobError.call(...arguments_));
 
-		const jobMethodStub = stub(context, "jobMethod").returnValue("dummy_data");
+		const jobMethodStub = stubFn().resolvedValue("dummy_data");
 
 		const error = new Error("dummy_error");
 		const errorMethod = stubFn().callsFake(async () => {
 			throw error;
 		});
 
-		const job1 = new DummyJob(errorMethod);
-		const job2 = new DummyJob(context.jobMethod);
+		const job1 = new DummyJob(() => errorMethod.call());
+		const job2 = new DummyJob((async) => jobMethodStub.call());
 
 		await context.driver.push(job1);
 		await context.driver.push(job2);
@@ -478,46 +481,46 @@ describe<{
 
 		await sleep(10);
 
-		assert.true(errorMethod.calledOnce);
+		errorMethod.calledOnce();
 		jobMethodStub.calledOnce();
 
-		assert.true(onJobError.calledOnce);
-		assert.true(onJobError.calledWith(job1, error));
+		onJobError.calledOnce();
+		onJobError.calledWith(job1, error);
 
-		assert.true(onJobDone.calledOnce);
-		assert.true(onJobDone.calledWith(job2, "dummy_data"));
+		onJobDone.calledOnce();
+		onJobDone.calledWith(job2, "dummy_data");
 	});
 
 	it("EventEmitter should emit drain", async (context) => {
 		const jobMethodSpy = spy(context, "jobMethod");
 
 		const onDrain = spyFn();
-		context.driver.on("drain", onDrain);
+		context.driver.on("drain", () => onDrain.call());
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodSpy.call()));
 		await context.driver.start();
 
 		await sleep(10);
 
 		// Second iteration
 		jobMethodSpy.calledOnce();
-		assert.true(onDrain.calledOnce);
+		onDrain.calledOnce();
 
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodSpy.call()));
 		await context.driver.start();
 
 		await sleep(10);
 
 		jobMethodSpy.calledTimes(2);
-		assert.true(onDrain.calledTwice);
+		onDrain.calledTimes(2);
 	});
 
 	it("should dispatch 'queue.finished' after every processed job", async (context) => {
-		const jobMethodStub = stub(context, "jobMethod").returnValue("dummy_data");
+		const jobMethodStub = stubFn().returnValue("dummy_data");
 		const dispatchSpy = spy(context.eventDispatcher, "dispatch");
 
-		await context.driver.push(new DummyJob(context.jobMethod));
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodStub.call()));
+		await context.driver.push(new DummyJob(() => jobMethodStub.call()));
 
 		await context.driver.start();
 		await sleep(10);
@@ -525,25 +528,25 @@ describe<{
 		jobMethodStub.calledTimes(2);
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
-			Enums.QueueEvent.Finished,
-			sinon.match({
-				driver: "memory",
-				executionTime: sinon.match.number,
+			QueueEvent.Finished,
+			match({
 				data: "dummy_data",
+				driver: "memory",
+				executionTime: match.number,
 			}),
 		);
 	});
 
 	it("should dispatch 'queue.failed' after every failed job", async (context) => {
 		const error = new Error("dummy_error");
-		const jobMethodStub = stub(context, "jobMethod").callsFake(async () => {
+		const jobMethodStub = stubFn().callsFake(async () => {
 			throw error;
 		});
 		const dispatchSpy = spy(context.eventDispatcher, "dispatch");
 		const warningLoggerSpy = spy(context.logger, "warning");
 
-		await context.driver.push(new DummyJob(context.jobMethod));
-		await context.driver.push(new DummyJob(context.jobMethod));
+		await context.driver.push(new DummyJob(() => jobMethodStub.call()));
+		await context.driver.push(new DummyJob(() => jobMethodStub.call()));
 
 		await context.driver.start();
 		await sleep(10);
@@ -552,11 +555,11 @@ describe<{
 		warningLoggerSpy.calledTimes(2);
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
-			Enums.QueueEvent.Failed,
-			sinon.match({
+			QueueEvent.Failed,
+			match({
 				driver: "memory",
-				executionTime: sinon.match.number,
-				error: sinon.match(error),
+				error: match(error),
+				executionTime: match.number,
 			}),
 		);
 	});

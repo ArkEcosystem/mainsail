@@ -1,10 +1,10 @@
-import { describe } from "../../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../../core-test-framework";
 import { Application } from "../../../application";
-import { NotImplemented } from "../../../exceptions/runtime";
-import { Container, Identifiers } from "../../../ioc";
-import { MemoryCacheStore } from "./memory";
 import { MemoryEventDispatcher } from "../../events";
+import { MemoryCacheStore } from "./memory";
 
 const items: Record<string, number> = {
 	"1": 1,
@@ -14,9 +14,9 @@ const items: Record<string, number> = {
 	"5": 5,
 };
 
-const itemsBool: boolean[] = new Array(5).fill(true);
-const itemsTruthy: boolean[] = new Array(5).fill(true);
-const itemsFalsey: boolean[] = new Array(5).fill(false);
+const itemsBool: boolean[] = Array.from<boolean>({ length: 5 }).fill(true);
+const itemsTruthy: boolean[] = Array.from<boolean>({ length: 5 }).fill(true);
+const itemsFalsey: boolean[] = Array.from<boolean>({ length: 5 }).fill(false);
 
 describe<{
 	app: Application;
@@ -109,11 +109,15 @@ describe<{
 	});
 
 	it("should throw if the [forever] method is not implemented", async (context) => {
-		await assert.rejects(() => context.store.forever("1", 1), NotImplemented, "forever");
+		await assert.rejects(() => context.store.forever("1", 1), Exceptions.NotImplemented, "forever");
 	});
 
 	it("should throw if the [foreverMany] method is not implemented", async (context) => {
-		await assert.rejects(() => context.store.foreverMany(Object.entries(items)), NotImplemented, "foreverMany");
+		await assert.rejects(
+			() => context.store.foreverMany(Object.entries(items)),
+			Exceptions.NotImplemented,
+			"foreverMany",
+		);
 	});
 
 	it("should remove an item from the store", async (context) => {
@@ -135,6 +139,6 @@ describe<{
 	});
 
 	it("should throw if the [getPrefix] method is not implemented", async (context) => {
-		await assert.rejects(() => context.store.getPrefix(), NotImplemented, "getPrefix");
+		await assert.rejects(() => context.store.getPrefix(), Exceptions.NotImplemented, "getPrefix");
 	});
 });

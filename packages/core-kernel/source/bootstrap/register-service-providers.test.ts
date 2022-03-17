@@ -1,4 +1,7 @@
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+
+import { describe } from "../../../core-test-framework";
 import {
 	InvalidConfigurationServiceProvider,
 	OptionalDependencyCannotBeFoundServiceProvider,
@@ -11,13 +14,11 @@ import {
 	RequiredInvalidConfigurationServiceProvider,
 	StubServiceProvider,
 	ValidConfigurationServiceProvider,
-} from "../../../test/stubs/bootstrap/service-providers";
-import { Application } from "../../application";
-import { ServiceProviderCannotBeRegistered } from "../../exceptions/plugins";
-import { Container, Identifiers } from "../../ioc";
-import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../../providers";
-import { MemoryEventDispatcher } from "../../services/events";
-import { ServiceProvider as ValidationServiceProvider } from "../../services/validation";
+} from "../../test/stubs/bootstrap/service-providers";
+import { Application } from "../application";
+import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers";
+import { MemoryEventDispatcher } from "../services/events";
+import { ServiceProvider as ValidationServiceProvider } from "../services/validation";
 import { RegisterServiceProviders } from "./register-service-providers";
 
 describe<{
@@ -27,8 +28,8 @@ describe<{
 }>("RegisterServiceProviders", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.logger = {
-			notice: () => undefined,
-			warning: () => undefined,
+			notice: () => {},
+			warning: () => {},
 		};
 
 		context.app = new Application(new Container());
@@ -94,7 +95,7 @@ describe<{
 
 		await assert.rejects(
 			() => context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap(),
-			ServiceProviderCannotBeRegistered,
+			Exceptions.ServiceProviderCannotBeRegistered,
 			'[stub] Failed to register: "[stub] Failed to validate the configuration: "{\n' +
 				'    "username": [\n' +
 				'        "\\"username\\" is required"\n' +

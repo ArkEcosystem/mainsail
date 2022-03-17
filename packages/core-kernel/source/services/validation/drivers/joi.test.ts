@@ -1,6 +1,6 @@
-import { describe } from "../../../../../core-test-framework";
-
 import Joi from "joi";
+
+import { describe } from "../../../../../core-test-framework";
 import { JoiValidator } from "./joi";
 
 const schema = Joi.object({

@@ -1,7 +1,7 @@
-import { describe } from "../../../../../core-test-framework";
-
-import { LocalFilesystem } from "./local";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
+
+import { describe } from "../../../../../core-test-framework";
+import { LocalFilesystem } from "./local";
 
 describe<{
 	fs: LocalFilesystem;
@@ -38,41 +38,41 @@ describe<{
 	});
 
 	it("should fail to delete the given file", async (context) => {
-		assert.false(await context.fs.delete(undefined));
+		assert.false(await context.fs.delete());
 	});
 
 	it("should copy the given file", async (context) => {
 		const fileSource: string = fileSync().name;
-		const fileDest: string = `${fileSource}.copy`;
+		const fileDestination = `${fileSource}.copy`;
 
 		assert.true(await context.fs.exists(fileSource));
-		assert.false(await context.fs.exists(fileDest));
+		assert.false(await context.fs.exists(fileDestination));
 
-		assert.true(await context.fs.copy(fileSource, fileDest));
+		assert.true(await context.fs.copy(fileSource, fileDestination));
 
 		assert.true(await context.fs.exists(fileSource));
-		assert.true(await context.fs.exists(fileDest));
+		assert.true(await context.fs.exists(fileDestination));
 	});
 
 	it("should fail to copy the given file", async (context) => {
-		assert.false(await context.fs.copy(undefined, undefined));
+		assert.false(await context.fs.copy());
 	});
 
 	it("should move the given file", async (context) => {
 		const fileSource: string = fileSync().name;
-		const fileDest: string = `${fileSource}.move`;
+		const fileDestination = `${fileSource}.move`;
 
 		assert.true(await context.fs.exists(fileSource));
-		assert.false(await context.fs.exists(fileDest));
+		assert.false(await context.fs.exists(fileDestination));
 
-		assert.true(await context.fs.move(fileSource, fileDest));
+		assert.true(await context.fs.move(fileSource, fileDestination));
 
 		assert.false(await context.fs.exists(fileSource));
-		assert.true(await context.fs.exists(fileDest));
+		assert.true(await context.fs.exists(fileDestination));
 	});
 
 	it("should fail to move the given file", async (context) => {
-		assert.false(await context.fs.move(undefined, undefined));
+		assert.false(await context.fs.move());
 	});
 
 	it("should return the size of the given file", async (context) => {
@@ -93,7 +93,7 @@ describe<{
 
 	it(".files", async (context) => {
 		const dir: string = dirSync().name;
-		const file: string = `${dir}/files.txt`;
+		const file = `${dir}/files.txt`;
 
 		await context.fs.put(file, "Hello World");
 
@@ -102,7 +102,7 @@ describe<{
 
 	it(".directories", async (context) => {
 		const dir: string = dirSync().name;
-		const subdir: string = `${dir}/sub`;
+		const subdir = `${dir}/sub`;
 
 		await context.fs.makeDirectory(subdir);
 
@@ -110,7 +110,7 @@ describe<{
 	});
 
 	it("should create the given directory", async (context) => {
-		const dir: string = `${dirSync().name}/sub`;
+		const dir = `${dirSync().name}/sub`;
 
 		assert.false(await context.fs.exists(dir));
 
@@ -120,7 +120,7 @@ describe<{
 	});
 
 	it("should fail to create the given directory", async (context) => {
-		assert.false(await context.fs.makeDirectory(undefined));
+		assert.false(await context.fs.makeDirectory());
 	});
 
 	it("should delete the given directory", async (context) => {
@@ -134,6 +134,6 @@ describe<{
 	});
 
 	it("should fail to delete the given directory", async (context) => {
-		assert.false(await context.fs.deleteDirectory(undefined));
+		assert.false(await context.fs.deleteDirectory());
 	});
 });

@@ -1,5 +1,4 @@
 import { describe } from "../../../../../core-test-framework";
-
 import { NullCacheStore } from "./null";
 
 describe("NullCacheStore", ({ assert, it }) => {

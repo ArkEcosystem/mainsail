@@ -1,14 +1,13 @@
-import { describe } from "../../../../core-test-framework";
+import { Exceptions } from "@arkecosystem/core-contracts";
 
-import { InvalidArgumentException } from "../../exceptions/logic";
-import { Triggers } from "./triggers";
-import { Action } from "./action";
+import { describe } from "../../../../core-test-framework";
 import { ActionArguments } from "../../types";
-import sinon from "sinon";
+import { Action } from "./action";
+import { Triggers } from "./triggers";
 
 class DummyAction extends Action {
-	public execute<T>(args: ActionArguments): T {
-		return args.returnValue;
+	public execute<T>(arguments_: ActionArguments): T {
+		return arguments_.returnValue;
 	}
 }
 
@@ -18,13 +17,13 @@ class DummyActionWithException extends Action {
 	}
 }
 
-const dummyParams = {
+const dummyParameters = {
 	returnValue: false,
 };
 
 describe<{
 	triggers: Triggers;
-}>("Triggers", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
+}>("Triggers", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn, match }) => {
 	beforeEach((context) => {
 		context.triggers = new Triggers();
 	});
@@ -32,7 +31,9 @@ describe<{
 	it("binds a trigger and accepts arguments for calls", async (context) => {
 		const before = spyFn();
 
-		context.triggers.bind("count", new DummyAction()).before(before);
+		context.triggers.bind("count", new DummyAction()).before(() => {
+			before.call();
+		});
 
 		assert.is(
 			await context.triggers.call<boolean>("count", {
@@ -40,47 +41,55 @@ describe<{
 			}),
 			"Hello World",
 		);
-		assert.true(before.calledOnce);
+		before.calledOnce();
 	});
 
 	it("binds a trigger and throws error from execute", async (context) => {
 		const before = spyFn();
 
-		context.triggers.bind("count", new DummyActionWithException()).before(before);
+		context.triggers.bind("count", new DummyActionWithException()).before(() => {
+			before.call();
+		});
 
 		await assert.rejects(() =>
 			context.triggers.call<boolean>("count", {
 				returnValue: "Hello World",
 			}),
 		);
-		assert.true(before.calledOnce);
+		before.calledOnce();
 	});
 
 	it("binds a trigger with a <before> hook and executes them", async (context) => {
 		const before = spyFn();
 
-		context.triggers.bind("count", new DummyAction()).before(before);
+		context.triggers.bind("count", new DummyAction()).before(() => {
+			before.call();
+		});
 
 		assert.undefined(await context.triggers.call<boolean>("count"));
-		assert.true(before.calledOnce);
+		before.calledOnce();
 	});
 
 	it("binds a trigger with an <error> hook and executes them", async (context) => {
 		const error = spyFn();
 
-		context.triggers.bind("count", new DummyActionWithException()).error(error);
+		context.triggers.bind("count", new DummyActionWithException()).error(() => {
+			error.call();
+		});
 
 		assert.undefined(await context.triggers.call<boolean>("count"));
-		assert.true(error.calledOnce);
+		error.calledOnce();
 	});
 
 	it("binds a trigger with an <after> hook and executes them", async (context) => {
 		const after = spyFn();
 
-		context.triggers.bind("count", new DummyAction()).after(after);
+		context.triggers.bind("count", new DummyAction()).after(() => {
+			after.call();
+		});
 
 		assert.undefined(await context.triggers.call<boolean>("count"));
-		assert.true(after.called);
+		after.calledOnce();
 	});
 
 	it("binds a trigger with <before/error/after> hooks and executes them", async (context) => {
@@ -88,18 +97,22 @@ describe<{
 		const error = spyFn();
 		const after = spyFn();
 
-		context.triggers.bind("count", new DummyActionWithException()).before(before).error(error).after(after);
+		context.triggers
+			.bind("count", new DummyActionWithException())
+			.before(() => before.call())
+			.error(() => error.call())
+			.after(() => after.call());
 
 		assert.undefined(await context.triggers.call<boolean>("count"));
-		assert.true(before.calledOnce);
-		assert.true(error.calledOnce);
-		assert.true(after.notCalled);
+		before.calledOnce();
+		error.calledOnce();
+		after.neverCalled();
 	});
 
 	it("throws an error if a trigger is not registered", async (context) => {
 		await assert.rejects(
 			() => context.triggers.call("count"),
-			InvalidArgumentException,
+			Exceptions.InvalidArgumentException,
 			"The given trigger [count] is not available.",
 		);
 	});
@@ -107,21 +120,21 @@ describe<{
 	it("throws an error if a trigger is already registered", async (context) => {
 		context.triggers.bind("duplicate", new DummyAction());
 
-		assert.rejects(
+		await assert.rejects(
 			() => {
 				context.triggers.bind("duplicate", new DummyAction());
 			},
-			InvalidArgumentException,
+			Exceptions.InvalidArgumentException,
 			"The given trigger [duplicate] is already registered.",
 		);
 	});
 
 	it("throws an error if a trigger is reserved", async (context) => {
-		assert.rejects(
+		await assert.rejects(
 			() => {
 				context.triggers.bind("internal.trigger", new DummyAction());
 			},
-			InvalidArgumentException,
+			Exceptions.InvalidArgumentException,
 			"The given trigger [internal.trigger] is reserved.",
 		);
 	});
@@ -133,17 +146,17 @@ describe<{
 
 		assert.instance(context.triggers.unbind("count"), Action);
 
-		assert.rejects(
+		await assert.rejects(
 			() => context.triggers.get("count"),
-			InvalidArgumentException,
+			Exceptions.InvalidArgumentException,
 			"The given trigger [count] is not available.",
 		);
 	});
 
 	it("throws an error if a trigger is not registered", async (context) => {
-		assert.rejects(
+		await assert.rejects(
 			() => context.triggers.unbind("count"),
-			InvalidArgumentException,
+			Exceptions.InvalidArgumentException,
 			"The given trigger [count] is not available.",
 		);
 	});
@@ -162,9 +175,9 @@ describe<{
 	});
 
 	it("throws an error if a trigger is not registered", async (context) => {
-		assert.rejects(
+		await assert.rejects(
 			() => context.triggers.rebind("count", new DummyAction()),
-			InvalidArgumentException,
+			Exceptions.InvalidArgumentException,
 			"The given trigger [count] is not available.",
 		);
 	});
@@ -176,9 +189,9 @@ describe<{
 	});
 
 	it("throws an error if a trigger is not registered", async (context) => {
-		assert.rejects(
+		await assert.rejects(
 			() => context.triggers.get("count"),
-			InvalidArgumentException,
+			Exceptions.InvalidArgumentException,
 			"The given trigger [count] is not available.",
 		);
 	});
@@ -188,37 +201,42 @@ describe<{
 			throw new Error();
 		});
 		const error = spyFn();
-		context.triggers.bind("count", new DummyAction()).before(before).error(error);
+		context.triggers
+			.bind("count", new DummyAction())
+			.before(() => {
+				before.call();
+			})
+			.error((...arguments_) => {
+				error.call(...arguments_);
+			});
 
-		assert.undefined(await context.triggers.call<boolean>("count", dummyParams));
-		assert.true(before.calledOnce);
-		assert.true(error.calledWith(dummyParams, undefined, sinon.match.instanceOf(Error), "before"));
+		assert.undefined(await context.triggers.call<boolean>("count", dummyParameters));
+		before.calledOnce();
+		error.calledWith(dummyParameters, undefined, match.instanceOf(Error), "before");
 	});
 
 	it("should throw error if error is thrown on <before> hook and no error handlers are defined", async (context) => {
 		const before = stubFn().callsFake(() => {
 			throw new Error();
 		});
-		context.triggers.bind("count", new DummyAction()).before(before);
+		context.triggers.bind("count", new DummyAction()).before(() => before.call());
 
-		await assert.rejects(() => context.triggers.call<boolean>("count", dummyParams));
-		assert.true(before.calledOnce);
+		await assert.rejects(() => context.triggers.call<boolean>("count", dummyParameters));
+		before.calledOnce();
 	});
 
 	it("should call error action if error is thrown on execute", async (context) => {
 		const error = spyFn();
-		context.triggers.bind("count", new DummyActionWithException()).error(error);
+		context.triggers.bind("count", new DummyActionWithException()).error((...arguments_) => {
+			error.call(...arguments_);
+		});
 
-		assert.undefined(await context.triggers.call<boolean>("count", dummyParams));
-		assert.true(
-			error.calledWith(
-				dummyParams,
-				undefined,
-				sinon.match((o) => {
-					return o instanceof Error && o.message === "Hello World";
-				}),
-				"execute",
-			),
+		assert.undefined(await context.triggers.call<boolean>("count", dummyParameters));
+		error.calledWith(
+			dummyParameters,
+			undefined,
+			match((o) => o instanceof Error && o.message === "Hello World"),
+			"execute",
 		);
 	});
 
@@ -233,20 +251,27 @@ describe<{
 			throw new Error();
 		});
 		const error = spyFn();
-		context.triggers.bind("count", new DummyAction()).after(after).error(error);
-
-		assert.is(await context.triggers.call<boolean>("count", dummyParams), dummyParams.returnValue);
-		assert.true(after.called);
-		assert.true(error.calledWith(dummyParams, dummyParams.returnValue, sinon.match.instanceOf(Error), "after"));
+		context.triggers
+			.bind("count", new DummyAction())
+			.after(() => {
+				after.call();
+			})
+			.error((...arguments_) => error.call(...arguments_));
+		assert.is(await context.triggers.call<boolean>("count", dummyParameters), dummyParameters.returnValue);
+		after.calledOnce();
+		error.calledOnce();
+		error.calledWith(dummyParameters, dummyParameters.returnValue, match.instanceOf(Error), "after");
 	});
 
 	it("should throw error if error is thrown on <after> hook and no error handlers are defined", async (context) => {
 		const after = stubFn().callsFake(() => {
 			throw new Error();
 		});
-		context.triggers.bind("count", new DummyAction()).after(after);
+		context.triggers.bind("count", new DummyAction()).after(() => {
+			after.call();
+		});
 
-		await assert.rejects(() => context.triggers.call<boolean>("count", dummyParams));
-		assert.true(after.called);
+		await assert.rejects(() => context.triggers.call<boolean>("count", dummyParameters));
+		after.calledOnce();
 	});
 });

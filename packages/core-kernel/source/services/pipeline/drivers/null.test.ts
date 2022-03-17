@@ -1,5 +1,4 @@
 import { describe } from "../../../../../core-test-framework";
-
 import { NullPipeline } from "./null";
 
 describe("NullPipeline.pipe", ({ assert, it }) => {

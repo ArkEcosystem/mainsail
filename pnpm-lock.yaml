@@ -1204,6 +1204,8 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/utils': workspace:*
       '@pm2/io': 4.3.5
       '@types/cron': 1.7.3
@@ -1229,7 +1231,6 @@ importers:
       nsfw: 2.1.2
       reflect-metadata: 0.1.13
       semver: 6.3.0
-      sinon: ^13.0.1
       type-fest: 0.21.3
       uvu: ^0.5.3
     dependencies:
@@ -1256,13 +1257,14 @@ importers:
       semver: 6.3.0
       type-fest: 0.21.3
     devDependencies:
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@types/cron': 1.7.3
       '@types/fs-extra': 8.1.2
       '@types/functional-red-black-tree': 1.0.1
       '@types/got': 9.6.12
       '@types/log-process-errors': 4.1.0
       '@types/semver': 6.2.3
-      sinon: 13.0.1
       uvu: 0.5.3
 
   packages/core-kernel/test/stubs/stub-plugin:

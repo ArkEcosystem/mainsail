@@ -1,6 +1,6 @@
-import { EventEmitter } from "events";
 import { decorateInjectable, injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
+import { EventEmitter } from "events";
 
 decorateInjectable(EventEmitter);
 

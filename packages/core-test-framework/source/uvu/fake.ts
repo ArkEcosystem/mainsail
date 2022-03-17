@@ -7,8 +7,8 @@ export abstract class Fake<T> {
 		this.subject = subject;
 	}
 
-	public call<U>(): U {
-		return this.subject();
+	public call<U>(...arguments_: any[]): U {
+		return this.subject(...arguments_);
 	}
 
 	public called(): void {

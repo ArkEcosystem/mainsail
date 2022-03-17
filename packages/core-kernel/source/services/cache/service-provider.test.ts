@@ -1,11 +1,12 @@
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { Application } from "../../application";
-import { Container, Identifiers } from "../../ioc";
-import { ServiceProvider } from "./service-provider";
-import { MemoryCacheStore } from "./drivers";
-import { MemoryEventDispatcher } from "../events";
 import { CacheFactory } from "../../types";
+import { MemoryEventDispatcher } from "../events";
+import { MemoryCacheStore } from "./drivers";
+import { ServiceProvider } from "./service-provider";
 
 describe<{
 	app: Application;

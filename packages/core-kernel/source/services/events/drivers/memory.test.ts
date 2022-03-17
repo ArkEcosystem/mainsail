@@ -1,6 +1,6 @@
-import { describe } from "../../../../../core-test-framework";
+import { Contracts } from "@arkecosystem/core-contracts";
 
-import { Contracts } from "../../../index";
+import { describe } from "../../../../../core-test-framework";
 import { MemoryEventDispatcher } from "./memory";
 
 class DummyClass implements Contracts.Kernel.EventListener {
@@ -19,7 +19,7 @@ describe<{
 }>("MemoryEventDispatcher", ({ assert, beforeEach, it, spy, spyFn }) => {
 	beforeEach((context) => {
 		context.emitter = new MemoryEventDispatcher();
-		context.dummyCaller = () => undefined;
+		context.dummyCaller = () => {};
 		context.dummyCallerSpy = spy(context, "dummyCaller");
 		context.dummyListener = new DummyClass(context.dummyCaller);
 	});
@@ -74,7 +74,7 @@ describe<{
 	});
 
 	it("should prevent duplicate listeners", async (context) => {
-		context.emitter.listenMany(new Array(5).fill(["firstEvent", context.dummyListener]));
+		context.emitter.listenMany(Array.from({ length: 5 }).fill(["firstEvent", context.dummyListener]));
 
 		await context.emitter.dispatch("firstEvent");
 

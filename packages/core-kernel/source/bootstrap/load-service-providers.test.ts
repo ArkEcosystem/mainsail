@@ -1,11 +1,12 @@
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 
-import { describe } from "../../../../core-test-framework";
-import { Application } from "../../application";
-import { Container, Identifiers } from "../../ioc";
-import { ServiceProvider, ServiceProviderRepository } from "../../providers";
-import { ConfigRepository } from "../../services/config";
-import { MemoryEventDispatcher } from "../../services/events";
+import { describe } from "../../../core-test-framework";
+import { Application } from "../application";
+import { ServiceProvider, ServiceProviderRepository } from "../providers";
+import { ConfigRepository } from "../services/config";
+import { MemoryEventDispatcher } from "../services/events";
 import { LoadServiceProviders } from "./load-service-providers";
 
 class StubServiceProvider extends ServiceProvider {
@@ -28,7 +29,7 @@ describe<{
 	});
 
 	it("should bootstrap with defaults", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "stub-plugin-with-defaults" }] },
@@ -40,7 +41,7 @@ describe<{
 	});
 
 	it("should bootstrap without defaults", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "stub-plugin" }] },
@@ -52,7 +53,7 @@ describe<{
 	});
 
 	it("should throw if package doesn't exist", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "non-existing-plugin" }] },

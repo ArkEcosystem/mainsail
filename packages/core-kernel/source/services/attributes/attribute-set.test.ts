@@ -1,5 +1,4 @@
 import { describe } from "../../../../core-test-framework";
-
 import { AttributeSet } from "./attribute-set";
 
 describe<{

@@ -7,14 +7,14 @@ describe("Lock", ({ assert, it }) => {
 		const promise = new Promise<void>((r) => (resolve = r));
 
 		let executions = 0;
-		const fn = async () => {
+		const function_ = async () => {
 			executions++;
 			await promise;
 			return executions;
 		};
 
 		const lock = new Lock();
-		const promises = [lock.runExclusive(fn), lock.runExclusive(fn), lock.runExclusive(fn)];
+		const promises = [lock.runExclusive(function_), lock.runExclusive(function_), lock.runExclusive(function_)];
 		resolve();
 
 		assert.equal(await Promise.all(promises), [1, 2, 3]);
@@ -25,14 +25,18 @@ describe("Lock", ({ assert, it }) => {
 		const promise = new Promise<void>((r) => (resolve = r));
 
 		let executions = 0;
-		const fn = async () => {
+		const function_ = async () => {
 			executions++;
 			await promise;
 			return executions;
 		};
 
 		const lock = new Lock();
-		const promises = [lock.runNonExclusive(fn), lock.runNonExclusive(fn), lock.runNonExclusive(fn)];
+		const promises = [
+			lock.runNonExclusive(function_),
+			lock.runNonExclusive(function_),
+			lock.runNonExclusive(function_),
+		];
 		resolve();
 
 		assert.equal(await Promise.all(promises), [3, 3, 3]);
@@ -43,14 +47,18 @@ describe("Lock", ({ assert, it }) => {
 		const promise = new Promise<void>((r) => (resolve = r));
 
 		let executions = 0;
-		const fn = async () => {
+		const function_ = async () => {
 			executions++;
 			await promise;
 			return executions;
 		};
 
 		const lock = new Lock();
-		const promises = [lock.runNonExclusive(fn), lock.runNonExclusive(fn), lock.runExclusive(fn)];
+		const promises = [
+			lock.runNonExclusive(function_),
+			lock.runNonExclusive(function_),
+			lock.runExclusive(function_),
+		];
 		resolve();
 
 		assert.equal(await Promise.all(promises), [2, 2, 3]);
@@ -61,14 +69,18 @@ describe("Lock", ({ assert, it }) => {
 		const promise = new Promise<void>((r) => (resolve = r));
 
 		let executions = 0;
-		const fn = async () => {
+		const function_ = async () => {
 			executions++;
 			await promise;
 			return executions;
 		};
 
 		const lock = new Lock();
-		const promises = [lock.runExclusive(fn), lock.runNonExclusive(fn), lock.runNonExclusive(fn)];
+		const promises = [
+			lock.runExclusive(function_),
+			lock.runNonExclusive(function_),
+			lock.runNonExclusive(function_),
+		];
 		resolve();
 
 		assert.equal(await Promise.all(promises), [1, 3, 3]);

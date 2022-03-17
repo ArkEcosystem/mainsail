@@ -1,17 +1,18 @@
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+
+import { describe } from "../../../core-test-framework";
 import {
 	DeferredBootServiceProvider,
 	DeferredDisposeServiceProvider,
 	DeferredServiceProvider,
 	FaultyBootServiceProvider,
 	RequiredFaultyBootServiceProvider,
-} from "../../../test/stubs/bootstrap/service-providers";
-import { Application } from "../../application";
-import { BlockEvent, KernelEvent } from "../../enums";
-import { ServiceProviderCannotBeBooted } from "../../exceptions/plugins";
-import { Container, Identifiers } from "../../ioc";
-import { ServiceProvider, ServiceProviderRepository } from "../../providers";
-import { MemoryEventDispatcher } from "../../services/events";
+} from "../../test/stubs/bootstrap/service-providers";
+import { Application } from "../application";
+import { BlockEvent, KernelEvent } from "../enums";
+import { ServiceProvider, ServiceProviderRepository } from "../providers";
+import { MemoryEventDispatcher } from "../services/events";
 import { BootServiceProviders } from "./boot-service-providers";
 
 describe<{
@@ -21,9 +22,9 @@ describe<{
 }>("BootServiceProviders", ({ afterEach, assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.logger = {
-			notice: () => undefined,
-			warning: () => undefined,
-			error: () => undefined,
+			error: () => {},
+			notice: () => {},
+			warning: () => {},
 		};
 
 		context.app = new Application(new Container());
@@ -46,7 +47,11 @@ describe<{
 		const serviceProvider: ServiceProvider = new RequiredFaultyBootServiceProvider();
 		context.serviceProviderRepository.set("stub", serviceProvider);
 
-		await assert.rejects(() => bootServiceProviders.bootstrap(), ServiceProviderCannotBeBooted, "Boot Error");
+		await assert.rejects(
+			() => bootServiceProviders.bootstrap(),
+			Exceptions.ServiceProviderCannotBeBooted,
+			"Boot Error",
+		);
 	});
 
 	it("FaultyBootServiceProvider", async (context) => {

@@ -1,8 +1,9 @@
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 
 import { describe } from "../../../core-test-framework";
 import { Application } from "../application";
-import { Container, Identifiers } from "../ioc";
 import { ConfigRepository } from "../services/config";
 import { PluginConfiguration } from "./plugin-configuration";
 

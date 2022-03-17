@@ -1,7 +1,8 @@
-import { describe } from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 
+import { describe } from "../../../../core-test-framework";
 import { Application } from "../../application";
-import { Container, Identifiers, interfaces } from "../../ioc";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
 import { CronJob } from "./cron-job";
@@ -9,7 +10,7 @@ import { Schedule } from "./schedule";
 
 describe<{
 	app: Application;
-	container: interfaces.Container;
+	container: Container;
 	scheduleService: Schedule;
 }>("Schedule", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
@@ -18,6 +19,7 @@ describe<{
 
 		context.app = new Application(context.container);
 		context.app.bind(Identifiers.EventDispatcherService).to(MemoryEventDispatcher);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
 		context.scheduleService = context.app.resolve<Schedule>(Schedule);
 	});
