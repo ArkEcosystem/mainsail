@@ -21,6 +21,14 @@ export class Stub extends Fake<SinonStub> {
 		return this;
 	}
 
+	public returnValueSequence(sequence: unknown[]): Stub {
+		for (const [nth, value] of sequence.entries()) {
+			this.returnValueNth(nth, value);
+		}
+
+		return this;
+	}
+
 	public resolvedValue(value: unknown): Stub {
 		this.subject.resolves(value);
 
@@ -33,6 +41,14 @@ export class Stub extends Fake<SinonStub> {
 		return this;
 	}
 
+	public resolvedValueSequence(sequence: unknown[]): Stub {
+		for (const [nth, value] of sequence.entries()) {
+			this.resolvedValueNth(nth, value);
+		}
+
+		return this;
+	}
+
 	public rejectedValue(value: unknown): Stub {
 		this.subject.rejects(value);
 
@@ -41,6 +57,14 @@ export class Stub extends Fake<SinonStub> {
 
 	public rejectedValueNth(nth: number, value: unknown): Stub {
 		this.subject.onCall(nth).rejects(value);
+
+		return this;
+	}
+
+	public rejectedValueSequence(sequence: unknown[]): Stub {
+		for (const [nth, value] of sequence.entries()) {
+			this.rejectedValueNth(nth, value);
+		}
 
 		return this;
 	}
