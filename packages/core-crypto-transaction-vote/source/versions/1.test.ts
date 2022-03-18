@@ -1,8 +1,8 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { ByteBuffer } from "@arkecosystem/utils";
 
+import { describe, Sandbox } from "../../../core-test-framework";
 import { VoteTransaction } from "./index";
 
 describe<{
