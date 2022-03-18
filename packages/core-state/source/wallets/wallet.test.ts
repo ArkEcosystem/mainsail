@@ -1,9 +1,8 @@
-import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { Services } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
-import { getWalletAttributeSet } from "@arkecosystem/core-test-framework/source/internal/wallet-attributes";
-import { Utils } from "@arkecosystem/crypto";
+import { Application, Services } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { describe, describeSkip, getWalletAttributeSet } from "../../../core-test-framework";
 import { SinonSpy } from "sinon";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { setUp } from "../../test/setup";
 import { Wallet, WalletEvent } from "../wallets";
@@ -32,64 +31,64 @@ describe<{
 		assert.equal(wallet.getPublicKey(), "publicKey");
 	});
 
-	it("should set and get balance", (context) => {
+	it.only("should set and get balance", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
+		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
-		wallet.setBalance(Utils.BigNumber.ONE);
-		assert.equal(wallet.getBalance(), Utils.BigNumber.ONE);
+		wallet.setBalance(BigNumber.ONE);
+		assert.equal(wallet.getBalance(), BigNumber.ONE);
 	});
 
 	it("should set and get nonce", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
-		wallet.setNonce(Utils.BigNumber.ONE);
-		assert.equal(wallet.getNonce(), Utils.BigNumber.ONE);
+		wallet.setNonce(BigNumber.ONE);
+		assert.equal(wallet.getNonce(), BigNumber.ONE);
 	});
 
 	it("should increase balance", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
+		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 
-		assert.equal(wallet.increaseBalance(Utils.BigNumber.ONE), wallet);
-		assert.equal(wallet.getBalance(), Utils.BigNumber.ONE);
+		assert.equal(wallet.increaseBalance(BigNumber.ONE), wallet);
+		assert.equal(wallet.getBalance(), BigNumber.ONE);
 	});
 
 	it("should decrease balance", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
-		assert.equal(wallet.decreaseBalance(Utils.BigNumber.ONE), wallet);
-		assert.equal(wallet.getBalance(), Utils.BigNumber.make("-1"));
+		assert.equal(wallet.getBalance(), BigNumber.ZERO);
+		assert.equal(wallet.decreaseBalance(BigNumber.ONE), wallet);
+		assert.equal(wallet.getBalance(), BigNumber.make("-1"));
 	});
 
 	it("should increase nonce", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
 		wallet.increaseNonce();
 
-		assert.equal(wallet.getNonce(), Utils.BigNumber.ONE);
+		assert.equal(wallet.getNonce(), BigNumber.ONE);
 	});
 
 	it("should decrease nonce", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 
 		wallet.decreaseNonce();
-		assert.equal(wallet.getNonce(), Utils.BigNumber.make("-1"));
+		assert.equal(wallet.getNonce(), BigNumber.make("-1"));
 	});
 
 	it("should get, set and forget custom attributes", (context) => {
@@ -129,9 +128,9 @@ describe<{
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		assert.false(wallet.isDelegate());
+		assert.false(wallet.isValidator());
 		wallet.setAttribute("delegate", {});
-		assert.true(wallet.isDelegate());
+		assert.true(wallet.isValidator());
 	});
 
 	it("should return whether wallet has voted", (context) => {
@@ -161,7 +160,7 @@ describe<{
 	});
 });
 
-describe<{
+describeSkip<{
 	app: Application;
 	wallet: Wallet;
 	dispatchSyncSpy: SinonSpy;
@@ -175,7 +174,7 @@ describe<{
 
 	beforeEach((context) => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = context.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
+		const events = context.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService);
 
 		context.wallet = new Wallet("Abcde", attributeMap, events);
 	});
@@ -201,60 +200,60 @@ describe<{
 	});
 
 	it("should emit on setBalance", async (context) => {
-		context.wallet.setBalance(Utils.BigNumber.ONE);
+		context.wallet.setBalance(BigNumber.ONE);
 
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "balance",
-				previousValue: Utils.BigNumber.ZERO,
-				value: Utils.BigNumber.ONE,
+				previousValue: BigNumber.ZERO,
+				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
 		);
 	});
 
 	it("should emit on increaseBalance", async (context) => {
-		context.wallet.increaseBalance(Utils.BigNumber.ONE);
+		context.wallet.increaseBalance(BigNumber.ONE);
 
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "balance",
-				previousValue: Utils.BigNumber.ZERO,
-				value: Utils.BigNumber.ONE,
+				previousValue: BigNumber.ZERO,
+				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
 		);
 	});
 
 	it("should emit on decreaseBalance", async (context) => {
-		context.wallet.decreaseBalance(Utils.BigNumber.ONE);
+		context.wallet.decreaseBalance(BigNumber.ONE);
 
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "balance",
-				previousValue: Utils.BigNumber.ZERO,
-				value: Utils.BigNumber.make("-1"),
+				previousValue: BigNumber.ZERO,
+				value: BigNumber.make("-1"),
 				wallet: context.wallet,
 			}),
 		);
 	});
 
 	it("should emit on setNonce", async (context) => {
-		context.wallet.setNonce(Utils.BigNumber.ONE);
+		context.wallet.setNonce(BigNumber.ONE);
 
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "nonce",
-				previousValue: Utils.BigNumber.ZERO,
-				value: Utils.BigNumber.ONE,
+				previousValue: BigNumber.ZERO,
+				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
 		);
@@ -268,8 +267,8 @@ describe<{
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "nonce",
-				previousValue: Utils.BigNumber.ZERO,
-				value: Utils.BigNumber.ONE,
+				previousValue: BigNumber.ZERO,
+				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
 		);
@@ -283,8 +282,8 @@ describe<{
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "nonce",
-				previousValue: Utils.BigNumber.ZERO,
-				value: Utils.BigNumber.make("-1"),
+				previousValue: BigNumber.ZERO,
+				value: BigNumber.make("-1"),
 				wallet: context.wallet,
 			}),
 		);
@@ -328,7 +327,7 @@ describe<{
 	});
 });
 
-describe<{
+describeSkip<{
 	app: Application;
 	clone: Contracts.State.Wallet;
 	dispatchSyncSpy: SinonSpy;
@@ -342,7 +341,7 @@ describe<{
 
 	beforeEach((context) => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = context.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
+		const events = context.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService);
 
 		const wallet = new Wallet("Abcde", attributeMap, events);
 
@@ -355,7 +354,7 @@ describe<{
 
 	it("should emit on property set", async (context) => {
 		// @ts-ignore
-		context.clone.nonce = Utils.BigNumber.make("3");
+		context.clone.nonce = BigNumber.make("3");
 
 		assert.false(context.dispatchSyncSpy.called);
 	});

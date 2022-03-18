@@ -1,10 +1,9 @@
-import { Application, Container, Utils } from "@arkecosystem/core-kernel";
-import { RoundInfo } from "@arkecosystem/core-kernel/source/contracts/shared";
-import { DposPreviousRoundStateProvider } from "@arkecosystem/core-kernel/source/contracts/state";
-import { describe, Factories } from "@arkecosystem/core-test-framework";
-import { Interfaces } from "@arkecosystem/crypto";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Application, Utils } from "@arkecosystem/core-kernel";
+import { describeSkip, Factories } from "../../../core-test-framework";
+import { VoteBuilder } from "../../../core-crypto-transaction-vote";
 
-import { buildDelegateAndVoteWallets } from "../../test/build-delegate-and-vote-balances";
+import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { makeVoteTransactions } from "../../test/make-vote-transactions";
 import { setUp } from "../../test/setup";
@@ -13,17 +12,19 @@ import { BlockState } from "../block-state";
 import { StateStore } from "../stores";
 import { WalletRepository } from "../wallets";
 import { DposState } from "./dpos";
+import { Configuration } from "../../../core-crypto-config";
 
-describe<{
+describeSkip<{
 	app: Application;
 	dposState: DposState;
-	dposPreviousRoundStateProv: DposPreviousRoundStateProvider;
+	dposPreviousRoundStateProv: Contracts.State.DposPreviousRoundStateProvider;
 	walletRepo: WalletRepository;
 	factory: Factories.FactoryBuilder;
 	blockState: BlockState;
 	stateStore: StateStore;
-	round: RoundInfo;
-	blocks: Interfaces.IBlock[];
+	round: Contracts.Shared.RoundInfo;
+	blocks: Contracts.Crypto.IBlock[];
+	configuration: Configuration;
 }>("dposPreviousRound", ({ it, beforeAll, beforeEach, afterEach, assert, spy, stub }) => {
 	beforeAll(async (context) => {
 		const env = await setUp();
@@ -40,14 +41,18 @@ describe<{
 	beforeEach(async (context) => {
 		context.walletRepo.reset();
 
-		context.round = Utils.roundCalculator.calculateRound(1);
+		context.round = Utils.roundCalculator.calculateRound(1, context.configuration);
 
-		buildDelegateAndVoteWallets(5, context.walletRepo);
+		await buildValidatorAndVoteWallets(
+			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
+			5,
+			context.walletRepo,
+		);
 
 		context.dposState.buildVoteBalances();
-		context.dposState.buildDelegateRanking();
-		context.round.maxDelegates = 5;
-		context.dposState.setDelegatesRound(context.round);
+		context.dposState.buildValidatorRanking();
+		context.round.maxValidators = 5;
+		context.dposState.setValidatorsRound(context.round);
 
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
 	});
@@ -59,18 +64,18 @@ describe<{
 	it("should get all delegates", async (context) => {
 		const previousRound = await context.dposPreviousRoundStateProv([], context.round);
 
-		assert.equal(previousRound.getAllDelegates(), context.walletRepo.allByUsername());
+		assert.equal(previousRound.getAllValidators(), context.walletRepo.allByUsername());
 	});
 
 	it("should get round delegates", async (context) => {
 		const previousRound = await context.dposPreviousRoundStateProv([], context.round);
 
-		assert.containValues(previousRound.getRoundDelegates(), context.walletRepo.allByUsername());
+		assert.containValues(previousRound.getRoundValidators(), context.walletRepo.allByUsername());
 	});
 
 	it("should revert blocks", async (context) => {
-		const spyBuildDelegateRanking = spy(context.dposState, "buildDelegateRanking");
-		const spySetDelegatesRound = spy(context.dposState, "setDelegatesRound");
+		const spyBuildDelegateRanking = spy(context.dposState, "buildValidatorRanking");
+		const spySetDelegatesRound = spy(context.dposState, "setValidatorsRound");
 		const spyRevertBlock = spy(context.blockState, "revertBlock");
 		const spyGetLastBlock = stub(context.stateStore, "getLastBlock").returnValue({
 			data: {
@@ -78,11 +83,11 @@ describe<{
 			},
 		});
 
-		context.app.rebind(Container.Identifiers.DposState).toConstantValue(context.dposState);
-		context.app.rebind(Container.Identifiers.BlockState).toConstantValue(context.blockState);
-		context.app.rebind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.app.rebind(Identifiers.DposState).toConstantValue(context.dposState);
+		context.app.rebind(Identifiers.BlockState).toConstantValue(context.blockState);
+		context.app.rebind(Identifiers.StateStore).toConstantValue(context.stateStore);
 
-		const generatorWallet = context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
+		const generatorWallet = await context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
 
 		generatorWallet.setAttribute("delegate", {
 			username: "test",
@@ -94,8 +99,12 @@ describe<{
 
 		context.walletRepo.index(generatorWallet);
 
+		const voteBuilder = context.app.resolve<VoteBuilder>(VoteBuilder);
+
 		addTransactionsToBlock(
-			makeVoteTransactions(3, [`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`]),
+			await makeVoteTransactions(voteBuilder, 3, [
+				`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`,
+			]),
 			context.blocks[0],
 		);
 		context.blocks[0].data.height = 2;
@@ -111,12 +120,12 @@ describe<{
 	});
 
 	it("should not revert the blocks when height is one", async (context) => {
-		const spyBuildDelegateRanking = spy(context.dposState, "buildDelegateRanking");
-		const spySetDelegatesRound = spy(context.dposState, "setDelegatesRound");
+		const spyBuildDelegateRanking = spy(context.dposState, "buildValidatorRanking");
+		const spySetDelegatesRound = spy(context.dposState, "setValidatorsRound");
 		const spyRevertBlock = spy(context.blockState, "revertBlock");
 
-		context.app.rebind(Container.Identifiers.DposState).toConstantValue(context.dposState);
-		context.app.rebind(Container.Identifiers.BlockState).toConstantValue(context.blockState);
+		context.app.rebind(Identifiers.DposState).toConstantValue(context.dposState);
+		context.app.rebind(Identifiers.BlockState).toConstantValue(context.blockState);
 
 		context.blocks[0].data.height = 1;
 

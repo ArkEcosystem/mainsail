@@ -74,9 +74,9 @@ export class Sandbox {
 		};
 
 		// Configure Crypto
-		const genesisBlock = require(this.paths.crypto.genesisBlock);
-		const milestones = require(this.paths.crypto.milestones);
-		const network = require(this.paths.crypto.network);
+		const genesisBlock = require(this.paths.crypto.crypto).genesisBlock;
+		const milestones = require(this.paths.crypto.crypto).milestones;
+		const network = require(this.paths.crypto.crypto).network;
 
 		// this.configuration.setConfig({
 		// 	genesisBlock,

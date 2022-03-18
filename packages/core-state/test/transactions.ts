@@ -1,6 +1,6 @@
-import { IBlock, ITransaction } from "@arkecosystem/crypto/distribution/interfaces";
+import { Contracts } from "@arkecosystem/core-contracts";
 
-export const addTransactionsToBlock = (txs: Crypto.ITransaction[], block: Crypto.IBlock) => {
+export const addTransactionsToBlock = (txs: Contracts.Crypto.ITransaction[], block: Contracts.Crypto.IBlock) => {
 	const { data } = block;
 	data.transactions = [];
 	txs.forEach((tx) => data.transactions?.push(tx.data));

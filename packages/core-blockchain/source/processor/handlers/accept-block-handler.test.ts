@@ -42,7 +42,7 @@ describe<{
 		context.databaseInteractions = {
 			applyBlock: () => {},
 			deleteRound: () => {},
-			getActiveDelegates: () => [],
+			getActiveValidators: () => [],
 			getLastBlock: () => {},
 			getTopBlocks: () => {},
 			loadBlocksFromCurrentRound: () => {},

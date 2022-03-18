@@ -1,13 +1,13 @@
-import { describe } from "@arkecosystem/core-test-framework";
-import { Interfaces } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { describe } from "../../../core-test-framework";
 
 import { BlockStore } from "./blocks";
 
 describe("BlockStore", ({ it, assert }) => {
 	it("should push and get a block", () => {
-		const block: Crypto.IBlock = {
+		const block: Contracts.Crypto.IBlock = {
 			data: { height: 1, id: "1", previousBlock: undefined },
-		} as Crypto.IBlock;
+		} as Contracts.Crypto.IBlock;
 
 		const store = new BlockStore(100);
 		store.set(block);
@@ -20,27 +20,27 @@ describe("BlockStore", ({ it, assert }) => {
 	it("should fail to push a block if its height is not 1 and there is no last block", () => {
 		const store = new BlockStore(2);
 
-		assert.throws(() => store.set({ data: { height: 3, id: "3" } } as Interfaces.IBlock));
+		assert.throws(() => store.set({ data: { height: 3, id: "3" } } as Contracts.Crypto.IBlock));
 	});
 
 	it("should fail to push a block if it does not contain an id", () => {
 		const store = new BlockStore(2);
 
-		assert.throws(() => store.set({ data: { height: 1 } } as Interfaces.IBlock));
+		assert.throws(() => store.set({ data: { height: 1 } } as Contracts.Crypto.IBlock));
 	});
 
 	it("should fail to push a block if it isn't chained", () => {
 		const store = new BlockStore(2);
-		store.set({ data: { height: 1, id: "1" } } as Crypto.IBlock);
+		store.set({ data: { height: 1, id: "1" } } as Contracts.Crypto.IBlock);
 
-		assert.throws(() => store.set({ data: { height: 3, id: "3" } } as Interfaces.IBlock));
+		assert.throws(() => store.set({ data: { height: 3, id: "3" } } as Contracts.Crypto.IBlock));
 	});
 
 	it("should return all ids and heights in the order they were inserted", () => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
 		}
 
 		assert.equal(store.count(), 4);
@@ -52,37 +52,37 @@ describe("BlockStore", ({ it, assert }) => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
 		}
 
-		assert.true(store.has({ height: 1, id: "1" } as Interfaces.IBlockData));
-		assert.false(store.has({ height: 5, id: "5" } as Interfaces.IBlockData));
+		assert.true(store.has({ height: 1, id: "1" } as Contracts.Crypto.IBlockData));
+		assert.false(store.has({ height: 5, id: "5" } as Contracts.Crypto.IBlockData));
 	});
 
 	it("should delete blocks", () => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
 		}
 
-		store.delete({ height: 4, id: "4" } as Interfaces.IBlockData);
+		store.delete({ height: 4, id: "4" } as Contracts.Crypto.IBlockData);
 
 		assert.equal(store.count(), 3);
-		assert.false(store.has({ height: 4, id: "4" } as Interfaces.IBlockData));
+		assert.false(store.has({ height: 4, id: "4" } as Contracts.Crypto.IBlockData));
 	});
 
 	// TODO: check this is the desired behaviour
 	it("should be resizeable", () => {
 		const store = new BlockStore(1);
-		store.set({ data: { height: 1, id: "1" } } as Interfaces.IBlock);
-		store.set({ data: { height: 2, id: "2" } } as Interfaces.IBlock);
+		store.set({ data: { height: 1, id: "1" } } as Contracts.Crypto.IBlock);
+		store.set({ data: { height: 2, id: "2" } } as Contracts.Crypto.IBlock);
 
 		assert.equal(store.count(), 1);
 		assert.equal(store.getIds(), ["2"]); // seems that the underlying CappedMap overwrites from beginning
 
 		store.resize(2);
-		store.set({ data: { height: 3, id: "3" } } as Interfaces.IBlock);
+		store.set({ data: { height: 3, id: "3" } } as Contracts.Crypto.IBlock);
 
 		assert.equal(store.count(), 2);
 		assert.equal(store.getIds(), ["2", "3"]);
@@ -92,7 +92,7 @@ describe("BlockStore", ({ it, assert }) => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
 		}
 
 		assert.equal(store.count(), 4);

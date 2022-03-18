@@ -1,5 +1,5 @@
 // uvu
-export { describe, describeEach, describeWithContext } from "./uvu/describe";
+export { describe, describeEach, describeWithContext, describeSkip } from "./uvu/describe";
 export { loader } from "./uvu/loader";
 // Entity Factories for commonly used entities like blocks and wallets
 export * from "./app";

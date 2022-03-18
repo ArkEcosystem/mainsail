@@ -1,15 +1,14 @@
-import { Contracts } from "@arkecosystem/core-kernel";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BlockState } from "./block-state";
-import { StateStore } from "./stores/state";
+import { StateStore } from "./stores";
 import { Wallet, WalletRepository } from "./wallets";
-import { Interfaces, Utils } from "@arkecosystem/crypto";
 import { makeChainedBlocks } from "../test/make-chained-block";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { addTransactionsToBlock } from "../test/transactions";
 import { setUp } from "../test/setup";
-import { describe, Factories } from "@arkecosystem/core-test-framework";
+import { describeSkip, Factories, Sandbox } from "../../core-test-framework";
 import { SinonSpy } from "sinon";
-import { Spy } from "@arkecosystem/core-test-framework/source/uvu/spy";
+import Utils from "@arkecosystem/utils";
 
 const buildMultipaymentTransaction = (context) => {
 	const sendersDelegate = context.forgingWallet.clone();
@@ -60,20 +59,21 @@ const buildMultipaymentTransaction = (context) => {
 	return { amount, multiPaymentTransaction, sendingWallet, sendersDelegate };
 };
 
-describe<{
+describeSkip<{
+	sandbox: Sandbox;
 	walletRepo: WalletRepository;
 	blockState: BlockState;
 	stateStore: StateStore;
 	factory: Factories.FactoryBuilder;
 	applySpy: SinonSpy;
 	revertSpy: SinonSpy;
-	blocks: Interfaces.IBlock[];
-	spyIncreaseWalletDelegateVoteBalance: Spy;
-	spyInitGenesisForgerWallet: Spy;
-	spyApplyBlockToForger: Spy;
-	spyDecreaseWalletDelegateVoteBalance: Spy;
-	spyApplyVoteBalances: Spy;
-	spyRevertBlockFromForger: Spy;
+	blocks: Contracts.Crypto.IBlock[];
+	spyIncreaseWalletDelegateVoteBalance: any;
+	spyInitGenesisForgerWallet: any;
+	spyApplyBlockToForger: any;
+	spyDecreaseWalletDelegateVoteBalance: any;
+	spyApplyVoteBalances: any;
+	spyRevertBlockFromForger: any;
 	forgingWallet: Contracts.State.Wallet;
 	votingWallet: Contracts.State.Wallet;
 	sendingWallet: Contracts.State.Wallet;
@@ -163,7 +163,7 @@ describe<{
 		};
 	});
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
 
 		context.spyIncreaseWalletDelegateVoteBalance = spy(context.blockState, "increaseWalletDelegateVoteBalance");
@@ -173,7 +173,7 @@ describe<{
 		context.spyApplyVoteBalances = spy(context.blockState, "applyVoteBalances");
 		context.spyRevertBlockFromForger = spy(context.blockState, "revertBlockFromForger");
 
-		context.forgingWallet = context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
+		context.forgingWallet = await context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
 
 		context.forgingWallet.setAttribute("delegate", {
 			username: "test",
@@ -306,7 +306,7 @@ describe<{
 
 		context.spyIncreaseWalletDelegateVoteBalance.calledWith(context.forgingWallet, balanceIncrease);
 
-		const delegateAfter = context.forgingWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
+		const delegateAfter = context.forgingWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("delegate");
 		const productsBlocks = 1;
 
 		assert.equal(delegateAfter.producedBlocks, productsBlocks);
@@ -337,7 +337,7 @@ describe<{
 		context.spyIncreaseWalletDelegateVoteBalance.calledWith(context.forgingWallet, balanceIncrease);
 		context.spyDecreaseWalletDelegateVoteBalance.calledWith(context.forgingWallet, balanceIncrease);
 
-		const delegate = context.forgingWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
+		const delegate = context.forgingWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("delegate");
 
 		assert.equal(delegate.producedBlocks, 0);
 		assert.equal(delegate.forgedFees, Utils.BigNumber.ZERO);
@@ -509,7 +509,7 @@ describe<{
 		const sender = context.walletRepo.findByPublicKey(testTransaction.data.senderPublicKey);
 		sender.setBalance(sendersBalance);
 
-		const votedForDelegate: Contracts.State.Wallet = context.walletRepo.findByPublicKey(voteAddress);
+		const votedForDelegate: Contracts.State.Wallet = await context.walletRepo.findByPublicKey(voteAddress);
 		const delegateBalanceBefore = Utils.BigNumber.make(4918);
 		votedForDelegate.setAttribute("delegate.voteBalance", delegateBalanceBefore);
 
@@ -657,7 +657,7 @@ describe<{
 		const transactions = context.generateTransactions();
 
 		for (const transaction of transactions.transactions) {
-			await context.blockState.applyTransaction(transaction as Interfaces.ITransaction);
+			await context.blockState.applyTransaction(transaction as Contracts.Crypto.ITransaction);
 
 			context.applySpy.calledWith(transaction);
 		}
@@ -667,7 +667,7 @@ describe<{
 		const transactions = context.generateTransactions();
 
 		for (const transaction of transactions.transactions) {
-			await context.blockState.revertTransaction(transaction as Interfaces.ITransaction);
+			await context.blockState.revertTransaction(transaction as Contracts.Crypto.ITransaction);
 
 			context.revertSpy.calledWith(transaction);
 		}
@@ -682,7 +682,9 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.applyTransaction(transaction as Interfaces.ITransaction));
+			await assert.resolves(() =>
+				context.blockState.applyTransaction(transaction as Contracts.Crypto.ITransaction),
+			);
 		}
 	});
 
@@ -695,7 +697,9 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.revertTransaction(transaction as Interfaces.ITransaction));
+			await assert.resolves(() =>
+				context.blockState.revertTransaction(transaction as Contracts.Crypto.ITransaction),
+			);
 		}
 	});
 
@@ -714,6 +718,8 @@ describe<{
 		// @ts-ignore
 		delete voteTransaction.data.asset;
 
-		await assert.rejects(() => context.blockState.applyTransaction(voteTransaction as Interfaces.ITransaction));
+		await assert.rejects(() =>
+			context.blockState.applyTransaction(voteTransaction as Contracts.Crypto.ITransaction),
+		);
 	});
 });

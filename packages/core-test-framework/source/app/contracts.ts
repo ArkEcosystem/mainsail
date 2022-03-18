@@ -65,9 +65,7 @@ export interface CoreConfigPaths {
 
 export interface CryptoConfigPaths {
 	root: string;
-	genesisBlock: string;
-	milestones: string;
-	network: string;
+	crypto: string;
 }
 
 export type SandboxCallback = (context: { app: Application; container: interfaces.Container }) => void;

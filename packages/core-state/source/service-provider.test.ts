@@ -1,6 +1,8 @@
-import { Application, Container, Services } from "@arkecosystem/core-kernel";
+import { Application, Services } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider } from "./";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { AnySchema } from "joi";
 import importFresh from "import-fresh";
 
@@ -13,8 +15,8 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container.Container());
-		app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		const app = new Application(new Container());
+		app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
 		context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
 		context.app = app;
@@ -49,8 +51,8 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container.Container());
-		app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		const app = new Application(new Container());
+		app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
 		context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
 

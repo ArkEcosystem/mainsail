@@ -30,7 +30,7 @@ import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-loo
 import { Configuration } from "../../../core-crypto-config";
 import { Validator } from "../../../core-validation/source/validator";
 import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
-import { Serializer, Utils, Verifier } from "@arkecosystem/core-crypto-transaction/source";
+import { Serializer, Utils, Verifier } from "@arkecosystem/core-crypto-transaction";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;

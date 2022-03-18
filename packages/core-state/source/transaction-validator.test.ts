@@ -4,9 +4,9 @@ import { AssertionError } from "assert";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { setUp } from "../test/setup";
 import { SinonSpy } from "sinon";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describeSkip } from "../../core-test-framework";
 
-describe<{
+describeSkip<{
 	transactionValidator: TransactionValidator;
 	applySpy: SinonSpy;
 }>("Transaction Validator", ({ it, beforeAll, afterEach, assert }) => {

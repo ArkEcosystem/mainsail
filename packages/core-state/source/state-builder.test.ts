@@ -1,10 +1,11 @@
 import { Application, Enums, Utils } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { StateBuilder } from "./state-builder";
 import { WalletRepository } from "./wallets";
-import { describe } from "@arkecosystem/core-test-framework";
-import { Managers } from "@arkecosystem/crypto";
+import { describeSkip } from "../../core-test-framework";
 import { setUp, setUpDefaults } from "../test/setup";
 import { SinonSpy } from "sinon";
+import { Configuration } from "../../core-crypto-config";
 
 const getBlockRewardsDefault = setUpDefaults.getBlockRewards[0];
 const getSentTransactionDefault = setUpDefaults.getSentTransaction[0];
@@ -19,8 +20,9 @@ const saveDefaultTransactions = (): (() => void) => {
 	return () => (setUpDefaults.getSentTransaction = saveTransaction);
 };
 
-describe<{
+describeSkip<{
 	app: Application;
+	configuration: Configuration;
 	walletRepo: WalletRepository;
 	stateBuilder: StateBuilder;
 	getBlockRewardsSpy: SinonSpy;
@@ -37,6 +39,8 @@ describe<{
 		context.stateBuilder = env.stateBuilder;
 		context.app = env.sandbox.app;
 
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.configuration = context.app.get(Identifiers.Cryptography.Configuration);
 		context.getBlockRewardsSpy = env.spies.getBlockRewardsSpy;
 		context.getSentTransactionSpy = env.spies.getSentTransactionSpy;
 		context.getRegisteredHandlersSpy = env.spies.getRegisteredHandlersSpy;
@@ -47,13 +51,13 @@ describe<{
 		restoreDefaultSentTransactions = saveDefaultTransactions();
 	});
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app.config("crypto.exceptions.negativeBalances", {});
 
 		restoreDefaultSentTransactions();
 
 		// sender wallet balance should always be enough for default transactions (unless it is overridden)
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setBalance(Utils.BigNumber.make(100000));
 	});
 
@@ -87,7 +91,7 @@ describe<{
 	});
 
 	it("should apply block rewards to generator wallet", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(generatorKey);
+		const wallet = await context.walletRepo.findByPublicKey(generatorKey);
 		wallet.setBalance(Utils.BigNumber.ZERO);
 		context.walletRepo.index(wallet);
 		const expectedBalance = wallet.getBalance().plus(getBlockRewardsDefault.rewards);
@@ -98,7 +102,7 @@ describe<{
 	});
 
 	it("should apply the transaction data to the sender", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setBalance(Utils.BigNumber.make(80000));
 		context.walletRepo.index(wallet);
 
@@ -114,7 +118,7 @@ describe<{
 	});
 
 	it("should fail if any wallet balance is negative and not whitelisted", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setBalance(Utils.BigNumber.make(-80000));
 		wallet.setPublicKey(senderKey);
 
@@ -131,11 +135,11 @@ describe<{
 	});
 
 	it("should not fail for negative genesis wallet balances", async (context) => {
-		const genesisPublicKeys: string[] = Managers.configManager
+		const genesisPublicKeys: string[] = context.configuration
 			.get("genesisBlock.transactions")
 			.reduce((acc, curr) => [...acc, curr.senderPublicKey], []);
 
-		const wallet = context.walletRepo.findByPublicKey(genesisPublicKeys[0]);
+		const wallet = await context.walletRepo.findByPublicKey(genesisPublicKeys[0]);
 		wallet.setBalance(Utils.BigNumber.make(-80000));
 		wallet.setPublicKey(genesisPublicKeys[0]);
 
@@ -148,7 +152,7 @@ describe<{
 	});
 
 	it("should not fail if the publicKey is whitelisted", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setNonce(getSentTransactionDefault.nonce);
 		const allowedWalletNegativeBalance = Utils.BigNumber.make(5555);
 		wallet.setBalance(allowedWalletNegativeBalance);
@@ -172,7 +176,7 @@ describe<{
 	});
 
 	it("should fail if the whitelisted key doesn't have the allowed negative balance", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setNonce(getSentTransactionDefault.nonce);
 		wallet.setBalance(Utils.BigNumber.make(-90000));
 		wallet.setPublicKey(senderKey);
@@ -199,7 +203,7 @@ describe<{
 	});
 
 	it("should not fail if the whitelisted key has the allowed negative balance", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setNonce(getSentTransactionDefault.nonce);
 		wallet.setBalance(Utils.BigNumber.make(-90000));
 		wallet.setPublicKey(senderKey);
@@ -222,7 +226,7 @@ describe<{
 	});
 
 	it("should not fail if delegates vote balance isn't below 0", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setBalance(Utils.BigNumber.ZERO);
 		context.walletRepo.index(wallet);
 		wallet.setAttribute("delegate.voteBalance", Utils.BigNumber.make(100));
@@ -236,7 +240,7 @@ describe<{
 	});
 
 	it("should fail if the wallet has no public key", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setNonce(getSentTransactionDefault.nonce);
 		wallet.setBalance(Utils.BigNumber.make(-90000));
 		// @ts-ignore
@@ -270,7 +274,7 @@ describe<{
 	});
 
 	it("should exit app if any vote balance is negative", async (context) => {
-		const wallet = context.walletRepo.findByPublicKey(senderKey);
+		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setBalance(Utils.BigNumber.ZERO);
 		context.walletRepo.index(wallet);
 		wallet.setAttribute("delegate.voteBalance", Utils.BigNumber.make(-100));

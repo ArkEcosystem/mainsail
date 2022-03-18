@@ -1,4 +1,4 @@
-import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 export default {
 	id: "17605317082329008056",

@@ -2,16 +2,17 @@ import { CoreConfigPaths, CryptoConfigPaths, SandboxOptions } from "../contracts
 import { CoreGenerator } from "./core";
 import { CryptoGenerator } from "./crypto";
 
-export const generateCoreConfig = (opts?: SandboxOptions): CoreConfigPaths => new CoreGenerator(opts).generate();
+export const generateCoreConfig = (options?: SandboxOptions): CoreConfigPaths => new CoreGenerator(options).generate();
 
-export const generateCryptoConfig = (opts?: SandboxOptions): CryptoConfigPaths => new CryptoGenerator(opts).generate();
+export const generateCryptoConfig = (options?: SandboxOptions): CryptoConfigPaths =>
+	new CryptoGenerator(options).generate();
 
-export const generateCryptoConfigRaw = (opts?: SandboxOptions) => {
-	const config: CryptoConfigPaths = generateCryptoConfig(opts);
+export const generateCryptoConfigRaw = (options?: SandboxOptions) => {
+	const { crypto } = generateCryptoConfig(options);
 
 	return {
-		genesisBlock: require(config.genesisBlock),
-		milestones: require(config.milestones),
-		network: require(config.network),
+		genesisBlock: require(crypto).genesisBlock,
+		milestones: require(crypto).milestones,
+		network: require(crypto).network,
 	};
 };

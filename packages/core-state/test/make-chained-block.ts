@@ -1,7 +1,7 @@
-import { Interfaces } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
 
-export const makeChainedBlocks = (length: number, blockFactory): Crypto.IBlock[] => {
-	const entitites: Crypto.IBlock[] = [];
+export const makeChainedBlocks = (length: number, blockFactory): Contracts.Crypto.IBlock[] => {
+	const entitites: Contracts.Crypto.IBlock[] = [];
 	let previousBlock; // first case uses genesis IBlockData
 	const getPreviousBlock = () => previousBlock;
 
@@ -9,7 +9,7 @@ export const makeChainedBlocks = (length: number, blockFactory): Crypto.IBlock[]
 		if (previousBlock) {
 			blockFactory.withOptions({ getPreviousBlock });
 		}
-		const entity: Crypto.IBlock = blockFactory.make();
+		const entity: Contracts.Crypto.IBlock = blockFactory.make();
 		entitites.push(entity);
 		previousBlock = entity.data;
 	}

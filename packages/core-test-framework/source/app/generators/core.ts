@@ -10,7 +10,7 @@ export class CoreGenerator extends Generator {
 	private destination!: string;
 
 	public generate(): CoreConfigPaths {
-		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.network}`);
+		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.flags.network}`);
 
 		if (existsSync(this.destination)) {
 			throw new Error(`${this.destination} already exists.`);
@@ -29,11 +29,11 @@ export class CoreGenerator extends Generator {
 		this.writeApplication();
 
 		return {
-			root: this.destination,
-			env: resolve(this.destination, ".env"),
 			app: resolve(this.destination, "app.json"),
-			validators: resolve(this.destination, "validators.json"),
+			env: resolve(this.destination, ".env"),
 			peers: resolve(this.destination, "peers.json"),
+			root: this.destination,
+			validators: resolve(this.destination, "validators.json"),
 		};
 	}
 
@@ -63,7 +63,7 @@ export class CoreGenerator extends Generator {
 		if (this.options.core.environment) {
 			writeFileSync(filePath, this.generateEnvironment(this.options.core.environment));
 		} else {
-			copyFileSync(require.resolve("@arkecosystem/core/bin/config/testnet/.env"), filePath);
+			copyFileSync(resolve(__dirname, "../../../../core/bin/config/testnet/.env"), filePath);
 		}
 	}
 
@@ -73,7 +73,7 @@ export class CoreGenerator extends Generator {
 		if (this.options.core.app) {
 			writeJSONSync(filePath, this.options.core.app, { spaces: 4 });
 		} else {
-			copyFileSync(require.resolve("@arkecosystem/core/bin/config/testnet/app.json"), filePath);
+			copyFileSync(resolve(__dirname, "../../../../core/bin/config/testnet/app.json"), filePath);
 		}
 	}
 

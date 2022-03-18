@@ -1,15 +1,13 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Factories } from "@arkecosystem/core-test-framework";
-import { describe } from "@arkecosystem/core-test-framework";
-import { Interfaces } from "@arkecosystem/crypto";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { describeSkip, Factories } from "../../../core-test-framework";
 import { SinonSpy } from "sinon";
 
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { setUp } from "../../test/setup";
 import { StateStore } from "./";
 
-describe<{
-	blocks: Interfaces.IBlock[];
+describeSkip<{
+	blocks: Contracts.Crypto.IBlock[];
 	stateStorage: StateStore;
 	factory: Factories.FactoryBuilder;
 	logger: SinonSpy;
@@ -21,7 +19,7 @@ describe<{
 		context.factory = env.factory;
 		context.logger = env.spies.logger.info;
 		context.dispatchSpy = env.spies.dispatchSpy;
-		context.stateStorage = env.sandbox.app.get(Container.Identifiers.StateStore);
+		context.stateStorage = env.sandbox.app.get(Identifiers.StateStore);
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
 	});
 
@@ -209,7 +207,7 @@ describe<{
 			context.stateStorage.setLastBlock(context.blocks[i]);
 		}
 
-		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Interfaces.IBlockData[];
+		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Contracts.Crypto.IBlockData[];
 		assert.length(lastBlocksData, 5);
 
 		for (let i = 0; i < 5; i++) {
@@ -225,7 +223,7 @@ describe<{
 			context.stateStorage.setLastBlock(context.blocks[i]);
 		}
 
-		const lastBlocksData = context.stateStorage.getLastBlocksData(true).toArray() as Interfaces.IBlockData[];
+		const lastBlocksData = context.stateStorage.getLastBlocksData(true).toArray() as Contracts.Crypto.IBlockData[];
 
 		assert.length(lastBlocksData, 5);
 	});
@@ -241,7 +239,7 @@ describe<{
 			context.stateStorage.setLastBlock(context.blocks[i]);
 		}
 
-		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Interfaces.IBlockData[];
+		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Contracts.Crypto.IBlockData[];
 
 		assert.length(lastBlocksData, 5);
 	});
@@ -343,7 +341,7 @@ describe<{
 	});
 
 	it("cacheTransactions - should add transaction id", (context) => {
-		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Interfaces.ITransactionData]), {
+		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Contracts.Crypto.ITransactionData]), {
 			added: [{ id: "1" }],
 			notAdded: [],
 		});
@@ -351,11 +349,11 @@ describe<{
 	});
 
 	it("cacheTransactions - should not add duplicate transaction ids", (context) => {
-		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Interfaces.ITransactionData]), {
+		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Contracts.Crypto.ITransactionData]), {
 			added: [{ id: "1" }],
 			notAdded: [],
 		});
-		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Interfaces.ITransactionData]), {
+		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Contracts.Crypto.ITransactionData]), {
 			added: [],
 			notAdded: [{ id: "1" }],
 		});

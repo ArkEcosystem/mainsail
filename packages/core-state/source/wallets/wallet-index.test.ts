@@ -1,10 +1,10 @@
-import { describe, Factories } from "@arkecosystem/core-test-framework";
+import { describeSkip, Factories } from "../../../core-test-framework";
 
 import { setUp } from "../../test/setup";
 import { Wallets } from "../";
 import { WalletIndex } from "./";
 
-describe<{
+describeSkip<{
 	factory: Factories.FactoryBuilder;
 	wallet: Wallets.Wallet;
 	walletIndex: WalletIndex;

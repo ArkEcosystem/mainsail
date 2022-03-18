@@ -40,9 +40,7 @@ export class CryptoGenerator extends Generator {
 		// this.writeNetwork(genesisBlock.payloadHash);
 
 		return {
-			genesisBlock: resolve(this.destination, "genesisBlock.json"),
-			milestones: resolve(this.destination, "milestones.json"),
-			network: resolve(this.destination, "network.json"),
+			crypto: resolve(this.destination, "crypto.json"),
 			root: this.destination,
 		};
 	}
