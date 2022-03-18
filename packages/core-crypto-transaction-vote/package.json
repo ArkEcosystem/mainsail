@@ -28,6 +28,11 @@
 		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@arkecosystem/utils": "workspace:*"
 	},
+	"devDependencies": {
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/core-validation": "workspace:*",
+		"uvu": "0.5.3"
+	},
 	"engines": {
 		"node": ">=16.x"
 	}

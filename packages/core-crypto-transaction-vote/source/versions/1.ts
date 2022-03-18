@@ -40,7 +40,7 @@ export class VoteTransaction extends Transaction {
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
-		const buff: ByteBuffer = ByteBuffer.fromSize(100);
+		const buff: ByteBuffer = ByteBuffer.fromSize(100); // TODO: Fix size
 
 		if (data.asset && data.asset.votes) {
 			const voteBytes = data.asset.votes
