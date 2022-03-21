@@ -946,6 +946,7 @@ importers:
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
+      uvu: 0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -954,6 +955,8 @@ importers:
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
+    devDependencies:
+      uvu: 0.5.3
 
   packages/core-crypto-transaction-validator-registration:
     specifiers:

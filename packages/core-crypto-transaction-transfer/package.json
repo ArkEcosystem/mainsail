@@ -27,6 +27,9 @@
 		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@arkecosystem/utils": "workspace:*"
 	},
+	"devDependencies": {
+		"uvu": "0.5.3"
+	},
 	"engines": {
 		"node": ">=16.x"
 	}
