@@ -1,57 +1,38 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import fs from "fs-extra";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Storage } from "./";
-import { Stub } from "@arkecosystem/core-test-framework/distribution/uvu/stub";
-
-const buildTransaction = (nonce: string): Interfaces.ITransaction => {
-	return Transactions.BuilderFactory.transfer()
-		.version(2)
-		.amount("100")
-		.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
-		.nonce(nonce)
-		.fee("900")
-		.sign("sender's secret")
-		.build();
-};
+import { Stub } from "../../core-test-framework/source/uvu/stub";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Application } from "@arkecosystem/core-kernel";
 
 describe<{
-	aip: Boolean;
 	configuration: any;
-	container: Container.Container;
-	transaction1: Interfaces.ITransaction;
-	transaction2: Interfaces.ITransaction;
+	app: Application;
 	ensureFileSync: Stub;
+	config: Configuration;
 }>("Storage", ({ it, beforeAll, afterAll, assert, stub }) => {
-	beforeAll((context) => {
+	beforeAll(async (context) => {
 		context.configuration = { getRequired: () => undefined };
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(context.configuration);
-
-		context.aip = Managers.configManager.getMilestone().aip11;
-		Managers.configManager.getMilestone().aip11 = true;
-
-		context.transaction1 = buildTransaction("1");
-		context.transaction2 = buildTransaction("2");
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 
 		context.ensureFileSync = stub(fs, "ensureFileSync").callsFake(() => {});
 	});
 
 	afterAll((context) => {
-		Managers.configManager.getMilestone().aip11 = context.aip;
-
 		context.ensureFileSync.restore();
 	});
 
 	it("boot - should instantiate BetterSqlite3 using configured filename", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
-			const database = storage["database"];
+			const database = storage.getDatabase();
 			context.ensureFileSync.calledWith(":memory:");
 			assert.equal(database.name, ":memory:");
 			assert.true(database.open);
@@ -62,9 +43,9 @@ describe<{
 
 	it("dispose - should close database", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
-		const database = storage["database"];
+		const database = storage.getDatabase();
 
 		storage.dispose();
 
@@ -73,18 +54,18 @@ describe<{
 
 	it("hasTransaction - should find transaction that was added", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			storage.addTransaction({
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			});
 
-			const has = storage.hasTransaction(context.transaction1.id);
+			const has = storage.hasTransaction("first-tx-id");
 			assert.true(has);
 		} finally {
 			storage.dispose();
@@ -93,18 +74,18 @@ describe<{
 
 	it("hasTransaction - should not find transaction that wasn't added", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			storage.addTransaction({
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			});
 
-			const has = storage.hasTransaction(context.transaction2.id);
+			const has = storage.hasTransaction("second-tx-id");
 			assert.false(has);
 		} finally {
 			storage.dispose();
@@ -113,22 +94,22 @@ describe<{
 
 	it("getAllTransactions - should return all added transactions", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			const storedTransaction1 = {
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			};
 
 			const storedTransaction2 = {
 				height: 100,
-				id: context.transaction2.id,
-				senderPublicKey: context.transaction2.data.senderPublicKey,
-				serialized: context.transaction2.serialized,
+				id: "second-tx-id",
+				senderPublicKey: "second-public-key",
+				serialized: Buffer.from("second-serialized"),
 			};
 
 			storage.addTransaction(storedTransaction1);
@@ -143,22 +124,22 @@ describe<{
 
 	it("getOldTransactions - should return only old transactions", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			const storedTransaction1 = {
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			};
 
 			const storedTransaction2 = {
 				height: 200,
-				id: context.transaction2.id,
-				senderPublicKey: context.transaction2.data.senderPublicKey,
-				serialized: context.transaction2.serialized,
+				id: "second-tx-id",
+				senderPublicKey: "second-public-key",
+				serialized: Buffer.from("second-serialized"),
 			};
 
 			storage.addTransaction(storedTransaction1);
@@ -173,22 +154,22 @@ describe<{
 
 	it("getOldTransactions - should return all old transactions", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			const storedTransaction1 = {
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			};
 
 			const storedTransaction2 = {
 				height: 200,
-				id: context.transaction2.id,
-				senderPublicKey: context.transaction2.data.senderPublicKey,
-				serialized: context.transaction2.serialized,
+				id: "second-tx-id",
+				senderPublicKey: "second-public-key",
+				serialized: Buffer.from("second-serialized"),
 			};
 
 			storage.addTransaction(storedTransaction1);
@@ -203,18 +184,18 @@ describe<{
 
 	it("addTransaction - should add new transaction", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			storage.addTransaction({
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			});
 
-			const has = storage.hasTransaction(context.transaction1.id);
+			const has = storage.hasTransaction("first-tx-id");
 			assert.true(has);
 		} finally {
 			storage.dispose();
@@ -223,23 +204,23 @@ describe<{
 
 	it("addTransaction - should throw when adding same transaction twice", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			storage.addTransaction({
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			});
 
 			assert.throws(() => {
 				storage.addTransaction({
 					height: 100,
-					id: context.transaction1.id,
-					senderPublicKey: context.transaction1.data.senderPublicKey,
-					serialized: context.transaction1.serialized,
+					id: "first-tx-id",
+					senderPublicKey: "some-public-key",
+					serialized: Buffer.from("test"),
 				});
 			});
 		} finally {
@@ -249,20 +230,20 @@ describe<{
 
 	it("removeTransaction - should remove previously added transaction", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			storage.addTransaction({
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "some-public-key",
+				serialized: Buffer.from("test"),
 			});
 
-			storage.removeTransaction(context.transaction1.id);
+			storage.removeTransaction("first-tx-id");
 
-			const has = storage.hasTransaction(context.transaction1.id);
+			const has = storage.hasTransaction("first-tx-id");
 			assert.false(has);
 		} finally {
 			storage.dispose();
@@ -271,22 +252,22 @@ describe<{
 
 	it("flush - should remove all previously added transactions", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
-		const storage = context.container.resolve(Storage);
+		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			storage.addTransaction({
 				height: 100,
-				id: context.transaction1.id,
-				senderPublicKey: context.transaction1.data.senderPublicKey,
-				serialized: context.transaction1.serialized,
+				id: "first-tx-id",
+				senderPublicKey: "dummy-sender-key-1",
+				serialized: Buffer.from("dummy-serialized-1"),
 			});
 
 			storage.addTransaction({
 				height: 100,
-				id: context.transaction2.id,
-				senderPublicKey: context.transaction2.data.senderPublicKey,
-				serialized: context.transaction2.serialized,
+				id: "second-tx-id",
+				senderPublicKey: "dummy-sender-key-2",
+				serialized: Buffer.from("dummy-serialized-2"),
 			});
 
 			storage.flush();

@@ -1,74 +1,103 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Enums, Identities, Managers, Transactions } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
-import { Query, QueryIterable } from "./";
+import { Container } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+
+import { describe } from "../../core-test-framework";
+import { BigNumber } from "../../utils";
+import { Query, QueryIterable } from ".";
 
 describe<{
-	aip: Boolean;
-	container: Container.Container;
+	container: Container;
 	mempool: any;
 	sender1Transaction100: any;
 	sender1Transaction200: any;
 	sender2Transaction100: any;
 	sender2Transaction200: any;
-}>("Query", ({ it, assert, beforeAll, afterAll, stub }) => {
+}>("Query", ({ it, assert, beforeAll, beforeEach, stub }) => {
 	beforeAll((context) => {
 		context.mempool = {
-			getSenderMempools: () => undefined,
-			hasSenderMempool: () => undefined,
-			getSenderMempool: () => undefined,
+			getSenderMempool: () => {},
+			getSenderMempools: () => {},
+			hasSenderMempool: () => {},
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.TransactionPoolMempool).toConstantValue(context.mempool);
-
-		context.aip = Managers.configManager.getMilestone().aip11;
-		Managers.configManager.getMilestone().aip11 = true;
-
-		context.sender1Transaction100 = Transactions.BuilderFactory.transfer()
-			.version(2)
-			.amount("100")
-			.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
-			.nonce("1")
-			.fee("100")
-			.sign("sender1 secret")
-			.build();
-		context.sender1Transaction200 = Transactions.BuilderFactory.delegateRegistration()
-			.usernameAsset("sender1")
-			.version(2)
-			.nonce("1")
-			.fee("200")
-			.sign("sender1 secret")
-			.build();
-		context.sender2Transaction100 = Transactions.BuilderFactory.transfer()
-			.version(2)
-			.amount("100")
-			.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
-			.nonce("1")
-			.fee("100")
-			.sign("sender2 secret")
-			.build();
-		context.sender2Transaction200 = Transactions.BuilderFactory.delegateRegistration()
-			.usernameAsset("sender2")
-			.version(2)
-			.nonce("1")
-			.fee("200")
-			.sign("sender2 secret")
-			.build();
+		context.container = new Container();
+		context.container.bind(Identifiers.TransactionPoolMempool).toConstantValue(context.mempool);
 	});
 
-	afterAll((context) => {
-		Managers.configManager.getMilestone().aip11 = context.aip;
+	beforeEach((context) => {
+		context.sender1Transaction100 = {
+			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(100),
+				nonce: BigNumber.make(1),
+				senderPublicKey: "sender-public-key",
+				type: 1,
+				version: 2,
+			},
+			id: "dummy-tx-id",
+			key: "some-key",
+			serialized: Buffer.from("dummy"),
+			type: Contracts.Crypto.TransactionType.Transfer,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+		};
+
+		context.sender1Transaction200 = {
+			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(200),
+				nonce: BigNumber.make(2),
+				senderPublicKey: "sender-public-key",
+				type: 1,
+				version: 2,
+			},
+			id: "dummy-tx-id-2",
+			key: "some-key-2",
+			serialized: Buffer.from("dummy-2"),
+			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+		};
+
+		context.sender2Transaction100 = {
+			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(300),
+				nonce: BigNumber.make(3),
+				senderPublicKey: "sender-public-key",
+				type: 1,
+				version: 2,
+			},
+			id: "dummy-tx-id-3",
+			key: "some-key-3",
+			serialized: Buffer.from("dummy-3"),
+			type: Contracts.Crypto.TransactionType.Transfer,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+		};
+
+		context.sender2Transaction200 = {
+			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(400),
+				nonce: BigNumber.make(4),
+				senderPublicKey: "sender-public-key",
+				type: 1,
+				version: 2,
+			},
+			id: "dummy-tx-id-4",
+			key: "some-key-3",
+			serialized: Buffer.from("dummy-4"),
+			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+		};
 	});
 
-	it("getAll - should return transactions from all sender states", (context) => {
+	it("getAll - should return transactions from all sender states", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
 			{ getFromLatest: () => [context.sender1Transaction100, context.sender1Transaction200] },
 			{ getFromLatest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getAll());
+		const result = await query.getAll().all();
 
 		assert.equal(result, [
 			context.sender1Transaction100,
@@ -78,124 +107,147 @@ describe<{
 		]);
 	});
 
-	it("getAllBySender - should return transaction from specific sender state", (context) => {
+	it("getAllBySender - should return transaction from specific sender state", async (context) => {
 		const hasSenderStub = stub(context.mempool, "hasSenderMempool").returnValueOnce(true);
 		const getSenderStub = stub(context.mempool, "getSenderMempool").returnValueOnce({
 			getFromEarliest: () => [context.sender1Transaction100, context.sender1Transaction200],
 		});
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getAllBySender("sender public key"));
+		const result = await query.getAllBySender("sender public key").all();
 
 		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
 		hasSenderStub.calledWith("sender public key");
 		getSenderStub.calledWith("sender public key");
 	});
 
-	it("getFromLowestPriority - should return transactions reverse ordered by fee", (context) => {
+	it("getFromLowestPriority - should return transactions reverse ordered by fee", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
 			{ getFromLatest: () => [context.sender1Transaction200, context.sender1Transaction100] },
 			{ getFromLatest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getFromLowestPriority());
+		const result = await query.getFromLowestPriority().all();
 
 		assert.equal(result, [
-			context.sender2Transaction100,
-			context.sender1Transaction200,
 			context.sender1Transaction100,
+			context.sender1Transaction200,
+			context.sender2Transaction100,
 			context.sender2Transaction200,
 		]);
 	});
 
-	it("getFromHighestPriority - should return transactions order by fee", (context) => {
+	it("getFromHighestPriority - should return transactions order by fee", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
 			{ getFromEarliest: () => [context.sender1Transaction200, context.sender1Transaction100] },
 			{ getFromEarliest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getFromHighestPriority());
+		const result = await query.getFromHighestPriority().all();
 
 		assert.equal(result, [
+			context.sender2Transaction200,
+			context.sender2Transaction100,
 			context.sender1Transaction200,
 			context.sender1Transaction100,
-			context.sender2Transaction100,
-			context.sender2Transaction200,
 		]);
 	});
 
-	it("whereId - should filter transactions by id", (context) => {
+	it("whereId - should filter transactions by id", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = Array.from(queryIterable.whereId(context.sender1Transaction200.id));
+		const result = await queryIterable.whereId(context.sender1Transaction200.id).all();
 
-		assert.equal(result, [context.sender1Transaction200]);
+		assert.length(result, 1);
+		assert.equal(result[0].id, context.sender1Transaction200.id);
 	});
 
-	it("whereType - should filter transactions by type", (context) => {
+	it("whereType - should filter transactions by type", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = Array.from(queryIterable.whereType(Enums.TransactionType.DelegateRegistration));
+		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).all();
 
-		assert.equal(result, [context.sender1Transaction200]);
+		assert.length(result, 1);
+		assert.equal(result[0].id, context.sender1Transaction200.id);
 	});
 
-	it("whereTypeGroup - should filter transactions by typeGroup", (context) => {
+	it("whereTypeGroup - should filter transactions by typeGroup", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = Array.from(queryIterable.whereTypeGroup(Enums.TransactionTypeGroup.Core));
+		const result = await queryIterable.whereTypeGroup(Contracts.Crypto.TransactionTypeGroup.Core).all();
 
 		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
 	});
 
-	it("whereVersion - should filter transactions by version", (context) => {
+	it("whereVersion - should filter transactions by version", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = Array.from(queryIterable.whereVersion(2));
+		const result = await queryIterable.whereVersion(2).all();
 
 		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
 	});
 
-	it("whereKind - should filter transactions by type and typeGroup", (context) => {
+	it("whereKind - should filter transactions by type and typeGroup", async (context) => {
 		const queryIterable = new QueryIterable([
 			context.sender1Transaction100,
 			context.sender1Transaction200,
 			context.sender2Transaction100,
 			context.sender2Transaction200,
 		]);
-		const result = Array.from(queryIterable.whereKind(context.sender1Transaction200));
+		const result = await queryIterable.whereKind(context.sender1Transaction200).all();
 
-		assert.equal(result, [context.sender1Transaction200, context.sender2Transaction200]);
+		assert.equal(
+			result.map((t) => t.id),
+			[context.sender1Transaction200.id, context.sender2Transaction200.id],
+		);
 	});
 
-	it("has - should return true when there are matching transactions", (context) => {
+	it("can chain multiple predicates", async (context) => {
+		const queryIterable = new QueryIterable([
+			context.sender1Transaction100,
+			context.sender1Transaction200,
+			context.sender2Transaction100,
+			context.sender2Transaction200,
+		]);
+		const result = await queryIterable
+			.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration)
+			.whereTypeGroup(Contracts.Crypto.TransactionTypeGroup.Core)
+			.all();
+
+		assert.equal(
+			result.map((t) => t.id),
+			[context.sender1Transaction200.id, context.sender2Transaction200.id],
+		);
+	});
+
+	it("has - should return true when there are matching transactions", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = queryIterable.whereType(Enums.TransactionType.DelegateRegistration).has();
+		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).has();
 
 		assert.true(result);
 	});
 
-	it("has - should return false when there are no matching transactions", (context) => {
+	it("has - should return false when there are no matching transactions", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = queryIterable.whereType(Enums.TransactionType.Vote).has();
+		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).has();
 
 		assert.false(result);
 	});
 
-	it("first - should return first matching transaction", (context) => {
+	it("first - should return first matching transaction", async (context) => {
 		const queryIterable = new QueryIterable([
 			context.sender1Transaction100,
 			context.sender1Transaction200,
 			context.sender2Transaction100,
 			context.sender2Transaction200,
 		]);
-		const result = queryIterable.whereType(Enums.TransactionType.DelegateRegistration).first();
+		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).first();
 
-		assert.equal(result, context.sender1Transaction200);
+		assert.equal(result.id, context.sender1Transaction200.id);
 	});
 
 	it("first - should throw where there are no matching transactions", (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const check = () => queryIterable.whereType(Enums.TransactionType.Vote).first();
+		const check = () => queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).first();
 
-		assert.throws(check);
+		assert.rejects(check);
 	});
 });

@@ -1,31 +1,16 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
-import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { BigNumber } from "./../../utils/source/big-number";
+import { describe } from "../../core-test-framework";
 import { SenderMempool } from "./";
-
-const buildTransaction = (nonce: string): Interfaces.ITransaction => {
-	return Transactions.BuilderFactory.transfer()
-		.version(2)
-		.amount("100")
-		.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
-		.nonce(nonce)
-		.fee("900")
-		.sign("sender's secret")
-		.build();
-};
+import { Container } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
 describe<{
-	aip: Boolean;
-	container: Container.Container;
+	container: Container;
 	configuration: any;
 	senderState: any;
-	transactions: Interfaces.ITransaction[];
-}>("SenderMempool.", ({ it, assert, beforeAll, afterAll, stub, spy }) => {
-	beforeAll((context) => {
-		context.aip = Managers.configManager.getMilestone().aip11;
-
-		Managers.configManager.getMilestone().aip11 = true;
-
+	transactions: Contracts.Crypto.ITransaction[];
+}>("SenderMempool.", ({ it, assert, beforeAll, stub, spy }) => {
+	beforeAll(async (context) => {
 		context.configuration = {
 			getRequired: () => undefined,
 			getOptional: () => undefined,
@@ -36,15 +21,57 @@ describe<{
 			revert: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(context.configuration);
-		context.container.bind(Container.Identifiers.TransactionPoolSenderState).toConstantValue(context.senderState);
+		context.container = new Container();
+		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
+		context.container.bind(Identifiers.TransactionPoolSenderState).toConstantValue(context.senderState);
 
-		context.transactions = [buildTransaction("1"), buildTransaction("2"), buildTransaction("3")];
-	});
+		const tx1 = {
+			id: "dummy-tx-id",
+			typeGroup: 1,
+			type: 1,
+			key: "some-key",
+			data: {
+				type: 1,
+				nonce: BigNumber.make(1),
+				fee: BigNumber.make(900),
+				amount: BigNumber.make(100),
+				senderPublicKey: "dummy-sender-key",
+			},
+			serialized: Buffer.from("dummy"),
+		};
 
-	afterAll((context) => {
-		Managers.configManager.getMilestone().aip11 = context.aip;
+		const tx2 = {
+			id: "dummy-tx-id-2",
+			typeGroup: 1,
+			type: 1,
+			key: "some-key-2",
+			data: {
+				type: 1,
+				nonce: BigNumber.make(2),
+				fee: BigNumber.make(900),
+				amount: BigNumber.make(100),
+				senderPublicKey: "dummy-sender-key",
+			},
+			serialized: Buffer.from("dummy-2"),
+		};
+
+		const tx3 = {
+			id: "dummy-tx-id-3",
+			typeGroup: 1,
+			type: 1,
+			key: "some-key-3",
+			data: {
+				type: 1,
+				nonce: BigNumber.make(3),
+				fee: BigNumber.make(900),
+				amount: BigNumber.make(100),
+				senderPublicKey: "dummy-sender-key",
+			},
+			serialized: Buffer.from("dummy-3"),
+		};
+
+		// @ts-ignore
+		context.transactions = [tx1, tx2, tx3];
 	});
 
 	it("isDisposable - should return true initially", (context) => {
@@ -120,16 +147,14 @@ describe<{
 		await assert.rejects(() => promise);
 
 		promise.catch((err) => {
-			assert.instance(err, Contracts.TransactionPool.PoolError);
+			assert.instance(err, Exceptions.SenderExceededMaximumTransactionCountError);
 			assert.equal(err.type, "ERR_EXCEEDS_MAX_COUNT");
 		});
 	});
 
 	it("addTransaction - should apply transaction to sender state when sender exceeded maximum transaction count but is included in allowedSenders", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(0); // maxTransactionsPerSender
-		stub(context.configuration, "getOptional").returnValueOnce([
-			Identities.PublicKey.fromPassphrase("sender's secret"),
-		]); // allowedSenders
+		stub(context.configuration, "getOptional").returnValueOnce(["dummy-sender-key"]); // allowedSenders
 		const applySpy = spy(context.senderState, "apply");
 
 		const senderMempool = context.container.resolve(SenderMempool);

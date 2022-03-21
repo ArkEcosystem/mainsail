@@ -23,11 +23,11 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 		return this;
 	}
 
-	public has(): boolean {
+	public async has(): Promise<boolean> {
 		return this.transactions.length > 0;
 	}
 
-	public first(): Contracts.Crypto.ITransaction {
+	public async first(): Promise<Contracts.Crypto.ITransaction> {
 		return this.transactions[0];
 	}
 }

@@ -1,10 +1,12 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Managers } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+import { describe } from "../../core-test-framework";
 import { Collator } from "./";
 
 describe<{
-	container: Container.Container;
+	container: Container;
+	config: Configuration;
 	validator: any;
 	createTransactionValidator: any;
 	blockchain: any;
@@ -12,35 +14,32 @@ describe<{
 	expirationService: any;
 	poolQuery: any;
 	logger: any;
-}>("Collator", ({ it, assert, beforeAll, beforeEach, afterEach, stubFn, stub, spy }) => {
+}>("Collator", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.validator = { validate: () => undefined };
-		context.createTransactionValidator = stubFn();
+		context.createTransactionValidator = () => context.validator;
 		context.blockchain = { getLastBlock: () => undefined };
 		context.pool = { removeTransaction: () => undefined };
 		context.expirationService = { isExpired: () => undefined };
-		context.poolQuery = { getFromHighestPriority: () => undefined };
+		context.poolQuery = {
+			getFromHighestPriority: () => {
+				all: () => undefined;
+			},
+		};
 		context.logger = { warning: () => undefined, error: () => undefined };
 
-		context.container = new Container.Container();
+		context.container = new Container();
 		context.container
-			.bind(Container.Identifiers.TransactionValidatorFactory)
+			.bind(Identifiers.TransactionValidatorFactory)
 			.toConstantValue(context.createTransactionValidator);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.pool);
-		context.container.bind(Container.Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
-		context.container
-			.bind(Container.Identifiers.TransactionPoolExpirationService)
-			.toConstantValue(context.expirationService);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-	});
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
+		context.container.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
+		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-	beforeEach((context) => {
-		context.createTransactionValidator.returns(context.validator);
-	});
-
-	afterEach((context) => {
-		context.createTransactionValidator.reset();
+		context.config = context.container.get(Identifiers.Cryptography.Configuration);
 	});
 
 	it("getBlockCandidateTransactions - should respect block.maxTransactions milestone limit", async (context) => {
@@ -56,9 +55,9 @@ describe<{
 		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
 		const lastBlock = { data: { height: 10 } };
 
-		const milestoneStub = stub(Managers.configManager, "getMilestone").returnValueOnce(milestone);
+		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValue({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
 		const validatorSpy = spy(context.validator, "validate");
@@ -68,7 +67,6 @@ describe<{
 
 		assert.length(candidateTransaction, 5);
 		milestoneStub.called();
-		assert.true(context.createTransactionValidator.called);
 		validatorSpy.calledTimes(5);
 	});
 
@@ -82,12 +80,12 @@ describe<{
 			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 141 + 10 + 4 + 10 + 4 } };
+		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 141 + 10 + 4 + 10 + 7 } };
 		const lastBlock = { data: { height: 10 } };
 
-		const milestoneStub = stub(Managers.configManager, "getMilestone").returnValueOnce(milestone);
+		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
 		const validatorSpy = spy(context.validator, "validate");
@@ -97,7 +95,6 @@ describe<{
 
 		assert.length(candidateTransaction, 2);
 		milestoneStub.called();
-		assert.true(context.createTransactionValidator.called);
 		validatorSpy.calledTimes(2);
 	});
 
@@ -114,9 +111,9 @@ describe<{
 		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
 		const lastBlock = { data: { height: 10 } };
 
-		const milestoneStub = stub(Managers.configManager, "getMilestone").returnValueOnce(milestone);
+		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 
 		const expiredStub = stub(context.expirationService, "isExpired");
 
@@ -131,7 +128,6 @@ describe<{
 
 		assert.length(candidateTransaction, 4);
 		milestoneStub.called();
-		assert.true(context.createTransactionValidator.called);
 		validatorSpy.calledTimes(4);
 		loggerSpy.calledOnce();
 	});
@@ -149,9 +145,9 @@ describe<{
 		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
 		const lastBlock = { data: { height: 10 } };
 
-		const milestoneStub = stub(Managers.configManager, "getMilestone").returnValueOnce(milestone);
+		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
 		const validatorStub = stub(context.validator, "validate").rejectedValueNth(0, new Error("Some error"));
@@ -162,7 +158,6 @@ describe<{
 
 		assert.length(candidateTransaction, 4);
 		milestoneStub.called();
-		assert.true(context.createTransactionValidator.called);
 		validatorStub.calledTimes(5);
 		loggerSpy.calledOnce();
 	});

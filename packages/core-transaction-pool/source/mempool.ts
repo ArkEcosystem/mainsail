@@ -10,7 +10,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	@inject(Identifiers.TransactionPoolSenderMempoolFactory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
-	@inject(Identifiers.Cryptography.Configuration)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
@@ -40,7 +40,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 		let senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
 		if (!senderMempool) {
-			senderMempool = this.createSenderMempool();
+			senderMempool = this.createSenderMempool.call(this);
 			this.#senderMempools.set(transaction.data.senderPublicKey, senderMempool);
 			this.logger.debug(
 				`${await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey)} state created`,

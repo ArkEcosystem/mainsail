@@ -1,8 +1,9 @@
-import { Application, Container, Contracts, Services } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-container";
+import { Application, Services } from "@arkecosystem/core-kernel";
 import { ServiceProvider } from "./";
-import child_process from "child_process";
 import { AnySchema } from "joi";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import importFresh from "import-fresh";
 
 const importDefaults = () =>
@@ -24,8 +25,8 @@ describe<{
 	maxTxPoolEnv: any;
 }>("ServiceProvider", ({ it, assert, beforeEach, afterEach, stub }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
-		context.app.bind(Container.Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
 		context.txPoolEnv = process.env.CORE_TRANSACTION_POOL;
 		context.maxTxPoolEnv = process.env.CORE_MAX_TRANSACTIONS_IN_POOL;
@@ -41,12 +42,12 @@ describe<{
 	it("should register, boot and dispose", async (context) => {
 		await assert.resolves(() => context.serviceProvider.register());
 
-		context.app.rebind(Container.Identifiers.TransactionPoolStorage).toConstantValue({
+		context.app.rebind(Identifiers.TransactionPoolStorage).toConstantValue({
 			boot: () => undefined,
 			dispose: () => undefined,
 		});
 
-		context.app.rebind(Container.Identifiers.TransactionPoolService).toConstantValue({
+		context.app.rebind(Identifiers.TransactionPoolService).toConstantValue({
 			boot: () => undefined,
 			dispose: () => undefined,
 		});
@@ -65,22 +66,6 @@ describe<{
 		});
 	});
 
-	it("should provide TransactionPoolWorkerIpcSubprocessFactory", async (context) => {
-		await assert.resolves(() => context.serviceProvider.register());
-
-		const subprocessFactory = context.app.get<Contracts.TransactionPool.WorkerIpcSubprocessFactory>(
-			Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory,
-		);
-
-		const forkStub = stub(child_process, "fork").returnValueOnce({
-			on: () => undefined,
-		});
-
-		subprocessFactory();
-
-		forkStub.called();
-	});
-
 	it("should validate schema using defaults", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
@@ -96,19 +81,6 @@ describe<{
 		assert.number(result.value.maxTransactionsPerRequest);
 		assert.number(result.value.maxTransactionAge);
 		assert.number(result.value.maxTransactionBytes);
-
-		assert.true(result.value.dynamicFees.enabled);
-		assert.number(result.value.dynamicFees.minFeePool);
-		assert.number(result.value.dynamicFees.minFeeBroadcast);
-
-		assert.number(result.value.dynamicFees.addonBytes.transfer);
-		assert.number(result.value.dynamicFees.addonBytes.delegateRegistration);
-		assert.number(result.value.dynamicFees.addonBytes.vote);
-		assert.number(result.value.dynamicFees.addonBytes.multiSignature);
-		assert.number(result.value.dynamicFees.addonBytes.multiPayment);
-		assert.number(result.value.dynamicFees.addonBytes.delegateResignation);
-
-		assert.number(result.value.workerPool.workerCount);
 	});
 
 	it("should allow configuration extension", async (context) => {
@@ -386,163 +358,5 @@ describe<{
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
 		assert.equal(result.error!.message, '"maxTransactionBytes" is required');
-	});
-
-	it("schema restrictions - dynamicFees is required", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		delete defaults.dynamicFees;
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees" is required');
-	});
-
-	it("schema restrictions - dynamicFees.enabled is required", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		delete defaults.dynamicFees.enabled;
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.enabled" is required');
-	});
-
-	it("schema restrictions - dynamicFees.minFeePool is required when enabled = true && is integer && >= 0", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		defaults.dynamicFees.minFeePool = false;
-		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeePool" must be a number');
-
-		defaults.dynamicFees.minFeePool = 1.12;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeePool" must be an integer');
-
-		defaults.dynamicFees.minFeePool = -1;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeePool" must be greater than or equal to 0');
-
-		delete defaults.dynamicFees.minFeePool;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeePool" is required');
-
-		defaults.dynamicFees.enabled = false;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.undefined(result.error);
-	});
-
-	it("schema restrictions - dynamicFees.minFeeBroadcast is required when enabled = true && must be larger or equal 0", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		defaults.dynamicFees.minFeeBroadcast = false;
-		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeeBroadcast" must be a number');
-
-		defaults.dynamicFees.minFeeBroadcast = 1.12;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeeBroadcast" must be an integer');
-
-		defaults.dynamicFees.minFeeBroadcast = -1;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeeBroadcast" must be greater than or equal to 0');
-
-		delete defaults.dynamicFees.minFeeBroadcast;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.minFeeBroadcast" is required');
-
-		defaults.dynamicFees.enabled = false;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.undefined(result.error);
-	});
-
-	it("schema restrictions - dynamicFees.addonBytes is required when enabled = true", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		delete defaults.dynamicFees.addonBytes;
-		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.addonBytes" is required');
-
-		defaults.dynamicFees.enabled = false;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.undefined(result.error);
-	});
-
-	it("schema restrictions - dynamicFees.addonBytes[transaction_name] should be integer && >= 0 when present", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		defaults.dynamicFees.addonBytes.test = false;
-		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.addonBytes.test" must be a number');
-
-		defaults.dynamicFees.addonBytes.test = 1.12;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.addonBytes.test" must be an integer');
-
-		defaults.dynamicFees.addonBytes.test = -1;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"dynamicFees.addonBytes.test" must be greater than or equal to 0');
-	});
-
-	it("schema restrictions - workerPool is required", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		delete defaults.workerPool;
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"workerPool" is required');
-	});
-
-	it("schema restrictions - workerPool.workerCount is required && is integer && >= 0", async (context) => {
-		removeTransactionPoolEnvironmentVariables();
-
-		const defaults = importDefaults();
-
-		defaults.workerPool.workerCount = false;
-		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"workerPool.workerCount" must be a number');
-
-		defaults.workerPool.workerCount = 1.12;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"workerPool.workerCount" must be an integer');
-
-		defaults.workerPool.workerCount = 0;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"workerPool.workerCount" must be greater than or equal to 1');
-
-		delete defaults.workerPool.workerCount;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error!.message, '"workerPool.workerCount" is required');
 	});
 });

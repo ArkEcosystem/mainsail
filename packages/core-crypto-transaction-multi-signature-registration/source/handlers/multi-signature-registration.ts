@@ -92,7 +92,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 		AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(transaction.data.asset?.multiSignature);
 
-		const hasSender: boolean = this.poolQuery
+		const hasSender: boolean = await this.poolQuery
 			.getAllBySender(transaction.data.senderPublicKey)
 			.whereKind(transaction)
 			.has();
@@ -105,7 +105,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		}
 
 		const address = await this.addressFactory.fromMultiSignatureAsset(transaction.data.asset.multiSignature);
-		const hasAddress: boolean = this.poolQuery
+		const hasAddress: boolean = await this.poolQuery
 			.getAll()
 			.whereKind(transaction)
 			.wherePredicate(

@@ -1,28 +1,20 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { TransactionFeeToLowError } from "./errors";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 import { Processor } from "./processor";
-import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
-
-const buildTransaction = (nonce: string): Interfaces.ITransaction =>
-	Transactions.BuilderFactory.transfer()
-		.version(2)
-		.amount("100")
-		.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
-		.nonce(nonce)
-		.sign("sender's secret")
-		.build();
+import { describe } from "../../core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@arkecosystem/core-contracts";
 
 describe<{
-	aip: Boolean;
-	container: Container.Container;
-	workerPool: any;
+	container: Container;
 	pool: any;
 	extensions: any[];
 	transactionBroadcaster: any;
-	transaction1: Interfaces.ITransaction;
-	transaction2: Interfaces.ITransaction;
-}>("Processor", ({ it, assert, beforeAll, stub, spy, afterAll }) => {
+	transaction1: any;
+	transaction2: any;
+	factory: any;
+}>("Processor", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.pool = {
 			addTransaction: () => undefined,
@@ -34,54 +26,70 @@ describe<{
 			broadcastTransactions: () => Promise.resolve(),
 		};
 
-		context.workerPool = {
-			getTransactionFromData: () => undefined,
+		context.factory = {
+			fromData: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container
-			.bind(Container.Identifiers.TransactionPoolProcessorExtension)
-			.toConstantValue(context.extensions[0]);
-		context.container
-			.bind(Container.Identifiers.TransactionPoolProcessorExtension)
-			.toConstantValue(context.extensions[1]);
-		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.pool);
-		context.container
-			.bind(Container.Identifiers.PeerTransactionBroadcaster)
-			.toConstantValue(context.transactionBroadcaster);
-		context.container.bind(Container.Identifiers.TransactionPoolWorkerPool).toConstantValue(context.workerPool);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue({
+		context.container = new Container();
+		context.container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[0]);
+		context.container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[1]);
+		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
+		context.container.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.factory);
+		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
+		context.container.bind(Identifiers.PeerTransactionBroadcaster).toConstantValue(context.transactionBroadcaster);
+		context.container.bind(Identifiers.LogService).toConstantValue({
 			error: () => undefined,
 		});
 
-		// Build transactions...
-		context.transaction1 = buildTransaction("1");
-		context.transaction2 = buildTransaction("2");
-		context.transaction2.data.typeGroup = undefined;
+		context.transaction1 = {
+			id: "dummy-tx-id",
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+			type: Contracts.Crypto.TransactionType.Transfer,
+			key: "some-key",
+			data: {
+				id: "dummy-tx-id",
+				type: Contracts.Crypto.TransactionType.Transfer,
+				version: 2,
+				nonce: BigNumber.make(1),
+				amount: BigNumber.make(100),
+				senderPublicKey: "dummy-sender-key",
+			},
+			serialized: Buffer.from("dummy"),
+		};
 
-		context.aip = Managers.configManager.getMilestone().aip11;
-		Managers.configManager.getMilestone().aip11 = true;
-	});
-
-	afterAll((context) => {
-		Managers.configManager.getMilestone().aip11 = context.aip;
+		context.transaction2 = {
+			id: "dummy-tx-id-2",
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+			type: Contracts.Crypto.TransactionType.Transfer,
+			key: "some-key",
+			data: {
+				id: "dummy-tx-id-2",
+				type: Contracts.Crypto.TransactionType.Transfer,
+				typeGroup: undefined,
+				version: 2,
+				nonce: BigNumber.make(1),
+				amount: BigNumber.make(100),
+				senderPublicKey: "dummy-sender-key",
+			},
+			serialized: Buffer.from("dummy-2"),
+		};
 	});
 
 	it("should parse transactions through factory pool", async (context) => {
 		const poolSpy = spy(context.pool, "addTransaction");
-		const workerPoolStub = stub(context.workerPool, "getTransactionFromData");
+		const factoryStub = stub(context.factory, "fromData");
 		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
-		workerPoolStub.resolvedValueNth(0, context.transaction1).resolvedValueNth(1, context.transaction2);
+		factoryStub.resolvedValueNth(0, context.transaction1).resolvedValueNth(1, context.transaction2);
 
 		const spiedExtension0 = stub(context.extensions[0], "throwIfCannotBroadcast");
 
 		spiedExtension0
 			.callsFakeNth(0, async (transaction) => {
-				throw new TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeToLowError(transaction);
 			})
 			.callsFakeNth(1, async (transaction) => {
-				throw new TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeToLowError(transaction);
 			});
 
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
@@ -101,34 +109,13 @@ describe<{
 		assert.undefined(result.errors);
 	});
 
-	it.skip("should wrap deserialize errors into BAD_DATA pool error", async (context) => {
-		const processor = context.container.resolve(Processor);
-
-		const workerPoolStub = stub(context.workerPool, "getTransactionFromData").rejectedValueNth(
-			0,
-			new Error("Version 1 not supported"),
-		);
-
-		const result = await processor.process([context.transaction1.data]);
-
-		workerPoolStub.calledWith(context.transaction1.data);
-
-		assert.equal(result.invalid, [context.transaction1.id]);
-		assert.equal(result.errors, {
-			[context.transaction1.data.id]: {
-				type: "ERR_BAD_DATA",
-				message: "Invalid transaction data: Version 1 not supported",
-			},
-		});
-	});
-
 	it("should add transactions to pool", async (context) => {
 		const poolStub = stub(context.pool, "addTransaction");
 
 		poolStub
 			.callsFakeNth(0, async (transaction) => {})
 			.callsFakeNth(1, async (transaction) => {
-				throw new TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeToLowError(transaction);
 			});
 
 		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
@@ -160,7 +147,7 @@ describe<{
 		spiedExtension0
 			.callsFakeNth(0, async (transaction) => {})
 			.callsFakeNth(1, async (transaction) => {
-				throw new TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeToLowError(transaction);
 			});
 
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
@@ -199,9 +186,10 @@ describe<{
 	});
 
 	it("should track excess transactions", async (context) => {
-		const exceedsError = new Contracts.TransactionPool.PoolError("Exceeds", "ERR_EXCEEDS_MAX_COUNT");
+		const exceedsError = new Exceptions.SenderExceededMaximumTransactionCountError(context.transaction1, 1);
 
 		const poolStub = stub(context.pool, "addTransaction").rejectedValueNth(0, exceedsError);
+		stub(context.factory, "fromData").returnValue(context.transaction1);
 
 		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");

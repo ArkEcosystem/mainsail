@@ -46,7 +46,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
 		const failedTransactions: Contracts.Crypto.ITransaction[] = [];
 
-		for (const transaction of this.poolQuery.getFromHighestPriority()) {
+		for (const transaction of await this.poolQuery.getFromHighestPriority().all()) {
 			if (candidateTransactions.length === milestone.block.maxTransactions) {
 				break;
 			}

@@ -308,7 +308,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	async #removeExpiredTransactions(): Promise<void> {
-		for (const transaction of this.poolQuery.getAll()) {
+		for (const transaction of await this.poolQuery.getAll().all()) {
 			AppUtils.assert.defined<string>(transaction.id);
 			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -333,7 +333,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			return;
 		}
 
-		const transaction = this.poolQuery.getFromLowestPriority().first();
+		const transaction = await this.poolQuery.getFromLowestPriority().first();
 
 		AppUtils.assert.defined<string>(transaction.id);
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -371,7 +371,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
-			const lowest = this.poolQuery.getFromLowestPriority().first();
+			const lowest = await this.poolQuery.getFromLowestPriority().first();
 			if (transaction.data.fee.isLessThanEqual(lowest.data.fee)) {
 				throw new Exceptions.TransactionPoolFullError(transaction, lowest.data.fee);
 			}

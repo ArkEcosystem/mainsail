@@ -88,4 +88,8 @@ export class Storage implements Contracts.TransactionPool.Storage {
 	public flush(): void {
 		this.#flushStmt.run();
 	}
+
+	public getDatabase(): BetterSqlite3.Database {
+		return this.#database;
+	}
 }

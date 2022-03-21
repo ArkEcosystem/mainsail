@@ -1,5 +1,5 @@
 import { IteratorMany } from "./";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 describe("IteratorMany", ({ it, assert }) => {
 	it("should choose next item based on comparator", () => {
