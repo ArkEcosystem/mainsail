@@ -287,7 +287,7 @@ describe<{
 		assert.true(context.delegateWallet.getAttribute<boolean>("delegate.resigned"));
 
 		const voteTransaction = Transactions.BuilderFactory.vote()
-			.votesAsset(["+" + context.delegateWallet.getPublicKey()])
+			.votesAsset([context.delegateWallet.getPublicKey()])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();

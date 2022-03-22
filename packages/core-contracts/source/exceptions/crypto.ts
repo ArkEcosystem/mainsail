@@ -304,6 +304,23 @@ export class VotedForResignedValidatorError extends Exception {
 	}
 }
 
+export class EmptyVoteError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because it doesn't contain any votes or unvotes.`);
+	}
+}
+export class MaxVotesExceeededError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because it exceeds max votes.`);
+	}
+}
+
+export class MaxUnvotesExceeededError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because it exceeds max unvotes`);
+	}
+}
+
 export class NotEnoughValidatorsError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because not enough validators to allow resignation.`);

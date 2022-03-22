@@ -19,15 +19,22 @@ export class VoteTransaction extends Transaction {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
+						unvotes: {
+							additionalItems: false,
+							items: { $ref: "publicKey" },
+							maxItems: 1,
+							minItems: 0,
+							type: "array",
+						},
 						votes: {
 							additionalItems: false,
-							items: { $ref: "walletVote" },
-							maxItems: 2,
-							minItems: 1,
+							items: { $ref: "publicKey" },
+							maxItems: 1,
+							minItems: 0,
 							type: "array",
 						},
 					},
-					required: ["votes"],
+					required: ["unvotes", "votes"],
 					type: "object",
 				},
 				fee: { bignumber: { minimum: 1 } },
@@ -40,33 +47,39 @@ export class VoteTransaction extends Transaction {
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
-		const buff: ByteBuffer = ByteBuffer.fromSize(100); // TODO: Fix size
+		const publicKeySize = this.app.get<number>(Identifiers.Cryptography.Size.PublicKey);
+		const buff: ByteBuffer = ByteBuffer.fromSize(
+			1 + 1 + publicKeySize * data.asset.votes.length + publicKeySize * data.asset.unvotes.length,
+		);
 
-		if (data.asset && data.asset.votes) {
-			const voteBytes = data.asset.votes
-				.map((vote) => (vote.startsWith("+") ? "01" : "00") + vote.slice(1))
-				.join("");
-			buff.writeUint8(data.asset.votes.length);
-			buff.writeBytes(Buffer.from(voteBytes, "hex"));
-		}
+		// TODO: Check asset
+
+		buff.writeUint8(data.asset.votes.length);
+		buff.writeBytes(Buffer.from(data.asset.votes.join(""), "hex"));
+
+		buff.writeUint8(data.asset.unvotes.length);
+		buff.writeBytes(Buffer.from(data.asset.unvotes.join(""), "hex"));
 
 		return buff;
 	}
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
+		data.asset = { unvotes: [], votes: [] };
+		const publicKeySize = this.app.get<number>(Identifiers.Cryptography.Size.PublicKey);
+
 		const votelength: number = buf.readUint8();
-		data.asset = { votes: [] };
-
 		for (let index = 0; index < votelength; index++) {
-			let vote: string = buf
-				.readBytes(this.app.get<number>(Identifiers.Cryptography.Size.PublicKey) + 1)
-				.toString("hex");
-			vote = (vote[1] === "1" ? "+" : "-") + vote.slice(2);
+			const vote: string = buf.readBytes(publicKeySize).toString("hex");
 
-			if (data.asset && data.asset.votes) {
-				data.asset.votes.push(vote);
-			}
+			data.asset.votes.push(vote);
+		}
+
+		const unvotelength: number = buf.readUint8();
+		for (let index = 0; index < unvotelength; index++) {
+			const unvote: string = buf.readBytes(publicKeySize).toString("hex");
+
+			data.asset.unvotes.push(unvote);
 		}
 	}
 }

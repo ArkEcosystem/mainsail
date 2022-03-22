@@ -91,18 +91,14 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public vote(publicKey?: string): TransactionFactory {
-		this.builder = new VoteBuilder().votesAsset([
-			`+${publicKey || this.publicKeyFactory.fromMnemonic(defaultPassphrase)}`,
-		]);
+	public vote(publicKey: string): TransactionFactory {
+		this.builder = new VoteBuilder().votesAsset([publicKey]);
 
 		return this;
 	}
 
-	public unvote(publicKey?: string): TransactionFactory {
-		this.builder = new VoteBuilder().votesAsset([
-			`-${publicKey || this.publicKeyFactory.fromMnemonic(defaultPassphrase)}`,
-		]);
+	public unvote(publicKey: string): TransactionFactory {
+		this.builder = new VoteBuilder().unvotesAsset([publicKey]);
 
 		return this;
 	}

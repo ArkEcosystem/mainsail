@@ -28,6 +28,7 @@ export interface ITransactionAsset {
 		username: string;
 	};
 	votes?: string[];
+	unvotes?: string[];
 	multiSignatureLegacy?: IMultiSignatureLegacyAsset;
 	multiSignature?: IMultiSignatureAsset;
 	payments?: IMultiPaymentItem[];

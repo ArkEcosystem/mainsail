@@ -28,27 +28,32 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		for (const transaction of this.allTransactions(transactions)) {
 			Utils.assert.defined<string>(transaction.senderPublicKey);
 			Utils.assert.defined<string[]>(transaction.asset?.votes);
+			Utils.assert.defined<string[]>(transaction.asset?.unvotes);
+
+			this.#checkAsset(transaction);
 
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+
+			for (const unvote of transaction.asset.unvotes) {
+				const hasVoted: boolean = wallet.hasAttribute("vote");
+
+				if (!hasVoted) {
+					throw new Exceptions.NoVoteError();
+				} else if (wallet.getAttribute("vote") !== unvote) {
+					throw new Exceptions.UnvoteMismatchError();
+				}
+
+				wallet.forgetAttribute("vote");
+			}
 
 			for (const vote of transaction.asset.votes) {
 				const hasVoted: boolean = wallet.hasAttribute("vote");
 
-				if (vote.startsWith("+")) {
-					if (hasVoted) {
-						throw new Exceptions.AlreadyVotedError();
-					}
-
-					wallet.setAttribute("vote", vote.slice(1));
-				} else {
-					if (!hasVoted) {
-						throw new Exceptions.NoVoteError();
-					} else if (wallet.getAttribute("vote") !== vote.slice(1)) {
-						throw new Exceptions.UnvoteMismatchError();
-					}
-
-					wallet.forgetAttribute("vote");
+				if (hasVoted) {
+					throw new Exceptions.AlreadyVotedError();
 				}
+
+				wallet.setAttribute("vote", vote);
 			}
 		}
 	}
@@ -62,40 +67,44 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
+		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
+
+		this.#checkAsset(transaction.data);
 
 		let walletVote: string | undefined;
 		if (wallet.hasAttribute("vote")) {
 			walletVote = wallet.getAttribute("vote");
 		}
 
+		for (const unvote of transaction.data.asset.unvotes) {
+			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(unvote);
+
+			if (!walletVote) {
+				throw new Exceptions.NoVoteError();
+			} else if (walletVote !== unvote) {
+				throw new Exceptions.UnvoteMismatchError();
+			}
+
+			if (!validatorWallet.isValidator()) {
+				throw new Exceptions.VotedForNonValidatorError(unvote);
+			}
+
+			walletVote = undefined;
+		}
+
 		for (const vote of transaction.data.asset.votes) {
-			const validatorPublicKey: string = vote.slice(1);
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				validatorPublicKey,
-			);
+			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
 
-			if (vote.startsWith("+")) {
-				if (walletVote) {
-					throw new Exceptions.AlreadyVotedError();
-				}
-
-				if (validatorWallet.hasAttribute("validator.resigned")) {
-					throw new Exceptions.VotedForResignedValidatorError(vote);
-				}
-
-				walletVote = vote.slice(1);
-			} else {
-				if (!walletVote) {
-					throw new Exceptions.NoVoteError();
-				} else if (walletVote !== vote.slice(1)) {
-					throw new Exceptions.UnvoteMismatchError();
-				}
-
-				walletVote = undefined;
+			if (walletVote) {
+				throw new Exceptions.AlreadyVotedError();
 			}
 
 			if (!validatorWallet.isValidator()) {
 				throw new Exceptions.VotedForNonValidatorError(vote);
+			}
+
+			if (validatorWallet.hasAttribute("validator.resigned")) {
+				throw new Exceptions.VotedForResignedValidatorError(vote);
 			}
 		}
 
@@ -104,9 +113,17 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
+		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
+
+		for (const unvote of transaction.data.asset.unvotes) {
+			emitter.dispatch(AppEnums.VoteEvent.Unvote, {
+				transaction: transaction.data,
+				validator: unvote,
+			});
+		}
 
 		for (const vote of transaction.data.asset.votes) {
-			emitter.dispatch(vote.startsWith("+") ? AppEnums.VoteEvent.Vote : AppEnums.VoteEvent.Unvote, {
+			emitter.dispatch(AppEnums.VoteEvent.Vote, {
 				transaction: transaction.data,
 				validator: vote,
 			});
@@ -139,13 +156,14 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		);
 
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
+		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
+
+		if (transaction.data.asset.unvotes.length > 0) {
+			sender.forgetAttribute("vote");
+		}
 
 		for (const vote of transaction.data.asset.votes) {
-			if (vote.startsWith("+")) {
-				sender.setAttribute("vote", vote.slice(1));
-			} else {
-				sender.forgetAttribute("vote");
-			}
+			sender.setAttribute("vote", vote);
 		}
 	}
 
@@ -159,17 +177,32 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		);
 
 		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.votes);
+		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.unvotes);
 
-		for (const vote of [...transaction.data.asset.votes].reverse()) {
-			if (vote.startsWith("+")) {
-				sender.forgetAttribute("vote");
-			} else {
-				sender.setAttribute("vote", vote.slice(1));
-			}
+		if (transaction.data.asset.votes.length > 0) {
+			sender.forgetAttribute("vote");
+		}
+
+		for (const unvote of transaction.data.asset.unvotes) {
+			sender.setAttribute("vote", unvote);
 		}
 	}
 
 	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
 	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+
+	#checkAsset(data: Contracts.Crypto.ITransactionData) {
+		if (data.asset.votes.length > 1) {
+			throw new Exceptions.MaxVotesExceeededError();
+		}
+
+		if (data.asset.unvotes.length > 1) {
+			throw new Exceptions.MaxUnvotesExceeededError();
+		}
+
+		if (data.asset.votes.length + data.asset.unvotes.length === 0) {
+			throw new Exceptions.EmptyVoteError();
+		}
+	}
 }

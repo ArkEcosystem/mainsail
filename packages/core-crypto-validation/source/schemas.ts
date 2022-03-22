@@ -108,10 +108,4 @@ export const schemas = {
 			{ transform: ["toLowerCase"] },
 		],
 	},
-
-	// @TODO: plugins should register this rule
-	walletVote: {
-		$id: "walletVote",
-		allOf: [{ pattern: "^[+|-][a-zA-Z0-9]{66}$", type: "string" }, { transform: ["toLowerCase"] }],
-	},
 };

@@ -55,7 +55,7 @@ export class Signer {
 		const transaction = await new VoteBuilder()
 			.fee(this.toSatoshi(options.voteFee))
 			.nonce(this.nonce.toString())
-			.votesAsset([`+${options.validator}`])
+			.votesAsset([options.validator])
 			.sign(options.passphrase);
 
 		this.incrementNonce();

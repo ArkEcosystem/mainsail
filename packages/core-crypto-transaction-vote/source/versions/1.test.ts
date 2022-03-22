@@ -22,17 +22,38 @@ describe<{
 		const datas: Partial<Contracts.Crypto.ITransactionData>[] = [
 			{
 				asset: {
-					votes: ["+" + "aa".repeat(PUBLIC_KEY_SIZE)],
+					unvotes: [],
+					votes: ["aa".repeat(PUBLIC_KEY_SIZE)],
 				},
 			},
 			{
 				asset: {
-					votes: ["-" + "aa".repeat(PUBLIC_KEY_SIZE)],
+					unvotes: [],
+					votes: ["aa".repeat(PUBLIC_KEY_SIZE), "bb".repeat(PUBLIC_KEY_SIZE)],
 				},
 			},
 			{
 				asset: {
-					votes: ["-" + "bb".repeat(PUBLIC_KEY_SIZE), "+" + "aa".repeat(PUBLIC_KEY_SIZE)],
+					unvotes: ["aa".repeat(PUBLIC_KEY_SIZE)],
+					votes: [],
+				},
+			},
+			{
+				asset: {
+					unvotes: ["aa".repeat(PUBLIC_KEY_SIZE), "bb".repeat(PUBLIC_KEY_SIZE)],
+					votes: [],
+				},
+			},
+			{
+				asset: {
+					unvotes: ["aa".repeat(PUBLIC_KEY_SIZE)],
+					votes: ["bb".repeat(PUBLIC_KEY_SIZE)],
+				},
+			},
+			{
+				asset: {
+					unvotes: ["aa".repeat(PUBLIC_KEY_SIZE), "bb".repeat(PUBLIC_KEY_SIZE)],
+					votes: ["cc".repeat(PUBLIC_KEY_SIZE), "dd".repeat(PUBLIC_KEY_SIZE)],
 				},
 			},
 		];

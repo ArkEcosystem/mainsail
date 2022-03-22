@@ -680,7 +680,7 @@ export class Command extends Commands.Command {
 						.network(pubKeyHash)
 						.fee("100000000")
 						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
-						.votesAsset([`+${sender.keys.publicKey}`])
+						.votesAsset([sender.keys.publicKey])
 						.fee(`${1 * 1e8}`)
 						.sign(sender.passphrase)
 				).data,

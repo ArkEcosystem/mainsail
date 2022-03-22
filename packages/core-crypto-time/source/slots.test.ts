@@ -44,7 +44,7 @@ describe<{
 
 	it("return epoch time as number", (context) => {
 		assert.number(context.slots.getTime());
-		assert.is(context.slots.getTime(1_646_870_400), genesisTimestamp(context.configuration));
+		assert.is(context.slots.getTime(1_647_561_600), genesisTimestamp(context.configuration));
 	});
 
 	it("return slot number", async (context) => {

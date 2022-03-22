@@ -154,7 +154,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		configManager.getMilestone().aip11 = false;
 
 		const vote = BuilderFactory.vote()
-			.votesAsset(["+02bcfa0951a92e7876db1fb71996a853b57f996972ed059a950d910f7d541706c9"])
+			.votesAsset(["02bcfa0951a92e7876db1fb71996a853b57f996972ed059a950d910f7d541706c9"])
 			.timestamp(148354645)
 			.fee("50000000")
 			.network(30)
