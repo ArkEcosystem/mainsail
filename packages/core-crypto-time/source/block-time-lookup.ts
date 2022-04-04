@@ -3,15 +3,19 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class BlockTimeLookup {
+	@inject(Identifiers.Application)
+	private readonly app: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Database.Service)
-	private readonly databaseService: Contracts.Database.IDatabaseService;
-
 	public async getBlockTimeLookup(height: number): Promise<number> {
 		const findBlockTimestampByHeight = async (height: number): Promise<number> =>
-			(await this.databaseService.findBlockByHeights([height]))[0].data.timestamp;
+			(
+				await this.app
+					.get<Contracts.Database.IDatabaseService>(Identifiers.Database.Service)
+					.findBlockByHeights([height])
+			)[0].data.timestamp;
 
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blockTime");
 

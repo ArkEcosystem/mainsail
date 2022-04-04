@@ -64,6 +64,8 @@ jobs:
               run: cd packages/core-kernel && pnpm run test
             - name: Test core-logger-pino
               run: cd packages/core-logger-pino && pnpm run test
+            - name: Test core-network-generate
+              run: cd packages/core-network-generate && pnpm run test
             - name: Test core-state
               run: cd packages/core-state && pnpm run test
             - name: Test core-test-framework
