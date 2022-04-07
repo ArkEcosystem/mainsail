@@ -916,6 +916,7 @@ describe<{
 		stub(context.configuration, "getMilestone").returnValue({
 			activeValidators: 51,
 		});
+		stub(Math, "random").returnValue(0.7);
 		const threshold = context.configuration.getMilestone().activeValidators / 3 - 1;
 
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
