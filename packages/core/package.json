@@ -27,6 +27,7 @@
 	"dependencies": {
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
+		"@arkecosystem/core-configuration-generator": "workspace:*",
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
@@ -53,7 +54,6 @@
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-lmdb": "workspace:*",
 		"@arkecosystem/core-logger-pino": "workspace:*",
-		"@arkecosystem/core-network-generate": "workspace:*",
 		"@arkecosystem/core-networking-dns": "workspace:*",
 		"@arkecosystem/core-networking-ntp": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",

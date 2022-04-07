@@ -307,7 +307,7 @@ describe<{
 				blockTime: "9",
 				validators: "47",
 				distribute: "true",
-				epoch: "2020-11-04T00:00:00.000Z",
+				epoch: new Date("2020-11-04T00:00:00.000Z"),
 				explorer: "myex.io",
 				feeDynamicBytesDelegateRegistration: 3,
 				feeDynamicEnabled: true,

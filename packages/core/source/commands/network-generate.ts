@@ -1,8 +1,10 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { ConfigurationGenerator, Identifiers, makeApplication } from "@arkecosystem/core-configuration-generator";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as AppContracts } from "@arkecosystem/core-contracts";
-import { NetworkGenerator } from "@arkecosystem/core-network-generate";
+import envPaths from "env-paths";
 import Joi from "joi";
+import { join } from "path";
 import prompts from "prompts";
 
 type Flag = {
@@ -133,7 +135,7 @@ export class Command extends Commands.Command {
 			name: "epoch",
 			description: "Start time of the network.",
 			schema: Joi.date(),
-			default: new Date(Date.now()).toISOString().slice(0, 11) + "00:00:00.000Z",
+			default: new Date(),
 		},
 		{
 			name: "vendorFieldLength",
@@ -205,10 +207,13 @@ export class Command extends Commands.Command {
 			...flags,
 		};
 
-		const networkGenerator = new NetworkGenerator(this.logger);
+		const configurationApp = await makeApplication(this.#getConfigurationPath(options));
+		configurationApp.bind(Identifiers.LogService).toConstantValue(this.logger);
 
 		if (flags.force || allFlagsSet) {
-			return networkGenerator.generate(this.#convertPeers(options));
+			return configurationApp
+				.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
+				.generate(this.#convertPeers(options));
 		}
 
 		const response = await prompts(
@@ -236,6 +241,8 @@ export class Command extends Commands.Command {
 			...response,
 		};
 
+		configurationApp.rebind(Identifiers.ConfigurationPath).toConstantValue(this.#getConfigurationPath(options));
+
 		if (!response.confirm) {
 			throw new Error("You'll need to confirm the input to continue.");
 		}
@@ -256,7 +263,9 @@ export class Command extends Commands.Command {
 			throw new Error(`Flag ${flag.name} is required.`);
 		}
 
-		await networkGenerator.generate(this.#convertPeers(options));
+		await configurationApp
+			.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
+			.generate(this.#convertPeers(options));
 	}
 
 	#convertPeers(options: Flags): AppContracts.NetworkGenerator.Options {
@@ -264,5 +273,12 @@ export class Command extends Commands.Command {
 			...options,
 			peers: options.peers.replace(" ", "").split(","),
 		};
+	}
+
+	#getConfigurationPath(options: AppContracts.NetworkGenerator.Options): string {
+		const paths = envPaths(options.token, { suffix: "core" });
+		const configPath = options.configPath ? options.configPath : paths.config;
+
+		return join(configPath, options.network);
 	}
 }

@@ -132,6 +132,7 @@ importers:
     specifiers:
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
+      '@arkecosystem/core-configuration-generator': workspace:*
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-address-bech32m': workspace:*
@@ -158,7 +159,6 @@ importers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-lmdb': workspace:*
       '@arkecosystem/core-logger-pino': workspace:*
-      '@arkecosystem/core-network-generate': workspace:*
       '@arkecosystem/core-networking-dns': workspace:*
       '@arkecosystem/core-networking-ntp': workspace:*
       '@arkecosystem/core-p2p': workspace:*
@@ -192,6 +192,7 @@ importers:
     dependencies:
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
+      '@arkecosystem/core-configuration-generator': link:../core-configuration-generator
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
@@ -218,7 +219,6 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-lmdb': link:../core-lmdb
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
-      '@arkecosystem/core-network-generate': link:../core-network-generate
       '@arkecosystem/core-networking-dns': link:../core-networking-dns
       '@arkecosystem/core-networking-ntp': link:../core-networking-ntp
       '@arkecosystem/core-p2p': link:../core-p2p
@@ -363,6 +363,69 @@ importers:
 
   packages/core-cli/test/plugins/package1:
     specifiers: {}
+
+  packages/core-configuration-generator:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-address-bech32m': workspace:*
+      '@arkecosystem/core-crypto-block': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-hash-bcrypto': workspace:*
+      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
+      '@arkecosystem/core-crypto-signature-schnorr': workspace:*
+      '@arkecosystem/core-crypto-time': workspace:*
+      '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-crypto-transaction-transfer': workspace:*
+      '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
+      '@arkecosystem/core-crypto-transaction-vote': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
+      '@arkecosystem/core-crypto-wif': workspace:*
+      '@arkecosystem/core-database': workspace:*
+      '@arkecosystem/core-fees': workspace:*
+      '@arkecosystem/core-fees-static': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-lmdb': workspace:*
+      '@arkecosystem/core-serializer': workspace:*
+      '@arkecosystem/core-validation': workspace:*
+      '@arkecosystem/utils': workspace:*
+      bip39: 3.0.4
+      dayjs: 1.10.7
+      env-paths: 2.2.1
+      envfile: 5.2.0
+      fs-extra: 8.1.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
+      '@arkecosystem/core-crypto-block': link:../core-crypto-block
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-hash-bcrypto': link:../core-crypto-hash-bcrypto
+      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
+      '@arkecosystem/core-crypto-signature-schnorr': link:../core-crypto-signature-schnorr
+      '@arkecosystem/core-crypto-time': link:../core-crypto-time
+      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-crypto-transaction-transfer': link:../core-crypto-transaction-transfer
+      '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
+      '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
+      '@arkecosystem/core-database': link:../core-database
+      '@arkecosystem/core-fees': link:../core-fees
+      '@arkecosystem/core-fees-static': link:../core-fees-static
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-lmdb': link:../core-lmdb
+      '@arkecosystem/core-serializer': link:../core-serializer
+      '@arkecosystem/core-validation': link:../core-validation
+      '@arkecosystem/utils': link:../utils
+      bip39: 3.0.4
+      dayjs: 1.10.7
+      env-paths: 2.2.1
+      envfile: 5.2.0
+      fs-extra: 8.1.0
+    devDependencies:
+      uvu: 0.5.3
 
   packages/core-container:
     specifiers:
@@ -1381,67 +1444,6 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       joi: 17.4.2
       winston: 3.6.0
-
-  packages/core-network-generate:
-    specifiers:
-      '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-crypto-address-bech32m': workspace:*
-      '@arkecosystem/core-crypto-block': workspace:*
-      '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-hash-bcrypto': workspace:*
-      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
-      '@arkecosystem/core-crypto-signature-schnorr': workspace:*
-      '@arkecosystem/core-crypto-time': workspace:*
-      '@arkecosystem/core-crypto-transaction': workspace:*
-      '@arkecosystem/core-crypto-transaction-transfer': workspace:*
-      '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
-      '@arkecosystem/core-crypto-transaction-vote': workspace:*
-      '@arkecosystem/core-crypto-validation': workspace:*
-      '@arkecosystem/core-crypto-wif': workspace:*
-      '@arkecosystem/core-database': workspace:*
-      '@arkecosystem/core-fees': workspace:*
-      '@arkecosystem/core-fees-static': workspace:*
-      '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-lmdb': workspace:*
-      '@arkecosystem/core-serializer': workspace:*
-      '@arkecosystem/core-validation': workspace:*
-      '@arkecosystem/utils': workspace:*
-      bip39: 3.0.4
-      dayjs: 1.10.7
-      env-paths: 2.2.1
-      fs-extra: 8.1.0
-      uvu: ^0.5.3
-    dependencies:
-      '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
-      '@arkecosystem/core-crypto-block': link:../core-crypto-block
-      '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-hash-bcrypto': link:../core-crypto-hash-bcrypto
-      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
-      '@arkecosystem/core-crypto-signature-schnorr': link:../core-crypto-signature-schnorr
-      '@arkecosystem/core-crypto-time': link:../core-crypto-time
-      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
-      '@arkecosystem/core-crypto-transaction-transfer': link:../core-crypto-transaction-transfer
-      '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
-      '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
-      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
-      '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
-      '@arkecosystem/core-database': link:../core-database
-      '@arkecosystem/core-fees': link:../core-fees
-      '@arkecosystem/core-fees-static': link:../core-fees-static
-      '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-lmdb': link:../core-lmdb
-      '@arkecosystem/core-serializer': link:../core-serializer
-      '@arkecosystem/core-validation': link:../core-validation
-      '@arkecosystem/utils': link:../utils
-      bip39: 3.0.4
-      dayjs: 1.10.7
-      env-paths: 2.2.1
-      fs-extra: 8.1.0
-    devDependencies:
-      uvu: 0.5.3
 
   packages/core-networking-dns:
     specifiers:
