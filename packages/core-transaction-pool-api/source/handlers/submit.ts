@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { FastifyRequest } from "fastify";
-import { Contracts, Identifiers } from "packages/core-contracts/distribution";
 
 @injectable()
 export class SubmitTransactionHandler {

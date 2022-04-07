@@ -1,8 +1,8 @@
-import { platform } from "os";
 import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@arkecosystem/core-cli";
 import { injectable } from "@arkecosystem/core-container";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
+import { platform } from "os";
 import { join, resolve } from "path";
 import { PackageJson } from "type-fest";
 
@@ -80,14 +80,14 @@ export class CommandLineInterface {
 			process.env.NODE_PATH = "";
 		}
 
-		const setPathIfExists = (path: string) => {
+		const setPath = (path: string) => {
 			if (existsSync(path)) {
 				process.env.NODE_PATH += `${delimiter}${path}`;
 			}
 		};
 
-		setPathIfExists(join(__dirname, "../../../"));
-		setPathIfExists(join(__dirname, "../../../node_modules"));
+		setPath(join(__dirname, "../"));
+		setPath(join(__dirname, "../node_modules"));
 
 		require("module").Module._initPaths();
 	}
