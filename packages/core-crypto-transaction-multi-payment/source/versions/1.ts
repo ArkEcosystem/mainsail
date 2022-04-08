@@ -5,6 +5,9 @@ import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
 export class MultiPaymentTransaction extends Transaction {
+	@inject(Identifiers.Application)
+	public readonly app: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
 	private readonly addressSerializer: Contracts.Crypto.IAddressSerializer;
 
@@ -48,7 +51,11 @@ export class MultiPaymentTransaction extends Transaction {
 		const { data } = this;
 
 		if (data.asset && data.asset.payments) {
-			const buff: ByteBuffer = ByteBuffer.fromSize(2 + data.asset.payments.length * 29);
+			const buff: ByteBuffer = ByteBuffer.fromSize(
+				2 +
+					data.asset.payments.length * this.app.get<number>(Identifiers.Cryptography.Size.Address) +
+					data.asset.payments.length * 8,
+			);
 			buff.writeUint16(data.asset.payments.length);
 
 			for (const payment of data.asset.payments) {

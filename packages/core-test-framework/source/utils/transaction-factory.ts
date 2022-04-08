@@ -33,17 +33,17 @@ export class TransactionFactory {
 	protected app: Contracts.Kernel.Application;
 
 	// @ts-ignore
-	private network = "testnet";
-	private networkConfig: Contracts.Crypto.NetworkConfig | undefined;
-	private nonce: BigNumber | undefined;
-	private fee: BigNumber | undefined;
-	private passphrase: string = defaultPassphrase;
-	private passphraseList: string[] | undefined;
-	private passphrasePairs: IPassphrasePair[] | undefined;
-	private version: number | undefined;
-	private senderPublicKey: string | undefined;
-	private expiration: number | undefined;
-	private vendorField: string | undefined;
+	#network = "testnet";
+	#networkConfig: Contracts.Crypto.NetworkConfig | undefined;
+	#nonce: BigNumber | undefined;
+	#fee: BigNumber | undefined;
+	#passphrase: string = defaultPassphrase;
+	#passphraseList: string[] | undefined;
+	#passphrasePairs: IPassphrasePair[] | undefined;
+	#version: number | undefined;
+	#senderPublicKey: string | undefined;
+	#expiration: number | undefined;
+	#vendorField: string | undefined;
 
 	protected constructor(app?: Contracts.Kernel.Application) {
 		// @ts-ignore - this is only needed because of the "getNonce"
@@ -142,19 +142,19 @@ export class TransactionFactory {
 	}
 
 	public withFee(fee: number): TransactionFactory {
-		this.fee = BigNumber.make(fee);
+		this.#fee = BigNumber.make(fee);
 
 		return this;
 	}
 
 	public withNetwork(network: string): TransactionFactory {
-		this.network = network;
+		this.#network = network;
 
 		return this;
 	}
 
 	public withNetworkConfig(networkConfig: Contracts.Crypto.NetworkConfig): TransactionFactory {
-		this.networkConfig = networkConfig;
+		this.#networkConfig = networkConfig;
 
 		return this;
 	}
@@ -166,61 +166,61 @@ export class TransactionFactory {
 	}
 
 	public withSenderPublicKey(sender: string): TransactionFactory {
-		this.senderPublicKey = sender;
+		this.#senderPublicKey = sender;
 
 		return this;
 	}
 
 	public withNonce(nonce: BigNumber): TransactionFactory {
-		this.nonce = nonce;
+		this.#nonce = nonce;
 
 		return this;
 	}
 
 	public withExpiration(expiration: number): TransactionFactory {
-		this.expiration = expiration;
+		this.#expiration = expiration;
 
 		return this;
 	}
 
 	public withVersion(version: number): TransactionFactory {
-		this.version = version;
+		this.#version = version;
 
 		return this;
 	}
 
 	public withVendorField(vendorField: string): TransactionFactory {
-		this.vendorField = vendorField;
+		this.#vendorField = vendorField;
 
 		return this;
 	}
 
 	public withPassphrase(passphrase: string): TransactionFactory {
-		this.passphrase = passphrase;
+		this.#passphrase = passphrase;
 
 		return this;
 	}
 
 	public withPassphraseList(passphrases: string[]): TransactionFactory {
-		this.passphraseList = passphrases;
+		this.#passphraseList = passphrases;
 
 		return this;
 	}
 
 	public withPassphrasePair(passphrases: IPassphrasePair): TransactionFactory {
-		this.passphrase = passphrases.passphrase;
+		this.#passphrase = passphrases.passphrase;
 
 		return this;
 	}
 
 	public withPassphrasePairs(passphrases: IPassphrasePair[]): TransactionFactory {
-		this.passphrasePairs = passphrases;
+		this.#passphrasePairs = passphrases;
 
 		return this;
 	}
 
 	public async create(quantity = 1): Promise<Contracts.Crypto.ITransactionData[]> {
-		return this.make<Contracts.Crypto.ITransactionData>(quantity, "getStruct");
+		return this.#make<Contracts.Crypto.ITransactionData>(quantity, "getStruct");
 	}
 
 	public async createOne(): Promise<Contracts.Crypto.ITransactionData> {
@@ -228,35 +228,35 @@ export class TransactionFactory {
 	}
 
 	public async build(quantity = 1): Promise<Contracts.Crypto.ITransaction[]> {
-		return this.make<Contracts.Crypto.ITransaction>(quantity, "build");
+		return this.#make<Contracts.Crypto.ITransaction>(quantity, "build");
 	}
 
 	public async getNonce(): Promise<BigNumber> {
-		if (this.nonce) {
-			return this.nonce;
+		if (this.#nonce) {
+			return this.#nonce;
 		}
 
-		AppUtils.assert.defined<string>(this.senderPublicKey);
+		AppUtils.assert.defined<string>(this.#senderPublicKey);
 
-		return getWalletNonce(this.app, this.senderPublicKey);
+		return getWalletNonce(this.app, this.#senderPublicKey);
 	}
 
-	private async make<T>(quantity = 1, method: string): Promise<T[]> {
-		if (this.passphrasePairs && this.passphrasePairs.length > 0) {
-			return this.passphrasePairs.map(
+	async #make<T>(quantity = 1, method: string): Promise<T[]> {
+		if (this.#passphrasePairs && this.#passphrasePairs.length > 0) {
+			return this.#passphrasePairs.map(
 				(passphrasePair: IPassphrasePair) =>
-					this.withPassphrase(passphrasePair.passphrase).sign<T>(quantity, method)[0],
+					this.withPassphrase(passphrasePair.passphrase).#sign<T>(quantity, method)[0],
 			);
 		}
 
-		return this.sign<T>(quantity, method);
+		return this.#sign<T>(quantity, method);
 	}
 
-	private async sign<T>(quantity: number, method: string): Promise<T[]> {
-		this.configuration.setConfig(this.networkConfig);
+	async #sign<T>(quantity: number, method: string): Promise<T[]> {
+		this.configuration.setConfig(this.#networkConfig);
 
-		if (!this.senderPublicKey) {
-			this.senderPublicKey = await this.publicKeyFactory.fromMnemonic(this.passphrase);
+		if (!this.#senderPublicKey) {
+			this.#senderPublicKey = await this.publicKeyFactory.fromMnemonic(this.#passphrase);
 		}
 
 		const transactions: T[] = [];
@@ -278,11 +278,11 @@ export class TransactionFactory {
 				// always remember the previous username instead generating a new one on each iteration
 				!this.builder.data.asset.validator.username
 			) {
-				this.builder = new ValidatorRegistrationBuilder().usernameAsset(this.getRandomUsername());
+				this.builder = new ValidatorRegistrationBuilder().usernameAsset(this.#getRandomUsername());
 			}
 
-			if (this.version) {
-				this.builder.version(this.version);
+			if (this.#version) {
+				this.builder.version(this.#version);
 			}
 
 			if (this.builder.data.version > 1) {
@@ -290,32 +290,32 @@ export class TransactionFactory {
 				this.builder.nonce(nonce);
 			}
 
-			if (this.fee) {
-				this.builder.fee(this.fee.toFixed());
+			if (this.#fee) {
+				this.builder.fee(this.#fee.toFixed());
 			}
 
-			if (this.expiration) {
-				this.builder.expiration(this.expiration);
+			if (this.#expiration) {
+				this.builder.expiration(this.#expiration);
 			}
 
-			if (this.vendorField) {
-				this.builder.vendorField(this.vendorField);
+			if (this.#vendorField) {
+				this.builder.vendorField(this.#vendorField);
 			}
 
-			this.builder.senderPublicKey(this.senderPublicKey);
+			this.builder.senderPublicKey(this.#senderPublicKey);
 
 			let sign = true;
 
-			if (this.passphraseList && this.passphraseList.length > 0) {
-				for (let index = 0; index < this.passphraseList.length; index++) {
-					this.builder.multiSign(this.passphraseList[index], index);
+			if (this.#passphraseList && this.#passphraseList.length > 0) {
+				for (let index = 0; index < this.#passphraseList.length; index++) {
+					this.builder.multiSign(this.#passphraseList[index], index);
 				}
 
 				sign = this.builder.constructor.name === "MultiSignatureBuilder";
 			}
 
 			if (sign) {
-				this.builder.sign(this.passphrase);
+				this.builder.sign(this.#passphrase);
 			}
 
 			transactions.push(this.builder[method]());
@@ -324,7 +324,7 @@ export class TransactionFactory {
 		return transactions;
 	}
 
-	private getRandomUsername(): string {
+	#getRandomUsername(): string {
 		return Math.random().toString(36).toLowerCase();
 	}
 }

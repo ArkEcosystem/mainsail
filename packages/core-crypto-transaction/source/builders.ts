@@ -27,9 +27,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier: Contracts.Crypto.ITransactionVerifier;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	protected readonly slots: Contracts.Crypto.Slots;
-
 	public data: Contracts.Crypto.ITransactionData;
 
 	protected signWithSenderAsRecipient = false;

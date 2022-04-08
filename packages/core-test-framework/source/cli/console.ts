@@ -14,8 +14,11 @@ export class Console {
 
 	public flags;
 
-	public constructor(private useDefaultFlags = true) {
-		this.app = this.createApplication();
+	#useDefaultFlags: boolean;
+
+	public constructor(useDefaultFlags = true) {
+		this.#useDefaultFlags = useDefaultFlags;
+		this.app = this.#createApplication();
 	}
 
 	public withArgs(arguments_: string[]): this {
@@ -51,18 +54,18 @@ export class Console {
 
 		await cmd.run();
 
-		this.reset();
+		this.#reset();
 	}
 
-	private reset(): void {
+	#reset(): void {
 		this.args = [];
-		this.flags = this.useDefaultFlags ? { network: "testnet", token: "ark" } : {};
+		this.flags = this.#useDefaultFlags ? { network: "testnet", token: "ark" } : {};
 	}
 
-	private createApplication(): Application {
+	#createApplication(): Application {
 		const app = ApplicationFactory.make(new Container(), this.pkg);
 
-		this.flags = this.useDefaultFlags ? { network: "testnet", token: "ark" } : {};
+		this.flags = this.#useDefaultFlags ? { network: "testnet", token: "ark" } : {};
 
 		return app;
 	}

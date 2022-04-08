@@ -1,106 +1,122 @@
-import { inject } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "../../../core-crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration";
-import { VoteBuilder } from "../../../core-crypto-transaction-vote";
+import { registerTransactionFactory } from "../factories/factories/transaction";
+import { FactoryBuilder } from "../factories/factory-builder";
+import {
+	MultiPaymentOptions,
+	MultiSignatureOptions,
+	TransferOptions,
+	ValidatorRegistrationOptions,
+	VoteOptions,
+} from "../factories/types";
 
 export class Signer {
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	#config: Contracts.Crypto.NetworkConfig;
+	#nonce: BigNumber;
+	#factoryBuilder: FactoryBuilder;
+	#initialized = false;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
+	public constructor(config: Contracts.Crypto.NetworkConfig, nonce: string) {
+		this.#config = config;
 
-	private nonce: BigNumber;
+		this.#nonce = BigNumber.make(nonce || 0);
 
-	public constructor(config, nonce: string) {
-		this.configuration.setConfig(config);
-
-		this.nonce = BigNumber.make(nonce || 0);
+		this.#factoryBuilder = new FactoryBuilder();
 	}
 
-	public async makeTransfer(options: Record<string, any>) {
-		const transaction = new TransferBuilder()
-			.fee(this.toSatoshi(options.transferFee))
-			.nonce(this.nonce.toString())
-			.recipientId(options.recipient)
-			.amount(this.toSatoshi(options.amount));
+	public async makeTransfer(options: TransferOptions): Promise<Contracts.Crypto.ITransactionData> {
+		await this.#initialize();
+
+		options = { ...options, nonce: this.#nonce.toFixed() };
+
+		const states = ["sign"];
 
 		if (options.vendorField) {
-			transaction.vendorField(options.vendorField);
+			states.unshift("vendorField");
 		}
 
-		await transaction.sign(options.passphrase);
+		const transferBuilder = await this.#factoryBuilder
+			.get("Transfer")
+			.withOptions(options)
+			.withStates(...states)
+			.make<TransactionBuilder<any>>();
 
-		this.incrementNonce();
-		return transaction.getStruct();
+		this.#incrementNonce();
+		return transferBuilder.getStruct();
 	}
 
-	public async makeValidator(options: Record<string, any>) {
-		const transaction = await new ValidatorRegistrationBuilder()
-			.fee(this.toSatoshi(options.validatorFee))
-			.nonce(this.nonce.toString())
-			.usernameAsset(options.username)
-			.sign(options.passphrase);
+	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.ITransactionData> {
+		await this.#initialize();
 
-		this.incrementNonce();
-		return transaction.getStruct();
+		options = { ...options, nonce: this.#nonce.toFixed() };
+
+		const transferBuilder = await this.#factoryBuilder
+			.get("ValidatorRegistration")
+			.withOptions(options)
+			.withStates("sign")
+			.make<TransactionBuilder<any>>();
+
+		this.#incrementNonce();
+		return transferBuilder.getStruct();
 	}
 
-	public async makeVote(options: Record<string, any>) {
-		const transaction = await new VoteBuilder()
-			.fee(this.toSatoshi(options.voteFee))
-			.nonce(this.nonce.toString())
-			.votesAsset([options.validator])
-			.sign(options.passphrase);
+	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.ITransactionData> {
+		await this.#initialize();
 
-		this.incrementNonce();
-		return transaction.getStruct();
+		options = { ...options, nonce: this.#nonce.toFixed() };
+
+		const transferBuilder = await this.#factoryBuilder
+			.get("Vote")
+			.withOptions(options)
+			.withStates("sign")
+			.make<TransactionBuilder<any>>();
+
+		this.#incrementNonce();
+		return transferBuilder.getStruct();
 	}
 
-	public async makeMultiSignatureRegistration(options: Record<string, any>) {
-		const transaction = new MultiSignatureBuilder()
-			.multiSignatureAsset({
-				min: options.min,
-				publicKeys: options.participants.split(","),
-			})
-			.senderPublicKey(await this.publicKeyFactory.fromMnemonic(options.passphrase))
-			.nonce(this.nonce.toString());
+	public async makeMultiSignatureRegistration(
+		options: MultiSignatureOptions,
+	): Promise<Contracts.Crypto.ITransactionData> {
+		await this.#initialize();
 
-		for (const [index, passphrase] of options.passphrases.split(",").entries()) {
-			await transaction.multiSign(passphrase, index);
+		options = { ...options, nonce: this.#nonce.toFixed() };
+
+		const transferBuilder = await this.#factoryBuilder
+			.get("MultiSignature")
+			.withOptions(options)
+			.withStates("sign", "multiSign")
+			.make<TransactionBuilder<any>>();
+
+		this.#incrementNonce();
+		return transferBuilder.getStruct();
+	}
+
+	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.ITransactionData> {
+		await this.#initialize();
+
+		options = { ...options, nonce: this.#nonce.toFixed() };
+
+		const transferBuilder = await this.#factoryBuilder
+			.get("MultiPayment")
+			.withOptions(options)
+			.withStates("sign")
+			.make<TransactionBuilder<any>>();
+
+		this.#incrementNonce();
+		return transferBuilder.getStruct();
+	}
+
+	#incrementNonce(): void {
+		this.#nonce = this.#nonce.plus(1);
+	}
+
+	async #initialize() {
+		if (!this.#initialized) {
+			await registerTransactionFactory(this.#factoryBuilder, this.#config);
+			this.#initialized = true;
 		}
-
-		await transaction.sign(options.passphrase);
-
-		this.incrementNonce();
-		return transaction.getStruct();
-	}
-
-	public async makeMultipayment(options: Record<string, any>) {
-		const transaction = new MultiPaymentBuilder()
-			.fee(this.toSatoshi(options.multipaymentFee))
-			.nonce(this.nonce.toString());
-
-		for (const payment of options.payments) {
-			transaction.addPayment(payment.recipientId, payment.amount);
-		}
-
-		await transaction.sign(options.passphrase);
-
-		this.incrementNonce();
-		return transaction.getStruct();
-	}
-
-	private incrementNonce(): void {
-		this.nonce = this.nonce.plus(1);
-	}
-
-	private toSatoshi(value): string {
-		return BigNumber.make(value * 1e8).toFixed();
 	}
 }

@@ -1577,11 +1577,22 @@ importers:
     specifiers:
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
+      '@arkecosystem/core-configuration-generator': workspace:*
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-crypto-transaction-multi-payment': workspace:*
+      '@arkecosystem/core-crypto-transaction-multi-signature-registration': workspace:*
+      '@arkecosystem/core-crypto-transaction-transfer': workspace:*
+      '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
+      '@arkecosystem/core-crypto-transaction-validator-resignation': workspace:*
+      '@arkecosystem/core-crypto-transaction-vote': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
       '@hapi/hapi': 20.1.5
       '@types/got': 9.6.12
@@ -1590,6 +1601,7 @@ importers:
       bs58: 4.0.1
       chance: 1.1.8
       concordance: ~5.0.4
+      dayjs: 1.10.7
       env-paths: 2.2.0
       fast-memoize: 2.5.2
       fs-extra: 8.1.0
@@ -1608,16 +1620,28 @@ importers:
     dependencies:
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
+      '@arkecosystem/core-configuration-generator': link:../core-configuration-generator
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-crypto-transaction-multi-payment': link:../core-crypto-transaction-multi-payment
+      '@arkecosystem/core-crypto-transaction-multi-signature-registration': link:../core-crypto-transaction-multi-signature-registration
+      '@arkecosystem/core-crypto-transaction-transfer': link:../core-crypto-transaction-transfer
+      '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
+      '@arkecosystem/core-crypto-transaction-validator-resignation': link:../core-crypto-transaction-validator-resignation
+      '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
+      '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
+      '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/utils': link:../utils
       bip39: 3.0.4
       bs58: 4.0.1
       chance: 1.1.8
       concordance: 5.0.4
+      dayjs: 1.10.7
       env-paths: 2.2.0
       fast-memoize: 2.5.2
       fs-extra: 8.1.0

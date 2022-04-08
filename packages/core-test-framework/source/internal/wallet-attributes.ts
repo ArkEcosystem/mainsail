@@ -9,7 +9,6 @@ export function getWalletAttributeSet(): Services.Attributes.AttributeSet {
 	attributes.set("validator.voteBalance");
 	attributes.set("validator");
 	attributes.set("multiSignature");
-	attributes.set("multiSignature.legacy");
 	attributes.set("vote");
 
 	return attributes;

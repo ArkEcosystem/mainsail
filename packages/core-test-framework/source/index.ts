@@ -7,7 +7,6 @@ export * from "./app";
 export * from "./cli";
 // Entity Factories for commonly used entities like blocks and wallets
 // Generators for commonly used entities like blocks and wallets
-export * as Generators from "./app/generators";
 export * as Factories from "./factories";
 // Utilities for common tasks like sending HTTP requests or altering wallets
 export * as Mocks from "./mocks"; // @TODO export as Utils
