@@ -5,11 +5,11 @@ import fs from "fs-extra";
 import { join } from "path";
 import prompts from "prompts";
 
-import { Command } from "./network-generate";
+import { Command } from "./config-generate";
 
 describe<{
 	cli: Console;
-}>("NetworkGenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
+}>("ConfigGenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
 	const configCrypto = join(configCore, "crypto");
@@ -315,17 +315,12 @@ describe<{
 				feeDynamicMinFeeBroadcast: 200,
 				feeDynamicBytesDelegateResignation: 8,
 				feeStaticDelegateRegistration: 3,
-				coreDBHost: "127.0.0.1",
 				feeStaticDelegateResignation: 8,
-				coreDBPassword: "password",
 				maxBlockPayload: "123444",
-				coreDBDatabase: "database",
 				maxTxPerBlock: "122",
 				coreAPIPort: 3003,
 				network: "testnet",
-				coreDBPort: 3001,
 				premine: "120000000000",
-				coreDBUsername: "username",
 				pubKeyHash: "168",
 				coreMonitorPort: 3005,
 				rewardAmount: "66000",

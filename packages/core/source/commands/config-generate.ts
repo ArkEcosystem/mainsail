@@ -24,9 +24,9 @@ export class Command extends Commands.Command {
 	@inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
-	public signature = "network:generate";
+	public signature = "config:generate";
 
-	public description = "Generates a new network configuration.";
+	public description = "Generate a new configuration.";
 
 	public requiresNetwork = false;
 
@@ -145,12 +145,6 @@ export class Command extends Commands.Command {
 		},
 
 		// Env
-		{ name: "coreDBHost", description: "Core database host.", schema: Joi.string(), default: "localhost" },
-		{ name: "coreDBPort", description: "Core database port.", schema: Joi.number(), default: 5432 },
-		{ name: "coreDBUsername", description: "Core database username.", schema: Joi.string() },
-		{ name: "coreDBPassword", description: "Core database password.", schema: Joi.string() },
-		{ name: "coreDBDatabase", description: "Core database database.", schema: Joi.string() },
-
 		{ name: "coreP2PPort", description: "Core P2P port.", schema: Joi.number(), default: 4000 },
 		{ name: "coreWebhooksPort", description: "Core Webhooks port.", schema: Joi.number(), default: 4004 },
 		{ name: "coreMonitorPort", description: "Core Webhooks port.", schema: Joi.number(), default: 4005 },
