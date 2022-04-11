@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 @injectable()
@@ -44,7 +44,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		this.events.listen(Enums.CryptoEvent.MilestoneChanged, this);
 		this.events.listen(Enums.BlockEvent.Applied, this);
 
-		if (process.env.CORE_RESET_DATABASE || process.env.CORE_RESET_POOL) {
+		if (process.env[Constants.Flags.CORE_RESET_DATABASE] || process.env[Constants.Flags.CORE_RESET_POOL]) {
 			await this.flush();
 		}
 	}

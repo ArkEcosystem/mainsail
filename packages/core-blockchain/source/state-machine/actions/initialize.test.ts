@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers, Constants } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 // import { Managers } from "@arkecosystem/crypto";
 import { describe } from "../../../../core-test-framework";
@@ -230,7 +230,7 @@ describe<{
 		dispatchSpy.calledWith("STARTED");
 	});
 
-	it("when process.env.NODE_ENV === 'test' should dispatch STARTED", async (context) => {
+	it("when process.env.CORE_ENV === 'test' should dispatch STARTED", async (context) => {
 		const initialize = context.container.resolve<Initialize>(Initialize);
 
 		const lastBlock = {
@@ -250,7 +250,7 @@ describe<{
 		const bootSpy = spy(context.peerNetworkMonitor, "boot");
 		const runSpy = spy(context.stateBuilder, "run");
 
-		process.env.NODE_ENV = "test";
+		process.env[Constants.Flags.CORE_ENV] = "test";
 		await initialize.handle();
 
 		deleteRoundSpy.calledOnce();

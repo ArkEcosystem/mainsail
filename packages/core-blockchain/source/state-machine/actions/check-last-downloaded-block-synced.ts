@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Action } from "../contracts";
 
@@ -60,7 +60,7 @@ export class CheckLastDownloadedBlockSynced implements Action {
 			event = "SYNCED";
 		}
 
-		if (process.env.CORE_ENV === "test") {
+		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			event = "TEST";
 		}
 

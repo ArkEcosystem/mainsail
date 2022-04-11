@@ -1,6 +1,5 @@
 import { inject } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { FastifyRequest } from "fastify";
 
@@ -37,7 +36,7 @@ export class GetBlocksController {
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
 		const blocksToReturn: Contracts.Shared.DownloadBlock[] = [];
-		const maxPayloadWithMargin = constants.DEFAULT_MAX_PAYLOAD - 100 * 1024; // 100KB margin because we're dealing with estimates
+		const maxPayloadWithMargin = constants.DEFAULT_MAX_PAYLOAD - 100 * Constants.Units.KILOBYTE; // 100KB margin because we're dealing with estimates
 		for (let index = 0, sizeEstimate = 0; sizeEstimate < maxPayloadWithMargin && index < blocks.length; index++) {
 			blocksToReturn.push(blocks[index]);
 			sizeEstimate +=

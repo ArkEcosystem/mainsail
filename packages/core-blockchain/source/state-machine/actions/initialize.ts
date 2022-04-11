@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
@@ -81,7 +81,7 @@ export class Initialize implements Action {
 				return this.blockchain.dispatch("STARTED");
 			}
 
-			if (process.env.NODE_ENV === "test") {
+			if (process.env[Constants.Flags.CORE_ENV] === "test") {
 				this.logger.notice("TEST SUITE DETECTED! SYNCING WALLETS AND STARTING IMMEDIATELY.");
 
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();

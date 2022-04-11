@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "./round-state";
@@ -53,7 +53,7 @@ export class DatabaseInteraction {
 
 			this.stateStore.setGenesisBlock(genesisBlock);
 
-			if (process.env.CORE_RESET_DATABASE) {
+			if (process.env[Constants.Flags.CORE_RESET_DATABASE]) {
 				await this.#reset();
 			}
 

@@ -1,6 +1,6 @@
 import { ConfigurationGenerator, makeApplication } from "@arkecosystem/core-configuration-generator";
 import { Container, interfaces } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Providers, Types } from "@arkecosystem/core-kernel";
 import { readJSONSync, removeSync } from "fs-extra";
 import { join, resolve } from "path";
@@ -62,7 +62,7 @@ export class Sandbox {
 		}
 
 		// Configure Application
-		process.env.CORE_PATH_CONFIG = this.getConfigurationPath();
+		process.env[Constants.Flags.CORE_PATH_CONFIG] = this.getConfigurationPath();
 
 		if (callback) {
 			callback({

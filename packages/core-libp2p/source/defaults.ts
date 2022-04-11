@@ -1,3 +1,4 @@
+import { Constants } from "@arkecosystem/core-contracts";
 import { NOISE } from "@chainsafe/libp2p-noise";
 import Bootstrap from "libp2p-bootstrap";
 import Gossipsub from "libp2p-gossipsub";
@@ -16,7 +17,7 @@ export const defaults = {
 			},
 		},
 		pubsub: {
-			emitSelf: process.env.CORE_NETWORK_NAME === "testnet",
+			emitSelf: process.env[Constants.Flags.CORE_NETWORK_NAME] === "testnet",
 			enabled: true,
 		},
 	},

@@ -1,3 +1,4 @@
+import { Constants } from "@arkecosystem/core-contracts";
 import { readJSON } from "fs-extra";
 import { join } from "path";
 
@@ -13,7 +14,7 @@ interface Config {
 export class DiscoverConfig {
 	public async discover(token = "", network = ""): Promise<Config | undefined> {
 		try {
-			return await readJSON(join(process.env.CORE_PATH_CONFIG!, "config.json"));
+			return await readJSON(join(process.env[Constants.Flags.CORE_PATH_CONFIG]!, "config.json"));
 		} catch {}
 
 		try {

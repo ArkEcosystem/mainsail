@@ -211,23 +211,23 @@ export class ConfigurationGenerator {
 
 	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions): EnviromentData {
 		const data: EnviromentData = {
-			CORE_DB_HOST: options.coreDBHost,
-			CORE_DB_PORT: options.coreDBPort,
+			// CORE_DB_HOST: options.coreDBHost,
+			// CORE_DB_PORT: options.coreDBPort,
 			CORE_P2P_PORT: options.coreP2PPort,
 			CORE_WEBHOOKS_PORT: options.coreWebhooksPort,
 		};
 
-		if (options.coreDBDatabase) {
-			data.CORE_DB_DATABASE = options.coreDBDatabase;
-		}
+		// if (options.coreDBDatabase) {
+		// 	data.CORE_DB_DATABASE = options.coreDBDatabase;
+		// }
 
-		if (options.coreDBUsername) {
-			data.CORE_DB_USERNAME = options.coreDBUsername;
-		}
+		// if (options.coreDBUsername) {
+		// 	data.CORE_DB_USERNAME = options.coreDBUsername;
+		// }
 
-		if (options.coreDBPassword) {
-			data.CORE_DB_PASSWORD = options.coreDBDatabase;
-		}
+		// if (options.coreDBPassword) {
+		// 	data.CORE_DB_PASSWORD = options.coreDBDatabase;
+		// }
 
 		return data;
 	}

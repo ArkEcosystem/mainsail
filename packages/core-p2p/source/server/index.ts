@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Types } from "@arkecosystem/core-kernel";
 import fastify, { FastifyInstance, FastifyRequest } from "fastify";
 import { v4 } from "uuid";
@@ -78,7 +78,7 @@ export class Server {
 		this.#server.get(
 			"/blocks",
 			{
-				bodyLimit: 1024,
+				bodyLimit: Constants.Units.KILOBYTE,
 				schema: {
 					headers: {
 						properties: {
@@ -125,7 +125,7 @@ export class Server {
 		this.#server.get(
 			"/blocks/common",
 			{
-				bodyLimit: 10 * 1024,
+				bodyLimit: 10 * Constants.Units.KILOBYTE,
 				schema: {
 					headers: {
 						properties: {
@@ -147,7 +147,7 @@ export class Server {
 		this.#server.get(
 			"/peers",
 			{
-				bodyLimit: 1024,
+				bodyLimit: Constants.Units.KILOBYTE,
 				schema: {
 					headers: {
 						properties: {
@@ -163,7 +163,7 @@ export class Server {
 		this.#server.get(
 			"/status",
 			{
-				bodyLimit: 1024,
+				bodyLimit: Constants.Units.KILOBYTE,
 				schema: {
 					headers: {
 						properties: {

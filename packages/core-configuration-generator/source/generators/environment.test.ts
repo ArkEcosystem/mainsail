@@ -23,8 +23,6 @@ describe<{
 	it("#addInitialRecords - should add initial records", ({ generator }) => {
 		const resul = generator.addInitialRecords().generate();
 
-		assert.equal(resul.CORE_DB_HOST, "localhost");
-		assert.equal(resul.CORE_DB_PORT, 5432);
 		assert.equal(resul.CORE_LOG_LEVEL, "info");
 		assert.equal(resul.CORE_LOG_LEVEL_FILE, "info");
 		assert.equal(resul.CORE_P2P_HOST, "0.0.0.0");

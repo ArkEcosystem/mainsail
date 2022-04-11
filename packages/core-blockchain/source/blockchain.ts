@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Constants } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
@@ -102,7 +102,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 		this.dispatch("START");
 
-		if (skipStartedCheck || process.env.CORE_SKIP_BLOCKCHAIN_STARTED_CHECK) {
+		if (skipStartedCheck || process.env[Constants.Flags.CORE_SKIP_BLOCKCHAIN_STARTED_CHECK]) {
 			return true;
 		}
 

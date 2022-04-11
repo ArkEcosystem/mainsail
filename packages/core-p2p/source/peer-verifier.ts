@@ -1,8 +1,8 @@
 /* eslint-disable unicorn/prefer-at */
-import assert from "assert";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
+import assert from "assert";
 import pluralize from "pluralize";
 import { inspect } from "util";
 
@@ -473,7 +473,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const fullMessage = `${this.#logPrefix} ${message}`;
 		switch (severity) {
 			case Severity.DEBUG_EXTRA:
-				if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
+				if (process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
 					this.logger.debug(fullMessage);
 				}
 				break;

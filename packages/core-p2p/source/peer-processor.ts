@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { isValidPeer } from "@arkecosystem/core-crypto-validation";
 import { Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
 
@@ -76,7 +76,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
 
 		if (this.repository.getSameSubnetPeers(peer.ip).length >= maxSameSubnetPeers && !options.seed) {
-			if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
+			if (process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
 				this.logger.warning(
 					`Rejected ${peer.ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
 				);
@@ -104,7 +104,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 			this.repository.setPeer(newPeer);
 
-			if (!options.lessVerbose || process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
+			if (!options.lessVerbose || process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
 				this.logger.debug(`Accepted new peer ${newPeer.ip}:${newPeer.port} (v${newPeer.version})`);
 			}
 

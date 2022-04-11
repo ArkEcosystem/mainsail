@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services, Types, Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
@@ -24,7 +24,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async bootWhen(): Promise<boolean> {
-		return !process.env.DISABLE_P2P_SERVER;
+		return !process.env[Constants.Flags.DISABLE_P2P_SERVER];
 	}
 
 	public async boot(): Promise<void> {
@@ -36,8 +36,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		if (!process.env.DISABLE_P2P_SERVER) {
-			this.app.get<Server>(Identifiers.P2PServer).dispose();
+		if (!process.env[Constants.Flags.DISABLE_P2P_SERVER]) {
+			await this.app.get<Server>(Identifiers.P2PServer).dispose();
 		}
 	}
 

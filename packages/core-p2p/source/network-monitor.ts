@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
 
@@ -73,7 +73,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async updateNetworkStatus(initialRun?: boolean): Promise<void> {
-		if (process.env.NODE_ENV === "test") {
+		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			return;
 		}
 

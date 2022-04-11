@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 
 import { assert } from "../utils";
@@ -22,10 +22,10 @@ export class RegisterBaseBindings implements Bootstrapper {
 		this.app.bind<string>(Identifiers.ApplicationVersion).toConstantValue(version);
 
 		// @@TODO implement a getter/setter that sets vars locally and in the process.env variables
-		process.env.CORE_ENV = flags.env;
-		// process.env.NODE_ENV = process.env.CORE_ENV;
-		process.env.CORE_TOKEN = flags.token;
-		process.env.CORE_NETWORK_NAME = flags.network;
-		process.env.CORE_VERSION = version;
+		process.env[Constants.Flags.CORE_ENV] = flags.env;
+		// process.env[Constants.Flags.CORE_ENV] = process.env.CORE_ENV;
+		process.env[Constants.Flags.CORE_TOKEN] = flags.token;
+		process.env[Constants.Flags.CORE_NETWORK_NAME] = flags.network;
+		process.env[Constants.Flags.CORE_VERSION] = version;
 	}
 }

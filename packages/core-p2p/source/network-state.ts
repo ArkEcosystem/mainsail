@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Utils } from "@arkecosystem/core-kernel";
 
 import { NetworkStateStatus } from "./enums";
@@ -59,7 +59,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		if (monitor.isColdStart()) {
 			monitor.completeColdStart();
 			return new NetworkState(NetworkStateStatus.ColdStart, lastBlock);
-		} else if (process.env.CORE_ENV === "test") {
+		} else if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			return new NetworkState(NetworkStateStatus.Test, lastBlock);
 		} else if (peers.length < minimumNetworkReach) {
 			return new NetworkState(NetworkStateStatus.BelowMinimumPeers, lastBlock);

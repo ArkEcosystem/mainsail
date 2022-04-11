@@ -1,3 +1,4 @@
+import { Constants } from "@arkecosystem/core-contracts";
 import { totalmem } from "os";
 
 import { Application } from "../application";
@@ -39,7 +40,7 @@ export class DaemonizeProcess {
 
 			flagsProcess.name = processName;
 
-			const potato: boolean = totalmem() < 2 * 1024 ** 3;
+			const potato: boolean = totalmem() < 2 * Constants.Units.GIGABYTE;
 
 			this.processManager.start(
 				{

@@ -9,8 +9,6 @@ export class EnvironmentGenerator {
 
 	addInitialRecords(): EnvironmentGenerator {
 		this.#data = {
-			CORE_DB_HOST: "localhost",
-			CORE_DB_PORT: 5432,
 			CORE_LOG_LEVEL: "info",
 			CORE_LOG_LEVEL_FILE: "info",
 			CORE_P2P_HOST: "0.0.0.0",
