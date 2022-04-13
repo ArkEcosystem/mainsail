@@ -3,13 +3,12 @@ import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
-
 @injectable()
 export class Configuration implements Contracts.Crypto.IConfiguration {
 	#config: Contracts.Crypto.NetworkConfig | undefined;
 	#height: number | undefined;
-	#milestone: Contracts.Crypto.IMilestone | undefined;
-	#milestones: Record<string, any> | undefined;
+	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
+	#milestones: Contracts.Crypto.Milestone[] | undefined;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfig): void {
 		this.#config = {
@@ -71,7 +70,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestones.some((milestone) => milestone.height === height);
 	}
 
-	public getMilestone(height?: number): { [key: string]: any } {
+	public getMilestone(height?: number): Contracts.Crypto.Milestone {
 		if (!this.#milestone || !this.#milestones) {
 			throw new Error();
 		}
@@ -100,7 +99,10 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestone.data;
 	}
 
-	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): Contracts.Crypto.MilestoneSearchResult {
+	public getNextMilestoneWithNewKey<K extends Contracts.Crypto.MilestoneKey>(
+		previousMilestone: number,
+		key: K,
+	): Contracts.Crypto.MilestoneSearchResult<Contracts.Crypto.Milestone[K]> {
 		if (!this.#milestones || this.#milestones.length === 0) {
 			throw new Error(`Attempted to get next milestone but none were set`);
 		}
@@ -136,7 +138,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			throw new Error();
 		}
 
-		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height);
+		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height) as Contracts.Crypto.Milestone[];
 		this.#milestone = {
 			data: this.#milestones[0],
 			index: 0,

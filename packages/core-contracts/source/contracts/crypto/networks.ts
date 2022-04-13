@@ -1,12 +1,18 @@
 import { IBlockJson } from "./block";
 
-export interface NetworkConfig {
+export type NetworkConfig = {
 	genesisBlock: IBlockJson;
-	milestones: Array<Record<string, any>>;
+	milestones: Milestone[];
 	network: Network;
-}
+};
 
-export interface Network {
+export type NetworkConfigPartial = {
+	genesisBlock: IBlockJson;
+	milestones: Partial<Milestone>[];
+	network: Network;
+};
+
+export type Network = {
 	name: string;
 	messagePrefix: string;
 	pubKeyHash: number;
@@ -18,10 +24,35 @@ export interface Network {
 		symbol: string;
 		explorer: string;
 	};
-}
+};
 
-export interface MilestoneSearchResult {
+export type MilestoneBlock = {
+	maxPayload: number;
+	maxTransactions: number;
+	version: number;
+};
+export type MilestoneSatoshi = {
+	decimals: number;
+	denomination: number;
+};
+
+export type Milestone = {
+	height: number;
+	activeValidators: number;
+	address: Record<string, any>;
+	block: MilestoneBlock;
+	blockTime: number;
+	epoch: string;
+	multiPaymentLimit: number;
+	reward: string;
+	satoshi: MilestoneSatoshi;
+	vendorFieldLength: number;
+};
+
+export type MilestoneKey = keyof Milestone;
+
+export type MilestoneSearchResult<T> = {
 	found: boolean;
 	height: number;
-	data: any;
-}
+	data: T;
+};

@@ -63,9 +63,6 @@ export abstract class TransactionHandler {
 		const isMultiSignatureRegistration: boolean =
 			transaction.type === Contracts.Crypto.TransactionType.MultiSignature &&
 			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core;
-		if (isMultiSignatureRegistration && !this.configuration.getMilestone().aip11) {
-			throw new Exceptions.LegacyMultiSignatureRegistrationError();
-		}
 
 		if (sender.hasMultiSignature()) {
 			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);

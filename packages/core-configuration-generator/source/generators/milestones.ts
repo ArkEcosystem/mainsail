@@ -1,11 +1,9 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
-import { Types } from "@arkecosystem/core-kernel";
 
-// TODO: Fix types
 @injectable()
 export class MilestonesGenerator {
-	#data: Types.JsonObject[] = [];
+	#data: Partial<Contracts.Crypto.Milestone>[] = [];
 
 	setInitial(options: Contracts.NetworkGenerator.MilestoneOptions): MilestonesGenerator {
 		this.#data = [
@@ -44,7 +42,7 @@ export class MilestonesGenerator {
 		return this;
 	}
 
-	generate(): Types.JsonObject[] {
+	generate(): Partial<Contracts.Crypto.Milestone>[] {
 		return this.#data;
 	}
 }

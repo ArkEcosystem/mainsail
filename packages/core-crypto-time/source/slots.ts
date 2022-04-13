@@ -97,8 +97,10 @@ export class Slots implements Contracts.Crypto.Slots {
 		};
 	}
 
-	public getMilestonesWhichAffectBlockTimes(): Array<Contracts.Crypto.MilestoneSearchResult> {
-		const milestones: Array<Contracts.Crypto.MilestoneSearchResult> = [
+	public getMilestonesWhichAffectBlockTimes(): Array<
+		Contracts.Crypto.MilestoneSearchResult<Contracts.Crypto.Milestone["blockTime"]>
+	> {
+		const milestones: Array<Contracts.Crypto.MilestoneSearchResult<Contracts.Crypto.Milestone["blockTime"]>> = [
 			{
 				data: this.configuration.getMilestone(1).blockTime,
 				found: true,

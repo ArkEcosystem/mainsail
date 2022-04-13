@@ -1,4 +1,4 @@
-import { MilestoneSearchResult } from "./networks";
+import { Milestone, MilestoneSearchResult } from "./networks";
 
 export interface SlotInfo {
 	startTime: number;
@@ -27,5 +27,5 @@ export interface Slots {
 
 	getSlotInfo(timestamp?: number, height?: number): Promise<SlotInfo>;
 
-	getMilestonesWhichAffectBlockTimes(): Array<MilestoneSearchResult>;
+	getMilestonesWhichAffectBlockTimes(): Array<MilestoneSearchResult<Milestone["blockTime"]>>;
 }
