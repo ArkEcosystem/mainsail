@@ -1,18 +1,18 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isEnumerable } from "./is-enumerable";
 
-const object1 = {};
-const array1 = [];
-// @ts-ignore
-object1.property1 = 42;
-// @ts-ignore
-array1[0] = 42;
-
-describe("#isEnumerable", () => {
+describe("isEnumerable", async ({ assert, it, nock, loader }) => {
 	it("should work with objects and arrays", () => {
-		expect(isEnumerable(object1, "property1")).toBeTrue();
-		expect(isEnumerable(array1, 0)).toBeTrue();
-		expect(isEnumerable(array1, "length")).toBeFalse();
+		const object1 = {};
+		const array1 = [];
+
+		object1.property1 = 42;
+
+		array1[0] = 42;
+
+		assert.true(isEnumerable(object1, "property1"));
+		assert.true(isEnumerable(array1, 0));
+		assert.false(isEnumerable(array1, "length"));
 	});
 });

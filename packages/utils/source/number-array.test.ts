@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { numberArray } from "./number-array";
 
-describe("#numberArray", () => {
+describe("numberArray", async ({ assert, it, nock, loader }) => {
 	it("should contain 5 numbers stating from 0", () => {
-		expect(numberArray(5)).toEqual([0, 1, 2, 3, 4]);
+		assert.equal(numberArray(5), [0, 1, 2, 3, 4]);
 	});
 });

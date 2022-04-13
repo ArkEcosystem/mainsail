@@ -1,8 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
+
 import { zipObject } from "./zip-object";
 
-describe("#zipObject", () => {
+describe("zipObject", async ({ assert, it, nock, loader }) => {
 	it("should create an object from the keys and values", () => {
-		expect(zipObject(["a", "b"], [1, 2])).toEqual({ a: 1, b: 2 });
+		assert.equal(zipObject(["a", "b"], [1, 2]), { a: 1, b: 2 });
 	});
 });

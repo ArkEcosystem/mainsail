@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isEmptyMap } from "./is-empty-map";
 
-describe("#isEmptyMap", () => {
+describe("isEmptyMap", async ({ assert, it, nock, loader }) => {
 	it("should return true for an empty map", () => {
-		expect(isEmptyMap(new Map())).toBeTrue();
+		assert.true(isEmptyMap(new Map()));
 	});
 });

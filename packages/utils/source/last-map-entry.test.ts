@@ -1,16 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { lastMapEntry } from "./last-map-entry";
 
-describe("#lastMapEntry", () => {
+describe("lastMapEntry", async ({ assert, it, nock, loader }) => {
 	it("should return the last entry", () => {
-		expect(
+		assert.equal(
 			lastMapEntry(
 				new Map([
 					["Hello", "World"],
 					["Another", "Planet"],
 				]),
 			),
-		).toEqual(["Another", "Planet"]);
+			["Another", "Planet"],
+		);
 	});
 });

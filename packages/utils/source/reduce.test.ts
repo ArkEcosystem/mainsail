@@ -1,14 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { reduce } from "./reduce";
 
-describe("#reduce", () => {
+describe("reduce", async ({ assert, it, nock, loader }) => {
 	it("should work with an array", () => {
-		expect(reduce([1, 2], (sum, n) => sum + n, 0)).toBe(3);
+		assert.is(
+			reduce([1, 2], (sum, n) => sum + n, 0),
+			3,
+		);
 	});
 
 	it("should work with an object", () => {
-		expect(
+		assert.equal(
 			reduce(
 				{ a: 1, b: 2, c: 1 },
 				(result, value, key) => {
@@ -18,6 +21,7 @@ describe("#reduce", () => {
 				},
 				{},
 			),
-		).toEqual({ "1": ["a", "c"], "2": ["b"] });
+			{ 1: ["a", "c"], 2: ["b"] },
+		);
 	});
 });

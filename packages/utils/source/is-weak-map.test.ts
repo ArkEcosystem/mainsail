@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isWeakMap } from "./is-weak-map";
 
-describe("#isWeakMap", () => {
+describe("isWeakMap", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isWeakMap(new WeakMap())).toBeTrue();
+		assert.true(isWeakMap(new WeakMap()));
 	});
 
 	it("should fail", () => {
-		expect(isWeakMap(1)).toBeFalse();
+		assert.false(isWeakMap(1));
 	});
 });

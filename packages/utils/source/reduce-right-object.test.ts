@@ -1,10 +1,10 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { reduceRightObject } from "./reduce-right-object";
 
-describe("#reduceRightObject", () => {
+describe("reduceRightObject", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(
+		assert.equal(
 			reduceRightObject(
 				{ a: 1, b: 2, c: 1 },
 				(result, value, key) => {
@@ -14,6 +14,7 @@ describe("#reduceRightObject", () => {
 				},
 				{},
 			),
-		).toEqual({ "1": ["c", "a"], "2": ["b"] });
+			{ 1: ["c", "a"], 2: ["b"] },
+		);
 	});
 });

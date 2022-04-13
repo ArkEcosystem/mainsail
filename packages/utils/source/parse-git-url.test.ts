@@ -1,18 +1,18 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { parseGitUrl } from "./parse-git-url";
 
-describe("#parseGitUrl", () => {
+describe("#parseGitUrl", ({ it, assert }) => {
 	it("should throw if it cannot find a host", () => {
-		expect(() => parseGitUrl("owner/repo.git")).toThrow("Failed to find a host.");
+		assert.throws(() => parseGitUrl("owner/repo.git"), "Failed to find a host.");
 	});
 
 	it("should throw if it cannot find a name", () => {
-		expect(() => parseGitUrl("git@github.com")).toThrow("Failed to find a name.");
+		assert.throws(() => parseGitUrl("git@github.com"), "Failed to find a name.");
 	});
 
 	it("should return the expected fields", () => {
-		expect(parseGitUrl("git@github.com:owner/repo.git")).toEqual({
+		assert.equal(parseGitUrl("git@github.com:owner/repo.git"), {
 			host: "github.com",
 			owner: "owner",
 			name: "repo",
@@ -20,7 +20,7 @@ describe("#parseGitUrl", () => {
 			branch: "master",
 		});
 
-		expect(parseGitUrl("https://github.com/owner/repo.git")).toEqual({
+		assert.equal(parseGitUrl("https://github.com/owner/repo.git"), {
 			host: "github.com",
 			owner: "owner",
 			name: "repo",
@@ -28,7 +28,7 @@ describe("#parseGitUrl", () => {
 			branch: "master",
 		});
 
-		expect(parseGitUrl("https://github.com/owner/repo.git#develop")).toEqual({
+		assert.equal(parseGitUrl("https://github.com/owner/repo.git#develop"), {
 			host: "github.com",
 			owner: "owner",
 			name: "repo",
@@ -36,7 +36,7 @@ describe("#parseGitUrl", () => {
 			branch: "develop",
 		});
 
-		expect(parseGitUrl("https://github.com/owner/repo.git#f4991348ca779b68b8e7139cfcbc601e6d496612")).toEqual({
+		assert.equal(parseGitUrl("https://github.com/owner/repo.git#f4991348ca779b68b8e7139cfcbc601e6d496612"), {
 			host: "github.com",
 			owner: "owner",
 			name: "repo",
@@ -44,7 +44,7 @@ describe("#parseGitUrl", () => {
 			branch: "f4991348ca779b68b8e7139cfcbc601e6d496612",
 		});
 
-		expect(parseGitUrl("https://github.com/owner/repo.git#develop#develop")).toEqual({
+		assert.equal(parseGitUrl("https://github.com/owner/repo.git#develop#develop"), {
 			host: "github.com",
 			owner: "owner",
 			name: "repo",

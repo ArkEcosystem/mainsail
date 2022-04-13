@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { snakeCase } from "./snake-case";
 
-describe("#snakeCase", () => {
+describe("snakeCase", async ({ assert, it, nock, loader }) => {
 	it("should turn any string into snake case", () => {
-		expect(snakeCase("string")).toBe("string");
-		expect(snakeCase("camelCase")).toBe("camel_case");
-		expect(snakeCase("param-case")).toBe("param_case");
-		expect(snakeCase("PascalCase")).toBe("pascal_case");
-		expect(snakeCase("UPPER_CASE")).toBe("upper_case");
-		expect(snakeCase("snake_case")).toBe("snake_case");
-		expect(snakeCase("sentence case")).toBe("sentence_case");
-		expect(snakeCase("Title Case")).toBe("title_case");
-		expect(snakeCase("dot.case")).toBe("dot_case");
+		assert.is(snakeCase("string"), "string");
+		assert.is(snakeCase("camelCase"), "camel_case");
+		assert.is(snakeCase("param-case"), "param_case");
+		assert.is(snakeCase("PascalCase"), "pascal_case");
+		assert.is(snakeCase("UPPER_CASE"), "upper_case");
+		assert.is(snakeCase("snake_case"), "snake_case");
+		assert.is(snakeCase("sentence case"), "sentence_case");
+		assert.is(snakeCase("Title Case"), "title_case");
+		assert.is(snakeCase("dot.case"), "dot_case");
 	});
 });

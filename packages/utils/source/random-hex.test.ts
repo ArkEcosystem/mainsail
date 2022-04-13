@@ -1,11 +1,11 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { randomHex } from "./random-hex";
 
-describe("#randomHex", () => {
+describe("#randomHex", ({ it, assert }) => {
 	it("should return a random hex string", () => {
-		expect(randomHex(8)).toHaveLength(8);
-		expect(randomHex(16)).toHaveLength(16);
-		expect(randomHex(32)).toHaveLength(32);
+		assert.length(randomHex(8), 8);
+		assert.length(randomHex(16), 16);
+		assert.length(randomHex(32), 32);
 	});
 });

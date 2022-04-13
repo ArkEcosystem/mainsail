@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isURI } from "./is-uri";
 
-describe("#isURI", () => {
+describe("isURI", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isURI("https://domain.com/")).toBeTrue();
+		assert.true(isURI("https://domain.com/"));
 	});
 
 	it("should fail", () => {
-		expect(isURI("random string")).toBeTrue();
+		assert.true(isURI("random string"));
 	});
 });

@@ -1,7 +1,9 @@
+import { describe } from "../../core-test-framework";
+
 import { chars } from "./chars";
 
-describe("#chars", () => {
+describe("#chars", ({ it, assert }) => {
 	it("should return all characters of the string as an array", () => {
-		expect(chars("Hello World")).toEqual(["H", "e", "l", "l", "o", " ", "W", "o", "r", "l", "d"]);
+		assert.equal(chars("Hello World"), ["H", "e", "l", "l", "o", " ", "W", "o", "r", "l", "d"]);
 	});
 });

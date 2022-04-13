@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { startCase } from "./start-case";
 
-describe("#startCase", () => {
+describe("startCase", async ({ assert, it, nock, loader }) => {
 	it("should turn any string into start case", () => {
-		expect(startCase("string")).toBe("String");
-		expect(startCase("camelCase")).toBe("Camel Case");
-		expect(startCase("param-case")).toBe("Param Case");
-		expect(startCase("PascalCase")).toBe("Pascal Case");
-		expect(startCase("UPPER_CASE")).toBe("Upper Case");
-		expect(startCase("snake_case")).toBe("Snake Case");
-		expect(startCase("sentence case")).toBe("Sentence Case");
-		expect(startCase("Title Case")).toBe("Title Case");
-		expect(startCase("dot.case")).toBe("Dot Case");
+		assert.is(startCase("string"), "String");
+		assert.is(startCase("camelCase"), "Camel Case");
+		assert.is(startCase("param-case"), "Param Case");
+		assert.is(startCase("PascalCase"), "Pascal Case");
+		assert.is(startCase("UPPER_CASE"), "Upper Case");
+		assert.is(startCase("snake_case"), "Snake Case");
+		assert.is(startCase("sentence case"), "Sentence Case");
+		assert.is(startCase("Title Case"), "Title Case");
+		assert.is(startCase("dot.case"), "Dot Case");
 	});
 });

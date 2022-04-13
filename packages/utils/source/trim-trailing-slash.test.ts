@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { trimTrailingSlash } from "./trim-trailing-slash";
 
-describe("#trimTrailingSlash", () => {
+describe("trimTrailingSlash", async ({ assert, it, nock, loader }) => {
 	it("should remove all trailing slashes", () => {
-		expect(trimTrailingSlash("/owner/path")).toBe("/owner/path");
-		expect(trimTrailingSlash("/owner/path/")).toBe("/owner/path");
-		expect(trimTrailingSlash("/owner/path//")).toBe("/owner/path");
-		expect(trimTrailingSlash("/owner/path//")).toBe("/owner/path");
-		expect(trimTrailingSlash("/owner/path///")).toBe("/owner/path");
+		assert.is(trimTrailingSlash("/owner/path"), "/owner/path");
+		assert.is(trimTrailingSlash("/owner/path/"), "/owner/path");
+		assert.is(trimTrailingSlash("/owner/path//"), "/owner/path");
+		assert.is(trimTrailingSlash("/owner/path//"), "/owner/path");
+		assert.is(trimTrailingSlash("/owner/path///"), "/owner/path");
 	});
 });

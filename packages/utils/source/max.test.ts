@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { max } from "./max";
 
-describe("#max", () => {
+describe("max", async ({ assert, it, nock, loader }) => {
 	it("should return the largest number", () => {
-		expect(max([1, 2, 3, 4, 5])).toBe(5);
+		assert.is(max([1, 2, 3, 4, 5]), 5);
 	});
 });

@@ -1,117 +1,109 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { Collection } from "./collection";
 
-let collection: Collection<string>;
-
-beforeEach(() => {
-	collection = new Collection<string>();
-	collection.set("key", "value");
-});
-
-describe("Collection", () => {
-	it("should return the underlying collection", () => {
-		expect(collection.all()).toEqual({ key: "value" });
+describe<{
+	collection: Collection<string>;
+}>("Collection", ({ it, assert, beforeEach }) => {
+	beforeEach((context) => {
+		context.collection = new Collection<string>();
+		context.collection.set("key", "value");
 	});
 
-	it("should return all entries", () => {
-		expect(collection.entries()).toEqual([["key", "value"]]);
+	it("#all - should return the underlying collection", ({ collection }) => {
+		assert.equal(collection.all(), { key: "value" });
 	});
 
-	it("should return all keys", () => {
-		expect(collection.keys()).toEqual(["key"]);
+	it("#entries - should return all entries", ({ collection }) => {
+		assert.equal(collection.entries(), [["key", "value"]]);
 	});
 
-	it("should return all values", () => {
-		expect(collection.values()).toEqual(["value"]);
+	it("#keys - should return all keys", ({ collection }) => {
+		assert.equal(collection.keys(), ["key"]);
 	});
 
-	it("should get an item and remove it", () => {
-		expect(collection.pull("key")).toEqual("value");
-
-		expect(collection.isEmpty()).toBeTrue();
+	it("#values - should return all values", ({ collection }) => {
+		assert.equal(collection.values(), ["value"]);
 	});
 
-	it("should get an item", () => {
-		expect(collection.get("key")).toEqual("value");
-	});
-	it("should set an item", () => {
-		expect(collection.has("key")).toBeTrue();
+	it("#pull - should get an item and remove it", ({ collection }) => {
+		assert.equal(collection.pull("key"), "value");
+
+		assert.true(collection.isEmpty());
 	});
 
-	it("should forget an item", () => {
-		expect(collection.isEmpty()).toBeFalse();
+	it("#get - should get an item", ({ collection }) => {
+		assert.equal(collection.get("key"), "value");
+	});
+	it("#has - should return true", ({ collection }) => {
+		assert.true(collection.has("key"));
+	});
+
+	it("#forget - should forget an item", ({ collection }) => {
+		assert.false(collection.isEmpty());
 
 		collection.forget("key");
 
-		expect(collection.isEmpty()).toBeTrue();
+		assert.true(collection.isEmpty());
 	});
 
-	it("should flush all items", () => {
-		expect(collection.isEmpty()).toBeFalse();
+	it("#flush - should flush all items", ({ collection }) => {
+		assert.false(collection.isEmpty());
 
 		collection.flush();
 
-		expect(collection.isEmpty()).toBeTrue();
+		assert.true(collection.isEmpty());
 	});
 
-	describe("has", () => {
-		it("should return true if an item exists", () => {
-			expect(collection.has("key")).toBeTrue();
-		});
-
-		it("should return false if an item doesn't exist", () => {
-			collection.flush();
-
-			expect(collection.has("key")).toBeFalse();
-		});
+	it("#has - should return true if an item exists", ({ collection }) => {
+		assert.true(collection.has("key"));
 	});
 
-	describe("missing", () => {
-		it("should return false if an item isn't missing", () => {
-			expect(collection.missing("key")).toBeFalse();
-		});
+	it("#has - should return false if an item doesn't exist", ({ collection }) => {
+		collection.flush();
 
-		it("should return true if an item is missing", () => {
-			collection.flush();
-
-			expect(collection.missing("key")).toBeTrue();
-		});
+		assert.false(collection.has("key"));
 	});
 
-	it("should count all items", () => {
-		expect(collection.count()).toBe(1);
+	it("#missing - should return false if an item isn't missing", ({ collection }) => {
+		assert.false(collection.missing("key"));
 	});
 
-	describe("isEmpty", () => {
-		it("should return false if there are items", () => {
-			expect(collection.isEmpty()).toBeFalse();
-		});
+	it("#missing - should return true if an item is missing", ({ collection }) => {
+		collection.flush();
 
-		it("should return true if there are no items", () => {
-			collection.flush();
-
-			expect(collection.isEmpty()).toBeTrue();
-		});
+		assert.true(collection.missing("key"));
 	});
 
-	describe("isNotEmpty", () => {
-		it("should return true if there are items", () => {
-			expect(collection.isNotEmpty()).toBeTrue();
-		});
-
-		it("should return false if there are no items", () => {
-			collection.flush();
-
-			expect(collection.isNotEmpty()).toBeFalse();
-		});
+	it("#count - should count all items", ({ collection }) => {
+		assert.equal(collection.count(), 1);
 	});
 
-	it("should return a random item", () => {
-		expect(collection.random()).toEqual("value");
+	it("#isEmpty - should return false if there are items", ({ collection }) => {
+		assert.false(collection.isEmpty());
 	});
 
-	it("should turn the items into JSON", () => {
-		expect(collection.toJson()).toEqual(JSON.stringify({ ["key"]: "value" }));
+	it("#isEmpty - should return true if there are no items", ({ collection }) => {
+		collection.flush();
+
+		assert.true(collection.isEmpty());
+	});
+
+	it("#isNotEmpty - should return true if there are items", ({ collection }) => {
+		assert.true(collection.isNotEmpty());
+	});
+
+	it("#isNotEmpty - should return false if there are no items", ({ collection }) => {
+		collection.flush();
+
+		assert.false(collection.isNotEmpty());
+	});
+
+	it("#random - should return a random item", ({ collection }) => {
+		assert.equal(collection.random(), "value");
+	});
+
+	it("#toJson - should turn the items into JSON", ({ collection }) => {
+		assert.equal(collection.toJson(), JSON.stringify({ ["key"]: "value" }));
 	});
 });

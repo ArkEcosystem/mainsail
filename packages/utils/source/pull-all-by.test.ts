@@ -1,11 +1,12 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { pullAllBy } from "./pull-all-by";
 
-describe("#pullAllBy", () => {
+describe("pullAllBy", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(pullAllBy([{ x: 1 }, { x: 2 }, { x: 3 }, { x: 1 }], [{ x: 1 }, { x: 3 }], (o) => o.x)).toEqual([
-			{ x: 2 },
-		]);
+		assert.equal(
+			pullAllBy([{ x: 1 }, { x: 2 }, { x: 3 }, { x: 1 }], [{ x: 1 }, { x: 3 }], (o) => o.x),
+			[{ x: 2 }],
+		);
 	});
 });

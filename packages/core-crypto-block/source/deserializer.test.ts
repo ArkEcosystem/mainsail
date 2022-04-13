@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 import { dummyBlock2 } from "../../test/fixtures/block";
 import { Deserializer } from "./deserializer";

@@ -1,15 +1,21 @@
+import { describeWithContext } from "../../core-test-framework";
+
 import { upperFirst } from "./upper-first";
 
-const dummies = {
-	fred: "Fred",
-	FRED: "FRED",
-	"test space": "Test space",
-};
-
-describe("#upperFirst", () => {
-	it("should capitalize the given input", () => {
-		Object.keys(dummies).forEach((key) => {
-			expect(upperFirst(key)).toEqual(dummies[key]);
+describeWithContext(
+	"upperFirst",
+	() => ({
+		dummies: {
+			fred: "Fred",
+			FRED: "FRED",
+			"test space": "Test space",
+		},
+	}),
+	({ assert, it, nock, loader }) => {
+		it("should capitalize the given input", (context) => {
+			Object.keys(context.dummies).forEach((key) => {
+				assert.is(upperFirst(key), context.dummies[key]);
+			});
 		});
-	});
-});
+	},
+);

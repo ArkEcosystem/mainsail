@@ -1,18 +1,18 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
+
 import { unset } from "./unset";
 
-describe("#unset", () => {
+describe("unset", async ({ assert, it, nock, loader }) => {
 	it("should return false if the target is not an object", () => {
-		expect(unset([], "a.b.c")).toBeFalse();
+		assert.false(unset([], "a.b.c"));
 	});
 
 	it("should return false if the path is not a string", () => {
-		// @ts-ignore
-		expect(unset({}, 123)).toBeFalse();
+		assert.false(unset({}, 123));
 	});
 
 	it("should not do anything if the object is not an object", () => {
-		expect(unset([], "a.b.c")).toBeFalse();
+		assert.false(unset([], "a.b.c"));
 	});
 
 	it("should work with a string or array as path", () => {
@@ -20,10 +20,10 @@ describe("#unset", () => {
 
 		unset(object, "a.b.c");
 
-		expect(object).toEqual({ a: { b: {} } });
+		assert.equal(object, { a: { b: {} } });
 
 		unset(object, "a.b.c");
 
-		expect(object).toEqual({ a: { b: {} } });
+		assert.equal(object, { a: { b: {} } });
 	});
 });

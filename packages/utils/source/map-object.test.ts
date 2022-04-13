@@ -1,9 +1,12 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { mapObject } from "./map-object";
 
-describe("#mapObject", () => {
+describe("mapObject", async ({ assert, it, nock, loader }) => {
 	it("should work like lodash", () => {
-		expect(mapObject({ a: 4, b: 8 }, (n) => n * n)).toEqual([16, 64]);
+		assert.equal(
+			mapObject({ a: 4, b: 8 }, (n) => n * n),
+			[16, 64],
+		);
 	});
 });

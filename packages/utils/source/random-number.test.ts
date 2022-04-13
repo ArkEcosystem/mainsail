@@ -1,10 +1,12 @@
+import { describe } from "../../core-test-framework";
+
 import { randomNumber } from "./random-number";
 
-describe("#randomNumber", () => {
+describe("randomNumber", async ({ assert, it, nock, loader }) => {
 	it("should return a random number within the given range", () => {
-		const actual: number = randomNumber(1, 5);
+		const actual = randomNumber(1, 5);
 
-		expect(actual).toBeGreaterThanOrEqual(1);
-		expect(actual).toBeLessThanOrEqual(5);
+		assert.gte(actual, 1);
+		assert.lte(actual, 5);
 	});
 });

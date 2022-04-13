@@ -1,5 +1,4 @@
-import "jest-extended";
-
+import { describe } from "../../core-test-framework";
 import { assign } from "./assign";
 
 function Foo() {
@@ -15,8 +14,8 @@ function Bar() {
 Foo.prototype.b = 2;
 Bar.prototype.d = 4;
 
-describe("#assign", () => {
+describe("#assign", ({ it, assert }) => {
 	it("should return the names of the users", () => {
-		expect(assign({ a: 0 }, new Foo(), new Bar())).toEqual({ a: 1, c: 3 });
+		assert.equal(assign({ a: 0 }, new Foo(), new Bar()), { a: 1, c: 3 });
 	});
 });

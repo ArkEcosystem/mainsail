@@ -1,28 +1,28 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isSSH } from "./is-ssh";
 
-describe("#isSSH", () => {
+describe("isSSH", async ({ assert, it, nock, loader }) => {
 	it("should pass for SSH URLs", () => {
-		expect(isSSH("ssh://user@github.com:port/owner/repo.git")).toBeTrue();
-		expect(isSSH("user@github.com:/owner/repo.git")).toBeTrue();
-		expect(isSSH("user@github.com:~user/owner/repo.git")).toBeTrue();
-		expect(isSSH("user@github.com:owner/repo.git")).toBeTrue();
-		expect(isSSH("rsync://github.com/owner/repo.git")).toBeTrue();
-		expect(isSSH("git://github.com/owner/repo.git")).toBeTrue();
+		assert.true(isSSH("ssh://user@github.com:port/owner/repo.git"));
+		assert.true(isSSH("user@github.com:/owner/repo.git"));
+		assert.true(isSSH("user@github.com:~user/owner/repo.git"));
+		assert.true(isSSH("user@github.com:owner/repo.git"));
+		assert.true(isSSH("rsync://github.com/owner/repo.git"));
+		assert.true(isSSH("git://github.com/owner/repo.git"));
 	});
 
 	it("should fail for URLs other than SSH", () => {
-		expect(isSSH("ssh://user@github.com:port/owner/repo.git")).toBeTrue();
-		expect(isSSH("user@github.com:/owner/repo.git")).toBeTrue();
-		expect(isSSH("user@github.com:~user/owner/repo.git")).toBeTrue();
-		expect(isSSH("user@github.com:owner/repo.git")).toBeTrue();
-		expect(isSSH("rsync://github.com/owner/repo.git")).toBeTrue();
-		expect(isSSH("git://github.com/owner/repo.git")).toBeTrue();
-		expect(isSSH("http://github.com/owner/repo.git")).toBeFalse();
-		expect(isSSH("https://github.com/owner/repo.git")).toBeFalse();
-		expect(isSSH("/owner/repo.git/")).toBeFalse();
-		expect(isSSH("file:///owner/repo.git/")).toBeFalse();
-		expect(isSSH("file://~/owner/repo.git/")).toBeFalse();
+		assert.true(isSSH("ssh://user@github.com:port/owner/repo.git"));
+		assert.true(isSSH("user@github.com:/owner/repo.git"));
+		assert.true(isSSH("user@github.com:~user/owner/repo.git"));
+		assert.true(isSSH("user@github.com:owner/repo.git"));
+		assert.true(isSSH("rsync://github.com/owner/repo.git"));
+		assert.true(isSSH("git://github.com/owner/repo.git"));
+		assert.false(isSSH("http://github.com/owner/repo.git"));
+		assert.false(isSSH("https://github.com/owner/repo.git"));
+		assert.false(isSSH("/owner/repo.git/"));
+		assert.false(isSSH("file:///owner/repo.git/"));
+		assert.false(isSSH("file://~/owner/repo.git/"));
 	});
 });

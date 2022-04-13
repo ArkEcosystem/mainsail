@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isMap } from "./is-map";
 
-describe("#isMap", () => {
+describe("isMap", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isMap(new Map())).toBeTrue();
+		assert.true(isMap(new Map()));
 	});
 
 	it("should fail", () => {
-		expect(isMap(1)).toBeFalse();
+		assert.false(isMap(1));
 	});
 });

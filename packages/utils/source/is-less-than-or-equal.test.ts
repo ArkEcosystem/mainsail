@@ -1,14 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isLessThanOrEqual } from "./is-less-than-or-equal";
 
-describe("#isLessThanOrEqual", () => {
+describe("isLessThanOrEqual", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isLessThanOrEqual(1, 2)).toBeTrue();
-		expect(isLessThanOrEqual(1, 1)).toBeTrue();
+		assert.true(isLessThanOrEqual(1, 2));
+		assert.true(isLessThanOrEqual(1, 1));
 	});
 
 	it("should fail", () => {
-		expect(isLessThanOrEqual(10, 5)).toBeFalse();
+		assert.false(isLessThanOrEqual(10, 5));
 	});
 });

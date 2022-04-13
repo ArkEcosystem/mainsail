@@ -1,14 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isURL } from "./is-url";
 import { URL } from "url";
 
-describe("#isURL", () => {
+describe("#isURL", ({ it, assert }) => {
 	it("should pass", () => {
-		expect(isURL(new URL("https://google.com"))).toBeTrue();
+		assert.true(isURL(new URL("https://google.com")));
 	});
 
 	it("should fail", () => {
-		expect(isURL(1)).toBeFalse();
+		assert.false(isURL(1));
 	});
 });

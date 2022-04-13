@@ -1,10 +1,10 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { reduceRightArray } from "./reduce-right-array";
 
-describe("#reduceRightArray", () => {
+describe("reduceRightArray", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(
+		assert.equal(
 			reduceRightArray(
 				[
 					[0, 1],
@@ -14,6 +14,7 @@ describe("#reduceRightArray", () => {
 				(flattened, other) => flattened.concat(other),
 				[],
 			),
-		).toEqual([4, 5, 2, 3, 0, 1]);
+			[4, 5, 2, 3, 0, 1],
+		);
 	});
 });

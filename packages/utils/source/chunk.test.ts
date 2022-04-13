@@ -1,21 +1,21 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { chunk } from "./chunk";
 
-describe("#chunk", () => {
+describe("#chunk", ({ it, assert }) => {
 	it("should chunk the given array", () => {
-		expect(chunk(["a", "b", "c", "d"], 2)).toEqual([
+		assert.equal(chunk(["a", "b", "c", "d"], 2), [
 			["a", "b"],
 			["c", "d"],
 		]);
-		expect(chunk(["a", "b", "c", "d"], 3)).toEqual([["a", "b", "c"], ["d"]]);
+		assert.equal(chunk(["a", "b", "c", "d"], 3), [["a", "b", "c"], ["d"]]);
 	});
 
 	it("should not chunk if 0 is passed in", () => {
-		expect(chunk(["a", "b", "c", "d"], 0)).toEqual([]);
+		assert.equal(chunk(["a", "b", "c", "d"], 0), []);
 	});
 
 	it("should not chunk if a negative number is passed in", () => {
-		expect(chunk(["a", "b", "c", "d"], -1)).toEqual([]);
+		assert.equal(chunk(["a", "b", "c", "d"], -1), []);
 	});
 });

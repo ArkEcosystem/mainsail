@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { head } from "./head";
 
-describe("#head", () => {
+describe("head", async ({ assert, it, nock, loader }) => {
 	it("should return the first item", () => {
-		expect(head([1, 2, 3, 4, 5])).toBe(1);
+		assert.is(head([1, 2, 3, 4, 5]), 1);
 	});
 });

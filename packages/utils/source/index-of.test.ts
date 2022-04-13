@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { indexOf } from "./index-of";
 
-describe("#indexOf", () => {
+describe("indexOf", async ({ assert, it, nock, loader }) => {
 	it("should return the expected index", () => {
-		expect(indexOf([1, 2, 1, 2], 2)).toBe(1);
-		expect(indexOf([1, 2, 1, 2], 2, 3)).toBe(3);
-		expect(indexOf([1, 2, 1, 2], 2, 2)).toBe(3);
-		expect(indexOf([1, 2, 1, 2], 3)).toBe(-1);
-		expect(indexOf([], 0, -1)).toBe(-1);
+		assert.is(indexOf([1, 2, 1, 2], 2), 1);
+		assert.is(indexOf([1, 2, 1, 2], 2, 3), 3);
+		assert.is(indexOf([1, 2, 1, 2], 2, 2), 3);
+		assert.is(indexOf([1, 2, 1, 2], 3), -1);
+		assert.is(indexOf([], 0, -1), -1);
 	});
 });

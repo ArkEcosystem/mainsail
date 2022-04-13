@@ -1,15 +1,15 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { castArray } from "./cast-array";
 
-describe("#castArray", () => {
+describe("#castArray", ({ it, assert }) => {
 	it("should work with any value", () => {
-		expect(castArray(1)).toEqual([1]);
-		expect(castArray([1])).toEqual([1]);
-		expect(castArray({ a: 1 })).toEqual([{ a: 1 }]);
-		expect(castArray("abc")).toEqual(["abc"]);
-		expect(castArray(null)).toEqual([]);
-		expect(castArray(undefined)).toEqual([]);
-		expect(castArray(new Map([["key", "value"]]).keys())).toEqual(["key"]);
+		assert.equal(castArray(1), [1]);
+		assert.equal(castArray([1]), [1]);
+		assert.equal(castArray({ a: 1 }), [{ a: 1 }]);
+		assert.equal(castArray("abc"), ["abc"]);
+		assert.equal(castArray(null), []);
+		assert.equal(castArray(undefined), []);
+		assert.equal(castArray(new Map([["key", "value"]]).keys()), ["key"]);
 	});
 });

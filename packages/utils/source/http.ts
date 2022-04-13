@@ -6,6 +6,76 @@ import { parse } from "url";
 import { isObject } from "./is-object";
 import { isUndefined } from "./is-undefined";
 
+const sendRequest = (method: string, url: string, options?: HttpOptions): Promise<HttpResponse> =>
+	new Promise((resolve, reject) => {
+		if (!isObject(options)) {
+			options = {};
+		}
+
+		options = { ...options, ...parse(url) };
+		options.method = method.toLowerCase();
+
+		if (options.protocol === "http:") {
+			options.agent = globalAgent;
+		}
+
+		if (isUndefined(options.timeout)) {
+			options.timeout = 1500;
+		}
+
+		const request_: ClientRequest = request(options, (r: IncomingMessage): void => {
+			let accumulator = "";
+
+			r.setEncoding("utf8");
+
+			r.on("data", (chunk: string) => (accumulator += chunk));
+
+			r.on("end", (): void => {
+				const response: HttpResponse = {
+					data: "",
+					headers: r.rawHeaders,
+					method,
+					statusCode: r.statusCode,
+					statusMessage: r.statusMessage,
+				};
+
+				const type: string | undefined = r.headers["content-type"];
+
+				if (type && accumulator && type.includes("application/json")) {
+					try {
+						accumulator = JSON.parse(accumulator);
+					} catch (error) {
+						return reject(new HttpError(response, error));
+					}
+				}
+
+				response.statusCode = r.statusCode;
+				response.statusMessage = r.statusMessage;
+				response.data = accumulator;
+
+				if (r.statusCode && r.statusCode >= 400) {
+					return reject(new HttpError(response));
+				}
+
+				return resolve(response);
+			});
+		});
+
+		request_.on("error", reject);
+
+		request_.on("timeout", () => request_.abort());
+
+		if (options.body) {
+			const body: string = JSON.stringify(options.body);
+
+			request_.setHeader("content-type", "application/json");
+			request_.setHeader("content-length", Buffer.byteLength(body));
+			request_.write(body);
+		}
+
+		request_.end();
+	});
+
 export type HttpOptions = RequestOptions & { body?: Record<string, Primitive> };
 
 export type HttpResponse = {
@@ -35,10 +105,10 @@ export class HttpError extends Error {
 		Object.defineProperty(this, "response", {
 			enumerable: false,
 			value: {
-				statusMessage: response.statusMessage,
-				statusCode: response.statusCode,
-				headers: response.headers,
 				data: response.data,
+				headers: response.headers,
+				statusCode: response.statusCode,
+				statusMessage: response.statusMessage,
 			},
 		});
 
@@ -46,81 +116,11 @@ export class HttpError extends Error {
 	}
 }
 
-const sendRequest = (method: string, url: string, opts?: HttpOptions): Promise<HttpResponse> =>
-	new Promise((res, rej) => {
-		if (!isObject(opts)) {
-			opts = {};
-		}
-
-		opts = { ...opts, ...parse(url) };
-		opts.method = method.toLowerCase();
-
-		if (opts.protocol === "http:") {
-			opts.agent = globalAgent;
-		}
-
-		if (isUndefined(opts.timeout)) {
-			opts.timeout = 1500;
-		}
-
-		const req: ClientRequest = request(opts, (r: IncomingMessage): void => {
-			let accumulator: string = "";
-
-			r.setEncoding("utf8");
-
-			r.on("data", (chunk: string) => (accumulator += chunk));
-
-			r.on("end", (): void => {
-				const response: HttpResponse = {
-					method,
-					statusCode: r.statusCode,
-					statusMessage: r.statusMessage,
-					data: "",
-					headers: r.rawHeaders,
-				};
-
-				const type: string | undefined = r.headers["content-type"];
-
-				if (type && accumulator && type.includes("application/json")) {
-					try {
-						accumulator = JSON.parse(accumulator);
-					} catch (error) {
-						return rej(new HttpError(response, error as any));
-					}
-				}
-
-				response.statusCode = r.statusCode;
-				response.statusMessage = r.statusMessage;
-				response.data = accumulator;
-
-				if (r.statusCode && r.statusCode >= 400) {
-					return rej(new HttpError(response));
-				}
-
-				return res(response);
-			});
-		});
-
-		req.on("error", rej);
-
-		req.on("timeout", () => req.abort());
-
-		if (opts.body) {
-			const body: string = JSON.stringify(opts.body);
-
-			req.setHeader("content-type", "application/json");
-			req.setHeader("content-length", Buffer.byteLength(body));
-			req.write(body);
-		}
-
-		req.end();
-	});
-
 export const http = {
-	get: (url: string, opts?: HttpOptions): Promise<HttpResponse> => sendRequest("GET", url, opts),
-	head: (url: string, opts?: HttpOptions): Promise<HttpResponse> => sendRequest("HEAD", url, opts),
-	post: (url: string, opts?: HttpOptions): Promise<HttpResponse> => sendRequest("POST", url, opts),
-	put: (url: string, opts?: HttpOptions): Promise<HttpResponse> => sendRequest("PUT", url, opts),
-	patch: (url: string, opts?: HttpOptions): Promise<HttpResponse> => sendRequest("PATCH", url, opts),
-	delete: (url: string, opts?: HttpOptions): Promise<HttpResponse> => sendRequest("DELETE", url, opts),
+	delete: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("DELETE", url, options),
+	get: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("GET", url, options),
+	head: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("HEAD", url, options),
+	patch: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("PATCH", url, options),
+	post: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("POST", url, options),
+	put: (url: string, options?: HttpOptions): Promise<HttpResponse> => sendRequest("PUT", url, options),
 };

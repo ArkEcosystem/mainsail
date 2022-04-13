@@ -1,8 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
+
 import { uniq } from "./uniq";
 
-describe("#uniq", () => {
+describe("uniq", async ({ assert, it, nock, loader }) => {
 	it("should remove duplicate items", () => {
-		expect(uniq([2, 1, 2])).toEqual([2, 1]);
+		assert.equal(uniq([2, 1, 2]), [2, 1]);
 	});
 });

@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { concat } from "./concat";
 
-describe("#concat", () => {
+describe("#concat", ({ it, assert }) => {
 	it("should concatenate all values", () => {
-		expect(concat([1], 2, [3], [[4]])).toEqual([1, 2, 3, [4]]);
+		assert.equal(concat([1], 2, [3], [[4]]), [1, 2, 3, [4]]);
 	});
 });

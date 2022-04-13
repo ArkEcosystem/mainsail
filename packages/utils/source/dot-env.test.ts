@@ -1,24 +1,25 @@
-import "jest-extended";
-
-import { dotenv } from "./dot-env";
+/* eslint-disable unicorn/prevent-abbreviations */
+import { describe } from "../../core-test-framework";
 import { resolve } from "path";
 
-describe("#DotEnv", () => {
+import { dotenv } from "./dot-env";
+
+describe("#DotEnv", ({ it, assert }) => {
 	it("should parse the given string", () => {
-		expect(dotenv.parse("key=value")).toEqual({ key: "value" });
-		expect(dotenv.parse("key=1")).toEqual({ key: 1 });
-		expect(dotenv.parse('key="1"')).toEqual({ key: 1 });
-		expect(dotenv.parse('key="true"')).toEqual({ key: true });
-		expect(dotenv.parse("key=true")).toEqual({ key: true });
-		expect(dotenv.parse('key="false"')).toEqual({ key: false });
-		expect(dotenv.parse("key=false")).toEqual({ key: false });
-		expect(dotenv.parse("key=")).toEqual({});
-		expect(dotenv.parse("=value")).toEqual({});
-		expect(dotenv.parse("")).toEqual({});
+		assert.equal(dotenv.parse("key=value"), { key: "value" });
+		assert.equal(dotenv.parse("key=1"), { key: 1 });
+		assert.equal(dotenv.parse('key="1"'), { key: 1 });
+		assert.equal(dotenv.parse('key="true"'), { key: true });
+		assert.equal(dotenv.parse("key=true"), { key: true });
+		assert.equal(dotenv.parse('key="false"'), { key: false });
+		assert.equal(dotenv.parse("key=false"), { key: false });
+		assert.equal(dotenv.parse("key="), {});
+		assert.equal(dotenv.parse("=value"), {});
+		assert.equal(dotenv.parse(""), {});
 	});
 
 	it("should parse the given file", () => {
-		expect(dotenv.parseFile(resolve(__dirname, "../test/fixtures/.env"))).toEqual({
+		assert.equal(dotenv.parseFile(resolve(__dirname, "../test/fixtures/.env")), {
 			key1: "value",
 			key2: 1,
 			key3: 1,
@@ -30,9 +31,9 @@ describe("#DotEnv", () => {
 	});
 
 	it("should stringify the given object", () => {
-		expect(dotenv.stringify({ key: "value" })).toBe('key="value"');
-		expect(dotenv.stringify({ key: 1 })).toBe("key=1");
-		expect(dotenv.stringify({ key: true })).toBe("key=true");
-		expect(dotenv.stringify({ [""]: true })).toBe("");
+		assert.equal(dotenv.stringify({ key: "value" }), 'key="value"');
+		assert.equal(dotenv.stringify({ key: 1 }), "key=1");
+		assert.equal(dotenv.stringify({ key: true }), "key=true");
+		assert.equal(dotenv.stringify({ [""]: true }), "");
 	});
 });

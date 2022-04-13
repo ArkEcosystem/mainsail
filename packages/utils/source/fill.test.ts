@@ -1,9 +1,11 @@
+import { describe } from "../../core-test-framework";
+
 import { fill } from "./fill";
 
-describe("#fill", () => {
+describe("#fill", ({ it, assert }) => {
 	it("should work with an array", () => {
-		expect(fill([1, 2, 3], "a")).toEqual(["a", "a", "a"]);
-		expect(fill(Array(3), 2)).toEqual([2, 2, 2]);
-		expect(fill([4, 6, 8, 10], "*", 1, 3)).toEqual([4, "*", "*", 10]);
+		assert.equal(fill([1, 2, 3], "a"), ["a", "a", "a"]);
+		assert.equal(fill(Array(3), 2), [2, 2, 2]);
+		assert.equal(fill([4, 6, 8, 10], "*", 1, 3), [4, "*", "*", 10]);
 	});
 });

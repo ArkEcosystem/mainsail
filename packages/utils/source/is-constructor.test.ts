@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isConstructor } from "./is-constructor";
 
-describe("#isConstructor", () => {
+describe("isConstructor", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isConstructor(Date)).toBeTrue();
+		assert.true(isConstructor(Date));
 	});
 
 	it("should fail", () => {
-		expect(isConstructor([])).toBeFalse();
+		assert.false(isConstructor([]));
 	});
 });

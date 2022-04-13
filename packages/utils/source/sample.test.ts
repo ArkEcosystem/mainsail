@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { sample } from "./sample";
 
-describe("#sample", () => {
+describe("sample", async ({ assert, it, nock, loader }) => {
 	it("should return a random item", () => {
-		expect(sample([1, 2, 3, 4, 5])).toBeNumber();
+		assert.number(sample([1, 2, 3, 4, 5]));
 	});
 });

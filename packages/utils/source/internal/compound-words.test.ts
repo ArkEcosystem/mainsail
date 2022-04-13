@@ -1,13 +1,16 @@
+import { describe } from "../../../core-test-framework";
+
 import { compoundWords } from "./compound-words";
 
-describe("#compoundWords", () => {
+describe("#compoundWords", ({ it, assert }) => {
 	it("should return undefined if the given string is empty", () => {
-		expect(compoundWords("", (word) => word)).toBeUndefined();
+		assert.undefined(compoundWords("", (word) => word));
 	});
 
 	it("should return undefined if the given string is empty", () => {
-		expect(
+		assert.equal(
 			compoundWords("fred, barney, & pebbles", (result: string, word: string) => `${result} ${word}`.trim()),
-		).toEqual("fred barney pebbles");
+			"fred barney pebbles",
+		);
 	});
 });

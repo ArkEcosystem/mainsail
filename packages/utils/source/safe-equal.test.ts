@@ -1,19 +1,19 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { safeEqual } from "./safe-equal";
 
-describe("#safeEqual", () => {
+describe("#safeEqual", ({ it, assert }) => {
 	it("should determine if values are equal in a safe manner", () => {
-		expect(safeEqual(new Uint8Array(1), new Uint8Array(1))).toBeTrue();
-		expect(safeEqual(new Uint8Array(1), new Uint8Array(2))).toBeFalse();
+		assert.true(safeEqual(new Uint8Array(1), new Uint8Array(1)));
+		assert.false(safeEqual(new Uint8Array(1), new Uint8Array(2)));
 
-		expect(safeEqual(new Uint16Array(1), new Uint16Array(1))).toBeTrue();
-		expect(safeEqual(new Uint16Array(1), new Uint16Array(2))).toBeFalse();
+		assert.true(safeEqual(new Uint16Array(1), new Uint16Array(1)));
+		assert.false(safeEqual(new Uint16Array(1), new Uint16Array(2)));
 
-		expect(safeEqual(new Uint32Array(1), new Uint32Array(1))).toBeTrue();
-		expect(safeEqual(new Uint32Array(1), new Uint32Array(2))).toBeFalse();
+		assert.true(safeEqual(new Uint32Array(1), new Uint32Array(1)));
+		assert.false(safeEqual(new Uint32Array(1), new Uint32Array(2)));
 
-		expect(safeEqual(Buffer.alloc(1), Buffer.alloc(1))).toBeTrue();
-		expect(safeEqual(Buffer.alloc(1), Buffer.alloc(2))).toBeFalse();
+		assert.true(safeEqual(Buffer.alloc(1), Buffer.alloc(1)));
+		assert.false(safeEqual(Buffer.alloc(1), Buffer.alloc(2)));
 	});
 });

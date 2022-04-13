@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isEmptyObject } from "./is-empty-object";
 
-describe("#isEmptyObject", () => {
+describe("isEmptyObject", async ({ assert, it, nock, loader }) => {
 	it("should return true for an empty object", () => {
-		expect(isEmptyObject({})).toBeTrue();
+		assert.true(isEmptyObject({}));
 	});
 });

@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isRegExp } from "./is-reg-exp";
 
-describe("#isRegExp", () => {
+describe("isRegExp", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isRegExp(/a/)).toBeTrue();
+		assert.true(isRegExp(/a/));
 	});
 
 	it("should fail", () => {
-		expect(isRegExp([])).toBeFalse();
+		assert.false(isRegExp([]));
 	});
 });

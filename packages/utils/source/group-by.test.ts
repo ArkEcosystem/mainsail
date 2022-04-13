@@ -1,10 +1,10 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { groupBy } from "./group-by";
 
-describe("#groupBy", () => {
+describe("groupBy", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(
+		assert.equal(
 			groupBy(
 				[
 					{ first: "John", last: "Doe" },
@@ -13,16 +13,17 @@ describe("#groupBy", () => {
 				],
 				(o) => o.last,
 			),
-		).toEqual({
-			Doe: [
-				{ first: "John", last: "Doe" },
-				{ first: "Jane", last: "Doe" },
-			],
-			Dorian: [{ first: "John", last: "Dorian" }],
-		});
+			{
+				Doe: [
+					{ first: "John", last: "Doe" },
+					{ first: "Jane", last: "Doe" },
+				],
+				Dorian: [{ first: "John", last: "Dorian" }],
+			},
+		);
 	});
 
 	it("should with a native function", () => {
-		expect(groupBy([6.1, 4.2, 6.3], Math.floor)).toEqual({ "4": [4.2], "6": [6.1, 6.3] });
+		assert.equal(groupBy([6.1, 4.2, 6.3], Math.floor), { 4: [4.2], 6: [6.1, 6.3] });
 	});
 });

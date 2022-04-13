@@ -1,4 +1,4 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { NSect } from "./nsect";
 
@@ -24,29 +24,29 @@ const probe = async (indexesToProbe: number[]): Promise<number | undefined> => {
 	return undefined;
 };
 
-beforeAll(() => {
-	data = [];
-	for (let i = 0; i < 1000; i++) {
-		data[i] = i * 10;
-	}
-});
+describe("N-section (binary search)", ({ it, assert, beforeAll }) => {
+	beforeAll(() => {
+		data = [];
+		for (let i = 0; i < 1000; i++) {
+			data[i] = i * 10;
+		}
+	});
 
-describe("N-section (binary search)", () => {
 	nAry = 2;
-
 	const nSect = new NSect(nAry, probe);
 
 	it("arbitrary", async () => {
 		numberOfProbeCalls = 0;
 	});
+
 	it("lucky case", async () => {
 		numberOfProbeCalls = 0;
 		searchCondition = (element: number) => element <= 5000;
 
 		const index: any = await nSect.find(0, data.length - 1);
 
-		expect(data[index]).toBe(5000);
-		expect(numberOfProbeCalls).toBe(2);
+		assert.equal(data[index], 5000);
+		assert.equal(numberOfProbeCalls, 2);
 	});
 
 	it("worst case", async () => {
@@ -55,8 +55,8 @@ describe("N-section (binary search)", () => {
 
 		const index: any = await nSect.find(0, data.length - 1);
 
-		expect(data[index]).toBe(3560);
-		expect(numberOfProbeCalls).toBe(9);
+		assert.equal(data[index], 3560);
+		assert.equal(numberOfProbeCalls, 9);
 	});
 
 	it("search in a sub-range", async () => {
@@ -65,16 +65,16 @@ describe("N-section (binary search)", () => {
 
 		const index: any = await nSect.find(350, 500);
 
-		expect(data[index]).toBe(4000);
-		expect(numberOfProbeCalls).toBe(6);
+		assert.equal(data[index], 4000);
+		assert.equal(numberOfProbeCalls, 6);
 	});
 
 	it("nonexistent", async () => {
 		numberOfProbeCalls = 0;
 		searchCondition = () => false;
 
-		expect(await nSect.find(0, data.length - 1)).toBeUndefined();
-		expect(numberOfProbeCalls).toBe(1);
+		assert.undefined(await nSect.find(0, data.length - 1));
+		assert.equal(numberOfProbeCalls, 1);
 	});
 
 	it("biggest one", async () => {
@@ -83,12 +83,12 @@ describe("N-section (binary search)", () => {
 
 		const index: any = await nSect.find(0, data.length - 1);
 
-		expect(data[index]).toBe(9990);
-		expect(numberOfProbeCalls).toBe(1);
+		assert.equal(data[index], 9990);
+		assert.equal(numberOfProbeCalls, 1);
 	});
 });
 
-describe("N-section (8-ary search)", () => {
+describe("N-section (8-ary search)", ({ it, assert }) => {
 	nAry = 8;
 
 	const nSect = new NSect(nAry, probe);
@@ -99,8 +99,8 @@ describe("N-section (8-ary search)", () => {
 
 		const index: any = await nSect.find(0, data.length - 1);
 
-		expect(data[index]).toBe(5670);
-		expect(numberOfProbeCalls).toBe(4);
+		assert.equal(data[index], 5670);
+		assert.equal(numberOfProbeCalls, 4);
 	});
 
 	it("lucky case", async () => {
@@ -109,8 +109,8 @@ describe("N-section (8-ary search)", () => {
 
 		const index: any = await nSect.find(0, data.length - 1);
 
-		expect(data[index]).toBe(5000);
-		expect(numberOfProbeCalls).toBe(2);
+		assert.equal(data[index], 5000);
+		assert.equal(numberOfProbeCalls, 2);
 	});
 
 	it("worst case", async () => {
@@ -119,8 +119,8 @@ describe("N-section (8-ary search)", () => {
 
 		const index: any = await nSect.find(0, data.length - 1);
 
-		expect(data[index]).toBe(3560);
-		expect(numberOfProbeCalls).toBe(4);
+		assert.equal(data[index], 3560);
+		assert.equal(numberOfProbeCalls, 4);
 	});
 
 	it("search in a sub-range", async () => {
@@ -129,8 +129,8 @@ describe("N-section (8-ary search)", () => {
 
 		const index: any = await nSect.find(350, 500);
 
-		expect(data[index]).toBe(4000);
-		expect(numberOfProbeCalls).toBe(3);
+		assert.equal(data[index], 4000);
+		assert.equal(numberOfProbeCalls, 3);
 	});
 
 	it("search in a narrow range", async () => {
@@ -139,8 +139,8 @@ describe("N-section (8-ary search)", () => {
 
 		const index: any = await nSect.find(398, 402);
 
-		expect(data[index]).toBe(4000);
-		expect(numberOfProbeCalls).toBe(1);
+		assert.equal(data[index], 4000);
+		assert.equal(numberOfProbeCalls, 1);
 	});
 
 	it("search in a range with length 9", async () => {
@@ -149,15 +149,15 @@ describe("N-section (8-ary search)", () => {
 
 		const index: any = await nSect.find(398, 407);
 
-		expect(data[index]).toBe(4000);
-		expect(numberOfProbeCalls).toBe(1);
+		assert.equal(data[index], 4000);
+		assert.equal(numberOfProbeCalls, 1);
 	});
 
 	it("nonexistent", async () => {
 		numberOfProbeCalls = 0;
 		searchCondition = () => false;
-		expect(await nSect.find(0, data.length - 1)).toBeUndefined();
-		expect(numberOfProbeCalls).toBe(1);
+		assert.undefined(await nSect.find(0, data.length - 1));
+		assert.equal(numberOfProbeCalls, 1);
 	});
 
 	it("biggest one", async () => {
@@ -166,7 +166,7 @@ describe("N-section (8-ary search)", () => {
 
 		const index: any = await nSect.find(0, data.length - 1);
 
-		expect(data[index]).toBe(9990);
-		expect(numberOfProbeCalls).toBe(1);
+		assert.equal(data[index], 9990);
+		assert.equal(numberOfProbeCalls, 1);
 	});
 });

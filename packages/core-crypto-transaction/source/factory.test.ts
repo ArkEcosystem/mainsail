@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { InvalidTransactionBytesError, TransactionSchemaError, UnkownTransactionError } from "../errors";
 import { ITransaction, ITransactionData, ITransactionJson, NetworkConfig } from "../interfaces";
 import { configManager } from "../managers";

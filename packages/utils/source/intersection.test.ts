@@ -1,11 +1,13 @@
+import { describe } from "../../core-test-framework";
+
 import { intersection } from "./intersection";
 
-describe("#intersection", () => {
+describe("intersection", async ({ assert, it, nock, loader }) => {
 	it("should return the common values", () => {
-		expect(intersection([2, 1], [2, 3])).toEqual([2]);
-		expect(intersection([], [])).toEqual([]);
-		expect(intersection(["a"], ["a"])).toEqual(["a"]);
-		expect(intersection([true], [true])).toEqual([true]);
-		expect(intersection([false], [false])).toEqual([false]);
+		assert.equal(intersection([2, 1], [2, 3]), [2]);
+		assert.equal(intersection([], []), []);
+		assert.equal(intersection(["a"], ["a"]), ["a"]);
+		assert.equal(intersection([true], [true]), [true]);
+		assert.equal(intersection([false], [false]), [false]);
 	});
 });

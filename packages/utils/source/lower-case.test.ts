@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { lowerCase } from "./lower-case";
 
-describe("#lowerCase", () => {
+describe("lowerCase", async ({ assert, it, nock, loader }) => {
 	it("should turn any string into lower case", () => {
-		expect(lowerCase("string")).toBe("string");
-		expect(lowerCase("camelCase")).toBe("camel case");
-		expect(lowerCase("param-case")).toBe("param case");
-		expect(lowerCase("PascalCase")).toBe("pascal case");
-		expect(lowerCase("UPPER_CASE")).toBe("upper case");
-		expect(lowerCase("snake_case")).toBe("snake case");
-		expect(lowerCase("sentence case")).toBe("sentence case");
-		expect(lowerCase("Title Case")).toBe("title case");
-		expect(lowerCase("dot.case")).toBe("dot case");
+		assert.is(lowerCase("string"), "string");
+		assert.is(lowerCase("camelCase"), "camel case");
+		assert.is(lowerCase("param-case"), "param case");
+		assert.is(lowerCase("PascalCase"), "pascal case");
+		assert.is(lowerCase("UPPER_CASE"), "upper case");
+		assert.is(lowerCase("snake_case"), "snake case");
+		assert.is(lowerCase("sentence case"), "sentence case");
+		assert.is(lowerCase("Title Case"), "title case");
+		assert.is(lowerCase("dot.case"), "dot case");
 	});
 });

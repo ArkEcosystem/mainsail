@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { pascalCase } from "./pascal-case";
 
-describe("#pascalCase", () => {
+describe("pascalCase", async ({ assert, it, nock, loader }) => {
 	it("should turn any string into pascal case", () => {
-		expect(pascalCase("string")).toBe("String");
-		expect(pascalCase("camelCase")).toBe("CamelCase");
-		expect(pascalCase("param-case")).toBe("ParamCase");
-		expect(pascalCase("PascalCase")).toBe("PascalCase");
-		expect(pascalCase("UPPER_CASE")).toBe("UpperCase");
-		expect(pascalCase("snake_case")).toBe("SnakeCase");
-		expect(pascalCase("sentence case")).toBe("SentenceCase");
-		expect(pascalCase("Title Case")).toBe("TitleCase");
-		expect(pascalCase("dot.case")).toBe("DotCase");
+		assert.is(pascalCase("string"), "String");
+		assert.is(pascalCase("camelCase"), "CamelCase");
+		assert.is(pascalCase("param-case"), "ParamCase");
+		assert.is(pascalCase("PascalCase"), "PascalCase");
+		assert.is(pascalCase("UPPER_CASE"), "UpperCase");
+		assert.is(pascalCase("snake_case"), "SnakeCase");
+		assert.is(pascalCase("sentence case"), "SentenceCase");
+		assert.is(pascalCase("Title Case"), "TitleCase");
+		assert.is(pascalCase("dot.case"), "DotCase");
 	});
 });

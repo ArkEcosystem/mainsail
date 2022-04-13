@@ -1,14 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { mapValues } from "./map-values";
 
-describe("#mapValues", () => {
-	const users = {
-		fred: { user: "fred", age: 40 },
-		pebbles: { user: "pebbles", age: 1 },
-	};
-
+describe("mapValues", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(mapValues(users, (o) => o.age)).toEqual({ fred: 40, pebbles: 1 });
+		const users = {
+			fred: { user: "fred", age: 40 },
+			pebbles: { user: "pebbles", age: 1 },
+		};
+
+		assert.equal(
+			mapValues(users, (o) => o.age),
+			{ fred: 40, pebbles: 1 },
+		);
 	});
 });

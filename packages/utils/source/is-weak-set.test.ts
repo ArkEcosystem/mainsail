@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isWeakSet } from "./is-weak-set";
 
-describe("#isWeakSet", () => {
+describe("isWeakSet", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isWeakSet(new WeakSet())).toBeTrue();
+		assert.true(isWeakSet(new WeakSet()));
 	});
 
 	it("should fail", () => {
-		expect(isWeakSet(1)).toBeFalse();
+		assert.false(isWeakSet(1));
 	});
 });

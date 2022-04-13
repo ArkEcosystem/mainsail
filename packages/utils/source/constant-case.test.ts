@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { constantCase } from "./constant-case";
 
-describe("#constantCase", () => {
+describe("#constantCase", ({ it, assert }) => {
 	it("should turn any string into constant case", () => {
-		expect(constantCase("string")).toBe("STRING");
-		expect(constantCase("camelCase")).toBe("CAMEL_CASE");
-		expect(constantCase("param-case")).toBe("PARAM_CASE");
-		expect(constantCase("PascalCase")).toBe("PASCAL_CASE");
-		expect(constantCase("UPPER_CASE")).toBe("UPPER_CASE");
-		expect(constantCase("snake_case")).toBe("SNAKE_CASE");
-		expect(constantCase("sentence case")).toBe("SENTENCE_CASE");
-		expect(constantCase("Title Case")).toBe("TITLE_CASE");
-		expect(constantCase("dot.case")).toBe("DOT_CASE");
+		assert.equal(constantCase("string"), "STRING");
+		assert.equal(constantCase("camelCase"), "CAMEL_CASE");
+		assert.equal(constantCase("param-case"), "PARAM_CASE");
+		assert.equal(constantCase("PascalCase"), "PASCAL_CASE");
+		assert.equal(constantCase("UPPER_CASE"), "UPPER_CASE");
+		assert.equal(constantCase("snake_case"), "SNAKE_CASE");
+		assert.equal(constantCase("sentence case"), "SENTENCE_CASE");
+		assert.equal(constantCase("Title Case"), "TITLE_CASE");
+		assert.equal(constantCase("dot.case"), "DOT_CASE");
 	});
 });

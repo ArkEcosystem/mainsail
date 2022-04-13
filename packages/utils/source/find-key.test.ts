@@ -1,10 +1,10 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { findKey } from "./find-key";
 
-describe("#findKey", () => {
+describe("#findKey", ({ it, assert }) => {
 	it("should work with a function", () => {
-		expect(
+		assert.equal(
 			findKey(
 				{
 					barney: { age: 36, active: true },
@@ -13,6 +13,7 @@ describe("#findKey", () => {
 				},
 				(o) => o.age < 40,
 			),
-		).toBe("barney");
+			"barney",
+		);
 	});
 });

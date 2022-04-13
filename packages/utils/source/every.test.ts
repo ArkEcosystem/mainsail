@@ -1,11 +1,11 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { every } from "./every";
 import { isBoolean } from "./is-boolean";
 
-describe("#every", () => {
+describe("#every", ({ it, assert }) => {
 	it("should work with a functions", () => {
-		expect(every([true, false], isBoolean)).toBeTrue();
-		expect(every([true, false, "yes"], isBoolean)).toBeFalse();
+		assert.true(every([true, false], isBoolean));
+		assert.false(every([true, false, "yes"], isBoolean));
 	});
 });

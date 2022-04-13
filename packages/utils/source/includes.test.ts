@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { includes } from "./includes";
 
-describe("#includes", () => {
+describe("includes", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(includes([1, 2, 3], 1)).toBeTrue();
+		assert.true(includes([1, 2, 3], 1));
 
-		expect(includes([1, 2, 3], 4)).toBeFalse();
+		assert.false(includes([1, 2, 3], 4));
 
-		expect(includes({ a: 1, b: 2 }, 1)).toBeTrue();
+		assert.true(includes({ a: 1, b: 2 }, 1));
 
-		expect(includes("abcd", "bc")).toBeTrue();
+		assert.true(includes("abcd", "bc"));
 
-		expect(includes(1, 2)).toBeFalse();
+		assert.false(includes(1, 2));
 	});
 });

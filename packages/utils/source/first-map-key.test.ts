@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { firstMapKey } from "./first-map-key";
 
-describe("#firstMapKey", () => {
+describe("#firstMapKey", ({ it, assert }) => {
 	it("should return the first key", () => {
-		expect(firstMapKey(new Map([["Hello", "World"]]))).toBe("Hello");
+		assert.equal(firstMapKey(new Map([["Hello", "World"]])), "Hello");
 	});
 });

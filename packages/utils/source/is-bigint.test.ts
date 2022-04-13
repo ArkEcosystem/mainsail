@@ -1,14 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isBigInt } from "./is-bigint";
 
-describe("#isBigInt", () => {
+describe("isBigInt", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isBigInt(BigInt(1))).toBeTrue();
+		assert.true(isBigInt(BigInt(1)));
 	});
 
 	it("should fail", () => {
-		expect(isBigInt("1")).toBeFalse();
-		expect(isBigInt(1)).toBeFalse();
+		assert.false(isBigInt("1"));
+		assert.false(isBigInt(1));
 	});
 });

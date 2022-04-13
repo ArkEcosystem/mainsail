@@ -1,10 +1,10 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { pluck } from "./pluck";
 
-describe("#pluck", () => {
+describe("pluck", async ({ assert, it, nock, loader }) => {
 	it("should return the names of the users", () => {
-		expect(
+		assert.equal(
 			pluck(
 				[
 					{ user: "barney", age: 36 },
@@ -12,7 +12,8 @@ describe("#pluck", () => {
 				],
 				"user",
 			),
-		).toEqual(["barney", "fred"]);
-		expect(pluck([{ age: 36 }, { age: 40 }], "user")).toEqual([]);
+			["barney", "fred"],
+		);
+		assert.equal(pluck([{ age: 36 }, { age: 40 }], "user"), []);
 	});
 });

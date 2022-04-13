@@ -1,8 +1,8 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { sleep } from "./sleep";
 
-describe("#sleep", () => {
+describe("#sleep", ({ it, assert }) => {
 	it("should sleep for 1 second", async () => {
 		const start: number = +new Date();
 
@@ -10,6 +10,6 @@ describe("#sleep", () => {
 
 		const end: number = +new Date();
 
-		expect(Math.round((end - start) / 1000)).toEqual(1);
+		assert.equal(Math.round((end - start) / 1000), 1);
 	});
 });

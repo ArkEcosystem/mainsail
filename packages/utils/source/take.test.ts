@@ -1,12 +1,12 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { take } from "./take";
 
-describe("#take", () => {
+describe("take", async ({ assert, it, nock, loader }) => {
 	it("should take the given number of items", () => {
-		expect(take([1, 2, 3])).toEqual([1]);
-		expect(take([1, 2, 3], 2)).toEqual([1, 2]);
-		expect(take([1, 2, 3], 5)).toEqual([1, 2, 3]);
-		expect(take([1, 2, 3], 0)).toEqual([]);
+		assert.equal(take([1, 2, 3]), [1]);
+		assert.equal(take([1, 2, 3], 2), [1, 2]);
+		assert.equal(take([1, 2, 3], 5), [1, 2, 3]);
+		assert.equal(take([1, 2, 3], 0), []);
 	});
 });

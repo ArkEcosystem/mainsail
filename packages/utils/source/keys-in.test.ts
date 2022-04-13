@@ -1,18 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { keysIn } from "./keys-in";
 
-describe("#keysIn", () => {
+describe("includeAllMembers", async ({ assert, it, nock, loader }) => {
 	it("should work with an object", () => {
 		function Foo() {
-			// @ts-ignore
 			this.a = 1;
-			// @ts-ignore
+
 			this.b = 2;
 		}
 
 		Foo.prototype.c = 3;
 
-		expect(keysIn(new Foo())).toIncludeAllMembers(["a", "b", "c"]);
+		assert.includeAllMembers(keysIn(new Foo()), ["a", "b", "c"]);
 	});
 });

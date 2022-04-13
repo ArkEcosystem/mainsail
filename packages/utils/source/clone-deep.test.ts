@@ -1,12 +1,12 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { cloneDeep } from "./clone-deep";
 
-describe("#cloneDeep", () => {
+describe("#cloneDeep", ({ it, assert }) => {
 	it("should work with objects", () => {
 		const object = { a: 1 };
 
-		expect(cloneDeep(object)).toEqual(object);
+		assert.equal(cloneDeep(object), object);
 	});
 
 	it("should work with class instances", () => {
@@ -20,14 +20,14 @@ describe("#cloneDeep", () => {
 
 		const original = new Wallet("address");
 
-		expect(original).toEqual(original);
-		expect(original.isDelegate()).toBeTrue();
-		expect(original.address).toBe("address");
+		assert.equal(original, original);
+		assert.true(original.isDelegate());
+		assert.equal(original.address, "address");
 
 		const clone = cloneDeep(original);
 
-		expect(clone).toEqual(original);
-		expect(clone.isDelegate()).toBeTrue();
-		expect(clone.address).toBe("address");
+		assert.equal(clone, original);
+		assert.true(clone.isDelegate());
+		assert.equal(clone.address, "address");
 	});
 });

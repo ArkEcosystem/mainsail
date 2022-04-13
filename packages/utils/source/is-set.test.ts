@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isSet } from "./is-set";
 
-describe("#isSet", () => {
+describe("isSet", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isSet(new Set())).toBeTrue();
+		assert.true(isSet(new Set()));
 	});
 
 	it("should fail", () => {
-		expect(isSet(1)).toBeFalse();
+		assert.false(isSet(1));
 	});
 });

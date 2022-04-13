@@ -1,10 +1,10 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { parseURI } from "./parse-uri";
 
-describe("#parseURI", () => {
+describe("parseURI", async ({ assert, it, nock, loader }) => {
 	it("should return all values", () => {
-		expect(parseURI("https://domain.com/path?query=value#fragment")).toEqual({
+		assert.equal(parseURI("https://domain.com/path?query=value#fragment"), {
 			authority: "domain.com",
 			fragment: "fragment",
 			path: "/path",
@@ -14,7 +14,7 @@ describe("#parseURI", () => {
 	});
 
 	it("should work just the domain", () => {
-		expect(parseURI("https://domain.com/")).toEqual({
+		assert.equal(parseURI("https://domain.com/"), {
 			authority: "domain.com",
 			fragment: undefined,
 			path: "/",
@@ -24,7 +24,7 @@ describe("#parseURI", () => {
 	});
 
 	it("should work just the domain and path", () => {
-		expect(parseURI("https://domain.com/path")).toEqual({
+		assert.equal(parseURI("https://domain.com/path"), {
 			authority: "domain.com",
 			fragment: undefined,
 			path: "/path",
@@ -34,7 +34,7 @@ describe("#parseURI", () => {
 	});
 
 	it("should work just the domain and query", () => {
-		expect(parseURI("https://domain.com/?query=value")).toEqual({
+		assert.equal(parseURI("https://domain.com/?query=value"), {
 			authority: "domain.com",
 			fragment: undefined,
 			path: "/",
@@ -44,7 +44,7 @@ describe("#parseURI", () => {
 	});
 
 	it("should work just the domain and fragment", () => {
-		expect(parseURI("https://domain.com/#fragment")).toEqual({
+		assert.equal(parseURI("https://domain.com/#fragment"), {
 			authority: "domain.com",
 			fragment: "fragment",
 			path: "/",

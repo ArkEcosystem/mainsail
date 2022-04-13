@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import os from "os";
 
 import { isValidPeer } from "./is-valid-peer";

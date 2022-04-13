@@ -1,11 +1,11 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { toLower } from "./to-lower";
 
-describe("#toLower", () => {
+describe("toLower", async ({ assert, it, nock, loader }) => {
 	it("should turn everything into lower case", () => {
-		expect(toLower("--foo-bar--")).toEqual("--foo-bar--");
-		expect(toLower("fooBar")).toEqual("foobar");
-		expect(toLower("__foo_bar__")).toEqual("__foo_bar__");
+		assert.is(toLower("--foo-bar--"), "--foo-bar--");
+		assert.is(toLower("fooBar"), "foobar");
+		assert.is(toLower("__foo_bar__"), "__foo_bar__");
 	});
 });

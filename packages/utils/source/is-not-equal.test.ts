@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isNotEqual } from "./is-not-equal";
 
-describe("#isNotEqual", () => {
+describe("isNotEqual", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isNotEqual<any>(1, "1")).toBeTrue();
+		assert.true(isNotEqual(1, "1"));
 	});
 
 	it("should fail", () => {
-		expect(isNotEqual(1, 1)).toBeFalse();
+		assert.false(isNotEqual(1, 1));
 	});
 });

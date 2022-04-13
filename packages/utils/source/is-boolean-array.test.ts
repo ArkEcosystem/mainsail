@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isBooleanArray } from "./is-boolean-array";
 
-describe("#isBooleanArray", () => {
+describe("isBooleanArray", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isBooleanArray([true])).toBeTrue();
+		assert.true(isBooleanArray([true]));
 	});
 
 	it("should fail", () => {
-		expect(isBooleanArray([1])).toBeFalse();
+		assert.false(isBooleanArray([1]));
 	});
 });

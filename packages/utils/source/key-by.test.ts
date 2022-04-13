@@ -1,17 +1,20 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { keyBy } from "./key-by";
 
-const array = [
-	{ dir: "left", code: 97 },
-	{ dir: "right", code: 100 },
-];
-
-describe("#keyBy", () => {
+describe("keyBy", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(keyBy(array, (o) => String.fromCharCode(o.code))).toEqual({
-			a: { dir: "left", code: 97 },
-			d: { dir: "right", code: 100 },
-		});
+		const array = [
+			{ dir: "left", code: 97 },
+			{ dir: "right", code: 100 },
+		];
+
+		assert.equal(
+			keyBy(array, (o) => String.fromCharCode(o.code)),
+			{
+				a: { dir: "left", code: 97 },
+				d: { dir: "right", code: 100 },
+			},
+		);
 	});
 });

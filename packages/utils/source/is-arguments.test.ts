@@ -1,14 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isArguments } from "./is-arguments";
 
-describe("#isArguments", () => {
+describe("#isArguments", ({ it, assert }) => {
 	it("should pass", () => {
 		// @ts-ignore
-		expect(isArguments(arguments)).toBeTrue();
+		assert.true(isArguments(arguments));
 	});
 
 	it("should fail", () => {
-		expect(isArguments(1)).toBeFalse();
+		assert.false(isArguments(1));
 	});
 });

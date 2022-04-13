@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isObject } from "./is-object";
 
-describe("#isObject", () => {
+describe("isObject", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isObject({ key: "value" })).toBeTrue();
+		assert.true(isObject({ key: "value" }));
 	});
 
 	it("should fail", () => {
-		expect(isObject(1)).toBeFalse();
+		assert.false(isObject(1));
 	});
 });

@@ -1,8 +1,10 @@
+import { describe } from "../../core-test-framework";
+
 import { findIndex } from "./find-index";
 
-describe("#findIndex", () => {
+describe("#findIndex", ({ it, assert }) => {
 	it("should work with a function", () => {
-		expect(
+		assert.equal(
 			findIndex(
 				[
 					{ user: "barney", active: false },
@@ -11,9 +13,10 @@ describe("#findIndex", () => {
 				],
 				(o) => o.user === "fred",
 			),
-		).toBe(1);
+			1,
+		);
 
-		expect(
+		assert.equal(
 			findIndex(
 				[
 					{ user: "barney", active: false },
@@ -22,9 +25,10 @@ describe("#findIndex", () => {
 				],
 				(o) => o.active,
 			),
-		).toBe(2);
+			2,
+		);
 
-		expect(
+		assert.equal(
 			findIndex(
 				[
 					{ user: "barney", active: false },
@@ -33,6 +37,7 @@ describe("#findIndex", () => {
 				],
 				(o) => o.user === "john",
 			),
-		).toBe(-1);
+			-1,
+		);
 	});
 });

@@ -1,11 +1,11 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { toUpper } from "./to-upper";
 
-describe("#toUpper", () => {
+describe("toUpper", async ({ assert, it, nock, loader }) => {
 	it("should turn everything into upper case", () => {
-		expect(toUpper("--foo-bar--")).toEqual("--FOO-BAR--");
-		expect(toUpper("fooBar")).toEqual("FOOBAR");
-		expect(toUpper("__foo_bar__")).toEqual("__FOO_BAR__");
+		assert.is(toUpper("--foo-bar--"), "--FOO-BAR--");
+		assert.is(toUpper("fooBar"), "FOOBAR");
+		assert.is(toUpper("__foo_bar__"), "__FOO_BAR__");
 	});
 });

@@ -1,15 +1,15 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isNil } from "./is-nil";
 
-describe("#isNil", () => {
+describe("isNil", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isNil(undefined)).toBeTrue();
-		expect(isNil(null)).toBeTrue();
+		assert.true(isNil(undefined));
+		assert.true(isNil(null));
 	});
 
 	it("should fail", () => {
-		expect(isNil("undefined")).toBeFalse();
-		expect(isNil("null")).toBeFalse();
+		assert.false(isNil("undefined"));
+		assert.false(isNil("null"));
 	});
 });

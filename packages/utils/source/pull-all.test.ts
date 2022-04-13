@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { pullAll } from "./pull-all";
 
-describe("#pullAll", () => {
+describe("pullAll", async ({ assert, it, nock, loader }) => {
 	it("should work with a property", () => {
-		expect(pullAll(["a", "b", "c", "a", "b", "c"], ["a", "c"])).toEqual(["b", "b"]);
+		assert.equal(pullAll(["a", "b", "c", "a", "b", "c"], ["a", "c"]), ["b", "b"]);
 	});
 });

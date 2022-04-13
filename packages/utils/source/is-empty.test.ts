@@ -1,37 +1,37 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isEmpty } from "./is-empty";
 
-describe("#isEmpty", () => {
+describe("at", async ({ assert, it, nock, loader }) => {
 	it("should return true for an empty array", () => {
-		expect(isEmpty([])).toBeTrue();
+		assert.true(isEmpty([]));
 	});
 
 	it("should return true for an empty object", () => {
-		expect(isEmpty({})).toBeTrue();
+		assert.true(isEmpty({}));
 	});
 
 	it("should return true for a false boolean", () => {
-		expect(isEmpty(false)).toBeTrue();
+		assert.true(isEmpty(false));
 	});
 
 	it("should return true for null", () => {
-		expect(isEmpty(null)).toBeTrue();
+		assert.true(isEmpty(null));
 	});
 
 	it("should return true for undefined", () => {
-		expect(isEmpty(undefined)).toBeTrue();
+		assert.true(isEmpty(undefined));
 	});
 
 	it("should return true for an empty map", () => {
-		expect(isEmpty(new Map())).toBeTrue();
+		assert.true(isEmpty(new Map()));
 	});
 
 	it("should return true for an empty set", () => {
-		expect(isEmpty(new Set())).toBeTrue();
+		assert.true(isEmpty(new Set()));
 	});
 
 	it("should return false if the value contains something", () => {
-		expect(isEmpty([1])).toBeFalse();
+		assert.false(isEmpty([1]));
 	});
 });

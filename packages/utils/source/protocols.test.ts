@@ -1,9 +1,11 @@
+import { describe } from "../../core-test-framework";
+
 import { protocols } from "./protocols";
 
-describe("#protocols", () => {
+describe("protocols", async ({ assert, it, nock, loader }) => {
 	it("should return all protocols of the given URL", () => {
-		expect(protocols("git+ssh://git@host.com/owner/repo")).toEqual(["git", "ssh"]);
-		expect(protocols("http://google.com/")).toEqual(["http"]);
-		expect(protocols("https://google.com/")).toEqual(["https"]);
+		assert.equal(protocols("git+ssh://git@host.com/owner/repo"), ["git", "ssh"]);
+		assert.equal(protocols("http://google.com/"), ["http"]);
+		assert.equal(protocols("https://google.com/"), ["https"]);
 	});
 });

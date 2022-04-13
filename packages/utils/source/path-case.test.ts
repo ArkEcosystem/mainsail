@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { pathCase } from "./path-case";
 
-describe("#pathCase", () => {
+describe("pathCase", async ({ assert, it, nock, loader }) => {
 	it("should turn any string into path case", () => {
-		expect(pathCase("string")).toBe("string");
-		expect(pathCase("camelCase")).toBe("camel/case");
-		expect(pathCase("param-case")).toBe("param/case");
-		expect(pathCase("PascalCase")).toBe("pascal/case");
-		expect(pathCase("UPPER_CASE")).toBe("upper/case");
-		expect(pathCase("snake_case")).toBe("snake/case");
-		expect(pathCase("sentence case")).toBe("sentence/case");
-		expect(pathCase("Title Case")).toBe("title/case");
-		expect(pathCase("dot.case")).toBe("dot/case");
+		assert.is(pathCase("string"), "string");
+		assert.is(pathCase("camelCase"), "camel/case");
+		assert.is(pathCase("param-case"), "param/case");
+		assert.is(pathCase("PascalCase"), "pascal/case");
+		assert.is(pathCase("UPPER_CASE"), "upper/case");
+		assert.is(pathCase("snake_case"), "snake/case");
+		assert.is(pathCase("sentence case"), "sentence/case");
+		assert.is(pathCase("Title Case"), "title/case");
+		assert.is(pathCase("dot.case"), "dot/case");
 	});
 });

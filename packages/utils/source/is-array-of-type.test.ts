@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isArrayOfType } from "./is-array-of-type";
 
-describe("#isArrayOfType", () => {
+describe("isArrayOfType", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isArrayOfType<number>([1], "number")).toBeTrue();
+		assert.true(isArrayOfType([1], "number"));
 	});
 
 	it("should fail", () => {
-		expect(isArrayOfType<number>(["string"], "number")).toBeFalse();
+		assert.false(isArrayOfType(["string"], "number"));
 	});
 });

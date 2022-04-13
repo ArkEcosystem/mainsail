@@ -1,14 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { at } from "./at";
 
-describe("#at", () => {
+describe("#at", ({ it, assert }) => {
 	it("should work like lodash", () => {
 		const object = {
 			a: { b: { c: 3 } },
 			x: { y: { z: 4 } },
 		};
 
-		expect(at(object, ["a.b.c", "x.y.z"])).toEqual([3, 4]);
+		assert.equal(at(object, ["a.b.c", "x.y.z"]), [3, 4]);
 	});
 });

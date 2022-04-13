@@ -1,17 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { upperCase } from "./upper-case";
 
-describe("#upperCase", () => {
+describe("upperCase", async ({ assert, it, nock, loader }) => {
 	it("should turn any string into upper case", () => {
-		expect(upperCase("string")).toBe("STRING");
-		expect(upperCase("camelCase")).toBe("CAMEL CASE");
-		expect(upperCase("param-case")).toBe("PARAM CASE");
-		expect(upperCase("PascalCase")).toBe("PASCAL CASE");
-		expect(upperCase("UPPER_CASE")).toBe("UPPER CASE");
-		expect(upperCase("snake_case")).toBe("SNAKE CASE");
-		expect(upperCase("sentence case")).toBe("SENTENCE CASE");
-		expect(upperCase("Title Case")).toBe("TITLE CASE");
-		expect(upperCase("dot.case")).toBe("DOT CASE");
+		assert.is(upperCase("string"), "STRING");
+		assert.is(upperCase("camelCase"), "CAMEL CASE");
+		assert.is(upperCase("param-case"), "PARAM CASE");
+		assert.is(upperCase("PascalCase"), "PASCAL CASE");
+		assert.is(upperCase("UPPER_CASE"), "UPPER CASE");
+		assert.is(upperCase("snake_case"), "SNAKE CASE");
+		assert.is(upperCase("sentence case"), "SENTENCE CASE");
+		assert.is(upperCase("Title Case"), "TITLE CASE");
+		assert.is(upperCase("dot.case"), "DOT CASE");
 	});
 });

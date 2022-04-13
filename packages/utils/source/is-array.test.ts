@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isArray } from "./is-array";
 
-describe("#isArray", () => {
+describe("isArray", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isArray([1])).toBeTrue();
+		assert.true(isArray([1]));
 	});
 
 	it("should fail", () => {
-		expect(isArray(1)).toBeFalse();
+		assert.false(isArray(1));
 	});
 });

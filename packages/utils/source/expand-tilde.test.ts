@@ -1,18 +1,20 @@
-import { expandTilde } from "./expand-tilde";
+import { describe } from "../../core-test-framework";
 import { homedir } from "os";
 import { join } from "path";
 
-describe("#expandTilde", () => {
+import { expandTilde } from "./expand-tilde";
+
+describe("#expandTilde", ({ it, assert }) => {
 	it("should not expand if the path is already absolute", function () {
-		expect(expandTilde("/home")).toBe("/home");
+		assert.equal(expandTilde("/home"), "/home");
 	});
 
 	it("should expand a tilde to the user home directory", function () {
-		expect(expandTilde("~")).toBe(homedir());
+		assert.equal(expandTilde("~"), homedir());
 	});
 
 	it("should expand `~+` to process.cwd, per bash spec", function () {
-		expect(expandTilde("~+")).toBe(process.cwd());
-		expect(expandTilde("~+/downloads")).toBe(join(process.cwd(), "downloads"));
+		assert.equal(expandTilde("~+"), process.cwd());
+		assert.equal(expandTilde("~+/downloads"), join(process.cwd(), "downloads"));
 	});
 });

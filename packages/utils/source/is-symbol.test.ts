@@ -1,13 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
-import { isSymbol } from "./is-symbol";
+import { isSyncFunction } from "./is-sync-function";
 
-describe("#isSymbol", () => {
+describe("isSyncFunction", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isSymbol(Symbol.for("string"))).toBeTrue();
+		assert.true(isSyncFunction(new Function()));
 	});
 
 	it("should fail", () => {
-		expect(isSymbol("string")).toBeFalse();
+		assert.false(isSyncFunction(async () => ({})));
+		assert.false(isSyncFunction([]));
 	});
 });

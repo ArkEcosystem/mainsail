@@ -1,15 +1,15 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isPositiveZero } from "./is-positive-zero";
 
-describe("#isPositiveZero", () => {
+describe("isPositiveZero", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isPositiveZero(+0)).toBeTrue();
-		expect(isPositiveZero(0)).toBeTrue();
+		assert.true(isPositiveZero(+0));
+		assert.true(isPositiveZero(0));
 	});
 
 	it("should fail", () => {
-		expect(isPositiveZero(-0)).toBeFalse();
-		expect(isPositiveZero(-1)).toBeFalse();
+		assert.false(isPositiveZero(-0));
+		assert.false(isPositiveZero(-1));
 	});
 });

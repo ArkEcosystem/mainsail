@@ -1,16 +1,17 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { lastMapKey } from "./last-map-key";
 
-describe("#lastMapKey", () => {
+describe("lastMapKey", async ({ assert, it, nock, loader }) => {
 	it("should return the last key", () => {
-		expect(
+		assert.is(
 			lastMapKey(
 				new Map([
 					["Hello", "World"],
 					["Another", "Planet"],
 				]),
 			),
-		).toBe("Another");
+			"Another",
+		);
 	});
 });

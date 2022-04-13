@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isNegative } from "./is-negative";
 
-describe("#isNegative", () => {
+describe("isNegative", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isNegative(-1)).toBeTrue();
+		assert.true(isNegative(-1));
 	});
 
 	it("should fail", () => {
-		expect(isNegative(1)).toBeFalse();
+		assert.false(isNegative(1));
 	});
 });

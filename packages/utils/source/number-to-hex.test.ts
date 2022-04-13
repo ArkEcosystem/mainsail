@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { numberToHex } from "./number-to-hex";
 
-describe("#numberToHex", () => {
+describe("numberToHex", async ({ assert, it, nock, loader }) => {
 	it("should return the number as hex", () => {
-		expect(numberToHex(1)).toBe("01");
+		assert.is(numberToHex(1), "01");
 	});
 });

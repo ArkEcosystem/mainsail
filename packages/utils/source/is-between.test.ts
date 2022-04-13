@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isBetween } from "./is-between";
 
-describe("#isBetween", () => {
+describe("isBetween", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isBetween(2, 1, 3)).toBeTrue();
+		assert.true(isBetween(2, 1, 3));
 	});
 
 	it("should fail", () => {
-		expect(isBetween(1, 2, 3)).toBeFalse();
+		assert.false(isBetween(1, 2, 3));
 	});
 });

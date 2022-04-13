@@ -1,25 +1,25 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { toString } from "./to-string";
 
-describe("#toString", () => {
+describe("toString", async ({ assert, it, nock, loader }) => {
 	it("should work with a string", () => {
-		expect(toString("hi")).toEqual("hi");
+		assert.is(toString("hi"), "hi");
 	});
 
 	it("should work with a symbol", () => {
-		expect(toString(Symbol.for("hi"))).toEqual("Symbol(hi)");
+		assert.is(toString(Symbol.for("hi")), "Symbol(hi)");
 	});
 
 	it("should work with a null value", () => {
-		expect(toString(null)).toEqual("");
+		assert.is(toString(null), "");
 	});
 
 	it("should work with an undefined value", () => {
-		expect(toString(undefined)).toEqual("");
+		assert.is(toString(undefined), "");
 	});
 
 	it("should work with an array", () => {
-		expect(toString([1, 2, 3])).toEqual("1,2,3");
+		assert.is(toString([1, 2, 3]), "1,2,3");
 	});
 });

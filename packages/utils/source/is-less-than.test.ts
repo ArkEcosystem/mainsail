@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isLessThan } from "./is-less-than";
 
-describe("#isLessThan", () => {
+describe("isLessThan", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isLessThan(5, 10)).toBeTrue();
+		assert.true(isLessThan(5, 10));
 	});
 
 	it("should fail", () => {
-		expect(isLessThan(10, 5)).toBeFalse();
+		assert.false(isLessThan(10, 5));
 	});
 });

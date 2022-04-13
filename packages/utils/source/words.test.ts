@@ -1,7 +1,9 @@
+import { describe } from "../../core-test-framework";
+
 import { words } from "./words";
 
-describe("#words", () => {
+describe("words", async ({ assert, it, nock, loader }) => {
 	it("should work with words", () => {
-		expect(words("fred, barney, & pebbles")).toEqual(["fred", "barney", "pebbles"]);
+		assert.equal(words("fred, barney, & pebbles"), ["fred", "barney", "pebbles"]);
 	});
 });

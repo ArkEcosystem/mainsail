@@ -1,15 +1,15 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { CappedSet } from "./capped-set";
 
-describe("CappedSet", () => {
+describe("CappedSet", ({ it, assert }) => {
 	it("basic", () => {
 		const cappedSet = new CappedSet<number>();
 
 		cappedSet.add(20);
 
-		expect(cappedSet.has(20)).toBeTrue();
-		expect(cappedSet.has(21)).toBeFalse();
+		assert.true(cappedSet.has(20));
+		assert.false(cappedSet.has(21));
 	});
 
 	it("overflow", () => {
@@ -21,11 +21,11 @@ describe("CappedSet", () => {
 		}
 
 		for (let i = 0; i < 5; i++) {
-			expect(cappedSet.has(i)).toBeFalse();
+			assert.false(cappedSet.has(i));
 		}
 
 		for (let i = 5; i < 15; i++) {
-			expect(cappedSet.has(i)).toBeTrue();
+			assert.true(cappedSet.has(i));
 		}
 	});
 });

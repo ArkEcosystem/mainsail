@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isUndefined } from "./is-undefined";
 
-describe("#isUndefined", () => {
+describe("isUndefined", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isUndefined(undefined)).toBeTrue();
+		assert.true(isUndefined(undefined));
 	});
 
 	it("should fail", () => {
-		expect(isUndefined("undefined")).toBeFalse();
+		assert.false(isUndefined("undefined"));
 	});
 });

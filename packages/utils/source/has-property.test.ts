@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { hasProperty } from "./has-property";
 
-describe("#hasProperty", () => {
+describe("hasProperty", async ({ assert, it, nock, loader }) => {
 	it("should return true if the object has a given property", () => {
-		expect(hasProperty({ property: undefined }, "property")).toBeTrue();
+		assert.true(hasProperty({ property: undefined }, "property"));
 	});
 
 	it("should return false if the object doesn't have a given property", () => {
-		expect(hasProperty({ property: undefined }, "not-present")).toBeFalse();
+		assert.false(hasProperty({ property: undefined }, "not-present"));
 	});
 });

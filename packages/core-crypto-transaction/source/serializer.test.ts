@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Address, PublicKey, Keys } from "../identities";
 import { ITransaction } from "../interfaces";
 import { configManager } from "../managers";

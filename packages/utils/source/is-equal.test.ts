@@ -1,29 +1,29 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isEqual } from "./is-equal";
 
-describe("#isEqual", () => {
+describe("isEqual", async ({ assert, it, nock, loader }) => {
 	it("should return true for the same strings", () => {
-		expect(isEqual("true", "true")).toBeTrue();
+		assert.true(isEqual("true", "true"));
 	});
 
 	it("should return true for the same numbers", () => {
-		expect(isEqual(1, 1)).toBeTrue();
+		assert.true(isEqual(1, 1));
 	});
 
 	it("should return true for the same booleans", () => {
-		expect(isEqual(true, true)).toBeTrue();
+		assert.true(isEqual(true, true));
 	});
 
 	it("should return true for the same objects", () => {
-		expect(isEqual({}, {})).toBeTrue();
+		assert.true(isEqual({}, {}));
 	});
 
 	it("should return true for the same arrays", () => {
-		expect(isEqual([], [])).toBeTrue();
+		assert.true(isEqual([], []));
 	});
 
 	it("should return true for the same nulls", () => {
-		expect(isEqual(null, null)).toBeTrue();
+		assert.true(isEqual(null, null));
 	});
 });

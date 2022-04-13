@@ -1,13 +1,15 @@
+import { describe } from "../../core-test-framework";
+
 import { extension } from "./extension";
 
-describe("#extension", () => {
+describe("#extension", ({ it, assert }) => {
 	it("should return the file extension", () => {
-		expect(extension("file.html")).toBe("html");
-		expect(extension("file.js")).toBe("js");
-		expect(extension("file.ts")).toBe("ts");
-		expect(extension("file.php")).toBe("php");
-		expect(extension("file.rb")).toBe("rb");
-		expect(extension("file.ext")).toBe("ext");
-		expect(extension("")).toBeUndefined();
+		assert.equal(extension("file.html"), "html");
+		assert.equal(extension("file.js"), "js");
+		assert.equal(extension("file.ts"), "ts");
+		assert.equal(extension("file.php"), "php");
+		assert.equal(extension("file.rb"), "rb");
+		assert.equal(extension("file.ext"), "ext");
+		assert.undefined(extension(""));
 	});
 });

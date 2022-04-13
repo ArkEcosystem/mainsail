@@ -1,12 +1,12 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { some } from "./some";
 
-describe("#some", () => {
+describe("some", async ({ assert, it, nock, loader }) => {
 	it("should work with any function", () => {
-		expect(some([null, 0, "yes", false], Boolean)).toBeTrue();
+		assert.true(some([null, 0, "yes", false], Boolean));
 
-		expect(
+		assert.true(
 			some(
 				[
 					{ user: "barney", active: true },
@@ -14,6 +14,6 @@ describe("#some", () => {
 				],
 				(currentValue) => currentValue.active,
 			),
-		).toBeTrue();
+		);
 	});
 });

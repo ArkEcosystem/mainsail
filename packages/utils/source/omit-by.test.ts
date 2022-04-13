@@ -1,10 +1,10 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isNumber } from "./is-number";
 import { omitBy } from "./omit-by";
 
-describe("#omitBy", () => {
+describe("omitBy", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(omitBy({ a: 1, b: "2", c: 3 }, isNumber)).toEqual({ b: "2" });
+		assert.equal(omitBy({ a: 1, b: "2", c: 3 }, isNumber), { b: "2" });
 	});
 });

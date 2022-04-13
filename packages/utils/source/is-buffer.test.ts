@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isBuffer } from "./is-buffer";
 
-describe("#isBuffer", () => {
+describe("isBuffer", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isBuffer(Buffer.alloc(1))).toBeTrue();
+		assert.true(isBuffer(Buffer.alloc(1)));
 	});
 
 	it("should fail", () => {
-		expect(isBuffer(1)).toBeFalse();
+		assert.false(isBuffer(1));
 	});
 });

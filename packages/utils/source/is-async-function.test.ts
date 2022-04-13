@@ -1,14 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isAsyncFunction } from "./is-async-function";
 
-describe("#isAsyncFunction", () => {
+describe("isAsyncFunction", async ({ assert, it, nock, loader }) => {
 	it("should pass", () => {
-		expect(isAsyncFunction(async () => ({}))).toBeTrue();
+		assert.true(isAsyncFunction(async () => ({})));
 	});
 
 	it("should fail", () => {
-		expect(isAsyncFunction(new Function())).toBeFalse();
-		expect(isAsyncFunction([])).toBeFalse();
+		assert.false(isAsyncFunction(new Function()));
+		assert.false(isAsyncFunction([]));
 	});
 });

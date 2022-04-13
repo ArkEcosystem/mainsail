@@ -1,14 +1,14 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { isSyncFunction } from "./is-sync-function";
 
-describe("#isSyncFunction", () => {
+describe("#isSyncFunction", ({ it, assert }) => {
 	it("should pass", () => {
-		expect(isSyncFunction(new Function())).toBeTrue();
+		assert.true(isSyncFunction(new Function()));
 	});
 
 	it("should fail", () => {
-		expect(isSyncFunction(async () => ({}))).toBeFalse();
-		expect(isSyncFunction([])).toBeFalse();
+		assert.false(isSyncFunction(async () => ({})));
+		assert.false(isSyncFunction([]));
 	});
 });

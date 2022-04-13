@@ -1,26 +1,25 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
-import { keys } from "./keys";
+import { keys } from "./keys.js";
 
-describe("#keys", () => {
+describe("keys", async ({ assert, it, nock, loader }) => {
 	it("should work with an object", () => {
 		function Foo() {
-			// @ts-ignore
 			this.a = 1;
-			// @ts-ignore
+
 			this.b = 2;
 		}
 
 		Foo.prototype.c = 3;
 
-		expect(keys(new Foo())).toEqual(["a", "b"]);
+		assert.equal(keys(new Foo()), ["a", "b"]);
 	});
 
 	it("should work with a string", () => {
-		expect(keys("hi")).toEqual(["0", "1"]);
+		assert.equal(keys("hi"), ["0", "1"]);
 	});
 
 	it("should work with an array", () => {
-		expect(keys([1, 2, 3, 4])).toEqual(["0", "1", "2", "3"]);
+		assert.equal(keys([1, 2, 3, 4]), ["0", "1", "2", "3"]);
 	});
 });

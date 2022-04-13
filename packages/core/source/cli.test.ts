@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Commands, Services } from "@arkecosystem/core-cli";
 import { CommandLineInterface } from "./cli";
 import envPaths from "env-paths";

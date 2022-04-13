@@ -1,9 +1,12 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { reduceArray } from "./reduce-array";
 
-describe("#reduceArray", () => {
+describe("reduceArray", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
-		expect(reduceArray([1, 2], (sum, n) => sum + n, 0)).toBe(3);
+		assert.is(
+			reduceArray([1, 2], (sum, n) => sum + n, 0),
+			3,
+		);
 	});
 });

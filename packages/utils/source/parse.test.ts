@@ -1,13 +1,13 @@
-import "jest-extended";
+import { describe } from "../../core-test-framework";
 
 import { parse } from "./parse";
 
-describe("#parse", () => {
+describe("parse", async ({ assert, it, nock, loader }) => {
 	it("should parse valid json", () => {
-		expect(parse("{}")).toEqual({});
+		assert.equal(parse("{}"), {});
 	});
 
 	it("should fail to parse invalid json", () => {
-		expect(() => parse("{")).toThrow("Unexpected end of JSON input");
+		assert.throws(() => parse("{"), "Unexpected end of JSON input");
 	});
 });
