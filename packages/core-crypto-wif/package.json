@@ -25,13 +25,16 @@
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
 		"@types/tmp": "^0.2.0",
 		"@types/uuid": "^8.0.0",
 		"@types/wif": "^2.0.1",
 		"big-integer": "^1.6.48",
 		"tmp": "^0.2.0",
 		"util": "^0.12.3",
-		"uuid": "^8.0.0"
+		"uuid": "^8.0.0",
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

@@ -1,20 +1,48 @@
-import "jest-extended";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+import { KeyPairFactory } from "@arkecosystem/core-crypto-key-pair-schnorr/source/pair";
 
-import { data, mnemonic } from "../test/identity.json";
+import { describe, Sandbox } from "../../core-test-framework";
+import { mnemonic, wif } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
-import { Keys } from "./keys";
-import { WIF } from "./wif";
+import { WIFFactory } from "./wif.factory";
 
-describe("Identities - WIF", () => {
-	describe("fromMnemonic", () => {
-		it("should be OK", () => {
-			expect(WIF.fromMnemonic(mnemonic, devnet)).toBe(data.wif);
+describe<{
+	sandbox: Sandbox;
+	factory: WIFFactory;
+}>("Identities - WIFFactory", ({ it, assert, beforeEach }) => {
+	beforeEach((context) => {
+		context.sandbox = new Sandbox();
+
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+			// @ts-ignore
+			genesisBlock: {},
+			milestones: [],
+			// @ts-ignore
+			network: devnet,
 		});
+
+		context.sandbox.app
+			.bind(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.to(KeyPairFactory)
+			.inSingletonScope();
+
+		context.factory = context.sandbox.app.resolve(WIFFactory);
 	});
 
-	describe("fromKeys", () => {
-		it("should be OK", () => {
-			expect(WIF.fromKeys(Keys.fromMnemonic(mnemonic), devnet)).toBe(data.wif);
-		});
+	it("#fromMnemonic - should be OK", async ({ factory }) => {
+		assert.equal(await factory.fromMnemonic(mnemonic), wif);
+	});
+
+	it("#fromKeys -  should be OK", async ({ factory, sandbox }) => {
+		assert.equal(
+			await factory.fromKeys(
+				await sandbox.app
+					.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+					.fromMnemonic(mnemonic),
+			),
+			wif,
+		);
 	});
 });

@@ -1102,6 +1102,8 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@types/tmp': ^0.2.0
       '@types/uuid': ^8.0.0
@@ -1110,6 +1112,7 @@ importers:
       tmp: ^0.2.0
       util: ^0.12.3
       uuid: ^8.0.0
+      uvu: ^0.5.3
       wif: ^2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
@@ -1117,6 +1120,8 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
       '@types/tmp': 0.2.3
       '@types/uuid': 8.3.1
       '@types/wif': 2.0.2
@@ -1124,6 +1129,7 @@ importers:
       tmp: 0.2.1
       util: 0.12.4
       uuid: 8.3.2
+      uvu: 0.5.3
 
   packages/core-database:
     specifiers:
