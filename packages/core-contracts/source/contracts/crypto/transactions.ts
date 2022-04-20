@@ -119,7 +119,7 @@ export interface ITransactionVerifier {
 
 	verifyHash(data: ITransactionData): Promise<boolean>;
 
-	verifySchema(data: ITransactionData, strict?: boolean): ISchemaValidationResult;
+	verifySchema(data: ITransactionData, strict?: boolean): Promise<ISchemaValidationResult>;
 }
 
 export interface ITransactionSigner {

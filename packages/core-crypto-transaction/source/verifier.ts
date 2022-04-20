@@ -7,7 +7,7 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator: any;
+	private readonly validator: Contracts.Crypto.IValidator;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly utils: Contracts.Crypto.ITransactionUtils;
@@ -50,7 +50,7 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 				const publicKey: string = publicKeys[publicKeyIndex];
 
 				if (
-					this.signatureFactory.verify(
+					await this.signatureFactory.verify(
 						hash,
 						Buffer.from(partialSignature, "hex"),
 						Buffer.from(publicKey, "hex"),
@@ -85,14 +85,14 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 		return this.signatureFactory.verify(hash, Buffer.from(signature, "hex"), Buffer.from(senderPublicKey, "hex"));
 	}
 
-	public verifySchema(
+	public async verifySchema(
 		data: Contracts.Crypto.ITransactionData,
 		strict: boolean,
-	): Contracts.Crypto.ISchemaValidationResult {
+	): Promise<Contracts.Crypto.ISchemaValidationResult> {
 		const transactionType = this.transactionTypeFactory.get(data.type, data.typeGroup, data.version);
 
 		if (!transactionType) {
-			throw new Error();
+			throw new Error("Unknown transaction type");
 		}
 
 		const { $id } = transactionType.getSchema();

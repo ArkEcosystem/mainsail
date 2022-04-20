@@ -35,7 +35,7 @@ export const transactionBaseSchema: Record<string, any> = {
 		typeGroup: { minimum: 0, type: "integer" },
 		version: { enum: [1] },
 	},
-	then: { required: ["type", "senderPublicKey", "fee", "amount", "timestamp"] },
+	then: { required: ["type", "senderPublicKey", "fee", "amount"] },
 	type: "object",
 };
 

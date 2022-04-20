@@ -42,7 +42,7 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 		data: Contracts.Crypto.ITransactionData,
 		strict?: boolean,
 	): Promise<Contracts.Crypto.ITransaction> {
-		const { value, error } = this.verifier.verifySchema(data, strict);
+		const { value, error } = await this.verifier.verifySchema(data, strict);
 
 		if (error) {
 			throw new Exceptions.TransactionSchemaError(error);
@@ -60,7 +60,7 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 			const transaction = await this.deserializer.deserialize(serialized);
 			transaction.data.id = await this.utils.getId(transaction.data);
 
-			const { error } = this.verifier.verifySchema(transaction.data, strict);
+			const { error } = await this.verifier.verifySchema(transaction.data, strict);
 
 			if (error) {
 				throw new Exceptions.TransactionSchemaError(error);

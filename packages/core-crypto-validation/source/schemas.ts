@@ -2,7 +2,7 @@ export const schemas = {
 	// @TODO: plugins should register this rule
 	address: {
 		$id: "address",
-		allOf: [{ maxLength: 34, minLength: 34 }, { $ref: "base58" }],
+		allOf: [{ maxLength: 62, minLength: 62 }, { $ref: "bech32m" }],
 	},
 
 	alphanumeric: {
@@ -14,6 +14,12 @@ export const schemas = {
 	base58: {
 		$id: "base58",
 		pattern: "^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$",
+		type: "string",
+	},
+
+	bech32m: {
+		$id: "bech32m",
+		pattern: "^[0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]+$",
 		type: "string",
 	},
 
