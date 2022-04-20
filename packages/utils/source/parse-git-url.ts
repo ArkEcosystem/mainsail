@@ -34,10 +34,10 @@ export const parseGitUrl = (
 	const name: string = segments[1].replace(/^\W+|\.git$/g, "");
 
 	const result: { host: string; owner: string; name: string; repo: string; branch: string } = {
-		host: parsed.host,
-		owner,
-		name,
 		branch: (parsed.hash ? last(parsed.hash.split("#")) : segments[2]) || "master",
+		host: parsed.host,
+		name,
+		owner,
 		repo: owner + "/" + name,
 	};
 

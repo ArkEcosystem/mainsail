@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { randomHex } from "./random-hex";
 
 describe("#randomHex", ({ it, assert }) => {

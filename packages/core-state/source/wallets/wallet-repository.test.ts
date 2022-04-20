@@ -1,21 +1,21 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { describeSkip } from "../../../core-test-framework";
 
+import { describeSkip } from "../../../core-test-framework";
 import { setUp } from "../../test/setup";
-import { Wallet, WalletRepository } from "./";
+import { Wallet, WalletRepository } from ".";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
 
 describeSkip<{
 	walletRepo: WalletRepository;
 }>("Wallet Repository", ({ it, assert, afterEach, beforeAll }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
 		// TODO: why does this have to be rebound here?
-		env.sandbox.app.rebind(Identifiers.WalletRepository).to(WalletRepository);
+		environment.sandbox.app.rebind(Identifiers.WalletRepository).to(WalletRepository);
 
-		context.walletRepo = env.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
+		context.walletRepo = environment.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 	});
 
 	afterEach((context) => {
@@ -164,8 +164,8 @@ describeSkip<{
 	it("should index array of wallets using different indexers", (context) => {
 		const wallets: Contracts.State.Wallet[] = [];
 		const walletAddresses: string[] = [];
-		for (let i = 0; i < 6; i++) {
-			const walletAddress = `wallet${i}`;
+		for (let index = 0; index < 6; index++) {
+			const walletAddress = `wallet${index}`;
 			walletAddresses.push(walletAddress);
 			const wallet = context.walletRepo.createWallet(walletAddress);
 			wallets.push(wallet);
@@ -175,7 +175,9 @@ describeSkip<{
 			context.walletRepo.index(wallet);
 		}
 
-		walletAddresses.forEach((address) => assert.true(context.walletRepo.has(address)));
+		for (const address of walletAddresses) {
+			assert.true(context.walletRepo.has(address));
+		}
 
 		const publicKey = "02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34";
 
@@ -183,9 +185,13 @@ describeSkip<{
 		context.walletRepo.getIndex("usernames").set("username", wallets[2]);
 		context.walletRepo.getIndex("resignations").set("resign", wallets[3]);
 
-		wallets.forEach((wallet) => context.walletRepo.index(wallet));
+		for (const wallet of wallets) {
+			context.walletRepo.index(wallet);
+		}
 
-		walletAddresses.forEach((address) => assert.true(context.walletRepo.has(address)));
+		for (const address of walletAddresses) {
+			assert.true(context.walletRepo.has(address));
+		}
 	});
 
 	it("should get the nonce of a wallet", (context) => {

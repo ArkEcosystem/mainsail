@@ -1,5 +1,4 @@
 import { ITransaction } from "../crypto";
-
 import { SenderMempool } from "./sender-mempool";
 
 export interface Mempool {

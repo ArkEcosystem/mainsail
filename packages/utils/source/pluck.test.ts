@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { pluck } from "./pluck";
 
 describe("pluck", async ({ assert, it, nock, loader }) => {
@@ -7,8 +6,8 @@ describe("pluck", async ({ assert, it, nock, loader }) => {
 		assert.equal(
 			pluck(
 				[
-					{ user: "barney", age: 36 },
-					{ user: "fred", age: 40 },
+					{ age: 36, user: "barney" },
+					{ age: 40, user: "fred" },
 				],
 				"user",
 			),

@@ -64,6 +64,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		emitter.dispatch(AppEnums.ValidatorEvent.Resigned, transaction.data);
 	}
 

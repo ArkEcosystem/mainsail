@@ -1,5 +1,5 @@
-import { IteratorMany } from "./";
 import { describe } from "../../core-test-framework";
+import { IteratorMany } from ".";
 
 describe("IteratorMany", ({ it, assert }) => {
 	it("should choose next item based on comparator", () => {

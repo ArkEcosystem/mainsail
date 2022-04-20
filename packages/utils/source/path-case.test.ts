@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { pathCase } from "./path-case";
 
 describe("pathCase", async ({ assert, it, nock, loader }) => {

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { parseURI } from "./parse-uri";
 
 describe("parseURI", async ({ assert, it, nock, loader }) => {

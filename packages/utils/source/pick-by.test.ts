@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isNumber } from "./is-number";
 import { pickBy } from "./pick-by";
 

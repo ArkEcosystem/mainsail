@@ -1,15 +1,15 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 import { PeerRepository } from "@arkecosystem/core-p2p";
 
-let mockPeers: Partial<Contracts.P2P.Peer>[] = [];
+let mockPeers: Contracts.P2P.Peer[] = [];
 
-export const setPeers = (peers: Partial<Contracts.P2P.Peer>[]) => {
+export const setPeers = (peers: Contracts.P2P.Peer[]) => {
 	mockPeers = peers;
 };
 
 class PeerRepositoryMock implements Partial<PeerRepository> {
 	public getPeers(): Contracts.P2P.Peer[] {
-		return mockPeers as Contracts.P2P.Peer[];
+		return mockPeers;
 	}
 
 	public hasPeer(ip: string): boolean {
@@ -17,7 +17,7 @@ class PeerRepositoryMock implements Partial<PeerRepository> {
 	}
 
 	public getPeer(ip: string): Contracts.P2P.Peer {
-		return mockPeers[0] as Contracts.P2P.Peer;
+		return mockPeers[0];
 	}
 }
 

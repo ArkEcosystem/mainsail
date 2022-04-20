@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { maxBy } from "./max-by";
 
 describe("maxBy", async ({ assert, it, nock, loader }) => {

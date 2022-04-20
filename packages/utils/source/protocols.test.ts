@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { protocols } from "./protocols";
 
 describe("protocols", async ({ assert, it, nock, loader }) => {

@@ -1,9 +1,10 @@
-import { describe } from "../../core-test-framework";
 import { Commands, Services } from "@arkecosystem/core-cli";
-import { CommandLineInterface } from "./cli";
 import envPaths from "env-paths";
-import prompts from "prompts";
 import { join } from "path";
+import prompts from "prompts";
+
+import { describe } from "../../core-test-framework";
+import { CommandLineInterface } from "./cli";
 
 describe("CLI", ({ beforeEach, it, assert, stub }) => {
 	beforeEach(() => {

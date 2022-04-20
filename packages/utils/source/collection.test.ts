@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { Collection } from "./collection";
 
 describe<{

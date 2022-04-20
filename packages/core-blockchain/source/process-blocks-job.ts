@@ -162,6 +162,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			lastProcessedBlock
 		) {
 			if (this.stateStore.isStarted() && this.stateMachine.getState() === "newBlock") {
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.networkMonitor.broadcastBlock(lastProcessedBlock);
 			}
 		} else if (forkBlock) {
@@ -170,8 +171,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			this.blockchain.clearQueue();
 			this.blockchain.resetLastDownloadedBlock();
 		}
-
-		return;
 	}
 
 	async #revertBlocks(blocksToRevert: Contracts.Crypto.IBlock[]): Promise<void> {
@@ -208,6 +207,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 	async #handleCorrupted() {
 		this.logger.error("Shutting down app, because state is corrupted");
+		// eslint-disable-next-line unicorn/no-process-exit
 		process.exit(1);
 	}
 }

@@ -1,11 +1,11 @@
-import { Application, Services } from "@arkecosystem/core-kernel";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describe, describeSkip, getWalletAttributeSet } from "../../../core-test-framework";
-import { SinonSpy } from "sinon";
+import { Application, Services } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import { SinonSpy } from "sinon";
 
+import { describe, describeSkip, getWalletAttributeSet } from "../../../core-test-framework";
 import { setUp } from "../../test/setup";
-import { Wallet, WalletEvent } from "../wallets";
+import { Wallet, WalletEvent } from ".";
 
 describe<{
 	attributeMap: Services.Attributes.AttributeMap;
@@ -166,10 +166,10 @@ describeSkip<{
 	dispatchSyncSpy: SinonSpy;
 }>("Original", ({ it, beforeAll, beforeEach, assert, afterEach }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.app = env.sandbox.app;
-		context.dispatchSyncSpy = env.spies.dispatchSyncSpy;
+		context.app = environment.sandbox.app;
+		context.dispatchSyncSpy = environment.spies.dispatchSyncSpy;
 	});
 
 	beforeEach((context) => {
@@ -190,9 +190,9 @@ describeSkip<{
 
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: "dummyPublicKey",
 				key: "publicKey",
 				previousValue: undefined,
+				publicKey: "dummyPublicKey",
 				value: "dummyPublicKey",
 				wallet: context.wallet,
 			}),
@@ -205,9 +205,9 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "balance",
 				previousValue: BigNumber.ZERO,
+				publicKey: undefined,
 				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
@@ -220,9 +220,9 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "balance",
 				previousValue: BigNumber.ZERO,
+				publicKey: undefined,
 				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
@@ -235,9 +235,9 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "balance",
 				previousValue: BigNumber.ZERO,
+				publicKey: undefined,
 				value: BigNumber.make("-1"),
 				wallet: context.wallet,
 			}),
@@ -250,9 +250,9 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "nonce",
 				previousValue: BigNumber.ZERO,
+				publicKey: undefined,
 				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
@@ -265,9 +265,9 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "nonce",
 				previousValue: BigNumber.ZERO,
+				publicKey: undefined,
 				value: BigNumber.ONE,
 				wallet: context.wallet,
 			}),
@@ -280,9 +280,9 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "nonce",
 				previousValue: BigNumber.ZERO,
+				publicKey: undefined,
 				value: BigNumber.make("-1"),
 				wallet: context.wallet,
 			}),
@@ -295,8 +295,8 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "delegate.username",
+				publicKey: undefined,
 				value: "dummy",
 				wallet: context.wallet,
 			}),
@@ -310,9 +310,9 @@ describeSkip<{
 		assert.true(context.dispatchSyncSpy.calledTwice);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				publicKey: undefined,
 				key: "delegate.username",
 				previousValue: "dummy",
+				publicKey: undefined,
 				wallet: context.wallet,
 			}),
 		);
@@ -333,10 +333,10 @@ describeSkip<{
 	dispatchSyncSpy: SinonSpy;
 }>("Clone", ({ it, beforeAll, beforeEach, afterEach, assert }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.app = env.sandbox.app;
-		context.dispatchSyncSpy = env.spies.dispatchSyncSpy;
+		context.app = environment.sandbox.app;
+		context.dispatchSyncSpy = environment.spies.dispatchSyncSpy;
 	});
 
 	beforeEach((context) => {

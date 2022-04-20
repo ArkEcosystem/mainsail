@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { hashString } from "./hash-string";
 
 describe("hashString", async ({ assert, it, nock, loader }) => {

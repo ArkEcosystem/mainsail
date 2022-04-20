@@ -1,11 +1,12 @@
-import { Application, Enums, Utils } from "@arkecosystem/core-kernel";
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { StateBuilder } from "./state-builder";
-import { WalletRepository } from "./wallets";
+import { Application, Enums, Utils } from "@arkecosystem/core-kernel";
+import { SinonSpy } from "sinon";
+
+import { Configuration } from "../../core-crypto-config";
 import { describeSkip } from "../../core-test-framework";
 import { setUp, setUpDefaults } from "../test/setup";
-import { SinonSpy } from "sinon";
-import { Configuration } from "../../core-crypto-config";
+import { StateBuilder } from "./state-builder";
+import { WalletRepository } from "./wallets";
 
 const getBlockRewardsDefault = setUpDefaults.getBlockRewards[0];
 const getSentTransactionDefault = setUpDefaults.getSentTransaction[0];
@@ -33,20 +34,20 @@ describeSkip<{
 	loggerInfoSpy: SinonSpy;
 }>("StateBuilder", ({ it, beforeAll, afterEach, beforeEach, assert }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.walletRepo = env.walletRepo;
-		context.stateBuilder = env.stateBuilder;
-		context.app = env.sandbox.app;
+		context.walletRepo = environment.walletRepo;
+		context.stateBuilder = environment.stateBuilder;
+		context.app = environment.sandbox.app;
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.configuration = context.app.get(Identifiers.Cryptography.Configuration);
-		context.getBlockRewardsSpy = env.spies.getBlockRewardsSpy;
-		context.getSentTransactionSpy = env.spies.getSentTransactionSpy;
-		context.getRegisteredHandlersSpy = env.spies.getRegisteredHandlersSpy;
-		context.dispatchSpy = env.spies.dispatchSpy;
-		context.loggerWarningSpy = env.spies.logger.warning;
-		context.loggerInfoSpy = env.spies.logger.info;
+		context.getBlockRewardsSpy = environment.spies.getBlockRewardsSpy;
+		context.getSentTransactionSpy = environment.spies.getSentTransactionSpy;
+		context.getRegisteredHandlersSpy = environment.spies.getRegisteredHandlersSpy;
+		context.dispatchSpy = environment.spies.dispatchSpy;
+		context.loggerWarningSpy = environment.spies.logger.warning;
+		context.loggerInfoSpy = environment.spies.logger.info;
 
 		restoreDefaultSentTransactions = saveDefaultTransactions();
 	});
@@ -58,7 +59,7 @@ describeSkip<{
 
 		// sender wallet balance should always be enough for default transactions (unless it is overridden)
 		const wallet = await context.walletRepo.findByPublicKey(senderKey);
-		wallet.setBalance(Utils.BigNumber.make(100000));
+		wallet.setBalance(Utils.BigNumber.make(100_000));
 	});
 
 	afterEach((context) => {
@@ -103,7 +104,7 @@ describeSkip<{
 
 	it("should apply the transaction data to the sender", async (context) => {
 		const wallet = await context.walletRepo.findByPublicKey(senderKey);
-		wallet.setBalance(Utils.BigNumber.make(80000));
+		wallet.setBalance(Utils.BigNumber.make(80_000));
 		context.walletRepo.index(wallet);
 
 		const expectedBalance = wallet
@@ -119,7 +120,7 @@ describeSkip<{
 
 	it("should fail if any wallet balance is negative and not whitelisted", async (context) => {
 		const wallet = await context.walletRepo.findByPublicKey(senderKey);
-		wallet.setBalance(Utils.BigNumber.make(-80000));
+		wallet.setBalance(Utils.BigNumber.make(-80_000));
 		wallet.setPublicKey(senderKey);
 
 		context.walletRepo.index(wallet);
@@ -137,10 +138,10 @@ describeSkip<{
 	it("should not fail for negative genesis wallet balances", async (context) => {
 		const genesisPublicKeys: string[] = context.configuration
 			.get("genesisBlock.transactions")
-			.reduce((acc, curr) => [...acc, curr.senderPublicKey], []);
+			.reduce((accumulator, current) => [...accumulator, current.senderPublicKey], []);
 
 		const wallet = await context.walletRepo.findByPublicKey(genesisPublicKeys[0]);
-		wallet.setBalance(Utils.BigNumber.make(-80000));
+		wallet.setBalance(Utils.BigNumber.make(-80_000));
 		wallet.setPublicKey(genesisPublicKeys[0]);
 
 		context.walletRepo.index(wallet);
@@ -178,13 +179,13 @@ describeSkip<{
 	it("should fail if the whitelisted key doesn't have the allowed negative balance", async (context) => {
 		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setNonce(getSentTransactionDefault.nonce);
-		wallet.setBalance(Utils.BigNumber.make(-90000));
+		wallet.setBalance(Utils.BigNumber.make(-90_000));
 		wallet.setPublicKey(senderKey);
 		context.walletRepo.index(wallet);
 
 		const balance: Record<string, Record<string, string>> = {
 			[senderKey]: {
-				[wallet.getNonce().toString()]: Utils.BigNumber.make(-80000).toString(),
+				[wallet.getNonce().toString()]: Utils.BigNumber.make(-80_000).toString(),
 			},
 		};
 
@@ -205,13 +206,13 @@ describeSkip<{
 	it("should not fail if the whitelisted key has the allowed negative balance", async (context) => {
 		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setNonce(getSentTransactionDefault.nonce);
-		wallet.setBalance(Utils.BigNumber.make(-90000));
+		wallet.setBalance(Utils.BigNumber.make(-90_000));
 		wallet.setPublicKey(senderKey);
 		context.walletRepo.index(wallet);
 
 		const balance: Record<string, Record<string, string>> = {
 			[senderKey]: {
-				[wallet.getNonce().toString()]: Utils.BigNumber.make(-90000).toString(),
+				[wallet.getNonce().toString()]: Utils.BigNumber.make(-90_000).toString(),
 			},
 		};
 
@@ -242,14 +243,14 @@ describeSkip<{
 	it("should fail if the wallet has no public key", async (context) => {
 		const wallet = await context.walletRepo.findByPublicKey(senderKey);
 		wallet.setNonce(getSentTransactionDefault.nonce);
-		wallet.setBalance(Utils.BigNumber.make(-90000));
+		wallet.setBalance(Utils.BigNumber.make(-90_000));
 		// @ts-ignore
 		wallet.publicKey = undefined;
 		context.walletRepo.index(wallet);
 
 		const balance: Record<string, Record<string, string>> = {
 			[senderKey]: {
-				[wallet.getNonce().toString()]: Utils.BigNumber.make(-90000).toString(),
+				[wallet.getNonce().toString()]: Utils.BigNumber.make(-90_000).toString(),
 			},
 		};
 
@@ -294,8 +295,8 @@ describeSkip<{
 		setUpDefaults.getRegisteredHandlers = [
 			{
 				getConstructor: () => ({
-					version: 1,
 					key: "test",
+					version: 1,
 				}),
 			},
 		];

@@ -37,6 +37,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 		if (!forgerWallet) {
 			const message = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.app.terminate(message);
 		}
 		const appliedTransactions: Contracts.Crypto.ITransaction[] = [];

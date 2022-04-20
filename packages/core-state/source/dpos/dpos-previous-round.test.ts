@@ -1,8 +1,9 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Utils } from "@arkecosystem/core-kernel";
-import { describeSkip, Factories } from "../../../core-test-framework";
-import { VoteBuilder } from "../../../core-crypto-transaction-vote";
 
+import { Configuration } from "../../../core-crypto-config";
+import { VoteBuilder } from "../../../core-crypto-transaction-vote";
+import { describeSkip, Factories } from "../../../core-test-framework";
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { makeVoteTransactions } from "../../test/make-vote-transactions";
@@ -12,7 +13,6 @@ import { BlockState } from "../block-state";
 import { StateStore } from "../stores";
 import { WalletRepository } from "../wallets";
 import { DposState } from "./dpos";
-import { Configuration } from "../../../core-crypto-config";
 
 describeSkip<{
 	app: Application;
@@ -27,15 +27,15 @@ describeSkip<{
 	configuration: Configuration;
 }>("dposPreviousRound", ({ it, beforeAll, beforeEach, afterEach, assert, spy, stub }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.app = env.sandbox.app;
-		context.dposState = env.dPosState;
-		context.dposPreviousRoundStateProv = env.dposPreviousRound;
-		context.walletRepo = env.walletRepo;
-		context.factory = env.factory;
-		context.blockState = env.blockState;
-		context.stateStore = env.stateStore;
+		context.app = environment.sandbox.app;
+		context.dposState = environment.dPosState;
+		context.dposPreviousRoundStateProv = environment.dposPreviousRound;
+		context.walletRepo = environment.walletRepo;
+		context.factory = environment.factory;
+		context.blockState = environment.blockState;
+		context.stateStore = environment.stateStore;
 	});
 
 	beforeEach(async (context) => {
@@ -90,11 +90,11 @@ describeSkip<{
 		const generatorWallet = await context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
 
 		generatorWallet.setAttribute("delegate", {
-			username: "test",
 			forgedFees: Utils.BigNumber.ZERO,
 			forgedRewards: Utils.BigNumber.ZERO,
-			producedBlocks: 0,
 			lastBlock: undefined,
+			producedBlocks: 0,
+			username: "test",
 		});
 
 		context.walletRepo.index(generatorWallet);

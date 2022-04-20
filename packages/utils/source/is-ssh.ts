@@ -7,7 +7,7 @@ export const isSSH = (value: string): boolean => {
 		return true;
 	}
 
-	value = value.substring(value.indexOf("://") + 3);
+	value = value.slice(Math.max(0, value.indexOf("://") + 3));
 
 	return value.indexOf("@") < value.indexOf(":");
 };

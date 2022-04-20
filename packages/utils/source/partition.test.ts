@@ -1,22 +1,21 @@
 import { describe } from "../../core-test-framework";
-
 import { partition } from "./partition";
 
 describe("partition", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
 		const users = [
-			{ user: "barney", age: 36, active: false },
-			{ user: "fred", age: 40, active: true },
-			{ user: "pebbles", age: 1, active: false },
+			{ active: false, age: 36, user: "barney" },
+			{ active: true, age: 40, user: "fred" },
+			{ active: false, age: 1, user: "pebbles" },
 		];
 
 		assert.equal(
 			partition(users, ({ active }) => active),
 			[
-				[{ user: "fred", age: 40, active: true }],
+				[{ active: true, age: 40, user: "fred" }],
 				[
-					{ user: "barney", age: 36, active: false },
-					{ user: "pebbles", age: 1, active: false },
+					{ active: false, age: 36, user: "barney" },
+					{ active: false, age: 1, user: "pebbles" },
 				],
 			],
 		);

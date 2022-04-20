@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { base64 } from "./base64";
 
 describe("#base64", ({ it, assert }) => {

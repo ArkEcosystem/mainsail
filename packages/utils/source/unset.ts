@@ -9,10 +9,10 @@ export const unset = <T>(object: T, path: string | string[]): boolean => {
 
 	const pathSegments: string[] = getPathSegments(path);
 
-	for (let i = 0; i < pathSegments.length; i++) {
-		const pathSegment: string = pathSegments[i];
+	for (let index = 0; index < pathSegments.length; index++) {
+		const pathSegment: string = pathSegments[index];
 
-		if (i === pathSegments.length - 1) {
+		if (index === pathSegments.length - 1) {
 			delete object[pathSegment];
 
 			return true;

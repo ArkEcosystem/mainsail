@@ -1,12 +1,11 @@
 import { describe } from "../../core-test-framework";
-
 import { find } from "./find";
 
 describe("#find", ({ it, assert }) => {
 	const users = [
-		{ user: "barney", age: 36, active: true },
-		{ user: "fred", age: 40, active: false },
-		{ user: "pebbles", age: 1, active: true },
+		{ active: true, age: 36, user: "barney" },
+		{ active: false, age: 40, user: "fred" },
+		{ active: true, age: 1, user: "pebbles" },
 	];
 
 	it("should work with a function", () => {

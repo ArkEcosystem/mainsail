@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { every } from "./every";
 import { isBoolean } from "./is-boolean";
 

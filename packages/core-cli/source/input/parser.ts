@@ -1,8 +1,8 @@
 import yargs from "yargs-parser";
 
 export class InputParser {
-	public static parseArgv(args: string[]) {
-		const parsed: yargs.Arguments = yargs(args, { count: ["v"] });
+	public static parseArgv(arguments_: string[]) {
+		const parsed: yargs.Arguments = yargs(arguments_, { count: ["v"] });
 
 		const argv: string[] = parsed._;
 

@@ -1,13 +1,14 @@
 import { describe, Generators } from "@arkecosystem/core-test-framework/source";
 import { TransactionFactory } from "@arkecosystem/core-test-framework/source/utils/transaction-factory";
-import { Address, Keys } from "../identities";
-import { Hash } from "../crypto/hash";
-import { BuilderFactory } from "./builders/index";
-import { Verifier } from "./verifier";
-import { Utils } from "./utils";
+
 import { configManager } from "../../../../packages/crypto/source/managers";
 import { createRandomTx } from "../../test/support";
+import { Hash } from "../crypto/hash";
+import { Address, Keys } from "../identities";
 import { ITransactionData, NetworkConfig } from "../interfaces";
+import { BuilderFactory } from "./builders/index";
+import { Utils } from "./utils";
+import { Verifier } from "./verifier";
 
 describe<{
 	config: NetworkConfig;

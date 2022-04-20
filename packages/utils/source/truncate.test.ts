@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { truncate } from "./truncate";
 
 describe("truncate", async ({ assert, it, nock, loader }) => {

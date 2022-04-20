@@ -1,2 +1,2 @@
-export const isEnumerable = <T>(object: T, prop: number | string): boolean =>
-	Object.prototype.propertyIsEnumerable.call(object, prop);
+export const isEnumerable = <T>(object: T, property: number | string): boolean =>
+	Object.prototype.propertyIsEnumerable.call(object, property);

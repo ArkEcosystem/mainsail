@@ -10,8 +10,8 @@ export class InputValidator {
 		if (error) {
 			let errorMessage = "";
 
-			for (const err of error.details) {
-				errorMessage += err.message;
+			for (const error_ of error.details) {
+				errorMessage += error_.message;
 			}
 
 			throw new Error(errorMessage);

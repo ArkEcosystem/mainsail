@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { safeEqual } from "./safe-equal";
 
 describe("#safeEqual", ({ it, assert }) => {

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { snakeCase } from "./snake-case";
 
 describe("snakeCase", async ({ assert, it, nock, loader }) => {

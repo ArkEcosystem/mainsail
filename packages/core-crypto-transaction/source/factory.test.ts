@@ -1,12 +1,14 @@
 import { describe } from "../../core-test-framework";
-import { InvalidTransactionBytesError, TransactionSchemaError, UnkownTransactionError } from "../errors";
-import { ITransaction, ITransactionData, ITransactionJson, NetworkConfig } from "../interfaces";
-import { configManager } from "../managers";
-import { Serializer, Transaction, TransactionFactory, Utils as TransactionUtils } from "./";
-import { transaction as transactionFixture } from "../../test/fixtures/transaction";
-import { transaction as transactionDataFixture } from "../../test/fixtures/transaction";
+import {
+	transaction as transactionDataFixture,
+	transaction as transactionFixture,
+} from "../../test/fixtures/transaction";
 import { createRandomTx } from "../../test/support";
+import { InvalidTransactionBytesError, TransactionSchemaError, UnkownTransactionError } from "../errors";
+import { ITransactionData, ITransactionJson, NetworkConfig } from "../interfaces";
+import { configManager } from "../managers";
 import { BigNumber } from "../utils/bignum";
+import { Serializer, Transaction, TransactionFactory, Utils as TransactionUtils } from ".";
 
 const transaction = TransactionFactory.fromData(transactionFixture);
 const transactionJson = transaction.toJson();
@@ -27,11 +29,10 @@ describe<{
 		context.transactionData = { ...transactionDataFixture };
 		context.transactionDataJSON = {
 			...context.transactionData,
-			...{
-				amount: context.transactionData.amount.toFixed(),
-				fee: context.transactionData.fee.toFixed(),
-				nonce: context.transactionData.nonce?.toFixed(),
-			},
+
+			amount: context.transactionData.amount.toFixed(),
+			fee: context.transactionData.fee.toFixed(),
+			nonce: context.transactionData.nonce?.toFixed(),
 		};
 	});
 
@@ -53,7 +54,7 @@ describe<{
 	it("fromHex - should fail to create a transaction from hex that contains malformed bytes", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromHex("deadbeef"),
-			(err) => err instanceof InvalidTransactionBytesError,
+			(error) => error instanceof InvalidTransactionBytesError,
 		);
 	});
 
@@ -71,7 +72,7 @@ describe<{
 	it("fromBytes - should fail to create a transaction from a buffer that contains malformed bytes", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromBytes(Buffer.from("deadbeef")),
-			(err) => err instanceof InvalidTransactionBytesError,
+			(error) => error instanceof InvalidTransactionBytesError,
 		);
 	});
 
@@ -89,7 +90,7 @@ describe<{
 	it("fromBytesUnsafe - should fail to create a transaction from a buffer that contains malformed bytes", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromBytesUnsafe(Buffer.from("deadbeef")),
-			(err) => err instanceof InvalidTransactionBytesError,
+			(error) => error instanceof InvalidTransactionBytesError,
 		);
 	});
 
@@ -120,32 +121,30 @@ describe<{
 			() =>
 				TransactionFactory.fromData({
 					...transaction.data,
-					...{ fee: BigNumber.make(0) },
+					fee: BigNumber.make(0),
 				}),
-			(err) => err instanceof TransactionSchemaError,
+			(error) => error instanceof TransactionSchemaError,
 		);
 	});
 
 	// Old tests
 	it("fromData - should match transaction id", (context) => {
 		configManager.setFromPreset("testnet");
-		[0, 2, 3]
-			.map((type) => createRandomTx(type))
-			.forEach((transaction) => {
-				const originalId = transaction.data.id;
-				const newTransaction = TransactionFactory.fromData(transaction.data);
-				assert.equal(newTransaction.data.id, originalId);
-			});
+		for (const transaction of [0, 2, 3].map((type) => createRandomTx(type))) {
+			const originalId = transaction.data.id;
+			const newTransaction = TransactionFactory.fromData(transaction.data);
+			assert.equal(newTransaction.data.id, originalId);
+		}
 	});
 
 	it("fromData - should throw when getting garbage", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromData({} as ITransactionData),
-			(err) => err instanceof UnkownTransactionError,
+			(error) => error instanceof UnkownTransactionError,
 		);
 		assert.throws(
 			() => TransactionFactory.fromData({ type: 0 } as ITransactionData),
-			(err) => err instanceof TransactionSchemaError,
+			(error) => error instanceof TransactionSchemaError,
 		);
 	});
 
@@ -165,9 +164,9 @@ describe<{
 			() =>
 				TransactionFactory.fromJson({
 					...transactionJson,
-					...{ senderPublicKey: "something" },
+					senderPublicKey: "something",
 				}),
-			(err) => err instanceof TransactionSchemaError,
+			(error) => error instanceof TransactionSchemaError,
 		);
 	});
 });

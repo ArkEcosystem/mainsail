@@ -1,20 +1,21 @@
 import { Utils } from "@arkecosystem/core-kernel";
-import { TransactionValidator } from "./transaction-validator";
 import { AssertionError } from "assert";
+import { SinonSpy } from "sinon";
+
+import { describeSkip } from "../../core-test-framework";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { setUp } from "../test/setup";
-import { SinonSpy } from "sinon";
-import { describeSkip } from "../../core-test-framework";
+import { TransactionValidator } from "./transaction-validator";
 
 describeSkip<{
 	transactionValidator: TransactionValidator;
 	applySpy: SinonSpy;
 }>("Transaction Validator", ({ it, beforeAll, afterEach, assert }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.transactionValidator = env.transactionValidator;
-		context.applySpy = env.spies.applySpy;
+		context.transactionValidator = environment.transactionValidator;
+		context.applySpy = environment.spies.applySpy;
 	});
 
 	afterEach((context) => {
@@ -38,6 +39,8 @@ describeSkip<{
 		const copiedTransaction = Utils.cloneObject(transaction[0]) as any;
 		copiedTransaction.id = "wrong";
 
-		context.transactionValidator.validate(copiedTransaction).catch((e) => assert.instance(e, AssertionError));
+		context.transactionValidator
+			.validate(copiedTransaction)
+			.catch((error) => assert.instance(error, AssertionError));
 	});
 });

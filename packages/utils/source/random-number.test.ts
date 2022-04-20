@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { randomNumber } from "./random-number";
 
 describe("randomNumber", async ({ assert, it, nock, loader }) => {

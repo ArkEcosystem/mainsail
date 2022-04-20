@@ -1,4 +1,5 @@
 import { tmpdir } from "os";
+// eslint-disable-next-line unicorn/import-style
 import { resolve } from "path";
 
 import { Paths } from "./env-paths";

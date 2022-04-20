@@ -1,7 +1,7 @@
-import { describe } from "../../core-test-framework";
 import { homedir } from "os";
 import { join } from "path";
 
+import { describe } from "../../core-test-framework";
 import { expandTilde } from "./expand-tilde";
 
 describe("#expandTilde", ({ it, assert }) => {

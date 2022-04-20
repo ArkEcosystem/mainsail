@@ -1,7 +1,7 @@
-import { describe } from "../../core-test-framework";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 
+import { describe } from "../../core-test-framework";
 import { http } from "./http";
 import { sleep } from "./sleep";
 

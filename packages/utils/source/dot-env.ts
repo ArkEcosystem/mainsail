@@ -7,7 +7,7 @@ const parse = (contents: string): Record<string, Primitive> => {
 	const result: Record<string, Primitive> = {};
 
 	for (const line of contents.toString().split("\n")) {
-		const matches: RegExpExecArray | null = new RegExp(/^([^=:#]+?)[=:](.*)/).exec(line);
+		const matches: RegExpExecArray | null = new RegExp(/^([^#:=]+?)[:=](.*)/).exec(line);
 
 		if (!matches) {
 			continue;
@@ -30,9 +30,7 @@ const parse = (contents: string): Record<string, Primitive> => {
 	return result;
 };
 
-const parseFile = (file: string): Record<string, Primitive> => {
-	return parse(readFileSync(file).toString());
-};
+const parseFile = (file: string): Record<string, Primitive> => parse(readFileSync(file).toString());
 
 const stringify = (pairs: object): string => {
 	const contents: string[] = [];

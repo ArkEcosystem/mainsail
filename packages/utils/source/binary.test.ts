@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { binary } from "./binary";
 
 describe("#binary", ({ it, assert }) => {

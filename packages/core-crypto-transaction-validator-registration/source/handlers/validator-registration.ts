@@ -75,6 +75,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		emitter.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
 	}
 

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { pluralize } from "./pluralize";
 
 describe("pluralize", async ({ assert, it, nock, loader }) => {

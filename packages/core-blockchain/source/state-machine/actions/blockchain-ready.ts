@@ -19,6 +19,7 @@ export class BlockchainReady implements Action {
 		if (!this.stateStore.isStarted()) {
 			this.stateStore.setStarted(true);
 
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.StateEvent.Started, true);
 		}
 	}

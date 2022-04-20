@@ -5,9 +5,7 @@ export const reduceObject = <T, V>(iterable: T, iteratee: FunctionReturning, ini
 
 	let result: V = initialValue;
 
-	for (let i = 0; i < keys.length; i++) {
-		const key = keys[i];
-
+	for (const key of keys) {
 		result = iteratee(result, iterable[key], key, iterable);
 	}
 

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isStringArray } from "./is-string-array";
 
 describe("isStringArray", async ({ assert, it, nock, loader }) => {

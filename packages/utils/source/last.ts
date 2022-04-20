@@ -1,1 +1,2 @@
-export const last = <T>(values: T[]): T => values[values.length - 1];
+// @ts-ignore unsupported .at
+export const last = <T>(values: T[]): T => values.at(-1);

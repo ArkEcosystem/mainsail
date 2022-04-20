@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isGit } from "./is-git";
 
 describe("isGit", async ({ assert, it, nock, loader }) => {

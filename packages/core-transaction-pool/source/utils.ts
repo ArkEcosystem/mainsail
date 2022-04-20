@@ -20,9 +20,9 @@ export class IteratorMany<T> implements Iterator<T> {
 			return { done: true, value: undefined };
 		}
 
-		const [iterator, result] = Array.from(this.#results.entries()).reduce((min, entry) => {
-			return this.#comparator(entry[1].value, min[1].value) < 0 ? entry : min;
-		});
+		const [iterator, result] = [...this.#results.entries()].reduce((min, entry) =>
+			this.#comparator(entry[1].value, min[1].value) < 0 ? entry : min,
+		);
 
 		const nextResult = iterator.next();
 		if (nextResult.done) {

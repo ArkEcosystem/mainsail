@@ -1,7 +1,7 @@
-import { describe } from "../../core-test-framework";
 import Ajv from "ajv";
 
-import { Managers, Utils, Validation } from "../";
+import { describe } from "../../core-test-framework";
+import { Managers, Utils, Validation } from "..";
 import { TransactionType } from "../enums";
 
 describe<{
@@ -12,7 +12,7 @@ describe<{
 	});
 
 	it("keyword maxBytes should be ok", (context) => {
-		const schema = { type: "string", maxBytes: 64 };
+		const schema = { maxBytes: 64, type: "string" };
 		const validate = context.ajv.compile(schema);
 
 		assert.true(validate("1234"));
@@ -21,7 +21,7 @@ describe<{
 		assert.true(validate("⊁".repeat(21)));
 		assert.false(validate("⊁".repeat(22)));
 		assert.false(validate({}));
-		assert.false(validate(undefined));
+		assert.false(validate());
 	});
 
 	it("keyword network should be ok", (context) => {
@@ -42,7 +42,7 @@ describe<{
 		assert.true(validate(30));
 		assert.false(validate(23));
 		assert.false(validate({}));
-		assert.false(validate(undefined));
+		assert.false(validate());
 	});
 
 	it("keyword transactionType should be ok", (context) => {
@@ -54,7 +54,7 @@ describe<{
 		assert.false(validate(-1));
 		assert.false(validate(""));
 		assert.false(validate("0"));
-		assert.false(validate(undefined));
+		assert.false(validate());
 	});
 
 	it("keyword blockId should be ok", (context) => {
@@ -82,7 +82,7 @@ describe<{
 		assert.false(validate("nein"));
 		assert.false(validate({}));
 		assert.false(validate(""));
-		assert.false(validate(undefined));
+		assert.false(validate());
 		assert.false(validate(1243));
 		assert.false(validate(Utils.BigNumber.make(0)));
 	});
@@ -91,7 +91,7 @@ describe<{
 		const schema = {
 			properties: {
 				height: { type: "number" },
-				previousBlock: { blockId: { hex: true, allowNullWhenGenesis: true } },
+				previousBlock: { blockId: { allowNullWhenGenesis: true, hex: true } },
 			},
 		};
 
@@ -110,7 +110,7 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
-		const schema = { bignumber: { type: "number", minimum: 100, maximum: 100 } };
+		const schema = { bignumber: { maximum: 100, minimum: 100, type: "number" } };
 		const validate = context.ajv.compile(schema);
 
 		assert.true(validate(100));
@@ -119,7 +119,7 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok if above or equal minimum", (context) => {
-		const schema = { bignumber: { type: "number", minimum: 20 } };
+		const schema = { bignumber: { minimum: 20, type: "number" } };
 		const validate = context.ajv.compile(schema);
 
 		assert.true(validate(25));
@@ -128,7 +128,7 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok if above or equal maximum", (context) => {
-		const schema = { bignumber: { type: "number", maximum: 20 } };
+		const schema = { bignumber: { maximum: 20, type: "number" } };
 		const validate = context.ajv.compile(schema);
 
 		assert.true(validate(20));
@@ -146,7 +146,7 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok for number, string and bignumber as input", (context) => {
-		const schema = { bignumber: { type: "number", minimum: 100, maximum: 2000 } };
+		const schema = { bignumber: { maximum: 2000, minimum: 100, type: "number" } };
 		const validate = context.ajv.compile(schema);
 
 		for (const value of [100, 1e2, 1020, 500, 2000]) {
@@ -165,7 +165,7 @@ describe<{
 		const schema = { bignumber: {} };
 		const validate = context.ajv.compile(schema);
 
-		assert.false(validate(undefined));
+		assert.false(validate());
 		assert.false(validate({}));
 		assert.false(validate(/d+/));
 		assert.false(validate(""));
@@ -174,10 +174,10 @@ describe<{
 
 	it("keyword bignumber should cast number to Bignumber", (context) => {
 		const schema = {
-			type: "object",
 			properties: {
 				amount: { bignumber: {} },
 			},
+			type: "object",
 		};
 
 		const data = {
@@ -192,10 +192,10 @@ describe<{
 
 	it("keyword bignumber should cast string to Bignumber", (context) => {
 		const schema = {
-			type: "object",
 			properties: {
 				amount: { bignumber: {} },
 			},
+			type: "object",
 		};
 
 		const data = {
@@ -210,10 +210,10 @@ describe<{
 
 	it("keyword bignumber bypassGenesis should be ok", (context) => {
 		const schema = {
-			type: "object",
 			properties: {
-				amount: { bignumber: { type: "number", minimum: 100, bypassGenesis: true } },
+				amount: { bignumber: { bypassGenesis: true, minimum: 100, type: "number" } },
 			},
+			type: "object",
 		};
 
 		const validate = context.ajv.compile(schema);

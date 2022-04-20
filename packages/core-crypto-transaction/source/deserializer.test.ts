@@ -1,4 +1,7 @@
 import { describe, Generators } from "@arkecosystem/core-test-framework";
+import ByteBuffer from "bytebuffer";
+
+import { legacyMultiSignatureRegistration } from "../../test/fixtures/transaction";
 import { Enums, Errors, Utils } from "..";
 import { Hash } from "../crypto";
 import {
@@ -10,12 +13,10 @@ import {
 import { Address, Keys } from "../identities";
 import { IKeyPair, ITransaction, ITransactionData } from "../interfaces";
 import { configManager } from "../managers";
-import { TransactionFactory, Utils as TransactionUtils, Verifier } from "./";
+import { TransactionFactory, Utils as TransactionUtils, Verifier } from ".";
 import { BuilderFactory } from "./builders";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
-import ByteBuffer from "bytebuffer";
-import { legacyMultiSignatureRegistration } from "../../test/fixtures/transaction";
 
 const builderWith = (hasher: (buffer: Buffer, keys: IKeyPair) => string) => {
 	const keys = Keys.fromPassphrase("secret");
@@ -40,8 +41,7 @@ const checkCommonFields = (assert, deserialized: ITransaction, expected) => {
 	if (deserialized.data.version === 1) {
 		fieldsToCheck.push("timestamp");
 	} else {
-		fieldsToCheck.push("typeGroup");
-		fieldsToCheck.push("nonce");
+		fieldsToCheck.push("typeGroup", "nonce");
 	}
 
 	for (const field of fieldsToCheck) {
@@ -59,7 +59,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 			.recipientId("D5q7YfEFDky1JJVQQEy4MGyiUhr5cGg47F")
 			.amount("10000")
 			.fee("50000000")
-			.timestamp(148354645)
+			.timestamp(148_354_645)
 			.vendorField("cool vendor field")
 			.network(30)
 			.sign("dummy passphrase")
@@ -87,7 +87,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 			.recipientId("D5q7YfEFDky1JJVQQEy4MGyiUhr5cGg47F")
 			.amount("10000")
 			.fee("50000000")
-			.timestamp(148354645)
+			.timestamp(148_354_645)
 			.vendorField("y".repeat(255))
 			.network(30)
 			.sign("dummy passphrase")
@@ -124,7 +124,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 				const serialized = TransactionUtils.toBytes(transferWithLongVendorfield);
 				TransactionFactory.fromBytes(serialized);
 			},
-			(err) => err instanceof TransactionSchemaError,
+			(error) => error instanceof TransactionSchemaError,
 		);
 	});
 
@@ -133,7 +133,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 
 		const delegateRegistration = BuilderFactory.delegateRegistration()
 			.usernameAsset("homer")
-			.timestamp(148354645)
+			.timestamp(148_354_645)
 			.network(30)
 			.sign("dummy passphrase")
 			.getStruct();
@@ -155,7 +155,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 
 		const vote = BuilderFactory.vote()
 			.votesAsset(["02bcfa0951a92e7876db1fb71996a853b57f996972ed059a950d910f7d541706c9"])
-			.timestamp(148354645)
+			.timestamp(148_354_645)
 			.fee("50000000")
 			.network(30)
 			.sign("dummy passphrase")
@@ -195,7 +195,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		const multiSignatureRegistration = BuilderFactory.multiSignature()
 			.senderPublicKey(participant1.publicKey)
 			.network(23)
-			.timestamp(148354645)
+			.timestamp(148_354_645)
 			.participant(participant1.publicKey)
 			.participant(participant2.publicKey)
 			.participant(participant3.publicKey)
@@ -233,7 +233,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		const multiSignatureRegistration = BuilderFactory.multiSignature()
 			.senderPublicKey(participant1.publicKey)
 			.network(23)
-			.timestamp(148354645)
+			.timestamp(148_354_645)
 			.participant(participant1.publicKey)
 			.participant(participant2.publicKey)
 			.participant(participant3.publicKey)
@@ -264,7 +264,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		const multiSignatureRegistration = BuilderFactory.multiSignature()
 			.senderPublicKey(participant1.publicKey)
 			.network(23)
-			.timestamp(148354645)
+			.timestamp(148_354_645)
 			.participant(participant1.publicKey)
 			.participant(participant2.publicKey)
 			.participant(participant3.publicKey)
@@ -276,11 +276,11 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 			.getStruct();
 
 		const transaction = TransactionFactory.fromData(multiSignatureRegistration);
-		transaction.serialized = transaction.serialized.slice(0, transaction.serialized.length - 2);
+		transaction.serialized = transaction.serialized.slice(0, -2);
 
 		assert.throws(
 			() => TransactionFactory.fromBytes(transaction.serialized),
-			(err) => err instanceof InvalidTransactionBytesError,
+			(error) => error instanceof InvalidTransactionBytesError,
 		);
 	});
 
@@ -355,13 +355,13 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 
 		const multiPayment = BuilderFactory.multiPayment().fee("50000000").network(23);
 
-		for (let i = 0; i < configManager.getMilestone().multiPaymentLimit; i++) {
-			multiPayment.addPayment(Address.fromPassphrase(`recipient-${i}`), "1");
+		for (let index = 0; index < configManager.getMilestone().multiPaymentLimit; index++) {
+			multiPayment.addPayment(Address.fromPassphrase(`recipient-${index}`), "1");
 		}
 
 		assert.throws(
 			() => multiPayment.addPayment(Address.fromPassphrase("recipientBad"), "1"),
-			(err) => err instanceof Errors.MaximumPaymentCountExceededError,
+			(error) => error instanceof Errors.MaximumPaymentCountExceededError,
 		);
 
 		const transaction = multiPayment.sign("dummy passphrase").build();
@@ -381,7 +381,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 					.addPayment("AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff", "1555")
 					.sign("dummy passphrase")
 					.build(),
-			(err) => err instanceof InvalidTransactionBytesError,
+			(error) => error instanceof InvalidTransactionBytesError,
 		);
 	});
 
@@ -416,7 +416,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		const serialized = serializeWrongType(transactionWrongType).toString("hex");
 		assert.throws(
 			() => Deserializer.deserialize(serialized),
-			(err) => err instanceof UnkownTransactionError,
+			(error) => error instanceof UnkownTransactionError,
 		);
 	});
 
@@ -428,7 +428,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		let transaction: ITransaction;
 		assert.equal(builder.data.version, 2);
 		assert.not.throws(() => (transaction = builder.build()));
-		assert.true(transaction!.verify());
+		assert.true(transaction.verify());
 	});
 
 	it("deserialize Schnorr / ECDSA - should deserialize a V2 transaction signed with ECDSA", () => {
@@ -440,7 +440,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		assert.equal(builder.data.version, 2);
 		assert.not.equal(builder.data.signature.length, 64);
 		assert.not.throws(() => (transaction = builder.build()));
-		assert.true(transaction!.verify());
+		assert.true(transaction.verify());
 	});
 
 	it("deserialize Schnorr / ECDSA - should throw when V2 transaction is signed with Schnorr and AIP11 not active", () => {
@@ -486,7 +486,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 
 		assert.throws(
 			() => TransactionFactory.fromData(transactionWrongType),
-			(err) => err instanceof UnkownTransactionError,
+			(error) => error instanceof UnkownTransactionError,
 		);
 	});
 
@@ -494,16 +494,16 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		configManager.getMilestone().aip11 = false;
 
 		const transaction = {
-			type: 0,
 			amount: Utils.BigNumber.make(1000),
-			fee: Utils.BigNumber.make(2000),
-			recipientId: "AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff",
-			timestamp: 141738,
 			asset: {},
+			fee: Utils.BigNumber.make(2000),
+			id: "13987348420913138422",
+			recipientId: "AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff",
 			senderPublicKey: "5d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09",
 			signature:
 				"618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-			id: "13987348420913138422",
+			timestamp: 141_738,
+			type: 0,
 		};
 
 		const bytes = Serializer.getBytes(transaction);
@@ -521,22 +521,22 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 		configManager.getMilestone().aip11 = false;
 
 		const transaction = {
-			version: 110,
-			type: 0,
 			amount: Utils.BigNumber.make(1000),
-			fee: Utils.BigNumber.make(2000),
-			recipientId: "AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff",
-			timestamp: 141738,
 			asset: {},
+			fee: Utils.BigNumber.make(2000),
+			id: "13987348420913138422",
+			recipientId: "AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff",
 			senderPublicKey: "5d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09",
 			signature:
 				"618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-			id: "13987348420913138422",
+			timestamp: 141_738,
+			type: 0,
+			version: 110,
 		};
 
 		assert.throws(
 			() => Serializer.getBytes(transaction),
-			(err) => err instanceof TransactionVersionError,
+			(error) => error instanceof TransactionVersionError,
 		);
 
 		configManager.getMilestone().aip11 = true;

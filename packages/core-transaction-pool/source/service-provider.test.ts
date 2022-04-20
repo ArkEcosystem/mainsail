@@ -1,10 +1,11 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
 import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Services } from "@arkecosystem/core-kernel";
-import { ServiceProvider } from "./";
-import { AnySchema } from "joi";
-import { describe } from "../../core-test-framework";
 import importFresh from "import-fresh";
+import { AnySchema } from "joi";
+
+import { describe } from "../../core-test-framework";
+import { ServiceProvider } from ".";
 
 const importDefaults = () =>
 	// @ts-ignore
@@ -43,13 +44,13 @@ describe<{
 		await assert.resolves(() => context.serviceProvider.register());
 
 		context.app.rebind(Identifiers.TransactionPoolStorage).toConstantValue({
-			boot: () => undefined,
-			dispose: () => undefined,
+			boot: () => {},
+			dispose: () => {},
 		});
 
 		context.app.rebind(Identifiers.TransactionPoolService).toConstantValue({
-			boot: () => undefined,
-			dispose: () => undefined,
+			boot: () => {},
+			dispose: () => {},
 		});
 
 		await assert.resolves(() => context.serviceProvider.boot());
@@ -146,7 +147,7 @@ describe<{
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
 
 		assert.defined(result.error);
-		assert.equal(result.error!.message, '"maxTransactionsInPool" must be a number');
+		assert.equal(result.error.message, '"maxTransactionsInPool" must be a number');
 	});
 
 	it("should parse process.env.CORE_TRANSACTION_POOL_MAX_PER_SENDER", async (context) => {
@@ -168,7 +169,7 @@ describe<{
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
 
 		assert.defined(result.error);
-		assert.equal(result.error!.message, '"maxTransactionsPerSender" must be a number');
+		assert.equal(result.error.message, '"maxTransactionsPerSender" must be a number');
 	});
 
 	it("should parse process.env.CORE_TRANSACTION_POOL_MAX_PER_SENDER", async (context) => {
@@ -190,7 +191,7 @@ describe<{
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
 
 		assert.defined(result.error);
-		assert.equal(result.error!.message, '"maxTransactionsPerRequest" must be a number');
+		assert.equal(result.error.message, '"maxTransactionsPerRequest" must be a number');
 	});
 
 	it("schema restrictions - enabled is required", async (context) => {
@@ -200,7 +201,7 @@ describe<{
 		delete defaults.enabled;
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"enabled" is required');
+		assert.equal(result.error.message, '"enabled" is required');
 	});
 
 	it("schema restrictions - storage is required", async (context) => {
@@ -211,7 +212,7 @@ describe<{
 		delete defaults.storage;
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage" is required');
+		assert.equal(result.error.message, '"storage" is required');
 	});
 
 	it("schema restrictions - maxTransactionsInPool is required && is integer && >= 1", async (context) => {
@@ -222,22 +223,22 @@ describe<{
 		defaults.maxTransactionsInPool = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsInPool" must be a number');
+		assert.equal(result.error.message, '"maxTransactionsInPool" must be a number');
 
 		defaults.maxTransactionsInPool = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsInPool" must be an integer');
+		assert.equal(result.error.message, '"maxTransactionsInPool" must be an integer');
 
 		defaults.maxTransactionsInPool = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsInPool" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"maxTransactionsInPool" must be greater than or equal to 1');
 
 		delete defaults.maxTransactionsInPool;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsInPool" is required');
+		assert.equal(result.error.message, '"maxTransactionsInPool" is required');
 	});
 
 	it("schema restrictions - maxTransactionsPerSender is required && is integer && >= 1", async (context) => {
@@ -248,22 +249,22 @@ describe<{
 		defaults.maxTransactionsPerSender = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerSender" must be a number');
+		assert.equal(result.error.message, '"maxTransactionsPerSender" must be a number');
 
 		defaults.maxTransactionsPerSender = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerSender" must be an integer');
+		assert.equal(result.error.message, '"maxTransactionsPerSender" must be an integer');
 
 		defaults.maxTransactionsPerSender = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerSender" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"maxTransactionsPerSender" must be greater than or equal to 1');
 
 		delete defaults.maxTransactionsPerSender;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerSender" is required');
+		assert.equal(result.error.message, '"maxTransactionsPerSender" is required');
 	});
 
 	it("schema restrictions - allowedSenders is required && must contain strings", async (context) => {
@@ -274,12 +275,12 @@ describe<{
 		delete defaults.allowedSenders;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"allowedSenders" is required');
+		assert.equal(result.error.message, '"allowedSenders" is required');
 
 		defaults.allowedSenders = [1, 2];
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"allowedSenders[0]" must be a string');
+		assert.equal(result.error.message, '"allowedSenders[0]" must be a string');
 	});
 
 	it("schema restrictions - maxTransactionsPerRequest is required && is integer && >= 1", async (context) => {
@@ -290,22 +291,22 @@ describe<{
 		defaults.maxTransactionsPerRequest = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerRequest" must be a number');
+		assert.equal(result.error.message, '"maxTransactionsPerRequest" must be a number');
 
 		defaults.maxTransactionsPerRequest = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerRequest" must be an integer');
+		assert.equal(result.error.message, '"maxTransactionsPerRequest" must be an integer');
 
 		defaults.maxTransactionsPerRequest = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerRequest" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"maxTransactionsPerRequest" must be greater than or equal to 1');
 
 		delete defaults.maxTransactionsPerRequest;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionsPerRequest" is required');
+		assert.equal(result.error.message, '"maxTransactionsPerRequest" is required');
 	});
 
 	it("schema restrictions - maxTransactionAge is required && is integer && >= 1", async (context) => {
@@ -316,22 +317,22 @@ describe<{
 		defaults.maxTransactionAge = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionAge" must be a number');
+		assert.equal(result.error.message, '"maxTransactionAge" must be a number');
 
 		defaults.maxTransactionAge = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionAge" must be an integer');
+		assert.equal(result.error.message, '"maxTransactionAge" must be an integer');
 
 		defaults.maxTransactionAge = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionAge" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"maxTransactionAge" must be greater than or equal to 1');
 
 		delete defaults.maxTransactionAge;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionAge" is required');
+		assert.equal(result.error.message, '"maxTransactionAge" is required');
 	});
 
 	it("schema restrictions - maxTransactionBytes is required && is integer && >= 1", async (context) => {
@@ -342,21 +343,21 @@ describe<{
 		defaults.maxTransactionBytes = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionBytes" must be a number');
+		assert.equal(result.error.message, '"maxTransactionBytes" must be a number');
 
 		defaults.maxTransactionBytes = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionBytes" must be an integer');
+		assert.equal(result.error.message, '"maxTransactionBytes" must be an integer');
 
 		defaults.maxTransactionBytes = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionBytes" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"maxTransactionBytes" must be greater than or equal to 1');
 
 		delete defaults.maxTransactionBytes;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"maxTransactionBytes" is required');
+		assert.equal(result.error.message, '"maxTransactionBytes" is required');
 	});
 });

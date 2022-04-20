@@ -9,16 +9,16 @@ export const has = <T>(object: T, path: string | string[]): boolean => {
 
 	const pathSegments: string[] = getPathSegments(path);
 
-	for (let i = 0; i < pathSegments.length; i++) {
+	for (const pathSegment of pathSegments) {
 		if (!isObject(object)) {
 			return false;
 		}
 
-		if (!(pathSegments[i] in object)) {
+		if (!(pathSegment in object)) {
 			return false;
 		}
 
-		object = object[pathSegments[i]];
+		object = object[pathSegment];
 	}
 
 	return true;

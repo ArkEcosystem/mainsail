@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { reduceRightObject } from "./reduce-right-object";
 
 describe("reduceRightObject", async ({ assert, it, nock, loader }) => {

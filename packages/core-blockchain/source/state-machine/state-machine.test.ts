@@ -14,14 +14,14 @@ describe<{
 }>("State machine", ({ assert, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
 		context.logService = {
-			warning: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
-			debug: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
 		};
 		context.stateStore = {
 			getBlockchain: () => ({ value: undefined }),
-			setBlockchain: () => undefined,
+			setBlockchain: () => {},
 		};
 
 		sandbox = new Sandbox();
@@ -32,7 +32,7 @@ describe<{
 	it("should use blockchainMachine.transition to get next state and return it", (context) => {
 		const stateMachine = sandbox.app.resolve<StateMachine>(StateMachine);
 
-		const mockNextState = { state: "next", actions: [] };
+		const mockNextState = { actions: [], state: "next" };
 		stub(blockchainMachine, "transition").returnValue(mockNextState);
 		const nextState = stateMachine.transition("EVENT");
 
@@ -45,7 +45,7 @@ describe<{
 		const nextAction = {
 			type: "dothis",
 		};
-		const mockNextState = { state: "next", actions: [nextAction] };
+		const mockNextState = { actions: [nextAction], state: "next" };
 		stub(blockchainMachine, "transition").returnValue(mockNextState);
 		const errorLogSpy = spy(context.logService, "error");
 
@@ -62,7 +62,7 @@ describe<{
 		const nextAction = {
 			type: "dothis",
 		};
-		const mockNextState = { state: "next", actions: [nextAction] };
+		const mockNextState = { actions: [nextAction], state: "next" };
 		stub(blockchainMachine, "transition").returnValue(mockNextState);
 		const action = {
 			handle: () => {},

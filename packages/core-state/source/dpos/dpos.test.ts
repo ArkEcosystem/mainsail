@@ -1,19 +1,19 @@
-import { Application, Services, Utils } from "@arkecosystem/core-kernel";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Container, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { AssertionException } from "@arkecosystem/core-contracts/distribution/exceptions";
+import { Application, Services, Utils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { describe } from "../../../core-test-framework";
+import { spy } from "sinon";
+
 import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
+import { Configuration } from "../../../core-crypto-config";
 import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
-
+import { describe } from "../../../core-test-framework";
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { registerIndexers, WalletRepository } from "../wallets";
-import { DposState } from "./dpos";
-import { Configuration } from "../../../core-crypto-config";
 import { walletFactory } from "../wallets/wallet-factory";
-import { spy } from "sinon";
-import { AssertionException } from "@arkecosystem/core-contracts/distribution/exceptions";
+import { DposState } from "./dpos";
 
 describe<{
 	app: Application;
@@ -106,9 +106,9 @@ describe<{
 
 		const validators = context.walletRepo.allByUsername();
 
-		for (let i = 0; i < 5; i++) {
-			const validator = validators[4 - i];
-			const total = BigNumber.make(5 - i)
+		for (let index = 0; index < 5; index++) {
+			const validator = validators[4 - index];
+			const total = BigNumber.make(5 - index)
 				.times(1000)
 				.times(BigNumber.SATOSHI);
 
@@ -123,11 +123,11 @@ describe<{
 		const validators = context.dposState.getActiveValidators();
 		assert.is(validators.length, 5);
 
-		for (let i = 0; i < 5; i++) {
-			const validator = validators[i];
-			const total = BigNumber.make((5 - i) * 1000).times(BigNumber.SATOSHI);
+		for (let index = 0; index < 5; index++) {
+			const validator = validators[index];
+			const total = BigNumber.make((5 - index) * 1000).times(BigNumber.SATOSHI);
 
-			assert.equal(validator.getAttribute<number>("validator.rank"), i + 1);
+			assert.equal(validator.getAttribute<number>("validator.rank"), index + 1);
 			assert.equal(validator.getAttribute<BigNumber>("validator.voteBalance"), total);
 		}
 	});
@@ -194,8 +194,8 @@ describe<{
 		assert.equal(context.dposState.getRoundInfo(), round);
 		assert.equal(roundValidators, validators.slice(0, 4));
 
-		for (let i = 0; i < round.maxValidators; i++) {
-			const validator = await context.walletRepo.findByPublicKey(roundValidators[i].getPublicKey()!);
+		for (let index = 0; index < round.maxValidators; index++) {
+			const validator = await context.walletRepo.findByPublicKey(roundValidators[index].getPublicKey()!);
 
 			assert.equal(validator.getAttribute("validator.round"), round.round);
 		}

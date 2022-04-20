@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isSSH } from "./is-ssh";
 
 describe("isSSH", async ({ assert, it, nock, loader }) => {

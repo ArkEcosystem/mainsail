@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isEmpty } from "./is-empty";
 
 describe("at", async ({ assert, it, nock, loader }) => {
@@ -20,7 +19,7 @@ describe("at", async ({ assert, it, nock, loader }) => {
 	});
 
 	it("should return true for undefined", () => {
-		assert.true(isEmpty(undefined));
+		assert.true(isEmpty());
 	});
 
 	it("should return true for an empty map", () => {

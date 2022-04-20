@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isEmptyObject } from "./is-empty-object";
 
 describe("isEmptyObject", async ({ assert, it, nock, loader }) => {

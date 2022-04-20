@@ -1,10 +1,11 @@
-import { Application, Services } from "@arkecosystem/core-kernel";
 import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { ServiceProvider } from "./";
-import { describe } from "../../core-test-framework";
-import { AnySchema } from "joi";
+import { Application, Services } from "@arkecosystem/core-kernel";
 import importFresh from "import-fresh";
+import { AnySchema } from "joi";
+
+import { describe } from "../../core-test-framework";
+import { ServiceProvider } from ".";
 
 const importDefaults = () =>
 	// @ts-ignore
@@ -28,9 +29,9 @@ describe<{
 
 	it("should boot and dispose", async (context) => {
 		const stubbedApp = stub(context.app, "get").returnValue({
-			initialize: () => {},
-			boot: () => {},
 			bind: () => {},
+			boot: () => {},
+			initialize: () => {},
 		});
 
 		await context.serviceProvider.register();
@@ -98,92 +99,92 @@ describe<{
 	});
 
 	it("has schema restrictions - storage is required && is object", (context) => {
-		let defaults = importDefaults();
+		const defaults = importDefaults();
 		defaults.storage = true;
 
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage" must be of type object');
+		assert.equal(result.error.message, '"storage" must be of type object');
 
 		delete defaults.storage;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage" is required');
+		assert.equal(result.error.message, '"storage" is required');
 	});
 
 	it("has schema restrictions - storage.maxLastBlocks is required && is integer && >= 1", (context) => {
-		let defaults = importDefaults();
+		const defaults = importDefaults();
 
 		defaults.storage.maxLastBlocks = true;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastBlocks" must be a number');
+		assert.equal(result.error.message, '"storage.maxLastBlocks" must be a number');
 
 		defaults.storage.maxLastBlocks = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastBlocks" must be an integer');
+		assert.equal(result.error.message, '"storage.maxLastBlocks" must be an integer');
 
 		defaults.storage.maxLastBlocks = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastBlocks" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"storage.maxLastBlocks" must be greater than or equal to 1');
 
 		delete defaults.storage.maxLastBlocks;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastBlocks" is required');
+		assert.equal(result.error.message, '"storage.maxLastBlocks" is required');
 	});
 
 	it("has schema restrictions - storage.maxLastTransactionIds is required && is integer && >= 1", (context) => {
-		let defaults = importDefaults();
+		const defaults = importDefaults();
 
 		defaults.storage.maxLastTransactionIds = true;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastTransactionIds" must be a number');
+		assert.equal(result.error.message, '"storage.maxLastTransactionIds" must be a number');
 
 		defaults.storage.maxLastTransactionIds = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastTransactionIds" must be an integer');
+		assert.equal(result.error.message, '"storage.maxLastTransactionIds" must be an integer');
 
 		defaults.storage.maxLastTransactionIds = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastTransactionIds" must be greater than or equal to 1');
+		assert.equal(result.error.message, '"storage.maxLastTransactionIds" must be greater than or equal to 1');
 
 		delete defaults.storage.maxLastTransactionIds;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"storage.maxLastTransactionIds" is required');
+		assert.equal(result.error.message, '"storage.maxLastTransactionIds" is required');
 	});
 
 	it("has schema restrictions - walletSync is required && is object", (context) => {
-		let defaults = importDefaults();
+		const defaults = importDefaults();
 
 		defaults.walletSync = true;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"walletSync" must be of type object');
+		assert.equal(result.error.message, '"walletSync" must be of type object');
 
 		delete defaults.walletSync;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"walletSync" is required');
+		assert.equal(result.error.message, '"walletSync" is required');
 	});
 
 	it("has schema restrictions - walletSync.enabled is required && is boolean", (context) => {
-		let defaults = importDefaults();
+		const defaults = importDefaults();
 
 		defaults.walletSync.enabled = 123;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"walletSync.enabled" must be a boolean');
+		assert.equal(result.error.message, '"walletSync.enabled" must be a boolean');
 
 		delete defaults.walletSync.enabled;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error!.message, '"walletSync.enabled" is required');
+		assert.equal(result.error.message, '"walletSync.enabled" is required');
 	});
 });

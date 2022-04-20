@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { orderBy } from "./order-by";
 
 const dummies = [

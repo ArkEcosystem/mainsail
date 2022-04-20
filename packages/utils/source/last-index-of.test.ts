@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { lastIndexOf } from "./last-index-of";
 
 describe("lastIndexOf", async ({ assert, it, nock, loader }) => {

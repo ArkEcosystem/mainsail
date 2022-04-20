@@ -35,19 +35,19 @@ export class ProcessManager {
 		return processes.find((process: ProcessDescription) => [process.id, process.name].includes(id));
 	}
 
-	public start(opts: Record<string, any>, flags: Record<string, any>): ExecaSyncReturnValue {
-		let command = `pm2 start ${opts.script}`;
+	public start(options: Record<string, any>, flags: Record<string, any>): ExecaSyncReturnValue {
+		let command = `pm2 start ${options.script}`;
 
-		if (opts.node_args) {
-			command += ` --node-args="${Flags.castFlagsToString(opts.node_args)}"`;
+		if (options.node_args) {
+			command += ` --node-args="${Flags.castFlagsToString(options.node_args)}"`;
 		}
 
 		if (flags !== undefined && Object.keys(flags).length > 0) {
 			command += ` ${Flags.castFlagsToString(flags)}`;
 		}
 
-		if (opts.args) {
-			command += ` -- ${opts.args}`;
+		if (options.args) {
+			command += ` -- ${options.args}`;
 		}
 
 		return this.#shellSync(command);
@@ -101,8 +101,12 @@ export class ProcessManager {
 		return this.#shellSync("pm2 update");
 	}
 
-	public async trigger(id: ProcessIdentifier, processActionName: string, param?: string): Promise<ExecaReturnValue> {
-		return this.#shell(`pm2 trigger ${id} ${processActionName} ${param}`);
+	public async trigger(
+		id: ProcessIdentifier,
+		processActionName: string,
+		parameter?: string,
+	): Promise<ExecaReturnValue> {
+		return this.#shell(`pm2 trigger ${id} ${processActionName} ${parameter}`);
 	}
 
 	public status(id: ProcessIdentifier): ProcessState | undefined {
@@ -153,7 +157,7 @@ export class ProcessManager {
 		try {
 			const { stdout } = this.#shellSync(`pm2 id ${id} | awk '{ print $2 }'`);
 
-			return !!stdout && !isNaN(Number(stdout));
+			return !!stdout && !Number.isNaN(Number(stdout));
 		} catch {
 			return false;
 		}

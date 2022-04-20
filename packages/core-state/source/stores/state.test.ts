@@ -1,10 +1,10 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describeSkip, Factories } from "../../../core-test-framework";
 import { SinonSpy } from "sinon";
 
+import { describeSkip, Factories } from "../../../core-test-framework";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { setUp } from "../../test/setup";
-import { StateStore } from "./";
+import { StateStore } from ".";
 
 describeSkip<{
 	blocks: Contracts.Crypto.IBlock[];
@@ -14,12 +14,12 @@ describeSkip<{
 	dispatchSpy: SinonSpy;
 }>("StateStore", ({ it, beforeEach, afterEach, assert, spy, clock }) => {
 	beforeEach(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.factory = env.factory;
-		context.logger = env.spies.logger.info;
-		context.dispatchSpy = env.spies.dispatchSpy;
-		context.stateStorage = env.sandbox.app.get(Identifiers.StateStore);
+		context.factory = environment.factory;
+		context.logger = environment.spies.logger.info;
+		context.dispatchSpy = environment.spies.dispatchSpy;
+		context.stateStorage = environment.sandbox.app.get(Identifiers.StateStore);
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
 	});
 
@@ -150,27 +150,27 @@ describeSkip<{
 	});
 
 	it("setLastBlock - should not exceed the max last blocks", (context) => {
-		for (let i = 0; i < 100; i++) {
+		for (let index = 0; index < 100; index++) {
 			// 100 is default
-			context.stateStorage.setLastBlock(context.blocks[i]);
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		assert.length(context.stateStorage.getLastBlocks(), 100);
 		assert.equal(context.stateStorage.getLastBlock(), context.blocks[99]);
-		assert.equal(context.stateStorage.getLastBlocks().slice(-1)[0], context.blocks[0]);
+		assert.equal(context.stateStorage.getLastBlocks().at(-1), context.blocks[0]);
 
 		// Push one more to remove the first last block.
 		context.stateStorage.setLastBlock(context.blocks[100]);
 
 		assert.length(context.stateStorage.getLastBlocks(), 100);
 		assert.equal(context.stateStorage.getLastBlock(), context.blocks[100]);
-		assert.equal(context.stateStorage.getLastBlocks().slice(-1)[0], context.blocks[1]);
+		assert.equal(context.stateStorage.getLastBlocks().at(-1), context.blocks[1]);
 	});
 
 	it("setLastBlock - should remove last blocks when going to lower height", (context) => {
-		for (let i = 0; i < 100; i++) {
+		for (let index = 0; index < 100; index++) {
 			// 100 is default
-			context.stateStorage.setLastBlock(context.blocks[i]);
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		assert.length(context.stateStorage.getLastBlocks(), 100);
@@ -189,38 +189,38 @@ describeSkip<{
 	});
 
 	it("getLastBlocks - should return the last blocks", (context) => {
-		for (let i = 0; i < 5; i++) {
-			context.stateStorage.setLastBlock(context.blocks[i]);
+		for (let index = 0; index < 5; index++) {
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		const lastBlocks = context.stateStorage.getLastBlocks();
 		assert.length(lastBlocks, 5);
 
-		for (let i = 0; i < 5; i++) {
-			assert.equal(lastBlocks[i].data.height, 6 - i); // Height started at 2
-			assert.equal(lastBlocks[i], context.blocks[4 - i]);
+		for (let index = 0; index < 5; index++) {
+			assert.equal(lastBlocks[index].data.height, 6 - index); // Height started at 2
+			assert.equal(lastBlocks[index], context.blocks[4 - index]);
 		}
 	});
 
 	it("getLastBlocksData - should return the last blocks data", (context) => {
-		for (let i = 0; i < 5; i++) {
-			context.stateStorage.setLastBlock(context.blocks[i]);
+		for (let index = 0; index < 5; index++) {
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Contracts.Crypto.IBlockData[];
 		assert.length(lastBlocksData, 5);
 
-		for (let i = 0; i < 5; i++) {
-			assert.equal(lastBlocksData[i].height, 6 - i); // Height started at 2
-			assert.true(lastBlocksData[i].hasOwnProperty("transactions"));
-			delete lastBlocksData[i].transactions;
-			assert.equal(lastBlocksData[i], context.blocks[4 - i].data);
+		for (let index = 0; index < 5; index++) {
+			assert.equal(lastBlocksData[index].height, 6 - index); // Height started at 2
+			assert.true(lastBlocksData[index].hasOwnProperty("transactions"));
+			delete lastBlocksData[index].transactions;
+			assert.equal(lastBlocksData[index], context.blocks[4 - index].data);
 		}
 	});
 
 	it("getLastBlocksData - should return last blocks data with headers only", (context) => {
-		for (let i = 0; i < 5; i++) {
-			context.stateStorage.setLastBlock(context.blocks[i]);
+		for (let index = 0; index < 5; index++) {
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		const lastBlocksData = context.stateStorage.getLastBlocksData(true).toArray() as Contracts.Crypto.IBlockData[];
@@ -229,14 +229,14 @@ describeSkip<{
 	});
 
 	it("getLastBlocksData - should return last blocks which have transactions", (context) => {
-		for (let i = 0; i < 5; i++) {
-			context.blocks[i].transactions = [
+		for (let index = 0; index < 5; index++) {
+			context.blocks[index].transactions = [
 				// @ts-ignore
 				{
 					id: "test",
 				},
 			];
-			context.stateStorage.setLastBlock(context.blocks[i]);
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Contracts.Crypto.IBlockData[];
@@ -252,15 +252,15 @@ describeSkip<{
 	});
 
 	it("getLastBlockIds - should return the last blocks data", (context) => {
-		for (let i = 0; i < 5; i++) {
-			context.stateStorage.setLastBlock(context.blocks[i]);
+		for (let index = 0; index < 5; index++) {
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		const lastBlockIds = context.stateStorage.getLastBlockIds();
 		assert.length(lastBlockIds, 5);
 
-		for (let i = 0; i < 5; i++) {
-			assert.equal(lastBlockIds[i], context.blocks[4 - i].data.id);
+		for (let index = 0; index < 5; index++) {
+			assert.equal(lastBlockIds[index], context.blocks[4 - index].data.id);
 		}
 	});
 
@@ -271,8 +271,8 @@ describeSkip<{
 	});
 
 	it("getLastBlocksByHeight - should return the last blocks data", (context) => {
-		for (let i = 0; i < 100; i++) {
-			context.stateStorage.setLastBlock(context.blocks[i]);
+		for (let index = 0; index < 100; index++) {
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		const lastBlocksByHeight = context.stateStorage.getLastBlocksByHeight(0, 101);
@@ -281,8 +281,8 @@ describeSkip<{
 	});
 
 	it("getLastBlocksByHeight - should return one last block if no end height", (context) => {
-		for (let i = 0; i < 100; i++) {
-			context.stateStorage.setLastBlock(context.blocks[i]);
+		for (let index = 0; index < 100; index++) {
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		const lastBlocksByHeight = context.stateStorage.getLastBlocksByHeight(50);
@@ -325,8 +325,8 @@ describeSkip<{
 	});
 
 	it("getCommonBlocks - should get common blocks", (context) => {
-		for (let i = 0; i < 100; i++) {
-			context.stateStorage.setLastBlock(context.blocks[i]);
+		for (let index = 0; index < 100; index++) {
+			context.stateStorage.setLastBlock(context.blocks[index]);
 		}
 
 		// Heights 90 - 100
@@ -335,8 +335,8 @@ describeSkip<{
 		assert.length(ids, 10);
 		assert.length(commonBlocks, 10);
 
-		for (const [i, commonBlock] of commonBlocks.entries()) {
-			assert.equal(commonBlock.height, context.blocks[98 - i].data.height);
+		for (const [index, commonBlock] of commonBlocks.entries()) {
+			assert.equal(commonBlock.height, context.blocks[98 - index].data.height);
 		}
 	});
 
@@ -362,8 +362,8 @@ describeSkip<{
 
 	it("cacheTransactions - should not add more than 10000 unique transaction ids", (context) => {
 		const transactions = [];
-		for (let i = 0; i < 10_000; i++) {
-			transactions.push({ id: i.toString() });
+		for (let index = 0; index < 10_000; index++) {
+			transactions.push({ id: index.toString() });
 		}
 
 		assert.equal(context.stateStorage.cacheTransactions(transactions), {
@@ -384,8 +384,8 @@ describeSkip<{
 
 	it("clearCachedTransactionIds - should remove cached transaction ids", (context) => {
 		const transactions = [];
-		for (let i = 0; i < 10; i++) {
-			transactions.push({ id: i.toString() });
+		for (let index = 0; index < 10; index++) {
+			transactions.push({ id: index.toString() });
 		}
 
 		assert.equal(context.stateStorage.cacheTransactions(transactions), {
@@ -419,10 +419,10 @@ describeSkip<{
 
 		// @ts-ignore
 		context.stateStorage.blockPing = {
+			block: context.blocks[5].data,
 			count: 1,
 			first: currentTime,
 			last: currentTime,
-			block: context.blocks[5].data,
 		};
 
 		timer.tick(100);
@@ -440,10 +440,10 @@ describeSkip<{
 		const currentTime = Date.now();
 		// @ts-ignore
 		context.stateStorage.blockPing = {
+			block: context.blocks[3].data,
 			count: 1,
 			first: currentTime,
 			last: currentTime,
-			block: context.blocks[3].data,
 		};
 		assert.false(context.stateStorage.pingBlock(context.blocks[5].data));
 
@@ -469,10 +469,10 @@ describeSkip<{
 	it("pushPingBlock - should log info message if there is already a blockPing", async (context) => {
 		// @ts-ignore
 		context.stateStorage.blockPing = {
+			block: context.blocks[3].data,
 			count: 1,
 			first: Date.now(),
 			last: Date.now(),
-			block: context.blocks[3].data,
 		};
 
 		context.stateStorage.pushPingBlock(context.blocks[5].data);
@@ -491,10 +491,10 @@ describeSkip<{
 	it("pushPingBlock - should log info message if there is already a blockPing when pushed fromForger", async (context) => {
 		// @ts-ignore
 		context.stateStorage.blockPing = {
+			block: context.blocks[3].data,
 			count: 0,
 			first: Date.now(),
 			last: Date.now(),
-			block: context.blocks[3].data,
 		};
 
 		context.stateStorage.pushPingBlock(context.blocks[5].data, true);
@@ -529,14 +529,14 @@ describeSkip<{
 	it("setWakeUpTimeout - should call callback and clear timeout", async (context) => {
 		const timer = clock();
 
-		const spyFn = spy(() => {});
+		const spyFunction = spy(() => {});
 		const spyOnClearWakeUpTimeout = spy(context.stateStorage, "clearWakeUpTimeout");
 
 		context.stateStorage.setWakeUpTimeout(() => {}, 100);
 
 		timer.tick(200);
 
-		spyFn.calledOnce();
+		spyFunction.calledOnce();
 		spyOnClearWakeUpTimeout.calledOnce();
 	});
 

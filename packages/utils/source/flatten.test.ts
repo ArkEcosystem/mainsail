@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { flatten } from "./flatten";
 
 describe("#flatten", ({ it, assert }) => {

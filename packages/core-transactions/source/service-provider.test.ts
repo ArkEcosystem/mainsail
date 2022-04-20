@@ -1,7 +1,7 @@
-import { Application } from "@arkecosystem/core-kernel";
 import { Container } from "@arkecosystem/core-container";
-import { describe } from "../../core-test-framework/source";
+import { Application } from "@arkecosystem/core-kernel";
 
+import { describe } from "../../core-test-framework/source";
 import { ServiceProvider } from "./service-provider";
 
 describe<{

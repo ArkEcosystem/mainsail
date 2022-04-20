@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { semver } from "./semver";
 
 describe("semver", async ({ assert, it, nock, loader }) => {

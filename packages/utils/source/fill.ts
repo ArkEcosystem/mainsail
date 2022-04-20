@@ -9,8 +9,8 @@ export const fill = <T, V>(subject: T[], value: V, start?: number, end?: number)
 
 	const results: (T | V)[] = [...subject];
 
-	for (let i = start; i < end; i++) {
-		results[i] = value;
+	for (let index = start; index < end; index++) {
+		results[index] = value;
 	}
 
 	return results;

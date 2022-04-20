@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { indexOf } from "./index-of";
 
 describe("indexOf", async ({ assert, it, nock, loader }) => {

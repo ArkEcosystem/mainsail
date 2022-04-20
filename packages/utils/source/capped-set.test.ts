@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { CappedSet } from "./capped-set";
 
 describe("CappedSet", ({ it, assert }) => {
@@ -16,16 +15,16 @@ describe("CappedSet", ({ it, assert }) => {
 		const maxSize = 10;
 		const cappedSet = new CappedSet<number>(maxSize);
 
-		for (let i = 0; i < 15; i++) {
-			cappedSet.add(i);
+		for (let index = 0; index < 15; index++) {
+			cappedSet.add(index);
 		}
 
-		for (let i = 0; i < 5; i++) {
-			assert.false(cappedSet.has(i));
+		for (let index = 0; index < 5; index++) {
+			assert.false(cappedSet.has(index));
 		}
 
-		for (let i = 5; i < 15; i++) {
-			assert.true(cappedSet.has(i));
+		for (let index = 5; index < 15; index++) {
+			assert.true(cappedSet.has(index));
 		}
 	});
 });

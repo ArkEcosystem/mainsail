@@ -5,8 +5,8 @@ export const reduceRightObject = <T, V>(iterable: T, iteratee: FunctionReturning
 
 	let result: V | undefined = initialValue;
 
-	for (let i = keys.length - 1; i >= 0; i--) {
-		const key = keys[i];
+	for (let index = keys.length - 1; index >= 0; index--) {
+		const key = keys[index];
 
 		result = iteratee(result, iterable[key], key, iterable);
 	}

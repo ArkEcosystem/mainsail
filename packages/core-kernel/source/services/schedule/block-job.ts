@@ -1,6 +1,6 @@
-import { performance } from "perf_hooks";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { performance } from "perf_hooks";
 
 import { BlockEvent, ScheduleEvent } from "../../enums";
 import { Job } from "./interfaces";

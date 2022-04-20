@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { randomBase64 } from "./random-base64";
 
 describe("#randomBase64", ({ it, assert }) => {

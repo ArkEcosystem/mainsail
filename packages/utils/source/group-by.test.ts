@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { groupBy } from "./group-by";
 
 describe("groupBy", async ({ assert, it, nock, loader }) => {

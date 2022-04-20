@@ -10,11 +10,11 @@ export class Watcher {
 	#watcher!: NSFW;
 
 	public async boot(): Promise<void> {
-		const configFiles: string[] = [".env", "validators.json", "peers.json", "plugins.js", "plugins.json"];
+		const configFiles = new Set([".env", "validators.json", "peers.json", "plugins.js", "plugins.json"]);
 
 		this.#watcher = await nsfw(this.app.configPath(), (events) => {
 			for (const event of events) {
-				if (event.action === ActionType.MODIFIED && configFiles.includes(event.file)) {
+				if (event.action === ActionType.MODIFIED && configFiles.has(event.file)) {
 					this.app.reboot();
 					break;
 				}

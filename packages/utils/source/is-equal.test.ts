@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isEqual } from "./is-equal";
 
 describe("isEqual", async ({ assert, it, nock, loader }) => {

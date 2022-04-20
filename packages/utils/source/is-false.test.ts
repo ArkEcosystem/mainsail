@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isFalse } from "./is-false";
 
 describe("isFalse", async ({ assert, it, nock, loader }) => {

@@ -1,6 +1,6 @@
-import { describe } from "../../core-test-framework";
 import os from "os";
 
+import { describe } from "../../core-test-framework";
 import { isValidPeer } from "./is-valid-peer";
 
 describe("isValidPeer", ({ it, assert }) => {

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isRegExp } from "./is-reg-exp";
 
 describe("isRegExp", async ({ assert, it, nock, loader }) => {

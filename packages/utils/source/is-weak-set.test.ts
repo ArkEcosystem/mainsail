@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isWeakSet } from "./is-weak-set";
 
 describe("isWeakSet", async ({ assert, it, nock, loader }) => {

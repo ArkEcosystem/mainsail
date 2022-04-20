@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { tail } from "./tail";
 
 describe("tail", async ({ assert, it, nock, loader }) => {

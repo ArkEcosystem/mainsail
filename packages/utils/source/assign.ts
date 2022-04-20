@@ -1,11 +1,8 @@
 export const assign = <T>(target: T, ...sources: any[]): T => {
-	for (let i = 0; i < sources.length; i++) {
-		const source = sources[i];
+	for (const source of sources) {
 		const keys = Object.keys(source);
 
-		for (let j = 0; j < keys.length; j++) {
-			const key = keys[j];
-
+		for (const key of keys) {
 			target[key] = source[key];
 		}
 	}

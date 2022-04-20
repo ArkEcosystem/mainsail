@@ -6,12 +6,10 @@ export const truncate = (
 		length?: number;
 		omission?: string;
 		omissionPosition?: string;
-	} = {
-		length: 30,
-		omission: "...",
-		omissionPosition: "right",
 	},
 ): string => {
+	options = { length: 30, omission: "...", omissionPosition: "right", ...options };
+	// eslint-disable-next-line unicorn/explicit-length-check
 	if (!options.length || options.length < 0) {
 		options.length = 30;
 	}
@@ -31,7 +29,7 @@ export const truncate = (
 	}
 
 	if (options.omissionPosition === "right") {
-		return value.substring(0, options.length - options.omission.length) + options.omission;
+		return value.slice(0, Math.max(0, options.length - options.omission.length)) + options.omission;
 	}
 
 	if (options.omissionPosition === "middle") {
@@ -43,5 +41,5 @@ export const truncate = (
 		)}`;
 	}
 
-	return options.omission + value.substring(value.length - options.length + options.omission.length);
+	return options.omission + value.slice(Math.max(0, value.length - options.length + options.omission.length));
 };

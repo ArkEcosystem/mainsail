@@ -38,8 +38,8 @@ export class Input {
 		const keys: string[] = Object.keys(this.#definition.getArguments());
 		const values: string[] = [...this.#rawArgs].slice(1);
 
-		for (const [i, key] of keys.entries()) {
-			this.args[key] = values[i];
+		for (const [index, key] of keys.entries()) {
+			this.args[key] = values[index];
 		}
 
 		this.flags = this.#rawFlags;

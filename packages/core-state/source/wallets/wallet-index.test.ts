@@ -1,8 +1,7 @@
 import { describeSkip, Factories } from "../../../core-test-framework";
-
 import { setUp } from "../../test/setup";
-import { Wallets } from "../";
-import { WalletIndex } from "./";
+import { Wallets } from "..";
+import { WalletIndex } from ".";
 
 describeSkip<{
 	factory: Factories.FactoryBuilder;
@@ -10,9 +9,9 @@ describeSkip<{
 	walletIndex: WalletIndex;
 }>("WalletIndex", ({ it, beforeAll, beforeEach, assert }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.factory = env.factory;
+		context.factory = environment.factory;
 	});
 
 	beforeEach((context) => {

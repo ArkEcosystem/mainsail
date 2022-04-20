@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isArguments } from "./is-arguments";
 
 describe("#isArguments", ({ it, assert }) => {

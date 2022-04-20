@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 @injectable()

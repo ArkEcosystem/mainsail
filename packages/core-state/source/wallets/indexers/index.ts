@@ -1,2 +1,2 @@
-export * from "./wallet-indexes";
 export * from "./indexers";
+export * from "./wallet-indexes";

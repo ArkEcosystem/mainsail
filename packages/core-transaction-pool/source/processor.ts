@@ -1,5 +1,5 @@
 import { inject, injectable, multiInject, optional } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()

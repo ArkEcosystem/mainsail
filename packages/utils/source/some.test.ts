@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { some } from "./some";
 
 describe("some", async ({ assert, it, nock, loader }) => {
@@ -9,8 +8,8 @@ describe("some", async ({ assert, it, nock, loader }) => {
 		assert.true(
 			some(
 				[
-					{ user: "barney", active: true },
-					{ user: "fred", active: false },
+					{ active: true, user: "barney" },
+					{ active: false, user: "fred" },
 				],
 				(currentValue) => currentValue.active,
 			),

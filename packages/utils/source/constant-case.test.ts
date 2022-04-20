@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { constantCase } from "./constant-case";
 
 describe("#constantCase", ({ it, assert }) => {

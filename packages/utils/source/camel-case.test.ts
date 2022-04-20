@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { camelCase } from "./camel-case";
 
 describe("#camelCase", ({ it, assert }) => {

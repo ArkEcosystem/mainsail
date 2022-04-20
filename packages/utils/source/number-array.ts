@@ -1,1 +1,1 @@
-export const numberArray = (amount: number): number[] => [...Array(amount).keys()];
+export const numberArray = (amount: number): number[] => [...new Array(amount).keys()];

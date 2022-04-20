@@ -81,7 +81,7 @@ export class BigNumber {
 		return this.#value.toString();
 	}
 
-	public toString(base: number = 10): string {
+	public toString(base = 10): string {
 		return this.#value.toString(base);
 	}
 

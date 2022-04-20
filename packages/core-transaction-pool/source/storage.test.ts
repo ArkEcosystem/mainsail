@@ -1,11 +1,12 @@
-import fs from "fs-extra";
-import { describe } from "../../core-test-framework";
-import { Storage } from "./";
-import { Stub } from "../../core-test-framework/source/uvu/stub";
 import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Application } from "@arkecosystem/core-kernel";
+import fs from "fs-extra";
+
+import { describe } from "../../core-test-framework";
+import { Stub } from "../../core-test-framework/source/uvu/stub";
+import { Storage } from ".";
 
 describe<{
 	configuration: any;
@@ -14,7 +15,7 @@ describe<{
 	config: Configuration;
 }>("Storage", ({ it, beforeAll, afterAll, assert, stub }) => {
 	beforeAll(async (context) => {
-		context.configuration = { getRequired: () => undefined };
+		context.configuration = { getRequired: () => {} };
 
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
@@ -115,7 +116,7 @@ describe<{
 			storage.addTransaction(storedTransaction1);
 			storage.addTransaction(storedTransaction2);
 
-			const allTransactions = Array.from(storage.getAllTransactions());
+			const allTransactions = [...storage.getAllTransactions()];
 			assert.equal(allTransactions, [storedTransaction1, storedTransaction2]);
 		} finally {
 			storage.dispose();
@@ -145,7 +146,7 @@ describe<{
 			storage.addTransaction(storedTransaction1);
 			storage.addTransaction(storedTransaction2);
 
-			const oldTransactions = Array.from(storage.getOldTransactions(100));
+			const oldTransactions = [...storage.getOldTransactions(100)];
 			assert.equal(oldTransactions, [storedTransaction1]);
 		} finally {
 			storage.dispose();
@@ -175,7 +176,7 @@ describe<{
 			storage.addTransaction(storedTransaction1);
 			storage.addTransaction(storedTransaction2);
 
-			const oldTransactions = Array.from(storage.getOldTransactions(200));
+			const oldTransactions = [...storage.getOldTransactions(200)];
 			assert.equal(oldTransactions, [storedTransaction2, storedTransaction1]);
 		} finally {
 			storage.dispose();
@@ -272,7 +273,7 @@ describe<{
 
 			storage.flush();
 
-			const allTransactions = Array.from(storage.getAllTransactions());
+			const allTransactions = [...storage.getAllTransactions()];
 			assert.equal(allTransactions, []);
 		} finally {
 			storage.dispose();

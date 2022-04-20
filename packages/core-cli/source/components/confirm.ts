@@ -7,12 +7,12 @@ export class Confirm {
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	public async render(message: string, opts: object = {}): Promise<boolean> {
+	public async render(message: string, options: object = {}): Promise<boolean> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
 			message,
 			name: "value",
 			type: "confirm",
-			...opts,
+			...options,
 		});
 
 		return value as boolean;

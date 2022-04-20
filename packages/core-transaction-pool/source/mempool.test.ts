@@ -1,13 +1,13 @@
 import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+
+import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
+import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
 import { describe } from "../../core-test-framework";
 import { Stub } from "../../core-test-framework/source/uvu/stub";
-import { Mempool } from "./";
-import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
-import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
-import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Mempool } from ".";
 
 describe<{
 	container: Container;
@@ -18,7 +18,7 @@ describe<{
 }>("Mempool", ({ it, beforeAll, assert, beforeEach, spy, stub, stubFn }) => {
 	beforeAll((context) => {
 		context.createSenderMempool = stubFn();
-		context.logger = { debug: () => undefined };
+		context.logger = { debug: () => {} };
 
 		context.container = new Container();
 		context.container
@@ -45,13 +45,13 @@ describe<{
 
 	it("getSize - should return sum of transaction counts of sender states", async (context) => {
 		const senderMempool1 = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			getSize: () => 10,
 			isDisposable: () => false,
 		};
 
 		const senderMempool2 = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			getSize: () => 20,
 			isDisposable: () => false,
 		};
@@ -59,13 +59,13 @@ describe<{
 		context.createSenderMempool.returnValueNth(0, senderMempool1).returnValueNth(1, senderMempool2);
 
 		const transaction1 = {
-			id: "transaction1-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction1-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const transaction2 = {
-			id: "transaction2-id",
 			data: { senderPublicKey: await context.createPublicKey("sender2") },
+			id: "transaction2-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const memory = context.container.resolve(Mempool);
@@ -78,15 +78,15 @@ describe<{
 
 	it("hasSenderMempool - should return true if sender's transaction was added previously", async (context) => {
 		const senderMempool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
 		context.createSenderMempool.returnValue(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const memory = context.container.resolve(Mempool);
@@ -98,15 +98,15 @@ describe<{
 
 	it("hasSenderMempool - should return false if sender's transaction wasn't added previously", async (context) => {
 		const senderMempool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
 		context.createSenderMempool.returnValue(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const memory = context.container.resolve(Mempool);
@@ -118,15 +118,15 @@ describe<{
 
 	it("getSenderMempool - should return sender state if sender's transaction was added previously", async (context) => {
 		const senderMempool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
 		context.createSenderMempool.returnValue(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const memory = context.container.resolve(Mempool);
@@ -137,47 +137,47 @@ describe<{
 
 	it("getSenderMempool - should throw if sender's transaction wasn't added previously", async (context) => {
 		const senderMempool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
 		context.createSenderMempool.returnValueNth(0, senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const key = await context.createPublicKey("not sender");
 
 		const memory = context.container.resolve(Mempool);
 		await memory.addTransaction(transaction);
-		const cb = () => memory.getSenderMempool(key);
+		const callback = () => memory.getSenderMempool(key);
 
-		assert.throws(cb);
+		assert.throws(callback);
 	});
 
 	it("getSenderMempools - should return all sender states", async (context) => {
 		const senderMempool1 = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
 		const senderMempool2 = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
 		context.createSenderMempool.returnValueNth(0, senderMempool1).returnValueNth(1, senderMempool2);
 
 		const transaction1 = {
-			id: "transaction1-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction1-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const transaction2 = {
-			id: "transaction2-id",
 			data: { senderPublicKey: await context.createPublicKey("sender2") },
+			id: "transaction2-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const memory = context.container.resolve(Mempool);
@@ -185,12 +185,12 @@ describe<{
 		await memory.addTransaction(transaction2);
 		const senderMempools = memory.getSenderMempools();
 
-		assert.length(Array.from(senderMempools), 2);
+		assert.length([...senderMempools], 2);
 	});
 
 	it("addTransaction - should add transaction to sender state", async (context) => {
 		const senderMempool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
@@ -199,8 +199,8 @@ describe<{
 		const addTransactionSpy = spy(senderMempool, "addTransaction");
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const loggerSpy = spy(context.logger, "debug");
@@ -216,7 +216,7 @@ describe<{
 		const error = new Error("Something went horribly wrong");
 
 		const senderMempool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => true,
 		};
 
@@ -225,8 +225,8 @@ describe<{
 		context.createSenderMempool.returnValue(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const loggerSpy = spy(context.logger, "debug");
@@ -244,8 +244,8 @@ describe<{
 
 	it("removeTransaction - should return empty array when removing transaction of sender that wasn't previously added", async (context) => {
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const memory = context.container.resolve(Mempool);
@@ -256,14 +256,14 @@ describe<{
 
 	it("removeTransaction - should remove previously added transaction and return list of removed transactions", async (context) => {
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const senderMempool = {
-			addTransaction: () => undefined,
-			removeTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
+			removeTransaction: () => {},
 		};
 
 		const removeTransactionStub = stub(senderMempool, "removeTransaction").returnValue([transaction]);
@@ -284,14 +284,14 @@ describe<{
 	it("removeTransaction - should forget sender state if it's empty even if error was thrown", async (context) => {
 		const error = new Error("Something went horribly wrong");
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const senderMempool = {
-			addTransaction: () => undefined,
-			removeTransaction: () => undefined,
-			isDisposable: () => undefined,
+			addTransaction: () => {},
+			isDisposable: () => {},
+			removeTransaction: () => {},
 		};
 
 		stub(senderMempool, "removeTransaction").rejectedValue(error);
@@ -325,14 +325,14 @@ describe<{
 
 	it("removeForgedTransaction - should remove previously added transaction and return list of removed transactions", async (context) => {
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const senderMempool = {
-			addTransaction: () => undefined,
-			removeForgedTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
+			removeForgedTransaction: () => {},
 		};
 
 		const removeStub = stub(senderMempool, "removeForgedTransaction").returnValue([transaction]);
@@ -356,14 +356,14 @@ describe<{
 	it("removeForgedTransaction - should forget sender state if it's empty even if error was thrown", async (context) => {
 		const error = new Error("Something went horribly wrong");
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const senderMempool = {
-			addTransaction: () => undefined,
-			removeForgedTransaction: () => undefined,
-			isDisposable: () => undefined,
+			addTransaction: () => {},
+			isDisposable: () => {},
+			removeForgedTransaction: () => {},
 		};
 
 		stub(senderMempool, "removeForgedTransaction").rejectedValue(error);
@@ -387,15 +387,15 @@ describe<{
 
 	it("flush - should remove all sender states", async (context) => {
 		const senderMempool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 			isDisposable: () => false,
 		};
 
 		context.createSenderMempool.returnValue(senderMempool);
 
 		const transaction = {
-			id: "transaction-id",
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
+			id: "transaction-id",
 		} as Contracts.Crypto.ITransaction;
 
 		const memory = context.container.resolve(Mempool);

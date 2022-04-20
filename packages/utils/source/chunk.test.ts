@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { chunk } from "./chunk";
 
 describe("#chunk", ({ it, assert }) => {

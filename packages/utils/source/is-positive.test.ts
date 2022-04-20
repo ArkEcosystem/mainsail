@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isPositive } from "./is-positive";
 
 describe("isPositive", async ({ assert, it, nock, loader }) => {

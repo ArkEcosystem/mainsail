@@ -4,7 +4,7 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as AppContracts } from "@arkecosystem/core-contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
-import { join } from "path";
+import path from "path";
 import prompts from "prompts";
 
 type Flag = {
@@ -188,7 +188,7 @@ export class Command extends Commands.Command {
 
 		const allFlagsSet = !this.#flagSettings
 			.filter((flag) => flag.promptType)
-			.find((flag) => flags[flag.name] === undefined);
+			.some((flag) => flags[flag.name] === undefined);
 
 		const defaults = this.#flagSettings.reduce<any>((accumulator: any, flag: Flag) => {
 			accumulator[flag.name] = flag.default;
@@ -273,6 +273,6 @@ export class Command extends Commands.Command {
 		const paths = envPaths(options.token, { suffix: "core" });
 		const configPath = options.configPath ? options.configPath : paths.config;
 
-		return join(configPath, options.network);
+		return path.join(configPath, options.network);
 	}
 }

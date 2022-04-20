@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isBoolean } from "./is-boolean";
 
 describe("isBoolean", async ({ assert, it, nock, loader }) => {

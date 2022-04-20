@@ -1,3 +1,4 @@
 import { filter } from "./filter";
 
-export const pull = <T>(iterable: T[], ...args: any[]): T[] => filter(iterable, (item) => !args.includes(item)) as T[];
+export const pull = <T>(iterable: T[], ...arguments_: any[]): T[] =>
+	filter(iterable, (item) => !arguments_.includes(item)) as T[];

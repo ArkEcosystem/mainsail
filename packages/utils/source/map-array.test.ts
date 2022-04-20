@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { mapArray } from "./map-array";
 
 describe("mapArray", async ({ assert, it, nock, loader }) => {

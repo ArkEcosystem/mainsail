@@ -12,9 +12,9 @@ export class FactoryBuilder {
 		return this.#factories.get(factory);
 	}
 
-	public set(factory: string, fn: FactoryFunction): boolean {
+	public set(factory: string, function_: FactoryFunction): boolean {
 		const instance: Factory = new Factory();
-		instance.state("default", fn);
+		instance.state("default", function_);
 
 		this.#factories.set(factory, instance);
 

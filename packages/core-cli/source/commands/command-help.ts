@@ -19,11 +19,11 @@ export class CommandHelp {
 ${blue().bold("Description")}
 ${command.description}`;
 
-		const args: string = this.#buildArguments(command);
+		const arguments_: string = this.#buildArguments(command);
 
-		if (args) {
+		if (arguments_) {
 			helpMessage += `${blue().bold("\n\nArguments")}
-${args}`;
+${arguments_}`;
 		}
 
 		const flags: string = this.#buildFlags(command);
@@ -37,17 +37,17 @@ ${flags}`;
 	}
 
 	#buildArguments(command): string {
-		const args = command.definition.getArguments();
+		const arguments_ = command.definition.getArguments();
 
-		if (Object.keys(args).length <= 0) {
+		if (Object.keys(arguments_).length <= 0) {
 			return "";
 		}
 
-		const { options, descriptions, longestProperty } = this.#buildProperties(args);
+		const { options, descriptions, longestProperty } = this.#buildProperties(arguments_);
 
 		const output: string[] = [];
-		for (const [i, option] of options.entries()) {
-			output.push(`${option.padEnd(longestProperty, " ")}    ${descriptions[i]}`);
+		for (const [index, option] of options.entries()) {
+			output.push(`${option.padEnd(longestProperty, " ")}    ${descriptions[index]}`);
 		}
 
 		return output.join("\n");
@@ -63,8 +63,8 @@ ${flags}`;
 		const { options, descriptions, longestProperty } = this.#buildProperties(flags);
 
 		const output: string[] = [];
-		for (const [i, option] of options.entries()) {
-			output.push(`--${option.padEnd(longestProperty, " ")}    ${descriptions[i]}`);
+		for (const [index, option] of options.entries()) {
+			output.push(`--${option.padEnd(longestProperty, " ")}    ${descriptions[index]}`);
 		}
 
 		return output.join("\n");

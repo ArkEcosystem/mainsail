@@ -1,6 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.ITransactionVerifier {

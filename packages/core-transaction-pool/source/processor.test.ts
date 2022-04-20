@@ -1,10 +1,9 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { BigNumber } from "@arkecosystem/utils";
-import { Processor } from "./processor";
-import { describe } from "../../core-test-framework";
 import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { BigNumber } from "@arkecosystem/utils";
+
+import { describe } from "../../core-test-framework";
+import { Processor } from "./processor";
 
 describe<{
 	container: Container;
@@ -17,17 +16,17 @@ describe<{
 }>("Processor", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.pool = {
-			addTransaction: () => undefined,
+			addTransaction: () => {},
 		};
 
-		context.extensions = [{ throwIfCannotBroadcast: () => undefined }, { throwIfCannotBroadcast: () => undefined }];
+		context.extensions = [{ throwIfCannotBroadcast: () => {} }, { throwIfCannotBroadcast: () => {} }];
 
 		context.transactionBroadcaster = {
 			broadcastTransactions: () => Promise.resolve(),
 		};
 
 		context.factory = {
-			fromData: () => undefined,
+			fromData: () => {},
 		};
 
 		context.container = new Container();
@@ -38,40 +37,40 @@ describe<{
 		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
 		context.container.bind(Identifiers.PeerTransactionBroadcaster).toConstantValue(context.transactionBroadcaster);
 		context.container.bind(Identifiers.LogService).toConstantValue({
-			error: () => undefined,
+			error: () => {},
 		});
 
 		context.transaction1 = {
-			id: "dummy-tx-id",
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.Transfer,
-			key: "some-key",
 			data: {
+				amount: BigNumber.make(100),
 				id: "dummy-tx-id",
+				nonce: BigNumber.make(1),
+				senderPublicKey: "dummy-sender-key",
 				type: Contracts.Crypto.TransactionType.Transfer,
 				version: 2,
-				nonce: BigNumber.make(1),
-				amount: BigNumber.make(100),
-				senderPublicKey: "dummy-sender-key",
 			},
+			id: "dummy-tx-id",
+			key: "some-key",
 			serialized: Buffer.from("dummy"),
+			type: Contracts.Crypto.TransactionType.Transfer,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.transaction2 = {
-			id: "dummy-tx-id-2",
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.Transfer,
-			key: "some-key",
 			data: {
+				amount: BigNumber.make(100),
 				id: "dummy-tx-id-2",
+				nonce: BigNumber.make(1),
+				senderPublicKey: "dummy-sender-key",
 				type: Contracts.Crypto.TransactionType.Transfer,
 				typeGroup: undefined,
 				version: 2,
-				nonce: BigNumber.make(1),
-				amount: BigNumber.make(100),
-				senderPublicKey: "dummy-sender-key",
 			},
+			id: "dummy-tx-id-2",
+			key: "some-key",
 			serialized: Buffer.from("dummy-2"),
+			type: Contracts.Crypto.TransactionType.Transfer,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 	});
 

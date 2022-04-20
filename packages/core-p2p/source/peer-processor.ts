@@ -108,6 +108,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 				this.logger.debug(`Accepted new peer ${newPeer.ip}:${newPeer.port} (v${newPeer.version})`);
 			}
 
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.PeerEvent.Added, newPeer);
 		} catch {
 			this.connector.disconnect(newPeer);

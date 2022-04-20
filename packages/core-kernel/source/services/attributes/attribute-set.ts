@@ -1,5 +1,5 @@
-import { strictEqual } from "assert";
 import { injectable } from "@arkecosystem/core-container";
+import { strictEqual } from "assert";
 
 @injectable()
 export class AttributeSet {

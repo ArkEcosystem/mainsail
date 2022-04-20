@@ -1,18 +1,18 @@
 import { interfaces } from "inversify";
 
 export const anyAncestorOrTargetTaggedFirst =
-	(key: string | number | symbol, value: any) => (req: interfaces.Request) => {
+	(key: string | number | symbol, value: any) => (request: interfaces.Request) => {
 		for (;;) {
-			const targetTags = req.target.getCustomTags();
+			const targetTags = request.target.getCustomTags();
 			if (targetTags) {
 				const targetTag = targetTags.find((t) => t.key === key);
 				if (targetTag) {
 					return targetTag.value === value;
 				}
 			}
-			if (!req.parentRequest) {
+			if (!request.parentRequest) {
 				return false;
 			}
-			req = req.parentRequest;
+			request = request.parentRequest;
 		}
 	};

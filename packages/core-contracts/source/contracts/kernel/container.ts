@@ -1,3 +1,1 @@
-import { interfaces as Container } from "inversify";
-
-export { Container };
+export { interfaces as Container } from "inversify";

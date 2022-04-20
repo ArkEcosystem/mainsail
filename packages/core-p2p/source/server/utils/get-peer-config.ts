@@ -13,7 +13,7 @@ const transformPlugins = (plugins: PluginConfig[]): Contracts.P2P.PeerPlugins =>
 
 		const port = Number(options.port);
 
-		if (isNaN(port) || name.includes("core-p2p")) {
+		if (Number.isNaN(port) || name.includes("core-p2p")) {
 			continue;
 		}
 

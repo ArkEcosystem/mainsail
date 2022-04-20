@@ -17,13 +17,13 @@ export class NSect {
 		for (;;) {
 			const indexesToProbe: number[] = this.#calcProbes(low, high);
 
-			const temp: number | undefined = await this.#probe(indexesToProbe);
+			const temporary: number | undefined = await this.#probe(indexesToProbe);
 
-			if (temp === undefined) {
+			if (temporary === undefined) {
 				break;
 			}
 
-			highestMatching = temp;
+			highestMatching = temporary;
 
 			if (low + this.#nAry >= high) {
 				// The range is narrowed so much that we probed every element in the range.
@@ -43,7 +43,8 @@ export class NSect {
 			//    1101 and 1199.
 
 			// Case A.
-			if (highestMatching === indexesToProbe[indexesToProbe.length - 1]) {
+			// @ts-ignore unsupported .at
+			if (highestMatching === indexesToProbe.at(-1)) {
 				break;
 			}
 
@@ -87,11 +88,11 @@ export class NSect {
 		const diff: number = high - low;
 		const p: Set<number> = new Set<number>();
 
-		for (let i = 0; i < this.#nAry + 1; i++) {
-			const h: number = low + Math.round((diff * i) / this.#nAry);
+		for (let index = 0; index < this.#nAry + 1; index++) {
+			const h: number = low + Math.round((diff * index) / this.#nAry);
 			p.add(h);
 		}
 
-		return Array.from(p);
+		return [...p];
 	}
 }

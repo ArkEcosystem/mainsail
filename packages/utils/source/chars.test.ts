@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { chars } from "./chars";
 
 describe("#chars", ({ it, assert }) => {

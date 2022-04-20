@@ -1,8 +1,8 @@
-import { describe } from "../index";
 import { Commands, Container } from "@arkecosystem/core-cli";
-
-import { Console } from "./console";
 import Joi from "joi";
+
+import { describe } from "../index";
+import { Console } from "./console";
 
 describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 	let spyOnGetFlag;
@@ -103,7 +103,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 
 		await assert.resolves(() =>
 			console
-				.withFlags({ flagName: "flag_test", token: "dummy_token", network: "dummy_network" })
+				.withFlags({ flagName: "flag_test", network: "dummy_network", token: "dummy_token" })
 				.execute(Command),
 		);
 
@@ -117,7 +117,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 
 			await assert.resolves(() =>
 				console
-					.withFlags({ token: "dummy_token", network: "dummy_network" })
+					.withFlags({ network: "dummy_network", token: "dummy_token" })
 					.withArgs(["test_arg"])
 					.execute(Command),
 			);

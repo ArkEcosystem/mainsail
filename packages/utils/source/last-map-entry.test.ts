@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { lastMapEntry } from "./last-map-entry";
 
 describe("lastMapEntry", async ({ assert, it, nock, loader }) => {

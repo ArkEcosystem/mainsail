@@ -20,7 +20,7 @@ export class SuggestCommand {
 
 		const signatures: string[] = context.signatures as string[];
 
-		if (!Array.isArray(signatures) || !signatures.length) {
+		if (!Array.isArray(signatures) || signatures.length === 0) {
 			return undefined;
 		}
 

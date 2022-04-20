@@ -6,8 +6,7 @@ import { PublicKey } from "../identities";
 import { Utils } from "../index";
 import { IMultiSignatureAsset, NetworkConfig } from "../interfaces";
 import { configManager } from "../managers";
-import { BuilderFactory } from "../transactions";
-import { TransactionTypeFactory } from "../transactions";
+import { BuilderFactory, TransactionTypeFactory } from "../transactions";
 import { schemas } from "../transactions/types";
 import { TransactionSchema } from "../transactions/types/schemas";
 import { validator as Ajv } from "../validation";
@@ -112,7 +111,7 @@ describe<{
 	});
 
 	it("should be invalid due to no address", (context) => {
-		context.transaction.recipientId(undefined).amount(context.amount).sign("passphrase");
+		context.transaction.recipientId().amount(context.amount).sign("passphrase");
 
 		const { error } = Ajv.validate(context.transactionSchema.$id, context.transaction.getStruct());
 		assert.defined(error);
@@ -312,7 +311,7 @@ describe<{
 	it("should be invalid due to transaction type", (context) => {
 		const transaction = BuilderFactory.transfer();
 		transaction
-			.recipientId(undefined)
+			.recipientId()
 			.amount((10 * ARKTOSHI).toString())
 			.sign("passphrase");
 
@@ -554,8 +553,8 @@ describe<{
 	it("should be invalid due to too many public keys", (context) => {
 		const values = [];
 		context.multiSignatureAsset.publicKeys = [];
-		for (let i = 0; i < 20; i++) {
-			const value = `passphrase ${i}`;
+		for (let index = 0; index < 20; index++) {
+			const value = `passphrase ${index}`;
 			values.push(value);
 			context.multiSignatureAsset.publicKeys.push(PublicKey.fromPassphrase(value));
 		}
@@ -644,12 +643,6 @@ describe<{
 
 	it("should validate legacy multisignature", (context) => {
 		const legacyMultiSignature = {
-			version: 1,
-			network: 23,
-			type: 4,
-			timestamp: 53_253_482,
-			senderPublicKey: "0333421e69d3531a1c43c43cd4b9344e5a10640644a5fd35618b6306f3a4d7f208",
-			fee: "2000000000",
 			amount: "0",
 			asset: {
 				multiSignatureLegacy: {
@@ -662,9 +655,15 @@ describe<{
 					min: 2,
 				},
 			},
+			fee: "2000000000",
+			id: "32aa60577531c190e6a29d28f434367c84c2f0a62eceba5c5483a3983639d51a",
+			network: 23,
+			senderPublicKey: "0333421e69d3531a1c43c43cd4b9344e5a10640644a5fd35618b6306f3a4d7f208",
 			signature:
 				"304402206009fbf8592e2e3485bc0aa84dbbc8c78326d59191daf870693bc3446b5eeeee02200b4ff5dd53b1e337fe6fbe090f42337dcfc4242c802c340815326e3858d13d6b",
-			id: "32aa60577531c190e6a29d28f434367c84c2f0a62eceba5c5483a3983639d51a",
+			timestamp: 53_253_482,
+			type: 4,
+			version: 1,
 		};
 
 		const { error } = Ajv.validate(schemas.multiSignatureLegacy, legacyMultiSignature);
@@ -707,8 +706,8 @@ describe<{
 	it("should not accept more than `multiPaymentLimit` payments", (context) => {
 		const limit = configManager.getMilestone().multiPaymentLimit;
 
-		for (let i = 0; i < limit; i++) {
-			context.multiPayment.addPayment(context.address, `${i + 1}`);
+		for (let index = 0; index < limit; index++) {
+			context.multiPayment.addPayment(context.address, `${index + 1}`);
 		}
 
 		context.multiPayment.data.asset.payments.push({ amount: Utils.BigNumber.ONE, recipientId: context.address });

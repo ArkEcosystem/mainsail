@@ -1,5 +1,6 @@
 import { describe, Generators } from "@arkecosystem/core-test-framework";
 import { TransactionFactory } from "@arkecosystem/core-test-framework/source/utils/transaction-factory";
+
 import { TransactionVersionError } from "../errors";
 import { Keys } from "../identities";
 import { IKeyPair, ITransactionData, NetworkConfig } from "../interfaces";
@@ -44,7 +45,7 @@ describe<{
 			() => {
 				Signer.sign(Object.assign({}, context.transaction, { version: 110 }), context.keys);
 			},
-			(err) => err instanceof TransactionVersionError,
+			(error) => error instanceof TransactionVersionError,
 		);
 	});
 
@@ -55,7 +56,7 @@ describe<{
 			() => {
 				Signer.sign(Object.assign({}, context.transaction, { version: 2 }), context.keys);
 			},
-			(err) => err instanceof TransactionVersionError,
+			(error) => error instanceof TransactionVersionError,
 		);
 
 		configManager.getMilestone().aip11 = true;
@@ -64,7 +65,7 @@ describe<{
 			() => {
 				Signer.sign(Object.assign({}, context.transaction, { version: 2 }), context.keys);
 			},
-			(err) => err instanceof TransactionVersionError,
+			(error) => error instanceof TransactionVersionError,
 		);
 	});
 });

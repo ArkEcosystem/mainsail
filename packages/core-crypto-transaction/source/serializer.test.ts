@@ -1,5 +1,5 @@
 import { describe } from "../../core-test-framework";
-import { Address, PublicKey, Keys } from "../identities";
+import { Address, Keys, PublicKey } from "../identities";
 import { ITransaction } from "../interfaces";
 import { configManager } from "../managers";
 import {
@@ -73,13 +73,13 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		const transaction = new TestTransaction();
 		transaction.data = {
 			amount: new BigNumber(100),
+			expiration: 0,
 			fee: new BigNumber(200),
 			nonce: new BigNumber(1),
-			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			recipientId: Address.fromPassphrase("recipient passphrase"),
+			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			timestamp: 0,
 			type: 1,
-			expiration: 0,
 			typeGroup: 3,
 			version: 2,
 		};
@@ -114,13 +114,13 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		const transaction = new TestTransaction();
 		transaction.data = {
 			amount: new BigNumber(100),
+			expiration: 0,
 			fee: new BigNumber(200),
 			nonce: new BigNumber(1),
-			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			recipientId: Address.fromPassphrase("recipient passphrase"),
+			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			timestamp: 0,
 			type: 1,
-			expiration: 0,
 			typeGroup: 3,
 			version: 2,
 		};
@@ -156,13 +156,13 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		const transaction = new TestTransaction();
 		transaction.data = {
 			amount: new BigNumber(100),
+			expiration: 0,
 			fee: new BigNumber(200),
 			nonce: new BigNumber(1),
-			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			recipientId: Address.fromPassphrase("recipient passphrase"),
+			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			timestamp: 0,
 			type: 1,
-			expiration: 0,
 			typeGroup: 3,
 			version: 2,
 		};
@@ -201,15 +201,15 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		const transaction = new TestTransaction();
 		transaction.data = {
 			amount: new BigNumber(100),
+			expiration: 0,
 			fee: new BigNumber(200),
 			nonce: new BigNumber(1),
-			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			recipientId: Address.fromPassphrase("recipient passphrase"),
+			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			timestamp: 0,
-			vendorField: "vendorField",
 			type: 1,
-			expiration: 0,
 			typeGroup: 3,
+			vendorField: "vendorField",
 			version: 2,
 		};
 
@@ -246,13 +246,13 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		const transaction = new TestTransaction();
 		transaction.data = {
 			amount: new BigNumber(100),
+			expiration: 0,
 			fee: new BigNumber(200),
 			nonce: new BigNumber(1),
-			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			recipientId: Address.fromPassphrase("recipient passphrase"),
+			senderPublicKey: PublicKey.fromPassphrase("sender passphrase"),
 			timestamp: 0,
 			type: 1,
-			expiration: 0,
 			typeGroup: 3,
 			version: 1,
 		};

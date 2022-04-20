@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isSyncFunction } from "./is-sync-function";
 
 describe("isSyncFunction", async ({ assert, it, nock, loader }) => {

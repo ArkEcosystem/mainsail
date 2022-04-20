@@ -34,44 +34,44 @@ export class PluginManager implements Contracts.PluginManager {
 		return plugins;
 	}
 
-	public async install(token: string, network: string, pkg: string, version?: string): Promise<void> {
+	public async install(token: string, network: string, package_: string, version?: string): Promise<void> {
 		for (const Instance of [File, Git, NPM]) {
 			const source: Source = new Instance({
 				data: this.#getPluginsPath(token, network),
 				temp: this.#getTempPath(token, network),
 			});
 
-			if (await source.exists(pkg, version)) {
-				return source.install(pkg, version);
+			if (await source.exists(package_, version)) {
+				return source.install(package_, version);
 			}
 		}
 
-		throw new Error(`The given package [${pkg}] is neither a git nor a npm package.`);
+		throw new Error(`The given package [${package_}] is neither a git nor a npm package.`);
 	}
 
-	public async update(token: string, network: string, pkg: string): Promise<void> {
+	public async update(token: string, network: string, package_: string): Promise<void> {
 		const paths = {
 			data: this.#getPluginsPath(token, network),
 			temp: this.#getTempPath(token, network),
 		};
-		const directory: string = join(paths.data, pkg);
+		const directory: string = join(paths.data, package_);
 
 		if (!existsSync(directory)) {
-			throw new Error(`The package [${pkg}] does not exist.`);
+			throw new Error(`The package [${package_}] does not exist.`);
 		}
 
 		if (existsSync(`${directory}/.git`)) {
-			return new Git(paths).update(pkg);
+			return new Git(paths).update(package_);
 		}
 
-		return new NPM(paths).update(pkg);
+		return new NPM(paths).update(package_);
 	}
 
-	public async remove(token: string, network: string, pkg): Promise<void> {
-		const directory: string = join(this.#getPluginsPath(token, network), pkg);
+	public async remove(token: string, network: string, package_): Promise<void> {
+		const directory: string = join(this.#getPluginsPath(token, network), package_);
 
 		if (!existsSync(directory)) {
-			throw new Error(`The package [${pkg}] does not exist.`);
+			throw new Error(`The package [${package_}] does not exist.`);
 		}
 
 		removeSync(directory);

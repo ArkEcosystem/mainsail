@@ -1,10 +1,11 @@
-import { describe } from "../../core-test-framework";
-import { ExpirationService } from ".";
 import { Container } from "@arkecosystem/core-container";
-import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
-import { Slots } from "@arkecosystem/core-crypto-time/source/slots";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BlockTimeCalculator } from "@arkecosystem/core-crypto-time/source/block-time-calculator";
+import { Slots } from "@arkecosystem/core-crypto-time/source/slots";
+
+import { describe } from "../../core-test-framework";
+import { ExpirationService } from ".";
 
 describe<{
 	app: any;

@@ -55,19 +55,19 @@ export class NPM extends AbstractSource {
 		};
 	}
 
-	async #downloadPackage(source: string, dest: string): Promise<void> {
-		removeSync(dest);
+	async #downloadPackage(source: string, destination: string): Promise<void> {
+		removeSync(destination);
 
-		ensureFileSync(dest);
+		ensureFileSync(destination);
 
-		await promisify(stream.pipeline)(got.stream(source), createWriteStream(dest));
+		await promisify(stream.pipeline)(got.stream(source), createWriteStream(destination));
 	}
 
 	async #extractPackage(name: string, file: string): Promise<void> {
 		await extract({
-			gzip: true,
-			file,
 			cwd: this.tempPath,
+			file,
+			gzip: true,
 		});
 
 		removeSync(file);

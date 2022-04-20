@@ -1,9 +1,9 @@
 import { FunctionReturning } from "./internal";
 
 export const findIndex = <T>(iterable: T[], iteratee: FunctionReturning): number => {
-	for (let i = 0; i < iterable.length; i++) {
-		if (iteratee(iterable[i], i, iterable)) {
-			return i;
+	for (let index = 0; index < iterable.length; index++) {
+		if (iteratee(iterable[index], index, iterable)) {
+			return index;
 		}
 	}
 

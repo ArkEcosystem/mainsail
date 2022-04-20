@@ -1,13 +1,13 @@
-import { resolve } from "path";
-import { describe } from "../../../../../core-test-framework";
-
-import { Application } from "../../../application";
 import { Container } from "@arkecosystem/core-container";
-import { Identifiers, Exceptions } from "@arkecosystem/core-contracts";
-import { LocalConfigLoader } from "./local";
-import { ConfigRepository } from "../repository";
+import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { resolve } from "path";
+
+import { describe } from "../../../../../core-test-framework";
+import { Application } from "../../../application";
 import { MemoryEventDispatcher } from "../../events";
 import { JoiValidator } from "../../validation/drivers/joi";
+import { ConfigRepository } from "../repository";
+import { LocalConfigLoader } from "./local";
 
 describe<{
 	app: Application;

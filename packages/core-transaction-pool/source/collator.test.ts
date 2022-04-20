@@ -1,8 +1,9 @@
 import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+
 import { describe } from "../../core-test-framework";
-import { Collator } from "./";
+import { Collator } from ".";
 
 describe<{
 	container: Container;
@@ -16,17 +17,17 @@ describe<{
 	logger: any;
 }>("Collator", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
-		context.validator = { validate: () => undefined };
+		context.validator = { validate: () => {} };
 		context.createTransactionValidator = () => context.validator;
-		context.blockchain = { getLastBlock: () => undefined };
-		context.pool = { removeTransaction: () => undefined };
-		context.expirationService = { isExpired: () => undefined };
+		context.blockchain = { getLastBlock: () => {} };
+		context.pool = { removeTransaction: () => {} };
+		context.expirationService = { isExpired: () => {} };
 		context.poolQuery = {
 			getFromHighestPriority: () => {
-				all: () => undefined;
+				() => {};
 			},
 		};
-		context.logger = { warning: () => undefined, error: () => undefined };
+		context.logger = { error: () => {}, warning: () => {} };
 
 		context.container = new Container();
 		context.container
@@ -52,7 +53,7 @@ describe<{
 			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
+		const milestone = { block: { idFullSha256: true, maxPayload: 2_097_152, maxTransactions: 5 } };
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
@@ -80,7 +81,7 @@ describe<{
 			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 141 + 10 + 4 + 10 + 7 } };
+		const milestone = { block: { idFullSha256: true, maxPayload: 141 + 10 + 4 + 10 + 7, maxTransactions: 5 } };
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
@@ -108,7 +109,7 @@ describe<{
 			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
+		const milestone = { block: { idFullSha256: true, maxPayload: 2_097_152, maxTransactions: 5 } };
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
@@ -142,7 +143,7 @@ describe<{
 			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 2097152 } };
+		const milestone = { block: { idFullSha256: true, maxPayload: 2_097_152, maxTransactions: 5 } };
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);

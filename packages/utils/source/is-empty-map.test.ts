@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isEmptyMap } from "./is-empty-map";
 
 describe("isEmptyMap", async ({ assert, it, nock, loader }) => {

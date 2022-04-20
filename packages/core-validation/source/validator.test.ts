@@ -11,15 +11,15 @@ import { validator } from "../validation";
 describe("validator", ({ it, assert }) => {
 	it("transaction - should expect a timestamp if version = 1 or absent", () => {
 		const transaction = {
-			type: 0,
 			amount: BigNumber.make(1000),
-			fee: BigNumber.make(2000),
-			recipientId: "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh",
 			asset: {},
+			fee: BigNumber.make(2000),
+			id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
+			recipientId: "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh",
 			senderPublicKey: "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
 			signature:
 				"618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-			id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
+			type: 0,
 		} as ITransactionData;
 
 		assert.equal(
@@ -39,15 +39,15 @@ describe("validator", ({ it, assert }) => {
 
 	it("transaction - should expect a nonce if version = 2 or higher", () => {
 		const transaction = {
-			type: 0,
 			amount: BigNumber.make(1000),
-			fee: BigNumber.make(2000),
-			recipientId: "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh",
 			asset: {},
+			fee: BigNumber.make(2000),
+			id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
+			recipientId: "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh",
 			senderPublicKey: "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
 			signature:
 				"618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-			id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
+			type: 0,
 		} as ITransactionData;
 
 		transaction.version = 2;
@@ -63,16 +63,16 @@ describe("validator", ({ it, assert }) => {
 
 	it("validate - transaction", () => {
 		const transaction = {
-			type: 0,
 			amount: BigNumber.make(1000),
-			fee: BigNumber.make(2000),
-			recipientId: "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh",
-			timestamp: 141_738,
 			asset: {},
+			fee: BigNumber.make(2000),
+			id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
+			recipientId: "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh",
 			senderPublicKey: "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
 			signature:
 				"618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-			id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
+			timestamp: 141_738,
+			type: 0,
 		};
 
 		assert.undefined(validator.validate("transferSigned", transaction).error);
@@ -94,7 +94,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("publicKey", "").error);
 		assert.defined(validator.validate("publicKey", 1234).error);
 		assert.defined(validator.validate("publicKey", null).error);
-		assert.defined(validator.validate("publicKey", undefined).error);
+		assert.defined(validator.validate("publicKey").error);
 	});
 
 	it("validate - address - should be ok", () => {
@@ -110,7 +110,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("address", "").error);
 		assert.defined(validator.validate("address", 1234).error);
 		assert.defined(validator.validate("address", null).error);
-		assert.defined(validator.validate("address", undefined).error);
+		assert.defined(validator.validate("address").error);
 	});
 
 	it("validate - hex - should be ok", () => {
@@ -122,7 +122,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("hex", 1).error);
 		assert.defined(validator.validate("hex", "").error);
 		assert.defined(validator.validate("hex", null).error);
-		assert.defined(validator.validate("hex", undefined).error);
+		assert.defined(validator.validate("hex").error);
 	});
 
 	it("validate - base58 - should be ok", () => {
@@ -134,7 +134,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("base58", 1).error);
 		assert.defined(validator.validate("base58", "").error);
 		assert.defined(validator.validate("base58", null).error);
-		assert.defined(validator.validate("base58", undefined).error);
+		assert.defined(validator.validate("base58").error);
 	});
 
 	it("validate - alphanumeric - should be ok", () => {
@@ -149,7 +149,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("alphanumeric", 1).error);
 		assert.defined(validator.validate("alphanumeric", "").error);
 		assert.defined(validator.validate("alphanumeric", null).error);
-		assert.defined(validator.validate("alphanumeric", undefined).error);
+		assert.defined(validator.validate("alphanumeric").error);
 	});
 
 	it("validate - transactionId - should be ok", () => {
@@ -175,7 +175,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("transactionId", 1).error);
 		assert.defined(validator.validate("transactionId", "").error);
 		assert.defined(validator.validate("transactionId", null).error);
-		assert.defined(validator.validate("transactionId", undefined).error);
+		assert.defined(validator.validate("transactionId").error);
 	});
 
 	it("validate - walletVote - should be ok", () => {
@@ -199,7 +199,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("walletVote", 1234).error);
 		assert.defined(validator.validate("walletVote", "").error);
 		assert.defined(validator.validate("walletVote", null).error);
-		assert.defined(validator.validate("walletVote", undefined).error);
+		assert.defined(validator.validate("walletVote").error);
 	});
 
 	it("validate - delegateUsername - should be ok", () => {
@@ -213,7 +213,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("delegateUsername", 1234).error);
 		assert.defined(validator.validate("delegateUsername", "").error);
 		assert.defined(validator.validate("delegateUsername", null).error);
-		assert.defined(validator.validate("delegateUsername", undefined).error);
+		assert.defined(validator.validate("delegateUsername").error);
 	});
 
 	it("block should be ok", () => {

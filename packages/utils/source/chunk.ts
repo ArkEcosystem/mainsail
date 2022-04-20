@@ -7,9 +7,9 @@ export const chunk = <T>(iterable: T[], chunkSize: number): T[][] => {
 		return [];
 	}
 
-	let index: number = 0;
-	let resIndex: number = 0;
-	const result: T[][] = Array(Math.ceil(iterableLength / chunkSize));
+	let index = 0;
+	let resIndex = 0;
+	const result: T[][] = new Array(Math.ceil(iterableLength / chunkSize));
 
 	while (index < iterableLength) {
 		result[resIndex++] = slice<T>(iterable, index, (index += chunkSize));

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { formatString } from "./format-string";
 
 describe("#formatString", ({ it, assert }) => {

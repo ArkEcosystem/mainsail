@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { numberArray } from "./number-array";
 import { shuffle } from "./shuffle";
 

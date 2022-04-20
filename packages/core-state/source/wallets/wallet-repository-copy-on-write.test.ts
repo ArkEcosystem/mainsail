@@ -1,9 +1,9 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { describeSkip } from "../../../core-test-framework";
 
+import { describeSkip } from "../../../core-test-framework";
 import { setUp } from "../../test/setup";
-import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from "./";
+import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from ".";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
 
 describeSkip<{
@@ -11,10 +11,10 @@ describeSkip<{
 	walletRepo: WalletRepository;
 }>("Wallet Repository Copy On Write", ({ it, assert, afterEach, beforeAll, spy }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.walletRepoCopyOnWrite = env.walletRepoCopyOnWrite;
-		context.walletRepo = env.walletRepo;
+		context.walletRepoCopyOnWrite = environment.walletRepoCopyOnWrite;
+		context.walletRepo = environment.walletRepo;
 	});
 
 	afterEach((context) => {
@@ -144,10 +144,10 @@ describeSkip<{
 		const wallet = context.walletRepo.createWallet("abcdef");
 		context.walletRepo.index(wallet);
 
-		const tempWallet = context.walletRepoCopyOnWrite.findByAddress(wallet.getAddress());
-		tempWallet.setBalance(BigNumber.ONE);
+		const temporaryWallet = context.walletRepoCopyOnWrite.findByAddress(wallet.getAddress());
+		temporaryWallet.setBalance(BigNumber.ONE);
 
-		assert.not.equal(wallet.getBalance(), tempWallet.getBalance());
+		assert.not.equal(wallet.getBalance(), temporaryWallet.getBalance());
 	});
 
 	it("findByPublicKey - should return a copy", async (context) => {
@@ -156,11 +156,11 @@ describeSkip<{
 		wallet.setBalance(BigNumber.SATOSHI);
 		context.walletRepo.index(wallet);
 
-		const tempWallet = await context.walletRepoCopyOnWrite.findByPublicKey(wallet.getPublicKey()!);
-		tempWallet.setBalance(BigNumber.ZERO);
+		const temporaryWallet = await context.walletRepoCopyOnWrite.findByPublicKey(wallet.getPublicKey()!);
+		temporaryWallet.setBalance(BigNumber.ZERO);
 
 		assert.equal(wallet.getBalance(), BigNumber.SATOSHI);
-		assert.equal(tempWallet.getBalance(), BigNumber.ZERO);
+		assert.equal(temporaryWallet.getBalance(), BigNumber.ZERO);
 	});
 
 	it("findByUsername - should return a copy", (context) => {
@@ -168,10 +168,10 @@ describeSkip<{
 		wallet.setAttribute("delegate", { username: "test" });
 		context.walletRepo.index(wallet);
 
-		const tempWallet = context.walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("delegate.username"));
-		tempWallet.setBalance(BigNumber.ONE);
+		const temporaryWallet = context.walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("delegate.username"));
+		temporaryWallet.setBalance(BigNumber.ONE);
 
-		assert.not.equal(wallet.getBalance(), tempWallet.getBalance());
+		assert.not.equal(wallet.getBalance(), temporaryWallet.getBalance());
 	});
 
 	it("hasByAddress - should be ok", (context) => {

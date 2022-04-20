@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Services } from "@arkecosystem/core-kernel";
-import { MemoryQueue } from "@arkecosystem/core-kernel/distribution/services/queue/drivers/memory";
 import { Actions } from "@arkecosystem/core-state";
 import { BigNumber } from "@arkecosystem/utils";
 import delay from "delay";
@@ -46,25 +45,27 @@ describe<{
 		context.stateStore = {
 			blockPing: undefined,
 			clearWakeUpTimeout: () => {},
+
+			getBlockPing: () => {},
+
+			getLastBlock: () => {},
 			// getGenesisBlock: () => ({ data: Networks.testnet.genesisBlock }),
 			getLastDownloadedBlock: () => {},
 			getMaxLastBlocks: () => 200,
 			getNetworkStart: () => false,
-			getLastBlock: () => {},
 			getNumberOfBlocksToRollback: () => 0,
 			isStarted: () => {},
+			pingBlock: () => {},
 			pushPingBlock: () => {},
 			reset: () => {},
-			getBlockPing: () => {},
 			setForkedBlock: () => {},
-			pingBlock: () => {},
-			wakeUpTimeout: undefined,
 			setLastBlock: () => {},
 			setLastDownloadedBlock: () => {},
 			setLastStoredBlockHeight: () => {},
 			setNetworkStart: () => {},
 			setNumberOfBlocksToRollback: () => {},
 			setWakeUpTimeout: () => {},
+			wakeUpTimeout: undefined,
 		};
 		context.databaseService = {
 			deleteRound: () => {},
@@ -114,18 +115,18 @@ describe<{
 
 		context.slots = {
 			getSlotNumber: () => {},
-			getTimeInMsUntilNextSlot: () => {},
 			getTime: () => 0,
+			getTimeInMsUntilNextSlot: () => {},
 		};
 
 		context.queue = {
-			on: () => {},
-			stop: () => {},
-			pause: () => {},
-			drain: () => {},
 			clear: () => {},
+			drain: () => {},
+			on: () => {},
+			pause: () => {},
 			push: () => {},
 			resume: () => {},
+			stop: () => {},
 		};
 
 		context.blockData = { height: 30_122 } as Contracts.Crypto.IBlockData;
@@ -141,41 +142,41 @@ describe<{
 		};
 		context.blockHeight2 = {
 			data: {
-				height: 2,
-				generatorPublicKey: "026c598170201caf0357f202ff14f365a3b09322071e347873869f58d776bfc565",
-				id: "17882607875259085966",
 				blockSignature:
 					"3045022100e7385c6ea42bd950f7f6ab8c8619cf2f66a41d8f8f185b0bc99af032cb25f30d02200b6210176a6cedfdcbe483167fd91c21d740e0e4011d24d679c601fdd46b0de9",
-				numberOfTransactions: 0,
 				createdAt: "2018-09-11T16:48:50.550Z",
-				payloadLength: 0,
+				generatorPublicKey: "026c598170201caf0357f202ff14f365a3b09322071e347873869f58d776bfc565",
+				height: 2,
+				id: "17882607875259085966",
+				numberOfTransactions: 0,
 				payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				payloadLength: 0,
 				previousBlock: "17184958558311101492",
 				reward: BigNumber.make("0"),
 				timestamp: 46_583_330,
 				totalAmount: BigNumber.make("0"),
-				version: 0,
 				totalFee: BigNumber.make("0"),
+				version: 0,
 			},
 			transactions: [],
 		};
 		context.blockHeight3 = {
 			data: {
-				height: 3,
-				generatorPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
-				id: "7242383292164246617",
 				blockSignature:
 					"304402204087bb1d2c82b9178b02b9b3f285de260cdf0778643064fe6c7aef27321d49520220594c57009c1fca543350126d277c6adeb674c00685a464c3e4bf0d634dc37e39",
-				numberOfTransactions: 0,
 				createdAt: "2018-09-11T16:48:58.431Z",
-				payloadLength: 0,
+				generatorPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
+				height: 3,
+				id: "7242383292164246617",
+				numberOfTransactions: 0,
 				payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				payloadLength: 0,
 				previousBlock: "17882607875259085966",
 				reward: BigNumber.make("0"),
 				timestamp: 46_583_338,
 				totalAmount: BigNumber.make("0"),
-				version: 0,
 				totalFee: BigNumber.make("0"),
+				version: 0,
 			},
 			transactions: [],
 		};
@@ -212,9 +213,7 @@ describe<{
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
 
-		context.sandbox.app.bind(Identifiers.QueueFactory).toFactory(() => () => {
-			return context.queue;
-		});
+		context.sandbox.app.bind(Identifiers.QueueFactory).toFactory(() => () => context.queue);
 
 		const getTimeStampForBlock = (height: number) => {
 			switch (height) {

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { getPathSegments } from "./get-path-segments";
 
 describe("getPathSegments", async ({ assert, it, nock, loader }) => {

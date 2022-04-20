@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { compoundWords } from "./compound-words";
 
 describe("#compoundWords", ({ it, assert }) => {

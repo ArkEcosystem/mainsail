@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { ordinal } from "./ordinal";
 
 describe("ordinal", async ({ assert, it, nock, loader }) => {
@@ -11,9 +10,9 @@ describe("ordinal", async ({ assert, it, nock, loader }) => {
 		assert.is(ordinal(10), "10th");
 		assert.is(ordinal(100), "100th");
 		assert.is(ordinal(1000), "1000th");
-		assert.is(ordinal(10000), "10000th");
-		assert.is(ordinal(100000), "100000th");
-		assert.is(ordinal(1000000), "1000000th");
-		assert.is(ordinal(10000000), "10000000th");
+		assert.is(ordinal(10_000), "10000th");
+		assert.is(ordinal(100_000), "100000th");
+		assert.is(ordinal(1_000_000), "1000000th");
+		assert.is(ordinal(10_000_000), "10000000th");
 	});
 });

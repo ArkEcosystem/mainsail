@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { numberToHex } from "./number-to-hex";
 
 describe("numberToHex", async ({ assert, it, nock, loader }) => {

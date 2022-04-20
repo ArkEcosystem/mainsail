@@ -1,6 +1,6 @@
-import { describe } from "../../../core-test-framework";
-
 import { Exceptions } from "@arkecosystem/core-contracts";
+
+import { describe } from "../../../core-test-framework";
 
 describe("WalletErrors", ({ it, assert }) => {
 	it("should construct base wallet error", () => {

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { mapObject } from "./map-object";
 
 describe("mapObject", async ({ assert, it, nock, loader }) => {

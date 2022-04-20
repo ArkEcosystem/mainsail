@@ -1,7 +1,6 @@
-// eslint-disable-next-line simple-import-sort/imports
-import { join } from "path";
-import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { existsSync, removeSync, writeFileSync } from "fs-extra";
+import { join } from "path";
 
 import { Bootstrappers } from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
@@ -156,6 +155,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
 			"kernel.maintenance",
 			true,
@@ -167,6 +167,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
 			"kernel.maintenance",
 			false,

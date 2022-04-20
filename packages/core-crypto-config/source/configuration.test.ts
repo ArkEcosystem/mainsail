@@ -1,7 +1,6 @@
 import { describe } from "../../core-test-framework";
-
-import { devnet, mainnet, testnet } from "../networks";
-import { configManager } from "./";
+import { devnet, mainnet } from "../networks";
+import { configManager } from ".";
 
 describe<{
 	config: any;
@@ -92,9 +91,9 @@ describe<{
 	it("getNextMilestoneByKey - should get the next milestone with a given key", () => {
 		configManager.setConfig(devnet);
 		const expected = {
+			data: 255,
 			found: true,
 			height: 1_750_000,
-			data: 255,
 		};
 		assert.equal(configManager.getNextMilestoneWithNewKey(1, "vendorFieldLength"), expected);
 	});
@@ -102,41 +101,41 @@ describe<{
 	it("getNextMilestoneByKey - should return empty result if no next milestone is found", () => {
 		configManager.setConfig(devnet);
 		const expected = {
+			data: null,
 			found: false,
 			height: 1_750_000,
-			data: null,
 		};
 		assert.equal(configManager.getNextMilestoneWithNewKey(1_750_000, "vendorFieldLength"), expected);
 	});
 
 	it("getNextMilestoneByKey - should get all milestones", () => {
 		const milestones = [
-			{ height: 1, blocktime: 8 },
-			{ height: 3, blocktime: 9 },
-			{ height: 6, blocktime: 10 },
-			{ height: 8, blocktime: 8 },
+			{ blocktime: 8, height: 1 },
+			{ blocktime: 9, height: 3 },
+			{ blocktime: 10, height: 6 },
+			{ blocktime: 8, height: 8 },
 		];
 		const config = { ...devnet, milestones };
 		configManager.setConfig(config);
 		const secondMilestone = {
+			data: 9,
 			found: true,
 			height: 3,
-			data: 9,
 		};
 		const thirdMilestone = {
+			data: 10,
 			found: true,
 			height: 6,
-			data: 10,
 		};
 		const fourthMilestone = {
+			data: 8,
 			found: true,
 			height: 8,
-			data: 8,
 		};
 		const emptyMilestone = {
+			data: null,
 			found: false,
 			height: 8,
-			data: null,
 		};
 		assert.equal(configManager.getNextMilestoneWithNewKey(1, "blocktime"), secondMilestone);
 		assert.equal(configManager.getNextMilestoneWithNewKey(3, "blocktime"), thirdMilestone);

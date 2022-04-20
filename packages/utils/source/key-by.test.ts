@@ -1,19 +1,18 @@
 import { describe } from "../../core-test-framework";
-
 import { keyBy } from "./key-by";
 
 describe("keyBy", async ({ assert, it, nock, loader }) => {
 	it("should work with a function", () => {
 		const array = [
-			{ dir: "left", code: 97 },
-			{ dir: "right", code: 100 },
+			{ code: 97, dir: "left" },
+			{ code: 100, dir: "right" },
 		];
 
 		assert.equal(
 			keyBy(array, (o) => String.fromCharCode(o.code)),
 			{
-				a: { dir: "left", code: 97 },
-				d: { dir: "right", code: 100 },
+				a: { code: 97, dir: "left" },
+				d: { code: 100, dir: "right" },
 			},
 		);
 	});

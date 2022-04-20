@@ -1,9 +1,7 @@
 export const max = (values: number[]): number => {
 	let max: number = values[0];
 
-	for (let i = 0; i < values.length; i++) {
-		const value: number = values[i];
-
+	for (const value of values) {
 		max = value > max ? value : max;
 	}
 

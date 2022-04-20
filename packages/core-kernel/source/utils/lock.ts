@@ -29,7 +29,7 @@ export class Lock {
 
 		const exclusivePromise = (async () => {
 			await Promise.all(
-				Array.from(this.#nonExclusivePromises).map(async (nonExclusivePromise) => {
+				[...this.#nonExclusivePromises].map(async (nonExclusivePromise) => {
 					try {
 						await nonExclusivePromise;
 					} catch {}

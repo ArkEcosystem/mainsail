@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { startCase } from "./start-case";
 
 describe("startCase", async ({ assert, it, nock, loader }) => {

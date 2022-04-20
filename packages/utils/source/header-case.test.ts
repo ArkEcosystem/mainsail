@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { headerCase } from "./header-case";
 
 describe("headerCase", async ({ assert, it, nock, loader }) => {

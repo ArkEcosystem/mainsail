@@ -49,9 +49,9 @@ export interface Updater {
 }
 
 export interface Installer {
-	install(pkg: string): void;
+	install(package_: string): void;
 
-	installFromChannel(pkg: string, channel: string): void;
+	installFromChannel(package_: string, channel: string): void;
 }
 
 export interface Plugin {
@@ -63,11 +63,11 @@ export interface Plugin {
 export interface PluginManager {
 	list(token: string, network: string): Promise<Plugin[]>;
 
-	install(token: string, network: string, pkg: string, version?: string): Promise<void>;
+	install(token: string, network: string, package_: string, version?: string): Promise<void>;
 
-	update(token: string, network: string, pkg: string): Promise<void>;
+	update(token: string, network: string, package_: string): Promise<void>;
 
-	remove(token: string, network: string, pkg: string): Promise<void>;
+	remove(token: string, network: string, package_: string): Promise<void>;
 }
 
 export enum ProcessState {

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { cloneObject } from "./clone-object";
 
 describe("#cloneObject", ({ it, assert }) => {

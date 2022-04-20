@@ -1,6 +1,6 @@
 import { Utils } from "@arkecosystem/core-kernel";
-import { execa } from "../../execa";
 
+import { execa } from "../../execa";
 import { AbstractSource } from "./abstract-source";
 
 export class Git extends AbstractSource {
@@ -13,10 +13,10 @@ export class Git extends AbstractSource {
 	}
 
 	public async update(value: string): Promise<void> {
-		const dest = this.getDestPath(value);
+		const destination = this.getDestPath(value);
 
-		execa.sync(`git`, ["reset", "--hard"], { cwd: dest });
-		execa.sync(`git`, ["pull"], { cwd: dest });
+		execa.sync(`git`, ["reset", "--hard"], { cwd: destination });
+		execa.sync(`git`, ["pull"], { cwd: destination });
 
 		await this.installDependencies(value);
 	}

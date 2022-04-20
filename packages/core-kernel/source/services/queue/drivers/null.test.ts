@@ -1,5 +1,4 @@
 import { describe } from "../../../../../core-test-framework";
-
 import { QueueJob } from "../../../contracts/kernel";
 import { NullQueue } from "./null";
 

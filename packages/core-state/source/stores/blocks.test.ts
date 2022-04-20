@@ -1,6 +1,6 @@
 import { Contracts } from "@arkecosystem/core-contracts";
-import { describe } from "../../../core-test-framework";
 
+import { describe } from "../../../core-test-framework";
 import { BlockStore } from "./blocks";
 
 describe("BlockStore", ({ it, assert }) => {
@@ -39,8 +39,8 @@ describe("BlockStore", ({ it, assert }) => {
 	it("should return all ids and heights in the order they were inserted", () => {
 		const store = new BlockStore(4);
 
-		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
+		for (let index = 1; index < 5; index++) {
+			store.set({ data: { height: index, id: index.toString() } } as Contracts.Crypto.IBlock);
 		}
 
 		assert.equal(store.count(), 4);
@@ -51,8 +51,8 @@ describe("BlockStore", ({ it, assert }) => {
 	it("should return whether the store contains a specific block", () => {
 		const store = new BlockStore(4);
 
-		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
+		for (let index = 1; index < 5; index++) {
+			store.set({ data: { height: index, id: index.toString() } } as Contracts.Crypto.IBlock);
 		}
 
 		assert.true(store.has({ height: 1, id: "1" } as Contracts.Crypto.IBlockData));
@@ -62,8 +62,8 @@ describe("BlockStore", ({ it, assert }) => {
 	it("should delete blocks", () => {
 		const store = new BlockStore(4);
 
-		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
+		for (let index = 1; index < 5; index++) {
+			store.set({ data: { height: index, id: index.toString() } } as Contracts.Crypto.IBlock);
 		}
 
 		store.delete({ height: 4, id: "4" } as Contracts.Crypto.IBlockData);
@@ -91,8 +91,8 @@ describe("BlockStore", ({ it, assert }) => {
 	it("should clear all blocks", () => {
 		const store = new BlockStore(4);
 
-		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Contracts.Crypto.IBlock);
+		for (let index = 1; index < 5; index++) {
+			store.set({ data: { height: index, id: index.toString() } } as Contracts.Crypto.IBlock);
 		}
 
 		assert.equal(store.count(), 4);

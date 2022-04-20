@@ -1,18 +1,18 @@
 export const lastIndexOf = <T>(subject: T[], target: T, fromIndex?: number): number => {
 	const length: number = subject.length;
-	let i = length - 1;
+	let index = length - 1;
 
 	if (fromIndex) {
-		i = fromIndex;
+		index = fromIndex;
 
-		if (i < 0) {
-			i += length;
+		if (index < 0) {
+			index += length;
 		}
 	}
 
-	for (; i >= 0; i--) {
-		if (subject[i] === target) {
-			return i;
+	for (; index >= 0; index--) {
+		if (subject[index] === target) {
+			return index;
 		}
 	}
 

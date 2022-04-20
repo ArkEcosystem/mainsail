@@ -7,12 +7,12 @@ export class Ask {
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	public async render(message: string, opts: object = {}): Promise<string> {
+	public async render(message: string, options: object = {}): Promise<string> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
 			message,
 			name: "value",
 			type: "text",
-			...opts,
+			...options,
 		});
 
 		return value as string;

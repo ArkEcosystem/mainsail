@@ -68,6 +68,7 @@ export class Listener {
 
 	async #dispatchWebhookEvent(start: number, webhook: Webhook, payload: object, error?: Error) {
 		if (error) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(WebhookEvent.Failed, {
 				error: error,
 				executionTime: performance.now() - start,
@@ -75,6 +76,7 @@ export class Listener {
 				webhook: webhook,
 			});
 		} else {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(WebhookEvent.Broadcasted, {
 				executionTime: performance.now() - start,
 				payload: payload,

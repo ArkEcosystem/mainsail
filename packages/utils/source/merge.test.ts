@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { merge } from "./merge";
 
 describe("merge", async ({ assert, it, nock, loader }) => {

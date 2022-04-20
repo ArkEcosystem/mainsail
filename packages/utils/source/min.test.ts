@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { min } from "./min";
 
 describe("min", async ({ assert, it, nock, loader }) => {

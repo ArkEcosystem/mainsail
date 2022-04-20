@@ -1,8 +1,9 @@
-import { BigNumber } from "./../../utils/source/big-number";
-import { describe } from "../../core-test-framework";
-import { SenderMempool } from "./";
 import { Container } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+
+import { describe } from "../../core-test-framework";
+import { BigNumber } from "../../utils/source/big-number";
+import { SenderMempool } from ".";
 
 describe<{
 	container: Container;
@@ -12,13 +13,13 @@ describe<{
 }>("SenderMempool.", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll(async (context) => {
 		context.configuration = {
-			getRequired: () => undefined,
-			getOptional: () => undefined,
+			getOptional: () => {},
+			getRequired: () => {},
 		};
 
 		context.senderState = {
-			apply: () => undefined,
-			revert: () => undefined,
+			apply: () => {},
+			revert: () => {},
 		};
 
 		context.container = new Container();
@@ -26,48 +27,48 @@ describe<{
 		context.container.bind(Identifiers.TransactionPoolSenderState).toConstantValue(context.senderState);
 
 		const tx1 = {
-			id: "dummy-tx-id",
-			typeGroup: 1,
-			type: 1,
-			key: "some-key",
 			data: {
-				type: 1,
-				nonce: BigNumber.make(1),
-				fee: BigNumber.make(900),
 				amount: BigNumber.make(100),
+				fee: BigNumber.make(900),
+				nonce: BigNumber.make(1),
 				senderPublicKey: "dummy-sender-key",
+				type: 1,
 			},
+			id: "dummy-tx-id",
+			key: "some-key",
 			serialized: Buffer.from("dummy"),
+			type: 1,
+			typeGroup: 1,
 		};
 
 		const tx2 = {
-			id: "dummy-tx-id-2",
-			typeGroup: 1,
-			type: 1,
-			key: "some-key-2",
 			data: {
-				type: 1,
-				nonce: BigNumber.make(2),
-				fee: BigNumber.make(900),
 				amount: BigNumber.make(100),
+				fee: BigNumber.make(900),
+				nonce: BigNumber.make(2),
 				senderPublicKey: "dummy-sender-key",
+				type: 1,
 			},
+			id: "dummy-tx-id-2",
+			key: "some-key-2",
 			serialized: Buffer.from("dummy-2"),
+			type: 1,
+			typeGroup: 1,
 		};
 
 		const tx3 = {
-			id: "dummy-tx-id-3",
-			typeGroup: 1,
-			type: 1,
-			key: "some-key-3",
 			data: {
-				type: 1,
-				nonce: BigNumber.make(3),
-				fee: BigNumber.make(900),
 				amount: BigNumber.make(100),
+				fee: BigNumber.make(900),
+				nonce: BigNumber.make(3),
 				senderPublicKey: "dummy-sender-key",
+				type: 1,
 			},
+			id: "dummy-tx-id-3",
+			key: "some-key-3",
 			serialized: Buffer.from("dummy-3"),
+			type: 1,
+			typeGroup: 1,
 		};
 
 		// @ts-ignore
@@ -146,9 +147,9 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.SenderExceededMaximumTransactionCountError);
-			assert.equal(err.type, "ERR_EXCEEDS_MAX_COUNT");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.SenderExceededMaximumTransactionCountError);
+			assert.equal(error.type, "ERR_EXCEEDS_MAX_COUNT");
 		});
 	});
 

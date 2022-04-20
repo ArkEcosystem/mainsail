@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { lowerCase } from "./lower-case";
 
 describe("lowerCase", async ({ assert, it, nock, loader }) => {

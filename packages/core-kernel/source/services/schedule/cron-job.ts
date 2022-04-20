@@ -19,6 +19,7 @@ export class CronJob implements Job {
 			// @ts-ignore
 			callback();
 
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(ScheduleEvent.CronJobFinished, {
 				executionTime: performance.now() - start,
 				expression: this.expression,

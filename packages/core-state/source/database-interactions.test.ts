@@ -1,10 +1,11 @@
-import { Enums } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-contracts";
 import { Container } from "@arkecosystem/core-container";
-import { DatabaseInteraction } from "./database-interactions";
-import { describe } from "../../core-test-framework";
-import { DatabaseService } from "../../core-database/source/database-service";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Enums } from "@arkecosystem/core-kernel";
+
 import { Configuration } from "../../core-crypto-config";
+import { DatabaseService } from "../../core-database/source/database-service";
+import { describe } from "../../core-test-framework";
+import { DatabaseInteraction } from "./database-interactions";
 
 describe<{
 	app: any;
@@ -22,89 +23,89 @@ describe<{
 }>("DatabaseInteractions", ({ it, assert, beforeAll, spy, stub, spyFn }) => {
 	beforeAll((context) => {
 		context.app = {
-			get: () => undefined,
-			terminate: () => undefined,
+			get: () => {},
+			terminate: () => {},
 		};
 
 		context.connection = {
-			query: () => undefined,
-			close: () => undefined,
+			close: () => {},
+			query: () => {},
 		};
 
 		context.blockStorage = {
-			findOne: () => undefined,
-			findByHeightRange: () => undefined,
-			findByHeightRangeWithTransactions: () => undefined,
-			findByHeightRangeWithTransactionsForDownload: () => undefined,
-			findByHeights: () => undefined,
-			findLatest: () => undefined,
-			findByIds: () => undefined,
-			findRecent: () => undefined,
-			findTop: () => undefined,
-			count: () => undefined,
-			getStatistics: () => undefined,
-			saveBlocks: () => undefined,
-			deleteBlocks: () => undefined,
+			count: () => {},
+			deleteBlocks: () => {},
+			findByHeightRange: () => {},
+			findByHeightRangeWithTransactions: () => {},
+			findByHeightRangeWithTransactionsForDownload: () => {},
+			findByHeights: () => {},
+			findByIds: () => {},
+			findLatest: () => {},
+			findOne: () => {},
+			findRecent: () => {},
+			findTop: () => {},
+			getStatistics: () => {},
+			saveBlocks: () => {},
 		};
 
 		context.blockHeightStorage = {
-			findOne: () => undefined,
-			findByHeightRange: () => undefined,
-			findByHeightRangeWithTransactions: () => undefined,
-			findByHeightRangeWithTransactionsForDownload: () => undefined,
-			findByHeights: () => undefined,
-			findLatest: () => undefined,
-			findByIds: () => undefined,
-			findRecent: () => undefined,
-			findTop: () => undefined,
-			count: () => undefined,
-			getStatistics: () => undefined,
-			saveBlocks: () => undefined,
-			deleteBlocks: () => undefined,
+			count: () => {},
+			deleteBlocks: () => {},
+			findByHeightRange: () => {},
+			findByHeightRangeWithTransactions: () => {},
+			findByHeightRangeWithTransactionsForDownload: () => {},
+			findByHeights: () => {},
+			findByIds: () => {},
+			findLatest: () => {},
+			findOne: () => {},
+			findRecent: () => {},
+			findTop: () => {},
+			getStatistics: () => {},
+			saveBlocks: () => {},
 		};
 
 		context.transactionRepository = {
-			find: () => undefined,
-			findOne: () => undefined,
-			findByBlockIds: () => undefined,
-			getStatistics: () => undefined,
+			find: () => {},
+			findByBlockIds: () => {},
+			findOne: () => {},
+			getStatistics: () => {},
 		};
 
 		context.stateStore = {
-			setGenesisBlock: () => undefined,
-			getGenesisBlock: () => undefined,
-			setLastBlock: () => undefined,
-			getLastBlock: () => undefined,
-			getLastBlocksByHeight: () => undefined,
-			getCommonBlocks: () => undefined,
-			getLastBlockIds: () => undefined,
+			getCommonBlocks: () => {},
+			getGenesisBlock: () => {},
+			getLastBlock: () => {},
+			getLastBlockIds: () => {},
+			getLastBlocksByHeight: () => {},
+			setGenesisBlock: () => {},
+			setLastBlock: () => {},
 		};
 
 		context.handlerRegistry = {
-			getActivatedHandlerForData: () => undefined,
+			getActivatedHandlerForData: () => {},
 		};
 
 		context.blockState = {
-			applyBlock: () => undefined,
-			revertBlock: () => undefined,
+			applyBlock: () => {},
+			revertBlock: () => {},
 		};
 
 		context.events = {
-			call: () => undefined,
-			dispatch: () => undefined,
+			call: () => {},
+			dispatch: () => {},
 		};
 
 		context.roundState = {
-			applyBlock: () => undefined,
-			revertBlock: () => undefined,
-			getActiveValidators: () => undefined,
-			restore: () => undefined,
-			detectMissedBlocks: () => undefined,
+			applyBlock: () => {},
+			detectMissedBlocks: () => {},
+			getActiveValidators: () => {},
+			restore: () => {},
+			revertBlock: () => {},
 		};
 
 		context.blockFactory = {
-			fromData: () => undefined,
-			fromJson: () => undefined,
+			fromData: () => {},
+			fromJson: () => {},
 		};
 
 		const container = new Container();
@@ -119,41 +120,41 @@ describe<{
 		container.bind(Identifiers.Database.BlockHeightStorage).toConstantValue(context.blockHeightStorage);
 		container.bind(Identifiers.Database.TransactionStorage).toConstantValue(context.transactionRepository);
 		container.bind(Identifiers.Database.RoundStorage).toConstantValue({
-			getRound: () => undefined,
-			save: () => undefined,
-			deleteFrom: () => undefined,
+			deleteFrom: () => {},
+			getRound: () => {},
+			save: () => {},
 		});
 		container.bind(Identifiers.Database.Service).to(DatabaseService);
 		container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		container.bind(Identifiers.StateBlockStore).toConstantValue({
-			resize: () => undefined,
+			resize: () => {},
 		});
 		container.bind(Identifiers.StateTransactionStore).toConstantValue({
-			resize: () => undefined,
+			resize: () => {},
 		});
 		container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
 		container.bind(Identifiers.WalletRepository).toConstantValue({
-			createWallet: () => undefined,
-			findByPublicKey: () => undefined,
-			findByUsername: () => undefined,
+			createWallet: () => {},
+			findByPublicKey: () => {},
+			findByUsername: () => {},
 		});
 		container.bind(Identifiers.BlockState).toConstantValue(context.blockState);
 		container.bind(Identifiers.DposState).toConstantValue({
-			buildValidatorRanking: () => undefined,
-			setValidatorsRound: () => undefined,
-			getRoundValidators: () => undefined,
+			buildValidatorRanking: () => {},
+			getRoundValidators: () => {},
+			setValidatorsRound: () => {},
 		});
-		container.bind(Identifiers.DposPreviousRoundStateProvider).toConstantValue(() => undefined);
+		container.bind(Identifiers.DposPreviousRoundStateProvider).toConstantValue(() => {});
 		container.bind(Identifiers.TriggerService).toConstantValue({
-			call: () => undefined,
+			call: () => {},
 		});
 		container.bind(Identifiers.EventDispatcherService).toConstantValue(context.events);
 
 		container.bind(Identifiers.LogService).toConstantValue({
-			error: () => undefined,
-			warning: () => undefined,
-			info: () => undefined,
-			debug: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
 		});
 
 		container.bind(Identifiers.RoundState).toConstantValue(context.roundState);
@@ -211,12 +212,12 @@ describe<{
 
 		const databaseInteraction = context.container.resolve<DatabaseInteraction>(DatabaseInteraction);
 
-		const block101data = { id: "block101", height: 101 };
-		const block102data = { id: "block102", height: 102 };
-		const block103data = { id: "block103", height: 103 };
-		const block104data = { id: "block104", height: 104 };
-		const block105data = { id: "block105", height: 105 };
-		const block106data = { id: "block106", height: 106 };
+		const block101data = { height: 101, id: "block101" };
+		const block102data = { height: 102, id: "block102" };
+		const block103data = { height: 103, id: "block103" };
+		const block104data = { height: 104, id: "block104" };
+		const block105data = { height: 105, id: "block105" };
+		const block106data = { height: 106, id: "block106" };
 
 		const blockRepoLatestStub = stub(context.blockStorage, "findLatest");
 		const transRepoStub = stub(context.transactionRepository, "findByBlockIds");
@@ -308,7 +309,7 @@ describe<{
 
 		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
-		const handler = { emitEvents: () => undefined };
+		const handler = { emitEvents: () => {} };
 		const spied = spy(handler, "emitEvents");
 		stub(context.handlerRegistry, "getActivatedHandlerForData").returnValueOnce(handler);
 		const transaction = { data: { id: "dummy_id" } };
@@ -334,7 +335,7 @@ describe<{
 		const transaction1 = { data: {} };
 		const transaction2 = { data: {} };
 		const block = {
-			data: { id: "123", height: 100 },
+			data: { height: 100, id: "123" },
 			transactions: [transaction1, transaction2],
 		};
 

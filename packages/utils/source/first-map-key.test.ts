@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { firstMapKey } from "./first-map-key";
 
 describe("#firstMapKey", ({ it, assert }) => {

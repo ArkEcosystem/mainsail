@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { findIndex } from "./find-index";
 
 describe("#findIndex", ({ it, assert }) => {
@@ -7,9 +6,9 @@ describe("#findIndex", ({ it, assert }) => {
 		assert.equal(
 			findIndex(
 				[
-					{ user: "barney", active: false },
-					{ user: "fred", active: false },
-					{ user: "pebbles", active: true },
+					{ active: false, user: "barney" },
+					{ active: false, user: "fred" },
+					{ active: true, user: "pebbles" },
 				],
 				(o) => o.user === "fred",
 			),
@@ -19,9 +18,9 @@ describe("#findIndex", ({ it, assert }) => {
 		assert.equal(
 			findIndex(
 				[
-					{ user: "barney", active: false },
-					{ user: "fred", active: false },
-					{ user: "pebbles", active: true },
+					{ active: false, user: "barney" },
+					{ active: false, user: "fred" },
+					{ active: true, user: "pebbles" },
 				],
 				(o) => o.active,
 			),
@@ -31,9 +30,9 @@ describe("#findIndex", ({ it, assert }) => {
 		assert.equal(
 			findIndex(
 				[
-					{ user: "barney", active: false },
-					{ user: "fred", active: false },
-					{ user: "pebbles", active: true },
+					{ active: false, user: "barney" },
+					{ active: false, user: "fred" },
+					{ active: true, user: "pebbles" },
 				],
 				(o) => o.user === "john",
 			),

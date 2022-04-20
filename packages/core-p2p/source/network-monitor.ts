@@ -105,6 +105,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#scheduleUpdateNetworkStatus(nextRunDelaySeconds);
 	}
 
@@ -129,7 +130,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
 		// in that case we want to keep on with our program execution while ping promises can finish in the background
-		await new Promise<void>((resolve) => {
+		await new Promise<void>(async (resolve) => {
 			let isResolved = false;
 
 			// Simulates Promise.race, but doesn't cause "multipleResolvers" process error
@@ -140,7 +141,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 				}
 			};
 
-			Promise.all(
+			await Promise.all(
 				peers.map(async (peer) => {
 					try {
 						await this.communicator.ping(peer, pingDelay, forcePing);
@@ -152,12 +153,13 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 						await this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
 
+						// eslint-disable-next-line @typescript-eslint/no-floating-promises
 						this.events.dispatch(Enums.PeerEvent.Removed, peer);
 					}
 				}),
 			).then(resolvesFirst);
 
-			delay(pingDelay).finally(resolvesFirst);
+			await delay(pingDelay).finally(resolvesFirst);
 		});
 
 		for (const key of Object.keys(peerErrors)) {
@@ -222,11 +224,13 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						.call("validateAndAcceptPeer", { options: { lessVerbose: true }, peer: p }),
 				),
 			);
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.#pingPeerPorts(pingAll);
 
 			return true;
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#pingPeerPorts();
 
 		return false;
@@ -529,7 +533,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		this.logger.debug(`Checking ports of ${Utils.pluralize("peer", peers.length, true)}.`);
 
-		Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
+		await Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
 	}
 
 	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
@@ -543,6 +547,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		this.nextUpdateNetworkStatusScheduled = false;
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.updateNetworkStatus();
 	}
 
@@ -572,6 +577,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		} catch {}
 
 		if (!peerList || peerList.length === 0) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.app.terminate("No seed peers defined in peers.json");
 		}
 

@@ -35,9 +35,9 @@ export class DiscoverCommands {
 			return commands;
 		}
 
-		for (const pkg of packages) {
+		for (const package_ of packages) {
 			try {
-				for (const CMD of require(pkg).Commands) {
+				for (const CMD of require(package_).Commands) {
 					const commandInstance: Command = this.app.resolve(CMD);
 
 					if (!commandInstance.isHidden) {

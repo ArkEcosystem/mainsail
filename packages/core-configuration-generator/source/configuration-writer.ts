@@ -3,7 +3,7 @@ import { Contracts } from "@arkecosystem/core-contracts";
 import { Types } from "@arkecosystem/core-kernel";
 import { stringifySync } from "envfile";
 import { writeFileSync, writeJSONSync } from "fs-extra";
-import { join } from "path";
+import path from "path";
 
 import { EnviromentData, Wallet } from "./contracts";
 import { Identifiers } from "./identifiers";
@@ -14,18 +14,18 @@ export class ConfigurationWriter {
 	private configurationPath: string;
 
 	writeApp(appData: Types.JsonObject): void {
-		writeJSONSync(join(this.configurationPath, "app.json"), appData, {
+		writeJSONSync(path.join(this.configurationPath, "app.json"), appData, {
 			spaces: 4,
 		});
 	}
 
 	writeEnvironment(environment: EnviromentData): void {
-		writeFileSync(join(this.configurationPath, ".env"), stringifySync(environment));
+		writeFileSync(path.join(this.configurationPath, ".env"), stringifySync(environment));
 	}
 
 	writePeers(peers: { port: number; ip: string }[]) {
 		writeJSONSync(
-			join(this.configurationPath, "peers.json"),
+			path.join(this.configurationPath, "peers.json"),
 			{ list: peers },
 			{
 				spaces: 4,
@@ -34,14 +34,14 @@ export class ConfigurationWriter {
 	}
 
 	writeGenesisWallet(wallet: Wallet): void {
-		writeJSONSync(join(this.configurationPath, "genesis-wallet.json"), wallet, {
+		writeJSONSync(path.join(this.configurationPath, "genesis-wallet.json"), wallet, {
 			spaces: 4,
 		});
 	}
 
 	writeValidators(mnemonics: string[]): void {
 		writeJSONSync(
-			join(this.configurationPath, "validators.json"),
+			path.join(this.configurationPath, "validators.json"),
 			{
 				secrets: mnemonics,
 			},
@@ -57,7 +57,7 @@ export class ConfigurationWriter {
 		network: Contracts.Crypto.Network,
 	): void {
 		writeJSONSync(
-			join(this.configurationPath, "crypto.json"),
+			path.join(this.configurationPath, "crypto.json"),
 			{
 				genesisBlock,
 				milestones,

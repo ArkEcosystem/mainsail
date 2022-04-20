@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { findKey } from "./find-key";
 
 describe("#findKey", ({ it, assert }) => {
@@ -7,9 +6,9 @@ describe("#findKey", ({ it, assert }) => {
 		assert.equal(
 			findKey(
 				{
-					barney: { age: 36, active: true },
-					fred: { age: 40, active: false },
-					pebbles: { age: 1, active: true },
+					barney: { active: true, age: 36 },
+					fred: { active: false, age: 40 },
+					pebbles: { active: true, age: 1 },
 				},
 				(o) => o.age < 40,
 			),

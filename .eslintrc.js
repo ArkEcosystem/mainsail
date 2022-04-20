@@ -76,7 +76,6 @@ module.exports = {
 		"import/no-unused-modules": "warn",
 		"import/no-useless-path-segments": "warn",
 		"import/no-webpack-loader-syntax": "warn",
-		"import/order": "warn",
 		"no-async-promise-executor": "off",
 		"no-prototype-builtins": "off",
 		"no-nested-ternary": "warn",

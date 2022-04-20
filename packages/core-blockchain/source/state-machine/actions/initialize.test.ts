@@ -1,9 +1,9 @@
 import { Container } from "@arkecosystem/core-container";
-import { Identifiers, Constants } from "@arkecosystem/core-contracts";
+import { Constants, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
+
 // import { Managers } from "@arkecosystem/crypto";
 import { describe } from "../../../../core-test-framework";
-
 import { Initialize } from "./initialize";
 
 describe<{
@@ -21,46 +21,46 @@ describe<{
 }>("Initialize", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
-			warning: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
-			notice: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			notice: () => {},
+			warning: () => {},
 		};
 		context.blockchain = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 		};
 		context.stateStore = {
-			getLastBlock: () => undefined,
-			setLastBlock: () => undefined,
+			getLastBlock: () => {},
 			getNetworkStart: () => false,
 			getRestoredDatabaseIntegrity: () => false,
+			setLastBlock: () => {},
 		};
 		context.transactionPool = {
-			readdTransactions: () => undefined,
+			readdTransactions: () => {},
 		};
 		context.databaseService = {
-			verifyBlockchain: () => undefined,
-			deleteRound: () => undefined,
+			deleteRound: () => {},
+			verifyBlockchain: () => {},
 		};
 		context.databaseInteractions = {
-			walletRepository: {
-				getNonce: () => undefined,
-			},
-			restoreCurrentRound: () => undefined,
-			applyBlock: () => undefined,
-			getTopBlocks: () => undefined,
-			getLastBlock: () => undefined,
-			loadBlocksFromCurrentRound: () => undefined,
-			revertBlock: () => undefined,
-			deleteRound: () => undefined,
+			applyBlock: () => {},
+			deleteRound: () => {},
 			getActiveDelegates: () => [],
+			getLastBlock: () => {},
+			getTopBlocks: () => {},
+			loadBlocksFromCurrentRound: () => {},
+			restoreCurrentRound: () => {},
+			revertBlock: () => {},
+			walletRepository: {
+				getNonce: () => {},
+			},
 		};
 		context.peerNetworkMonitor = {
-			boot: () => undefined,
+			boot: () => {},
 		};
 		context.stateBuilder = {
-			run: () => undefined,
+			run: () => {},
 		};
 
 		context.configuration = {
@@ -90,8 +90,8 @@ describe<{
 
 		const lastBlock = {
 			data: {
-				id: "345",
 				height: 5554,
+				id: "345",
 			},
 		};
 		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
@@ -122,8 +122,8 @@ describe<{
 
 		const lastBlock = {
 			data: {
-				id: "345",
 				height: 5554,
+				id: "345",
 			},
 		};
 
@@ -143,8 +143,8 @@ describe<{
 
 		const lastBlock = {
 			data: {
-				id: "345",
 				height: 5554,
+				id: "345",
 			},
 		};
 		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
@@ -164,8 +164,8 @@ describe<{
 
 		const lastBlock = {
 			data: {
-				id: "345",
 				height: 1,
+				id: "345",
 				payloadHash: "6d84d08bd299ed97c212c886c98a57e36545c8f5d645ca7eeae63a8bd62d8988",
 			},
 		};
@@ -186,8 +186,8 @@ describe<{
 
 		const lastBlock = {
 			data: {
-				id: "345",
 				height: 1,
+				id: "345",
 				payloadHash: "6d84d08bd299ed97c212c886c98a57e36545c8f5d645ca7eeae63a8bd62d8988",
 			},
 		};
@@ -213,8 +213,8 @@ describe<{
 
 		const lastBlock = {
 			data: {
-				id: "345",
 				height: 334,
+				id: "345",
 			},
 		};
 		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
@@ -235,8 +235,8 @@ describe<{
 
 		const lastBlock = {
 			data: {
-				id: "345",
 				height: 334,
+				id: "345",
 			},
 		};
 		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });

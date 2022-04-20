@@ -6,11 +6,11 @@ import {
 	MultiSignatureKeyCountMismatchError,
 	MultiSignatureMinimumKeysError,
 } from "@arkecosystem/core-errors";
-import { Application, Container, Exceptions, Services } from "@arkecosystem/core-kernel";
+import { Application, Exceptions, Services } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, getWalletAttributeSet, passphrases } from "@arkecosystem/core-test-framework";
 import { Mempool } from "@arkecosystem/core-transaction-pool";
-import { Crypto, Enums, Errors, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { Crypto, Enums, Errors, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";

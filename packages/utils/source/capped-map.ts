@@ -12,7 +12,7 @@ export class CappedMap<K, V> {
 
 	public set(key: K, value: V): void {
 		if (this.store.size >= this.#maxSize) {
-			this.store.delete(Array.from(this.store)[0][0]);
+			this.store.delete([...this.store][0][0]);
 		}
 
 		this.store = this.store.set(key, value);
@@ -40,16 +40,16 @@ export class CappedMap<K, V> {
 		this.#maxSize = maxSize;
 
 		if (this.store.size > this.#maxSize) {
-			this.store = new Map<K, V>(Array.from(this.store).slice(-Math.max(0, this.#maxSize)));
+			this.store = new Map<K, V>([...this.store].slice(-Math.max(0, this.#maxSize)));
 		}
 	}
 
 	public first(): V {
-		return Array.from(this.store)[0][1];
+		return [...this.store][0][1];
 	}
 
 	public last(): V {
-		return Array.from(this.store)[this.store.size - 1][1];
+		return [...this.store][this.store.size - 1][1];
 	}
 
 	public keys(): K[] {

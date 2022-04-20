@@ -1,22 +1,28 @@
 import { constants } from "./constants";
 
 export const replySchemas = {
+	getBlocks: {
+		items: {
+			$ref: "blockHeader",
+		},
+		maxItems: 400,
+		type: "array",
+	},
 	getCommonBlocks: {
-		type: "object",
 		additionalProperties: false,
 		properties: {
 			common: {
 				anyOf: [
 					{
-						type: "object",
 						properties: {
 							height: {
-								type: "integer",
 								minimum: 1,
+								type: "integer",
 							},
 							id: { blockId: {} },
 						},
 						required: ["height", "id"],
+						type: "object",
 					},
 					{
 						type: "null",
@@ -25,92 +31,53 @@ export const replySchemas = {
 			},
 		},
 		required: ["common"],
+		type: "object",
 	},
 	getPeers: {
-		type: "array",
-		maxItems: constants.MAX_PEERS_GETPEERS,
 		items: {
-			type: "object",
 			properties: {
 				ip: {
 					anyOf: [
 						{
-							type: "string",
 							format: "ipv4",
+							type: "string",
 						},
 						{
-							type: "string",
 							format: "ipv6",
+							type: "string",
 						},
 					],
 				},
 				port: {
-					type: "integer",
+					maximum: 65_535,
 					minimum: 0,
-					maximum: 65535,
+					type: "integer",
 				},
 			},
 			required: ["ip", "port"],
+			type: "object",
 		},
+		maxItems: constants.MAX_PEERS_GETPEERS,
+		type: "array",
 	},
 	getStatus: {
-		type: "object",
-		required: ["state", "config"],
 		additionalProperties: false,
 		properties: {
-			state: {
-				type: "object",
-				required: ["height", "forgingAllowed", "currentSlot", "header"],
-				properties: {
-					height: {
-						type: "integer",
-						minimum: 1,
-					},
-					forgingAllowed: {
-						type: "boolean",
-					},
-					currentSlot: {
-						type: "integer",
-						minimum: 1,
-					},
-					header: {
-						anyOf: [
-							{
-								$ref: "blockHeader",
-							},
-							{
-								type: "object",
-								minProperties: 0,
-								maxProperties: 0,
-							},
-						],
-					},
-				},
-			},
 			config: {
-				type: "object",
-				required: ["version", "network", "plugins"],
 				additionalProperties: false,
 				properties: {
-					version: {
-						type: "string",
-						minLength: 5,
-						maxLength: 24,
-					},
 					network: {
-						type: "object",
-						required: ["name", "nethash", "explorer", "token"],
 						additionalProperties: false,
 						properties: {
-							name: {
+							explorer: {
+								maxLength: 128,
+								minLength: 0,
 								type: "string",
-								minLength: 1,
-								maxLength: 20,
 							},
-							version: {
-								type: "integer",
-								minimum: 0,
-								maximum: 255,
+							name: {
+								maxLength: 20,
+								minLength: 1,
+								type: "string",
 							},
 							nethash: {
 								allOf: [
@@ -118,80 +85,113 @@ export const replySchemas = {
 										$ref: "hex",
 									},
 									{
-										type: "string",
-										minLength: 64,
 										maxLength: 64,
+										minLength: 64,
+										type: "string",
 									},
 								],
 							},
-							explorer: {
-								type: "string",
-								minLength: 0,
-								maxLength: 128,
-							},
 							token: {
-								type: "object",
-								required: ["name", "symbol"],
 								additionalProperties: false,
 								properties: {
 									name: {
-										type: "string",
-										minLength: 1,
 										maxLength: 8,
+										minLength: 1,
+										type: "string",
 									},
 									symbol: {
-										type: "string",
-										minLength: 1,
 										maxLength: 4,
+										minLength: 1,
+										type: "string",
 									},
 								},
+								required: ["name", "symbol"],
+								type: "object",
+							},
+							version: {
+								maximum: 255,
+								minimum: 0,
+								type: "integer",
 							},
 						},
+						required: ["name", "nethash", "explorer", "token"],
+						type: "object",
 					},
 					plugins: {
-						type: "object",
+						additionalProperties: false,
 						maxProperties: 32,
 						minProperties: 0,
-						additionalProperties: false,
 						patternProperties: {
 							"^.{4,64}$": {
-								type: "object",
-								required: ["port", "enabled"],
 								additionalProperties: false,
 								properties: {
-									port: {
-										type: "integer",
-										minimum: 0,
-										maximum: 65535,
-									},
 									enabled: {
 										type: "boolean",
 									},
 									estimateTotalCount: {
 										type: "boolean",
 									},
+									port: {
+										maximum: 65_535,
+										minimum: 0,
+										type: "integer",
+									},
 								},
+								required: ["port", "enabled"],
+								type: "object",
 							},
 						},
+						type: "object",
+					},
+					version: {
+						maxLength: 24,
+						minLength: 5,
+						type: "string",
 					},
 				},
+				required: ["version", "network", "plugins"],
+				type: "object",
+			},
+			state: {
+				properties: {
+					currentSlot: {
+						minimum: 1,
+						type: "integer",
+					},
+					forgingAllowed: {
+						type: "boolean",
+					},
+					header: {
+						anyOf: [
+							{
+								$ref: "blockHeader",
+							},
+							{
+								maxProperties: 0,
+								minProperties: 0,
+								type: "object",
+							},
+						],
+					},
+					height: {
+						minimum: 1,
+						type: "integer",
+					},
+				},
+				required: ["height", "forgingAllowed", "currentSlot", "header"],
+				type: "object",
 			},
 		},
-	},
-	getBlocks: {
-		type: "array",
-		maxItems: 400,
-		items: {
-			$ref: "blockHeader",
-		},
+		required: ["state", "config"],
+		type: "object",
 	},
 	postBlock: {
-		type: "object",
 		additionalProperties: false,
 		properties: {
+			height: { minimum: 1, type: "integer" },
 			status: { type: "boolean" },
-			height: { type: "integer", minimum: 1 },
 		},
+		type: "object",
 	},
 	postTransactions: {
 		type: "array",

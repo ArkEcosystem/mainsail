@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { isWeakMap } from "./is-weak-map";
 
 describe("isWeakMap", async ({ assert, it, nock, loader }) => {

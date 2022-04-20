@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Constants } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
@@ -151,11 +151,13 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	public clearAndStopQueue(): void {
 		this.stateStore.setLastDownloadedBlock(this.getLastBlock().data);
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#queue.pause();
 		this.clearQueue();
 	}
 
 	public clearQueue(): void {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#queue.clear();
 	}
 
@@ -195,10 +197,12 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			this.dispatch("NEWBLOCK");
 			this.enqueueBlocks([block]);
 
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.BlockEvent.Received, block);
 		} else {
 			this.logger.info(`Block disregarded because blockchain is not ready`);
 
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.BlockEvent.Disregarded, block);
 		}
 	}
@@ -212,7 +216,9 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			const processBlocksJob = this.app.resolve<ProcessBlocksJob>(ProcessBlocksJob);
 			processBlocksJob.setBlocks(blocks);
 
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.#queue.push(processBlocksJob);
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.#queue.resume();
 		};
 

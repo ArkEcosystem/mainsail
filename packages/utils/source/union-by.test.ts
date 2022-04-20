@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { unionBy } from "./union-by";
 
 describe("unionBy", async ({ assert, it, nock, loader }) => {

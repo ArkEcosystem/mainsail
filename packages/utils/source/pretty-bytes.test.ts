@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { prettyBytes } from "./pretty-bytes";
 
 describe("prettyBytes", async ({ assert, it, nock, loader }) => {

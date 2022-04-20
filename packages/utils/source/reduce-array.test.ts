@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { reduceArray } from "./reduce-array";
 
 describe("reduceArray", async ({ assert, it, nock, loader }) => {

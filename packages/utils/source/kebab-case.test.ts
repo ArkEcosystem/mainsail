@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { kebabCase } from "./kebab-case";
 
 describe("kebabCase", async ({ assert, it, nock, loader }) => {

@@ -4,8 +4,8 @@ import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../core-test-framework/distribution";
 import { makeApplication } from "./application-factory";
-import { Identifiers } from "./identifiers";
 import { ConfigurationWriter } from "./configuration-writer";
+import { Identifiers } from "./identifiers";
 
 describe<{
 	dataPath: string;

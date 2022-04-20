@@ -104,10 +104,12 @@ export class Service implements Contracts.TransactionPool.Service {
 				await this.feeMatcher.throwIfCannotEnterPool(transaction);
 				await this.#addTransactionToMempool(transaction);
 				this.logger.debug(`${transaction} added to pool`);
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.warning(`${transaction} failed to enter pool: ${error.message}`);
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.TransactionEvent.RejectedByPool, transaction.data);
 
 				throw error instanceof Exceptions.PoolError
@@ -225,12 +227,14 @@ export class Service implements Contracts.TransactionPool.Service {
 				AppUtils.assert.defined<string>(removedTransaction.id);
 				this.storage.removeTransaction(removedTransaction.id);
 				this.logger.debug(`Removed ${removedTransaction}`);
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
 			}
 
-			if (!removedTransactions.find((t) => t.id === transaction.id)) {
+			if (!removedTransactions.some((t) => t.id === transaction.id)) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.error(`Removed ${transaction} from storage`);
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 		});
@@ -260,7 +264,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.debug(`Removed forged ${removedTransaction}`);
 			}
 
-			if (!removedTransactions.find((t) => t.id === transaction.id)) {
+			if (!removedTransactions.some((t) => t.id === transaction.id)) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.error(`Removed forged ${transaction} from storage`);
 			}
@@ -302,6 +306,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				AppUtils.assert.defined<string>(removedTransaction.id);
 				this.storage.removeTransaction(removedTransaction.id);
 				this.logger.info(`Removed old ${removedTransaction}`);
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
 			}
 		}
@@ -322,6 +327,7 @@ export class Service implements Contracts.TransactionPool.Service {
 					AppUtils.assert.defined<string>(removedTransaction.id);
 					this.storage.removeTransaction(removedTransaction.id);
 					this.logger.info(`Removed expired ${removedTransaction}`);
+					// eslint-disable-next-line @typescript-eslint/no-floating-promises
 					this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
 				}
 			}
@@ -347,6 +353,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			AppUtils.assert.defined<string>(removedTransaction.id);
 			this.storage.removeTransaction(removedTransaction.id);
 			this.logger.info(`Removed lowest priority ${removedTransaction}`);
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
 		}
 	}

@@ -1,14 +1,15 @@
 import { Contracts } from "@arkecosystem/core-contracts";
+import Utils from "@arkecosystem/utils";
+import { SinonSpy } from "sinon";
+
+import { describeSkip, Factories, Sandbox } from "../../core-test-framework";
+import { makeChainedBlocks } from "../test/make-chained-block";
+import { makeVoteTransactions } from "../test/make-vote-transactions";
+import { setUp } from "../test/setup";
+import { addTransactionsToBlock } from "../test/transactions";
 import { BlockState } from "./block-state";
 import { StateStore } from "./stores";
 import { Wallet, WalletRepository } from "./wallets";
-import { makeChainedBlocks } from "../test/make-chained-block";
-import { makeVoteTransactions } from "../test/make-vote-transactions";
-import { addTransactionsToBlock } from "../test/transactions";
-import { setUp } from "../test/setup";
-import { describeSkip, Factories, Sandbox } from "../../core-test-framework";
-import { SinonSpy } from "sinon";
-import Utils from "@arkecosystem/utils";
 
 const buildMultipaymentTransaction = (context) => {
 	const sendersDelegate = context.forgingWallet.clone();
@@ -17,8 +18,8 @@ const buildMultipaymentTransaction = (context) => {
 	const sendingWallet: Wallet = context.factory
 		.get("Wallet")
 		.withOptions({
-			passphrase: "testPassphrase1",
 			nonce: 0,
+			passphrase: "testPassphrase1",
 		})
 		.make();
 
@@ -28,8 +29,8 @@ const buildMultipaymentTransaction = (context) => {
 		.get("MultiPayment")
 		.withOptions({
 			amount,
-			senderPublicKey: sendingWallet.getPublicKey(),
 			recipientId: context.recipientWallet.getAddress(),
+			senderPublicKey: sendingWallet.getPublicKey(),
 		})
 		.make();
 
@@ -56,7 +57,7 @@ const buildMultipaymentTransaction = (context) => {
 	context.recipientWallet.setAttribute("vote", context.recipientsDelegate.getPublicKey());
 	context.walletRepo.index([sendersDelegate, context.recipientsDelegate, sendingWallet, context.recipientWallet]);
 
-	return { amount, multiPaymentTransaction, sendingWallet, sendersDelegate };
+	return { amount, multiPaymentTransaction, sendersDelegate, sendingWallet };
 };
 
 describeSkip<{
@@ -84,21 +85,21 @@ describeSkip<{
 	forgetWallet: Function;
 }>("BlockState", ({ it, assert, beforeEach, beforeAll, afterEach, stub, spy }) => {
 	beforeAll(async (context) => {
-		const env = await setUp();
+		const environment = await setUp();
 
-		context.walletRepo = env.walletRepo;
-		context.blockState = env.blockState;
-		context.stateStore = env.stateStore;
-		context.factory = env.factory;
-		context.applySpy = env.spies.applySpy;
-		context.revertSpy = env.spies.revertSpy;
+		context.walletRepo = environment.walletRepo;
+		context.blockState = environment.blockState;
+		context.stateStore = environment.stateStore;
+		context.factory = environment.factory;
+		context.applySpy = environment.spies.applySpy;
+		context.revertSpy = environment.spies.revertSpy;
 
 		context.generateTransactions = () => {
 			const sender: any = context.factory
 				.get("Wallet")
 				.withOptions({
-					passphrase: "testPassphrase1",
 					nonce: 0,
+					passphrase: "testPassphrase1",
 				})
 				.make();
 
@@ -111,15 +112,19 @@ describeSkip<{
 
 			const transfer = context.factory
 				.get("Transfer")
-				.withOptions({ amount: 96579, senderPublicKey: sender.publicKey, recipientId: recipientWallet.address })
+				.withOptions({
+					amount: 96_579,
+					recipientId: recipientWallet.address,
+					senderPublicKey: sender.publicKey,
+				})
 				.make();
 
 			const delegateReg = context.factory
 				.get("DelegateRegistration")
 				.withOptions({
-					username: "dummy",
-					senderPublicKey: sender.getPublicKey(),
 					recipientId: recipientWallet.getAddress(),
+					senderPublicKey: sender.getPublicKey(),
+					username: "dummy",
 				})
 				.make()
 				// @ts-ignore
@@ -130,17 +135,17 @@ describeSkip<{
 				.get("Vote")
 				.withOptions({
 					publicKey: recipientWallet.publicKey,
-					senderPublicKey: sender.publicKey,
 					recipientId: recipientWallet.address,
+					senderPublicKey: sender.publicKey,
 				})
 				.make();
 
 			const delegateRes = context.factory
 				.get("DelegateResignation")
 				.withOptions({
-					username: "dummy",
-					senderPublicKey: sender.getPublicKey(),
 					recipientId: recipientWallet.getAddress(),
+					senderPublicKey: sender.getPublicKey(),
+					username: "dummy",
 				})
 				.make()
 				// @ts-ignore
@@ -148,8 +153,8 @@ describeSkip<{
 				.build();
 
 			return {
-				sender,
 				recipientWallet,
+				sender,
 				transactions: [transfer, delegateReg, vote, delegateRes],
 			};
 		};
@@ -176,51 +181,51 @@ describeSkip<{
 		context.forgingWallet = await context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
 
 		context.forgingWallet.setAttribute("delegate", {
-			username: "test",
 			forgedFees: Utils.BigNumber.ZERO,
 			forgedRewards: Utils.BigNumber.ZERO,
-			producedBlocks: 0,
 			lastBlock: undefined,
+			producedBlocks: 0,
+			username: "test",
 		});
 
 		context.votingWallet = context.factory
 			.get("Wallet")
 			.withOptions({
-				passphrase: "testPassphrase1",
 				nonce: 0,
+				passphrase: "testPassphrase1",
 			})
 			.make();
 
 		context.sendingWallet = context.factory
 			.get("Wallet")
 			.withOptions({
-				passphrase: "testPassphrase1",
 				nonce: 0,
+				passphrase: "testPassphrase1",
 			})
 			.make();
 
 		context.recipientWallet = context.factory
 			.get("Wallet")
 			.withOptions({
-				passphrase: "testPassphrase2",
 				nonce: 0,
+				passphrase: "testPassphrase2",
 			})
 			.make();
 
 		context.recipientsDelegate = context.factory
 			.get("Wallet")
 			.withOptions({
-				passphrase: "recipientDelegate",
 				nonce: 0,
+				passphrase: "recipientDelegate",
 			})
 			.make();
 
 		context.recipientsDelegate.setAttribute("delegate", {
-			username: "test2",
 			forgedFees: Utils.BigNumber.ZERO,
 			forgedRewards: Utils.BigNumber.ZERO,
-			producedBlocks: 0,
 			lastBlock: undefined,
+			producedBlocks: 0,
+			username: "test2",
 		});
 		context.recipientsDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
 
@@ -251,8 +256,8 @@ describeSkip<{
 
 		await context.blockState.applyBlock(context.blocks[1]);
 
-		for (let i = 0; i < context.blocks[1].transactions.length; i++) {
-			spyApplyTransaction.calledWith(context.blocks[0].transactions[i]);
+		for (let index = 0; index < context.blocks[1].transactions.length; index++) {
+			spyApplyTransaction.calledWith(context.blocks[0].transactions[index]);
 		}
 	});
 
@@ -373,8 +378,8 @@ describeSkip<{
 			.get("Transfer")
 			.withOptions({
 				amount,
-				senderPublicKey: context.sendingWallet.getPublicKey(),
 				recipientId: context.recipientWallet.getAddress(),
+				senderPublicKey: context.sendingWallet.getPublicKey(),
 			})
 			.make();
 
@@ -399,8 +404,8 @@ describeSkip<{
 		const sendingWallet: Wallet = context.factory
 			.get("Wallet")
 			.withOptions({
-				passphrase: "testPassphrase1",
 				nonce: 0,
+				passphrase: "testPassphrase1",
 			})
 			.make();
 
@@ -418,8 +423,8 @@ describeSkip<{
 			.get("Transfer")
 			.withOptions({
 				amount,
-				senderPublicKey: sendingWallet.getPublicKey(),
 				recipientId: context.recipientWallet.getAddress(),
+				senderPublicKey: sendingWallet.getPublicKey(),
 			})
 			.make();
 
@@ -581,10 +586,10 @@ describeSkip<{
 		assert.true(context.revertSpy.calledTwice);
 
 		for (const transaction of context.blocks[0].transactions.slice(0, 1)) {
-			const i = context.blocks[0].transactions.slice(0, 1).indexOf(transaction);
+			const index = context.blocks[0].transactions.slice(0, 1).indexOf(transaction);
 			const total = context.blocks[0].transactions.slice(0, 1).length;
 
-			revert.calledNthWith(total - i, context.blocks[0].transactions[i]);
+			revert.calledNthWith(total - index, context.blocks[0].transactions[index]);
 		}
 
 		apply.restore();
@@ -710,8 +715,8 @@ describeSkip<{
 			.get("Vote")
 			.withOptions({
 				publicKey: transactions.recipientWallet.publicKey,
-				senderPublicKey: transactions.sender.publicKey,
 				recipientId: transactions.recipientWallet.address,
+				senderPublicKey: transactions.sender.publicKey,
 			})
 			.make();
 

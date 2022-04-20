@@ -1,3 +1,3 @@
-import * as ipAddr from "ipaddr.js";
+import { process } from "ipaddr.js";
 
-export const mapAddr = (addr: string): string => ipAddr.process(addr).toString();
+export const mapAddr = (addr: string): string => process(addr).toString();

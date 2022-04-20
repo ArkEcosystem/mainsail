@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { NSect } from "./nsect";
 
 let data: number[];
@@ -13,8 +12,8 @@ const probe = async (indexesToProbe: number[]): Promise<number | undefined> => {
 	// We must return the biggest index whose element satisfies the condition. So we probe
 	// from the biggest to the smallest and the first one that satisfies the condition is
 	// the one we report.
-	for (let i = indexesToProbe.length - 1; i >= 0; i--) {
-		const indexToProbe: number = indexesToProbe[i];
+	for (let index = indexesToProbe.length - 1; index >= 0; index--) {
+		const indexToProbe: number = indexesToProbe[index];
 
 		if (searchCondition(data[indexToProbe])) {
 			return indexToProbe;
@@ -27,8 +26,8 @@ const probe = async (indexesToProbe: number[]): Promise<number | undefined> => {
 describe("N-section (binary search)", ({ it, assert, beforeAll }) => {
 	beforeAll(() => {
 		data = [];
-		for (let i = 0; i < 1000; i++) {
-			data[i] = i * 10;
+		for (let index = 0; index < 1000; index++) {
+			data[index] = index * 10;
 		}
 	});
 

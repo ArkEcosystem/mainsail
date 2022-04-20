@@ -1,36 +1,38 @@
-import { Application, Services } from "@arkecosystem/core-kernel";
 import { Container } from "@arkecosystem/core-container";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { describe } from "../../../core-test-framework/source";
+import {
+	schemas,
+	Serializer,
+	Transaction,
+	TransactionRegistry,
+	TransactionTypeFactory,
+	Utils,
+	Verifier,
+} from "@arkecosystem/core-crypto-transaction";
+import { Application, Services } from "@arkecosystem/core-kernel";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
+import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
+import { Configuration } from "../../../core-crypto-config";
+import { HashFactory } from "../../../core-crypto-hash-bcrypto/source/hash.factory";
+import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
+import { Signature } from "../../../core-crypto-signature-schnorr/source/signature";
+import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
+import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
+import { Slots } from "../../../core-crypto-time/source/slots";
+import { MultiPaymentTransactionHandler } from "../../../core-crypto-transaction-multi-payment/source/handlers";
+import { MultiSignatureRegistrationTransactionHandler } from "../../../core-crypto-transaction-multi-signature-registration/source/handlers";
+import { TransferTransactionHandler } from "../../../core-crypto-transaction-transfer/source/handlers";
+import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
+import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
+import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
+import { describe } from "../../../core-test-framework/source";
+import { Validator } from "../../../core-validation/source/validator";
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
-import {
-	schemas,
-	Transaction,
-	TransactionRegistry,
-	TransactionTypeFactory,
-} from "@arkecosystem/core-crypto-transaction";
-import { MultiPaymentTransactionHandler } from "../../../core-crypto-transaction-multi-payment/source/handlers";
-import { MultiSignatureRegistrationTransactionHandler } from "../../../core-crypto-transaction-multi-signature-registration/source/handlers";
-import { TransferTransactionHandler } from "../../../core-crypto-transaction-transfer/source/handlers";
-import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
-import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
-import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
-import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
-import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
-import { Signature } from "../../../core-crypto-signature-schnorr/source/signature";
-import { HashFactory } from "../../../core-crypto-hash-bcrypto/source/hash.factory";
-import { Slots } from "../../../core-crypto-time/source/slots";
-import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
-import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
-import { Configuration } from "../../../core-crypto-config";
-import { Validator } from "../../../core-validation/source/validator";
-import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
-import { Serializer, Utils, Verifier } from "@arkecosystem/core-crypto-transaction";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;

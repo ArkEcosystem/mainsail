@@ -1,13 +1,13 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Selectors } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
-import { describe, Sandbox } from "../../../core-test-framework";
+
 import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
+import { Configuration } from "../../../core-crypto-config";
 import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
-import { Configuration } from "../../../core-crypto-config";
-
+import { describe, Sandbox } from "../../../core-test-framework";
 import {
 	addressesIndexer,
 	publicKeysIndexer,
@@ -15,7 +15,7 @@ import {
 	Wallet,
 	WalletRepository,
 	WalletRepositoryClone,
-} from "./";
+} from ".";
 import { walletFactory } from "./wallet-factory";
 
 describe<{
@@ -60,33 +60,29 @@ describe<{
 		} as any);
 
 		app.bind(Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-			name: Contracts.State.WalletIndexes.Addresses,
+			autoIndex: true,
 			indexer: addressesIndexer,
-			autoIndex: true,
+			name: Contracts.State.WalletIndexes.Addresses,
 		});
 
 		app.bind(Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-			name: Contracts.State.WalletIndexes.PublicKeys,
+			autoIndex: true,
 			indexer: publicKeysIndexer,
-			autoIndex: true,
+			name: Contracts.State.WalletIndexes.PublicKeys,
 		});
 
 		app.bind(Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-			name: Contracts.State.WalletIndexes.Usernames,
-			indexer: usernamesIndexer,
 			autoIndex: true,
+			indexer: usernamesIndexer,
+			name: Contracts.State.WalletIndexes.Usernames,
 		});
 
 		app.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) => {
-				return walletFactory(container.get(Identifiers.WalletAttributes));
-			})
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 		app.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) => {
-				return walletFactory(container.get(Identifiers.WalletAttributes));
-			})
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 		app.bind(Identifiers.WalletRepository)
@@ -324,7 +320,7 @@ describe<{
 		const wallet = await context.walletRepositoryClone.findByUsername("genesis_1");
 
 		assert.not.equal(wallet, blockchainWallet);
-		blockchainWallet.setPublicKey(undefined);
+		blockchainWallet.setPublicKey();
 		assert.equal(wallet, blockchainWallet);
 		assert.equal(wallet.getAttribute("validator.username"), "genesis_1");
 		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
@@ -351,7 +347,7 @@ describe<{
 		assert.equal(context.walletRepositoryBlockchain.findByIndexes(["addresses"], "address"), blockchainWallet);
 		assert.not.equal(context.walletRepositoryClone.findByIndexes(["addresses"], "address"), blockchainWallet);
 
-		blockchainWallet.setPublicKey(undefined);
+		blockchainWallet.setPublicKey();
 
 		assert.equal(context.walletRepositoryClone.findByIndexes(["addresses"], "address"), blockchainWallet);
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
@@ -387,7 +383,7 @@ describe<{
 		);
 
 		assert.not.equal(wallet, blockchainWallet);
-		blockchainWallet.setPublicKey(undefined);
+		blockchainWallet.setPublicKey();
 
 		assert.equal(wallet, blockchainWallet);
 		assert.equal(wallet.getAttribute("validator.username"), context.username);

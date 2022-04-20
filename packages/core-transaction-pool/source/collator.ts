@@ -76,6 +76,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 			}
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		(async () => {
 			for (const failedTransaction of failedTransactions) {
 				await this.pool.removeTransaction(failedTransaction);

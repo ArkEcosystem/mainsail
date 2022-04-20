@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { zipObject } from "./zip-object";
 
 describe("zipObject", async ({ assert, it, nock, loader }) => {

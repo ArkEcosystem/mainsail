@@ -52,17 +52,12 @@ export const blockchainMachine: any = Machine({
 		syncWithNetwork: {
 			initial: "syncing",
 			on: {
-				SYNCFINISHED: "idle",
 				FORK: "fork",
-				TEST: "idle",
 				STOP: "stopped",
+				SYNCFINISHED: "idle",
+				TEST: "idle",
 			},
 			states: {
-				idle: {
-					on: {
-						DOWNLOADED: "downloadBlocks",
-					},
-				},
 				downloadBlocks: {
 					on: {
 						DOWNLOADED: "syncing",
@@ -70,15 +65,6 @@ export const blockchainMachine: any = Machine({
 						PROCESSFINISHED: "downloadFinished",
 					},
 					onEntry: ["downloadBlocks"],
-				},
-				syncing: {
-					onEntry: ["checkLastDownloadedBlockSynced"],
-					on: {
-						SYNCED: "downloadFinished",
-						NOTSYNCED: "downloadBlocks",
-						PAUSED: "downloadPaused",
-						NETWORKHALTED: "end",
-					},
 				},
 				downloadFinished: {
 					on: {
@@ -95,12 +81,26 @@ export const blockchainMachine: any = Machine({
 				end: {
 					onEntry: ["syncingComplete"],
 				},
+				idle: {
+					on: {
+						DOWNLOADED: "downloadBlocks",
+					},
+				},
 				processFinished: {
 					on: {
-						SYNCED: "end",
 						NOTSYNCED: "downloadBlocks",
+						SYNCED: "end",
 					},
 					onEntry: ["checkLastBlockSynced"],
+				},
+				syncing: {
+					on: {
+						NETWORKHALTED: "end",
+						NOTSYNCED: "downloadBlocks",
+						PAUSED: "downloadPaused",
+						SYNCED: "downloadFinished",
+					},
+					onEntry: ["checkLastDownloadedBlockSynced"],
 				},
 			},
 		},

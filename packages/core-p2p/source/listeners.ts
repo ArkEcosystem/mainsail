@@ -1,6 +1,6 @@
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums } from "@arkecosystem/core-kernel";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { PeerConnector } from "./peer-connector";
 import { isValidVersion } from "./utils";

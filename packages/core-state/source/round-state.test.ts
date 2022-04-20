@@ -1,25 +1,25 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Enums } from "@arkecosystem/core-kernel";
 import Utils from "@arkecosystem/utils";
-import { describeSkip, Sandbox } from "../../core-test-framework";
-import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
-import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
-import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
 
-import { RoundState } from "./round-state";
+import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
+import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
+import { describeSkip, Sandbox } from "../../core-test-framework";
 import block1760000 from "../test/fixtures/block1760000";
+import { RoundState } from "./round-state";
 
 const dummyBlock = { ...block1760000 };
 
 const generateBlocks = (count: number): any[] => {
 	const blocks: any[] = [];
 
-	for (let i = 1; i <= count; i++) {
+	for (let index = 1; index <= count; index++) {
 		blocks.push({
 			data: {
-				height: i,
-				id: "id_" + i,
-				generatorPublicKey: "public_key_" + i,
+				generatorPublicKey: "public_key_" + index,
+				height: index,
+				id: "id_" + index,
 			},
 		} as any);
 	}
@@ -30,20 +30,14 @@ const generateBlocks = (count: number): any[] => {
 const generateValidators = (count: number): any[] => {
 	const validators: any[] = [];
 
-	for (let i = 1; i <= count; i++) {
+	for (let index = 1; index <= count; index++) {
 		const validator: any = {
-			getPublicKey: () => {
-				return "public_key_" + i;
-			},
-			username: "username_" + i,
-			getAttribute: (key: string) => {
-				return key === "validator.username" ? "username_" + i : i;
-			},
-			setAttribute: () => undefined,
+			getAttribute: (key: string) => (key === "validator.username" ? "username_" + index : index),
+			getPublicKey: () => "public_key_" + index,
+			setAttribute: () => {},
+			username: "username_" + index,
 		};
-		validator.clone = () => {
-			return validator;
-		};
+		validator.clone = () => validator;
 		validators.push(validator);
 	}
 
@@ -66,55 +60,55 @@ describeSkip<{
 }>("Round State", ({ it, assert, beforeAll, beforeEach, spy, stub, stubFn }) => {
 	beforeAll((context) => {
 		context.databaseService = {
-			getLastBlock: () => undefined,
-			getBlocks: () => undefined,
-			getRound: () => undefined,
-			saveRound: () => undefined,
-			deleteRound: () => undefined,
+			deleteRound: () => {},
+			getBlocks: () => {},
+			getLastBlock: () => {},
+			getRound: () => {},
+			saveRound: () => {},
 		};
 
 		context.dposState = {
-			buildValidatorRanking: () => undefined,
-			setValidatorsRound: () => undefined,
-			getRoundValidators: () => undefined,
+			buildValidatorRanking: () => {},
+			getRoundValidators: () => {},
+			setValidatorsRound: () => {},
 		};
 
-		context.getDposPreviousRoundState = () => undefined;
+		context.getDposPreviousRoundState = () => {};
 
 		context.stateStore = {
-			setGenesisBlock: () => undefined,
-			getGenesisBlock: () => undefined,
-			setLastBlock: () => undefined,
-			getLastBlock: () => undefined,
-			getLastBlocksByHeight: () => undefined,
-			getCommonBlocks: () => undefined,
-			getLastBlockIds: () => undefined,
+			getCommonBlocks: () => {},
+			getGenesisBlock: () => {},
+			getLastBlock: () => {},
+			getLastBlockIds: () => {},
+			getLastBlocksByHeight: () => {},
+			setGenesisBlock: () => {},
+			setLastBlock: () => {},
 		};
 
 		context.walletRepository = {
-			createWallet: () => undefined,
-			findByPublicKey: () => undefined,
-			findByUsername: () => undefined,
+			createWallet: () => {},
+			findByPublicKey: () => {},
+			findByUsername: () => {},
 		};
 
 		context.triggerService = {
-			call: () => undefined,
+			call: () => {},
 		};
 
 		context.eventDispatcher = {
-			call: () => undefined,
-			dispatch: () => undefined,
+			call: () => {},
+			dispatch: () => {},
 		};
 
 		context.logger = {
-			error: () => undefined,
-			warning: () => undefined,
-			info: () => undefined,
-			debug: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
 		};
 
 		context.blockFactory = {
-			fromData: () => undefined,
+			fromData: () => {},
 		};
 
 		const sandbox = new Sandbox();
@@ -149,9 +143,7 @@ describeSkip<{
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(context.blocks);
 
-		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
-			return block;
-		});
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => block);
 
 		// @ts-ignore
 		assert.equal(await context.roundState.getBlocksForRound(), context.blocks);
@@ -167,9 +159,7 @@ describeSkip<{
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue([lastBlock]);
 		const databaseServiceStub = stub(context.databaseService, "getBlocks").returnValue(context.blocks.slice(0, 2));
 
-		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
-			return block;
-		});
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => block);
 
 		// @ts-ignore
 		assert.equal(await context.roundState.getBlocksForRound(), context.blocks);
@@ -186,15 +176,15 @@ describeSkip<{
 
 		const validatorPublicKey = "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37";
 		const validatorVoteBalance = Utils.BigNumber.make("100");
-		const roundValidatorModel = { publicKey: validatorPublicKey, balance: validatorVoteBalance };
+		const roundValidatorModel = { balance: validatorVoteBalance, publicKey: validatorPublicKey };
 
 		stub(context.databaseService, "getRound").returnValueOnce([roundValidatorModel]);
 		const cloneStub = stubFn();
 		const setAttributeStub = stubFn();
 
 		const newValidatorWallet = {
-			setAttribute: setAttributeStub,
 			clone: cloneStub,
+			setAttribute: setAttributeStub,
 			setPublicKey: () => {},
 		};
 		const walletRepoStub1 = stub(context.walletRepository, "createWallet").returnValue(newValidatorWallet);
@@ -218,9 +208,9 @@ describeSkip<{
 		assert.true(oldValidatorWallet.getAttribute.calledWith("validator.username"));
 		assert.true(
 			newValidatorWallet.setAttribute.calledWith("validator", {
-				voteBalance: validatorVoteBalance,
+				round: 34_510,
 				username: validatorUsername,
-				round: 34510,
+				voteBalance: validatorVoteBalance,
 			}),
 		);
 		assert.true(cloneStub.called);
@@ -228,7 +218,7 @@ describeSkip<{
 	});
 
 	it("getActiveValidators - should return cached #forgingValidators when round is the same", async (context) => {
-		const forgingDelegate = { getAttribute: () => undefined };
+		const forgingDelegate = { getAttribute: () => {} };
 		const forgingDelegateRound = 2;
 
 		const getAttributeStub = stub(forgingDelegate, "getAttribute").returnValueOnce(forgingDelegateRound);
@@ -251,13 +241,13 @@ describeSkip<{
 
 		const triggerStub = stub(context.triggerService, "call").returnValue([validator]);
 
-		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxValidators: 51 };
+		const roundInfo = { maxValidators: 51, nextRound: 3, round: 2, roundHeight: 2 };
 		// @ts-ignore
 		await context.roundState.setForgingDelegatesOfRound(roundInfo, [validator]);
 
 		triggerStub.calledWith("getActiveValidators", {
-			validators: [validator],
 			roundInfo,
+			validators: [validator],
 		});
 
 		// @ts-ignore
@@ -268,15 +258,15 @@ describeSkip<{
 		const validator = {
 			username: "dummy_validator",
 		};
-		const triggerStub = stub(context.triggerService, "call").returnValue(undefined);
+		const triggerStub = stub(context.triggerService, "call").returnValue();
 
-		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxValidators: 51 };
+		const roundInfo = { maxValidators: 51, nextRound: 3, round: 2, roundHeight: 2 };
 		// @ts-ignore
 		await context.roundState.setForgingDelegatesOfRound(roundInfo, [validator]);
 
 		triggerStub.calledWith("getActiveValidators", {
-			validators: [validator],
 			roundInfo,
+			validators: [validator],
 		});
 
 		// @ts-ignore
@@ -290,8 +280,8 @@ describeSkip<{
 		const dposStateSetSpy = spy(context.dposState, "setValidatorsRound");
 
 		const forgingDelegate = {
-			getAttribute: () => undefined,
-			getPublicKey: () => undefined,
+			getAttribute: () => {},
+			getPublicKey: () => {},
 		};
 
 		// @ts-ignore
@@ -303,8 +293,8 @@ describeSkip<{
 		const getAttributeStub2 = stubFn();
 
 		const validatorWallet = {
-			getPublicKey: () => "delegate public key",
 			getAttribute: getAttributeStub2,
+			getPublicKey: () => "delegate public key",
 		};
 
 		const dposStateRoundDelegates = [validatorWallet];
@@ -326,10 +316,10 @@ describeSkip<{
 
 		dposStateBuildSpy.called();
 		dposStateSetSpy.calledWith({
-			round: 1,
-			nextRound: 1,
-			roundHeight: 1,
 			maxValidators: 51,
+			nextRound: 1,
+			round: 1,
+			roundHeight: 1,
 		});
 		databaseServiceSpy.calledWith(dposStateRoundDelegates);
 		eventStub.calledWith("round.applied");
@@ -347,7 +337,7 @@ describeSkip<{
 
 		const forgingDelegate = {
 			getAttribute: getAttributeStub,
-			getPublicKey: () => undefined,
+			getPublicKey: () => {},
 		};
 
 		// @ts-ignore
@@ -358,7 +348,7 @@ describeSkip<{
 
 		const getAttributeStub2 = stubFn();
 
-		const delegateWallet = { publicKey: "delegate public key", getAttribute: getAttributeStub2 };
+		const delegateWallet = { getAttribute: getAttributeStub2, publicKey: "delegate public key" };
 		const dposStateRoundDelegates = [delegateWallet];
 
 		const dposGetStub = stub(context.dposState, "getRoundValidators");
@@ -380,10 +370,10 @@ describeSkip<{
 
 		dposStateBuildSpy.called();
 		dposStateSetSpy.calledWith({
-			round: 2,
-			nextRound: 2,
-			roundHeight: 52,
 			maxValidators: 51,
+			nextRound: 2,
+			round: 2,
+			roundHeight: 52,
 		});
 		databaseServiceSpy.calledWith(dposStateRoundDelegates);
 		eventStub.calledWith("round.applied");
@@ -421,9 +411,7 @@ describeSkip<{
 		const blocksInPreviousRound: any[] = generateBlocks(51);
 		const delegates: any[] = generateValidators(51);
 
-		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
-			return block;
-		});
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => block);
 
 		const databaseServiceSpy = spy(context.databaseService, "deleteRound");
 
@@ -433,8 +421,8 @@ describeSkip<{
 		stub(context.stateStore, "getLastBlock").returnValue(block);
 
 		context.getDposPreviousRoundState = stubFn().returns({
-			getAllValidators: () => delegates,
 			getActiveValidators: () => delegates,
+			getAllValidators: () => delegates,
 			getRoundValidators: () => delegates,
 		});
 
@@ -458,9 +446,7 @@ describeSkip<{
 		const blocksInPreviousRound: any[] = generateBlocks(51);
 		const delegates: any[] = generateValidators(51);
 
-		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
-			return block;
-		});
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => block);
 
 		const block = blocksInPreviousRound[50];
 
@@ -468,8 +454,8 @@ describeSkip<{
 		stub(context.stateStore, "getLastBlock").returnValue(block);
 
 		context.getDposPreviousRoundState = stubFn().returns({
-			getAllValidators: () => delegates,
 			getActiveValidators: () => delegates,
+			getAllValidators: () => delegates,
 			getRoundValidators: () => delegates,
 		});
 
@@ -500,7 +486,7 @@ describeSkip<{
 	it("revertBlock - should throw error if last blocks is not equal to block", async (context) => {
 		const blocks = generateBlocks(2);
 
-		const dbSpy = spy(context.databaseService, "deleteRound");
+		const databaseSpy = spy(context.databaseService, "deleteRound");
 		const stateSpy = spy(context.stateStore, "getLastBlocksByHeight");
 
 		// @ts-ignore
@@ -510,7 +496,7 @@ describeSkip<{
 
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, [blocks[0]]);
-		dbSpy.neverCalled();
+		databaseSpy.neverCalled();
 		stateSpy.neverCalled();
 	});
 
@@ -524,9 +510,7 @@ describeSkip<{
 		stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
 		const databaseServiceSpy = spy(context.databaseService, "deleteRound");
 
-		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
-			return block;
-		});
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => block);
 
 		stub(context.triggerService, "call").returnValue(delegates);
 
@@ -553,17 +537,15 @@ describeSkip<{
 		stub(context.dposState, "getRoundValidators").returnValue(delegates);
 		stub(context.triggerService, "call").returnValue(delegates);
 
-		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
-			return block;
-		});
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => block);
 
-		const dbDeleteSpy = spy(context.databaseService, "deleteRound");
-		const dbSaveSpy = spy(context.databaseService, "saveRound");
+		const databaseDeleteSpy = spy(context.databaseService, "deleteRound");
+		const databaseSaveSpy = spy(context.databaseService, "saveRound");
 
 		await context.roundState.restore();
 
-		dbDeleteSpy.calledWith(2);
-		dbSaveSpy.calledWith(delegates);
+		databaseDeleteSpy.calledWith(2);
+		databaseSaveSpy.calledWith(delegates);
 		spyOnFromData.calledTimes(51);
 
 		eventSpy.calledWith(Enums.RoundEvent.Applied);
@@ -585,17 +567,15 @@ describeSkip<{
 		stub(context.dposState, "getRoundValidators").returnValue(delegates);
 		stub(context.triggerService, "call").returnValue(delegates);
 
-		stub(context.blockFactory, "fromData").callsFake((block) => {
-			return block;
-		});
+		stub(context.blockFactory, "fromData").callsFake((block) => block);
 
-		const dbStub = stub(context.databaseService, "deleteRound").callsFake(() => {
+		const databaseStub = stub(context.databaseService, "deleteRound").callsFake(() => {
 			throw new Error("Database error");
 		});
 
 		await assert.rejects(() => context.roundState.restore());
 
-		dbStub.calledWith(2);
+		databaseStub.calledWith(2);
 	});
 
 	it("calcPreviousActiveDelegates - should return previous active delegates && set ranks", async (context) => {
@@ -603,15 +583,15 @@ describeSkip<{
 		const blocks = generateBlocks(51);
 
 		stub(context.roundState, "getDposPreviousRoundState").returnValue({
-			getAllValidators: () => delegates,
 			getActiveValidators: () => delegates,
+			getAllValidators: () => delegates,
 			getRoundValidators: () => delegates,
 		});
 
 		const setAttributeSpy = spy(delegates[0], "setAttribute");
-		const walletRepoStub = stub(context.walletRepository, "findByUsername").callsFake((username) => {
-			return delegates.find((delegate) => delegate.username === username);
-		});
+		const walletRepoStub = stub(context.walletRepository, "findByUsername").callsFake((username) =>
+			delegates.find((delegate) => delegate.username === username),
+		);
 
 		const roundInfo: any = { round: 1 };
 
@@ -733,14 +713,13 @@ describeSkip<{
 	});
 
 	it("detectMissedRound - should not detect missed round if all delegates forged blocks", (context) => {
-		let delegates = generateValidators(3);
+		const delegates = generateValidators(3);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
-		let blocksInCurrentRound = generateBlocks(3);
+		const blocksInCurrentRound = generateBlocks(3);
 
-		context.walletRepository.findByPublicKey = (publicKey) => {
-			return delegates.find((delegate) => delegate.getPublicKey() === publicKey);
-		};
+		context.walletRepository.findByPublicKey = (publicKey) =>
+			delegates.find((delegate) => delegate.getPublicKey() === publicKey);
 
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = blocksInCurrentRound;
@@ -756,14 +735,13 @@ describeSkip<{
 	});
 
 	it("detectMissedRound - should detect missed round", (context) => {
-		let delegates = generateValidators(3);
+		const delegates = generateValidators(3);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
-		let blocksInCurrentRound = generateBlocks(3);
+		const blocksInCurrentRound = generateBlocks(3);
 
-		context.walletRepository.findByPublicKey = (publicKey) => {
-			return delegates.find((delegate) => delegate.getPublicKey() === publicKey);
-		};
+		context.walletRepository.findByPublicKey = (publicKey) =>
+			delegates.find((delegate) => delegate.getPublicKey() === publicKey);
 
 		blocksInCurrentRound[2].data.generatorPublicKey = "public_key_1";
 
@@ -781,7 +759,7 @@ describeSkip<{
 	});
 
 	it("applyBlock - should push block to blocksInCurrentRound and skip applyRound when block is not last block in round", async (context) => {
-		let delegates = generateValidators(51);
+		const delegates = generateValidators(51);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 
@@ -807,7 +785,7 @@ describeSkip<{
 	});
 
 	it("applyBlock - should push block to blocksInCurrentRound, applyRound, check missing round, calculate delegates, and clear blocksInCurrentRound when block is last in round", async (context) => {
-		let delegates = generateValidators(51);
+		const delegates = generateValidators(51);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 
@@ -816,8 +794,9 @@ describeSkip<{
 
 		const block = {
 			data: {
-				height: 51, // Last block in round 1
+				// Last block in round 1
 				generatorPublicKey: "public_key_51",
+				height: 51,
 			},
 		};
 
@@ -825,9 +804,9 @@ describeSkip<{
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
 		stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		stub(context.triggerService, "call").callsFake((name, args) => {
-			return context.roundState.getActiveValidators(args.roundInfo, args.delegates);
-		});
+		stub(context.triggerService, "call").callsFake((name, arguments_) =>
+			context.roundState.getActiveValidators(arguments_.roundInfo, arguments_.delegates),
+		);
 
 		const spyOnShuffleDelegates = spy(context.roundState, "shuffleDelegates");
 		const spyOnDetectMissedRound = spy(context.roundState, "detectMissedRound");
@@ -849,7 +828,7 @@ describeSkip<{
 
 	// TODO: Check how we can restore
 	it("applyBlock - should throw error if databaseService.saveRound throws error", async (context) => {
-		let delegates = generateValidators(51);
+		const delegates = generateValidators(51);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 
@@ -858,17 +837,18 @@ describeSkip<{
 
 		const block = {
 			data: {
-				height: 51, // Last block in round 1
+				// Last block in round 1
 				generatorPublicKey: "public_key_51",
+				height: 51,
 			},
 		};
 
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
 		stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		stub(context.triggerService, "call").callsFake((name, args) => {
-			return context.roundState.getActiveValidators(args.roundInfo, args.delegates);
-		});
+		stub(context.triggerService, "call").callsFake((name, arguments_) =>
+			context.roundState.getActiveValidators(arguments_.roundInfo, arguments_.delegates),
+		);
 
 		const spyOnShuffleDelegates = spy(context.roundState, "shuffleDelegates");
 		const spyOnDetectMissedRound = spy(context.roundState, "detectMissedRound");

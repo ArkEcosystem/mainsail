@@ -1,5 +1,6 @@
 import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
+
 import { describe } from "../../core-test-framework";
 
 describe<{
@@ -7,21 +8,21 @@ describe<{
 }>("Errors", ({ it, assert, beforeAll }) => {
 	beforeAll((context) => {
 		context.transaction = {
-			id: "dummy-tx-id",
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.Transfer,
-			key: "some-key",
 			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(900),
 				id: "dummy-tx-id",
-				type: Contracts.Crypto.TransactionType.Transfer,
-				version: 2,
 				network: 30,
 				nonce: BigNumber.make(1),
-				fee: BigNumber.make(900),
-				amount: BigNumber.make(100),
 				senderPublicKey: "dummy-sender-key",
+				type: Contracts.Crypto.TransactionType.Transfer,
+				version: 2,
 			},
+			id: "dummy-tx-id",
+			key: "some-key",
 			serialized: Buffer.from("dummy"),
+			type: Contracts.Crypto.TransactionType.Transfer,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 	});
 

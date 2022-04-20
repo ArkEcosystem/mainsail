@@ -1,6 +1,6 @@
 import { BigNumber } from "@arkecosystem/utils";
 
-const toBoolean = (value): boolean => (value.toString().toLowerCase().trim() === "true" ? true : false);
+const toBoolean = (value): boolean => value.toString().toLowerCase().trim() === "true";
 
 const compareBigNumber = (value, expected, comparison): boolean => {
 	try {
@@ -35,6 +35,7 @@ const regexp = (actual, expected): boolean => new RegExp(expected).test(actual);
 const truthy = (actual): boolean => actual === true || toBoolean(actual);
 
 export const conditions = {
+	between,
 	contains,
 	eq,
 	falsy,
@@ -42,7 +43,6 @@ export const conditions = {
 	gte,
 	lt,
 	lte,
-	between,
 	ne,
 	notBetween,
 	regexp,

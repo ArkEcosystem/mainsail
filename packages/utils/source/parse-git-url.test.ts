@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { parseGitUrl } from "./parse-git-url";
 
 describe("#parseGitUrl", ({ it, assert }) => {
@@ -13,43 +12,43 @@ describe("#parseGitUrl", ({ it, assert }) => {
 
 	it("should return the expected fields", () => {
 		assert.equal(parseGitUrl("git@github.com:owner/repo.git"), {
-			host: "github.com",
-			owner: "owner",
-			name: "repo",
-			repo: "owner/repo",
 			branch: "master",
+			host: "github.com",
+			name: "repo",
+			owner: "owner",
+			repo: "owner/repo",
 		});
 
 		assert.equal(parseGitUrl("https://github.com/owner/repo.git"), {
-			host: "github.com",
-			owner: "owner",
-			name: "repo",
-			repo: "owner/repo",
 			branch: "master",
+			host: "github.com",
+			name: "repo",
+			owner: "owner",
+			repo: "owner/repo",
 		});
 
 		assert.equal(parseGitUrl("https://github.com/owner/repo.git#develop"), {
-			host: "github.com",
-			owner: "owner",
-			name: "repo",
-			repo: "owner/repo",
 			branch: "develop",
+			host: "github.com",
+			name: "repo",
+			owner: "owner",
+			repo: "owner/repo",
 		});
 
 		assert.equal(parseGitUrl("https://github.com/owner/repo.git#f4991348ca779b68b8e7139cfcbc601e6d496612"), {
-			host: "github.com",
-			owner: "owner",
-			name: "repo",
-			repo: "owner/repo",
 			branch: "f4991348ca779b68b8e7139cfcbc601e6d496612",
+			host: "github.com",
+			name: "repo",
+			owner: "owner",
+			repo: "owner/repo",
 		});
 
 		assert.equal(parseGitUrl("https://github.com/owner/repo.git#develop#develop"), {
-			host: "github.com",
-			owner: "owner",
-			name: "repo",
-			repo: "owner/repo",
 			branch: "develop",
+			host: "github.com",
+			name: "repo",
+			owner: "owner",
+			repo: "owner/repo",
 		});
 	});
 });

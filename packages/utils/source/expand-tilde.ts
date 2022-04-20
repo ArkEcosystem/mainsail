@@ -5,8 +5,8 @@ import { join } from "path";
 export const expandTilde = (path: string): string => {
 	const home: string = homedir();
 
-	if (path.charCodeAt(0) === 126) {
-		if (path.charCodeAt(1) === 43) {
+	if (path.codePointAt(0) === 126) {
+		if (path.codePointAt(1) === 43) {
 			return join(process.cwd(), path.slice(2));
 		}
 

@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { dotCase } from "./dot-case";
 
 describe("#dotCase", ({ it, assert }) => {

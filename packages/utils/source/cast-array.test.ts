@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { castArray } from "./cast-array";
 
 describe("#castArray", ({ it, assert }) => {
@@ -9,7 +8,7 @@ describe("#castArray", ({ it, assert }) => {
 		assert.equal(castArray({ a: 1 }), [{ a: 1 }]);
 		assert.equal(castArray("abc"), ["abc"]);
 		assert.equal(castArray(null), []);
-		assert.equal(castArray(undefined), []);
+		assert.equal(castArray(), []);
 		assert.equal(castArray(new Map([["key", "value"]]).keys()), ["key"]);
 	});
 });

@@ -1,11 +1,12 @@
 import { Container } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BlockTimeCalculator } from "@arkecosystem/core-crypto-time/source/block-time-calculator";
 import { Slots } from "@arkecosystem/core-crypto-time/source/slots";
 import { Enums } from "@arkecosystem/core-kernel";
+
 import { describe } from "../../core-test-framework";
-import { SenderState } from "./";
+import { SenderState } from ".";
 
 describe<{
 	configuration: any;
@@ -20,22 +21,22 @@ describe<{
 }>("SenderState", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.configuration = {
-			get: () => undefined,
-			getRequired: () => undefined,
-			getOptional: () => undefined,
+			get: () => {},
+			getOptional: () => {},
+			getRequired: () => {},
 		};
 		context.handlerRegistry = {
-			getActivatedHandlerForData: () => undefined,
+			getActivatedHandlerForData: () => {},
 		};
 		context.expirationService = {
-			isExpired: () => undefined,
-			getExpirationHeight: () => undefined,
+			getExpirationHeight: () => {},
+			isExpired: () => {},
 		};
 		context.triggers = {
-			call: () => undefined,
+			call: () => {},
 		};
 		context.emitter = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 		};
 
 		context.container = new Container();
@@ -65,10 +66,10 @@ describe<{
 
 		// @ts-ignore
 		context.transaction = {
+			data: { network: 123, senderPublicKey: "sender's public key" },
 			id: "tx1",
-			timestamp: 13600,
-			data: { senderPublicKey: "sender's public key", network: 123 },
 			serialized: Buffer.alloc(10),
+			timestamp: 13_600,
 		} as Contracts.Crypto.ITransaction;
 	});
 
@@ -81,9 +82,9 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.PoolError);
-			assert.equal(err.type, "ERR_TOO_LARGE");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.PoolError);
+			assert.equal(error.type, "ERR_TOO_LARGE");
 		});
 	});
 
@@ -97,9 +98,9 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.PoolError);
-			assert.equal(err.type, "ERR_WRONG_NETWORK");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.PoolError);
+			assert.equal(error.type, "ERR_WRONG_NETWORK");
 		});
 	});
 
@@ -114,9 +115,9 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.PoolError);
-			assert.equal(err.type, "ERR_FROM_FUTURE");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.PoolError);
+			assert.equal(error.type, "ERR_FROM_FUTURE");
 		});
 	});
 
@@ -124,7 +125,7 @@ describe<{
 		const senderState = context.container.resolve(SenderState);
 
 		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
-		stub(context.slots, "getTime").returnValue(13600);
+		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(true);
 		stub(context.expirationService, "getExpirationHeight").returnValueOnce(10);
@@ -134,9 +135,9 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.PoolError);
-			assert.equal(err.type, "ERR_EXPIRED");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.PoolError);
+			assert.equal(error.type, "ERR_EXPIRED");
 		});
 
 		eventSpy.calledTimes(1);
@@ -148,7 +149,7 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
-		stub(context.slots, "getTime").returnValue(13600);
+		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
@@ -158,9 +159,9 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.PoolError);
-			assert.equal(err.type, "ERR_BAD_DATA");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.PoolError);
+			assert.equal(error.type, "ERR_BAD_DATA");
 		});
 
 		handlerStub.calledWith(context.transaction.data);
@@ -172,7 +173,7 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
-		stub(context.slots, "getTime").returnValue(13600);
+		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData");
@@ -186,14 +187,14 @@ describe<{
 		handlerStub.resolvedValueNth(1, handler);
 		triggerStub.resolvedValueNth(1, true); // verifyTransaction
 
-		await senderState.revert(context.transaction).catch(() => undefined);
+		await senderState.revert(context.transaction).catch(() => {});
 		const promise = senderState.apply(context.transaction);
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.PoolError);
-			assert.equal(err.type, "ERR_RETRY");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.PoolError);
+			assert.equal(error.type, "ERR_RETRY");
 		});
 
 		handlerStub.calledNthWith(0, context.transaction.data);
@@ -208,23 +209,23 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
-		stub(context.slots, "getTime").returnValue(13600);
+		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 
 		const triggerStub = stub(context.triggers, "call");
 		triggerStub.resolvedValueNth(0, true); // verifyTransaction
-		triggerStub.resolvedValueNth(1, undefined); // throwIfCannotEnterPool
+		triggerStub.resolvedValueNth(1); // throwIfCannotEnterPool
 		triggerStub.rejectedValueNth(2, new Error("Some apply error")); // applyTransaction
 
 		const promise = senderState.apply(context.transaction);
 
 		await assert.rejects(() => promise);
 
-		promise.catch((err) => {
-			assert.instance(err, Exceptions.PoolError);
-			assert.equal(err.type, "ERR_APPLY");
+		promise.catch((error) => {
+			assert.instance(error, Exceptions.PoolError);
+			assert.equal(error.type, "ERR_APPLY");
 		});
 
 		handlerStub.calledWith(context.transaction.data);
@@ -238,15 +239,15 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
-		stub(context.slots, "getTime").returnValue(13600);
+		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 
 		const triggerStub = stub(context.triggers, "call");
 		triggerStub.resolvedValueNth(0, true); // verifyTransaction
-		triggerStub.resolvedValueNth(1, undefined); // throwIfCannotEnterPool
-		triggerStub.resolvedValueNth(2, undefined); // applyTransaction
+		triggerStub.resolvedValueNth(1); // throwIfCannotEnterPool
+		triggerStub.resolvedValueNth(2); // applyTransaction
 
 		await senderState.apply(context.transaction);
 
@@ -261,7 +262,7 @@ describe<{
 		const handler = {};
 
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
-		const triggerStub = stub(context.triggers, "call").resolvedValue(undefined); // revertTransaction
+		const triggerStub = stub(context.triggers, "call").resolvedValue(); // revertTransaction
 
 		await senderState.revert(context.transaction);
 

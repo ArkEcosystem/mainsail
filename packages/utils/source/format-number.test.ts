@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { formatNumber } from "./format-number";
 
 describe("#formatNumber", ({ it, assert }) => {

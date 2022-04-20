@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { toString } from "./to-string";
 
 describe("toString", async ({ assert, it, nock, loader }) => {
@@ -16,7 +15,7 @@ describe("toString", async ({ assert, it, nock, loader }) => {
 	});
 
 	it("should work with an undefined value", () => {
-		assert.is(toString(undefined), "");
+		assert.is(toString(), "");
 	});
 
 	it("should work with an array", () => {

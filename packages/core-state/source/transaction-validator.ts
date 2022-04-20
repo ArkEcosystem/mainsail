@@ -1,6 +1,6 @@
-import { strictEqual } from "assert";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { strictEqual } from "assert";
 
 @injectable()
 export class TransactionValidator implements Contracts.State.TransactionValidator {

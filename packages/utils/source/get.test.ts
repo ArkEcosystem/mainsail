@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { get } from "./get";
 
 describe("get", async ({ assert, it, nock, loader }) => {

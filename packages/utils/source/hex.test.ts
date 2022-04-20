@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { hex } from "./hex";
 
 describe("hex", async ({ assert, it, nock, loader }) => {

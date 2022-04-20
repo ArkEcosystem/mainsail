@@ -1,6 +1,6 @@
 import { injectable } from "@arkecosystem/core-container";
-
 import { Exceptions } from "@arkecosystem/core-contracts";
+
 import { ActionArguments } from "../../types";
 import { assert } from "../../utils";
 import { Action } from "./action";

@@ -1,3 +1,4 @@
+import kleur from "kleur";
 import sinon from "sinon";
 import { Callback, Context, suite, Test } from "uvu";
 import { z as schema } from "zod";
@@ -9,7 +10,6 @@ import { loader } from "./loader";
 import { nock } from "./nock";
 import { Spy } from "./spy";
 import { Stub } from "./stub";
-import kleur from "kleur";
 
 type ContextFunction<T> = () => T;
 type ContextCallback<T> = (context: T) => Promise<void> | void;
