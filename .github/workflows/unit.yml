@@ -34,6 +34,8 @@ jobs:
               run: cd packages/core-crypto-address-keccak256 && pnpm run test
             - name: Test core-crypto-address-ss58
               run: cd packages/core-crypto-address-ss58 && pnpm run test
+            - name: Test core-crypto-block
+              run: cd packages/core-crypto-block && pnpm run test
             - name: Test core-crypto-hash-bcrypto
               run: cd packages/core-crypto-hash-bcrypto && pnpm run test
             - name: Test core-crypto-hash-noble
