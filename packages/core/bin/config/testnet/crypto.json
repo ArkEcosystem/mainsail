@@ -2640,25 +2640,8 @@
 			"vendorFieldLength": 255
 		},
 		{
-			"activeValidators": 51,
-			"address": {
-				"bech32m": "ark"
-			},
-			"block": {
-				"maxPayload": 2097152,
-				"maxTransactions": 150,
-				"version": 1
-			},
-			"blockTime": 8,
-			"epoch": "2022-03-18T00:00:00.000Z",
 			"height": 75600,
-			"multiPaymentLimit": 256,
-			"reward": 200000000,
-			"satoshi": {
-				"decimals": 8,
-				"denomination": 100000000
-			},
-			"vendorFieldLength": 255
+			"reward": "200000000"
 		}
 	],
 	"network": {

@@ -10,7 +10,7 @@ import { generateApp } from "./generate-app";
 
 export const registerBlockFactory = async (
 	factory: FactoryBuilder,
-	config?: Contracts.Crypto.NetworkConfig,
+	config?: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
 	const app = await generateApp(
 		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/crypto.json")),
@@ -27,7 +27,10 @@ export const registerBlockFactory = async (
 
 		const transactions = options.transactions || [];
 		if (options.transactionsCount) {
-			const signer = new Signer(config, options.nonce);
+			const signer = new Signer(
+				app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).all(),
+				options.nonce,
+			);
 
 			const genesisAddresses = previousBlock.transactions
 				.map((transaction) => transaction.recipientId)

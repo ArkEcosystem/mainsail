@@ -3,7 +3,7 @@ import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class MilestonesGenerator {
-	#data: Partial<Contracts.Crypto.Milestone>[] = [];
+	#data: Contracts.Crypto.MilestonePartial[] = [];
 
 	setInitial(options: Contracts.NetworkGenerator.MilestoneOptions): MilestonesGenerator {
 		this.#data = [
@@ -42,7 +42,7 @@ export class MilestonesGenerator {
 		return this;
 	}
 
-	generate(): Partial<Contracts.Crypto.Milestone>[] {
+	generate(): Contracts.Crypto.MilestonePartial[] {
 		return this.#data;
 	}
 }

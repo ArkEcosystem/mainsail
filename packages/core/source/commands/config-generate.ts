@@ -15,8 +15,9 @@ type Flag = {
 	default?: any;
 };
 
-type Flags = AppContracts.NetworkGenerator.Options & {
+type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
 	peers: string;
+	rewardAmount: number | string;
 };
 
 @injectable()
@@ -207,7 +208,7 @@ export class Command extends Commands.Command {
 		if (flags.force || allFlagsSet) {
 			return configurationApp
 				.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
-				.generate(this.#convertPeers(options));
+				.generate(this.#convertFlags(options));
 		}
 
 		const response = await prompts(
@@ -259,17 +260,18 @@ export class Command extends Commands.Command {
 
 		await configurationApp
 			.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
-			.generate(this.#convertPeers(options));
+			.generate(this.#convertFlags(options));
 	}
 
-	#convertPeers(options: Flags): AppContracts.NetworkGenerator.Options {
+	#convertFlags(options: Flags): AppContracts.NetworkGenerator.Options {
 		return {
 			...options,
 			peers: options.peers.replace(" ", "").split(","),
+			rewardAmount: options.rewardAmount.toString(),
 		};
 	}
 
-	#getConfigurationPath(options: AppContracts.NetworkGenerator.Options): string {
+	#getConfigurationPath(options: Flags): string {
 		const paths = envPaths(options.token, { suffix: "core" });
 		const configPath = options.configPath ? options.configPath : paths.config;
 

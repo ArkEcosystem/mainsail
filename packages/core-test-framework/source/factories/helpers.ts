@@ -12,7 +12,7 @@ import {
 import { Factory } from "./factory";
 import { FactoryBuilder } from "./factory-builder";
 
-const createFactory = memoize(async (config?: Contracts.Crypto.NetworkConfig): Promise<FactoryBuilder> => {
+const createFactory = memoize(async (config?: Contracts.Crypto.NetworkConfigPartial): Promise<FactoryBuilder> => {
 	const factory: FactoryBuilder = new FactoryBuilder();
 
 	await registerBlockFactory(factory, config);
@@ -30,7 +30,7 @@ const createFactory = memoize(async (config?: Contracts.Crypto.NetworkConfig): P
 	return factory;
 });
 
-export const factory = async (name: string, config: Contracts.Crypto.NetworkConfig): Promise<Factory> => {
+export const factory = async (name: string, config: Contracts.Crypto.NetworkConfigPartial): Promise<Factory> => {
 	const factoryBuilder = await createFactory(config);
 	return factoryBuilder.get(name);
 };

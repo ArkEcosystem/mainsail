@@ -19,7 +19,7 @@ const setup = (context: Context) => {
 	context.configuration.setConfig(crypto);
 };
 
-describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it }) => {
+describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it, stub }) => {
 	beforeEach(setup);
 
 	it("static delegate count - should calculate the round when nextRound is the same", ({ configuration }) => {
@@ -135,10 +135,31 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		const config = { ...crypto, milestones };
 		configuration.setConfig(config);
 
-		milestones.push({ activeValidators: 4, height: 3 }); // Next milestone should be 4
+		const stubGetNextMilestoneWithKey = stub(configuration, "getNextMilestoneWithNewKey")
+			// nextMilestone
+			.returnValueNth(0, {
+				data: 4,
+				found: true,
+				height: 3,
+			})
+			// getMilestones
+			.returnValueNth(1, {
+				data: 4,
+				found: true,
+				height: 3,
+			})
+			.returnValueNth(2, {
+				data: undefined,
+				found: false,
+				height: 1,
+			});
 
 		calculateRound(1, configuration);
+
+		stubGetNextMilestoneWithKey.reset();
 		calculateRound(2, configuration);
+
+		stubGetNextMilestoneWithKey.reset();
 		assert.throws(
 			() => calculateRound(3, configuration),
 			new Exceptions.InvalidMilestoneConfigurationError(

@@ -8,7 +8,7 @@ export type NetworkConfig = {
 
 export type NetworkConfigPartial = {
 	genesisBlock: IBlockJson;
-	milestones: Partial<Milestone>[];
+	milestones: MilestonePartial[];
 	network: Network;
 };
 
@@ -47,6 +47,10 @@ export type Milestone = {
 	reward: string;
 	satoshi: MilestoneSatoshi;
 	vendorFieldLength: number;
+};
+
+export type MilestonePartial = Partial<Milestone> & {
+	height: number;
 };
 
 export type MilestoneKey = keyof Milestone;

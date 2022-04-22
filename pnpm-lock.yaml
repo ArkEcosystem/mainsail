@@ -651,6 +651,7 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       deepmerge: 4.2.2
+      lodash.clone: 4.5.0
       lodash.get: 4.4.2
       lodash.set: 4.3.2
     dependencies:
@@ -658,6 +659,7 @@ importers:
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       deepmerge: 4.2.2
+      lodash.clone: 4.5.0
       lodash.get: 4.4.2
       lodash.set: 4.3.2
 
@@ -10520,7 +10522,6 @@ packages:
 
   /lodash.clone/4.5.0:
     resolution: {integrity: sha1-GVhwRQ9aExkkeN9Lw9I9LeoZB7Y=}
-    dev: true
 
   /lodash.clonedeep/4.5.0:
     resolution: {integrity: sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8=}

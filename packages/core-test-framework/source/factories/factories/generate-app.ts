@@ -18,7 +18,9 @@ import { ServiceProvider as CoreSerializer } from "../../../../core-serializer";
 import { ServiceProvider as CoreValidation } from "../../../../core-validation";
 import { Sandbox } from "../../app/sandbox";
 
-export const generateApp = async (config: Contracts.Crypto.NetworkConfig): Promise<Contracts.Kernel.Application> => {
+export const generateApp = async (
+	config: Contracts.Crypto.NetworkConfigPartial,
+): Promise<Contracts.Kernel.Application> => {
 	const sandbox = new Sandbox();
 
 	sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});

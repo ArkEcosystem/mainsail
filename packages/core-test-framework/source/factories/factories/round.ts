@@ -10,7 +10,7 @@ import { generateApp } from "./generate-app";
 
 export const registerRoundFactory = async (
 	factory: FactoryBuilder,
-	config?: Contracts.Crypto.NetworkConfig,
+	config?: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
 	const app = await generateApp(
 		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/crypto.json")),

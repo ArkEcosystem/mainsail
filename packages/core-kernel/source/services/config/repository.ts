@@ -1,11 +1,12 @@
 import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { get, has, set, unset } from "@arkecosystem/utils";
 
 import { JsonObject, KeyValuePair } from "../../types";
 import { assert } from "../../utils";
 
 @injectable()
-export class ConfigRepository {
+export class ConfigRepository implements Contracts.Kernel.Repository {
 	#items: JsonObject = {};
 
 	public all(): JsonObject {

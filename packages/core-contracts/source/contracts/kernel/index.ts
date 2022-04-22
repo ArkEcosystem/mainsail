@@ -8,4 +8,5 @@ export * from "./log";
 export * from "./pipeline";
 export * from "./process-actions";
 export * from "./queue";
+export * from "./repository";
 export * from "./validation";
