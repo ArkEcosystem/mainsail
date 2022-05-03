@@ -2,7 +2,10 @@ import yargs from "yargs-parser";
 
 export class InputParser {
 	public static parseArgv(arguments_: string[]) {
-		const parsed: yargs.Arguments = yargs(arguments_, { count: ["v"] });
+		const parsed: yargs.Arguments = yargs(
+			arguments_.filter((argument) => argument !== "--"),
+			{ count: ["v"] },
+		);
 
 		const argv: string[] = parsed._;
 

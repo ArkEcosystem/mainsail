@@ -110,7 +110,7 @@ export class Sandbox {
 		klass: Types.Class<any>;
 	}): Promise<this> {
 		const serviceProvider: Providers.ServiceProvider = this.app.resolve<any>(klass);
-		serviceProvider.setManifest(this.app.resolve(Providers.PluginManifest).discover(path));
+		// serviceProvider.setManifest(this.app.resolve(Providers.PluginManifest).discover(path)); // TODO: Check resolve path
 		serviceProvider.setConfig(this.app.resolve(Providers.PluginConfiguration).discover(name, path));
 
 		this.app
