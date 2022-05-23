@@ -94,15 +94,15 @@ export class ValidatorTracker {
 			}
 
 			if (indexInNextForgers === 0) {
-				this.logger.debug(`${this.#getUsername(validator.publicKey)} will forge next.`);
+				this.logger.debug(`${await this.#getUsername(validator.publicKey)} will forge next.`);
 			} else if (indexInNextForgers <= maxValidators - forgingInfo.nextForger) {
 				this.logger.debug(
-					`${this.#getUsername(validator.publicKey)} will forge in ${Utils.prettyTime(
+					`${await this.#getUsername(validator.publicKey)} will forge in ${Utils.prettyTime(
 						indexInNextForgers * blockTime * 1000,
 					)}.`,
 				);
 			} else {
-				this.logger.debug(`${this.#getUsername(validator.publicKey)} has already forged.`);
+				this.logger.debug(`${await this.#getUsername(validator.publicKey)} has already forged.`);
 			}
 		}
 

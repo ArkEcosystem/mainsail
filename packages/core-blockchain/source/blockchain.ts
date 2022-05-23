@@ -115,9 +115,9 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			peerCount: 10,
 		});
 
-		this.events.listen(Enums.ForgerEvent.Missing, { handle: this.checkMissingBlocks });
+		this.events.listen(Enums.ForgerEvent.Missing, { handle: () => this.checkMissingBlocks() });
 
-		this.events.listen(Enums.RoundEvent.Applied, { handle: this.#resetMissedBlocks });
+		this.events.listen(Enums.RoundEvent.Applied, { handle: () => this.#resetMissedBlocks() });
 
 		this.#booted = true;
 

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { sortBy, sortByDesc } from "@arkecosystem/utils";
+import { BigNumber, sortBy, sortByDesc } from "@arkecosystem/utils";
 import lmdb from "lmdb";
 
 @injectable()
@@ -122,7 +122,13 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async getRound(round: number): Promise<Contracts.Database.IRound[]> {
-		const roundByNumber: Contracts.Database.IRound[] = this.roundStorage.get(round);
+		const roundByNumber: Contracts.Database.IRound[] = this.roundStorage
+			.get(round)
+			?.map((r: { balance: string; round: string; publicKey: string }) => ({
+				balance: BigNumber.make(r.balance),
+				publicKey: r.publicKey,
+				round: BigNumber.make(r.round),
+			}));
 
 		if (!roundByNumber) {
 			return [];
@@ -140,9 +146,9 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 			await this.roundStorage.put(
 				roundNumber,
 				activeValidators.map((validator: Contracts.State.Wallet) => ({
-					balance: validator.getAttribute("validator.voteBalance"),
+					balance: validator.getAttribute("validator.voteBalance").toString(),
 					publicKey: validator.getPublicKey(),
-					round: validator.getAttribute("validator.round"),
+					round: validator.getAttribute("validator.round").toString(),
 				})),
 			);
 		});

@@ -102,6 +102,7 @@ export class RoundState {
 
 		// When called during #applyRound we already know the validators, so we don't have to query the database.
 		if (!validators) {
+			validators = [];
 			const validatorsRound = await this.databaseService.getRound(roundInfo.round);
 
 			for (const [index, { balance, publicKey }] of validatorsRound.entries()) {
