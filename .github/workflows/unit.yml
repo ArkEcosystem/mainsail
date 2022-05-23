@@ -60,6 +60,22 @@ jobs:
               run: cd packages/core-crypto-signature-schnorr && pnpm run test
             - name: Test core-crypto-time
               run: cd packages/core-crypto-time && pnpm run test
+            - name: Test core-crypto-transaction
+              run: cd packages/core-crypto-transaction && pnpm run test
+            - name: Test core-crypto-transaction-multi-payment
+              run: cd packages/core-crypto-transaction-multi-payment && pnpm run test
+            - name: Test core-crypto-transaction-multi-signature-registration
+              run: cd packages/core-crypto-transaction-multi-signature-registration && pnpm run test
+            - name: Test core-crypto-transaction-transfer
+              run: cd packages/core-crypto-transaction-transfer && pnpm run test
+            - name: Test core-crypto-transaction-validator-registration
+              run: cd packages/core-crypto-transaction-validator-registration && pnpm run test
+            - name: Test core-crypto-transaction-validator-resignation
+              run: cd packages/core-crypto-transaction-validator-resignation && pnpm run test
+            - name: Test core-crypto-transaction-vote
+              run: cd packages/core-crypto-transaction-vote && pnpm run test
+            - name: Test core-crypto-validation
+              run: cd packages/core-crypto-validation && pnpm run test
             - name: Test core-crypto-wif
               run: cd packages/core-crypto-wif && pnpm run test
             - name: Test core-forger
@@ -78,6 +94,8 @@ jobs:
               run: cd packages/core-transaction-pool && pnpm run test
             - name: Test core-transactions
               run: cd packages/core-transactions && pnpm run test
+            - name: Test core-validation
+              run: cd packages/core-validation && pnpm run test
             - name: Test core-webhooks
               run: cd packages/core-webhooks && pnpm run test
             - name: Test utils

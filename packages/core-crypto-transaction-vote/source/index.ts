@@ -5,6 +5,7 @@ import { Providers } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { VoteTransactionHandler } from "./handlers";
+import { makeKeywords } from "./validation";
 import { VoteTransaction } from "./versions/1";
 
 export * from "./builder";
@@ -13,11 +14,19 @@ export * from "./versions";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		this.#registerKeywords();
+
 		this.#registerFees();
 
 		this.#registerType();
 
 		this.#registerHandler();
+	}
+
+	#registerKeywords(): void {
+		for (const keyword of Object.values(makeKeywords())) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+		}
 	}
 
 	#registerFees(): void {

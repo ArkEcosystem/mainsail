@@ -7,4 +7,5 @@ export * from "./service-provider";
 export * from "./signer";
 export * from "./types";
 export * from "./utils";
+export * from "./validation";
 export * from "./verifier";

@@ -1,11 +1,16 @@
-import { parse, process } from "ipaddr.js";
+import ipaddr from "ipaddr.js";
 import os from "os";
 
-// @TODO review the implementation of all methods
+const sanitizeRemoteAddress = (ip: string): string | undefined => {
+	try {
+		return ipaddr.process(ip).toString();
+	} catch {
+		return undefined;
+	}
+};
 export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolean => {
 	try {
-		const parsed = parse(ip);
-		if (parsed.range() === "loopback" || ip.startsWith("0") || ["127.0.0.1", "::ffff:127.0.0.1"].includes(ip)) {
+		if (ip.startsWith("0") || ["127.0.0.1", "::ffff:127.0.0.1", "::1"].includes(ip)) {
 			return true;
 		}
 
@@ -16,19 +21,9 @@ export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolea
 
 			return Object.keys(interfaces).some((ifname) => interfaces[ifname].some((iface) => iface.address === ip));
 		}
+	} catch {}
 
-		return false;
-	} catch {
-		return false;
-	}
-};
-
-const sanitizeRemoteAddress = (ip: string): string | undefined => {
-	try {
-		return process(ip).toString();
-	} catch {
-		return undefined;
-	}
+	return false;
 };
 
 export const isValidPeer = (

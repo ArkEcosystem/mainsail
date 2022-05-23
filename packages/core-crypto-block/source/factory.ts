@@ -95,7 +95,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	}
 
 	async #applySchema(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockData | undefined> {
-		const result = await this.validator.validate("block", data);
+		const result = this.validator.validate("block", data);
 
 		if (!result.error) {
 			return result.value;
@@ -104,7 +104,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		for (const error of result.errors) {
 			let fatal = false;
 
-			const match = error.dataPath.match(/\.transactions\[(\d+)]/);
+			const match = error.instancePath.match(/\.transactions\[(\d+)]/);
 			if (match === null) {
 				fatal = true;
 			} else {
@@ -122,7 +122,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			if (fatal) {
 				throw new Exceptions.BlockSchemaError(
 					data.height,
-					`Invalid data${error.dataPath ? " at " + error.dataPath : ""}: ` +
+					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
 						`${error.message}: ${JSON.stringify(error.data)}`,
 				);
 			}

@@ -1,4 +1,4 @@
-import { Constants, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Services, Types, Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
@@ -13,6 +13,7 @@ import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { Server } from "./server";
 import { TransactionBroadcaster } from "./transaction-broadcaster";
+import { makeFormats } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -21,6 +22,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerServices();
 
 		this.#registerActions();
+
+		this.#registerValidation();
 	}
 
 	public async bootWhen(): Promise<boolean> {
@@ -113,5 +116,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
+	}
+
+	#registerValidation(): void {
+		for (const [name, format] of Object.entries(makeFormats())) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+		}
 	}
 }

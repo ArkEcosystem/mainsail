@@ -91,9 +91,9 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
 
 		const serviceProviderOptions = {
-			klass: require("@arkecosystem/core-crypto-transaction").ServiceProvider,
-			name: "@arkecosystem/core-crypto-transaction",
-			path: "@arkecosystem/core-crypto-transaction",
+			klass: require("@arkecosystem/core-validation").ServiceProvider,
+			name: "@arkecosystem/core-validation",
+			path: "@arkecosystem/core-validation",
 		};
 
 		assert.equal(await sandbox.registerServiceProvider(serviceProviderOptions), sandbox);

@@ -13,6 +13,7 @@ import { TransferTransaction } from "../../../../core-crypto-transaction-transfe
 import { ValidatorRegistrationTransaction } from "../../../../core-crypto-transaction-validator-registration";
 import { ValidatorResignationTransaction } from "../../../../core-crypto-transaction-validator-resignation";
 import { VoteTransaction } from "../../../../core-crypto-transaction-vote";
+import { ServiceProvider as CoreCryptoValidation } from "../../../../core-crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "../../../../core-crypto-wif";
 import { ServiceProvider as CoreSerializer } from "../../../../core-serializer";
 import { ServiceProvider as CoreValidation } from "../../../../core-validation";
@@ -28,11 +29,12 @@ export const generateApp = async (
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
+	await sandbox.app.resolve(CoreValidation).register();
+	await sandbox.app.resolve(CoreCryptoValidation).register();
 	await sandbox.app.resolve(CoreCryptoAddressBech32m).register();
 	await sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 	await sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
 	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();
-	await sandbox.app.resolve(CoreValidation).register();
 	await sandbox.app.resolve(CoreCryptoTransaction).register();
 	await sandbox.app.resolve(CoreCryptoBlock).register();
 	await sandbox.app.resolve(CoreSerializer).register();

@@ -22,8 +22,11 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"ajv": "6.12.6",
-		"ajv-keywords": "3.4.1"
+		"ajv": "8.11.0",
+		"ajv-keywords": "5.1.0"
+	},
+	"devDependencies": {
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

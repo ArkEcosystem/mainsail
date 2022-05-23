@@ -4,9 +4,11 @@ import { Configuration } from "@arkecosystem/core-crypto-config";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { Application } from "@arkecosystem/core-kernel";
+import { Validator } from "@arkecosystem/core-validation/source/validator";
 
 import { describe } from "../../core-test-framework";
 import { AddressFactory } from "./address.factory";
+import { schemas } from "./schemas";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
@@ -15,9 +17,13 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	beforeEach((context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
+
+		context.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schemas.address);
 
 		context.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
 			milestones: [
+				// @ts-ignore
 				{
 					address: {
 						bech32m: "mod",

@@ -1,9 +1,10 @@
 import { Container } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import {
-	schemas,
+	extendSchema,
 	Serializer,
 	Transaction,
+	transactionBaseSchema,
 	TransactionRegistry,
 	TransactionTypeFactory,
 	Utils,
@@ -52,8 +53,8 @@ abstract class TestTransaction extends Transaction {
 		return undefined;
 	}
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "test",
 		});
 	}
@@ -70,8 +71,8 @@ abstract class TestDeactivatedTransaction extends Transaction {
 		return undefined;
 	}
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "test",
 		});
 	}
@@ -88,8 +89,8 @@ abstract class TestWithDependencyTransaction extends Transaction {
 		return undefined;
 	}
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "test_with_dependency",
 		});
 	}

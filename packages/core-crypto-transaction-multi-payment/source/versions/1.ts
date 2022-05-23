@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -15,15 +15,14 @@ export class MultiPaymentTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.MultiPayment;
 	public static key = "multiPayment";
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "multiPayment",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
 						payments: {
-							additionalItems: false,
 							items: {
 								properties: {
 									amount: { bignumber: { minimum: 1 } },
@@ -31,7 +30,9 @@ export class MultiPaymentTransaction extends Transaction {
 								},
 								required: ["amount", "recipientId"],
 								type: "object",
+								unevaluatedProperties: false,
 							},
+							maxMultiPaymentLimit: {},
 							minItems: 2,
 							type: "array",
 							uniqueItems: false,
@@ -39,6 +40,7 @@ export class MultiPaymentTransaction extends Transaction {
 					},
 					required: ["payments"],
 					type: "object",
+					unevaluatedProperties: false,
 				},
 				fee: { bignumber: { minimum: 1 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.MultiPayment },

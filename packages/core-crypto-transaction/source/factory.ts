@@ -68,7 +68,6 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 
 			return transaction;
 		} catch (error) {
-			console.log(error);
 			if (
 				error instanceof Exceptions.TransactionVersionError ||
 				error instanceof Exceptions.TransactionSchemaError ||

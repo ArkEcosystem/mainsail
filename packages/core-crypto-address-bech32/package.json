@@ -29,6 +29,9 @@
 		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@arkecosystem/core-crypto-key-pair-ecdsa": "workspace:*",
 		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
+		"@arkecosystem/core-crypto-validation": "workspace:*",
+		"@arkecosystem/core-validation": "workspace:*",
+		"bip39": "3.0.4",
 		"uvu": "^0.5.3"
 	}
 }

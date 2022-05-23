@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
-		"ajv": "6.12.6",
+		"ajv": "8.11.0",
 		"dayjs": "1.10.7",
 		"inversify": "5.1.1",
 		"joi": "17.4.2",

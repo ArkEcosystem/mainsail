@@ -1,6 +1,6 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
-import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -9,8 +9,8 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.ValidatorRegistration;
 	public static key = "validatorRegistration";
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "validatorRegistration",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
@@ -22,10 +22,12 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 							},
 							required: ["username"],
 							type: "object",
+							unevaluatedProperties: false,
 						},
 					},
 					required: ["validator"],
 					type: "object",
+					unevaluatedProperties: false,
 				},
 				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorRegistration },

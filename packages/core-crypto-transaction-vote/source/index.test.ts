@@ -11,6 +11,7 @@ describe<{
 	serviceProvider: ServiceProvider;
 	feeRegistry: any;
 	transactionRegistry: any;
+	validator: any;
 }>("Index", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.feeRegistry = {
@@ -21,9 +22,14 @@ describe<{
 			registerTransactionType: () => {},
 		};
 
+		context.validator = {
+			addKeyword: () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Fee.Registry).toConstantValue(context.feeRegistry);
+		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(context.validator);
 		context.sandbox.app.bind(Identifiers.Fee.Type).toConstantValue("managed");
 		context.sandbox.app
 			.bind(Identifiers.Cryptography.Transaction.Registry)
@@ -39,6 +45,14 @@ describe<{
 
 		spySet.calledOnce();
 		spySet.calledWith(VoteTransaction.key, VoteTransaction.version, BigNumber.make("100"));
+	});
+
+	it("#register - should register keywords", async ({ serviceProvider, validator }) => {
+		const spyAddKeyword = spy(validator, "addKeyword");
+
+		await assert.resolves(() => serviceProvider.register());
+
+		spyAddKeyword.calledOnce();
 	});
 
 	it("#register - should register static fees", async ({ serviceProvider, feeRegistry, sandbox }) => {

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -12,8 +12,8 @@ export class TransferTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.Transfer;
 	public static key = "transfer";
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "transfer",
 			properties: {
 				expiration: { minimum: 0, type: "integer" },

@@ -4,6 +4,7 @@ import { Configuration } from "@arkecosystem/core-crypto-config";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { Application } from "@arkecosystem/core-kernel";
+import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 
 import { describe } from "../../core-test-framework";
 import { AddressFactory } from "./address.factory";
@@ -12,7 +13,7 @@ const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
@@ -25,6 +26,8 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 				},
 			],
 		});
+
+		await context.app.resolve(CoreValidation).register();
 	});
 
 	it("should derive an address from an mnemonic (schnorr)", async (context) => {

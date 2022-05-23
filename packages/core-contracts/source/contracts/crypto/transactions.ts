@@ -18,6 +18,8 @@ export interface ITransaction {
 	hasVendorField(): boolean;
 }
 
+export type ITransactionSchema = Record<string, any>;
+
 export interface ITransactionAsset {
 	[custom: string]: any;
 

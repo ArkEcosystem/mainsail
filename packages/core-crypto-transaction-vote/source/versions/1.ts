@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -12,22 +12,21 @@ export class VoteTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.Vote;
 	public static key = "vote";
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "vote",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
+					minVotesUnvotesLength: 1,
 					properties: {
 						unvotes: {
-							additionalItems: false,
 							items: { $ref: "publicKey" },
 							maxItems: 1,
 							minItems: 0,
 							type: "array",
 						},
 						votes: {
-							additionalItems: false,
 							items: { $ref: "publicKey" },
 							maxItems: 1,
 							minItems: 0,
@@ -36,6 +35,7 @@ export class VoteTransaction extends Transaction {
 					},
 					required: ["unvotes", "votes"],
 					type: "object",
+					unevaluatedProperties: false,
 				},
 				fee: { bignumber: { minimum: 1 } },
 				recipientId: { $ref: "address" },

@@ -26,11 +26,16 @@
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
-		"@arkecosystem/utils": "workspace:*"
+		"@arkecosystem/utils": "workspace:*",
+		"ajv": "8.11.0"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
+		"@arkecosystem/core-crypto-validation": "workspace:*",
 		"@arkecosystem/core-validation": "workspace:*",
-		"uvu": "0.5.3"
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

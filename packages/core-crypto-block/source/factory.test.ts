@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import clone from "lodash.clone";
 
 import crypto from "../../core/bin/config/testnet/crypto.json";
@@ -14,7 +14,9 @@ import {
 import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { BlockFactory } from "./factory";
+import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
+
 interface Identity {
 	keys: Contracts.Crypto.IKeyPair;
 	publicKey: string;
@@ -42,6 +44,10 @@ describe<{
 		blockDataWithTransactionsClone = clone(blockDataWithTransactionsOriginal);
 
 		await prepareSandbox(context);
+
+		for (const schema of Object.values(schemas)) {
+			context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
 
 		context.factory = context.sandbox.app.resolve(BlockFactory);
 		context.serializer = context.sandbox.app.resolve(Serializer);
@@ -150,14 +156,17 @@ describe<{
 		factory,
 	}) => {
 		const b2 = Object.assign({}, blockData, { totalAmount: "abcd" });
-		await assert.rejects(() => factory.fromData(b2), "Cannot convert abcd to a BigInt");
+		await assert.rejects(
+			() => factory.fromData(b2),
+			'Invalid data at /totalAmount: must pass "bignumber" keyword validation: undefined',
+		);
 	});
 
 	it("#fromData - should throw on invalid input data - required block property is missing", async ({ factory }) => {
 		delete blockDataClone.generatorPublicKey;
 		await assert.rejects(
 			() => factory.fromData(blockDataClone),
-			" Invalid data: should have required property 'generatorPublicKey': undefined",
+			" Invalid data: must have required property 'generatorPublicKey': undefined",
 		);
 	});
 
@@ -166,7 +175,7 @@ describe<{
 
 		await assert.rejects(
 			() => factory.fromData(blockDataWithTransactionsClone),
-			"Invalid data at .transactions[0]: should have required property '.id': undefined",
+			"Invalid data at /transactions/0: must have required property 'id': undefined",
 		);
 	});
 

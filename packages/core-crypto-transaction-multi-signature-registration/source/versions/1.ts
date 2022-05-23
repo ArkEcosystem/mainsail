@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -15,8 +15,8 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.MultiSignature;
 	public static key = "multiSignature";
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(transactionBaseSchema, {
 			$id: "multiSignature",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
@@ -30,7 +30,6 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 									type: "integer",
 								},
 								publicKeys: {
-									additionalItems: false,
 									items: { $ref: "publicKey" },
 									maxItems: 16,
 									minItems: 1,
@@ -40,14 +39,15 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 							},
 							required: ["min", "publicKeys"],
 							type: "object",
+							unevaluatedProperties: false,
 						},
 					},
 					required: ["multiSignature"],
 					type: "object",
+					unevaluatedProperties: false,
 				},
 				fee: { bignumber: { minimum: 1 } },
 				signatures: {
-					additionalItems: false,
 					items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }] },
 					maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },
 					minItems: { $data: "1/asset/multiSignature/min" },

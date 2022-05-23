@@ -2,8 +2,6 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 
-import { TransactionSchema } from "./schemas";
-
 @injectable()
 export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
@@ -36,7 +34,7 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 		return (this as any).__proto__.constructor.key;
 	}
 
-	public static getSchema(): TransactionSchema {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
 		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
 	}
 

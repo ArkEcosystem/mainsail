@@ -1,9 +1,8 @@
 import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { schemas } from "@arkecosystem/core-crypto-validation";
 
 import { Transaction } from "./types";
-import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
+import { signedSchema, strictSchema } from "./validation/utils";
 
 export type TransactionConstructor = typeof Transaction;
 
@@ -20,7 +19,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		Map<number, TransactionConstructor>
 	> = new Map();
 
-	readonly #transactionSchemas = new Map<string, TransactionSchema>();
+	readonly #transactionSchemas = new Map<string, Contracts.Crypto.ITransactionSchema>();
 
 	@postConstruct()
 	public postConstruct() {
@@ -92,7 +91,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		}
 	}
 
-	#updateSchemas(schema: TransactionSchema, remove?: boolean): void {
+	#updateSchemas(schema: Contracts.Crypto.ITransactionSchema, remove?: boolean): void {
 		this.validator.extend((ajv) => {
 			if (ajv.getSchema(schema.$id)) {
 				remove = true;
@@ -113,15 +112,12 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			ajv.addSchema(strictSchema(schema));
 
 			// Update schemas
-			ajv.removeSchema("block");
 			ajv.removeSchema("transactions");
 			ajv.addSchema({
 				$id: "transactions",
-				additionalItems: false,
 				items: { anyOf: [...this.#transactionSchemas.keys()].map((schema) => ({ $ref: `${schema}Signed` })) },
 				type: "array",
 			});
-			ajv.addSchema(schemas.block);
 		});
 	}
 }

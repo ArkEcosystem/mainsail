@@ -1,29 +1,30 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
-import Ajv from "ajv";
+import Ajv, { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv/dist/2020";
 import keywords from "ajv-keywords";
 
 @injectable()
 export class Validator implements Contracts.Crypto.IValidator {
-	#ajv: Ajv.Ajv;
+	#ajv: Ajv;
 
 	@postConstruct()
 	public postConstruct(): void {
 		this.#ajv = new Ajv({
 			$data: true,
-			extendRefs: true,
 			removeAdditional: true,
 		});
 
 		keywords(this.#ajv);
 	}
 
-	public async validate<T = any>(
-		schemaKeyReference: string | boolean | object,
+	public validate<T = any>(
+		schemaKeyReference: string | Schema,
 		data: T,
-	): Promise<Contracts.Crypto.ISchemaValidationResult<T>> {
+	): Contracts.Crypto.ISchemaValidationResult<T> {
 		try {
-			await this.#ajv.validate(schemaKeyReference, data);
+			this.#ajv.validate(schemaKeyReference, data);
+
+			this.#ajv.errors;
 
 			return {
 				error: this.#ajv.errors ? this.#ajv.errorsText() : undefined,
@@ -35,27 +36,27 @@ export class Validator implements Contracts.Crypto.IValidator {
 		}
 	}
 
-	public addFormat(name: string, format: Ajv.FormatDefinition): void {
+	public addFormat(name: string, format: FormatDefinition<string> | FormatDefinition<number>): void {
 		this.#ajv.addFormat(name, format);
 	}
 
-	public addKeyword(keyword: string, definition: Ajv.KeywordDefinition): void {
-		this.#ajv.addKeyword(keyword, definition);
+	public addKeyword(definition: KeywordDefinition): void {
+		this.#ajv.addKeyword(definition);
 	}
 
-	public addSchema(schema: object | object[], key?: string): void {
-		this.#ajv.addSchema(schema, key);
+	public addSchema(schema: AnySchema | AnySchema[]): void {
+		this.#ajv.addSchema(schema);
 	}
 
 	public removeKeyword(keyword: string): void {
 		this.#ajv.removeKeyword(keyword);
 	}
 
-	public removeSchema(schemaKeyReference: string | boolean | object | RegExp): void {
+	public removeSchema(schemaKeyReference: string): void {
 		this.#ajv.removeSchema(schemaKeyReference);
 	}
 
-	public extend(callback: (ajv: Ajv.Ajv) => void): void {
+	public extend(callback: (ajv: Ajv) => void): void {
 		callback(this.#ajv);
 	}
 }
