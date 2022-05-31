@@ -1,7 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber, sortBy, sortByDesc } from "@arkecosystem/utils";
-import lmdb from "lmdb";
+import { Database } from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.IDatabaseService {
@@ -9,16 +9,16 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	private readonly logger: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Database.BlockStorage)
-	private readonly blockStorage: lmdb.Database;
+	private readonly blockStorage: Database;
 
 	@inject(Identifiers.Database.BlockHeightStorage)
-	private readonly blockStorageById: lmdb.Database;
+	private readonly blockStorageById: Database;
 
 	@inject(Identifiers.Database.TransactionStorage)
-	private readonly transactionStorage: lmdb.Database;
+	private readonly transactionStorage: Database;
 
 	@inject(Identifiers.Database.RoundStorage)
-	private readonly roundStorage: lmdb.Database;
+	private readonly roundStorage: Database;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
@@ -27,7 +27,13 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
-		return this.blockFactory.fromBytes(this.blockStorage.get(id));
+		const bytes = this.blockStorage.get(id);
+
+		if (bytes) {
+			return this.blockFactory.fromBytes(bytes);
+		}
+
+		return undefined;
 	}
 
 	public async findBlocksByHeightRange(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
@@ -53,15 +59,11 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		).sort((a: Contracts.Crypto.IBlock, b: Contracts.Crypto.IBlock) => a.data.height - b.data.height);
 	}
 
-	public async getBlocks(start: number, end: number, headersOnly?: boolean): Promise<Contracts.Crypto.IBlockData[]> {
+	public async getBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlockData[]> {
 		return (await this.findBlocksByHeightRange(start, end)).map(({ data }) => data);
 	}
 
-	public async getBlocksForDownload(
-		offset: number,
-		limit: number,
-		headersOnly?: boolean,
-	): Promise<Contracts.Shared.DownloadBlock[]> {
+	public async getBlocksForDownload(offset: number, limit: number): Promise<Contracts.Shared.DownloadBlock[]> {
 		return (await this.findBlocksByHeightRange(offset, offset + limit - 1)).map(({ data, transactions }) => ({
 			...data,
 			transactions: transactions.map(({ serialized }) => serialized.toString("hex")),
@@ -69,15 +71,18 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {
-		return this.#map<Contracts.Crypto.IBlock>(heights, (height: number) =>
-			this.blockFactory.fromBytes(this.blockStorage.get(height)),
+		const ids = await this.#map<string>(heights, (height: number) => this.blockStorageById.get(height));
+
+		return this.#map<Contracts.Crypto.IBlock>(
+			ids.filter((id) => id !== undefined),
+			(id: string) => this.blockFactory.fromBytes(this.blockStorage.get(id)),
 		);
 	}
 
 	public async getLastBlock(): Promise<Contracts.Crypto.IBlock | undefined> {
 		try {
 			return this.blockFactory.fromBytes(
-				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
+				this.blockStorage.get(this.blockStorageById.getRange({ limit: 1, reverse: true }).asArray[0].value),
 			);
 		} catch {
 			return undefined;
@@ -102,7 +107,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 				throw new Error(`Failed to store block ${block.data.height} because it has no ID.`);
 			}
 
-			await this.blockStorage.ifNoExists(blockID, async () => {
+			if (!this.blockStorage.doesExist(blockID)) {
 				await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
 
 				await this.blockStorageById.put(block.data.height, blockID);
@@ -110,24 +115,26 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 				for (const transaction of block.transactions) {
 					await this.transactionStorage.put(transaction.data.id, transaction.serialized);
 				}
-			});
+			}
 		}
 	}
 
-	public async findBlocksByIds(ids: any[]): Promise<Contracts.Crypto.IBlockData[]> {
+	public async findBlocksByIds(ids: string[]): Promise<Contracts.Crypto.IBlockData[]> {
+		const blocks = await this.#map<Buffer | undefined>(ids, (id: string) => this.blockStorage.get(id));
+
 		return this.#map(
-			ids,
-			async (id: string) => (await this.blockFactory.fromBytes(this.blockStorage.get(id))).data,
+			blocks.filter((block) => block !== undefined),
+			async (block: Buffer) => (await this.blockFactory.fromBytes(block)).data,
 		);
 	}
 
 	public async getRound(round: number): Promise<Contracts.Database.IRound[]> {
 		const roundByNumber: Contracts.Database.IRound[] = this.roundStorage
 			.get(round)
-			?.map((r: { balance: string; round: string; publicKey: string }) => ({
+			?.map((r: { balance: string; round: number; publicKey: string }) => ({
 				balance: BigNumber.make(r.balance),
 				publicKey: r.publicKey,
-				round: BigNumber.make(r.round),
+				round: r.round,
 			}));
 
 		if (!roundByNumber) {
@@ -142,16 +149,16 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 		const roundNumber: number = activeValidators[0].getAttribute("validator.round");
 
-		await this.roundStorage.ifNoExists(roundNumber, async () => {
+		if (!this.roundStorage.doesExist(roundNumber)) {
 			await this.roundStorage.put(
 				roundNumber,
 				activeValidators.map((validator: Contracts.State.Wallet) => ({
 					balance: validator.getAttribute("validator.voteBalance").toString(),
 					publicKey: validator.getPublicKey(),
-					round: validator.getAttribute("validator.round").toString(),
+					round: validator.getAttribute("validator.round"),
 				})),
 			);
-		});
+		}
 	}
 
 	public async deleteRound(round: number): Promise<void> {

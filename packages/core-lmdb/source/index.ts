@@ -1,10 +1,10 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
-import lmdb from "lmdb";
+import { open } from "lmdb";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const rootStorage = lmdb.open({
+		const rootStorage = open({
 			compression: true,
 			name: "core",
 			path: this.app.dataPath(),

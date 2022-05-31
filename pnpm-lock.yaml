@@ -1274,11 +1274,27 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-address-bech32m': workspace:*
+      '@arkecosystem/core-crypto-block': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-hash-bcrypto': workspace:*
+      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
+      '@arkecosystem/core-crypto-signature-schnorr': workspace:*
+      '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-crypto-transaction-transfer': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
+      '@arkecosystem/core-fees': workspace:*
+      '@arkecosystem/core-fees-static': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-lmdb': workspace:*
+      '@arkecosystem/core-serializer': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': 1.3.1
       dayjs: 1.10.7
       joi: 17.4.2
-      lmdb: ^2.2.4
+      lmdb: 2.4.2
+      tmp: 0.2.1
+      uvu: 0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -1286,7 +1302,24 @@ importers:
       '@arkecosystem/utils': link:../utils
       dayjs: 1.10.7
       joi: 17.4.2
-      lmdb: 2.2.4
+      lmdb: 2.4.2
+    devDependencies:
+      '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
+      '@arkecosystem/core-crypto-block': link:../core-crypto-block
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-hash-bcrypto': link:../core-crypto-hash-bcrypto
+      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
+      '@arkecosystem/core-crypto-signature-schnorr': link:../core-crypto-signature-schnorr
+      '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
+      '@arkecosystem/core-crypto-transaction-transfer': link:../core-crypto-transaction-transfer
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-fees': link:../core-fees
+      '@arkecosystem/core-fees-static': link:../core-fees-static
+      '@arkecosystem/core-lmdb': link:../core-lmdb
+      '@arkecosystem/core-serializer': link:../core-serializer
+      '@arkecosystem/core-validation': link:../core-validation
+      tmp: 0.2.1
+      uvu: 0.5.3
 
   packages/core-fees:
     specifiers:
@@ -1518,12 +1551,17 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      lmdb: ^2.2.4
+      lmdb: 2.4.2
+      tmp: 0.2.1
+      uvu: 0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
-      lmdb: 2.2.4
+      lmdb: 2.4.2
+    devDependencies:
+      tmp: 0.2.1
+      uvu: 0.5.3
 
   packages/core-logger-pino:
     specifiers:
@@ -3795,6 +3833,54 @@ packages:
       - undici
     dev: false
 
+  /@lmdb/lmdb-darwin-arm64/2.4.0:
+    resolution: {integrity: sha512-TqYe2na5LXTq8KhfcKnafDbBH7BgM/EzgqTJNL67v2wUgFJeTrXw6RtBV3uzAfgQcmx1ucvEl7qVDYTA1W6VAw==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lmdb/lmdb-darwin-x64/2.4.0:
+    resolution: {integrity: sha512-mvkiGPKVYzNamO0+I9ayRhbUf5sykj1RcHyg/7/xAusfPYWGn7j01sCExl0prYOSNGDrgGkwKaUCUndbiOWHeA==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lmdb/lmdb-linux-arm/2.4.0:
+    resolution: {integrity: sha512-VCpBd9rTkwarIJWJmTumIYeuy6aNhgQiVtnsP8cPH2GJYNqv4Odfo96loB/fDTtHSvMdDHgu6/KjNrBwJ1zTEg==}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lmdb/lmdb-linux-arm64/2.4.0:
+    resolution: {integrity: sha512-reRkhk9wxzvYuRDHipiKJgMUCPL73x08xQ344IFK+EEZgyNISDYsERijBQ3h8aJGf1Rj9r8eU2oKFHbOTRoAeg==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lmdb/lmdb-linux-x64/2.4.0:
+    resolution: {integrity: sha512-uLDGJefR5tQNn/5mFhAZ8bBHwJE07bC4SG56I34fMtxTFmdgfL0pWEJzxSmOBNhFWaqaT3ZyKqmJFoM290EQBQ==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lmdb/lmdb-win32-x64/2.4.0:
+    resolution: {integrity: sha512-fGdifcROMMUvhNZqPRGSwu6c+VwzVvWB8U1VFGkYZVpSkQwmHz87+qvmZXQB7GzEK2WDIdqAfGk4K6gQ1wBWiA==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@mapbox/node-pre-gyp/1.0.8:
     resolution: {integrity: sha512-CMGKi28CF+qlbXh26hDe6NxCd7amqeAzEqnS6IHeO6LoaKyM/n+Xw3HT1COdq8cuioOdlKdqn/hCmqPUOMOywg==}
     hasBin: true
@@ -4766,7 +4852,6 @@ packages:
     resolution: {integrity: sha512-FXCJgyyN3ivVgRoml4h94G/p3kY+u/B86La+QptcqJaWtBWtmc6TtkNfS40n9bIvyLteHh7zXOtgbobORKPbDg==}
     dependencies:
       '@types/node': 17.0.18
-    dev: false
 
   /@types/listr/0.14.4:
     resolution: {integrity: sha512-+MWvidNujBUgJsi4yMVwEQQwaHe6oHedPSy+dwk3akGEeuIbvhWkK+TGsXSwbFup7Y0cCBb+wzzdD+yGKp7sOg==}
@@ -4892,7 +4977,6 @@ packages:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
       '@types/node': 17.0.18
-    dev: false
 
   /@types/retry/0.12.1:
     resolution: {integrity: sha512-xoDlM2S4ortawSWORYqsdU+2rxdh4LRW9ytc3zmT37RIKQh6IHyKwwtKhKis9ah8ol07DCkZxPt8BBvPjC6v4g==}
@@ -5917,6 +6001,8 @@ packages:
       snapdragon-node: 2.1.1
       split-string: 3.1.0
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /braces/3.0.2:
@@ -6631,6 +6717,8 @@ packages:
     dependencies:
       cpy: 8.1.2
       meow: 6.1.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /cpy/8.1.2:
@@ -6646,6 +6734,8 @@ packages:
       p-all: 2.1.0
       p-filter: 2.1.0
       p-map: 3.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /create-hash/1.2.0:
@@ -6768,6 +6858,11 @@ packages:
 
   /debug/3.1.0:
     resolution: {integrity: sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.0.0
     dev: false
@@ -8184,6 +8279,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /expand-template/2.0.3:
@@ -8219,6 +8316,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /extract-stack/2.0.0:
@@ -8262,6 +8361,8 @@ packages:
       is-glob: 4.0.3
       merge2: 1.4.1
       micromatch: 3.1.10
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /fast-glob/3.2.11:
@@ -8975,6 +9076,8 @@ packages:
       ignore: 4.0.6
       pify: 4.0.1
       slash: 2.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /globrex/0.1.2:
@@ -9012,6 +9115,8 @@ packages:
     dependencies:
       '@sindresorhus/is': 0.14.0
       '@szmarczak/http-timer': 1.1.2
+      '@types/keyv': 3.1.3
+      '@types/responselike': 1.0.0
       cacheable-request: 6.1.0
       decompress-response: 3.3.0
       duplexer3: 0.1.4
@@ -9223,6 +9328,8 @@ packages:
     dependencies:
       agent-base: 4.3.0
       debug: 3.1.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /http-proxy-agent/4.0.1:
@@ -10687,6 +10794,24 @@ packages:
       weak-lru-cache: 1.2.2
     dev: false
 
+  /lmdb/2.4.2:
+    resolution: {integrity: sha512-dgqoGgHl/lzPobumxIsagVy7JXBAdFJv74avJTC733lb6d/RiCrzjm5YOUyCjhKnCNTNlNPGBP6/C1gZelUwlA==}
+    requiresBuild: true
+    dependencies:
+      msgpackr: 1.5.4
+      node-addon-api: 4.3.0
+      node-gyp-build-optional-packages: 5.0.2
+      ordered-binary: 1.2.4
+      weak-lru-cache: 1.2.2
+    optionalDependencies:
+      '@lmdb/lmdb-darwin-arm64': 2.4.0
+      '@lmdb/lmdb-darwin-x64': 2.4.0
+      '@lmdb/lmdb-linux-arm': 2.4.0
+      '@lmdb/lmdb-linux-arm64': 2.4.0
+      '@lmdb/lmdb-linux-x64': 2.4.0
+      '@lmdb/lmdb-win32-x64': 2.4.0
+    dev: false
+
   /load-json-file/6.2.0:
     resolution: {integrity: sha512-gUD/epcRms75Cw8RT1pUdHugZYM5ce64ucs2GEISABwkRsOQr0q2wm/MV2TKThycIe5e0ytRweW2RZxclogCdQ==}
     engines: {node: '>=8'}
@@ -11076,6 +11201,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /micromatch/4.0.4:
@@ -11405,6 +11532,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
 
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
@@ -11571,6 +11700,11 @@ packages:
   /node-forge/1.2.1:
     resolution: {integrity: sha512-Fcvtbb+zBcZXbTTVwqGA5W+MKBj56UjVRevvchv5XrcyXbmNdesfZL37nlcWOfpgHhgmxApw3tQbTr4CqNmX4w==}
     engines: {node: '>= 6.13.0'}
+    dev: false
+
+  /node-gyp-build-optional-packages/5.0.2:
+    resolution: {integrity: sha512-PiN4NWmlQPqvbEFcH/omQsswWQbe5Z9YK/zdB23irp5j2XibaA2IrGvpSWmVVG4qMZdmPdwPctSy4a86rOMn6g==}
+    hasBin: true
     dev: false
 
   /node-gyp-build/4.3.0:
@@ -13562,6 +13696,8 @@ packages:
       source-map: 0.5.7
       source-map-resolve: 0.5.3
       use: 3.1.1
+    transitivePeerDependencies:
+      - supports-color
 
   /socks-proxy-agent/4.0.2:
     resolution: {integrity: sha512-NT6syHhI9LmuEMSK6Kd2V7gNv5KFZoLE7V5udWmn0de+3Mkj3UMA/AJPLyeNUVmElCurSHtUdM3ETpR3z770Wg==}

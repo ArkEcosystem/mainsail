@@ -21,7 +21,6 @@ export class GetBlocksController {
 	): Promise<Contracts.Crypto.IBlockData[] | Contracts.Shared.DownloadBlock[]> {
 		const requestBlockHeight: number = +(request.body as any).lastBlockHeight + 1;
 		const requestBlockLimit: number = +(request.body as any).blockLimit || 400;
-		const requestHeadersOnly = !!(request.body as any).headersOnly;
 
 		const lastHeight: number = this.blockchain.getLastHeight();
 		if (requestBlockHeight > lastHeight) {
@@ -31,7 +30,6 @@ export class GetBlocksController {
 		const blocks: Contracts.Shared.DownloadBlock[] = await this.database.getBlocksForDownload(
 			requestBlockHeight,
 			requestBlockLimit,
-			requestHeadersOnly,
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit

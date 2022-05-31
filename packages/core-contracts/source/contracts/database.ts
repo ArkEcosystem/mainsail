@@ -6,7 +6,7 @@ import { Wallet } from "./state";
 
 export interface IRound {
 	publicKey: string;
-	round: BigNumber;
+	round: number;
 	balance: BigNumber;
 }
 
@@ -15,9 +15,9 @@ export interface IDatabaseService {
 
 	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
 
-	getBlocks(start: number, end: number, headersOnly?: boolean): Promise<IBlockData[]>;
+	getBlocks(start: number, end: number): Promise<IBlockData[]>;
 
-	getBlocksForDownload(offset: number, limit: number, headersOnly?: boolean): Promise<DownloadBlock[]>;
+	getBlocksForDownload(offset: number, limit: number): Promise<DownloadBlock[]>;
 
 	findBlockByHeights(heights: number[]): Promise<IBlock[]>;
 
