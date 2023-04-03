@@ -5,14 +5,14 @@ jobs:
             group: ${{ github.head_ref }}-unit
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
               with:
                   ref: ${{ github.head_ref }}
             - uses: pnpm/action-setup@v2
               with:
                   run_install: true
                   version: latest
-            - uses: actions/setup-node@v2
+            - uses: actions/setup-node@v3
               with:
                   cache: pnpm
                   node-version: ${{ matrix.node-version }}
@@ -103,7 +103,7 @@ jobs:
         strategy:
             matrix:
                 node-version:
-                    - 16.x
+                    - 18.x
 name: CI
 on:
     pull_request:
