@@ -361,6 +361,12 @@ importers:
 
   packages/core-api:
     dependencies:
+      '@arkecosystem/core-container':
+        specifier: workspace:*
+        version: link:../core-container
+      '@arkecosystem/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
       '@arkecosystem/core-database':
         specifier: workspace:*
         version: link:../core-database

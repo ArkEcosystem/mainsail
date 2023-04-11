@@ -19,6 +19,8 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
