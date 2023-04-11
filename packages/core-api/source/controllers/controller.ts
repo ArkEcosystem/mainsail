@@ -1,20 +1,22 @@
-import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
+import {Providers } from "@arkecosystem/core-kernel";
+import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 
 import { Resource } from "../interfaces";
 import { SchemaObject } from "../schemas";
 
-@Container.injectable()
+@injectable()
 export class Controller {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-api")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-api")
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
-	protected getQueryPagination(query: Hapi.RequestQuery): Contracts.Search.Pagination {
+	protected getQueryPagination(query: Hapi.RequestQuery): any { // Contracts.Search.Pagination
 		const pagination = {
 			limit: query.limit,
 			offset: (query.page - 1) * query.limit || 0,
@@ -38,7 +40,7 @@ export class Controller {
 		return criteria;
 	}
 
-	protected getListingPage(request: Hapi.Request): Contracts.Search.Pagination {
+	protected getListingPage(request: Hapi.Request): any { // Contracts.Search.Pagination
 		const pagination = {
 			limit: request.query.limit || 100,
 			offset: (request.query.page - 1) * request.query.limit || 0,
@@ -51,7 +53,7 @@ export class Controller {
 		return pagination;
 	}
 
-	protected getListingOrder(request: Hapi.Request): Contracts.Search.Sorting {
+	protected getListingOrder(request: Hapi.Request): any { // Contracts.Search.Sorting 
 		if (!request.query.orderBy) {
 			return [];
 		}
@@ -64,7 +66,7 @@ export class Controller {
 		}));
 	}
 
-	protected getListingOptions(): Contracts.Search.Options {
+	protected getListingOptions(): any { // Contracts.Search.Options
 		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
 
 		return {
@@ -109,10 +111,10 @@ export class Controller {
 	}
 
 	protected toPagination<T, R extends Resource>(
-		resultsPage: Contracts.Search.ResultsPage<T>,
+		resultsPage: any, // Contracts.Search.ResultsPage<T>
 		transformer: new () => R,
 		transform = true,
-	): Contracts.Search.ResultsPage<ReturnType<R["raw"]>> | Contracts.Search.ResultsPage<ReturnType<R["transform"]>> {
+	): any { // Contracts.Search.ResultsPage<ReturnType<R["raw"]>> | Contracts.Search.ResultsPage<ReturnType<R["transform"]>>
 		const items = this.toCollection(resultsPage.results, transformer, transform);
 
 		return { ...resultsPage, results: items };

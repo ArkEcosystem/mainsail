@@ -1,9 +1,11 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+// import { Utils } from "@arkecosystem/core-kernel";
+import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject } from "@arkecosystem/core-container";
 
 import { Controller } from "./controller";
 
 export class BlockchainController extends Controller {
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async index() {
@@ -15,7 +17,7 @@ export class BlockchainController extends Controller {
 					height: data.height,
 					id: data.id,
 				},
-				supply: Utils.supplyCalculator.calculate(data.height),
+				// supply: Utils.supplyCalculator.calculate(data.height), // TODO: Enable supply calculator
 			},
 		};
 	}

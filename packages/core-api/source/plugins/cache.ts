@@ -1,4 +1,4 @@
-import { Crypto } from "@arkecosystem/crypto";
+// import { Crypto } from "@arkecosystem/crypto";
 import Hapi from "@hapi/hapi";
 import NodeCache from "node-cache";
 
@@ -8,16 +8,20 @@ type CachedResponse = {
 	payload: unknown;
 };
 
+// const generateCacheKey = (request: Hapi.Request): string =>
+// 	Crypto.HashAlgorithms.sha256(
+// 		JSON.stringify({
+// 			method: request.method,
+// 			params: request.params || {},
+// 			pathname: request.url.pathname,
+// 			payload: request.payload || {},
+// 			query: request.query,
+// 		}),
+// 	).toString("hex");
+
+
 const generateCacheKey = (request: Hapi.Request): string =>
-	Crypto.HashAlgorithms.sha256(
-		JSON.stringify({
-			method: request.method,
-			params: request.params || {},
-			pathname: request.url.pathname,
-			payload: request.payload || {},
-			query: request.query,
-		}),
-	).toString("hex");
+	""
 
 export = {
 	name: "node-cache",

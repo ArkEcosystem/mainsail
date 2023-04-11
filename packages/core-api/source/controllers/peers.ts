@@ -1,4 +1,6 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import {  Utils } from "@arkecosystem/core-kernel";
+import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import semver from "semver";
@@ -6,9 +8,9 @@ import semver from "semver";
 import { PeerResource } from "../resources";
 import { Controller } from "./controller";
 
-@Container.injectable()
+@injectable()
 export class PeersController extends Controller {
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {

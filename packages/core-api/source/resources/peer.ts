@@ -1,8 +1,8 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { injectable } from "@arkecosystem/core-container";
 
 import { Resource } from "../interfaces";
 
-@Container.injectable()
+@injectable()
 export class PeerResource implements Resource {
 	public raw(resource): object {
 		return resource;

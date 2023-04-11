@@ -1,7 +1,7 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+// import { Container, Contracts } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
-import { getIp } from "../utils";
+// import { getIp } from "../utils";
 
 export const log = {
 	name: "log",
@@ -16,17 +16,17 @@ export const log = {
 			return;
 		}
 
-		const logger = server.app.app.get<Contracts.Kernel.Logger>(Container.Identifiers.LogService);
+		// const logger = server.app.app.get<Contracts.Kernel.Logger>(Container.Identifiers.LogService);
 
-		server.ext("onRequest", (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
-			logger.debug(
-				`API request on: "${request.path}" from: "${getIp(request, options.trustProxy)}" with query: "${
-					request.url.search
-				}"`,
-			);
+		// server.ext("onRequest", (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
+		// 	logger.debug(
+		// 		`API request on: "${request.path}" from: "${getIp(request, options.trustProxy)}" with query: "${
+		// 			request.url.search
+		// 		}"`,
+		// 	);
 
-			return h.continue;
-		});
+		// 	return h.continue;
+		// });
 	},
 
 	version: "1.0.0",

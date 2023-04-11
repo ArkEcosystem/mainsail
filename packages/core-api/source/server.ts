@@ -1,4 +1,6 @@
-import { Container, Contracts, Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import {  Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { badData } from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { readFileSync } from "fs";
@@ -6,16 +8,16 @@ import { readFileSync } from "fs";
 import * as Schemas from "./schemas";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class Server {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-api")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-api")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	private server: HapiServer;

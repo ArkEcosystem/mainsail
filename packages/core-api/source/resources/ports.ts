@@ -1,10 +1,12 @@
-import { Container, Providers } from "@arkecosystem/core-kernel";
+import { Providers } from "@arkecosystem/core-kernel";
+import {   Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
 
 import { Resource } from "../interfaces";
 
-@Container.injectable()
+@injectable()
 export class PortsResource implements Resource {
-	@Container.inject(Container.Identifiers.ServiceProviderRepository)
+	@inject(Identifiers.ServiceProviderRepository)
 	protected readonly serviceProviderRepository!: Providers.ServiceProviderRepository;
 
 	public raw(resource): object {
