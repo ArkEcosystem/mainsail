@@ -88,6 +88,9 @@
 			"package": "@arkecosystem/core-blockchain"
 		},
 		{
+			"package": "@arkecosystem/core-api"
+		},
+		{
 			"package": "@arkecosystem/core-webhooks"
 		},
 		{

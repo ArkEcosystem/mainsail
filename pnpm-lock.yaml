@@ -178,6 +178,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@arkecosystem/core-api':
+        specifier: workspace:*
+        version: link:../core-api
       '@arkecosystem/core-blockchain':
         specifier: workspace:*
         version: link:../core-blockchain

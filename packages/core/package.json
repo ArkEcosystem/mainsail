@@ -25,6 +25,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
+		"@arkecosystem/core-api": "workspace:*",
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
 		"@arkecosystem/core-configuration-generator": "workspace:*",
