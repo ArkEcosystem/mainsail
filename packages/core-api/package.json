@@ -25,6 +25,7 @@
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"@hapi/boom": "9.1.4",
 		"@hapi/hapi": "20.1.5",
 		"@hapi/hoek": "9.2.0",

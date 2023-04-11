@@ -1,6 +1,5 @@
-// @ts-nocheck
-// import { Contracts } from "@arkecosystem/core-kernel";
-// import { Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
+import { Sorting } from "./types";
 import Joi from "joi";
 
 const isSchema = (value: Joi.Schema | SchemaObject): value is Joi.Schema => {
@@ -10,14 +9,14 @@ const isSchema = (value: Joi.Schema | SchemaObject): value is Joi.Schema => {
 // BigNumber
 
 export const bigNumber = Joi.custom((value: unknown) => {
-	return Utils.BigNumber.make(value as any);
+	return BigNumber.make(value as any);
 });
 
-export const nonNegativeBigNumber = bigNumber.custom((value: Utils.BigNumber, helpers) => {
+export const nonNegativeBigNumber = bigNumber.custom((value: BigNumber, helpers) => {
 	return value.isGreaterThanEqual(0) ? value : helpers.error("any.invalid");
 });
 
-export const positiveBigNumber = bigNumber.custom((value: Utils.BigNumber, helpers) => {
+export const positiveBigNumber = bigNumber.custom((value: BigNumber, helpers) => {
 	return value.isGreaterThanEqual(1) ? value : helpers.error("any.invalid");
 });
 
@@ -62,7 +61,7 @@ export const createSortingSchema = (schemaObject: SchemaObject, wildcardPaths: s
 				return [];
 			}
 
-			const sorting: Contracts.Search.Sorting = [];
+			const sorting: Sorting = [];
 
 			for (const item of value.split(",")) {
 				const pair = item.split(":");

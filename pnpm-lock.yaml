@@ -382,6 +382,9 @@ importers:
       '@arkecosystem/core-transactions':
         specifier: workspace:*
         version: link:../core-transactions
+      '@arkecosystem/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@hapi/boom':
         specifier: 9.1.4
         version: 9.1.4
