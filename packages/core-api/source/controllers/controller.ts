@@ -1,6 +1,7 @@
 import {Providers } from "@arkecosystem/core-kernel";
 import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Sorting, Pagination, Options, ResultsPage } from "../types";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 
@@ -16,7 +17,7 @@ export class Controller {
 	@tagged("plugin", "core-api")
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
-	protected getQueryPagination(query: Hapi.RequestQuery): any { // Contracts.Search.Pagination
+	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
 		const pagination = {
 			limit: query.limit,
 			offset: (query.page - 1) * query.limit || 0,
@@ -40,7 +41,7 @@ export class Controller {
 		return criteria;
 	}
 
-	protected getListingPage(request: Hapi.Request): any { // Contracts.Search.Pagination
+	protected getListingPage(request: Hapi.Request): Pagination {
 		const pagination = {
 			limit: request.query.limit || 100,
 			offset: (request.query.page - 1) * request.query.limit || 0,
@@ -53,7 +54,7 @@ export class Controller {
 		return pagination;
 	}
 
-	protected getListingOrder(request: Hapi.Request): any { // Contracts.Search.Sorting 
+	protected getListingOrder(request: Hapi.Request): Sorting {
 		if (!request.query.orderBy) {
 			return [];
 		}
@@ -66,7 +67,7 @@ export class Controller {
 		}));
 	}
 
-	protected getListingOptions(): any { // Contracts.Search.Options
+	protected getListingOptions(): Options {
 		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
 
 		return {
@@ -111,10 +112,10 @@ export class Controller {
 	}
 
 	protected toPagination<T, R extends Resource>(
-		resultsPage: any, // Contracts.Search.ResultsPage<T>
+		resultsPage: ResultsPage<T>,
 		transformer: new () => R,
 		transform = true,
-	): any { // Contracts.Search.ResultsPage<ReturnType<R["raw"]>> | Contracts.Search.ResultsPage<ReturnType<R["transform"]>>
+	): ResultsPage<ReturnType<R["raw"]>> | ResultsPage<ReturnType<R["transform"]>> {
 		const items = this.toCollection(resultsPage.results, transformer, transform);
 
 		return { ...resultsPage, results: items };
