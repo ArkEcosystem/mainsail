@@ -4,7 +4,7 @@ import { Utils } from "@arkecosystem/core-kernel";
 import Hoek from "@hapi/hoek";
 import Qs from "querystring";
 
-export class Ext {
+export class Extension {
 	private readonly routePathPrefix = "/api";
 	public constructor(private readonly config) {}
 

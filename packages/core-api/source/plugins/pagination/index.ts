@@ -1,9 +1,9 @@
 // Based on https://github.com/fknop/hapi-pagination
 
 import { getConfig } from "./config";
-import { Ext as Extension } from "./ext";
+import { Extension } from "./extension";
 
-exports.plugin = {
+export = {
 	name: "hapi-pagination",
 	register(server, options) {
 		const { error, config } = getConfig(options);
