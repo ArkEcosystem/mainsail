@@ -1,5 +1,4 @@
 import Hapi from "@hapi/hapi";
-import Joi from "joi";
 
 import { NodeController } from "../controllers/node";
 
@@ -19,11 +18,11 @@ export const register = (server: Hapi.Server): void => {
 		path: "/node/syncing",
 	});
 
-	server.route({
-		handler: (request: Hapi.Request) => controller.configuration(request),
-		method: "GET",
-		path: "/node/configuration",
-	});
+	// server.route({
+	// 	handler: (request: Hapi.Request) => controller.configuration(request),
+	// 	method: "GET",
+	// 	path: "/node/configuration",
+	// });
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.configurationCrypto(request),
@@ -31,16 +30,16 @@ export const register = (server: Hapi.Server): void => {
 		path: "/node/configuration/crypto",
 	});
 
-	server.route({
-		handler: (request: Hapi.Request) => controller.fees(request),
-		method: "GET",
-		options: {
-			validate: {
-				query: Joi.object({
-					days: Joi.number().integer().min(1).max(30),
-				}),
-			},
-		},
-		path: "/node/fees",
-	});
+	// server.route({
+	// 	handler: (request: Hapi.Request) => controller.fees(request),
+	// 	method: "GET",
+	// 	options: {
+	// 		validate: {
+	// 			query: Joi.object({
+	// 				days: Joi.number().integer().min(1).max(30),
+	// 			}),
+	// 		},
+	// 	},
+	// 	path: "/node/fees",
+	// });
 };
