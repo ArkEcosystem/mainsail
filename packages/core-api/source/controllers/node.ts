@@ -27,6 +27,9 @@ export class NodeController extends Controller {
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
 	// @Container.inject(Container.Identifiers.DatabaseTransactionRepository)
 	// private readonly transactionRepository!: Repositories.TransactionRepository;
 
@@ -94,11 +97,11 @@ export class NodeController extends Controller {
 	// 	};
 	// }
 
-	// public async configurationCrypto() {
-	// 	return {
-	// 		data: Managers.configManager.all(),
-	// 	};
-	// }
+	public async configurationCrypto() {
+		return {
+			data: this.configuration.all(),
+		};
+	}
 
 	// 	public async fees(request: Hapi.Request) {
 	// 		// @ts-ignore
