@@ -11,26 +11,6 @@ export const register = (server: Hapi.Server): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.index(request),
-		method: "GET",
-		options: {
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
-			validate: {
-				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
-					orderBy: server.app.schemas.transactionsOrderBy,
-					transform: Joi.bool().default(true),
-				}).concat(pagination),
-			},
-		},
-		path: "/transactions",
-	});
-
-	server.route({
 		handler: (request: Hapi.Request) => controller.store(request),
 		method: "POST",
 		options: {
@@ -117,11 +97,5 @@ export const register = (server: Hapi.Server): void => {
 		handler: (request: Hapi.Request) => controller.schemas(request),
 		method: "GET",
 		path: "/transactions/schemas",
-	});
-
-	server.route({
-		handler: (request: Hapi.Request) => controller.fees(request),
-		method: "GET",
-		path: "/transactions/fees",
 	});
 };
