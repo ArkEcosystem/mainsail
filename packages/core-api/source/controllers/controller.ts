@@ -75,12 +75,12 @@ export class Controller {
 		};
 	}
 
-	protected respondWithResource(data, transformer, transform = true): any {
+	protected async respondWithResource(data, transformer, transform = true): Promise<any> {
 		if (!data) {
 			return Boom.notFound();
 		}
 
-		return { data: this.toResource(data, transformer, transform) };
+		return { data: await this.toResource(data, transformer, transform) };
 	}
 
 	protected respondWithCollection(data, transformer, transform = true): object {
@@ -89,11 +89,11 @@ export class Controller {
 		};
 	}
 
-	protected toResource<T, R extends Resource>(
+	protected async toResource<T, R extends Resource>(
 		item: T,
 		transformer: new () => R,
 		transform = true,
-	): ReturnType<R["raw"]> | ReturnType<R["transform"]> {
+	): Promise<ReturnType<R["raw"]> | ReturnType<R["transform"]>> {
 		const resource = this.app.resolve<R>(transformer);
 
 		if (transform) {
@@ -103,20 +103,20 @@ export class Controller {
 		}
 	}
 
-	protected toCollection<T, R extends Resource>(
+	protected async toCollection<T, R extends Resource>(
 		items: T[],
 		transformer: new () => R,
 		transform = true,
-	): ReturnType<R["raw"]>[] | ReturnType<R["transform"]>[] {
-		return items.map((item) => this.toResource(item, transformer, transform));
+	): Promise<ReturnType<R["raw"]>[] | ReturnType<R["transform"]>[]> {
+		return Promise.all(items.map(async (item) => await this.toResource(item, transformer, transform)));
 	}
 
-	protected toPagination<T, R extends Resource>(
+	protected async toPagination<T, R extends Resource>(
 		resultsPage: ResultsPage<T>,
 		transformer: new () => R,
 		transform = true,
-	): ResultsPage<ReturnType<R["raw"]>> | ResultsPage<ReturnType<R["transform"]>> {
-		const items = this.toCollection(resultsPage.results, transformer, transform);
+	): Promise<ResultsPage<ReturnType<R["raw"]>> | ResultsPage<ReturnType<R["transform"]>>> {
+		const items = await this.toCollection(resultsPage.results, transformer, transform);
 
 		return { ...resultsPage, results: items };
 	}
