@@ -19,9 +19,7 @@ type CachedResponse = {
 // 		}),
 // 	).toString("hex");
 
-
-const generateCacheKey = (request: Hapi.Request): string =>
-	""
+const generateCacheKey = (request: Hapi.Request): string => "";
 
 export = {
 	name: "node-cache",

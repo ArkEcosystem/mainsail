@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
-		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
+		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue =>
 			// const blockHeight = app
 			// 	.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService)
 			// 	.getLastHeight();
@@ -12,8 +12,7 @@ export const responseHeaders = {
 			// responsePropToUpdate.headers = responsePropToUpdate.headers ?? {};
 			// responsePropToUpdate.headers["X-Block-Height"] = blockHeight;
 
-			return h.continue;
-		};
+			h.continue;
 	},
 	name: "response-headers",
 

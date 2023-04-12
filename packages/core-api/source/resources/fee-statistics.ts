@@ -11,9 +11,9 @@ export class FeeStatisticsResource implements Resource {
 	public transform(resource): object {
 		return {
 			fees: {
-				avgFee: parseInt(resource.avgFee, 10),
-				maxFee: parseInt(resource.maxFee, 10),
-				minFee: parseInt(resource.minFee, 10),
+				avgFee: Number.parseInt(resource.avgFee, 10),
+				maxFee: Number.parseInt(resource.maxFee, 10),
+				minFee: Number.parseInt(resource.minFee, 10),
 			},
 			type: resource.type,
 		};

@@ -39,47 +39,47 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): object {
 		return Joi.object({
-			server: Joi.object({
-				http: Joi.object({
-					enabled: Joi.bool().required(),
-					host: Joi.string().required(),
-					port: Joi.number().integer().min(1).max(65535).required(),
-				}).required(),
-				https: Joi.object({
-					enabled: Joi.bool().required(),
-					host: Joi.string().required(),
-					port: Joi.number().integer().min(1).max(65535).required(),
-					tls: Joi.object({
-						key: Joi.string().when("...enabled", { is: true, then: Joi.required() }),
-						cert: Joi.string().when("...enabled", { is: true, then: Joi.required() }),
-					}).required(),
-				}).required(),
+			options: Joi.object({
+				estimateTotalCount: Joi.bool().required(),
 			}).required(),
 			plugins: Joi.object({
-				log: Joi.object({
-					enabled: Joi.bool().required(),
-				}).required(),
 				cache: Joi.object({
+					checkperiod: Joi.number().integer().min(0).required(),
 					enabled: Joi.bool().required(),
 					stdTTL: Joi.number().integer().min(0).required(),
-					checkperiod: Joi.number().integer().min(0).required(),
 				}).required(),
-				rateLimit: Joi.object({
+				log: Joi.object({
 					enabled: Joi.bool().required(),
-					points: Joi.number().integer().min(0).required(),
-					duration: Joi.number().integer().min(0).required(),
-					whitelist: Joi.array().items(Joi.string()).required(),
-					blacklist: Joi.array().items(Joi.string()).required(),
 				}).required(),
 				pagination: Joi.object({
 					limit: Joi.number().integer().min(0).required(),
 				}).required(),
+				rateLimit: Joi.object({
+					blacklist: Joi.array().items(Joi.string()).required(),
+					duration: Joi.number().integer().min(0).required(),
+					enabled: Joi.bool().required(),
+					points: Joi.number().integer().min(0).required(),
+					whitelist: Joi.array().items(Joi.string()).required(),
+				}).required(),
 				socketTimeout: Joi.number().integer().min(0).required(),
-				whitelist: Joi.array().items(Joi.string()).required(),
 				trustProxy: Joi.bool().required(),
+				whitelist: Joi.array().items(Joi.string()).required(),
 			}).required(),
-			options: Joi.object({
-				estimateTotalCount: Joi.bool().required(),
+			server: Joi.object({
+				http: Joi.object({
+					enabled: Joi.bool().required(),
+					host: Joi.string().required(),
+					port: Joi.number().integer().min(1).max(65_535).required(),
+				}).required(),
+				https: Joi.object({
+					enabled: Joi.bool().required(),
+					host: Joi.string().required(),
+					port: Joi.number().integer().min(1).max(65_535).required(),
+					tls: Joi.object({
+						cert: Joi.string().when("...enabled", { is: true, then: Joi.required() }),
+						key: Joi.string().when("...enabled", { is: true, then: Joi.required() }),
+					}).required(),
+				}).required(),
 			}).required(),
 		}).unknown(true);
 	}
@@ -91,10 +91,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		await server.initialize(`Public API (${type.toUpperCase()})`, {
 			...this.config().get(`server.${type}`),
-			...{
-				routes: {
-					cors: true,
-				},
+
+			routes: {
+				cors: true,
 			},
 		});
 

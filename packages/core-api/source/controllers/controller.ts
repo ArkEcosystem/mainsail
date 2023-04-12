@@ -1,12 +1,12 @@
-import {Providers } from "@arkecosystem/core-kernel";
-import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Sorting, Pagination, Options, ResultsPage } from "../types";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 
 import { Resource } from "../interfaces";
 import { SchemaObject } from "../schemas";
+import { Options, Pagination, ResultsPage, Sorting } from "../types";
 
 @injectable()
 export class Controller {

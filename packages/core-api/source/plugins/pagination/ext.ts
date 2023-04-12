@@ -14,11 +14,11 @@ export class Ext {
 
 	public onPreHandler(request, h) {
 		if (this.isValidRoute(request)) {
-			const setParam = (name, defaultValue) => {
+			const setParameter = (name, defaultValue) => {
 				let value;
 
 				if (request.query[name]) {
-					value = parseInt(request.query[name]);
+					value = Number.parseInt(request.query[name]);
 
 					if (Number.isNaN(value)) {
 						value = defaultValue;
@@ -27,12 +27,12 @@ export class Ext {
 
 				request.query[name] = value || defaultValue;
 
-				return undefined;
+				return;
 			};
 
 			// ! should be set through validation schema
-			setParam("page", 1);
-			setParam("limit", Utils.get(this.config, "query.limit.default", 100));
+			setParameter("page", 1);
+			setParameter("limit", Utils.get(this.config, "query.limit.default", 100));
 		}
 
 		return h.continue;
@@ -60,7 +60,7 @@ export class Ext {
 
 		const { totalCount } = source.totalCount ? source : request;
 
-		let pageCount: number = 1;
+		let pageCount = 1;
 		if (totalCount) {
 			/* istanbul ignore next */
 			pageCount = Math.trunc(totalCount / currentLimit) + (totalCount % currentLimit === 0 ? 0 : 1);
@@ -72,26 +72,27 @@ export class Ext {
 			page ? baseUri + Qs.stringify(Hoek.applyToDefaults({ ...query, ...request.orig.query }, { page })) : null;
 
 		const newSource = {
-			meta: {
-				...(source.meta || {}),
-				...{
-					count: results.length,
-					pageCount: pageCount,
-					totalCount: totalCount ? totalCount : 0,
-
-					// tslint:disable-next-line: no-null-keyword
-					/* istanbul ignore next */
-					next: totalCount && currentPage < pageCount ? getUri(currentPage + 1) : null,
-					previous:
-						// tslint:disable-next-line: no-null-keyword
-						totalCount && currentPage > 1 && currentPage <= pageCount + 1 ? getUri(currentPage - 1) : null,
-
-					self: getUri(currentPage),
-					first: getUri(1),
-					last: getUri(pageCount),
-				},
-			},
 			data: results,
+			meta: {
+				...source.meta,
+
+				count: results.length,
+
+				first: getUri(1),
+
+				last: getUri(pageCount),
+
+				// tslint:disable-next-line: no-null-keyword
+				/* istanbul ignore next */
+				next: totalCount && currentPage < pageCount ? getUri(currentPage + 1) : null,
+				pageCount: pageCount,
+
+				previous:
+					// tslint:disable-next-line: no-null-keyword
+					totalCount && currentPage > 1 && currentPage <= pageCount + 1 ? getUri(currentPage - 1) : null,
+				self: getUri(currentPage),
+				totalCount: totalCount ? totalCount : 0,
+			},
 		};
 
 		if (source.response) {

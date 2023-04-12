@@ -1,6 +1,6 @@
 // import { Repositories } from "@arkecosystem/core-database";
-import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 // import { Handlers } from "@arkecosystem/core-transactions";
 // import { Crypto, Managers } from "@arkecosystem/crypto";
 import Hapi from "@hapi/hapi";
@@ -100,36 +100,35 @@ export class NodeController extends Controller {
 	// 	};
 	// }
 
+	// 	public async fees(request: Hapi.Request) {
+	// 		// @ts-ignore
+	// 		const handlers = this.nullHandlerRegistry.getRegisteredHandlers();
+	// 		const handlersKey = {};
+	// 		const txsTypes: Array<{ type: number; typeGroup: number }> = [];
+	// 		for (const handler of handlers) {
+	// 			handlersKey[`${handler.getConstructor().type}-${handler.getConstructor().typeGroup}`] =
+	// 				handler.getConstructor().key;
+	// 			txsTypes.push({ type: handler.getConstructor().type, typeGroup: handler.getConstructor().typeGroup });
+	// 		}
 
-// 	public async fees(request: Hapi.Request) {
-// 		// @ts-ignore
-// 		const handlers = this.nullHandlerRegistry.getRegisteredHandlers();
-// 		const handlersKey = {};
-// 		const txsTypes: Array<{ type: number; typeGroup: number }> = [];
-// 		for (const handler of handlers) {
-// 			handlersKey[`${handler.getConstructor().type}-${handler.getConstructor().typeGroup}`] =
-// 				handler.getConstructor().key;
-// 			txsTypes.push({ type: handler.getConstructor().type, typeGroup: handler.getConstructor().typeGroup });
-// 		}
+	// 		const results = await this.transactionRepository.getFeeStatistics(txsTypes, request.query.days);
 
-// 		const results = await this.transactionRepository.getFeeStatistics(txsTypes, request.query.days);
+	// 		const groupedByTypeGroup = {};
+	// 		for (const result of results) {
+	// 			if (!groupedByTypeGroup[result.typeGroup]) {
+	// 				groupedByTypeGroup[result.typeGroup] = {};
+	// 			}
 
-// 		const groupedByTypeGroup = {};
-// 		for (const result of results) {
-// 			if (!groupedByTypeGroup[result.typeGroup]) {
-// 				groupedByTypeGroup[result.typeGroup] = {};
-// 			}
+	// 			const handlerKey = handlersKey[`${result.type}-${result.typeGroup}`];
 
-// 			const handlerKey = handlersKey[`${result.type}-${result.typeGroup}`];
+	// 			groupedByTypeGroup[result.typeGroup][handlerKey] = {
+	// 				avg: result.avg,
+	// 				max: result.max,
+	// 				min: result.min,
+	// 				sum: result.sum,
+	// 			};
+	// 		}
 
-// 			groupedByTypeGroup[result.typeGroup][handlerKey] = {
-// 				avg: result.avg,
-// 				max: result.max,
-// 				min: result.min,
-// 				sum: result.sum,
-// 			};
-// 		}
-
-// 		return { data: groupedByTypeGroup, meta: { days: request.query.days } };
-// 	}'
+	// 		return { data: groupedByTypeGroup, meta: { days: request.query.days } };
+	// 	}'
 }

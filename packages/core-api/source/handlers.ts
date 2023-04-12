@@ -5,6 +5,7 @@ import * as Node from "./routes/node";
 import * as Peers from "./routes/peers";
 
 export = {
+	name: "Public API",
 	async register(server: Hapi.Server): Promise<void> {
 		const handlers = [Blockchain, Node, Peers];
 
@@ -12,6 +13,5 @@ export = {
 			handler.register(server);
 		}
 	},
-	name: "Public API",
 	version: "2.0.0",
 };

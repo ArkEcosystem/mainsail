@@ -1,6 +1,6 @@
-import {  Providers, Types, Utils } from "@arkecosystem/core-kernel";
-import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import { badData } from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { readFileSync } from "fs";
@@ -53,11 +53,11 @@ export class Server {
 		});
 
 		this.server.route({
-			method: "GET",
-			path: "/",
 			handler() {
 				return { data: "Hello World!" };
 			},
+			method: "GET",
+			path: "/",
 		});
 	}
 
@@ -125,18 +125,18 @@ export class Server {
 			routes: {
 				payload: {
 					/* istanbul ignore next */
-					async failAction(request, h, err) {
-						return badData(err.message);
+					async failAction(request, h, error) {
+						return badData(error.message);
 					},
 				},
 				validate: {
-					options: {
-						context: validateContext,
+					/* istanbul ignore next */
+					async failAction(request, h, error) {
+						return badData(error.message);
 					},
 
-					/* istanbul ignore next */
-					async failAction(request, h, err) {
-						return badData(err.message);
+					options: {
+						context: validateContext,
 					},
 				},
 			},

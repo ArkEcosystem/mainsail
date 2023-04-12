@@ -1,6 +1,6 @@
-import {  Utils } from "@arkecosystem/core-kernel";
-import {  Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import semver from "semver";
@@ -57,7 +57,7 @@ export class PeersController extends Controller {
 				case "height": {
 					results = Utils.orderBy(
 						results,
-						(el) => el.state[orderByMapped[0]],
+						(element) => element.state[orderByMapped[0]],
 						orderByMapped[1] === "asc" ? "asc" : "desc", // ? why desc is default
 					);
 					break;

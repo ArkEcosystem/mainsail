@@ -1,11 +1,10 @@
 // Based on https://github.com/fknop/hapi-pagination
 
 import { getConfig } from "./config";
-import { Ext } from "./ext";
+import { Ext as Extension } from "./ext";
 
 exports.plugin = {
 	name: "hapi-pagination",
-	version: "1.0.0",
 	register(server, options) {
 		const { error, config } = getConfig(options);
 
@@ -13,9 +12,10 @@ exports.plugin = {
 			throw error;
 		}
 
-		const ext = new Ext(config);
+		const extension = new Extension(config);
 
-		server.ext("onPreHandler", (request, h) => ext.onPreHandler(request, h));
-		server.ext("onPostHandler", (request, h) => ext.onPostHandler(request, h));
+		server.ext("onPreHandler", (request, h) => extension.onPreHandler(request, h));
+		server.ext("onPostHandler", (request, h) => extension.onPostHandler(request, h));
 	},
+	version: "1.0.0",
 };

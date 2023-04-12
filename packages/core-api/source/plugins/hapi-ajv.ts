@@ -12,7 +12,7 @@ export const hapiAjv = {
 		// 	Boom.badData(errors.map((error) => error.message).join(","));
 
 		server.ext({
-			method: (request, h) => {
+			method: (request, h) =>
 				// const config = request.route.settings.plugins[name] || {};
 
 				// if (config.payloadSchema) {
@@ -31,8 +31,7 @@ export const hapiAjv = {
 				// 	}
 				// }
 
-				return h.continue;
-			},
+				h.continue,
 			type: "onPreHandler",
 		});
 	},
