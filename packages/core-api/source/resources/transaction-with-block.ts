@@ -1,48 +1,65 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { Resource } from "../interfaces";
 
-@Container.injectable()
+type TransactionDataWithBlockData = {
+	data: Contracts.Crypto.ITransactionData;
+	block: Contracts.Crypto.IBlockData;
+};
+
+@injectable()
 export class TransactionWithBlockResource implements Resource {
-	@Container.inject(Container.Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	protected readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	public raw(resource: Contracts.Shared.TransactionDataWithBlockData): object {
+	public raw(resource: TransactionDataWithBlockData): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
-	public transform(resource: Contracts.Shared.TransactionDataWithBlockData): object {
+	public async transform(resource: TransactionDataWithBlockData): Promise<object> {
 		const transactionData = resource.data;
 		const blockData = resource.block;
 
 		AppUtils.assert.defined<string>(transactionData.senderPublicKey);
 
-		const sender: string = this.walletRepository.findByPublicKey(transactionData.senderPublicKey).getAddress();
+		const wallet = await this.walletRepository.findByPublicKey(transactionData.senderPublicKey);
+		const sender: string = wallet.getAddress();
 		const recipient: string = transactionData.recipientId ?? sender;
 		const confirmations: number = this.stateStore.getLastHeight() - blockData.height + 1;
 
 		return {
-			id: transactionData.id,
-			blockId: transactionData.blockId,
-			version: transactionData.version,
-			type: transactionData.type,
-			typeGroup: transactionData.typeGroup,
 			amount: transactionData.amount.toFixed(),
-			fee: transactionData.fee.toFixed(),
-			sender,
-			senderPublicKey: transactionData.senderPublicKey,
-			recipient,
-			signature: transactionData.signature,
-			signatures: transactionData.signatures,
-			vendorField: transactionData.vendorField,
 			asset: transactionData.asset,
+			blockId: transactionData.blockId,
 			confirmations,
-			timestamp: AppUtils.formatTimestamp(blockData.timestamp),
-			nonce: transactionData.nonce!.toFixed(),
+			fee: transactionData.fee.toFixed(),
+			id: transactionData.id,
+			// timestamp: AppUtils.formatTimestamp(blockData.timestamp),
+			nonce: transactionData.nonce.toFixed(),
+
+			recipient,
+
+			sender,
+
+			senderPublicKey: transactionData.senderPublicKey,
+
+			signature: transactionData.signature,
+
+			signatures: transactionData.signatures,
+
+			type: transactionData.type,
+
+			typeGroup: transactionData.typeGroup,
+
+			vendorField: transactionData.vendorField,
+
+			version: transactionData.version,
 		};
 	}
 }

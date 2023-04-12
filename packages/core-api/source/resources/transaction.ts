@@ -1,17 +1,19 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
+// import { Interfaces } from "@arkecosystem/crypto";
 import { Resource } from "../interfaces";
 
-@Container.injectable()
+@injectable()
 export class TransactionResource implements Resource {
 	/**
 	 * @protected
 	 * @type {Contracts.State.WalletRepository}
 	 * @memberof TransactionResource
 	 */
-	@Container.inject(Container.Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	protected readonly walletRepository!: Contracts.State.WalletRepository;
 
 	/**
@@ -21,7 +23,7 @@ export class TransactionResource implements Resource {
 	 * @returns {object}
 	 * @memberof Resource
 	 */
-	public raw(resource: Interfaces.ITransactionData): object {
+	public raw(resource: Contracts.Crypto.ITransactionData): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
@@ -32,30 +34,41 @@ export class TransactionResource implements Resource {
 	 * @returns {object}
 	 * @memberof Resource
 	 */
-	public transform(resource: Interfaces.ITransactionData): object {
+	public async transform(resource: Contracts.Crypto.ITransactionData): Promise<object> {
 		AppUtils.assert.defined<string>(resource.senderPublicKey);
 
-		const sender: string = this.walletRepository.findByPublicKey(resource.senderPublicKey).getAddress();
+		const wallet = await this.walletRepository.findByPublicKey(resource.senderPublicKey);
+		const sender: string = wallet.getAddress();
 
 		return {
-			id: resource.id,
-			blockId: resource.blockId,
-			version: resource.version,
-			type: resource.type,
-			typeGroup: resource.typeGroup,
 			amount: resource.amount.toFixed(),
-			fee: resource.fee.toFixed(),
-			sender,
-			senderPublicKey: resource.senderPublicKey,
-			recipient: resource.recipientId || sender,
-			signature: resource.signature,
-			signatures: resource.signatures,
-			vendorField: resource.vendorField,
+			blockId: resource.blockId,
 			asset: resource.asset,
-			confirmations: 0, // ! resource.block ? lastBlock.data.height - resource.block.height + 1 : 0
-			timestamp:
-				typeof resource.timestamp !== "undefined" ? AppUtils.formatTimestamp(resource.timestamp) : undefined,
+			fee: resource.fee.toFixed(),
+			confirmations: 0,
+			id: resource.id,
+			// ! resource.block ? lastBlock.data.height - resource.block.height + 1 : 0
+			// timestamp:
+			// 	typeof resource.timestamp !== "undefined" ? AppUtils.formatTimestamp(resource.timestamp) : undefined,
 			nonce: resource.nonce?.toFixed(),
+
+			recipient: resource.recipientId || sender,
+
+			sender,
+
+			senderPublicKey: resource.senderPublicKey,
+
+			signature: resource.signature,
+
+			type: resource.type,
+
+			signatures: resource.signatures,
+
+			version: resource.version,
+
+			typeGroup: resource.typeGroup,
+
+			vendorField: resource.vendorField,
 		};
 	}
 }

@@ -1,9 +1,9 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { injectable } from "@arkecosystem/core-container";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { Resource } from "../interfaces";
 
-@Container.injectable()
+@injectable()
 export class RoundResource implements Resource {
 	/**
 	 * Return the raw representation of the resource.
@@ -26,7 +26,7 @@ export class RoundResource implements Resource {
 	public transform(resource): object {
 		return {
 			publicKey: resource.publicKey,
-			votes: Utils.BigNumber.make(resource.balance).toFixed(),
+			votes: BigNumber.make(resource.balance).toFixed(),
 		};
 	}
 }

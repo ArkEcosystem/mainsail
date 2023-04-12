@@ -1,9 +1,9 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { Resource } from "../interfaces";
 
-@Container.injectable()
+@injectable()
 export class BlockResource implements Resource {
 	/**
 	 * Return the raw representation of the resource.
@@ -12,7 +12,7 @@ export class BlockResource implements Resource {
 	 * @returns {object}
 	 * @memberof Resource
 	 */
-	public raw(resource: Interfaces.IBlockData): object {
+	public raw(resource: Contracts.Crypto.IBlockData): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
@@ -23,7 +23,7 @@ export class BlockResource implements Resource {
 	 * @returns {object}
 	 * @memberof Resource
 	 */
-	public transform(resource: Interfaces.IBlockData): object {
+	public transform(resource: Contracts.Crypto.IBlockData): object {
 		throw new Error("Deprecated, use BlockWithTransactionsResources instead");
 	}
 }

@@ -1,68 +1,68 @@
-import { Container, Providers } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Providers } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions";
-import * as Schemas from "../schemas";
+import { pagination } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(TransactionsController);
 	server.bind(controller);
 
 	server.route({
-		method: "GET",
-		path: "/transactions",
 		handler: (request: Hapi.Request) => controller.index(request),
+		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				query: Joi.object({
 					...server.app.schemas.transactionCriteriaSchemas,
 					orderBy: server.app.schemas.transactionsOrderBy,
 					transform: Joi.bool().default(true),
-				}).concat(Schemas.pagination),
-			},
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
+				}).concat(pagination),
 			},
 		},
+		path: "/transactions",
 	});
 
 	server.route({
-		method: "POST",
-		path: "/transactions",
 		handler: (request: Hapi.Request) => controller.store(request),
+		method: "POST",
 		options: {
 			plugins: {
 				"hapi-ajv": {
 					payloadSchema: {
-						type: "object",
-						required: ["transactions"],
 						additionalProperties: false,
 						properties: {
 							transactions: {
 								$ref: "transactions",
-								minItems: 1,
 								maxItems: server.app.app
 									.getTagged<Providers.PluginConfiguration>(
-										Container.Identifiers.PluginConfiguration,
+										Identifiers.PluginConfiguration,
 										"plugin",
 										"core-transaction-pool",
 									)
 									.get<number>("maxTransactionsPerRequest"),
+								minItems: 1,
 							},
 						},
+						required: ["transactions"],
+						type: "object",
 					},
 				},
 			},
 		},
+		path: "/transactions",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/transactions/{id}",
 		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
 		options: {
 			validate: {
 				params: Joi.object({
@@ -73,30 +73,30 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/transactions/{id}",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/transactions/unconfirmed",
 		handler: (request: Hapi.Request) => controller.unconfirmed(request),
+		method: "GET",
 		options: {
-			validate: {
-				query: Joi.object({
-					transform: Joi.bool().default(true),
-				}).concat(Schemas.pagination),
-			},
 			plugins: {
 				pagination: {
 					enabled: true,
 				},
 			},
+			validate: {
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}).concat(pagination),
+			},
 		},
+		path: "/transactions/unconfirmed",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/transactions/unconfirmed/{id}",
 		handler: (request: Hapi.Request) => controller.showUnconfirmed(request),
+		method: "GET",
 		options: {
 			validate: {
 				params: Joi.object({
@@ -104,23 +104,24 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/transactions/unconfirmed/{id}",
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.types(request),
 		method: "GET",
 		path: "/transactions/types",
-		handler: (request: Hapi.Request) => controller.types(request),
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.schemas(request),
 		method: "GET",
 		path: "/transactions/schemas",
-		handler: (request: Hapi.Request) => controller.schemas(request),
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.fees(request),
 		method: "GET",
 		path: "/transactions/fees",
-		handler: (request: Hapi.Request) => controller.fees(request),
 	});
 };

@@ -1,58 +1,57 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces } from "@arkecosystem/crypto";
-import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 
-import { TransactionResource, TransactionWithBlockResource } from "../resources";
 import { Controller } from "./controller";
 
-@Container.injectable()
+@injectable()
 export class TransactionsController extends Controller {
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "null")
+	@inject(Identifiers.TransactionHandlerRegistry)
+	@tagged("state", "null")
 	private readonly nullHandlerRegistry!: Handlers.Registry;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.TransactionPoolQuery)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	// @inject(Identifiers.TransactionPoolQuery)
+	// private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@Container.inject(Container.Identifiers.TransactionHistoryService)
-	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
+	// @inject(Identifiers.TransactionHistoryService)
+	// private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
 
-	@Container.inject(Container.Identifiers.BlockHistoryService)
-	private readonly blockHistoryService!: Contracts.Shared.BlockHistoryService;
+	// @inject(Identifiers.BlockHistoryService)
+	// private readonly blockHistoryService!: Contracts.Shared.BlockHistoryService;
 
-	@Container.inject(Container.Identifiers.TransactionPoolProcessor)
+	@inject(Identifiers.TransactionPoolProcessor)
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const criteria: Contracts.Shared.TransactionCriteria = request.query;
-		const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
-		const pagination: Contracts.Search.Pagination = this.getListingPage(request);
-		const options: Contracts.Search.Options = this.getListingOptions();
+	// public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	// 	const criteria: Contracts.Shared.TransactionCriteria = request.query;
+	// 	const sorting: Contracts.Search.Sorting = this.getListingOrder(request);
+	// 	const pagination: Contracts.Search.Pagination = this.getListingPage(request);
+	// 	const options: Contracts.Search.Options = this.getListingOptions();
 
-		if (request.query.transform) {
-			const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
-				criteria,
-				sorting,
-				pagination,
-				options,
-			);
+	// 	if (request.query.transform) {
+	// 		const transactionListResult = await this.transactionHistoryService.listByCriteriaJoinBlock(
+	// 			criteria,
+	// 			sorting,
+	// 			pagination,
+	// 			options,
+	// 		);
 
-			return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
-		} else {
-			const transactionListResult = await this.transactionHistoryService.listByCriteria(
-				criteria,
-				sorting,
-				pagination,
-				options,
-			);
-			return this.toPagination(transactionListResult, TransactionResource, false);
-		}
-	}
+	// 		return this.toPagination(transactionListResult, TransactionWithBlockResource, true);
+	// 	} else {
+	// 		const transactionListResult = await this.transactionHistoryService.listByCriteria(
+	// 			criteria,
+	// 			sorting,
+	// 			pagination,
+	// 			options,
+	// 		);
+	// 		return this.toPagination(transactionListResult, TransactionResource, false);
+	// 	}
+	// }
 
 	public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const result = await this.processor.process(request.payload.transactions);
@@ -67,55 +66,55 @@ export class TransactionsController extends Controller {
 		};
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const transaction = await this.transactionHistoryService.findOneByCriteria({ id: request.params.id });
-		if (!transaction) {
-			return Boom.notFound("Transaction not found");
-		}
+	// public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	// 	const transaction = await this.transactionHistoryService.findOneByCriteria({ id: request.params.id });
+	// 	if (!transaction) {
+	// 		return Boom.notFound("Transaction not found");
+	// 	}
 
-		if (request.query.transform) {
-			const blockData = await this.blockHistoryService.findOneByCriteria({ id: transaction.blockId! });
+	// 	if (request.query.transform) {
+	// 		const blockData = await this.blockHistoryService.findOneByCriteria({ id: transaction.blockId! });
 
-			return this.respondWithResource(
-				{ data: transaction, block: blockData },
-				TransactionWithBlockResource,
-				true,
-			);
-		} else {
-			return this.respondWithResource(transaction, TransactionResource, false);
-		}
-	}
+	// 		return this.respondWithResource(
+	// 			{ data: transaction, block: blockData },
+	// 			TransactionWithBlockResource,
+	// 			true,
+	// 		);
+	// 	} else {
+	// 		return this.respondWithResource(transaction, TransactionResource, false);
+	// 	}
+	// }
 
-	public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const pagination: Contracts.Search.Pagination = super.getListingPage(request);
-		const all: Interfaces.ITransaction[] = Array.from(this.poolQuery.getFromHighestPriority());
-		const transactions: Interfaces.ITransaction[] = all.slice(
-			pagination.offset,
-			pagination.offset + pagination.limit,
-		);
-		const results = transactions.map((t) => t.data);
-		const resultsPage = {
-			results,
-			totalCount: all.length,
-			meta: { totalCountIsEstimate: false },
-		};
+	// public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	// 	const pagination: Contracts.Search.Pagination = super.getListingPage(request);
+	// 	const all: Interfaces.ITransaction[] = [...this.poolQuery.getFromHighestPriority()];
+	// 	const transactions: Interfaces.ITransaction[] = all.slice(
+	// 		pagination.offset,
+	// 		pagination.offset + pagination.limit,
+	// 	);
+	// 	const results = transactions.map((t) => t.data);
+	// 	const resultsPage = {
+	// 		meta: { totalCountIsEstimate: false },
+	// 		results,
+	// 		totalCount: all.length,
+	// 	};
 
-		return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
-	}
+	// 	return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
+	// }
 
-	public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
-			.getFromHighestPriority()
-			.whereId(request.params.id);
+	// public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	// 	const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
+	// 		.getFromHighestPriority()
+	// 		.whereId(request.params.id);
 
-		if (transactionQuery.has() === false) {
-			return Boom.notFound("Transaction not found");
-		}
+	// 	if (transactionQuery.has() === false) {
+	// 		return Boom.notFound("Transaction not found");
+	// 	}
 
-		const transaction: Interfaces.ITransaction = transactionQuery.first();
+	// 	const transaction: Interfaces.ITransaction = transactionQuery.first();
 
-		return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
-	}
+	// 	return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
+	// }
 
 	public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
