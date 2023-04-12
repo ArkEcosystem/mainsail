@@ -18,28 +18,15 @@ export const register = (server: Hapi.Server): void => {
 		path: "/node/syncing",
 	});
 
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.configuration(request),
-	// 	method: "GET",
-	// 	path: "/node/configuration",
-	// });
+	server.route({
+		handler: (request: Hapi.Request) => controller.configurationNode(request),
+		method: "GET",
+		path: "/node/configuration",
+	});
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.configurationCrypto(request),
 		method: "GET",
 		path: "/node/configuration/crypto",
 	});
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.fees(request),
-	// 	method: "GET",
-	// 	options: {
-	// 		validate: {
-	// 			query: Joi.object({
-	// 				days: Joi.number().integer().min(1).max(30),
-	// 			}),
-	// 		},
-	// 	},
-	// 	path: "/node/fees",
-	// });
 };

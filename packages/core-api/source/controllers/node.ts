@@ -1,26 +1,11 @@
-// import { Repositories } from "@arkecosystem/core-database";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-// import { Handlers } from "@arkecosystem/core-transactions";
-// import { Crypto, Managers } from "@arkecosystem/crypto";
 import Hapi from "@hapi/hapi";
 
-// import { PortsResource } from "../resources";
 import { Controller } from "./controller";
 
 @injectable()
 export class NodeController extends Controller {
-	// @Container.inject(Container.Identifiers.PluginConfiguration)
-	// @Container.tagged("plugin", "core-transaction-pool")
-	// private readonly transactionPoolConfiguration!: Providers.PluginConfiguration;
-
-	// @Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	// @Container.tagged("state", "null")
-	// private readonly nullHandlerRegistry!: Handlers.Registry;
-
-	// @Container.inject(Container.Identifiers.ConfigRepository)
-	// private readonly configRepository!: Services.Config.ConfigRepository;
-
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
@@ -29,9 +14,6 @@ export class NodeController extends Controller {
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
-
-	// @Container.inject(Container.Identifiers.DatabaseTransactionRepository)
-	// private readonly transactionRepository!: Repositories.TransactionRepository;
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const lastBlock = this.blockchain.getLastBlock();
@@ -61,77 +43,41 @@ export class NodeController extends Controller {
 		};
 	}
 
-	// public async configuration(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const dynamicFees = this.transactionPoolConfiguration.getRequired<{
-	// 		enabled?: boolean;
-	// 	}>("dynamicFees");
+	public async configurationNode(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const network = this.configuration.all().network;
 
-	// 	const network = Managers.configManager.get("network");
-
-	// 	return {
-	// 		data: {
-	// 			constants: Managers.configManager.getMilestone(this.blockchain.getLastHeight()),
-	// 			core: {
-	// 				version: this.app.version(),
-	// 			},
-	// 			explorer: network.client.explorer,
-	// 			nethash: network.nethash,
-	// 			ports: super.toResource(this.configRepository, PortsResource),
-	// 			slip44: network.slip44,
-	// 			symbol: network.client.symbol,
-	// 			token: network.client.token,
-	// 			transactionPool: {
-	// 				dynamicFees: dynamicFees.enabled ? dynamicFees : { enabled: false },
-	// 				maxTransactionAge: this.transactionPoolConfiguration.getRequired<number>("maxTransactionAge"),
-	// 				maxTransactionBytes: this.transactionPoolConfiguration.getRequired<number>("maxTransactionBytes"),
-	// 				maxTransactionsInPool:
-	// 					this.transactionPoolConfiguration.getRequired<number>("maxTransactionsInPool"),
-	// 				maxTransactionsPerRequest:
-	// 					this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerRequest"),
-	// 				maxTransactionsPerSender:
-	// 					this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerSender"),
-	// 			},
-	// 			version: network.pubKeyHash,
-	// 			wif: network.wif,
-	// 		},
-	// 	};
-	// }
+		return {
+			data: {
+				constants: this.configuration.getMilestone(this.blockchain.getLastHeight()),
+				core: {
+					version: this.app.version(),
+				},
+				explorer: network.client.explorer,
+				nethash: network.nethash,
+				// ports: super.toResource(this.configRepository, PortsResource),
+				slip44: network.slip44,
+				symbol: network.client.symbol,
+				token: network.client.token,
+				// transactionPool: {
+				// 	dynamicFees: dynamicFees.enabled ? dynamicFees : { enabled: false },
+				// 	maxTransactionAge: this.transactionPoolConfiguration.getRequired<number>("maxTransactionAge"),
+				// 	maxTransactionBytes: this.transactionPoolConfiguration.getRequired<number>("maxTransactionBytes"),
+				// 	maxTransactionsInPool:
+				// 		this.transactionPoolConfiguration.getRequired<number>("maxTransactionsInPool"),
+				// 	maxTransactionsPerRequest:
+				// 		this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerRequest"),
+				// 	maxTransactionsPerSender:
+				// 		this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerSender"),
+				// },
+				version: network.pubKeyHash,
+				wif: network.wif,
+			},
+		};
+	}
 
 	public async configurationCrypto() {
 		return {
 			data: this.configuration.all(),
 		};
 	}
-
-	// 	public async fees(request: Hapi.Request) {
-	// 		// @ts-ignore
-	// 		const handlers = this.nullHandlerRegistry.getRegisteredHandlers();
-	// 		const handlersKey = {};
-	// 		const txsTypes: Array<{ type: number; typeGroup: number }> = [];
-	// 		for (const handler of handlers) {
-	// 			handlersKey[`${handler.getConstructor().type}-${handler.getConstructor().typeGroup}`] =
-	// 				handler.getConstructor().key;
-	// 			txsTypes.push({ type: handler.getConstructor().type, typeGroup: handler.getConstructor().typeGroup });
-	// 		}
-
-	// 		const results = await this.transactionRepository.getFeeStatistics(txsTypes, request.query.days);
-
-	// 		const groupedByTypeGroup = {};
-	// 		for (const result of results) {
-	// 			if (!groupedByTypeGroup[result.typeGroup]) {
-	// 				groupedByTypeGroup[result.typeGroup] = {};
-	// 			}
-
-	// 			const handlerKey = handlersKey[`${result.type}-${result.typeGroup}`];
-
-	// 			groupedByTypeGroup[result.typeGroup][handlerKey] = {
-	// 				avg: result.avg,
-	// 				max: result.max,
-	// 				min: result.min,
-	// 				sum: result.sum,
-	// 			};
-	// 		}
-
-	// 		return { data: groupedByTypeGroup, meta: { days: request.query.days } };
-	// 	}'
 }
