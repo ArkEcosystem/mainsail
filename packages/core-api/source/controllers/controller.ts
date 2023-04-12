@@ -83,9 +83,9 @@ export class Controller {
 		return { data: await this.toResource(data, transformer, transform) };
 	}
 
-	protected respondWithCollection(data, transformer, transform = true): object {
+	protected async respondWithCollection(data, transformer, transform = true): Promise<object> {
 		return {
-			data: this.toCollection(data, transformer, transform),
+			data: await this.toCollection(data, transformer, transform),
 		};
 	}
 
