@@ -7,33 +7,14 @@ import { Resource } from "../interfaces";
 
 @injectable()
 export class TransactionResource implements Resource {
-	/**
-	 * @protected
-	 * @type {Contracts.State.WalletRepository}
-	 * @memberof TransactionResource
-	 */
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
 	protected readonly walletRepository!: Contracts.State.WalletRepository;
 
-	/**
-	 * Return the raw representation of the resource.
-	 *
-	 * @param {Interfaces.ITransactionData} resource
-	 * @returns {object}
-	 * @memberof Resource
-	 */
 	public raw(resource: Contracts.Crypto.ITransactionData): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
-	/**
-	 * Return the transformed representation of the resource.
-	 *
-	 * @param {Interfaces.ITransactionData} resource
-	 * @returns {object}
-	 * @memberof Resource
-	 */
 	public async transform(resource: Contracts.Crypto.ITransactionData): Promise<object> {
 		AppUtils.assert.defined<string>(resource.senderPublicKey);
 

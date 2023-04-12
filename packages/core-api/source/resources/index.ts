@@ -1,6 +1,5 @@
 export * from "./block";
 export * from "./block-with-transactions";
-export * from "./fee-statistics";
 export * from "./peer";
 export * from "./ports";
 export * from "./round";
