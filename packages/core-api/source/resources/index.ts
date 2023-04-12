@@ -6,3 +6,4 @@ export * from "./ports";
 export * from "./round";
 export * from "./transaction";
 export * from "./transaction-with-block";
+export * from "./wallet";

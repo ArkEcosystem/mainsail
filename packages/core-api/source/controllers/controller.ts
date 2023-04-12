@@ -120,4 +120,8 @@ export class Controller {
 
 		return { ...resultsPage, results: items };
 	}
+
+	protected getOffset(query: { page: number; limit: number }): number {
+		return (query.page - 1) * query.limit;
+	}
 }

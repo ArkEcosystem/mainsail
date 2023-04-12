@@ -123,8 +123,4 @@ export class BlocksController extends Controller {
 
 		return block;
 	}
-
-	private getOffset(query: { page: number; limit: number }): number {
-		return (query.page - 1) * query.limit;
-	}
 }
