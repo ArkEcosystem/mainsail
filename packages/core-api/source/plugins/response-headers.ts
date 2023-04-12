@@ -1,18 +1,17 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
-		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue =>
-			// const blockHeight = app
-			// 	.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService)
-			// 	.getLastHeight();
+		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
+			const blockHeight = app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService).getLastHeight();
 
-			// const responsePropToUpdate = request.response.isBoom ? request.response.output : request.response;
-			// responsePropToUpdate.headers = responsePropToUpdate.headers ?? {};
-			// responsePropToUpdate.headers["X-Block-Height"] = blockHeight;
+			const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
+			responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
+			responsePropertyToUpdate.headers["X-Block-Height"] = blockHeight;
 
-			h.continue;
+			return h.continue;
+		};
 	},
 	name: "response-headers",
 
