@@ -1,96 +1,51 @@
-import { injectable } from "@arkecosystem/core-container";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Boom, notFound } from "@hapi/boom";
+import Hapi from "@hapi/hapi";
 
-// import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-// import { Enums } from "@arkecosystem/crypto";
-// import { Boom, notFound } from "@hapi/boom";
-// import Hapi from "@hapi/hapi";
-// import { Identifiers } from "../identifiers";
-// import { BlockResource, BlockWithTransactionsResource } from "../resources";
-// import {
-// 	DelegateCriteria,
-// 	delegateCriteriaSchemaObject,
-// 	DelegateResource,
-// 	WalletCriteria,
-// 	walletCriteriaSchemaObject,
-// 	WalletResource,
-// } from "../resources-new";
-// import { DelegateSearchService, WalletSearchService } from "../services";
+import { WalletResource } from "../resources";
 import { Controller } from "./controller";
 
 @injectable()
 export class DelegatesController extends Controller {
-	// @inject(Identifiers.DelegateSearchService)
-	// private readonly delegateSearchService!: DelegateSearchService;
-	// @inject(Identifiers.WalletSearchService)
-	// private readonly walletSearchService!: WalletSearchService;
-	// @inject(Identifiers.BlockHistoryService)
-	// private readonly blockHistoryService!: Contracts.Shared.BlockHistoryService;
-	// public index(request: Hapi.Request): Contracts.Search.ResultsPage<DelegateResource> {
-	// 	const pagination = this.getQueryPagination(request.query);
-	// 	const sorting = request.query.orderBy as Contracts.Search.Sorting;
-	// 	const criteria = this.getQueryCriteria(request.query, delegateCriteriaSchemaObject) as DelegateCriteria;
-	// 	return this.delegateSearchService.getDelegatesPage(pagination, sorting, criteria);
-	// }
-	// public show(request: Hapi.Request): { data: DelegateResource } | Boom {
-	// 	const walletId = request.params.id as string;
-	// 	const walletResource = this.walletSearchService.getWallet(walletId);
-	// 	if (!walletResource) {
-	// 		return notFound("Wallet not found");
-	// 	}
-	// 	const delegateResource = this.delegateSearchService.getDelegate(walletResource.address);
-	// 	if (!delegateResource) {
-	// 		return notFound("Delegate not found");
-	// 	}
-	// 	return { data: delegateResource };
-	// }
-	// public voters(request: Hapi.Request): Contracts.Search.ResultsPage<WalletResource> | Boom {
-	// 	const walletId = request.params.id as string;
-	// 	const walletResource = this.walletSearchService.getWallet(walletId);
-	// 	if (!walletResource) {
-	// 		return notFound("Wallet not found");
-	// 	}
-	// 	const delegateResource = this.delegateSearchService.getDelegate(walletResource.address);
-	// 	if (!delegateResource) {
-	// 		return notFound("Delegate not found");
-	// 	}
-	// 	const pagination = this.getQueryPagination(request.query);
-	// 	const sorting = request.query.orderBy as Contracts.Search.Sorting;
-	// 	const criteria = this.getQueryCriteria(request.query, walletCriteriaSchemaObject) as WalletCriteria;
-	// 	return this.walletSearchService.getActiveWalletsPage(pagination, sorting, criteria, {
-	// 		attributes: {
-	// 			vote: delegateResource.publicKey,
-	// 		},
-	// 	});
-	// }
-	// public async blocks(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const walletId = request.params.id as string;
-	// 	const walletResource = this.walletSearchService.getWallet(walletId);
-	// 	if (!walletResource) {
-	// 		return notFound("Wallet not found");
-	// 	}
-	// 	const delegateResource = this.delegateSearchService.getDelegate(walletResource.address);
-	// 	if (!delegateResource) {
-	// 		return notFound("Delegate not found");
-	// 	}
-	// 	if (request.query.transform) {
-	// 		const blockCriteria = { generatorPublicKey: delegateResource.publicKey };
-	// 		const blockWithSomeTransactionsListResult = await this.blockHistoryService.listByCriteriaJoinTransactions(
-	// 			blockCriteria,
-	// 			{ typeGroup: Enums.TransactionTypeGroup.Core, type: Enums.TransactionType.MultiPayment },
-	// 			this.getListingOrder(request),
-	// 			this.getListingPage(request),
-	// 			this.getListingOptions(),
-	// 		);
-	// 		return this.toPagination(blockWithSomeTransactionsListResult, BlockWithTransactionsResource, true);
-	// 	} else {
-	// 		const blockCriteria = { generatorPublicKey: delegateResource.publicKey };
-	// 		const blockListResult = await this.blockHistoryService.listByCriteria(
-	// 			blockCriteria,
-	// 			this.getListingOrder(request),
-	// 			this.getListingPage(request),
-	// 			this.getListingOptions(),
-	// 		);
-	// 		return this.toPagination(blockListResult, BlockResource, false);
-	// 	}
-	// }
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
+	private readonly walletRepository!: Contracts.State.WalletRepository;
+
+	public index(request: Hapi.Request) {
+		const wallets = this.walletRepository.allByUsername();
+
+		return this.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: wallets.slice(
+					this.getOffset(request.query),
+					this.getOffset(request.query) + request.query.limit,
+				),
+				totalCount: wallets.length,
+			},
+			WalletResource,
+			true,
+		);
+	}
+
+	public async show(request: Hapi.Request): Promise<any | Boom> {
+		const walletId = request.params.id as string;
+
+		let wallet: Contracts.State.Wallet | undefined;
+
+		if (this.walletRepository.hasByAddress(walletId)) {
+			wallet = this.walletRepository.findByAddress(walletId);
+		} else if (this.walletRepository.hasByPublicKey(walletId)) {
+			wallet = await this.walletRepository.findByPublicKey(walletId);
+		} else if (this.walletRepository.hasByUsername(walletId)) {
+			wallet = this.walletRepository.findByUsername(walletId);
+		}
+
+		if (!wallet || !wallet.hasAttribute("validator.username")) {
+			return notFound("Wallet not found");
+		}
+
+		return this.toResource(wallet, WalletResource, false);
+	}
 }
