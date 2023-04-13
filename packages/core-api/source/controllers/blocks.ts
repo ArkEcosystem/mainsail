@@ -20,11 +20,11 @@ export class BlocksController extends Controller {
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const lastBlock = this.blockchain.getLastBlock();
 
-		const offset = this.getOffset(request.query);
+		const pagination = this.getQueryPagination(request.query);
 
 		const blocks = await this.database.findBlocksByHeightRange(
-			lastBlock.data.height - offset - request.query.limit + 1,
-			lastBlock.data.height - offset,
+			lastBlock.data.height - pagination.offset - pagination.limit + 1,
+			lastBlock.data.height - pagination.offset,
 		);
 		blocks.reverse();
 
@@ -94,13 +94,12 @@ export class BlocksController extends Controller {
 
 		const transactions = block.transactions.map((tx) => tx.data);
 
+		const pagination = this.getQueryPagination(request.query);
+
 		return this.toPagination(
 			{
 				meta: { totalCountIsEstimate: false },
-				results: transactions.slice(
-					this.getOffset(request.query),
-					this.getOffset(request.query) + request.query.limit,
-				),
+				results: transactions.slice(pagination.offset, pagination.offset + pagination.limit),
 				totalCount: block.transactions.length,
 			},
 			TransactionResource,

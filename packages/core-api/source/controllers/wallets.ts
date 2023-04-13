@@ -15,13 +15,12 @@ export class WalletsController extends Controller {
 	public index(request: Hapi.Request) {
 		const wallets = this.walletRepository.allByAddress();
 
+		const pagination = this.getQueryPagination(request.query);
+
 		return this.toPagination(
 			{
 				meta: { totalCountIsEstimate: false },
-				results: wallets.slice(
-					this.getOffset(request.query),
-					this.getOffset(request.query) + request.query.limit,
-				),
+				results: wallets.slice(pagination.offset, pagination.offset + pagination.limit),
 				totalCount: wallets.length,
 			},
 			WalletResource,

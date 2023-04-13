@@ -18,16 +18,10 @@ export class Controller {
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
 	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
-		const pagination = {
+		return {
 			limit: query.limit,
 			offset: (query.page - 1) * query.limit || 0,
 		};
-
-		if (query.offset) {
-			pagination.offset = query.offset;
-		}
-
-		return pagination;
 	}
 
 	protected getQueryCriteria(query: Hapi.RequestQuery, schemaObject: SchemaObject): unknown {
@@ -119,9 +113,5 @@ export class Controller {
 		const items = await this.toCollection(resultsPage.results, transformer, transform);
 
 		return { ...resultsPage, results: items };
-	}
-
-	protected getOffset(query: { page: number; limit: number }): number {
-		return (query.page - 1) * query.limit;
 	}
 }
