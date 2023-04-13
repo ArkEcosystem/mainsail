@@ -1,7 +1,4 @@
-import { commaArrayQuery } from "./comma-array-query";
-import { dotSeparatedQuery } from "./dot-separated-query";
 import { hapiAjv } from "./hapi-ajv";
-import { log } from "./log";
 import { responseHeaders } from "./response-headers";
 import { whitelist } from "./whitelist";
 
@@ -14,19 +11,6 @@ export const preparePlugins = (config) => [
 		plugin: whitelist,
 	},
 	{ plugin: hapiAjv },
-	{
-		options: {
-			...config.log,
-			trustProxy: config.trustProxy,
-		},
-		plugin: log,
-	},
-	{ plugin: commaArrayQuery },
-	{ plugin: dotSeparatedQuery },
-	{
-		options: config.cache,
-		plugin: require("./cache"),
-	},
 	{
 		options: {
 			...config.rateLimit,
