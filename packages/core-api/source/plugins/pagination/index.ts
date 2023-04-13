@@ -3,7 +3,7 @@
 import { getConfig } from "./config";
 import { Extension } from "./extension";
 
-export = {
+export const pagination = {
 	name: "hapi-pagination",
 	register(server, options) {
 		const { error, config } = getConfig(options);

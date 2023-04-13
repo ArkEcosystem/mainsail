@@ -24,7 +24,7 @@ const isListed = (ip: string, patterns: string[]): boolean => {
 	return false;
 };
 
-export = {
+export const rateLimit = {
 	name: "rate-limit",
 	once: true,
 	async register(

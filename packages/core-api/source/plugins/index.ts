@@ -1,4 +1,6 @@
 import { hapiAjv } from "./hapi-ajv";
+import { pagination } from "./pagination";
+import { rateLimit } from "./rate-limit";
 import { responseHeaders } from "./response-headers";
 import { whitelist } from "./whitelist";
 
@@ -16,7 +18,7 @@ export const preparePlugins = (config) => [
 			...config.rateLimit,
 			trustProxy: config.trustProxy,
 		},
-		plugin: require("./rate-limit"),
+		plugin: rateLimit,
 	},
 	{
 		options: {
@@ -26,7 +28,7 @@ export const preparePlugins = (config) => [
 				},
 			},
 		},
-		plugin: require("./pagination"),
+		plugin: pagination,
 	},
 	{ plugin: responseHeaders },
 ];
