@@ -4,9 +4,8 @@ import { Providers } from "@arkecosystem/core-kernel";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 
-import { Resource } from "../interfaces";
 import { SchemaObject } from "../schemas";
-import { Options, Pagination, ResultsPage, Sorting } from "../types";
+import { Options, Pagination, Resource, ResultsPage, Sorting } from "../types";
 
 @injectable()
 export class Controller {

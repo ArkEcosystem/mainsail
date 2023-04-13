@@ -2,7 +2,7 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
-import { Resource } from "../interfaces";
+import { Resource } from "../types";
 
 @injectable()
 export class PortsResource implements Resource {

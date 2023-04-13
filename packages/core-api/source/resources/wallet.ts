@@ -1,8 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 
-import { Resource } from "../interfaces";
-import { Resources } from "../types";
+import { Resource, Resources } from "../types";
 
 @injectable()
 export class WalletResource implements Resource {

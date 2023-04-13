@@ -1,7 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Resource } from "../interfaces";
+import { Resource } from "../types";
 
 @injectable()
 export class RoundResource implements Resource {

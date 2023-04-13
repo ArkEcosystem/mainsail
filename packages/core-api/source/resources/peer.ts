@@ -1,6 +1,6 @@
 import { injectable } from "@arkecosystem/core-container";
 
-import { Resource } from "../interfaces";
+import { Resource } from "../types";
 
 @injectable()
 export class PeerResource implements Resource {

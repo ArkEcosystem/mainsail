@@ -19,3 +19,9 @@ export type ResultsPage<T> = {
 	totalCount: number;
 	meta: { totalCountIsEstimate: boolean };
 };
+
+export interface Resource {
+	raw(resource): object;
+
+	transform(resource): object;
+}

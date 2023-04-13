@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
-import { Resource } from "../interfaces";
+import { Resource } from "../types";
 
 type TransactionDataWithBlockData = {
 	data: Contracts.Crypto.ITransactionData;

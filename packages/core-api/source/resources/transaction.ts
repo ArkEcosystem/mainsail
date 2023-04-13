@@ -2,8 +2,7 @@ import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
-// import { Interfaces } from "@arkecosystem/crypto";
-import { Resource } from "../interfaces";
+import { Resource } from "../types";
 
 @injectable()
 export class TransactionResource implements Resource {
