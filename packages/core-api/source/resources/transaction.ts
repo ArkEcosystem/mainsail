@@ -23,10 +23,10 @@ export class TransactionResource implements Resource {
 
 		return {
 			amount: resource.amount.toFixed(),
-			blockId: resource.blockId,
 			asset: resource.asset,
-			fee: resource.fee.toFixed(),
+			blockId: resource.blockId,
 			confirmations: 0,
+			fee: resource.fee.toFixed(),
 			id: resource.id,
 			// ! resource.block ? lastBlock.data.height - resource.block.height + 1 : 0
 			// timestamp:
@@ -41,15 +41,15 @@ export class TransactionResource implements Resource {
 
 			signature: resource.signature,
 
-			type: resource.type,
-
 			signatures: resource.signatures,
 
-			version: resource.version,
+			type: resource.type,
 
 			typeGroup: resource.typeGroup,
 
 			vendorField: resource.vendorField,
+
+			version: resource.version,
 		};
 	}
 }

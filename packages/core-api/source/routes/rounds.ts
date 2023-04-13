@@ -8,9 +8,8 @@ export const register = (server: Hapi.Server): void => {
 	server.bind(controller);
 
 	server.route({
-		method: "GET",
-		path: "/rounds/{id}/delegates",
 		handler: (request: Hapi.Request) => controller.delegates(request),
+		method: "GET",
 		options: {
 			validate: {
 				params: Joi.object({
@@ -18,5 +17,6 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/rounds/{id}/delegates",
 	});
 };
