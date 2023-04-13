@@ -109,3 +109,6 @@ tags
 
 # Madge
 *.svg
+
+# Pnpm
+.pnpm-store

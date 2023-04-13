@@ -9,6 +9,7 @@
 	"scripts": {
 		"build": "ultra -r build",
 		"clean": "ultra -r clean",
+		"clean:node_modules": "ultra -r del node_modules && del node_modules",
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
 		"deps:missing": "node ./scripts/deps/missing.js",
 		"deps:types": "./node_modules/typesync/bin/typesync",
