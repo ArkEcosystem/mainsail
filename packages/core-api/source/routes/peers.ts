@@ -2,7 +2,7 @@ import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 import { PeersController } from "../controllers/peers";
-import { pagination } from "../schemas";
+import { orderBy, pagination } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(PeersController);
@@ -20,7 +20,7 @@ export const register = (server: Hapi.Server): void => {
 			validate: {
 				query: Joi.object({
 					ip: Joi.string().ip({ version: ["ipv4", "ipV6"] }),
-					orderBy: server.app.schemas.orderBy,
+					orderBy: orderBy,
 					version: Joi.string(),
 				}).concat(pagination),
 			},

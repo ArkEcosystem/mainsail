@@ -2,7 +2,7 @@ import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 import { BlocksController } from "../controllers/blocks";
-import { pagination } from "../schemas";
+import { blockId, pagination } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(BlocksController);
@@ -19,8 +19,6 @@ export const register = (server: Hapi.Server): void => {
 			},
 			validate: {
 				query: Joi.object({
-					...server.app.schemas.blockCriteriaSchemas,
-					orderBy: server.app.schemas.blocksOrderBy,
 					transform: Joi.bool().default(true),
 				}).concat(pagination),
 			},
@@ -60,7 +58,7 @@ export const register = (server: Hapi.Server): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					id: server.app.schemas.blockId,
+					id: blockId,
 				}),
 				query: Joi.object({
 					transform: Joi.bool().default(true),
@@ -84,8 +82,6 @@ export const register = (server: Hapi.Server): void => {
 					id: Joi.string(),
 				}),
 				query: Joi.object({
-					...server.app.schemas.transactionCriteriaSchemas,
-					orderBy: server.app.schemas.transactionsOrderBy,
 					transform: Joi.bool().default(true),
 				}).concat(pagination),
 			},
