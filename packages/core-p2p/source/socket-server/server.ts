@@ -4,11 +4,11 @@ import { Types } from "@arkecosystem/core-kernel";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 
 import { plugin as hapiNesPlugin } from "../hapi-nes";
-import { AcceptPeerPlugin } from "./plugins/accept-peer";
-import { AwaitBlockPlugin } from "./plugins/await-block";
+// import { AcceptPeerPlugin } from "./plugins/accept-peer";
+// import { AwaitBlockPlugin } from "./plugins/await-block";
 import { CodecPlugin } from "./plugins/codec";
-import { IsAppReadyPlugin } from "./plugins/is-app-ready";
-import { RateLimitPlugin } from "./plugins/rate-limit";
+// import { IsAppReadyPlugin } from "./plugins/is-app-ready";
+// import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
 import { BlocksRoute } from "./routes/blocks";
 import { PeerRoute } from "./routes/peer";
@@ -47,16 +47,16 @@ export class Server {
 		this.app.resolve(TransactionsRoute).register(this.server);
 
 		// onPreAuth
-		this.app.resolve(RateLimitPlugin).register(this.server);
-		this.app.resolve(AwaitBlockPlugin).register(this.server);
+		// this.app.resolve(RateLimitPlugin).register(this.server);
+		// this.app.resolve(AwaitBlockPlugin).register(this.server);
 
 		// onPostAuth
 		this.app.resolve(CodecPlugin).register(this.server);
 		this.app.resolve(ValidatePlugin).register(this.server);
-		this.app.resolve(IsAppReadyPlugin).register(this.server);
+		// this.app.resolve(IsAppReadyPlugin).register(this.server);
 
 		// onPreHandler
-		this.app.resolve(AcceptPeerPlugin).register(this.server);
+		// this.app.resolve(AcceptPeerPlugin).register(this.server);
 	}
 
 	public async boot(): Promise<void> {
