@@ -1,7 +1,6 @@
 import { inject } from "@arkecosystem/core-container";
 import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
-import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
@@ -13,14 +12,11 @@ export class PeerController extends Controller {
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.DatabaseInterceptor)
-	private readonly databaseInterceptor!: DatabaseInterceptor;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
@@ -49,8 +45,8 @@ export class PeerController extends Controller {
 		common: Contracts.Crypto.IBlockData;
 		lastBlockHeight: number;
 	}> {
-		const commonBlocks: Contracts.Crypto.IBlockData[] = await this.databaseInterceptor.getCommonBlocks(
-			(request.payload as any).ids,
+		const commonBlocks: Contracts.Crypto.IBlockData[] = await Promise.all(
+			(request.payload as any).ids.map(async (blockId) => await this.databaseService.getBlock(blockId)),
 		);
 
 		if (commonBlocks.length === 0) {
@@ -66,19 +62,14 @@ export class PeerController extends Controller {
 	public async getStatus(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerPingResponse> {
 		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			lastBlock.data.height,
-			this.configuration,
-		);
-		const slotInfo = this.slots.getSlotInfo(blockTimeLookup);
+		const slotInfo = this.slots.getSlotInfo();
 
 		return {
 			config: getPeerConfig(this.app),
 			state: {
 				currentSlot: slotInfo.slotNumber,
 				forgingAllowed: slotInfo.forgingStatus,
-				header: lastBlock.getHeader(),
+				header: lastBlock.header,
 				height: lastBlock.data.height,
 			},
 		};
