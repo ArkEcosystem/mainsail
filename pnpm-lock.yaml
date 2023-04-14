@@ -2422,6 +2422,9 @@ importers:
       '@hapi/teamwork':
         specifier: 5.1.0
         version: 5.1.0
+      ajv:
+        specifier: 8.11.0
+        version: 8.11.0
       dayjs:
         specifier: 1.10.7
         version: 1.10.7
@@ -13790,7 +13793,7 @@ packages:
     resolution: {integrity: sha512-44DUg21G/liUZ48dJpUSjZnFfZro/0K5JTyFYLBcmh9+T6Ooi4/i4efwUiEy0+4oQusCBqWdhv16XohIj1GqnQ==}
     dependencies:
       agent-base: 4.3.0
-      debug: 4.1.1
+      debug: 4.3.4(supports-color@8.1.1)
       get-uri: 2.0.4
       http-proxy-agent: 2.1.0
       https-proxy-agent: 3.0.1
@@ -14451,7 +14454,7 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       agent-base: 4.3.0
-      debug: 4.1.1
+      debug: 4.3.4(supports-color@8.1.1)
       http-proxy-agent: 2.1.0
       https-proxy-agent: 3.0.1
       lru-cache: 5.1.1
@@ -14893,7 +14896,7 @@ packages:
     resolution: {integrity: sha512-efCx3b+0Z69/LGJmm9Yvi4cqEdxnoGnxYxGxBghkkTTFeXRtTCmmhO0AnAfHz59k957uTSuy8WaHqOs8wbYUWg==}
     engines: {node: '>=6'}
     dependencies:
-      debug: 4.1.1
+      debug: 4.3.4(supports-color@8.1.1)
       module-details-from-path: 1.0.3
       resolve: 1.22.2
     transitivePeerDependencies:
