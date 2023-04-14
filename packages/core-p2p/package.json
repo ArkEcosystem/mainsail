@@ -16,7 +16,10 @@
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "uvu -r tsm source",
+		"pbjs": "pbjs -t static-module -w commonjs source/socket-server/codecs/proto/*.proto -o source/socket-server/codecs/proto/protos.js",
+		"pbts": "pbts source/socket-server/codecs/proto/protos.js -o source/socket-server/codecs/proto/protos.d.ts",
+		"build:proto": "pnpm pbjs && pnpm pbts"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
