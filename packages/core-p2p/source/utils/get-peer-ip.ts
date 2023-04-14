@@ -1,4 +1,4 @@
-import { FastifyRequest } from "fastify";
+import { Socket } from "../hapi-nes/socket";
 
-export const getPeerIp = (request: FastifyRequest) =>
-	(request.headers["x-forwarded-for"] as string).split(",")[0]?.trim() ?? request.ip;
+export const getPeerIp = (socket: Socket) =>
+	socket.info["x-forwarded-for"]?.split(",")[0]?.trim() ?? socket.info.remoteAddress;

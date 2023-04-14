@@ -125,8 +125,6 @@ export class ForgerService {
 
 			return this.#checkLater(Utils.getRemainingSlotTime(this.#round, this.configuration));
 		} catch (error) {
-			console.log(error);
-
 			if (
 				error instanceof Exceptions.HostNoResponseError ||
 				error instanceof Exceptions.RelayCommunicationError
@@ -220,5 +218,12 @@ export class ForgerService {
 				)}: ${inactiveValidators.join(", ")}`,
 			);
 		}
+	}
+
+	#getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
+		const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
+		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
+
+		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
 	}
 }

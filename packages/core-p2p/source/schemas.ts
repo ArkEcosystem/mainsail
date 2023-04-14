@@ -193,7 +193,7 @@ export const replySchemas = {
 		},
 		type: "object",
 	},
-	postTransactions: {
+	"p2p.transactions.postTransactions": {
 		type: "array",
 	},
 };
