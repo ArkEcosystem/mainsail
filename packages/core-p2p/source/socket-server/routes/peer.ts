@@ -7,26 +7,26 @@ export class PeerRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
 		const controller = this.getController();
 		return {
-			"/p2p/peer/getPeers": {
-				id: "p2p.peer.getPeers",
-				handler: controller.getPeers,
-				validation: peerSchemas.getPeers,
-				codec: getPeers,
-				maxBytes: 1024,
-			},
 			"/p2p/peer/getCommonBlocks": {
-				id: "p2p.peer.getCommonBlocks",
-				handler: controller.getCommonBlocks,
-				validation: peerSchemas.getCommonBlocks,
 				codec: getCommonBlocks,
+				handler: controller.getCommonBlocks,
+				id: "p2p.peer.getCommonBlocks",
 				maxBytes: 10 * 1024,
+				validation: peerSchemas.getCommonBlocks,
+			},
+			"/p2p/peer/getPeers": {
+				codec: getPeers,
+				handler: controller.getPeers,
+				id: "p2p.peer.getPeers",
+				maxBytes: 1024,
+				validation: peerSchemas.getPeers,
 			},
 			"/p2p/peer/getStatus": {
-				id: "p2p.peer.getStatus",
-				handler: controller.getStatus,
-				validation: peerSchemas.getStatus,
 				codec: getStatus,
+				handler: controller.getStatus,
+				id: "p2p.peer.getStatus",
 				maxBytes: 1024,
+				validation: peerSchemas.getStatus,
 			},
 		};
 	}

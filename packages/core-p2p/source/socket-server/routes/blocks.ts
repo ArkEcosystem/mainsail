@@ -9,18 +9,18 @@ export class BlocksRoute extends Route {
 		const controller = this.getController();
 		return {
 			"/p2p/blocks/getBlocks": {
-				id: "p2p.blocks.getBlocks",
-				handler: controller.getBlocks,
-				validation: blocksSchemas.getBlocks,
 				codec: getBlocks,
+				handler: controller.getBlocks,
+				id: "p2p.blocks.getBlocks",
 				maxBytes: 1024,
+				validation: blocksSchemas.getBlocks,
 			},
 			"/p2p/blocks/postBlock": {
-				id: "p2p.blocks.postBlock",
-				handler: controller.postBlock,
-				validation: blocksSchemas.postBlock,
 				codec: postBlock,
+				handler: controller.postBlock,
+				id: "p2p.blocks.postBlock",
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
+				validation: blocksSchemas.postBlock,
 			},
 		};
 	}

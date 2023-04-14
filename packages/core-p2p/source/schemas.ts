@@ -185,6 +185,9 @@ export const replySchemas = {
 		required: ["state", "config"],
 		type: "object",
 	},
+	"p2p.transactions.postTransactions": {
+		type: "array",
+	},
 	postBlock: {
 		additionalProperties: false,
 		properties: {
@@ -192,8 +195,5 @@ export const replySchemas = {
 			status: { type: "boolean" },
 		},
 		type: "object",
-	},
-	"p2p.transactions.postTransactions": {
-		type: "array",
 	},
 };

@@ -9,11 +9,11 @@ export class TransactionsRoute extends Route {
 		const controller = this.getController();
 		return {
 			"/p2p/transactions/postTransactions": {
-				id: "p2p.transactions.postTransactions",
-				handler: controller.postTransactions,
-				validation: transactionsSchemas.createPostTransactionsSchema(this.app),
 				codec: postTransactions,
+				handler: controller.postTransactions,
+				id: "p2p.transactions.postTransactions",
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
+				validation: transactionsSchemas.createPostTransactionsSchema(this.app),
 			},
 		};
 	}

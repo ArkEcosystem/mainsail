@@ -5,20 +5,6 @@ const hardLimitNumberOfTransactions = 1000;
 
 export const postTransactions = {
 	request: {
-		serialize: (obj): Buffer => {
-			const size = obj.transactions.reduce((sum: number, tx: Buffer) => sum + 4 + tx.length, 0);
-			const result = Buffer.alloc(size);
-
-			let offset = 0;
-			for (const tx of obj.transactions as Buffer[]) {
-				offset = result.writeUInt32BE(tx.length, offset);
-				offset += tx.copy(result, offset);
-			}
-
-			obj = { ...obj, transactions: result };
-
-			return Buffer.from(transactions.PostTransactionsRequest.encode(obj).finish());
-		},
 		deserialize: (payload: Buffer) => {
 			const decoded = transactions.PostTransactionsRequest.decode(payload);
 			const txsBuffer = Buffer.from(decoded.transactions);
@@ -37,10 +23,24 @@ export const postTransactions = {
 				transactions: txs,
 			};
 		},
+		serialize: (object): Buffer => {
+			const size = object.transactions.reduce((sum: number, tx: Buffer) => sum + 4 + tx.length, 0);
+			const result = Buffer.alloc(size);
+
+			let offset = 0;
+			for (const tx of object.transactions as Buffer[]) {
+				offset = result.writeUInt32BE(tx.length, offset);
+				offset += tx.copy(result, offset);
+			}
+
+			object = { ...object, transactions: result };
+
+			return Buffer.from(transactions.PostTransactionsRequest.encode(object).finish());
+		},
 	},
 	response: {
+		deserialize: (payload: Buffer) => transactions.PostTransactionsResponse.decode(payload).accept,
 		serialize: (accept: string[]): Buffer =>
 			Buffer.from(transactions.PostTransactionsResponse.encode({ accept }).finish()),
-		deserialize: (payload: Buffer) => transactions.PostTransactionsResponse.decode(payload).accept,
 	},
 };

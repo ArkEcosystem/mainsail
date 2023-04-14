@@ -1,7 +1,7 @@
+import { inject,injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
-import { injectable, inject } from "@arkecosystem/core-container";
 
 import { Client } from "./hapi-nes";
 
