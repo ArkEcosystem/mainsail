@@ -5,3 +5,5 @@ bin
 dist
 distribution
 node_modules
+
+packages/core-p2p/source/hapi-nes
