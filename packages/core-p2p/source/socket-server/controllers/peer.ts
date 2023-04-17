@@ -1,5 +1,5 @@
 import { inject } from "@arkecosystem/core-container";
-import { Contracts, Exceptions,Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
@@ -19,7 +19,7 @@ export class PeerController extends Controller {
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: any;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	public getPeers(request: Hapi.Request, h: Hapi.ResponseToolkit): Contracts.P2P.PeerBroadcast[] {
 		const peerIp = getPeerIp(request.socket);
@@ -62,7 +62,7 @@ export class PeerController extends Controller {
 	public async getStatus(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerPingResponse> {
 		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
-		const slotInfo = this.slots.getSlotInfo();
+		const slotInfo = await this.slots.getSlotInfo();
 
 		return {
 			config: getPeerConfig(this.app),
