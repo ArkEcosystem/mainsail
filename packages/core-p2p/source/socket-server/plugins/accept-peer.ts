@@ -27,6 +27,7 @@ export class AcceptPeerPlugin {
 			async method(request, h) {
 				if (routesConfigByPath[request.path]) {
 					const peerIp = request.socket ? getPeerIp(request.socket) : request.info.remoteAddress;
+					// eslint-disable-next-line @typescript-eslint/no-floating-promises
 					peerProcessor.validateAndAcceptPeer({
 						ip: peerIp,
 					} as Contracts.P2P.Peer);

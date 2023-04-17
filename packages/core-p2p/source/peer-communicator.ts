@@ -351,6 +351,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		this.connector.setError(peer, error.name);
 		peer.sequentialErrorCounter++;
 		if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
 		}
 
@@ -369,6 +370,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				}
 
 				if (disconnect) {
+					// eslint-disable-next-line @typescript-eslint/no-floating-promises
 					this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
 				}
 		}

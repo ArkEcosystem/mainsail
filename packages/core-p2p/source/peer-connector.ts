@@ -1,4 +1,4 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
@@ -47,6 +47,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		const connection = this.connection(peer);
 
 		if (connection) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			connection.terminate();
 
 			this.connections.delete(`${peer.ip}`);
