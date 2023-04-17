@@ -22,6 +22,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
@@ -239,7 +242,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
-		if (config.network.nethash !== this.configuration.get("network.nethash")) {
+		if (config.network.nethash !== this.cryptoConfiguration.get("network.nethash")) {
 			return false;
 		}
 
