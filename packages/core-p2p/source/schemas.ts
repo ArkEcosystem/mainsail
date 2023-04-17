@@ -60,7 +60,7 @@ export const replySchemas = {
 		maxItems: constants.MAX_PEERS_GETPEERS,
 		type: "array",
 	},
-	getStatus: {
+	"p2p.peer.getStatus": {
 		additionalProperties: false,
 		properties: {
 			config: {
