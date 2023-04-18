@@ -1,9 +1,15 @@
-import * as Blocks from "./blocks";
-import * as Peer from "./peer";
-import * as Transactions from "./transactions";
+import { getBlocks } from "./get-blocks";
+import { getCommonBlocks } from "./get-common-blocks";
+import { getPeers } from "./get-peers";
+import { getStatus } from "./get-status";
+import { postBlock } from "./post-block";
+import { postTransactions } from "./post-transactions";
 
 export const Codecs = {
-	...Blocks,
-	...Peer,
-	...Transactions,
+	getBlocks,
+	getCommonBlocks,
+	getPeers,
+	getStatus,
+	postBlock,
+	postTransactions,
 };
