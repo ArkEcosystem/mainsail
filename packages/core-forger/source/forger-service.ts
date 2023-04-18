@@ -125,8 +125,6 @@ export class ForgerService {
 
 			return this.#checkLater(Utils.getRemainingSlotTime(this.#round, this.configuration));
 		} catch (error) {
-			console.log(error);
-
 			if (
 				error instanceof Exceptions.HostNoResponseError ||
 				error instanceof Exceptions.RelayCommunicationError

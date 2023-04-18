@@ -11,7 +11,7 @@ import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
-import { Server } from "./server";
+import { Server } from "./socket-server/server";
 import { TransactionBroadcaster } from "./transaction-broadcaster";
 import { makeFormats } from "./validation";
 

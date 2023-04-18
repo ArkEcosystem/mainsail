@@ -3,12 +3,13 @@ import { Constants, Contracts, Exceptions, Identifiers } from "@arkecosystem/cor
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
-import got from "got";
 
 import { constants } from "./constants";
+import { SocketErrors } from "./enums";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 import { replySchemas } from "./schemas";
+import { getCodec } from "./socket-server/utils/get-codec";
 import { buildRateLimiter, isValidVersion } from "./utils";
 
 // @TODO review the implementation
@@ -20,6 +21,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
@@ -65,17 +69,19 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postBlock(peer: Contracts.P2P.Peer, block: Contracts.Crypto.IBlock) {
-		const response = await this.#post({
-			json: {
+		const postBlockTimeout = 10_000;
+
+		const response = await this.emit(
+			peer,
+			"p2p.blocks.postBlock",
+			{
 				block: await this.serializer.serializeWithTransactions({
 					...block.data,
 					transactions: block.transactions.map((tx) => tx.data),
 				}),
 			},
-			path: "blocks",
-			peer,
-			schema: replySchemas.postBlock,
-		});
+			postBlockTimeout,
+		);
 
 		if (response && response.height) {
 			peer.state.height = response.height;
@@ -83,6 +89,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
+		const postTransactionsTimeout = 10_000;
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
 		if (!this.#postTransactionsQueueByIp.get(peer.ip)) {
@@ -95,13 +102,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		queue.push({
 			handle: async () => {
-				await this.#post({
-					json: { transactions },
-					path: "transactions",
-					peer,
-					schema: replySchemas.postTransactions,
-				});
-
+				await this.emit(peer, "p2p.transactions.postTransactions", { transactions }, postTransactionsTimeout);
 				await delay(Math.ceil(1000 / postTransactionsRateLimit));
 				// to space up between consecutive calls to postTransactions according to rate limit
 				// optimized here because default throttling would not be effective for postTransactions
@@ -119,12 +120,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			return undefined;
 		}
 
-		// const getStatusTimeout = timeoutMsec < 5000 ? timeoutMsec : 5000;
-		const pingResponse: Contracts.P2P.PeerPingResponse = await this.#get({
-			path: "status",
+		const getStatusTimeout = timeoutMsec < 5000 ? timeoutMsec : 5000;
+		const pingResponse: Contracts.P2P.PeerPingResponse = await this.emit(
 			peer,
-			schema: replySchemas.getStatus,
-		});
+			"p2p.peer.getStatus",
+			{},
+			getStatusTimeout,
+		);
 
 		if (!pingResponse) {
 			throw new Exceptions.PeerStatusResponseError(peer.ip);
@@ -173,18 +175,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.PeerBroadcast[]> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
 
-		return this.#get({ path: "peers", peer, schema: replySchemas.getPeers });
+		const getPeersTimeout = 5000;
+		return this.emit(peer, "p2p.peer.getPeers", {}, getPeersTimeout);
 	}
 
 	public async hasCommonBlocks(peer: Contracts.P2P.Peer, ids: string[], timeoutMsec?: number): Promise<any> {
-		const body: any = await this.#post({
-			json: {
-				ids,
-			},
-			path: "blocks/common",
-			peer,
-			schema: replySchemas.getCommonBlocks,
-		});
+		const getCommonBlocksTimeout = timeoutMsec && timeoutMsec < 5000 ? timeoutMsec : 5000;
+		const body: any = await this.emit(peer, "p2p.peer.getCommonBlocks", { ids }, getCommonBlocksTimeout);
 
 		if (!body || !body.common) {
 			return false;
@@ -201,19 +198,21 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			headersOnly,
 		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
 	): Promise<Contracts.Crypto.IBlockData[]> {
-		// const maxPayload = headersOnly ? blockLimit * Constants.Unit.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
+		const maxPayload = headersOnly ? blockLimit * Constants.Units.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
 
-		const peerBlocks = await this.#get({
-			path: "blocks",
+		const peerBlocks = await this.emit(
 			peer,
-			schema: replySchemas.getBlocks,
-			searchParams: {
+			"p2p.blocks.getBlocks",
+			{
 				blockLimit,
 				headersOnly,
 				lastBlockHeight: fromBlockHeight,
 				serialized: true,
 			},
-		});
+			this.configuration.getRequired<number>("getBlocksTimeout"),
+			maxPayload,
+			false,
+		);
 
 		if (!peerBlocks || peerBlocks.length === 0) {
 			this.logger.debug(
@@ -243,7 +242,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
-		if (config.network.nethash !== this.configuration.get("network.nethash")) {
+		if (config.network.nethash !== this.cryptoConfiguration.get("network.nethash")) {
 			return false;
 		}
 
@@ -256,151 +255,124 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return true;
 	}
 
-	async #get<T = any>({
-		peer,
-		path,
-		schema,
-		searchParams,
-	}: {
-		peer: Contracts.P2P.Peer;
-		path: string;
-		schema: object;
-		searchParams?;
-	}): Promise<T> {
-		const url: string = this.#requestUrl(peer, path);
-
-		return this.#sendRequest({
-			peer,
-			request: async () =>
-				got
-					.get(url, {
-						headers: {
-							version: this.app.version(),
-						},
-						searchParams,
-						timeout: this.configuration.getRequired<number>("getBlocksTimeout"),
-					})
-					.json(),
-			schema,
-			url,
-		});
-	}
-
-	async #post<T = any>({
-		peer,
-		path,
-		schema,
-		json,
-		searchParams,
-	}: {
-		peer: Contracts.P2P.Peer;
-		path: string;
-		schema: object;
-		json: object;
-		searchParams?;
-	}): Promise<T> {
-		const url: string = this.#requestUrl(peer, path);
-
-		return this.#sendRequest({
-			peer,
-			request: async () =>
-				got
-					.post(url, {
-						headers: {
-							version: this.app.version(),
-						},
-						json,
-						searchParams,
-						timeout: this.configuration.getRequired<number>("getBlocksTimeout"),
-					})
-					.json(),
-			schema,
-			url,
-		});
-	}
-
-	async #sendRequest<T = any>({
-		peer,
-		url,
-		schema,
-		request,
-	}: {
-		peer: Contracts.P2P.Peer;
-		url: string;
-		schema: object;
-		request: any;
-	}): Promise<T> {
-		// Throttle
-		const msBeforeReCheck = 1000;
-
-		while (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, url)) {
-			this.logger.debug(`Throttling outgoing requests to ${peer.ip}/${url} to avoid triggering their rate limit`);
-
-			await delay(msBeforeReCheck);
+	private async validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
+		const schema = replySchemas[endpoint];
+		if (schema === undefined) {
+			this.logger.error(`Can't validate reply from "${endpoint}": none of the predefined schemas matches.`);
+			return false;
 		}
 
-		try {
-			await this.#outgoingRateLimiter.consume(peer.ip, url);
-		} catch {
-			//@ts-ignore
+		const { error } = await this.validator.validate(schema, reply);
+		if (error) {
+			if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
+				this.logger.debug(`Got unexpected reply from ${peer.url}/${endpoint}: ${error}`);
+			}
+
+			return false;
 		}
 
-		// Request
+		return true;
+	}
+
+	private async emit(
+		peer: Contracts.P2P.Peer,
+		event: string,
+		payload: any,
+		timeout?: number,
+		maxPayload?: number,
+		disconnectOnError = true,
+	) {
+		await this.throttle(peer, event);
+
+		const codec = getCodec(this.app, event);
+
+		let response;
+		let parsedResponsePayload;
 		try {
 			this.connector.forgetError(peer);
 
 			const timeBeforeSocketCall: number = Date.now();
 
-			await this.connector.connect(peer);
-			// constants.DEFAULT_MAX_PAYLOAD_CLIENT
+			maxPayload = maxPayload || constants.DEFAULT_MAX_PAYLOAD_CLIENT;
+			await this.connector.connect(peer, maxPayload);
 
-			const parsedResponsePayload: any = await request();
+			response = await this.connector.emit(
+				peer,
+				event,
+				codec.request.serialize({
+					...payload,
+					headers: {
+						version: this.app.version(),
+					},
+				}),
+				timeout,
+			);
+			parsedResponsePayload = codec.response.deserialize(response.payload);
 
 			peer.sequentialErrorCounter = 0; // reset counter if response is successful, keep it after emit
+
 			peer.latency = Date.now() - timeBeforeSocketCall;
 
-			if (parsedResponsePayload.headers && parsedResponsePayload.headers.height) {
-				peer.state.height = +parsedResponsePayload.headers.height;
+			if (!this.validateReply(peer, parsedResponsePayload, event)) {
+				const validationError = new Error(
+					`Response validation failed from peer ${peer.ip} : ${JSON.stringify(parsedResponsePayload)}`,
+				);
+				validationError.name = SocketErrors.Validation;
+				throw validationError;
 			}
-
-			// Validate
-			const { error, errors } = await this.validator.validate(schema, parsedResponsePayload);
-
-			if (error) {
-				this.logger.info(`Got unexpected reply from ${url}: ${JSON.stringify(errors)}`);
-
-				throw new Error(`Response validation failed from peer ${peer.ip} : ${JSON.stringify(errors)}`);
-			}
-
-			// // Validate
-			// this.validator.validate(parsedResponsePayload, schema);
-
-			// if (this.validator.fails()) {
-			// 	this.logger.debug(`Got unexpected reply from ${url}: ${JSON.stringify(this.validator.errors())}`);
-
-			// 	const validationError = new Error(
-			// 		`Response validation failed from peer ${peer.ip} : ${JSON.stringify(parsedResponsePayload)}`,
-			// 	);
-
-			// 	throw validationError;
-			// }
-
-			return parsedResponsePayload as T;
 		} catch (error) {
-			this.connector.setError(peer, error.name);
+			this.handleSocketError(peer, event, error, disconnectOnError);
+			return;
+		}
 
-			peer.sequentialErrorCounter++;
+		return parsedResponsePayload;
+	}
 
-			if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
-			}
-
-			throw error;
+	private async throttle(peer: Contracts.P2P.Peer, event: string): Promise<void> {
+		const msBeforeReCheck = 1000;
+		while (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
+			this.logger.debug(
+				`Throttling outgoing requests to ${peer.ip}/${event} to avoid triggering their rate limit`,
+			);
+			await delay(msBeforeReCheck);
+		}
+		try {
+			await this.#outgoingRateLimiter.consume(peer.ip, event);
+		} catch {
+			//@ts-ignore
 		}
 	}
 
-	#requestUrl(peer: Contracts.P2P.Peer, path: string): string {
-		return `http://${peer.ip}:4002/${path}`;
+	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error, disconnect = true): void {
+		if (!error.name) {
+			return;
+		}
+
+		this.connector.setError(peer, error.name);
+		peer.sequentialErrorCounter++;
+		if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
+			this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
+		}
+
+		switch (error.name) {
+			case SocketErrors.Validation:
+				this.logger.debug(`Socket data validation error (peer ${peer.ip}) : ${error.message}`);
+				break;
+			case "Error":
+				if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
+					this.logger.debug(`Response error (peer ${peer.ip}/${event}) : ${error.message}`);
+				}
+				break;
+			default:
+				if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
+					this.logger.debug(`Socket error (peer ${peer.ip}) : ${error.message}`);
+				}
+
+				if (disconnect) {
+					// eslint-disable-next-line @typescript-eslint/no-floating-promises
+					this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
+				}
+		}
 	}
 }
