@@ -2,10 +2,10 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 
+import { Controller } from "../../types";
 import { getPeerConfig } from "../utils/get-peer-config";
-
 @injectable()
-export class GetStatusController {
+export class GetStatusController implements Controller {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 

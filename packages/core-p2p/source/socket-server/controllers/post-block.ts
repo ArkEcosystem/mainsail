@@ -3,10 +3,11 @@ import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts
 import { Providers, Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
+import { Controller } from "../../types";
 import { mapAddr } from "../utils/map-addr";
 
 @injectable()
-export class PostBlockController {
+export class PostBlockController implements Controller {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 

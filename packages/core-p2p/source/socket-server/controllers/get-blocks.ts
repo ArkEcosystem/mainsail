@@ -4,10 +4,11 @@ import { Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
+import { Controller } from "../../types";
 import { mapAddr } from "../utils/map-addr";
 
 @injectable()
-export class GetBlocksController {
+export class GetBlocksController implements Controller {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
