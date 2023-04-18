@@ -1,7 +1,7 @@
 import { constants } from "../../constants";
 import { Codecs } from "../codecs";
 import { PostTransactionsController } from "../controllers";
-import { transactionsSchemas } from "../schemas/transactions";
+import { createPostTransactionsSchema } from "../schemas/post-transactions";
 import { Route, RouteConfig } from "./route";
 
 export class PostTransactionsRoute extends Route {
@@ -13,7 +13,7 @@ export class PostTransactionsRoute extends Route {
 				handler: controller.handle,
 				id: "p2p.transactions.postTransactions",
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
-				validation: transactionsSchemas.createPostTransactionsSchema(this.app),
+				validation: createPostTransactionsSchema(this.app),
 			},
 		};
 	}

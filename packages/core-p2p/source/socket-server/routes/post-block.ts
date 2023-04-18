@@ -1,7 +1,7 @@
 import { constants } from "../../constants";
 import { Codecs } from "../codecs";
 import { PostBlockController } from "../controllers";
-import { blocksSchemas } from "../schemas/blocks";
+import { Schemas } from "../schemas";
 import { Route, RouteConfig } from "./route";
 
 export class PostBlockRoute extends Route {
@@ -13,7 +13,7 @@ export class PostBlockRoute extends Route {
 				handler: controller.handle,
 				id: "p2p.blocks.postBlock",
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
-				validation: blocksSchemas.postBlock,
+				validation: Schemas.postBlock,
 			},
 		};
 	}

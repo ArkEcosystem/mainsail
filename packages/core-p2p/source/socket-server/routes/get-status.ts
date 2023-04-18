@@ -1,6 +1,6 @@
 import { Codecs } from "../codecs";
 import { GetStatusController } from "../controllers";
-import { peerSchemas } from "../schemas/peer";
+import { Schemas } from "../schemas";
 import { Route, RouteConfig } from "./route";
 
 export class GetStausRoute extends Route {
@@ -12,7 +12,7 @@ export class GetStausRoute extends Route {
 				handler: controller.handle,
 				id: "p2p.peer.getStatus",
 				maxBytes: 1024,
-				validation: peerSchemas.getStatus,
+				validation: Schemas.getStatus,
 			},
 		};
 	}

@@ -1,6 +1,6 @@
 import { Codecs } from "../codecs";
 import { GetPeersController } from "../controllers";
-import { peerSchemas } from "../schemas/peer";
+import { Schemas } from "../schemas";
 import { Route, RouteConfig } from "./route";
 
 export class GetPeersRoute extends Route {
@@ -12,7 +12,7 @@ export class GetPeersRoute extends Route {
 				handler: controller.handle,
 				id: "p2p.peer.getPeers",
 				maxBytes: 1024,
-				validation: peerSchemas.getPeers,
+				validation: Schemas.getPeers,
 			},
 		};
 	}

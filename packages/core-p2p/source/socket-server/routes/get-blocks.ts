@@ -1,6 +1,6 @@
 import { Codecs } from "../codecs";
 import { GetBlocksController } from "../controllers";
-import { blocksSchemas } from "../schemas/blocks";
+import { Schemas } from "../schemas";
 import { Route, RouteConfig } from "./route";
 
 export class GetBlocksRoute extends Route {
@@ -12,7 +12,7 @@ export class GetBlocksRoute extends Route {
 				handler: controller.handle,
 				id: "p2p.blocks.getBlocks",
 				maxBytes: 1024,
-				validation: blocksSchemas.getBlocks,
+				validation: Schemas.getBlocks,
 			},
 		};
 	}

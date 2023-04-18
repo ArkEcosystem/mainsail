@@ -1,6 +1,6 @@
 import { Codecs } from "../codecs";
 import { GetCommonBlocksController } from "../controllers";
-import { peerSchemas } from "../schemas/peer";
+import { Schemas } from "../schemas";
 import { Route, RouteConfig } from "./route";
 
 export class GetCommonBlocksRoute extends Route {
@@ -12,7 +12,7 @@ export class GetCommonBlocksRoute extends Route {
 				handler: controller.handle,
 				id: "p2p.peer.getCommonBlocks",
 				maxBytes: 10 * 1024,
-				validation: peerSchemas.getCommonBlocks,
+				validation: Schemas.getCommonBlocks,
 			},
 		};
 	}
