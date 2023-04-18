@@ -1,15 +1,23 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 
-import { BlocksRoute } from "../routes/blocks";
-import { PeerRoute } from "../routes/peer";
+import {
+	GetBlocksRoute,
+	GetCommonBlocksRoute,
+	GetPeersRoute,
+	GetStausRoute,
+	PostBlockRoute,
+	PostTransactionsRoute,
+} from "../routes";
 import { Codec } from "../routes/route";
-import { TransactionsRoute } from "../routes/transactions";
 
 export const getCodec = (app: Contracts.Kernel.Application, event: string): Codec => {
 	const allRoutesConfigByPath = {
-		...app.resolve(PeerRoute).getRoutesConfigByPath(),
-		...app.resolve(BlocksRoute).getRoutesConfigByPath(),
-		...app.resolve(TransactionsRoute).getRoutesConfigByPath(),
+		...app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
+		...app.resolve(GetCommonBlocksRoute).getRoutesConfigByPath(),
+		...app.resolve(GetPeersRoute).getRoutesConfigByPath(),
+		...app.resolve(GetStausRoute).getRoutesConfigByPath(),
+		...app.resolve(PostBlockRoute).getRoutesConfigByPath(),
+		...app.resolve(PostTransactionsRoute).getRoutesConfigByPath(),
 	};
 
 	const codecByEvent = {};

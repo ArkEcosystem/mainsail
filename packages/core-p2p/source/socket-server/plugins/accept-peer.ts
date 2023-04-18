@@ -2,9 +2,14 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { getPeerIp } from "../../utils/get-peer-ip";
-import { BlocksRoute } from "../routes/blocks";
-import { PeerRoute } from "../routes/peer";
-import { TransactionsRoute } from "../routes/transactions";
+import {
+	GetBlocksRoute,
+	GetCommonBlocksRoute,
+	GetPeersRoute,
+	GetStausRoute,
+	PostBlockRoute,
+	PostTransactionsRoute,
+} from "../routes";
 
 @injectable()
 export class AcceptPeerPlugin {
@@ -17,9 +22,12 @@ export class AcceptPeerPlugin {
 	public register(server) {
 		// try to add peer when receiving request on all routes except internal
 		const routesConfigByPath = {
-			...this.app.resolve(PeerRoute).getRoutesConfigByPath(),
-			...this.app.resolve(BlocksRoute).getRoutesConfigByPath(),
-			...this.app.resolve(TransactionsRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetCommonBlocksRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetStausRoute).getRoutesConfigByPath(),
+			...this.app.resolve(PostBlockRoute).getRoutesConfigByPath(),
+			...this.app.resolve(PostTransactionsRoute).getRoutesConfigByPath(),
 		};
 		const peerProcessor = this.peerProcessor;
 
