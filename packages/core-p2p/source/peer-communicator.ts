@@ -9,7 +9,7 @@ import { Routes, SocketErrors } from "./enums";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 import { replySchemas } from "./schemas";
-import { getCodec } from "./socket-server/utils/get-codec";
+import { Codecs } from "./socket-server/codecs";
 import { buildRateLimiter, isValidVersion } from "./utils";
 
 // @TODO review the implementation
@@ -276,7 +276,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	private async emit(
 		peer: Contracts.P2P.Peer,
-		event: string,
+		event: Routes,
 		payload: any,
 		timeout?: number,
 		maxPayload?: number,
@@ -284,7 +284,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	) {
 		await this.throttle(peer, event);
 
-		const codec = getCodec(this.app, event);
+		const codec = Codecs[event];
 
 		let response;
 		let parsedResponsePayload;
