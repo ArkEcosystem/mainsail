@@ -26,3 +26,12 @@ export enum SocketErrors {
 	SocketNotOpen = "CoreSocketNotOpenError",
 	Validation = "CoreValidationError",
 }
+
+export enum Routes {
+	GetBlocks = "getBlocks",
+	GetCommonBlocks = "getCommonBlocks",
+	GetPeers = "getPeers",
+	GetStatus = "getStatus",
+	PostBlock = "postBlock",
+	PostTransactions = "postTransactions",
+}

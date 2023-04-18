@@ -1,3 +1,4 @@
+import { Routes } from "../enums";
 import { RateLimiter } from "../rate-limiter";
 
 export const buildRateLimiter = (options) =>
@@ -6,28 +7,28 @@ export const buildRateLimiter = (options) =>
 			endpoints: [
 				{
 					duration: 4,
-					endpoint: "p2p.blocks.postBlock",
+					endpoint: Routes.PostBlock,
 					rateLimit: 2,
 				},
 				{
 					duration: 2,
-					endpoint: "p2p.blocks.getBlocks",
+					endpoint: Routes.GetBlocks,
 					rateLimit: 1,
 				},
 				{
-					endpoint: "p2p.peer.getPeers",
+					endpoint: Routes.GetPeers,
 					rateLimit: 1,
 				},
 				{
-					endpoint: "p2p.peer.getStatus",
+					endpoint: Routes.GetStatus,
 					rateLimit: 2,
 				},
 				{
-					endpoint: "p2p.peer.getCommonBlocks",
+					endpoint: Routes.GetCommonBlocks,
 					rateLimit: 9,
 				},
 				{
-					endpoint: "p2p.transactions.postTransactions",
+					endpoint: Routes.PostTransactions,
 					rateLimit: options.rateLimitPostTransactions || 25,
 				},
 			],

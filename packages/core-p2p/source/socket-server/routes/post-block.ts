@@ -1,4 +1,5 @@
 import { constants } from "../../constants";
+import { Routes } from "../../enums";
 import { Codecs } from "../codecs";
 import { PostBlockController } from "../controllers";
 import { Schemas } from "../schemas";
@@ -8,10 +9,10 @@ export class PostBlockRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
 		const controller = this.getController();
 		return {
-			"/p2p/blocks/postBlock": {
+			"/postBlock": {
 				codec: Codecs.postBlock,
 				handler: controller.handle,
-				id: "p2p.blocks.postBlock",
+				id: Routes.PostBlock,
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
 				validation: Schemas.postBlock,
 			},

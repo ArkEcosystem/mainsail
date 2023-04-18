@@ -1,3 +1,4 @@
+import { Routes } from "../../enums";
 import { Codecs } from "../codecs";
 import { GetStatusController } from "../controllers";
 import { Schemas } from "../schemas";
@@ -7,10 +8,10 @@ export class GetStausRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
 		const controller = this.getController();
 		return {
-			"/p2p/peer/getStatus": {
+			"/getStatus": {
 				codec: Codecs.getStatus,
 				handler: controller.handle,
-				id: "p2p.peer.getStatus",
+				id: Routes.GetStatus,
 				maxBytes: 1024,
 				validation: Schemas.getStatus,
 			},

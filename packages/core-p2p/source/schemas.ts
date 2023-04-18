@@ -1,22 +1,14 @@
 import { constants } from "./constants";
 
 export const replySchemas = {
-	"p2p.blocks.getBlocks": {
+	getBlocks: {
 		items: {
 			$ref: "blockHeader",
 		},
 		maxItems: 400,
 		type: "array",
 	},
-	"p2p.blocks.postBlock": {
-		additionalProperties: false,
-		properties: {
-			height: { minimum: 1, type: "integer" },
-			status: { type: "boolean" },
-		},
-		type: "object",
-	},
-	"p2p.peer.getCommonBlocks": {
+	getCommonBlocks: {
 		additionalProperties: false,
 		properties: {
 			common: {
@@ -41,7 +33,7 @@ export const replySchemas = {
 		required: ["common"],
 		type: "object",
 	},
-	"p2p.peer.getPeers": {
+	getPeers: {
 		items: {
 			properties: {
 				ip: {
@@ -68,7 +60,7 @@ export const replySchemas = {
 		maxItems: constants.MAX_PEERS_GETPEERS,
 		type: "array",
 	},
-	"p2p.peer.getStatus": {
+	getStatus: {
 		additionalProperties: false,
 		properties: {
 			config: {
@@ -193,7 +185,15 @@ export const replySchemas = {
 		required: ["state", "config"],
 		type: "object",
 	},
-	"p2p.transactions.postTransactions": {
+	postBlock: {
+		additionalProperties: false,
+		properties: {
+			height: { minimum: 1, type: "integer" },
+			status: { type: "boolean" },
+		},
+		type: "object",
+	},
+	postTransactions: {
 		type: "array",
 	},
 };

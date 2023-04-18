@@ -1,3 +1,4 @@
+import { Routes } from "../../enums";
 import { Codecs } from "../codecs";
 import { GetBlocksController } from "../controllers";
 import { Schemas } from "../schemas";
@@ -7,10 +8,10 @@ export class GetBlocksRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
 		const controller = this.getController();
 		return {
-			"/p2p/blocks/getBlocks": {
+			"/getBlocks": {
 				codec: Codecs.getBlocks,
 				handler: controller.handle,
-				id: "p2p.blocks.getBlocks",
+				id: Routes.GetBlocks,
 				maxBytes: 1024,
 				validation: Schemas.getBlocks,
 			},
