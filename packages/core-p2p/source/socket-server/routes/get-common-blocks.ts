@@ -1,4 +1,4 @@
-import { getCommonBlocks } from "../codecs/peer";
+import { Codecs } from "../codecs";
 import { GetCommonBlocksController } from "../controllers";
 import { peerSchemas } from "../schemas/peer";
 import { Route, RouteConfig } from "./route";
@@ -8,7 +8,7 @@ export class GetCommonBlocksRoute extends Route {
 		const controller = this.getController();
 		return {
 			"/p2p/peer/getCommonBlocks": {
-				codec: getCommonBlocks,
+				codec: Codecs.getCommonBlocks,
 				handler: controller.handle,
 				id: "p2p.peer.getCommonBlocks",
 				maxBytes: 10 * 1024,

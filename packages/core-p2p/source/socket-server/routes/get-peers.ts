@@ -1,4 +1,4 @@
-import { getPeers } from "../codecs/peer";
+import { Codecs } from "../codecs";
 import { GetPeersController } from "../controllers";
 import { peerSchemas } from "../schemas/peer";
 import { Route, RouteConfig } from "./route";
@@ -8,7 +8,7 @@ export class GetPeersRoute extends Route {
 		const controller = this.getController();
 		return {
 			"/p2p/peer/getPeers": {
-				codec: getPeers,
+				codec: Codecs.getPeers,
 				handler: controller.handle,
 				id: "p2p.peer.getPeers",
 				maxBytes: 1024,

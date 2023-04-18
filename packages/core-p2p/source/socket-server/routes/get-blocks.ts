@@ -1,4 +1,4 @@
-import { getBlocks } from "../codecs/blocks";
+import { Codecs } from "../codecs";
 import { GetBlocksController } from "../controllers";
 import { blocksSchemas } from "../schemas/blocks";
 import { Route, RouteConfig } from "./route";
@@ -8,7 +8,7 @@ export class GetBlocksRoute extends Route {
 		const controller = this.getController();
 		return {
 			"/p2p/blocks/getBlocks": {
-				codec: getBlocks,
+				codec: Codecs.getBlocks,
 				handler: controller.handle,
 				id: "p2p.blocks.getBlocks",
 				maxBytes: 1024,

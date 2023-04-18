@@ -1,5 +1,5 @@
 import { constants } from "../../constants";
-import { postTransactions } from "../codecs/transactions";
+import { Codecs } from "../codecs";
 import { PostTransactionsController } from "../controllers";
 import { transactionsSchemas } from "../schemas/transactions";
 import { Route, RouteConfig } from "./route";
@@ -9,7 +9,7 @@ export class PostTransactionsRoute extends Route {
 		const controller = this.getController();
 		return {
 			"/p2p/transactions/postTransactions": {
-				codec: postTransactions,
+				codec: Codecs.postTransactions,
 				handler: controller.handle,
 				id: "p2p.transactions.postTransactions",
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
