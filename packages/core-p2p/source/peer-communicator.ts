@@ -5,11 +5,11 @@ import dayjs from "dayjs";
 import delay from "delay";
 
 import { constants } from "./constants";
-import { SocketErrors } from "./enums";
+import { Routes, SocketErrors } from "./enums";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
-import { replySchemas } from "./schemas";
-import { getCodec } from "./socket-server/utils/get-codec";
+import { replySchemas } from "./reply-schemas";
+import { Codecs } from "./socket-server/codecs";
 import { buildRateLimiter, isValidVersion } from "./utils";
 
 // @TODO review the implementation
@@ -73,7 +73,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 		const response = await this.emit(
 			peer,
-			"p2p.blocks.postBlock",
+			Routes.PostBlock,
 			{
 				block: await this.serializer.serializeWithTransactions({
 					...block.data,
@@ -102,7 +102,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		queue.push({
 			handle: async () => {
-				await this.emit(peer, "p2p.transactions.postTransactions", { transactions }, postTransactionsTimeout);
+				await this.emit(peer, Routes.PostTransactions, { transactions }, postTransactionsTimeout);
 				await delay(Math.ceil(1000 / postTransactionsRateLimit));
 				// to space up between consecutive calls to postTransactions according to rate limit
 				// optimized here because default throttling would not be effective for postTransactions
@@ -123,7 +123,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const getStatusTimeout = timeoutMsec < 5000 ? timeoutMsec : 5000;
 		const pingResponse: Contracts.P2P.PeerPingResponse = await this.emit(
 			peer,
-			"p2p.peer.getStatus",
+			Routes.GetStatus,
 			{},
 			getStatusTimeout,
 		);
@@ -176,12 +176,12 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
 
 		const getPeersTimeout = 5000;
-		return this.emit(peer, "p2p.peer.getPeers", {}, getPeersTimeout);
+		return this.emit(peer, Routes.GetPeers, {}, getPeersTimeout);
 	}
 
 	public async hasCommonBlocks(peer: Contracts.P2P.Peer, ids: string[], timeoutMsec?: number): Promise<any> {
 		const getCommonBlocksTimeout = timeoutMsec && timeoutMsec < 5000 ? timeoutMsec : 5000;
-		const body: any = await this.emit(peer, "p2p.peer.getCommonBlocks", { ids }, getCommonBlocksTimeout);
+		const body: any = await this.emit(peer, Routes.GetCommonBlocks, { ids }, getCommonBlocksTimeout);
 
 		if (!body || !body.common) {
 			return false;
@@ -202,7 +202,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 		const peerBlocks = await this.emit(
 			peer,
-			"p2p.blocks.getBlocks",
+			Routes.GetBlocks,
 			{
 				blockLimit,
 				headersOnly,
@@ -276,7 +276,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	private async emit(
 		peer: Contracts.P2P.Peer,
-		event: string,
+		event: Routes,
 		payload: any,
 		timeout?: number,
 		maxPayload?: number,
@@ -284,7 +284,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	) {
 		await this.throttle(peer, event);
 
-		const codec = getCodec(this.app, event);
+		const codec = Codecs[event];
 
 		let response;
 		let parsedResponsePayload;

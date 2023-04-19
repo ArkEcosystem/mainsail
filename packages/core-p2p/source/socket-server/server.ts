@@ -10,9 +10,14 @@ import { CodecPlugin } from "./plugins/codec";
 import { IsAppReadyPlugin } from "./plugins/is-app-ready";
 import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
-import { BlocksRoute } from "./routes/blocks";
-import { PeerRoute } from "./routes/peer";
-import { TransactionsRoute } from "./routes/transactions";
+import {
+	GetBlocksRoute,
+	GetCommonBlocksRoute,
+	GetPeersRoute,
+	GetStausRoute,
+	PostBlockRoute,
+	PostTransactionsRoute,
+} from "./routes";
 
 // todo: review the implementation
 @injectable()
@@ -42,9 +47,12 @@ export class Server {
 			plugin: hapiNesPlugin,
 		});
 
-		this.app.resolve(PeerRoute).register(this.server);
-		this.app.resolve(BlocksRoute).register(this.server);
-		this.app.resolve(TransactionsRoute).register(this.server);
+		this.app.resolve(GetBlocksRoute).register(this.server);
+		this.app.resolve(GetCommonBlocksRoute).register(this.server);
+		this.app.resolve(GetPeersRoute).register(this.server);
+		this.app.resolve(GetStausRoute).register(this.server);
+		this.app.resolve(PostBlockRoute).register(this.server);
+		this.app.resolve(PostTransactionsRoute).register(this.server);
 
 		// onPreAuth
 		this.app.resolve(RateLimitPlugin).register(this.server);

@@ -9,454 +9,20 @@ var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.ut
 // Exported root namespace
 var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-$root.blocks = (function() {
+$root.getBlocks = (function() {
 
     /**
-     * Namespace blocks.
-     * @exports blocks
+     * Namespace getBlocks.
+     * @exports getBlocks
      * @namespace
      */
-    var blocks = {};
+    var getBlocks = {};
 
-    blocks.PostBlockRequest = (function() {
-
-        /**
-         * Properties of a PostBlockRequest.
-         * @memberof blocks
-         * @interface IPostBlockRequest
-         * @property {Uint8Array|null} [block] PostBlockRequest block
-         * @property {shared.IHeaders|null} [headers] PostBlockRequest headers
-         */
-
-        /**
-         * Constructs a new PostBlockRequest.
-         * @memberof blocks
-         * @classdesc Represents a PostBlockRequest.
-         * @implements IPostBlockRequest
-         * @constructor
-         * @param {blocks.IPostBlockRequest=} [properties] Properties to set
-         */
-        function PostBlockRequest(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PostBlockRequest block.
-         * @member {Uint8Array} block
-         * @memberof blocks.PostBlockRequest
-         * @instance
-         */
-        PostBlockRequest.prototype.block = $util.newBuffer([]);
-
-        /**
-         * PostBlockRequest headers.
-         * @member {shared.IHeaders|null|undefined} headers
-         * @memberof blocks.PostBlockRequest
-         * @instance
-         */
-        PostBlockRequest.prototype.headers = null;
-
-        /**
-         * Creates a new PostBlockRequest instance using the specified properties.
-         * @function create
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {blocks.IPostBlockRequest=} [properties] Properties to set
-         * @returns {blocks.PostBlockRequest} PostBlockRequest instance
-         */
-        PostBlockRequest.create = function create(properties) {
-            return new PostBlockRequest(properties);
-        };
-
-        /**
-         * Encodes the specified PostBlockRequest message. Does not implicitly {@link blocks.PostBlockRequest.verify|verify} messages.
-         * @function encode
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {blocks.IPostBlockRequest} message PostBlockRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockRequest.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.block != null && Object.hasOwnProperty.call(message, "block"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.block);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PostBlockRequest message, length delimited. Does not implicitly {@link blocks.PostBlockRequest.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {blocks.IPostBlockRequest} message PostBlockRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer.
-         * @function decode
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {blocks.PostBlockRequest} PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockRequest.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.blocks.PostBlockRequest();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.block = reader.bytes();
-                    break;
-                case 2:
-                    message.headers = $root.shared.Headers.decode(reader, reader.uint32());
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {blocks.PostBlockRequest} PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockRequest.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PostBlockRequest message.
-         * @function verify
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PostBlockRequest.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.block != null && message.hasOwnProperty("block"))
-                if (!(message.block && typeof message.block.length === "number" || $util.isString(message.block)))
-                    return "block: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers);
-                if (error)
-                    return "headers." + error;
-            }
-            return null;
-        };
-
-        /**
-         * Creates a PostBlockRequest message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {blocks.PostBlockRequest} PostBlockRequest
-         */
-        PostBlockRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.blocks.PostBlockRequest)
-                return object;
-            var message = new $root.blocks.PostBlockRequest();
-            if (object.block != null)
-                if (typeof object.block === "string")
-                    $util.base64.decode(object.block, message.block = $util.newBuffer($util.base64.length(object.block)), 0);
-                else if (object.block.length)
-                    message.block = object.block;
-            if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".blocks.PostBlockRequest.headers: object expected");
-                message.headers = $root.shared.Headers.fromObject(object.headers);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PostBlockRequest message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof blocks.PostBlockRequest
-         * @static
-         * @param {blocks.PostBlockRequest} message PostBlockRequest
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PostBlockRequest.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                if (options.bytes === String)
-                    object.block = "";
-                else {
-                    object.block = [];
-                    if (options.bytes !== Array)
-                        object.block = $util.newBuffer(object.block);
-                }
-                object.headers = null;
-            }
-            if (message.block != null && message.hasOwnProperty("block"))
-                object.block = options.bytes === String ? $util.base64.encode(message.block, 0, message.block.length) : options.bytes === Array ? Array.prototype.slice.call(message.block) : message.block;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            return object;
-        };
-
-        /**
-         * Converts this PostBlockRequest to JSON.
-         * @function toJSON
-         * @memberof blocks.PostBlockRequest
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PostBlockRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return PostBlockRequest;
-    })();
-
-    blocks.PostBlockResponse = (function() {
-
-        /**
-         * Properties of a PostBlockResponse.
-         * @memberof blocks
-         * @interface IPostBlockResponse
-         * @property {boolean|null} [status] PostBlockResponse status
-         * @property {number|null} [height] PostBlockResponse height
-         */
-
-        /**
-         * Constructs a new PostBlockResponse.
-         * @memberof blocks
-         * @classdesc Represents a PostBlockResponse.
-         * @implements IPostBlockResponse
-         * @constructor
-         * @param {blocks.IPostBlockResponse=} [properties] Properties to set
-         */
-        function PostBlockResponse(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PostBlockResponse status.
-         * @member {boolean} status
-         * @memberof blocks.PostBlockResponse
-         * @instance
-         */
-        PostBlockResponse.prototype.status = false;
-
-        /**
-         * PostBlockResponse height.
-         * @member {number} height
-         * @memberof blocks.PostBlockResponse
-         * @instance
-         */
-        PostBlockResponse.prototype.height = 0;
-
-        /**
-         * Creates a new PostBlockResponse instance using the specified properties.
-         * @function create
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {blocks.IPostBlockResponse=} [properties] Properties to set
-         * @returns {blocks.PostBlockResponse} PostBlockResponse instance
-         */
-        PostBlockResponse.create = function create(properties) {
-            return new PostBlockResponse(properties);
-        };
-
-        /**
-         * Encodes the specified PostBlockResponse message. Does not implicitly {@link blocks.PostBlockResponse.verify|verify} messages.
-         * @function encode
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {blocks.IPostBlockResponse} message PostBlockResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockResponse.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
-                writer.uint32(/* id 1, wireType 0 =*/8).bool(message.status);
-            if (message.height != null && Object.hasOwnProperty.call(message, "height"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PostBlockResponse message, length delimited. Does not implicitly {@link blocks.PostBlockResponse.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {blocks.IPostBlockResponse} message PostBlockResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer.
-         * @function decode
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {blocks.PostBlockResponse} PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockResponse.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.blocks.PostBlockResponse();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.status = reader.bool();
-                    break;
-                case 2:
-                    message.height = reader.uint32();
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {blocks.PostBlockResponse} PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockResponse.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PostBlockResponse message.
-         * @function verify
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PostBlockResponse.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.status != null && message.hasOwnProperty("status"))
-                if (typeof message.status !== "boolean")
-                    return "status: boolean expected";
-            if (message.height != null && message.hasOwnProperty("height"))
-                if (!$util.isInteger(message.height))
-                    return "height: integer expected";
-            return null;
-        };
-
-        /**
-         * Creates a PostBlockResponse message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {blocks.PostBlockResponse} PostBlockResponse
-         */
-        PostBlockResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.blocks.PostBlockResponse)
-                return object;
-            var message = new $root.blocks.PostBlockResponse();
-            if (object.status != null)
-                message.status = Boolean(object.status);
-            if (object.height != null)
-                message.height = object.height >>> 0;
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PostBlockResponse message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof blocks.PostBlockResponse
-         * @static
-         * @param {blocks.PostBlockResponse} message PostBlockResponse
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PostBlockResponse.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.status = false;
-                object.height = 0;
-            }
-            if (message.status != null && message.hasOwnProperty("status"))
-                object.status = message.status;
-            if (message.height != null && message.hasOwnProperty("height"))
-                object.height = message.height;
-            return object;
-        };
-
-        /**
-         * Converts this PostBlockResponse to JSON.
-         * @function toJSON
-         * @memberof blocks.PostBlockResponse
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PostBlockResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return PostBlockResponse;
-    })();
-
-    blocks.GetBlocksRequest = (function() {
+    getBlocks.GetBlocksRequest = (function() {
 
         /**
          * Properties of a GetBlocksRequest.
-         * @memberof blocks
+         * @memberof getBlocks
          * @interface IGetBlocksRequest
          * @property {number|null} [lastBlockHeight] GetBlocksRequest lastBlockHeight
          * @property {number|null} [blockLimit] GetBlocksRequest blockLimit
@@ -467,11 +33,11 @@ $root.blocks = (function() {
 
         /**
          * Constructs a new GetBlocksRequest.
-         * @memberof blocks
+         * @memberof getBlocks
          * @classdesc Represents a GetBlocksRequest.
          * @implements IGetBlocksRequest
          * @constructor
-         * @param {blocks.IGetBlocksRequest=} [properties] Properties to set
+         * @param {getBlocks.IGetBlocksRequest=} [properties] Properties to set
          */
         function GetBlocksRequest(properties) {
             if (properties)
@@ -483,7 +49,7 @@ $root.blocks = (function() {
         /**
          * GetBlocksRequest lastBlockHeight.
          * @member {number} lastBlockHeight
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @instance
          */
         GetBlocksRequest.prototype.lastBlockHeight = 0;
@@ -491,7 +57,7 @@ $root.blocks = (function() {
         /**
          * GetBlocksRequest blockLimit.
          * @member {number} blockLimit
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @instance
          */
         GetBlocksRequest.prototype.blockLimit = 0;
@@ -499,7 +65,7 @@ $root.blocks = (function() {
         /**
          * GetBlocksRequest headersOnly.
          * @member {boolean} headersOnly
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @instance
          */
         GetBlocksRequest.prototype.headersOnly = false;
@@ -507,7 +73,7 @@ $root.blocks = (function() {
         /**
          * GetBlocksRequest serialized.
          * @member {boolean} serialized
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @instance
          */
         GetBlocksRequest.prototype.serialized = false;
@@ -515,7 +81,7 @@ $root.blocks = (function() {
         /**
          * GetBlocksRequest headers.
          * @member {shared.IHeaders|null|undefined} headers
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @instance
          */
         GetBlocksRequest.prototype.headers = null;
@@ -523,21 +89,21 @@ $root.blocks = (function() {
         /**
          * Creates a new GetBlocksRequest instance using the specified properties.
          * @function create
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
-         * @param {blocks.IGetBlocksRequest=} [properties] Properties to set
-         * @returns {blocks.GetBlocksRequest} GetBlocksRequest instance
+         * @param {getBlocks.IGetBlocksRequest=} [properties] Properties to set
+         * @returns {getBlocks.GetBlocksRequest} GetBlocksRequest instance
          */
         GetBlocksRequest.create = function create(properties) {
             return new GetBlocksRequest(properties);
         };
 
         /**
-         * Encodes the specified GetBlocksRequest message. Does not implicitly {@link blocks.GetBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetBlocksRequest message. Does not implicitly {@link getBlocks.GetBlocksRequest.verify|verify} messages.
          * @function encode
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
-         * @param {blocks.IGetBlocksRequest} message GetBlocksRequest message or plain object to encode
+         * @param {getBlocks.IGetBlocksRequest} message GetBlocksRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -558,11 +124,11 @@ $root.blocks = (function() {
         };
 
         /**
-         * Encodes the specified GetBlocksRequest message, length delimited. Does not implicitly {@link blocks.GetBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetBlocksRequest message, length delimited. Does not implicitly {@link getBlocks.GetBlocksRequest.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
-         * @param {blocks.IGetBlocksRequest} message GetBlocksRequest message or plain object to encode
+         * @param {getBlocks.IGetBlocksRequest} message GetBlocksRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -573,18 +139,18 @@ $root.blocks = (function() {
         /**
          * Decodes a GetBlocksRequest message from the specified reader or buffer.
          * @function decode
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {blocks.GetBlocksRequest} GetBlocksRequest
+         * @returns {getBlocks.GetBlocksRequest} GetBlocksRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetBlocksRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.blocks.GetBlocksRequest();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getBlocks.GetBlocksRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -614,10 +180,10 @@ $root.blocks = (function() {
         /**
          * Decodes a GetBlocksRequest message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {blocks.GetBlocksRequest} GetBlocksRequest
+         * @returns {getBlocks.GetBlocksRequest} GetBlocksRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -630,7 +196,7 @@ $root.blocks = (function() {
         /**
          * Verifies a GetBlocksRequest message.
          * @function verify
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -661,15 +227,15 @@ $root.blocks = (function() {
         /**
          * Creates a GetBlocksRequest message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {blocks.GetBlocksRequest} GetBlocksRequest
+         * @returns {getBlocks.GetBlocksRequest} GetBlocksRequest
          */
         GetBlocksRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.blocks.GetBlocksRequest)
+            if (object instanceof $root.getBlocks.GetBlocksRequest)
                 return object;
-            var message = new $root.blocks.GetBlocksRequest();
+            var message = new $root.getBlocks.GetBlocksRequest();
             if (object.lastBlockHeight != null)
                 message.lastBlockHeight = object.lastBlockHeight >>> 0;
             if (object.blockLimit != null)
@@ -680,7 +246,7 @@ $root.blocks = (function() {
                 message.serialized = Boolean(object.serialized);
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".blocks.GetBlocksRequest.headers: object expected");
+                    throw TypeError(".getBlocks.GetBlocksRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -689,9 +255,9 @@ $root.blocks = (function() {
         /**
          * Creates a plain object from a GetBlocksRequest message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @static
-         * @param {blocks.GetBlocksRequest} message GetBlocksRequest
+         * @param {getBlocks.GetBlocksRequest} message GetBlocksRequest
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -722,7 +288,7 @@ $root.blocks = (function() {
         /**
          * Converts this GetBlocksRequest to JSON.
          * @function toJSON
-         * @memberof blocks.GetBlocksRequest
+         * @memberof getBlocks.GetBlocksRequest
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -733,22 +299,22 @@ $root.blocks = (function() {
         return GetBlocksRequest;
     })();
 
-    blocks.GetBlocksResponse = (function() {
+    getBlocks.GetBlocksResponse = (function() {
 
         /**
          * Properties of a GetBlocksResponse.
-         * @memberof blocks
+         * @memberof getBlocks
          * @interface IGetBlocksResponse
          * @property {Uint8Array|null} [blocks] GetBlocksResponse blocks
          */
 
         /**
          * Constructs a new GetBlocksResponse.
-         * @memberof blocks
+         * @memberof getBlocks
          * @classdesc Represents a GetBlocksResponse.
          * @implements IGetBlocksResponse
          * @constructor
-         * @param {blocks.IGetBlocksResponse=} [properties] Properties to set
+         * @param {getBlocks.IGetBlocksResponse=} [properties] Properties to set
          */
         function GetBlocksResponse(properties) {
             if (properties)
@@ -760,7 +326,7 @@ $root.blocks = (function() {
         /**
          * GetBlocksResponse blocks.
          * @member {Uint8Array} blocks
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @instance
          */
         GetBlocksResponse.prototype.blocks = $util.newBuffer([]);
@@ -768,21 +334,21 @@ $root.blocks = (function() {
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.
          * @function create
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
-         * @param {blocks.IGetBlocksResponse=} [properties] Properties to set
-         * @returns {blocks.GetBlocksResponse} GetBlocksResponse instance
+         * @param {getBlocks.IGetBlocksResponse=} [properties] Properties to set
+         * @returns {getBlocks.GetBlocksResponse} GetBlocksResponse instance
          */
         GetBlocksResponse.create = function create(properties) {
             return new GetBlocksResponse(properties);
         };
 
         /**
-         * Encodes the specified GetBlocksResponse message. Does not implicitly {@link blocks.GetBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetBlocksResponse message. Does not implicitly {@link getBlocks.GetBlocksResponse.verify|verify} messages.
          * @function encode
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
-         * @param {blocks.IGetBlocksResponse} message GetBlocksResponse message or plain object to encode
+         * @param {getBlocks.IGetBlocksResponse} message GetBlocksResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -795,11 +361,11 @@ $root.blocks = (function() {
         };
 
         /**
-         * Encodes the specified GetBlocksResponse message, length delimited. Does not implicitly {@link blocks.GetBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetBlocksResponse message, length delimited. Does not implicitly {@link getBlocks.GetBlocksResponse.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
-         * @param {blocks.IGetBlocksResponse} message GetBlocksResponse message or plain object to encode
+         * @param {getBlocks.IGetBlocksResponse} message GetBlocksResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -810,18 +376,18 @@ $root.blocks = (function() {
         /**
          * Decodes a GetBlocksResponse message from the specified reader or buffer.
          * @function decode
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {blocks.GetBlocksResponse} GetBlocksResponse
+         * @returns {getBlocks.GetBlocksResponse} GetBlocksResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetBlocksResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.blocks.GetBlocksResponse();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getBlocks.GetBlocksResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -839,10 +405,10 @@ $root.blocks = (function() {
         /**
          * Decodes a GetBlocksResponse message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {blocks.GetBlocksResponse} GetBlocksResponse
+         * @returns {getBlocks.GetBlocksResponse} GetBlocksResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -855,7 +421,7 @@ $root.blocks = (function() {
         /**
          * Verifies a GetBlocksResponse message.
          * @function verify
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -872,15 +438,15 @@ $root.blocks = (function() {
         /**
          * Creates a GetBlocksResponse message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {blocks.GetBlocksResponse} GetBlocksResponse
+         * @returns {getBlocks.GetBlocksResponse} GetBlocksResponse
          */
         GetBlocksResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.blocks.GetBlocksResponse)
+            if (object instanceof $root.getBlocks.GetBlocksResponse)
                 return object;
-            var message = new $root.blocks.GetBlocksResponse();
+            var message = new $root.getBlocks.GetBlocksResponse();
             if (object.blocks != null)
                 if (typeof object.blocks === "string")
                     $util.base64.decode(object.blocks, message.blocks = $util.newBuffer($util.base64.length(object.blocks)), 0);
@@ -892,9 +458,9 @@ $root.blocks = (function() {
         /**
          * Creates a plain object from a GetBlocksResponse message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @static
-         * @param {blocks.GetBlocksResponse} message GetBlocksResponse
+         * @param {getBlocks.GetBlocksResponse} message GetBlocksResponse
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -918,7 +484,7 @@ $root.blocks = (function() {
         /**
          * Converts this GetBlocksResponse to JSON.
          * @function toJSON
-         * @memberof blocks.GetBlocksResponse
+         * @memberof getBlocks.GetBlocksResponse
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -930,7 +496,7 @@ $root.blocks = (function() {
 
             /**
              * Properties of a BlockHeader.
-             * @memberof blocks.GetBlocksResponse
+             * @memberof getBlocks.GetBlocksResponse
              * @interface IBlockHeader
              * @property {string|null} [id] BlockHeader id
              * @property {number|null} [version] BlockHeader version
@@ -950,11 +516,11 @@ $root.blocks = (function() {
 
             /**
              * Constructs a new BlockHeader.
-             * @memberof blocks.GetBlocksResponse
+             * @memberof getBlocks.GetBlocksResponse
              * @classdesc Represents a BlockHeader.
              * @implements IBlockHeader
              * @constructor
-             * @param {blocks.GetBlocksResponse.IBlockHeader=} [properties] Properties to set
+             * @param {getBlocks.GetBlocksResponse.IBlockHeader=} [properties] Properties to set
              */
             function BlockHeader(properties) {
                 if (properties)
@@ -966,7 +532,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader id.
              * @member {string} id
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.id = "";
@@ -974,7 +540,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader version.
              * @member {number} version
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.version = 0;
@@ -982,7 +548,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader timestamp.
              * @member {number} timestamp
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.timestamp = 0;
@@ -990,7 +556,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader previousBlock.
              * @member {string} previousBlock
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.previousBlock = "";
@@ -998,7 +564,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader height.
              * @member {number} height
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.height = 0;
@@ -1006,7 +572,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader numberOfTransactions.
              * @member {number} numberOfTransactions
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.numberOfTransactions = 0;
@@ -1014,7 +580,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader totalAmount.
              * @member {string} totalAmount
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.totalAmount = "";
@@ -1022,7 +588,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader totalFee.
              * @member {string} totalFee
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.totalFee = "";
@@ -1030,7 +596,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader reward.
              * @member {string} reward
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.reward = "";
@@ -1038,7 +604,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader payloadLength.
              * @member {number} payloadLength
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.payloadLength = 0;
@@ -1046,7 +612,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader payloadHash.
              * @member {string} payloadHash
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.payloadHash = "";
@@ -1054,7 +620,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader generatorPublicKey.
              * @member {string} generatorPublicKey
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.generatorPublicKey = "";
@@ -1062,7 +628,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader blockSignature.
              * @member {string} blockSignature
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.blockSignature = "";
@@ -1070,7 +636,7 @@ $root.blocks = (function() {
             /**
              * BlockHeader transactions.
              * @member {Uint8Array} transactions
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              */
             BlockHeader.prototype.transactions = $util.newBuffer([]);
@@ -1078,21 +644,21 @@ $root.blocks = (function() {
             /**
              * Creates a new BlockHeader instance using the specified properties.
              * @function create
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
-             * @param {blocks.GetBlocksResponse.IBlockHeader=} [properties] Properties to set
-             * @returns {blocks.GetBlocksResponse.BlockHeader} BlockHeader instance
+             * @param {getBlocks.GetBlocksResponse.IBlockHeader=} [properties] Properties to set
+             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader instance
              */
             BlockHeader.create = function create(properties) {
                 return new BlockHeader(properties);
             };
 
             /**
-             * Encodes the specified BlockHeader message. Does not implicitly {@link blocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
+             * Encodes the specified BlockHeader message. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
              * @function encode
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
-             * @param {blocks.GetBlocksResponse.IBlockHeader} message BlockHeader message or plain object to encode
+             * @param {getBlocks.GetBlocksResponse.IBlockHeader} message BlockHeader message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -1131,11 +697,11 @@ $root.blocks = (function() {
             };
 
             /**
-             * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link blocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
+             * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
              * @function encodeDelimited
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
-             * @param {blocks.GetBlocksResponse.IBlockHeader} message BlockHeader message or plain object to encode
+             * @param {getBlocks.GetBlocksResponse.IBlockHeader} message BlockHeader message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -1146,18 +712,18 @@ $root.blocks = (function() {
             /**
              * Decodes a BlockHeader message from the specified reader or buffer.
              * @function decode
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
              * @param {number} [length] Message length if known beforehand
-             * @returns {blocks.GetBlocksResponse.BlockHeader} BlockHeader
+             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             BlockHeader.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.blocks.GetBlocksResponse.BlockHeader();
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getBlocks.GetBlocksResponse.BlockHeader();
                 while (reader.pos < end) {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
@@ -1214,10 +780,10 @@ $root.blocks = (function() {
             /**
              * Decodes a BlockHeader message from the specified reader or buffer, length delimited.
              * @function decodeDelimited
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {blocks.GetBlocksResponse.BlockHeader} BlockHeader
+             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
@@ -1230,7 +796,7 @@ $root.blocks = (function() {
             /**
              * Verifies a BlockHeader message.
              * @function verify
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -1286,15 +852,15 @@ $root.blocks = (function() {
             /**
              * Creates a BlockHeader message from a plain object. Also converts values to their respective internal types.
              * @function fromObject
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
              * @param {Object.<string,*>} object Plain object
-             * @returns {blocks.GetBlocksResponse.BlockHeader} BlockHeader
+             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader
              */
             BlockHeader.fromObject = function fromObject(object) {
-                if (object instanceof $root.blocks.GetBlocksResponse.BlockHeader)
+                if (object instanceof $root.getBlocks.GetBlocksResponse.BlockHeader)
                     return object;
-                var message = new $root.blocks.GetBlocksResponse.BlockHeader();
+                var message = new $root.getBlocks.GetBlocksResponse.BlockHeader();
                 if (object.id != null)
                     message.id = String(object.id);
                 if (object.version != null)
@@ -1332,9 +898,9 @@ $root.blocks = (function() {
             /**
              * Creates a plain object from a BlockHeader message. Also converts values to other types if specified.
              * @function toObject
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @static
-             * @param {blocks.GetBlocksResponse.BlockHeader} message BlockHeader
+             * @param {getBlocks.GetBlocksResponse.BlockHeader} message BlockHeader
              * @param {$protobuf.IConversionOptions} [options] Conversion options
              * @returns {Object.<string,*>} Plain object
              */
@@ -1398,7 +964,7 @@ $root.blocks = (function() {
             /**
              * Converts this BlockHeader to JSON.
              * @function toJSON
-             * @memberof blocks.GetBlocksResponse.BlockHeader
+             * @memberof getBlocks.GetBlocksResponse.BlockHeader
              * @instance
              * @returns {Object.<string,*>} JSON object
              */
@@ -1412,633 +978,23 @@ $root.blocks = (function() {
         return GetBlocksResponse;
     })();
 
-    return blocks;
+    return getBlocks;
 })();
 
-$root.peer = (function() {
+$root.getCommonBlocks = (function() {
 
     /**
-     * Namespace peer.
-     * @exports peer
+     * Namespace getCommonBlocks.
+     * @exports getCommonBlocks
      * @namespace
      */
-    var peer = {};
+    var getCommonBlocks = {};
 
-    peer.GetPeersRequest = (function() {
-
-        /**
-         * Properties of a GetPeersRequest.
-         * @memberof peer
-         * @interface IGetPeersRequest
-         * @property {shared.IHeaders|null} [headers] GetPeersRequest headers
-         */
-
-        /**
-         * Constructs a new GetPeersRequest.
-         * @memberof peer
-         * @classdesc Represents a GetPeersRequest.
-         * @implements IGetPeersRequest
-         * @constructor
-         * @param {peer.IGetPeersRequest=} [properties] Properties to set
-         */
-        function GetPeersRequest(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GetPeersRequest headers.
-         * @member {shared.IHeaders|null|undefined} headers
-         * @memberof peer.GetPeersRequest
-         * @instance
-         */
-        GetPeersRequest.prototype.headers = null;
-
-        /**
-         * Creates a new GetPeersRequest instance using the specified properties.
-         * @function create
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {peer.IGetPeersRequest=} [properties] Properties to set
-         * @returns {peer.GetPeersRequest} GetPeersRequest instance
-         */
-        GetPeersRequest.create = function create(properties) {
-            return new GetPeersRequest(properties);
-        };
-
-        /**
-         * Encodes the specified GetPeersRequest message. Does not implicitly {@link peer.GetPeersRequest.verify|verify} messages.
-         * @function encode
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {peer.IGetPeersRequest} message GetPeersRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GetPeersRequest.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GetPeersRequest message, length delimited. Does not implicitly {@link peer.GetPeersRequest.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {peer.IGetPeersRequest} message GetPeersRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GetPeersRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GetPeersRequest message from the specified reader or buffer.
-         * @function decode
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {peer.GetPeersRequest} GetPeersRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GetPeersRequest.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetPeersRequest();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.headers = $root.shared.Headers.decode(reader, reader.uint32());
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GetPeersRequest message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {peer.GetPeersRequest} GetPeersRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GetPeersRequest.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GetPeersRequest message.
-         * @function verify
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GetPeersRequest.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers);
-                if (error)
-                    return "headers." + error;
-            }
-            return null;
-        };
-
-        /**
-         * Creates a GetPeersRequest message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {peer.GetPeersRequest} GetPeersRequest
-         */
-        GetPeersRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.peer.GetPeersRequest)
-                return object;
-            var message = new $root.peer.GetPeersRequest();
-            if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".peer.GetPeersRequest.headers: object expected");
-                message.headers = $root.shared.Headers.fromObject(object.headers);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a GetPeersRequest message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof peer.GetPeersRequest
-         * @static
-         * @param {peer.GetPeersRequest} message GetPeersRequest
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GetPeersRequest.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults)
-                object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            return object;
-        };
-
-        /**
-         * Converts this GetPeersRequest to JSON.
-         * @function toJSON
-         * @memberof peer.GetPeersRequest
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GetPeersRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return GetPeersRequest;
-    })();
-
-    peer.GetPeersResponse = (function() {
-
-        /**
-         * Properties of a GetPeersResponse.
-         * @memberof peer
-         * @interface IGetPeersResponse
-         * @property {Array.<peer.GetPeersResponse.IPeer>|null} [peers] GetPeersResponse peers
-         */
-
-        /**
-         * Constructs a new GetPeersResponse.
-         * @memberof peer
-         * @classdesc Represents a GetPeersResponse.
-         * @implements IGetPeersResponse
-         * @constructor
-         * @param {peer.IGetPeersResponse=} [properties] Properties to set
-         */
-        function GetPeersResponse(properties) {
-            this.peers = [];
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GetPeersResponse peers.
-         * @member {Array.<peer.GetPeersResponse.IPeer>} peers
-         * @memberof peer.GetPeersResponse
-         * @instance
-         */
-        GetPeersResponse.prototype.peers = $util.emptyArray;
-
-        /**
-         * Creates a new GetPeersResponse instance using the specified properties.
-         * @function create
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {peer.IGetPeersResponse=} [properties] Properties to set
-         * @returns {peer.GetPeersResponse} GetPeersResponse instance
-         */
-        GetPeersResponse.create = function create(properties) {
-            return new GetPeersResponse(properties);
-        };
-
-        /**
-         * Encodes the specified GetPeersResponse message. Does not implicitly {@link peer.GetPeersResponse.verify|verify} messages.
-         * @function encode
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {peer.IGetPeersResponse} message GetPeersResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GetPeersResponse.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.peers != null && message.peers.length)
-                for (var i = 0; i < message.peers.length; ++i)
-                    $root.peer.GetPeersResponse.Peer.encode(message.peers[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GetPeersResponse message, length delimited. Does not implicitly {@link peer.GetPeersResponse.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {peer.IGetPeersResponse} message GetPeersResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GetPeersResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GetPeersResponse message from the specified reader or buffer.
-         * @function decode
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {peer.GetPeersResponse} GetPeersResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GetPeersResponse.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetPeersResponse();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    if (!(message.peers && message.peers.length))
-                        message.peers = [];
-                    message.peers.push($root.peer.GetPeersResponse.Peer.decode(reader, reader.uint32()));
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GetPeersResponse message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {peer.GetPeersResponse} GetPeersResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GetPeersResponse.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GetPeersResponse message.
-         * @function verify
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GetPeersResponse.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.peers != null && message.hasOwnProperty("peers")) {
-                if (!Array.isArray(message.peers))
-                    return "peers: array expected";
-                for (var i = 0; i < message.peers.length; ++i) {
-                    var error = $root.peer.GetPeersResponse.Peer.verify(message.peers[i]);
-                    if (error)
-                        return "peers." + error;
-                }
-            }
-            return null;
-        };
-
-        /**
-         * Creates a GetPeersResponse message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {peer.GetPeersResponse} GetPeersResponse
-         */
-        GetPeersResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.peer.GetPeersResponse)
-                return object;
-            var message = new $root.peer.GetPeersResponse();
-            if (object.peers) {
-                if (!Array.isArray(object.peers))
-                    throw TypeError(".peer.GetPeersResponse.peers: array expected");
-                message.peers = [];
-                for (var i = 0; i < object.peers.length; ++i) {
-                    if (typeof object.peers[i] !== "object")
-                        throw TypeError(".peer.GetPeersResponse.peers: object expected");
-                    message.peers[i] = $root.peer.GetPeersResponse.Peer.fromObject(object.peers[i]);
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a GetPeersResponse message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof peer.GetPeersResponse
-         * @static
-         * @param {peer.GetPeersResponse} message GetPeersResponse
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GetPeersResponse.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.arrays || options.defaults)
-                object.peers = [];
-            if (message.peers && message.peers.length) {
-                object.peers = [];
-                for (var j = 0; j < message.peers.length; ++j)
-                    object.peers[j] = $root.peer.GetPeersResponse.Peer.toObject(message.peers[j], options);
-            }
-            return object;
-        };
-
-        /**
-         * Converts this GetPeersResponse to JSON.
-         * @function toJSON
-         * @memberof peer.GetPeersResponse
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GetPeersResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        GetPeersResponse.Peer = (function() {
-
-            /**
-             * Properties of a Peer.
-             * @memberof peer.GetPeersResponse
-             * @interface IPeer
-             * @property {string|null} [ip] Peer ip
-             * @property {number|null} [port] Peer port
-             */
-
-            /**
-             * Constructs a new Peer.
-             * @memberof peer.GetPeersResponse
-             * @classdesc Represents a Peer.
-             * @implements IPeer
-             * @constructor
-             * @param {peer.GetPeersResponse.IPeer=} [properties] Properties to set
-             */
-            function Peer(properties) {
-                if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * Peer ip.
-             * @member {string} ip
-             * @memberof peer.GetPeersResponse.Peer
-             * @instance
-             */
-            Peer.prototype.ip = "";
-
-            /**
-             * Peer port.
-             * @member {number} port
-             * @memberof peer.GetPeersResponse.Peer
-             * @instance
-             */
-            Peer.prototype.port = 0;
-
-            /**
-             * Creates a new Peer instance using the specified properties.
-             * @function create
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {peer.GetPeersResponse.IPeer=} [properties] Properties to set
-             * @returns {peer.GetPeersResponse.Peer} Peer instance
-             */
-            Peer.create = function create(properties) {
-                return new Peer(properties);
-            };
-
-            /**
-             * Encodes the specified Peer message. Does not implicitly {@link peer.GetPeersResponse.Peer.verify|verify} messages.
-             * @function encode
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {peer.GetPeersResponse.IPeer} message Peer message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            Peer.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
-                if (message.port != null && Object.hasOwnProperty.call(message, "port"))
-                    writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
-                return writer;
-            };
-
-            /**
-             * Encodes the specified Peer message, length delimited. Does not implicitly {@link peer.GetPeersResponse.Peer.verify|verify} messages.
-             * @function encodeDelimited
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {peer.GetPeersResponse.IPeer} message Peer message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            Peer.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
-            };
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer.
-             * @function decode
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {peer.GetPeersResponse.Peer} Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            Peer.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetPeersResponse.Peer();
-                while (reader.pos < end) {
-                    var tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 1:
-                        message.ip = reader.string();
-                        break;
-                    case 2:
-                        message.port = reader.uint32();
-                        break;
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer, length delimited.
-             * @function decodeDelimited
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {peer.GetPeersResponse.Peer} Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            Peer.decodeDelimited = function decodeDelimited(reader) {
-                if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
-                return this.decode(reader, reader.uint32());
-            };
-
-            /**
-             * Verifies a Peer message.
-             * @function verify
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            Peer.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.ip != null && message.hasOwnProperty("ip"))
-                    if (!$util.isString(message.ip))
-                        return "ip: string expected";
-                if (message.port != null && message.hasOwnProperty("port"))
-                    if (!$util.isInteger(message.port))
-                        return "port: integer expected";
-                return null;
-            };
-
-            /**
-             * Creates a Peer message from a plain object. Also converts values to their respective internal types.
-             * @function fromObject
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {Object.<string,*>} object Plain object
-             * @returns {peer.GetPeersResponse.Peer} Peer
-             */
-            Peer.fromObject = function fromObject(object) {
-                if (object instanceof $root.peer.GetPeersResponse.Peer)
-                    return object;
-                var message = new $root.peer.GetPeersResponse.Peer();
-                if (object.ip != null)
-                    message.ip = String(object.ip);
-                if (object.port != null)
-                    message.port = object.port >>> 0;
-                return message;
-            };
-
-            /**
-             * Creates a plain object from a Peer message. Also converts values to other types if specified.
-             * @function toObject
-             * @memberof peer.GetPeersResponse.Peer
-             * @static
-             * @param {peer.GetPeersResponse.Peer} message Peer
-             * @param {$protobuf.IConversionOptions} [options] Conversion options
-             * @returns {Object.<string,*>} Plain object
-             */
-            Peer.toObject = function toObject(message, options) {
-                if (!options)
-                    options = {};
-                var object = {};
-                if (options.defaults) {
-                    object.ip = "";
-                    object.port = 0;
-                }
-                if (message.ip != null && message.hasOwnProperty("ip"))
-                    object.ip = message.ip;
-                if (message.port != null && message.hasOwnProperty("port"))
-                    object.port = message.port;
-                return object;
-            };
-
-            /**
-             * Converts this Peer to JSON.
-             * @function toJSON
-             * @memberof peer.GetPeersResponse.Peer
-             * @instance
-             * @returns {Object.<string,*>} JSON object
-             */
-            Peer.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-            };
-
-            return Peer;
-        })();
-
-        return GetPeersResponse;
-    })();
-
-    peer.GetCommonBlocksRequest = (function() {
+    getCommonBlocks.GetCommonBlocksRequest = (function() {
 
         /**
          * Properties of a GetCommonBlocksRequest.
-         * @memberof peer
+         * @memberof getCommonBlocks
          * @interface IGetCommonBlocksRequest
          * @property {Array.<string>|null} [ids] GetCommonBlocksRequest ids
          * @property {shared.IHeaders|null} [headers] GetCommonBlocksRequest headers
@@ -2046,11 +1002,11 @@ $root.peer = (function() {
 
         /**
          * Constructs a new GetCommonBlocksRequest.
-         * @memberof peer
+         * @memberof getCommonBlocks
          * @classdesc Represents a GetCommonBlocksRequest.
          * @implements IGetCommonBlocksRequest
          * @constructor
-         * @param {peer.IGetCommonBlocksRequest=} [properties] Properties to set
+         * @param {getCommonBlocks.IGetCommonBlocksRequest=} [properties] Properties to set
          */
         function GetCommonBlocksRequest(properties) {
             this.ids = [];
@@ -2063,7 +1019,7 @@ $root.peer = (function() {
         /**
          * GetCommonBlocksRequest ids.
          * @member {Array.<string>} ids
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @instance
          */
         GetCommonBlocksRequest.prototype.ids = $util.emptyArray;
@@ -2071,7 +1027,7 @@ $root.peer = (function() {
         /**
          * GetCommonBlocksRequest headers.
          * @member {shared.IHeaders|null|undefined} headers
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @instance
          */
         GetCommonBlocksRequest.prototype.headers = null;
@@ -2079,21 +1035,21 @@ $root.peer = (function() {
         /**
          * Creates a new GetCommonBlocksRequest instance using the specified properties.
          * @function create
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
-         * @param {peer.IGetCommonBlocksRequest=} [properties] Properties to set
-         * @returns {peer.GetCommonBlocksRequest} GetCommonBlocksRequest instance
+         * @param {getCommonBlocks.IGetCommonBlocksRequest=} [properties] Properties to set
+         * @returns {getCommonBlocks.GetCommonBlocksRequest} GetCommonBlocksRequest instance
          */
         GetCommonBlocksRequest.create = function create(properties) {
             return new GetCommonBlocksRequest(properties);
         };
 
         /**
-         * Encodes the specified GetCommonBlocksRequest message. Does not implicitly {@link peer.GetCommonBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksRequest message. Does not implicitly {@link getCommonBlocks.GetCommonBlocksRequest.verify|verify} messages.
          * @function encode
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
-         * @param {peer.IGetCommonBlocksRequest} message GetCommonBlocksRequest message or plain object to encode
+         * @param {getCommonBlocks.IGetCommonBlocksRequest} message GetCommonBlocksRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2109,11 +1065,11 @@ $root.peer = (function() {
         };
 
         /**
-         * Encodes the specified GetCommonBlocksRequest message, length delimited. Does not implicitly {@link peer.GetCommonBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksRequest message, length delimited. Does not implicitly {@link getCommonBlocks.GetCommonBlocksRequest.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
-         * @param {peer.IGetCommonBlocksRequest} message GetCommonBlocksRequest message or plain object to encode
+         * @param {getCommonBlocks.IGetCommonBlocksRequest} message GetCommonBlocksRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2124,18 +1080,18 @@ $root.peer = (function() {
         /**
          * Decodes a GetCommonBlocksRequest message from the specified reader or buffer.
          * @function decode
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {peer.GetCommonBlocksRequest} GetCommonBlocksRequest
+         * @returns {getCommonBlocks.GetCommonBlocksRequest} GetCommonBlocksRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetCommonBlocksRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetCommonBlocksRequest();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getCommonBlocks.GetCommonBlocksRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -2158,10 +1114,10 @@ $root.peer = (function() {
         /**
          * Decodes a GetCommonBlocksRequest message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {peer.GetCommonBlocksRequest} GetCommonBlocksRequest
+         * @returns {getCommonBlocks.GetCommonBlocksRequest} GetCommonBlocksRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -2174,7 +1130,7 @@ $root.peer = (function() {
         /**
          * Verifies a GetCommonBlocksRequest message.
          * @function verify
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -2200,25 +1156,25 @@ $root.peer = (function() {
         /**
          * Creates a GetCommonBlocksRequest message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {peer.GetCommonBlocksRequest} GetCommonBlocksRequest
+         * @returns {getCommonBlocks.GetCommonBlocksRequest} GetCommonBlocksRequest
          */
         GetCommonBlocksRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.peer.GetCommonBlocksRequest)
+            if (object instanceof $root.getCommonBlocks.GetCommonBlocksRequest)
                 return object;
-            var message = new $root.peer.GetCommonBlocksRequest();
+            var message = new $root.getCommonBlocks.GetCommonBlocksRequest();
             if (object.ids) {
                 if (!Array.isArray(object.ids))
-                    throw TypeError(".peer.GetCommonBlocksRequest.ids: array expected");
+                    throw TypeError(".getCommonBlocks.GetCommonBlocksRequest.ids: array expected");
                 message.ids = [];
                 for (var i = 0; i < object.ids.length; ++i)
                     message.ids[i] = String(object.ids[i]);
             }
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".peer.GetCommonBlocksRequest.headers: object expected");
+                    throw TypeError(".getCommonBlocks.GetCommonBlocksRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -2227,9 +1183,9 @@ $root.peer = (function() {
         /**
          * Creates a plain object from a GetCommonBlocksRequest message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @static
-         * @param {peer.GetCommonBlocksRequest} message GetCommonBlocksRequest
+         * @param {getCommonBlocks.GetCommonBlocksRequest} message GetCommonBlocksRequest
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -2254,7 +1210,7 @@ $root.peer = (function() {
         /**
          * Converts this GetCommonBlocksRequest to JSON.
          * @function toJSON
-         * @memberof peer.GetCommonBlocksRequest
+         * @memberof getCommonBlocks.GetCommonBlocksRequest
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -2265,22 +1221,22 @@ $root.peer = (function() {
         return GetCommonBlocksRequest;
     })();
 
-    peer.GetCommonBlocksResponse = (function() {
+    getCommonBlocks.GetCommonBlocksResponse = (function() {
 
         /**
          * Properties of a GetCommonBlocksResponse.
-         * @memberof peer
+         * @memberof getCommonBlocks
          * @interface IGetCommonBlocksResponse
-         * @property {peer.GetCommonBlocksResponse.ICommon|null} [common] GetCommonBlocksResponse common
+         * @property {getCommonBlocks.GetCommonBlocksResponse.ICommon|null} [common] GetCommonBlocksResponse common
          */
 
         /**
          * Constructs a new GetCommonBlocksResponse.
-         * @memberof peer
+         * @memberof getCommonBlocks
          * @classdesc Represents a GetCommonBlocksResponse.
          * @implements IGetCommonBlocksResponse
          * @constructor
-         * @param {peer.IGetCommonBlocksResponse=} [properties] Properties to set
+         * @param {getCommonBlocks.IGetCommonBlocksResponse=} [properties] Properties to set
          */
         function GetCommonBlocksResponse(properties) {
             if (properties)
@@ -2291,8 +1247,8 @@ $root.peer = (function() {
 
         /**
          * GetCommonBlocksResponse common.
-         * @member {peer.GetCommonBlocksResponse.ICommon|null|undefined} common
-         * @memberof peer.GetCommonBlocksResponse
+         * @member {getCommonBlocks.GetCommonBlocksResponse.ICommon|null|undefined} common
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @instance
          */
         GetCommonBlocksResponse.prototype.common = null;
@@ -2300,21 +1256,21 @@ $root.peer = (function() {
         /**
          * Creates a new GetCommonBlocksResponse instance using the specified properties.
          * @function create
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
-         * @param {peer.IGetCommonBlocksResponse=} [properties] Properties to set
-         * @returns {peer.GetCommonBlocksResponse} GetCommonBlocksResponse instance
+         * @param {getCommonBlocks.IGetCommonBlocksResponse=} [properties] Properties to set
+         * @returns {getCommonBlocks.GetCommonBlocksResponse} GetCommonBlocksResponse instance
          */
         GetCommonBlocksResponse.create = function create(properties) {
             return new GetCommonBlocksResponse(properties);
         };
 
         /**
-         * Encodes the specified GetCommonBlocksResponse message. Does not implicitly {@link peer.GetCommonBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksResponse message. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.verify|verify} messages.
          * @function encode
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
-         * @param {peer.IGetCommonBlocksResponse} message GetCommonBlocksResponse message or plain object to encode
+         * @param {getCommonBlocks.IGetCommonBlocksResponse} message GetCommonBlocksResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2322,16 +1278,16 @@ $root.peer = (function() {
             if (!writer)
                 writer = $Writer.create();
             if (message.common != null && Object.hasOwnProperty.call(message, "common"))
-                $root.peer.GetCommonBlocksResponse.Common.encode(message.common, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                $root.getCommonBlocks.GetCommonBlocksResponse.Common.encode(message.common, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
         /**
-         * Encodes the specified GetCommonBlocksResponse message, length delimited. Does not implicitly {@link peer.GetCommonBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksResponse message, length delimited. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
-         * @param {peer.IGetCommonBlocksResponse} message GetCommonBlocksResponse message or plain object to encode
+         * @param {getCommonBlocks.IGetCommonBlocksResponse} message GetCommonBlocksResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2342,23 +1298,23 @@ $root.peer = (function() {
         /**
          * Decodes a GetCommonBlocksResponse message from the specified reader or buffer.
          * @function decode
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {peer.GetCommonBlocksResponse} GetCommonBlocksResponse
+         * @returns {getCommonBlocks.GetCommonBlocksResponse} GetCommonBlocksResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetCommonBlocksResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetCommonBlocksResponse();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getCommonBlocks.GetCommonBlocksResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.common = $root.peer.GetCommonBlocksResponse.Common.decode(reader, reader.uint32());
+                    message.common = $root.getCommonBlocks.GetCommonBlocksResponse.Common.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -2371,10 +1327,10 @@ $root.peer = (function() {
         /**
          * Decodes a GetCommonBlocksResponse message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {peer.GetCommonBlocksResponse} GetCommonBlocksResponse
+         * @returns {getCommonBlocks.GetCommonBlocksResponse} GetCommonBlocksResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -2387,7 +1343,7 @@ $root.peer = (function() {
         /**
          * Verifies a GetCommonBlocksResponse message.
          * @function verify
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -2396,7 +1352,7 @@ $root.peer = (function() {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.common != null && message.hasOwnProperty("common")) {
-                var error = $root.peer.GetCommonBlocksResponse.Common.verify(message.common);
+                var error = $root.getCommonBlocks.GetCommonBlocksResponse.Common.verify(message.common);
                 if (error)
                     return "common." + error;
             }
@@ -2406,19 +1362,19 @@ $root.peer = (function() {
         /**
          * Creates a GetCommonBlocksResponse message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {peer.GetCommonBlocksResponse} GetCommonBlocksResponse
+         * @returns {getCommonBlocks.GetCommonBlocksResponse} GetCommonBlocksResponse
          */
         GetCommonBlocksResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.peer.GetCommonBlocksResponse)
+            if (object instanceof $root.getCommonBlocks.GetCommonBlocksResponse)
                 return object;
-            var message = new $root.peer.GetCommonBlocksResponse();
+            var message = new $root.getCommonBlocks.GetCommonBlocksResponse();
             if (object.common != null) {
                 if (typeof object.common !== "object")
-                    throw TypeError(".peer.GetCommonBlocksResponse.common: object expected");
-                message.common = $root.peer.GetCommonBlocksResponse.Common.fromObject(object.common);
+                    throw TypeError(".getCommonBlocks.GetCommonBlocksResponse.common: object expected");
+                message.common = $root.getCommonBlocks.GetCommonBlocksResponse.Common.fromObject(object.common);
             }
             return message;
         };
@@ -2426,9 +1382,9 @@ $root.peer = (function() {
         /**
          * Creates a plain object from a GetCommonBlocksResponse message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @static
-         * @param {peer.GetCommonBlocksResponse} message GetCommonBlocksResponse
+         * @param {getCommonBlocks.GetCommonBlocksResponse} message GetCommonBlocksResponse
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -2439,14 +1395,14 @@ $root.peer = (function() {
             if (options.defaults)
                 object.common = null;
             if (message.common != null && message.hasOwnProperty("common"))
-                object.common = $root.peer.GetCommonBlocksResponse.Common.toObject(message.common, options);
+                object.common = $root.getCommonBlocks.GetCommonBlocksResponse.Common.toObject(message.common, options);
             return object;
         };
 
         /**
          * Converts this GetCommonBlocksResponse to JSON.
          * @function toJSON
-         * @memberof peer.GetCommonBlocksResponse
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -2458,7 +1414,7 @@ $root.peer = (function() {
 
             /**
              * Properties of a Common.
-             * @memberof peer.GetCommonBlocksResponse
+             * @memberof getCommonBlocks.GetCommonBlocksResponse
              * @interface ICommon
              * @property {number|null} [height] Common height
              * @property {string|null} [id] Common id
@@ -2466,11 +1422,11 @@ $root.peer = (function() {
 
             /**
              * Constructs a new Common.
-             * @memberof peer.GetCommonBlocksResponse
+             * @memberof getCommonBlocks.GetCommonBlocksResponse
              * @classdesc Represents a Common.
              * @implements ICommon
              * @constructor
-             * @param {peer.GetCommonBlocksResponse.ICommon=} [properties] Properties to set
+             * @param {getCommonBlocks.GetCommonBlocksResponse.ICommon=} [properties] Properties to set
              */
             function Common(properties) {
                 if (properties)
@@ -2482,7 +1438,7 @@ $root.peer = (function() {
             /**
              * Common height.
              * @member {number} height
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @instance
              */
             Common.prototype.height = 0;
@@ -2490,7 +1446,7 @@ $root.peer = (function() {
             /**
              * Common id.
              * @member {string} id
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @instance
              */
             Common.prototype.id = "";
@@ -2498,21 +1454,21 @@ $root.peer = (function() {
             /**
              * Creates a new Common instance using the specified properties.
              * @function create
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
-             * @param {peer.GetCommonBlocksResponse.ICommon=} [properties] Properties to set
-             * @returns {peer.GetCommonBlocksResponse.Common} Common instance
+             * @param {getCommonBlocks.GetCommonBlocksResponse.ICommon=} [properties] Properties to set
+             * @returns {getCommonBlocks.GetCommonBlocksResponse.Common} Common instance
              */
             Common.create = function create(properties) {
                 return new Common(properties);
             };
 
             /**
-             * Encodes the specified Common message. Does not implicitly {@link peer.GetCommonBlocksResponse.Common.verify|verify} messages.
+             * Encodes the specified Common message. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.Common.verify|verify} messages.
              * @function encode
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
-             * @param {peer.GetCommonBlocksResponse.ICommon} message Common message or plain object to encode
+             * @param {getCommonBlocks.GetCommonBlocksResponse.ICommon} message Common message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -2527,11 +1483,11 @@ $root.peer = (function() {
             };
 
             /**
-             * Encodes the specified Common message, length delimited. Does not implicitly {@link peer.GetCommonBlocksResponse.Common.verify|verify} messages.
+             * Encodes the specified Common message, length delimited. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.Common.verify|verify} messages.
              * @function encodeDelimited
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
-             * @param {peer.GetCommonBlocksResponse.ICommon} message Common message or plain object to encode
+             * @param {getCommonBlocks.GetCommonBlocksResponse.ICommon} message Common message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -2542,18 +1498,18 @@ $root.peer = (function() {
             /**
              * Decodes a Common message from the specified reader or buffer.
              * @function decode
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
              * @param {number} [length] Message length if known beforehand
-             * @returns {peer.GetCommonBlocksResponse.Common} Common
+             * @returns {getCommonBlocks.GetCommonBlocksResponse.Common} Common
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             Common.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetCommonBlocksResponse.Common();
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getCommonBlocks.GetCommonBlocksResponse.Common();
                 while (reader.pos < end) {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
@@ -2574,10 +1530,10 @@ $root.peer = (function() {
             /**
              * Decodes a Common message from the specified reader or buffer, length delimited.
              * @function decodeDelimited
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {peer.GetCommonBlocksResponse.Common} Common
+             * @returns {getCommonBlocks.GetCommonBlocksResponse.Common} Common
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
@@ -2590,7 +1546,7 @@ $root.peer = (function() {
             /**
              * Verifies a Common message.
              * @function verify
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -2610,15 +1566,15 @@ $root.peer = (function() {
             /**
              * Creates a Common message from a plain object. Also converts values to their respective internal types.
              * @function fromObject
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
              * @param {Object.<string,*>} object Plain object
-             * @returns {peer.GetCommonBlocksResponse.Common} Common
+             * @returns {getCommonBlocks.GetCommonBlocksResponse.Common} Common
              */
             Common.fromObject = function fromObject(object) {
-                if (object instanceof $root.peer.GetCommonBlocksResponse.Common)
+                if (object instanceof $root.getCommonBlocks.GetCommonBlocksResponse.Common)
                     return object;
-                var message = new $root.peer.GetCommonBlocksResponse.Common();
+                var message = new $root.getCommonBlocks.GetCommonBlocksResponse.Common();
                 if (object.height != null)
                     message.height = object.height >>> 0;
                 if (object.id != null)
@@ -2629,9 +1585,9 @@ $root.peer = (function() {
             /**
              * Creates a plain object from a Common message. Also converts values to other types if specified.
              * @function toObject
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @static
-             * @param {peer.GetCommonBlocksResponse.Common} message Common
+             * @param {getCommonBlocks.GetCommonBlocksResponse.Common} message Common
              * @param {$protobuf.IConversionOptions} [options] Conversion options
              * @returns {Object.<string,*>} Plain object
              */
@@ -2653,7 +1609,7 @@ $root.peer = (function() {
             /**
              * Converts this Common to JSON.
              * @function toJSON
-             * @memberof peer.GetCommonBlocksResponse.Common
+             * @memberof getCommonBlocks.GetCommonBlocksResponse.Common
              * @instance
              * @returns {Object.<string,*>} JSON object
              */
@@ -2667,22 +1623,656 @@ $root.peer = (function() {
         return GetCommonBlocksResponse;
     })();
 
-    peer.GetStatusRequest = (function() {
+    return getCommonBlocks;
+})();
+
+$root.getPeers = (function() {
+
+    /**
+     * Namespace getPeers.
+     * @exports getPeers
+     * @namespace
+     */
+    var getPeers = {};
+
+    getPeers.GetPeersRequest = (function() {
+
+        /**
+         * Properties of a GetPeersRequest.
+         * @memberof getPeers
+         * @interface IGetPeersRequest
+         * @property {shared.IHeaders|null} [headers] GetPeersRequest headers
+         */
+
+        /**
+         * Constructs a new GetPeersRequest.
+         * @memberof getPeers
+         * @classdesc Represents a GetPeersRequest.
+         * @implements IGetPeersRequest
+         * @constructor
+         * @param {getPeers.IGetPeersRequest=} [properties] Properties to set
+         */
+        function GetPeersRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetPeersRequest headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getPeers.GetPeersRequest
+         * @instance
+         */
+        GetPeersRequest.prototype.headers = null;
+
+        /**
+         * Creates a new GetPeersRequest instance using the specified properties.
+         * @function create
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {getPeers.IGetPeersRequest=} [properties] Properties to set
+         * @returns {getPeers.GetPeersRequest} GetPeersRequest instance
+         */
+        GetPeersRequest.create = function create(properties) {
+            return new GetPeersRequest(properties);
+        };
+
+        /**
+         * Encodes the specified GetPeersRequest message. Does not implicitly {@link getPeers.GetPeersRequest.verify|verify} messages.
+         * @function encode
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {getPeers.IGetPeersRequest} message GetPeersRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetPeersRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetPeersRequest message, length delimited. Does not implicitly {@link getPeers.GetPeersRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {getPeers.IGetPeersRequest} message GetPeersRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetPeersRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetPeersRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getPeers.GetPeersRequest} GetPeersRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetPeersRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getPeers.GetPeersRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetPeersRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getPeers.GetPeersRequest} GetPeersRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetPeersRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetPeersRequest message.
+         * @function verify
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetPeersRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetPeersRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getPeers.GetPeersRequest} GetPeersRequest
+         */
+        GetPeersRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.getPeers.GetPeersRequest)
+                return object;
+            var message = new $root.getPeers.GetPeersRequest();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getPeers.GetPeersRequest.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetPeersRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getPeers.GetPeersRequest
+         * @static
+         * @param {getPeers.GetPeersRequest} message GetPeersRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetPeersRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
+        };
+
+        /**
+         * Converts this GetPeersRequest to JSON.
+         * @function toJSON
+         * @memberof getPeers.GetPeersRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetPeersRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return GetPeersRequest;
+    })();
+
+    getPeers.GetPeersResponse = (function() {
+
+        /**
+         * Properties of a GetPeersResponse.
+         * @memberof getPeers
+         * @interface IGetPeersResponse
+         * @property {Array.<getPeers.GetPeersResponse.IPeer>|null} [peers] GetPeersResponse peers
+         */
+
+        /**
+         * Constructs a new GetPeersResponse.
+         * @memberof getPeers
+         * @classdesc Represents a GetPeersResponse.
+         * @implements IGetPeersResponse
+         * @constructor
+         * @param {getPeers.IGetPeersResponse=} [properties] Properties to set
+         */
+        function GetPeersResponse(properties) {
+            this.peers = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetPeersResponse peers.
+         * @member {Array.<getPeers.GetPeersResponse.IPeer>} peers
+         * @memberof getPeers.GetPeersResponse
+         * @instance
+         */
+        GetPeersResponse.prototype.peers = $util.emptyArray;
+
+        /**
+         * Creates a new GetPeersResponse instance using the specified properties.
+         * @function create
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {getPeers.IGetPeersResponse=} [properties] Properties to set
+         * @returns {getPeers.GetPeersResponse} GetPeersResponse instance
+         */
+        GetPeersResponse.create = function create(properties) {
+            return new GetPeersResponse(properties);
+        };
+
+        /**
+         * Encodes the specified GetPeersResponse message. Does not implicitly {@link getPeers.GetPeersResponse.verify|verify} messages.
+         * @function encode
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {getPeers.IGetPeersResponse} message GetPeersResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetPeersResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.peers != null && message.peers.length)
+                for (var i = 0; i < message.peers.length; ++i)
+                    $root.getPeers.GetPeersResponse.Peer.encode(message.peers[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetPeersResponse message, length delimited. Does not implicitly {@link getPeers.GetPeersResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {getPeers.IGetPeersResponse} message GetPeersResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetPeersResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetPeersResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getPeers.GetPeersResponse} GetPeersResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetPeersResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getPeers.GetPeersResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.peers && message.peers.length))
+                        message.peers = [];
+                    message.peers.push($root.getPeers.GetPeersResponse.Peer.decode(reader, reader.uint32()));
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetPeersResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getPeers.GetPeersResponse} GetPeersResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetPeersResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetPeersResponse message.
+         * @function verify
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetPeersResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.peers != null && message.hasOwnProperty("peers")) {
+                if (!Array.isArray(message.peers))
+                    return "peers: array expected";
+                for (var i = 0; i < message.peers.length; ++i) {
+                    var error = $root.getPeers.GetPeersResponse.Peer.verify(message.peers[i]);
+                    if (error)
+                        return "peers." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetPeersResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getPeers.GetPeersResponse} GetPeersResponse
+         */
+        GetPeersResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.getPeers.GetPeersResponse)
+                return object;
+            var message = new $root.getPeers.GetPeersResponse();
+            if (object.peers) {
+                if (!Array.isArray(object.peers))
+                    throw TypeError(".getPeers.GetPeersResponse.peers: array expected");
+                message.peers = [];
+                for (var i = 0; i < object.peers.length; ++i) {
+                    if (typeof object.peers[i] !== "object")
+                        throw TypeError(".getPeers.GetPeersResponse.peers: object expected");
+                    message.peers[i] = $root.getPeers.GetPeersResponse.Peer.fromObject(object.peers[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetPeersResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getPeers.GetPeersResponse
+         * @static
+         * @param {getPeers.GetPeersResponse} message GetPeersResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetPeersResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.peers = [];
+            if (message.peers && message.peers.length) {
+                object.peers = [];
+                for (var j = 0; j < message.peers.length; ++j)
+                    object.peers[j] = $root.getPeers.GetPeersResponse.Peer.toObject(message.peers[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this GetPeersResponse to JSON.
+         * @function toJSON
+         * @memberof getPeers.GetPeersResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetPeersResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        GetPeersResponse.Peer = (function() {
+
+            /**
+             * Properties of a Peer.
+             * @memberof getPeers.GetPeersResponse
+             * @interface IPeer
+             * @property {string|null} [ip] Peer ip
+             * @property {number|null} [port] Peer port
+             */
+
+            /**
+             * Constructs a new Peer.
+             * @memberof getPeers.GetPeersResponse
+             * @classdesc Represents a Peer.
+             * @implements IPeer
+             * @constructor
+             * @param {getPeers.GetPeersResponse.IPeer=} [properties] Properties to set
+             */
+            function Peer(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Peer ip.
+             * @member {string} ip
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @instance
+             */
+            Peer.prototype.ip = "";
+
+            /**
+             * Peer port.
+             * @member {number} port
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @instance
+             */
+            Peer.prototype.port = 0;
+
+            /**
+             * Creates a new Peer instance using the specified properties.
+             * @function create
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {getPeers.GetPeersResponse.IPeer=} [properties] Properties to set
+             * @returns {getPeers.GetPeersResponse.Peer} Peer instance
+             */
+            Peer.create = function create(properties) {
+                return new Peer(properties);
+            };
+
+            /**
+             * Encodes the specified Peer message. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
+             * @function encode
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {getPeers.GetPeersResponse.IPeer} message Peer message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Peer.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
+                if (message.port != null && Object.hasOwnProperty.call(message, "port"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified Peer message, length delimited. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {getPeers.GetPeersResponse.IPeer} message Peer message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Peer.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a Peer message from the specified reader or buffer.
+             * @function decode
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {getPeers.GetPeersResponse.Peer} Peer
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Peer.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getPeers.GetPeersResponse.Peer();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.ip = reader.string();
+                        break;
+                    case 2:
+                        message.port = reader.uint32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a Peer message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {getPeers.GetPeersResponse.Peer} Peer
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Peer.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a Peer message.
+             * @function verify
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Peer.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.ip != null && message.hasOwnProperty("ip"))
+                    if (!$util.isString(message.ip))
+                        return "ip: string expected";
+                if (message.port != null && message.hasOwnProperty("port"))
+                    if (!$util.isInteger(message.port))
+                        return "port: integer expected";
+                return null;
+            };
+
+            /**
+             * Creates a Peer message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {getPeers.GetPeersResponse.Peer} Peer
+             */
+            Peer.fromObject = function fromObject(object) {
+                if (object instanceof $root.getPeers.GetPeersResponse.Peer)
+                    return object;
+                var message = new $root.getPeers.GetPeersResponse.Peer();
+                if (object.ip != null)
+                    message.ip = String(object.ip);
+                if (object.port != null)
+                    message.port = object.port >>> 0;
+                return message;
+            };
+
+            /**
+             * Creates a plain object from a Peer message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @static
+             * @param {getPeers.GetPeersResponse.Peer} message Peer
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            Peer.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults) {
+                    object.ip = "";
+                    object.port = 0;
+                }
+                if (message.ip != null && message.hasOwnProperty("ip"))
+                    object.ip = message.ip;
+                if (message.port != null && message.hasOwnProperty("port"))
+                    object.port = message.port;
+                return object;
+            };
+
+            /**
+             * Converts this Peer to JSON.
+             * @function toJSON
+             * @memberof getPeers.GetPeersResponse.Peer
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            Peer.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return Peer;
+        })();
+
+        return GetPeersResponse;
+    })();
+
+    return getPeers;
+})();
+
+$root.getStatus = (function() {
+
+    /**
+     * Namespace getStatus.
+     * @exports getStatus
+     * @namespace
+     */
+    var getStatus = {};
+
+    getStatus.GetStatusRequest = (function() {
 
         /**
          * Properties of a GetStatusRequest.
-         * @memberof peer
+         * @memberof getStatus
          * @interface IGetStatusRequest
          * @property {shared.IHeaders|null} [headers] GetStatusRequest headers
          */
 
         /**
          * Constructs a new GetStatusRequest.
-         * @memberof peer
+         * @memberof getStatus
          * @classdesc Represents a GetStatusRequest.
          * @implements IGetStatusRequest
          * @constructor
-         * @param {peer.IGetStatusRequest=} [properties] Properties to set
+         * @param {getStatus.IGetStatusRequest=} [properties] Properties to set
          */
         function GetStatusRequest(properties) {
             if (properties)
@@ -2694,7 +2284,7 @@ $root.peer = (function() {
         /**
          * GetStatusRequest headers.
          * @member {shared.IHeaders|null|undefined} headers
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @instance
          */
         GetStatusRequest.prototype.headers = null;
@@ -2702,21 +2292,21 @@ $root.peer = (function() {
         /**
          * Creates a new GetStatusRequest instance using the specified properties.
          * @function create
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
-         * @param {peer.IGetStatusRequest=} [properties] Properties to set
-         * @returns {peer.GetStatusRequest} GetStatusRequest instance
+         * @param {getStatus.IGetStatusRequest=} [properties] Properties to set
+         * @returns {getStatus.GetStatusRequest} GetStatusRequest instance
          */
         GetStatusRequest.create = function create(properties) {
             return new GetStatusRequest(properties);
         };
 
         /**
-         * Encodes the specified GetStatusRequest message. Does not implicitly {@link peer.GetStatusRequest.verify|verify} messages.
+         * Encodes the specified GetStatusRequest message. Does not implicitly {@link getStatus.GetStatusRequest.verify|verify} messages.
          * @function encode
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
-         * @param {peer.IGetStatusRequest} message GetStatusRequest message or plain object to encode
+         * @param {getStatus.IGetStatusRequest} message GetStatusRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2729,11 +2319,11 @@ $root.peer = (function() {
         };
 
         /**
-         * Encodes the specified GetStatusRequest message, length delimited. Does not implicitly {@link peer.GetStatusRequest.verify|verify} messages.
+         * Encodes the specified GetStatusRequest message, length delimited. Does not implicitly {@link getStatus.GetStatusRequest.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
-         * @param {peer.IGetStatusRequest} message GetStatusRequest message or plain object to encode
+         * @param {getStatus.IGetStatusRequest} message GetStatusRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2744,18 +2334,18 @@ $root.peer = (function() {
         /**
          * Decodes a GetStatusRequest message from the specified reader or buffer.
          * @function decode
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {peer.GetStatusRequest} GetStatusRequest
+         * @returns {getStatus.GetStatusRequest} GetStatusRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetStatusRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusRequest();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -2773,10 +2363,10 @@ $root.peer = (function() {
         /**
          * Decodes a GetStatusRequest message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {peer.GetStatusRequest} GetStatusRequest
+         * @returns {getStatus.GetStatusRequest} GetStatusRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -2789,7 +2379,7 @@ $root.peer = (function() {
         /**
          * Verifies a GetStatusRequest message.
          * @function verify
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -2808,18 +2398,18 @@ $root.peer = (function() {
         /**
          * Creates a GetStatusRequest message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {peer.GetStatusRequest} GetStatusRequest
+         * @returns {getStatus.GetStatusRequest} GetStatusRequest
          */
         GetStatusRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.peer.GetStatusRequest)
+            if (object instanceof $root.getStatus.GetStatusRequest)
                 return object;
-            var message = new $root.peer.GetStatusRequest();
+            var message = new $root.getStatus.GetStatusRequest();
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".peer.GetStatusRequest.headers: object expected");
+                    throw TypeError(".getStatus.GetStatusRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -2828,9 +2418,9 @@ $root.peer = (function() {
         /**
          * Creates a plain object from a GetStatusRequest message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @static
-         * @param {peer.GetStatusRequest} message GetStatusRequest
+         * @param {getStatus.GetStatusRequest} message GetStatusRequest
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -2848,7 +2438,7 @@ $root.peer = (function() {
         /**
          * Converts this GetStatusRequest to JSON.
          * @function toJSON
-         * @memberof peer.GetStatusRequest
+         * @memberof getStatus.GetStatusRequest
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -2859,23 +2449,23 @@ $root.peer = (function() {
         return GetStatusRequest;
     })();
 
-    peer.GetStatusResponse = (function() {
+    getStatus.GetStatusResponse = (function() {
 
         /**
          * Properties of a GetStatusResponse.
-         * @memberof peer
+         * @memberof getStatus
          * @interface IGetStatusResponse
-         * @property {peer.GetStatusResponse.IState|null} [state] GetStatusResponse state
-         * @property {peer.GetStatusResponse.IConfig|null} [config] GetStatusResponse config
+         * @property {getStatus.GetStatusResponse.IState|null} [state] GetStatusResponse state
+         * @property {getStatus.GetStatusResponse.IConfig|null} [config] GetStatusResponse config
          */
 
         /**
          * Constructs a new GetStatusResponse.
-         * @memberof peer
+         * @memberof getStatus
          * @classdesc Represents a GetStatusResponse.
          * @implements IGetStatusResponse
          * @constructor
-         * @param {peer.IGetStatusResponse=} [properties] Properties to set
+         * @param {getStatus.IGetStatusResponse=} [properties] Properties to set
          */
         function GetStatusResponse(properties) {
             if (properties)
@@ -2886,16 +2476,16 @@ $root.peer = (function() {
 
         /**
          * GetStatusResponse state.
-         * @member {peer.GetStatusResponse.IState|null|undefined} state
-         * @memberof peer.GetStatusResponse
+         * @member {getStatus.GetStatusResponse.IState|null|undefined} state
+         * @memberof getStatus.GetStatusResponse
          * @instance
          */
         GetStatusResponse.prototype.state = null;
 
         /**
          * GetStatusResponse config.
-         * @member {peer.GetStatusResponse.IConfig|null|undefined} config
-         * @memberof peer.GetStatusResponse
+         * @member {getStatus.GetStatusResponse.IConfig|null|undefined} config
+         * @memberof getStatus.GetStatusResponse
          * @instance
          */
         GetStatusResponse.prototype.config = null;
@@ -2903,21 +2493,21 @@ $root.peer = (function() {
         /**
          * Creates a new GetStatusResponse instance using the specified properties.
          * @function create
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
-         * @param {peer.IGetStatusResponse=} [properties] Properties to set
-         * @returns {peer.GetStatusResponse} GetStatusResponse instance
+         * @param {getStatus.IGetStatusResponse=} [properties] Properties to set
+         * @returns {getStatus.GetStatusResponse} GetStatusResponse instance
          */
         GetStatusResponse.create = function create(properties) {
             return new GetStatusResponse(properties);
         };
 
         /**
-         * Encodes the specified GetStatusResponse message. Does not implicitly {@link peer.GetStatusResponse.verify|verify} messages.
+         * Encodes the specified GetStatusResponse message. Does not implicitly {@link getStatus.GetStatusResponse.verify|verify} messages.
          * @function encode
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
-         * @param {peer.IGetStatusResponse} message GetStatusResponse message or plain object to encode
+         * @param {getStatus.IGetStatusResponse} message GetStatusResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2925,18 +2515,18 @@ $root.peer = (function() {
             if (!writer)
                 writer = $Writer.create();
             if (message.state != null && Object.hasOwnProperty.call(message, "state"))
-                $root.peer.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                $root.getStatus.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.config != null && Object.hasOwnProperty.call(message, "config"))
-                $root.peer.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                $root.getStatus.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
         /**
-         * Encodes the specified GetStatusResponse message, length delimited. Does not implicitly {@link peer.GetStatusResponse.verify|verify} messages.
+         * Encodes the specified GetStatusResponse message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
-         * @param {peer.IGetStatusResponse} message GetStatusResponse message or plain object to encode
+         * @param {getStatus.IGetStatusResponse} message GetStatusResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2947,26 +2537,26 @@ $root.peer = (function() {
         /**
          * Decodes a GetStatusResponse message from the specified reader or buffer.
          * @function decode
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {peer.GetStatusResponse} GetStatusResponse
+         * @returns {getStatus.GetStatusResponse} GetStatusResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetStatusResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusResponse();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.state = $root.peer.GetStatusResponse.State.decode(reader, reader.uint32());
+                    message.state = $root.getStatus.GetStatusResponse.State.decode(reader, reader.uint32());
                     break;
                 case 2:
-                    message.config = $root.peer.GetStatusResponse.Config.decode(reader, reader.uint32());
+                    message.config = $root.getStatus.GetStatusResponse.Config.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -2979,10 +2569,10 @@ $root.peer = (function() {
         /**
          * Decodes a GetStatusResponse message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {peer.GetStatusResponse} GetStatusResponse
+         * @returns {getStatus.GetStatusResponse} GetStatusResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -2995,7 +2585,7 @@ $root.peer = (function() {
         /**
          * Verifies a GetStatusResponse message.
          * @function verify
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -3004,12 +2594,12 @@ $root.peer = (function() {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.state != null && message.hasOwnProperty("state")) {
-                var error = $root.peer.GetStatusResponse.State.verify(message.state);
+                var error = $root.getStatus.GetStatusResponse.State.verify(message.state);
                 if (error)
                     return "state." + error;
             }
             if (message.config != null && message.hasOwnProperty("config")) {
-                var error = $root.peer.GetStatusResponse.Config.verify(message.config);
+                var error = $root.getStatus.GetStatusResponse.Config.verify(message.config);
                 if (error)
                     return "config." + error;
             }
@@ -3019,24 +2609,24 @@ $root.peer = (function() {
         /**
          * Creates a GetStatusResponse message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {peer.GetStatusResponse} GetStatusResponse
+         * @returns {getStatus.GetStatusResponse} GetStatusResponse
          */
         GetStatusResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.peer.GetStatusResponse)
+            if (object instanceof $root.getStatus.GetStatusResponse)
                 return object;
-            var message = new $root.peer.GetStatusResponse();
+            var message = new $root.getStatus.GetStatusResponse();
             if (object.state != null) {
                 if (typeof object.state !== "object")
-                    throw TypeError(".peer.GetStatusResponse.state: object expected");
-                message.state = $root.peer.GetStatusResponse.State.fromObject(object.state);
+                    throw TypeError(".getStatus.GetStatusResponse.state: object expected");
+                message.state = $root.getStatus.GetStatusResponse.State.fromObject(object.state);
             }
             if (object.config != null) {
                 if (typeof object.config !== "object")
-                    throw TypeError(".peer.GetStatusResponse.config: object expected");
-                message.config = $root.peer.GetStatusResponse.Config.fromObject(object.config);
+                    throw TypeError(".getStatus.GetStatusResponse.config: object expected");
+                message.config = $root.getStatus.GetStatusResponse.Config.fromObject(object.config);
             }
             return message;
         };
@@ -3044,9 +2634,9 @@ $root.peer = (function() {
         /**
          * Creates a plain object from a GetStatusResponse message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @static
-         * @param {peer.GetStatusResponse} message GetStatusResponse
+         * @param {getStatus.GetStatusResponse} message GetStatusResponse
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -3059,16 +2649,16 @@ $root.peer = (function() {
                 object.config = null;
             }
             if (message.state != null && message.hasOwnProperty("state"))
-                object.state = $root.peer.GetStatusResponse.State.toObject(message.state, options);
+                object.state = $root.getStatus.GetStatusResponse.State.toObject(message.state, options);
             if (message.config != null && message.hasOwnProperty("config"))
-                object.config = $root.peer.GetStatusResponse.Config.toObject(message.config, options);
+                object.config = $root.getStatus.GetStatusResponse.Config.toObject(message.config, options);
             return object;
         };
 
         /**
          * Converts this GetStatusResponse to JSON.
          * @function toJSON
-         * @memberof peer.GetStatusResponse
+         * @memberof getStatus.GetStatusResponse
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -3080,21 +2670,21 @@ $root.peer = (function() {
 
             /**
              * Properties of a State.
-             * @memberof peer.GetStatusResponse
+             * @memberof getStatus.GetStatusResponse
              * @interface IState
              * @property {number|null} [height] State height
              * @property {boolean|null} [forgingAllowed] State forgingAllowed
              * @property {number|null} [currentSlot] State currentSlot
-             * @property {peer.GetStatusResponse.State.IBlockHeader|null} [header] State header
+             * @property {getStatus.GetStatusResponse.State.IBlockHeader|null} [header] State header
              */
 
             /**
              * Constructs a new State.
-             * @memberof peer.GetStatusResponse
+             * @memberof getStatus.GetStatusResponse
              * @classdesc Represents a State.
              * @implements IState
              * @constructor
-             * @param {peer.GetStatusResponse.IState=} [properties] Properties to set
+             * @param {getStatus.GetStatusResponse.IState=} [properties] Properties to set
              */
             function State(properties) {
                 if (properties)
@@ -3106,7 +2696,7 @@ $root.peer = (function() {
             /**
              * State height.
              * @member {number} height
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @instance
              */
             State.prototype.height = 0;
@@ -3114,7 +2704,7 @@ $root.peer = (function() {
             /**
              * State forgingAllowed.
              * @member {boolean} forgingAllowed
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @instance
              */
             State.prototype.forgingAllowed = false;
@@ -3122,15 +2712,15 @@ $root.peer = (function() {
             /**
              * State currentSlot.
              * @member {number} currentSlot
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @instance
              */
             State.prototype.currentSlot = 0;
 
             /**
              * State header.
-             * @member {peer.GetStatusResponse.State.IBlockHeader|null|undefined} header
-             * @memberof peer.GetStatusResponse.State
+             * @member {getStatus.GetStatusResponse.State.IBlockHeader|null|undefined} header
+             * @memberof getStatus.GetStatusResponse.State
              * @instance
              */
             State.prototype.header = null;
@@ -3138,21 +2728,21 @@ $root.peer = (function() {
             /**
              * Creates a new State instance using the specified properties.
              * @function create
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
-             * @param {peer.GetStatusResponse.IState=} [properties] Properties to set
-             * @returns {peer.GetStatusResponse.State} State instance
+             * @param {getStatus.GetStatusResponse.IState=} [properties] Properties to set
+             * @returns {getStatus.GetStatusResponse.State} State instance
              */
             State.create = function create(properties) {
                 return new State(properties);
             };
 
             /**
-             * Encodes the specified State message. Does not implicitly {@link peer.GetStatusResponse.State.verify|verify} messages.
+             * Encodes the specified State message. Does not implicitly {@link getStatus.GetStatusResponse.State.verify|verify} messages.
              * @function encode
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
-             * @param {peer.GetStatusResponse.IState} message State message or plain object to encode
+             * @param {getStatus.GetStatusResponse.IState} message State message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -3166,16 +2756,16 @@ $root.peer = (function() {
                 if (message.currentSlot != null && Object.hasOwnProperty.call(message, "currentSlot"))
                     writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.currentSlot);
                 if (message.header != null && Object.hasOwnProperty.call(message, "header"))
-                    $root.peer.GetStatusResponse.State.BlockHeader.encode(message.header, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    $root.getStatus.GetStatusResponse.State.BlockHeader.encode(message.header, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
             };
 
             /**
-             * Encodes the specified State message, length delimited. Does not implicitly {@link peer.GetStatusResponse.State.verify|verify} messages.
+             * Encodes the specified State message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.State.verify|verify} messages.
              * @function encodeDelimited
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
-             * @param {peer.GetStatusResponse.IState} message State message or plain object to encode
+             * @param {getStatus.GetStatusResponse.IState} message State message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -3186,18 +2776,18 @@ $root.peer = (function() {
             /**
              * Decodes a State message from the specified reader or buffer.
              * @function decode
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
              * @param {number} [length] Message length if known beforehand
-             * @returns {peer.GetStatusResponse.State} State
+             * @returns {getStatus.GetStatusResponse.State} State
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             State.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusResponse.State();
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.State();
                 while (reader.pos < end) {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
@@ -3211,7 +2801,7 @@ $root.peer = (function() {
                         message.currentSlot = reader.uint32();
                         break;
                     case 4:
-                        message.header = $root.peer.GetStatusResponse.State.BlockHeader.decode(reader, reader.uint32());
+                        message.header = $root.getStatus.GetStatusResponse.State.BlockHeader.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -3224,10 +2814,10 @@ $root.peer = (function() {
             /**
              * Decodes a State message from the specified reader or buffer, length delimited.
              * @function decodeDelimited
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {peer.GetStatusResponse.State} State
+             * @returns {getStatus.GetStatusResponse.State} State
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
@@ -3240,7 +2830,7 @@ $root.peer = (function() {
             /**
              * Verifies a State message.
              * @function verify
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -3258,7 +2848,7 @@ $root.peer = (function() {
                     if (!$util.isInteger(message.currentSlot))
                         return "currentSlot: integer expected";
                 if (message.header != null && message.hasOwnProperty("header")) {
-                    var error = $root.peer.GetStatusResponse.State.BlockHeader.verify(message.header);
+                    var error = $root.getStatus.GetStatusResponse.State.BlockHeader.verify(message.header);
                     if (error)
                         return "header." + error;
                 }
@@ -3268,15 +2858,15 @@ $root.peer = (function() {
             /**
              * Creates a State message from a plain object. Also converts values to their respective internal types.
              * @function fromObject
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
              * @param {Object.<string,*>} object Plain object
-             * @returns {peer.GetStatusResponse.State} State
+             * @returns {getStatus.GetStatusResponse.State} State
              */
             State.fromObject = function fromObject(object) {
-                if (object instanceof $root.peer.GetStatusResponse.State)
+                if (object instanceof $root.getStatus.GetStatusResponse.State)
                     return object;
-                var message = new $root.peer.GetStatusResponse.State();
+                var message = new $root.getStatus.GetStatusResponse.State();
                 if (object.height != null)
                     message.height = object.height >>> 0;
                 if (object.forgingAllowed != null)
@@ -3285,8 +2875,8 @@ $root.peer = (function() {
                     message.currentSlot = object.currentSlot >>> 0;
                 if (object.header != null) {
                     if (typeof object.header !== "object")
-                        throw TypeError(".peer.GetStatusResponse.State.header: object expected");
-                    message.header = $root.peer.GetStatusResponse.State.BlockHeader.fromObject(object.header);
+                        throw TypeError(".getStatus.GetStatusResponse.State.header: object expected");
+                    message.header = $root.getStatus.GetStatusResponse.State.BlockHeader.fromObject(object.header);
                 }
                 return message;
             };
@@ -3294,9 +2884,9 @@ $root.peer = (function() {
             /**
              * Creates a plain object from a State message. Also converts values to other types if specified.
              * @function toObject
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @static
-             * @param {peer.GetStatusResponse.State} message State
+             * @param {getStatus.GetStatusResponse.State} message State
              * @param {$protobuf.IConversionOptions} [options] Conversion options
              * @returns {Object.<string,*>} Plain object
              */
@@ -3317,14 +2907,14 @@ $root.peer = (function() {
                 if (message.currentSlot != null && message.hasOwnProperty("currentSlot"))
                     object.currentSlot = message.currentSlot;
                 if (message.header != null && message.hasOwnProperty("header"))
-                    object.header = $root.peer.GetStatusResponse.State.BlockHeader.toObject(message.header, options);
+                    object.header = $root.getStatus.GetStatusResponse.State.BlockHeader.toObject(message.header, options);
                 return object;
             };
 
             /**
              * Converts this State to JSON.
              * @function toJSON
-             * @memberof peer.GetStatusResponse.State
+             * @memberof getStatus.GetStatusResponse.State
              * @instance
              * @returns {Object.<string,*>} JSON object
              */
@@ -3336,7 +2926,7 @@ $root.peer = (function() {
 
                 /**
                  * Properties of a BlockHeader.
-                 * @memberof peer.GetStatusResponse.State
+                 * @memberof getStatus.GetStatusResponse.State
                  * @interface IBlockHeader
                  * @property {string|null} [id] BlockHeader id
                  * @property {number|null} [version] BlockHeader version
@@ -3355,11 +2945,11 @@ $root.peer = (function() {
 
                 /**
                  * Constructs a new BlockHeader.
-                 * @memberof peer.GetStatusResponse.State
+                 * @memberof getStatus.GetStatusResponse.State
                  * @classdesc Represents a BlockHeader.
                  * @implements IBlockHeader
                  * @constructor
-                 * @param {peer.GetStatusResponse.State.IBlockHeader=} [properties] Properties to set
+                 * @param {getStatus.GetStatusResponse.State.IBlockHeader=} [properties] Properties to set
                  */
                 function BlockHeader(properties) {
                     if (properties)
@@ -3371,7 +2961,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader id.
                  * @member {string} id
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.id = "";
@@ -3379,7 +2969,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader version.
                  * @member {number} version
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.version = 0;
@@ -3387,7 +2977,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader timestamp.
                  * @member {number} timestamp
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.timestamp = 0;
@@ -3395,7 +2985,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader previousBlock.
                  * @member {string} previousBlock
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.previousBlock = "";
@@ -3403,7 +2993,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader height.
                  * @member {number} height
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.height = 0;
@@ -3411,7 +3001,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader numberOfTransactions.
                  * @member {number} numberOfTransactions
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.numberOfTransactions = 0;
@@ -3419,7 +3009,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader totalAmount.
                  * @member {string} totalAmount
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.totalAmount = "";
@@ -3427,7 +3017,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader totalFee.
                  * @member {string} totalFee
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.totalFee = "";
@@ -3435,7 +3025,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader reward.
                  * @member {string} reward
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.reward = "";
@@ -3443,7 +3033,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader payloadLength.
                  * @member {number} payloadLength
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.payloadLength = 0;
@@ -3451,7 +3041,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader payloadHash.
                  * @member {string} payloadHash
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.payloadHash = "";
@@ -3459,7 +3049,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader generatorPublicKey.
                  * @member {string} generatorPublicKey
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.generatorPublicKey = "";
@@ -3467,7 +3057,7 @@ $root.peer = (function() {
                 /**
                  * BlockHeader blockSignature.
                  * @member {string} blockSignature
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
                 BlockHeader.prototype.blockSignature = "";
@@ -3475,21 +3065,21 @@ $root.peer = (function() {
                 /**
                  * Creates a new BlockHeader instance using the specified properties.
                  * @function create
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
-                 * @param {peer.GetStatusResponse.State.IBlockHeader=} [properties] Properties to set
-                 * @returns {peer.GetStatusResponse.State.BlockHeader} BlockHeader instance
+                 * @param {getStatus.GetStatusResponse.State.IBlockHeader=} [properties] Properties to set
+                 * @returns {getStatus.GetStatusResponse.State.BlockHeader} BlockHeader instance
                  */
                 BlockHeader.create = function create(properties) {
                     return new BlockHeader(properties);
                 };
 
                 /**
-                 * Encodes the specified BlockHeader message. Does not implicitly {@link peer.GetStatusResponse.State.BlockHeader.verify|verify} messages.
+                 * Encodes the specified BlockHeader message. Does not implicitly {@link getStatus.GetStatusResponse.State.BlockHeader.verify|verify} messages.
                  * @function encode
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
-                 * @param {peer.GetStatusResponse.State.IBlockHeader} message BlockHeader message or plain object to encode
+                 * @param {getStatus.GetStatusResponse.State.IBlockHeader} message BlockHeader message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -3526,11 +3116,11 @@ $root.peer = (function() {
                 };
 
                 /**
-                 * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link peer.GetStatusResponse.State.BlockHeader.verify|verify} messages.
+                 * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.State.BlockHeader.verify|verify} messages.
                  * @function encodeDelimited
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
-                 * @param {peer.GetStatusResponse.State.IBlockHeader} message BlockHeader message or plain object to encode
+                 * @param {getStatus.GetStatusResponse.State.IBlockHeader} message BlockHeader message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -3541,18 +3131,18 @@ $root.peer = (function() {
                 /**
                  * Decodes a BlockHeader message from the specified reader or buffer.
                  * @function decode
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {peer.GetStatusResponse.State.BlockHeader} BlockHeader
+                 * @returns {getStatus.GetStatusResponse.State.BlockHeader} BlockHeader
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
                 BlockHeader.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusResponse.State.BlockHeader();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.State.BlockHeader();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -3606,10 +3196,10 @@ $root.peer = (function() {
                 /**
                  * Decodes a BlockHeader message from the specified reader or buffer, length delimited.
                  * @function decodeDelimited
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @returns {peer.GetStatusResponse.State.BlockHeader} BlockHeader
+                 * @returns {getStatus.GetStatusResponse.State.BlockHeader} BlockHeader
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
@@ -3622,7 +3212,7 @@ $root.peer = (function() {
                 /**
                  * Verifies a BlockHeader message.
                  * @function verify
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -3675,15 +3265,15 @@ $root.peer = (function() {
                 /**
                  * Creates a BlockHeader message from a plain object. Also converts values to their respective internal types.
                  * @function fromObject
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
                  * @param {Object.<string,*>} object Plain object
-                 * @returns {peer.GetStatusResponse.State.BlockHeader} BlockHeader
+                 * @returns {getStatus.GetStatusResponse.State.BlockHeader} BlockHeader
                  */
                 BlockHeader.fromObject = function fromObject(object) {
-                    if (object instanceof $root.peer.GetStatusResponse.State.BlockHeader)
+                    if (object instanceof $root.getStatus.GetStatusResponse.State.BlockHeader)
                         return object;
-                    var message = new $root.peer.GetStatusResponse.State.BlockHeader();
+                    var message = new $root.getStatus.GetStatusResponse.State.BlockHeader();
                     if (object.id != null)
                         message.id = String(object.id);
                     if (object.version != null)
@@ -3716,9 +3306,9 @@ $root.peer = (function() {
                 /**
                  * Creates a plain object from a BlockHeader message. Also converts values to other types if specified.
                  * @function toObject
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @static
-                 * @param {peer.GetStatusResponse.State.BlockHeader} message BlockHeader
+                 * @param {getStatus.GetStatusResponse.State.BlockHeader} message BlockHeader
                  * @param {$protobuf.IConversionOptions} [options] Conversion options
                  * @returns {Object.<string,*>} Plain object
                  */
@@ -3773,7 +3363,7 @@ $root.peer = (function() {
                 /**
                  * Converts this BlockHeader to JSON.
                  * @function toJSON
-                 * @memberof peer.GetStatusResponse.State.BlockHeader
+                 * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  * @returns {Object.<string,*>} JSON object
                  */
@@ -3791,20 +3381,20 @@ $root.peer = (function() {
 
             /**
              * Properties of a Config.
-             * @memberof peer.GetStatusResponse
+             * @memberof getStatus.GetStatusResponse
              * @interface IConfig
              * @property {string|null} [version] Config version
-             * @property {peer.GetStatusResponse.Config.INetwork|null} [network] Config network
-             * @property {Object.<string,peer.GetStatusResponse.Config.IPlugin>|null} [plugins] Config plugins
+             * @property {getStatus.GetStatusResponse.Config.INetwork|null} [network] Config network
+             * @property {Object.<string,getStatus.GetStatusResponse.Config.IPlugin>|null} [plugins] Config plugins
              */
 
             /**
              * Constructs a new Config.
-             * @memberof peer.GetStatusResponse
+             * @memberof getStatus.GetStatusResponse
              * @classdesc Represents a Config.
              * @implements IConfig
              * @constructor
-             * @param {peer.GetStatusResponse.IConfig=} [properties] Properties to set
+             * @param {getStatus.GetStatusResponse.IConfig=} [properties] Properties to set
              */
             function Config(properties) {
                 this.plugins = {};
@@ -3817,23 +3407,23 @@ $root.peer = (function() {
             /**
              * Config version.
              * @member {string} version
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @instance
              */
             Config.prototype.version = "";
 
             /**
              * Config network.
-             * @member {peer.GetStatusResponse.Config.INetwork|null|undefined} network
-             * @memberof peer.GetStatusResponse.Config
+             * @member {getStatus.GetStatusResponse.Config.INetwork|null|undefined} network
+             * @memberof getStatus.GetStatusResponse.Config
              * @instance
              */
             Config.prototype.network = null;
 
             /**
              * Config plugins.
-             * @member {Object.<string,peer.GetStatusResponse.Config.IPlugin>} plugins
-             * @memberof peer.GetStatusResponse.Config
+             * @member {Object.<string,getStatus.GetStatusResponse.Config.IPlugin>} plugins
+             * @memberof getStatus.GetStatusResponse.Config
              * @instance
              */
             Config.prototype.plugins = $util.emptyObject;
@@ -3841,21 +3431,21 @@ $root.peer = (function() {
             /**
              * Creates a new Config instance using the specified properties.
              * @function create
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
-             * @param {peer.GetStatusResponse.IConfig=} [properties] Properties to set
-             * @returns {peer.GetStatusResponse.Config} Config instance
+             * @param {getStatus.GetStatusResponse.IConfig=} [properties] Properties to set
+             * @returns {getStatus.GetStatusResponse.Config} Config instance
              */
             Config.create = function create(properties) {
                 return new Config(properties);
             };
 
             /**
-             * Encodes the specified Config message. Does not implicitly {@link peer.GetStatusResponse.Config.verify|verify} messages.
+             * Encodes the specified Config message. Does not implicitly {@link getStatus.GetStatusResponse.Config.verify|verify} messages.
              * @function encode
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
-             * @param {peer.GetStatusResponse.IConfig} message Config message or plain object to encode
+             * @param {getStatus.GetStatusResponse.IConfig} message Config message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -3865,21 +3455,21 @@ $root.peer = (function() {
                 if (message.version != null && Object.hasOwnProperty.call(message, "version"))
                     writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
                 if (message.network != null && Object.hasOwnProperty.call(message, "network"))
-                    $root.peer.GetStatusResponse.Config.Network.encode(message.network, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    $root.getStatus.GetStatusResponse.Config.Network.encode(message.network, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 if (message.plugins != null && Object.hasOwnProperty.call(message, "plugins"))
                     for (var keys = Object.keys(message.plugins), i = 0; i < keys.length; ++i) {
                         writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                        $root.peer.GetStatusResponse.Config.Plugin.encode(message.plugins[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                        $root.getStatus.GetStatusResponse.Config.Plugin.encode(message.plugins[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
                     }
                 return writer;
             };
 
             /**
-             * Encodes the specified Config message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.verify|verify} messages.
+             * Encodes the specified Config message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.verify|verify} messages.
              * @function encodeDelimited
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
-             * @param {peer.GetStatusResponse.IConfig} message Config message or plain object to encode
+             * @param {getStatus.GetStatusResponse.IConfig} message Config message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
@@ -3890,18 +3480,18 @@ $root.peer = (function() {
             /**
              * Decodes a Config message from the specified reader or buffer.
              * @function decode
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
              * @param {number} [length] Message length if known beforehand
-             * @returns {peer.GetStatusResponse.Config} Config
+             * @returns {getStatus.GetStatusResponse.Config} Config
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             Config.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusResponse.Config(), key, value;
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config(), key, value;
                 while (reader.pos < end) {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
@@ -3909,7 +3499,7 @@ $root.peer = (function() {
                         message.version = reader.string();
                         break;
                     case 2:
-                        message.network = $root.peer.GetStatusResponse.Config.Network.decode(reader, reader.uint32());
+                        message.network = $root.getStatus.GetStatusResponse.Config.Network.decode(reader, reader.uint32());
                         break;
                     case 3:
                         if (message.plugins === $util.emptyObject)
@@ -3924,7 +3514,7 @@ $root.peer = (function() {
                                 key = reader.string();
                                 break;
                             case 2:
-                                value = $root.peer.GetStatusResponse.Config.Plugin.decode(reader, reader.uint32());
+                                value = $root.getStatus.GetStatusResponse.Config.Plugin.decode(reader, reader.uint32());
                                 break;
                             default:
                                 reader.skipType(tag2 & 7);
@@ -3944,10 +3534,10 @@ $root.peer = (function() {
             /**
              * Decodes a Config message from the specified reader or buffer, length delimited.
              * @function decodeDelimited
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {peer.GetStatusResponse.Config} Config
+             * @returns {getStatus.GetStatusResponse.Config} Config
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
@@ -3960,7 +3550,7 @@ $root.peer = (function() {
             /**
              * Verifies a Config message.
              * @function verify
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -3972,7 +3562,7 @@ $root.peer = (function() {
                     if (!$util.isString(message.version))
                         return "version: string expected";
                 if (message.network != null && message.hasOwnProperty("network")) {
-                    var error = $root.peer.GetStatusResponse.Config.Network.verify(message.network);
+                    var error = $root.getStatus.GetStatusResponse.Config.Network.verify(message.network);
                     if (error)
                         return "network." + error;
                 }
@@ -3981,7 +3571,7 @@ $root.peer = (function() {
                         return "plugins: object expected";
                     var key = Object.keys(message.plugins);
                     for (var i = 0; i < key.length; ++i) {
-                        var error = $root.peer.GetStatusResponse.Config.Plugin.verify(message.plugins[key[i]]);
+                        var error = $root.getStatus.GetStatusResponse.Config.Plugin.verify(message.plugins[key[i]]);
                         if (error)
                             return "plugins." + error;
                     }
@@ -3992,30 +3582,30 @@ $root.peer = (function() {
             /**
              * Creates a Config message from a plain object. Also converts values to their respective internal types.
              * @function fromObject
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
              * @param {Object.<string,*>} object Plain object
-             * @returns {peer.GetStatusResponse.Config} Config
+             * @returns {getStatus.GetStatusResponse.Config} Config
              */
             Config.fromObject = function fromObject(object) {
-                if (object instanceof $root.peer.GetStatusResponse.Config)
+                if (object instanceof $root.getStatus.GetStatusResponse.Config)
                     return object;
-                var message = new $root.peer.GetStatusResponse.Config();
+                var message = new $root.getStatus.GetStatusResponse.Config();
                 if (object.version != null)
                     message.version = String(object.version);
                 if (object.network != null) {
                     if (typeof object.network !== "object")
-                        throw TypeError(".peer.GetStatusResponse.Config.network: object expected");
-                    message.network = $root.peer.GetStatusResponse.Config.Network.fromObject(object.network);
+                        throw TypeError(".getStatus.GetStatusResponse.Config.network: object expected");
+                    message.network = $root.getStatus.GetStatusResponse.Config.Network.fromObject(object.network);
                 }
                 if (object.plugins) {
                     if (typeof object.plugins !== "object")
-                        throw TypeError(".peer.GetStatusResponse.Config.plugins: object expected");
+                        throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
                     message.plugins = {};
                     for (var keys = Object.keys(object.plugins), i = 0; i < keys.length; ++i) {
                         if (typeof object.plugins[keys[i]] !== "object")
-                            throw TypeError(".peer.GetStatusResponse.Config.plugins: object expected");
-                        message.plugins[keys[i]] = $root.peer.GetStatusResponse.Config.Plugin.fromObject(object.plugins[keys[i]]);
+                            throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
+                        message.plugins[keys[i]] = $root.getStatus.GetStatusResponse.Config.Plugin.fromObject(object.plugins[keys[i]]);
                     }
                 }
                 return message;
@@ -4024,9 +3614,9 @@ $root.peer = (function() {
             /**
              * Creates a plain object from a Config message. Also converts values to other types if specified.
              * @function toObject
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @static
-             * @param {peer.GetStatusResponse.Config} message Config
+             * @param {getStatus.GetStatusResponse.Config} message Config
              * @param {$protobuf.IConversionOptions} [options] Conversion options
              * @returns {Object.<string,*>} Plain object
              */
@@ -4043,12 +3633,12 @@ $root.peer = (function() {
                 if (message.version != null && message.hasOwnProperty("version"))
                     object.version = message.version;
                 if (message.network != null && message.hasOwnProperty("network"))
-                    object.network = $root.peer.GetStatusResponse.Config.Network.toObject(message.network, options);
+                    object.network = $root.getStatus.GetStatusResponse.Config.Network.toObject(message.network, options);
                 var keys2;
                 if (message.plugins && (keys2 = Object.keys(message.plugins)).length) {
                     object.plugins = {};
                     for (var j = 0; j < keys2.length; ++j)
-                        object.plugins[keys2[j]] = $root.peer.GetStatusResponse.Config.Plugin.toObject(message.plugins[keys2[j]], options);
+                        object.plugins[keys2[j]] = $root.getStatus.GetStatusResponse.Config.Plugin.toObject(message.plugins[keys2[j]], options);
                 }
                 return object;
             };
@@ -4056,7 +3646,7 @@ $root.peer = (function() {
             /**
              * Converts this Config to JSON.
              * @function toJSON
-             * @memberof peer.GetStatusResponse.Config
+             * @memberof getStatus.GetStatusResponse.Config
              * @instance
              * @returns {Object.<string,*>} JSON object
              */
@@ -4068,22 +3658,22 @@ $root.peer = (function() {
 
                 /**
                  * Properties of a Network.
-                 * @memberof peer.GetStatusResponse.Config
+                 * @memberof getStatus.GetStatusResponse.Config
                  * @interface INetwork
                  * @property {string|null} [name] Network name
                  * @property {string|null} [nethash] Network nethash
                  * @property {string|null} [explorer] Network explorer
-                 * @property {peer.GetStatusResponse.Config.Network.IToken|null} [token] Network token
+                 * @property {getStatus.GetStatusResponse.Config.Network.IToken|null} [token] Network token
                  * @property {number|null} [version] Network version
                  */
 
                 /**
                  * Constructs a new Network.
-                 * @memberof peer.GetStatusResponse.Config
+                 * @memberof getStatus.GetStatusResponse.Config
                  * @classdesc Represents a Network.
                  * @implements INetwork
                  * @constructor
-                 * @param {peer.GetStatusResponse.Config.INetwork=} [properties] Properties to set
+                 * @param {getStatus.GetStatusResponse.Config.INetwork=} [properties] Properties to set
                  */
                 function Network(properties) {
                     if (properties)
@@ -4095,7 +3685,7 @@ $root.peer = (function() {
                 /**
                  * Network name.
                  * @member {string} name
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @instance
                  */
                 Network.prototype.name = "";
@@ -4103,7 +3693,7 @@ $root.peer = (function() {
                 /**
                  * Network nethash.
                  * @member {string} nethash
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @instance
                  */
                 Network.prototype.nethash = "";
@@ -4111,15 +3701,15 @@ $root.peer = (function() {
                 /**
                  * Network explorer.
                  * @member {string} explorer
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @instance
                  */
                 Network.prototype.explorer = "";
 
                 /**
                  * Network token.
-                 * @member {peer.GetStatusResponse.Config.Network.IToken|null|undefined} token
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @member {getStatus.GetStatusResponse.Config.Network.IToken|null|undefined} token
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @instance
                  */
                 Network.prototype.token = null;
@@ -4127,7 +3717,7 @@ $root.peer = (function() {
                 /**
                  * Network version.
                  * @member {number} version
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @instance
                  */
                 Network.prototype.version = 0;
@@ -4135,21 +3725,21 @@ $root.peer = (function() {
                 /**
                  * Creates a new Network instance using the specified properties.
                  * @function create
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
-                 * @param {peer.GetStatusResponse.Config.INetwork=} [properties] Properties to set
-                 * @returns {peer.GetStatusResponse.Config.Network} Network instance
+                 * @param {getStatus.GetStatusResponse.Config.INetwork=} [properties] Properties to set
+                 * @returns {getStatus.GetStatusResponse.Config.Network} Network instance
                  */
                 Network.create = function create(properties) {
                     return new Network(properties);
                 };
 
                 /**
-                 * Encodes the specified Network message. Does not implicitly {@link peer.GetStatusResponse.Config.Network.verify|verify} messages.
+                 * Encodes the specified Network message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.verify|verify} messages.
                  * @function encode
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
-                 * @param {peer.GetStatusResponse.Config.INetwork} message Network message or plain object to encode
+                 * @param {getStatus.GetStatusResponse.Config.INetwork} message Network message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -4163,18 +3753,18 @@ $root.peer = (function() {
                     if (message.explorer != null && Object.hasOwnProperty.call(message, "explorer"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.explorer);
                     if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                        $root.peer.GetStatusResponse.Config.Network.Token.encode(message.token, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                        $root.getStatus.GetStatusResponse.Config.Network.Token.encode(message.token, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.version != null && Object.hasOwnProperty.call(message, "version"))
                         writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.version);
                     return writer;
                 };
 
                 /**
-                 * Encodes the specified Network message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.Network.verify|verify} messages.
+                 * Encodes the specified Network message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.verify|verify} messages.
                  * @function encodeDelimited
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
-                 * @param {peer.GetStatusResponse.Config.INetwork} message Network message or plain object to encode
+                 * @param {getStatus.GetStatusResponse.Config.INetwork} message Network message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -4185,18 +3775,18 @@ $root.peer = (function() {
                 /**
                  * Decodes a Network message from the specified reader or buffer.
                  * @function decode
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {peer.GetStatusResponse.Config.Network} Network
+                 * @returns {getStatus.GetStatusResponse.Config.Network} Network
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
                 Network.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusResponse.Config.Network();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config.Network();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -4210,7 +3800,7 @@ $root.peer = (function() {
                             message.explorer = reader.string();
                             break;
                         case 4:
-                            message.token = $root.peer.GetStatusResponse.Config.Network.Token.decode(reader, reader.uint32());
+                            message.token = $root.getStatus.GetStatusResponse.Config.Network.Token.decode(reader, reader.uint32());
                             break;
                         case 5:
                             message.version = reader.uint32();
@@ -4226,10 +3816,10 @@ $root.peer = (function() {
                 /**
                  * Decodes a Network message from the specified reader or buffer, length delimited.
                  * @function decodeDelimited
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @returns {peer.GetStatusResponse.Config.Network} Network
+                 * @returns {getStatus.GetStatusResponse.Config.Network} Network
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
@@ -4242,7 +3832,7 @@ $root.peer = (function() {
                 /**
                  * Verifies a Network message.
                  * @function verify
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -4260,7 +3850,7 @@ $root.peer = (function() {
                         if (!$util.isString(message.explorer))
                             return "explorer: string expected";
                     if (message.token != null && message.hasOwnProperty("token")) {
-                        var error = $root.peer.GetStatusResponse.Config.Network.Token.verify(message.token);
+                        var error = $root.getStatus.GetStatusResponse.Config.Network.Token.verify(message.token);
                         if (error)
                             return "token." + error;
                     }
@@ -4273,15 +3863,15 @@ $root.peer = (function() {
                 /**
                  * Creates a Network message from a plain object. Also converts values to their respective internal types.
                  * @function fromObject
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
                  * @param {Object.<string,*>} object Plain object
-                 * @returns {peer.GetStatusResponse.Config.Network} Network
+                 * @returns {getStatus.GetStatusResponse.Config.Network} Network
                  */
                 Network.fromObject = function fromObject(object) {
-                    if (object instanceof $root.peer.GetStatusResponse.Config.Network)
+                    if (object instanceof $root.getStatus.GetStatusResponse.Config.Network)
                         return object;
-                    var message = new $root.peer.GetStatusResponse.Config.Network();
+                    var message = new $root.getStatus.GetStatusResponse.Config.Network();
                     if (object.name != null)
                         message.name = String(object.name);
                     if (object.nethash != null)
@@ -4290,8 +3880,8 @@ $root.peer = (function() {
                         message.explorer = String(object.explorer);
                     if (object.token != null) {
                         if (typeof object.token !== "object")
-                            throw TypeError(".peer.GetStatusResponse.Config.Network.token: object expected");
-                        message.token = $root.peer.GetStatusResponse.Config.Network.Token.fromObject(object.token);
+                            throw TypeError(".getStatus.GetStatusResponse.Config.Network.token: object expected");
+                        message.token = $root.getStatus.GetStatusResponse.Config.Network.Token.fromObject(object.token);
                     }
                     if (object.version != null)
                         message.version = object.version >>> 0;
@@ -4301,9 +3891,9 @@ $root.peer = (function() {
                 /**
                  * Creates a plain object from a Network message. Also converts values to other types if specified.
                  * @function toObject
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @static
-                 * @param {peer.GetStatusResponse.Config.Network} message Network
+                 * @param {getStatus.GetStatusResponse.Config.Network} message Network
                  * @param {$protobuf.IConversionOptions} [options] Conversion options
                  * @returns {Object.<string,*>} Plain object
                  */
@@ -4325,7 +3915,7 @@ $root.peer = (function() {
                     if (message.explorer != null && message.hasOwnProperty("explorer"))
                         object.explorer = message.explorer;
                     if (message.token != null && message.hasOwnProperty("token"))
-                        object.token = $root.peer.GetStatusResponse.Config.Network.Token.toObject(message.token, options);
+                        object.token = $root.getStatus.GetStatusResponse.Config.Network.Token.toObject(message.token, options);
                     if (message.version != null && message.hasOwnProperty("version"))
                         object.version = message.version;
                     return object;
@@ -4334,7 +3924,7 @@ $root.peer = (function() {
                 /**
                  * Converts this Network to JSON.
                  * @function toJSON
-                 * @memberof peer.GetStatusResponse.Config.Network
+                 * @memberof getStatus.GetStatusResponse.Config.Network
                  * @instance
                  * @returns {Object.<string,*>} JSON object
                  */
@@ -4346,7 +3936,7 @@ $root.peer = (function() {
 
                     /**
                      * Properties of a Token.
-                     * @memberof peer.GetStatusResponse.Config.Network
+                     * @memberof getStatus.GetStatusResponse.Config.Network
                      * @interface IToken
                      * @property {string|null} [name] Token name
                      * @property {string|null} [symbol] Token symbol
@@ -4354,11 +3944,11 @@ $root.peer = (function() {
 
                     /**
                      * Constructs a new Token.
-                     * @memberof peer.GetStatusResponse.Config.Network
+                     * @memberof getStatus.GetStatusResponse.Config.Network
                      * @classdesc Represents a Token.
                      * @implements IToken
                      * @constructor
-                     * @param {peer.GetStatusResponse.Config.Network.IToken=} [properties] Properties to set
+                     * @param {getStatus.GetStatusResponse.Config.Network.IToken=} [properties] Properties to set
                      */
                     function Token(properties) {
                         if (properties)
@@ -4370,7 +3960,7 @@ $root.peer = (function() {
                     /**
                      * Token name.
                      * @member {string} name
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @instance
                      */
                     Token.prototype.name = "";
@@ -4378,7 +3968,7 @@ $root.peer = (function() {
                     /**
                      * Token symbol.
                      * @member {string} symbol
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @instance
                      */
                     Token.prototype.symbol = "";
@@ -4386,21 +3976,21 @@ $root.peer = (function() {
                     /**
                      * Creates a new Token instance using the specified properties.
                      * @function create
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
-                     * @param {peer.GetStatusResponse.Config.Network.IToken=} [properties] Properties to set
-                     * @returns {peer.GetStatusResponse.Config.Network.Token} Token instance
+                     * @param {getStatus.GetStatusResponse.Config.Network.IToken=} [properties] Properties to set
+                     * @returns {getStatus.GetStatusResponse.Config.Network.Token} Token instance
                      */
                     Token.create = function create(properties) {
                         return new Token(properties);
                     };
 
                     /**
-                     * Encodes the specified Token message. Does not implicitly {@link peer.GetStatusResponse.Config.Network.Token.verify|verify} messages.
+                     * Encodes the specified Token message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.Token.verify|verify} messages.
                      * @function encode
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
-                     * @param {peer.GetStatusResponse.Config.Network.IToken} message Token message or plain object to encode
+                     * @param {getStatus.GetStatusResponse.Config.Network.IToken} message Token message or plain object to encode
                      * @param {$protobuf.Writer} [writer] Writer to encode to
                      * @returns {$protobuf.Writer} Writer
                      */
@@ -4415,11 +4005,11 @@ $root.peer = (function() {
                     };
 
                     /**
-                     * Encodes the specified Token message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.Network.Token.verify|verify} messages.
+                     * Encodes the specified Token message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.Token.verify|verify} messages.
                      * @function encodeDelimited
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
-                     * @param {peer.GetStatusResponse.Config.Network.IToken} message Token message or plain object to encode
+                     * @param {getStatus.GetStatusResponse.Config.Network.IToken} message Token message or plain object to encode
                      * @param {$protobuf.Writer} [writer] Writer to encode to
                      * @returns {$protobuf.Writer} Writer
                      */
@@ -4430,18 +4020,18 @@ $root.peer = (function() {
                     /**
                      * Decodes a Token message from the specified reader or buffer.
                      * @function decode
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
                      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                      * @param {number} [length] Message length if known beforehand
-                     * @returns {peer.GetStatusResponse.Config.Network.Token} Token
+                     * @returns {getStatus.GetStatusResponse.Config.Network.Token} Token
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
                     Token.decode = function decode(reader, length) {
                         if (!(reader instanceof $Reader))
                             reader = $Reader.create(reader);
-                        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusResponse.Config.Network.Token();
+                        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config.Network.Token();
                         while (reader.pos < end) {
                             var tag = reader.uint32();
                             switch (tag >>> 3) {
@@ -4462,10 +4052,10 @@ $root.peer = (function() {
                     /**
                      * Decodes a Token message from the specified reader or buffer, length delimited.
                      * @function decodeDelimited
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
                      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                     * @returns {peer.GetStatusResponse.Config.Network.Token} Token
+                     * @returns {getStatus.GetStatusResponse.Config.Network.Token} Token
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
@@ -4478,7 +4068,7 @@ $root.peer = (function() {
                     /**
                      * Verifies a Token message.
                      * @function verify
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
                      * @param {Object.<string,*>} message Plain object to verify
                      * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -4498,15 +4088,15 @@ $root.peer = (function() {
                     /**
                      * Creates a Token message from a plain object. Also converts values to their respective internal types.
                      * @function fromObject
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
                      * @param {Object.<string,*>} object Plain object
-                     * @returns {peer.GetStatusResponse.Config.Network.Token} Token
+                     * @returns {getStatus.GetStatusResponse.Config.Network.Token} Token
                      */
                     Token.fromObject = function fromObject(object) {
-                        if (object instanceof $root.peer.GetStatusResponse.Config.Network.Token)
+                        if (object instanceof $root.getStatus.GetStatusResponse.Config.Network.Token)
                             return object;
-                        var message = new $root.peer.GetStatusResponse.Config.Network.Token();
+                        var message = new $root.getStatus.GetStatusResponse.Config.Network.Token();
                         if (object.name != null)
                             message.name = String(object.name);
                         if (object.symbol != null)
@@ -4517,9 +4107,9 @@ $root.peer = (function() {
                     /**
                      * Creates a plain object from a Token message. Also converts values to other types if specified.
                      * @function toObject
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @static
-                     * @param {peer.GetStatusResponse.Config.Network.Token} message Token
+                     * @param {getStatus.GetStatusResponse.Config.Network.Token} message Token
                      * @param {$protobuf.IConversionOptions} [options] Conversion options
                      * @returns {Object.<string,*>} Plain object
                      */
@@ -4541,7 +4131,7 @@ $root.peer = (function() {
                     /**
                      * Converts this Token to JSON.
                      * @function toJSON
-                     * @memberof peer.GetStatusResponse.Config.Network.Token
+                     * @memberof getStatus.GetStatusResponse.Config.Network.Token
                      * @instance
                      * @returns {Object.<string,*>} JSON object
                      */
@@ -4559,7 +4149,7 @@ $root.peer = (function() {
 
                 /**
                  * Properties of a Plugin.
-                 * @memberof peer.GetStatusResponse.Config
+                 * @memberof getStatus.GetStatusResponse.Config
                  * @interface IPlugin
                  * @property {number|null} [port] Plugin port
                  * @property {boolean|null} [enabled] Plugin enabled
@@ -4568,11 +4158,11 @@ $root.peer = (function() {
 
                 /**
                  * Constructs a new Plugin.
-                 * @memberof peer.GetStatusResponse.Config
+                 * @memberof getStatus.GetStatusResponse.Config
                  * @classdesc Represents a Plugin.
                  * @implements IPlugin
                  * @constructor
-                 * @param {peer.GetStatusResponse.Config.IPlugin=} [properties] Properties to set
+                 * @param {getStatus.GetStatusResponse.Config.IPlugin=} [properties] Properties to set
                  */
                 function Plugin(properties) {
                     if (properties)
@@ -4584,7 +4174,7 @@ $root.peer = (function() {
                 /**
                  * Plugin port.
                  * @member {number} port
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @instance
                  */
                 Plugin.prototype.port = 0;
@@ -4592,7 +4182,7 @@ $root.peer = (function() {
                 /**
                  * Plugin enabled.
                  * @member {boolean} enabled
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @instance
                  */
                 Plugin.prototype.enabled = false;
@@ -4600,7 +4190,7 @@ $root.peer = (function() {
                 /**
                  * Plugin estimateTotalCount.
                  * @member {boolean} estimateTotalCount
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @instance
                  */
                 Plugin.prototype.estimateTotalCount = false;
@@ -4608,21 +4198,21 @@ $root.peer = (function() {
                 /**
                  * Creates a new Plugin instance using the specified properties.
                  * @function create
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
-                 * @param {peer.GetStatusResponse.Config.IPlugin=} [properties] Properties to set
-                 * @returns {peer.GetStatusResponse.Config.Plugin} Plugin instance
+                 * @param {getStatus.GetStatusResponse.Config.IPlugin=} [properties] Properties to set
+                 * @returns {getStatus.GetStatusResponse.Config.Plugin} Plugin instance
                  */
                 Plugin.create = function create(properties) {
                     return new Plugin(properties);
                 };
 
                 /**
-                 * Encodes the specified Plugin message. Does not implicitly {@link peer.GetStatusResponse.Config.Plugin.verify|verify} messages.
+                 * Encodes the specified Plugin message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Plugin.verify|verify} messages.
                  * @function encode
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
-                 * @param {peer.GetStatusResponse.Config.IPlugin} message Plugin message or plain object to encode
+                 * @param {getStatus.GetStatusResponse.Config.IPlugin} message Plugin message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -4639,11 +4229,11 @@ $root.peer = (function() {
                 };
 
                 /**
-                 * Encodes the specified Plugin message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.Plugin.verify|verify} messages.
+                 * Encodes the specified Plugin message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Plugin.verify|verify} messages.
                  * @function encodeDelimited
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
-                 * @param {peer.GetStatusResponse.Config.IPlugin} message Plugin message or plain object to encode
+                 * @param {getStatus.GetStatusResponse.Config.IPlugin} message Plugin message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
@@ -4654,18 +4244,18 @@ $root.peer = (function() {
                 /**
                  * Decodes a Plugin message from the specified reader or buffer.
                  * @function decode
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {peer.GetStatusResponse.Config.Plugin} Plugin
+                 * @returns {getStatus.GetStatusResponse.Config.Plugin} Plugin
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
                 Plugin.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.peer.GetStatusResponse.Config.Plugin();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getStatus.GetStatusResponse.Config.Plugin();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -4689,10 +4279,10 @@ $root.peer = (function() {
                 /**
                  * Decodes a Plugin message from the specified reader or buffer, length delimited.
                  * @function decodeDelimited
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @returns {peer.GetStatusResponse.Config.Plugin} Plugin
+                 * @returns {getStatus.GetStatusResponse.Config.Plugin} Plugin
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
@@ -4705,7 +4295,7 @@ $root.peer = (function() {
                 /**
                  * Verifies a Plugin message.
                  * @function verify
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -4728,15 +4318,15 @@ $root.peer = (function() {
                 /**
                  * Creates a Plugin message from a plain object. Also converts values to their respective internal types.
                  * @function fromObject
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
                  * @param {Object.<string,*>} object Plain object
-                 * @returns {peer.GetStatusResponse.Config.Plugin} Plugin
+                 * @returns {getStatus.GetStatusResponse.Config.Plugin} Plugin
                  */
                 Plugin.fromObject = function fromObject(object) {
-                    if (object instanceof $root.peer.GetStatusResponse.Config.Plugin)
+                    if (object instanceof $root.getStatus.GetStatusResponse.Config.Plugin)
                         return object;
-                    var message = new $root.peer.GetStatusResponse.Config.Plugin();
+                    var message = new $root.getStatus.GetStatusResponse.Config.Plugin();
                     if (object.port != null)
                         message.port = object.port >>> 0;
                     if (object.enabled != null)
@@ -4749,9 +4339,9 @@ $root.peer = (function() {
                 /**
                  * Creates a plain object from a Plugin message. Also converts values to other types if specified.
                  * @function toObject
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @static
-                 * @param {peer.GetStatusResponse.Config.Plugin} message Plugin
+                 * @param {getStatus.GetStatusResponse.Config.Plugin} message Plugin
                  * @param {$protobuf.IConversionOptions} [options] Conversion options
                  * @returns {Object.<string,*>} Plain object
                  */
@@ -4776,7 +4366,7 @@ $root.peer = (function() {
                 /**
                  * Converts this Plugin to JSON.
                  * @function toJSON
-                 * @memberof peer.GetStatusResponse.Config.Plugin
+                 * @memberof getStatus.GetStatusResponse.Config.Plugin
                  * @instance
                  * @returns {Object.<string,*>} JSON object
                  */
@@ -4793,7 +4383,892 @@ $root.peer = (function() {
         return GetStatusResponse;
     })();
 
-    return peer;
+    return getStatus;
+})();
+
+$root.postBlock = (function() {
+
+    /**
+     * Namespace postBlock.
+     * @exports postBlock
+     * @namespace
+     */
+    var postBlock = {};
+
+    postBlock.PostBlockRequest = (function() {
+
+        /**
+         * Properties of a PostBlockRequest.
+         * @memberof postBlock
+         * @interface IPostBlockRequest
+         * @property {Uint8Array|null} [block] PostBlockRequest block
+         * @property {shared.IHeaders|null} [headers] PostBlockRequest headers
+         */
+
+        /**
+         * Constructs a new PostBlockRequest.
+         * @memberof postBlock
+         * @classdesc Represents a PostBlockRequest.
+         * @implements IPostBlockRequest
+         * @constructor
+         * @param {postBlock.IPostBlockRequest=} [properties] Properties to set
+         */
+        function PostBlockRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PostBlockRequest block.
+         * @member {Uint8Array} block
+         * @memberof postBlock.PostBlockRequest
+         * @instance
+         */
+        PostBlockRequest.prototype.block = $util.newBuffer([]);
+
+        /**
+         * PostBlockRequest headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postBlock.PostBlockRequest
+         * @instance
+         */
+        PostBlockRequest.prototype.headers = null;
+
+        /**
+         * Creates a new PostBlockRequest instance using the specified properties.
+         * @function create
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {postBlock.IPostBlockRequest=} [properties] Properties to set
+         * @returns {postBlock.PostBlockRequest} PostBlockRequest instance
+         */
+        PostBlockRequest.create = function create(properties) {
+            return new PostBlockRequest(properties);
+        };
+
+        /**
+         * Encodes the specified PostBlockRequest message. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
+         * @function encode
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {postBlock.IPostBlockRequest} message PostBlockRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostBlockRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.block != null && Object.hasOwnProperty.call(message, "block"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.block);
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostBlockRequest message, length delimited. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {postBlock.IPostBlockRequest} message PostBlockRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostBlockRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostBlockRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postBlock.PostBlockRequest} PostBlockRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostBlockRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postBlock.PostBlockRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.block = reader.bytes();
+                    break;
+                case 2:
+                    message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostBlockRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postBlock.PostBlockRequest} PostBlockRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostBlockRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostBlockRequest message.
+         * @function verify
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostBlockRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.block != null && message.hasOwnProperty("block"))
+                if (!(message.block && typeof message.block.length === "number" || $util.isString(message.block)))
+                    return "block: buffer expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a PostBlockRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postBlock.PostBlockRequest} PostBlockRequest
+         */
+        PostBlockRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.postBlock.PostBlockRequest)
+                return object;
+            var message = new $root.postBlock.PostBlockRequest();
+            if (object.block != null)
+                if (typeof object.block === "string")
+                    $util.base64.decode(object.block, message.block = $util.newBuffer($util.base64.length(object.block)), 0);
+                else if (object.block.length)
+                    message.block = object.block;
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postBlock.PostBlockRequest.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PostBlockRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postBlock.PostBlockRequest
+         * @static
+         * @param {postBlock.PostBlockRequest} message PostBlockRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostBlockRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if (options.bytes === String)
+                    object.block = "";
+                else {
+                    object.block = [];
+                    if (options.bytes !== Array)
+                        object.block = $util.newBuffer(object.block);
+                }
+                object.headers = null;
+            }
+            if (message.block != null && message.hasOwnProperty("block"))
+                object.block = options.bytes === String ? $util.base64.encode(message.block, 0, message.block.length) : options.bytes === Array ? Array.prototype.slice.call(message.block) : message.block;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
+        };
+
+        /**
+         * Converts this PostBlockRequest to JSON.
+         * @function toJSON
+         * @memberof postBlock.PostBlockRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostBlockRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return PostBlockRequest;
+    })();
+
+    postBlock.PostBlockResponse = (function() {
+
+        /**
+         * Properties of a PostBlockResponse.
+         * @memberof postBlock
+         * @interface IPostBlockResponse
+         * @property {boolean|null} [status] PostBlockResponse status
+         * @property {number|null} [height] PostBlockResponse height
+         */
+
+        /**
+         * Constructs a new PostBlockResponse.
+         * @memberof postBlock
+         * @classdesc Represents a PostBlockResponse.
+         * @implements IPostBlockResponse
+         * @constructor
+         * @param {postBlock.IPostBlockResponse=} [properties] Properties to set
+         */
+        function PostBlockResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PostBlockResponse status.
+         * @member {boolean} status
+         * @memberof postBlock.PostBlockResponse
+         * @instance
+         */
+        PostBlockResponse.prototype.status = false;
+
+        /**
+         * PostBlockResponse height.
+         * @member {number} height
+         * @memberof postBlock.PostBlockResponse
+         * @instance
+         */
+        PostBlockResponse.prototype.height = 0;
+
+        /**
+         * Creates a new PostBlockResponse instance using the specified properties.
+         * @function create
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {postBlock.IPostBlockResponse=} [properties] Properties to set
+         * @returns {postBlock.PostBlockResponse} PostBlockResponse instance
+         */
+        PostBlockResponse.create = function create(properties) {
+            return new PostBlockResponse(properties);
+        };
+
+        /**
+         * Encodes the specified PostBlockResponse message. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
+         * @function encode
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {postBlock.IPostBlockResponse} message PostBlockResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostBlockResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+                writer.uint32(/* id 1, wireType 0 =*/8).bool(message.status);
+            if (message.height != null && Object.hasOwnProperty.call(message, "height"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostBlockResponse message, length delimited. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {postBlock.IPostBlockResponse} message PostBlockResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostBlockResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostBlockResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postBlock.PostBlockResponse} PostBlockResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostBlockResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postBlock.PostBlockResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.status = reader.bool();
+                    break;
+                case 2:
+                    message.height = reader.uint32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostBlockResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postBlock.PostBlockResponse} PostBlockResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostBlockResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostBlockResponse message.
+         * @function verify
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostBlockResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.status != null && message.hasOwnProperty("status"))
+                if (typeof message.status !== "boolean")
+                    return "status: boolean expected";
+            if (message.height != null && message.hasOwnProperty("height"))
+                if (!$util.isInteger(message.height))
+                    return "height: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a PostBlockResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postBlock.PostBlockResponse} PostBlockResponse
+         */
+        PostBlockResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.postBlock.PostBlockResponse)
+                return object;
+            var message = new $root.postBlock.PostBlockResponse();
+            if (object.status != null)
+                message.status = Boolean(object.status);
+            if (object.height != null)
+                message.height = object.height >>> 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PostBlockResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postBlock.PostBlockResponse
+         * @static
+         * @param {postBlock.PostBlockResponse} message PostBlockResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostBlockResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.status = false;
+                object.height = 0;
+            }
+            if (message.status != null && message.hasOwnProperty("status"))
+                object.status = message.status;
+            if (message.height != null && message.hasOwnProperty("height"))
+                object.height = message.height;
+            return object;
+        };
+
+        /**
+         * Converts this PostBlockResponse to JSON.
+         * @function toJSON
+         * @memberof postBlock.PostBlockResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostBlockResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return PostBlockResponse;
+    })();
+
+    return postBlock;
+})();
+
+$root.postTransactions = (function() {
+
+    /**
+     * Namespace postTransactions.
+     * @exports postTransactions
+     * @namespace
+     */
+    var postTransactions = {};
+
+    postTransactions.PostTransactionsRequest = (function() {
+
+        /**
+         * Properties of a PostTransactionsRequest.
+         * @memberof postTransactions
+         * @interface IPostTransactionsRequest
+         * @property {Uint8Array|null} [transactions] PostTransactionsRequest transactions
+         * @property {shared.IHeaders|null} [headers] PostTransactionsRequest headers
+         */
+
+        /**
+         * Constructs a new PostTransactionsRequest.
+         * @memberof postTransactions
+         * @classdesc Represents a PostTransactionsRequest.
+         * @implements IPostTransactionsRequest
+         * @constructor
+         * @param {postTransactions.IPostTransactionsRequest=} [properties] Properties to set
+         */
+        function PostTransactionsRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PostTransactionsRequest transactions.
+         * @member {Uint8Array} transactions
+         * @memberof postTransactions.PostTransactionsRequest
+         * @instance
+         */
+        PostTransactionsRequest.prototype.transactions = $util.newBuffer([]);
+
+        /**
+         * PostTransactionsRequest headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postTransactions.PostTransactionsRequest
+         * @instance
+         */
+        PostTransactionsRequest.prototype.headers = null;
+
+        /**
+         * Creates a new PostTransactionsRequest instance using the specified properties.
+         * @function create
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {postTransactions.IPostTransactionsRequest=} [properties] Properties to set
+         * @returns {postTransactions.PostTransactionsRequest} PostTransactionsRequest instance
+         */
+        PostTransactionsRequest.create = function create(properties) {
+            return new PostTransactionsRequest(properties);
+        };
+
+        /**
+         * Encodes the specified PostTransactionsRequest message. Does not implicitly {@link postTransactions.PostTransactionsRequest.verify|verify} messages.
+         * @function encode
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {postTransactions.IPostTransactionsRequest} message PostTransactionsRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostTransactionsRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.transactions != null && Object.hasOwnProperty.call(message, "transactions"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.transactions);
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostTransactionsRequest message, length delimited. Does not implicitly {@link postTransactions.PostTransactionsRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {postTransactions.IPostTransactionsRequest} message PostTransactionsRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostTransactionsRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostTransactionsRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postTransactions.PostTransactionsRequest} PostTransactionsRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostTransactionsRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postTransactions.PostTransactionsRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.transactions = reader.bytes();
+                    break;
+                case 2:
+                    message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostTransactionsRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postTransactions.PostTransactionsRequest} PostTransactionsRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostTransactionsRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostTransactionsRequest message.
+         * @function verify
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostTransactionsRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.transactions != null && message.hasOwnProperty("transactions"))
+                if (!(message.transactions && typeof message.transactions.length === "number" || $util.isString(message.transactions)))
+                    return "transactions: buffer expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a PostTransactionsRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postTransactions.PostTransactionsRequest} PostTransactionsRequest
+         */
+        PostTransactionsRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.postTransactions.PostTransactionsRequest)
+                return object;
+            var message = new $root.postTransactions.PostTransactionsRequest();
+            if (object.transactions != null)
+                if (typeof object.transactions === "string")
+                    $util.base64.decode(object.transactions, message.transactions = $util.newBuffer($util.base64.length(object.transactions)), 0);
+                else if (object.transactions.length)
+                    message.transactions = object.transactions;
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postTransactions.PostTransactionsRequest.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PostTransactionsRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postTransactions.PostTransactionsRequest
+         * @static
+         * @param {postTransactions.PostTransactionsRequest} message PostTransactionsRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostTransactionsRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if (options.bytes === String)
+                    object.transactions = "";
+                else {
+                    object.transactions = [];
+                    if (options.bytes !== Array)
+                        object.transactions = $util.newBuffer(object.transactions);
+                }
+                object.headers = null;
+            }
+            if (message.transactions != null && message.hasOwnProperty("transactions"))
+                object.transactions = options.bytes === String ? $util.base64.encode(message.transactions, 0, message.transactions.length) : options.bytes === Array ? Array.prototype.slice.call(message.transactions) : message.transactions;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
+        };
+
+        /**
+         * Converts this PostTransactionsRequest to JSON.
+         * @function toJSON
+         * @memberof postTransactions.PostTransactionsRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostTransactionsRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return PostTransactionsRequest;
+    })();
+
+    postTransactions.PostTransactionsResponse = (function() {
+
+        /**
+         * Properties of a PostTransactionsResponse.
+         * @memberof postTransactions
+         * @interface IPostTransactionsResponse
+         * @property {Array.<string>|null} [accept] PostTransactionsResponse accept
+         */
+
+        /**
+         * Constructs a new PostTransactionsResponse.
+         * @memberof postTransactions
+         * @classdesc Represents a PostTransactionsResponse.
+         * @implements IPostTransactionsResponse
+         * @constructor
+         * @param {postTransactions.IPostTransactionsResponse=} [properties] Properties to set
+         */
+        function PostTransactionsResponse(properties) {
+            this.accept = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PostTransactionsResponse accept.
+         * @member {Array.<string>} accept
+         * @memberof postTransactions.PostTransactionsResponse
+         * @instance
+         */
+        PostTransactionsResponse.prototype.accept = $util.emptyArray;
+
+        /**
+         * Creates a new PostTransactionsResponse instance using the specified properties.
+         * @function create
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {postTransactions.IPostTransactionsResponse=} [properties] Properties to set
+         * @returns {postTransactions.PostTransactionsResponse} PostTransactionsResponse instance
+         */
+        PostTransactionsResponse.create = function create(properties) {
+            return new PostTransactionsResponse(properties);
+        };
+
+        /**
+         * Encodes the specified PostTransactionsResponse message. Does not implicitly {@link postTransactions.PostTransactionsResponse.verify|verify} messages.
+         * @function encode
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {postTransactions.IPostTransactionsResponse} message PostTransactionsResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostTransactionsResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.accept != null && message.accept.length)
+                for (var i = 0; i < message.accept.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.accept[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostTransactionsResponse message, length delimited. Does not implicitly {@link postTransactions.PostTransactionsResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {postTransactions.IPostTransactionsResponse} message PostTransactionsResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostTransactionsResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostTransactionsResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postTransactions.PostTransactionsResponse} PostTransactionsResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostTransactionsResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postTransactions.PostTransactionsResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.accept && message.accept.length))
+                        message.accept = [];
+                    message.accept.push(reader.string());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostTransactionsResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postTransactions.PostTransactionsResponse} PostTransactionsResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostTransactionsResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostTransactionsResponse message.
+         * @function verify
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostTransactionsResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.accept != null && message.hasOwnProperty("accept")) {
+                if (!Array.isArray(message.accept))
+                    return "accept: array expected";
+                for (var i = 0; i < message.accept.length; ++i)
+                    if (!$util.isString(message.accept[i]))
+                        return "accept: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a PostTransactionsResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postTransactions.PostTransactionsResponse} PostTransactionsResponse
+         */
+        PostTransactionsResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.postTransactions.PostTransactionsResponse)
+                return object;
+            var message = new $root.postTransactions.PostTransactionsResponse();
+            if (object.accept) {
+                if (!Array.isArray(object.accept))
+                    throw TypeError(".postTransactions.PostTransactionsResponse.accept: array expected");
+                message.accept = [];
+                for (var i = 0; i < object.accept.length; ++i)
+                    message.accept[i] = String(object.accept[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PostTransactionsResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postTransactions.PostTransactionsResponse
+         * @static
+         * @param {postTransactions.PostTransactionsResponse} message PostTransactionsResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostTransactionsResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.accept = [];
+            if (message.accept && message.accept.length) {
+                object.accept = [];
+                for (var j = 0; j < message.accept.length; ++j)
+                    object.accept[j] = message.accept[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this PostTransactionsResponse to JSON.
+         * @function toJSON
+         * @memberof postTransactions.PostTransactionsResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostTransactionsResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return PostTransactionsResponse;
+    })();
+
+    return postTransactions;
 })();
 
 $root.shared = (function() {
@@ -4993,445 +5468,6 @@ $root.shared = (function() {
     })();
 
     return shared;
-})();
-
-$root.transactions = (function() {
-
-    /**
-     * Namespace transactions.
-     * @exports transactions
-     * @namespace
-     */
-    var transactions = {};
-
-    transactions.PostTransactionsRequest = (function() {
-
-        /**
-         * Properties of a PostTransactionsRequest.
-         * @memberof transactions
-         * @interface IPostTransactionsRequest
-         * @property {Uint8Array|null} [transactions] PostTransactionsRequest transactions
-         * @property {shared.IHeaders|null} [headers] PostTransactionsRequest headers
-         */
-
-        /**
-         * Constructs a new PostTransactionsRequest.
-         * @memberof transactions
-         * @classdesc Represents a PostTransactionsRequest.
-         * @implements IPostTransactionsRequest
-         * @constructor
-         * @param {transactions.IPostTransactionsRequest=} [properties] Properties to set
-         */
-        function PostTransactionsRequest(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PostTransactionsRequest transactions.
-         * @member {Uint8Array} transactions
-         * @memberof transactions.PostTransactionsRequest
-         * @instance
-         */
-        PostTransactionsRequest.prototype.transactions = $util.newBuffer([]);
-
-        /**
-         * PostTransactionsRequest headers.
-         * @member {shared.IHeaders|null|undefined} headers
-         * @memberof transactions.PostTransactionsRequest
-         * @instance
-         */
-        PostTransactionsRequest.prototype.headers = null;
-
-        /**
-         * Creates a new PostTransactionsRequest instance using the specified properties.
-         * @function create
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {transactions.IPostTransactionsRequest=} [properties] Properties to set
-         * @returns {transactions.PostTransactionsRequest} PostTransactionsRequest instance
-         */
-        PostTransactionsRequest.create = function create(properties) {
-            return new PostTransactionsRequest(properties);
-        };
-
-        /**
-         * Encodes the specified PostTransactionsRequest message. Does not implicitly {@link transactions.PostTransactionsRequest.verify|verify} messages.
-         * @function encode
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {transactions.IPostTransactionsRequest} message PostTransactionsRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostTransactionsRequest.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.transactions != null && Object.hasOwnProperty.call(message, "transactions"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.transactions);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PostTransactionsRequest message, length delimited. Does not implicitly {@link transactions.PostTransactionsRequest.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {transactions.IPostTransactionsRequest} message PostTransactionsRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostTransactionsRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PostTransactionsRequest message from the specified reader or buffer.
-         * @function decode
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {transactions.PostTransactionsRequest} PostTransactionsRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostTransactionsRequest.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.transactions.PostTransactionsRequest();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.transactions = reader.bytes();
-                    break;
-                case 2:
-                    message.headers = $root.shared.Headers.decode(reader, reader.uint32());
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PostTransactionsRequest message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {transactions.PostTransactionsRequest} PostTransactionsRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostTransactionsRequest.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PostTransactionsRequest message.
-         * @function verify
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PostTransactionsRequest.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.transactions != null && message.hasOwnProperty("transactions"))
-                if (!(message.transactions && typeof message.transactions.length === "number" || $util.isString(message.transactions)))
-                    return "transactions: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers);
-                if (error)
-                    return "headers." + error;
-            }
-            return null;
-        };
-
-        /**
-         * Creates a PostTransactionsRequest message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {transactions.PostTransactionsRequest} PostTransactionsRequest
-         */
-        PostTransactionsRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.transactions.PostTransactionsRequest)
-                return object;
-            var message = new $root.transactions.PostTransactionsRequest();
-            if (object.transactions != null)
-                if (typeof object.transactions === "string")
-                    $util.base64.decode(object.transactions, message.transactions = $util.newBuffer($util.base64.length(object.transactions)), 0);
-                else if (object.transactions.length)
-                    message.transactions = object.transactions;
-            if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".transactions.PostTransactionsRequest.headers: object expected");
-                message.headers = $root.shared.Headers.fromObject(object.headers);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PostTransactionsRequest message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof transactions.PostTransactionsRequest
-         * @static
-         * @param {transactions.PostTransactionsRequest} message PostTransactionsRequest
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PostTransactionsRequest.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                if (options.bytes === String)
-                    object.transactions = "";
-                else {
-                    object.transactions = [];
-                    if (options.bytes !== Array)
-                        object.transactions = $util.newBuffer(object.transactions);
-                }
-                object.headers = null;
-            }
-            if (message.transactions != null && message.hasOwnProperty("transactions"))
-                object.transactions = options.bytes === String ? $util.base64.encode(message.transactions, 0, message.transactions.length) : options.bytes === Array ? Array.prototype.slice.call(message.transactions) : message.transactions;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            return object;
-        };
-
-        /**
-         * Converts this PostTransactionsRequest to JSON.
-         * @function toJSON
-         * @memberof transactions.PostTransactionsRequest
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PostTransactionsRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return PostTransactionsRequest;
-    })();
-
-    transactions.PostTransactionsResponse = (function() {
-
-        /**
-         * Properties of a PostTransactionsResponse.
-         * @memberof transactions
-         * @interface IPostTransactionsResponse
-         * @property {Array.<string>|null} [accept] PostTransactionsResponse accept
-         */
-
-        /**
-         * Constructs a new PostTransactionsResponse.
-         * @memberof transactions
-         * @classdesc Represents a PostTransactionsResponse.
-         * @implements IPostTransactionsResponse
-         * @constructor
-         * @param {transactions.IPostTransactionsResponse=} [properties] Properties to set
-         */
-        function PostTransactionsResponse(properties) {
-            this.accept = [];
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PostTransactionsResponse accept.
-         * @member {Array.<string>} accept
-         * @memberof transactions.PostTransactionsResponse
-         * @instance
-         */
-        PostTransactionsResponse.prototype.accept = $util.emptyArray;
-
-        /**
-         * Creates a new PostTransactionsResponse instance using the specified properties.
-         * @function create
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {transactions.IPostTransactionsResponse=} [properties] Properties to set
-         * @returns {transactions.PostTransactionsResponse} PostTransactionsResponse instance
-         */
-        PostTransactionsResponse.create = function create(properties) {
-            return new PostTransactionsResponse(properties);
-        };
-
-        /**
-         * Encodes the specified PostTransactionsResponse message. Does not implicitly {@link transactions.PostTransactionsResponse.verify|verify} messages.
-         * @function encode
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {transactions.IPostTransactionsResponse} message PostTransactionsResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostTransactionsResponse.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.accept != null && message.accept.length)
-                for (var i = 0; i < message.accept.length; ++i)
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.accept[i]);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PostTransactionsResponse message, length delimited. Does not implicitly {@link transactions.PostTransactionsResponse.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {transactions.IPostTransactionsResponse} message PostTransactionsResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostTransactionsResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PostTransactionsResponse message from the specified reader or buffer.
-         * @function decode
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {transactions.PostTransactionsResponse} PostTransactionsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostTransactionsResponse.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.transactions.PostTransactionsResponse();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    if (!(message.accept && message.accept.length))
-                        message.accept = [];
-                    message.accept.push(reader.string());
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PostTransactionsResponse message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {transactions.PostTransactionsResponse} PostTransactionsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostTransactionsResponse.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PostTransactionsResponse message.
-         * @function verify
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PostTransactionsResponse.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.accept != null && message.hasOwnProperty("accept")) {
-                if (!Array.isArray(message.accept))
-                    return "accept: array expected";
-                for (var i = 0; i < message.accept.length; ++i)
-                    if (!$util.isString(message.accept[i]))
-                        return "accept: string[] expected";
-            }
-            return null;
-        };
-
-        /**
-         * Creates a PostTransactionsResponse message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {transactions.PostTransactionsResponse} PostTransactionsResponse
-         */
-        PostTransactionsResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.transactions.PostTransactionsResponse)
-                return object;
-            var message = new $root.transactions.PostTransactionsResponse();
-            if (object.accept) {
-                if (!Array.isArray(object.accept))
-                    throw TypeError(".transactions.PostTransactionsResponse.accept: array expected");
-                message.accept = [];
-                for (var i = 0; i < object.accept.length; ++i)
-                    message.accept[i] = String(object.accept[i]);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PostTransactionsResponse message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof transactions.PostTransactionsResponse
-         * @static
-         * @param {transactions.PostTransactionsResponse} message PostTransactionsResponse
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PostTransactionsResponse.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.arrays || options.defaults)
-                object.accept = [];
-            if (message.accept && message.accept.length) {
-                object.accept = [];
-                for (var j = 0; j < message.accept.length; ++j)
-                    object.accept[j] = message.accept[j];
-            }
-            return object;
-        };
-
-        /**
-         * Converts this PostTransactionsResponse to JSON.
-         * @function toJSON
-         * @memberof transactions.PostTransactionsResponse
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PostTransactionsResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return PostTransactionsResponse;
-    })();
-
-    return transactions;
 })();
 
 module.exports = $root;

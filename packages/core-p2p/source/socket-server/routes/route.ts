@@ -3,8 +3,6 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
-import { Controller } from "../controllers/controller";
-
 export type Codec = {
 	request: {
 		serialize: any;
@@ -30,9 +28,8 @@ export abstract class Route {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public register(server: Hapi.Server): void {
-		const controller = this.getController(server);
+		const controller = this.getController();
 		server.bind(controller);
-
 		for (const [path, config] of Object.entries(this.getRoutesConfigByPath())) {
 			server.route({
 				config: {
@@ -51,5 +48,5 @@ export abstract class Route {
 
 	public abstract getRoutesConfigByPath(): { [path: string]: RouteConfig };
 
-	protected abstract getController(server: Hapi.Server): Controller;
+	protected abstract getController(): Contracts.P2P.Controller;
 }

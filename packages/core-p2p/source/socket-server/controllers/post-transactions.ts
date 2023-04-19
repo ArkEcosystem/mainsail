@@ -1,14 +1,13 @@
-import { inject } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 
-import { Controller } from "./controller";
-
-export class TransactionsController extends Controller {
+@injectable()
+export class PostTransactionsController implements Contracts.P2P.Controller {
 	@inject(Identifiers.TransactionPoolProcessor)
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
-	public async postTransactions(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<string[]> {
+	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<string[]> {
 		const result = await this.processor.process((request.payload as any).transactions as Buffer[]);
 		return result.accept;
 	}

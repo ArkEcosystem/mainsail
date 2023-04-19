@@ -2,7 +2,6 @@ import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-co
 import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
 
-import { PeerFactory } from "./contracts";
 import { DisconnectInvalidPeers } from "./listeners";
 import { isValidPeer } from "./validation";
 
@@ -93,7 +92,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return;
 		}
 
-		const newPeer: Contracts.P2P.Peer = this.app.get<PeerFactory>(Identifiers.PeerFactory)(peer.ip);
+		const newPeer: Contracts.P2P.Peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(peer.ip);
 
 		try {
 			this.repository.setPendingPeer(peer);

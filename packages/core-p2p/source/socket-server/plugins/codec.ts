@@ -2,9 +2,14 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Boom from "@hapi/boom";
 
-import { BlocksRoute } from "../routes/blocks";
-import { PeerRoute } from "../routes/peer";
-import { TransactionsRoute } from "../routes/transactions";
+import {
+	GetBlocksRoute,
+	GetCommonBlocksRoute,
+	GetPeersRoute,
+	GetStausRoute,
+	PostBlockRoute,
+	PostTransactionsRoute,
+} from "../routes";
 
 @injectable()
 export class CodecPlugin {
@@ -16,9 +21,12 @@ export class CodecPlugin {
 
 	public register(server) {
 		const allRoutesConfigByPath = {
-			...this.app.resolve(PeerRoute).getRoutesConfigByPath(),
-			...this.app.resolve(BlocksRoute).getRoutesConfigByPath(),
-			...this.app.resolve(TransactionsRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetCommonBlocksRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetStausRoute).getRoutesConfigByPath(),
+			...this.app.resolve(PostBlockRoute).getRoutesConfigByPath(),
+			...this.app.resolve(PostTransactionsRoute).getRoutesConfigByPath(),
 		};
 
 		server.ext({

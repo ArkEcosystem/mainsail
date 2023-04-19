@@ -1,16 +1,6 @@
 syntax = "proto3";
 
-package blocks;
-
-message PostBlockRequest {
-    bytes block = 1;
-    shared.Headers headers = 2;
-}
-
-message PostBlockResponse {
-    bool status = 1;
-    uint32 height = 2;
-}
+package getBlocks;
 
 message GetBlocksRequest {
     uint32 lastBlockHeight = 1;

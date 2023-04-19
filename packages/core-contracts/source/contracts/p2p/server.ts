@@ -1,5 +1,11 @@
+import Hapi from "@hapi/hapi";
+
 import { IBlockData } from "../crypto";
 import { WalletData, WalletValidatorAttributes } from "../state";
+
+export interface Controller {
+	handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<any>;
+}
 
 export interface Response<T> {
 	data: T;
