@@ -8,7 +8,7 @@ import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
-import { replySchemas } from "./schemas";
+import { replySchemas } from "./reply-schemas";
 import { Codecs } from "./socket-server/codecs";
 import { buildRateLimiter, isValidVersion } from "./utils";
 
