@@ -56,6 +56,7 @@
 		"@types/ip": "1.1.0",
 		"@types/semver": "6.2.3",
 		"import-fresh": "3.3.0",
+		"rewiremock": "3.14.5",
 		"uvu": "0.5.3"
 	},
 	"engines": {
