@@ -35,7 +35,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		await this.#buildServer();
 
-		return this.app.get<Server>(Identifiers.P2PServer).boot();
+		await this.app.get<Server>(Identifiers.P2PServer).boot();
 	}
 
 	public async dispose(): Promise<void> {
