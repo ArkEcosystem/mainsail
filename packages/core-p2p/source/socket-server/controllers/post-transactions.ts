@@ -2,10 +2,8 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 
-import { Controller } from "../../types";
-
 @injectable()
-export class PostTransactionsController implements Controller {
+export class PostTransactionsController implements Contracts.P2P.Controller {
 	@inject(Identifiers.TransactionPoolProcessor)
 	private readonly processor!: Contracts.TransactionPool.Processor;
 

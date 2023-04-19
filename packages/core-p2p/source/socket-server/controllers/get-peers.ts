@@ -4,11 +4,10 @@ import { Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 import { constants } from "../../constants";
-import { Controller } from "../../types";
 import { getPeerIp } from "../../utils/get-peer-ip";
 
 @injectable()
-export class GetPeersController implements Controller {
+export class GetPeersController implements Contracts.P2P.Controller {
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 

@@ -74,3 +74,5 @@ export interface PeerVerificationResult {
 	readonly highestCommonHeight: number;
 	readonly forked: boolean;
 }
+
+export type PeerFactory = (ip: string) => Peer;

@@ -3,8 +3,6 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
-import { Controller } from "../../types";
-
 export type Codec = {
 	request: {
 		serialize: any;
@@ -50,5 +48,5 @@ export abstract class Route {
 
 	public abstract getRoutesConfigByPath(): { [path: string]: RouteConfig };
 
-	protected abstract getController(): Controller;
+	protected abstract getController(): Contracts.P2P.Controller;
 }

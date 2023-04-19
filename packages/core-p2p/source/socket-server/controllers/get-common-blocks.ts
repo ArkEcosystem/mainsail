@@ -2,10 +2,8 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import Hapi from "@hapi/hapi";
 
-import { Controller } from "../../types";
-
 @injectable()
-export class GetCommonBlocksController implements Controller {
+export class GetCommonBlocksController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
