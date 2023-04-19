@@ -7,9 +7,7 @@ import { AnySchema } from "joi";
 import { describe } from "../../core-test-framework";
 import { ServiceProvider } from ".";
 
-const importDefaults = () =>
-	// @ts-ignore
-	importFresh("../distribution/defaults.js").defaults;
+const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;
 
 describe<{
 	app: Application;

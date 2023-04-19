@@ -2483,6 +2483,9 @@ importers:
       '@types/semver':
         specifier: 6.2.3
         version: 6.2.3
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
       uvu:
         specifier: 0.5.3
         version: 0.5.3
