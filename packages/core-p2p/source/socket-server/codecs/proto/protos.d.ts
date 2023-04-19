@@ -1,198 +1,6 @@
 import * as $protobuf from "protobufjs";
-/** Namespace blocks. */
-export namespace blocks {
-
-    /** Properties of a PostBlockRequest. */
-    interface IPostBlockRequest {
-
-        /** PostBlockRequest block */
-        block?: (Uint8Array|null);
-
-        /** PostBlockRequest headers */
-        headers?: (shared.IHeaders|null);
-    }
-
-    /** Represents a PostBlockRequest. */
-    class PostBlockRequest implements IPostBlockRequest {
-
-        /**
-         * Constructs a new PostBlockRequest.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: blocks.IPostBlockRequest);
-
-        /** PostBlockRequest block. */
-        public block: Uint8Array;
-
-        /** PostBlockRequest headers. */
-        public headers?: (shared.IHeaders|null);
-
-        /**
-         * Creates a new PostBlockRequest instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostBlockRequest instance
-         */
-        public static create(properties?: blocks.IPostBlockRequest): blocks.PostBlockRequest;
-
-        /**
-         * Encodes the specified PostBlockRequest message. Does not implicitly {@link blocks.PostBlockRequest.verify|verify} messages.
-         * @param message PostBlockRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: blocks.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostBlockRequest message, length delimited. Does not implicitly {@link blocks.PostBlockRequest.verify|verify} messages.
-         * @param message PostBlockRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: blocks.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): blocks.PostBlockRequest;
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): blocks.PostBlockRequest;
-
-        /**
-         * Verifies a PostBlockRequest message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostBlockRequest message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostBlockRequest
-         */
-        public static fromObject(object: { [k: string]: any }): blocks.PostBlockRequest;
-
-        /**
-         * Creates a plain object from a PostBlockRequest message. Also converts values to other types if specified.
-         * @param message PostBlockRequest
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: blocks.PostBlockRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostBlockRequest to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    /** Properties of a PostBlockResponse. */
-    interface IPostBlockResponse {
-
-        /** PostBlockResponse status */
-        status?: (boolean|null);
-
-        /** PostBlockResponse height */
-        height?: (number|null);
-    }
-
-    /** Represents a PostBlockResponse. */
-    class PostBlockResponse implements IPostBlockResponse {
-
-        /**
-         * Constructs a new PostBlockResponse.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: blocks.IPostBlockResponse);
-
-        /** PostBlockResponse status. */
-        public status: boolean;
-
-        /** PostBlockResponse height. */
-        public height: number;
-
-        /**
-         * Creates a new PostBlockResponse instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostBlockResponse instance
-         */
-        public static create(properties?: blocks.IPostBlockResponse): blocks.PostBlockResponse;
-
-        /**
-         * Encodes the specified PostBlockResponse message. Does not implicitly {@link blocks.PostBlockResponse.verify|verify} messages.
-         * @param message PostBlockResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: blocks.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostBlockResponse message, length delimited. Does not implicitly {@link blocks.PostBlockResponse.verify|verify} messages.
-         * @param message PostBlockResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: blocks.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): blocks.PostBlockResponse;
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): blocks.PostBlockResponse;
-
-        /**
-         * Verifies a PostBlockResponse message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostBlockResponse message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostBlockResponse
-         */
-        public static fromObject(object: { [k: string]: any }): blocks.PostBlockResponse;
-
-        /**
-         * Creates a plain object from a PostBlockResponse message. Also converts values to other types if specified.
-         * @param message PostBlockResponse
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: blocks.PostBlockResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostBlockResponse to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
+/** Namespace getBlocks. */
+export namespace getBlocks {
 
     /** Properties of a GetBlocksRequest. */
     interface IGetBlocksRequest {
@@ -220,7 +28,7 @@ export namespace blocks {
          * Constructs a new GetBlocksRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: blocks.IGetBlocksRequest);
+        constructor(properties?: getBlocks.IGetBlocksRequest);
 
         /** GetBlocksRequest lastBlockHeight. */
         public lastBlockHeight: number;
@@ -242,23 +50,23 @@ export namespace blocks {
          * @param [properties] Properties to set
          * @returns GetBlocksRequest instance
          */
-        public static create(properties?: blocks.IGetBlocksRequest): blocks.GetBlocksRequest;
+        public static create(properties?: getBlocks.IGetBlocksRequest): getBlocks.GetBlocksRequest;
 
         /**
-         * Encodes the specified GetBlocksRequest message. Does not implicitly {@link blocks.GetBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetBlocksRequest message. Does not implicitly {@link getBlocks.GetBlocksRequest.verify|verify} messages.
          * @param message GetBlocksRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: blocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: getBlocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GetBlocksRequest message, length delimited. Does not implicitly {@link blocks.GetBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetBlocksRequest message, length delimited. Does not implicitly {@link getBlocks.GetBlocksRequest.verify|verify} messages.
          * @param message GetBlocksRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: blocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: getBlocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetBlocksRequest message from the specified reader or buffer.
@@ -268,7 +76,7 @@ export namespace blocks {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): blocks.GetBlocksRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksRequest;
 
         /**
          * Decodes a GetBlocksRequest message from the specified reader or buffer, length delimited.
@@ -277,7 +85,7 @@ export namespace blocks {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): blocks.GetBlocksRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksRequest;
 
         /**
          * Verifies a GetBlocksRequest message.
@@ -291,7 +99,7 @@ export namespace blocks {
          * @param object Plain object
          * @returns GetBlocksRequest
          */
-        public static fromObject(object: { [k: string]: any }): blocks.GetBlocksRequest;
+        public static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksRequest;
 
         /**
          * Creates a plain object from a GetBlocksRequest message. Also converts values to other types if specified.
@@ -299,7 +107,7 @@ export namespace blocks {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: blocks.GetBlocksRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: getBlocks.GetBlocksRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetBlocksRequest to JSON.
@@ -322,7 +130,7 @@ export namespace blocks {
          * Constructs a new GetBlocksResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: blocks.IGetBlocksResponse);
+        constructor(properties?: getBlocks.IGetBlocksResponse);
 
         /** GetBlocksResponse blocks. */
         public blocks: Uint8Array;
@@ -332,23 +140,23 @@ export namespace blocks {
          * @param [properties] Properties to set
          * @returns GetBlocksResponse instance
          */
-        public static create(properties?: blocks.IGetBlocksResponse): blocks.GetBlocksResponse;
+        public static create(properties?: getBlocks.IGetBlocksResponse): getBlocks.GetBlocksResponse;
 
         /**
-         * Encodes the specified GetBlocksResponse message. Does not implicitly {@link blocks.GetBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetBlocksResponse message. Does not implicitly {@link getBlocks.GetBlocksResponse.verify|verify} messages.
          * @param message GetBlocksResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: blocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: getBlocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GetBlocksResponse message, length delimited. Does not implicitly {@link blocks.GetBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetBlocksResponse message, length delimited. Does not implicitly {@link getBlocks.GetBlocksResponse.verify|verify} messages.
          * @param message GetBlocksResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: blocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: getBlocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetBlocksResponse message from the specified reader or buffer.
@@ -358,7 +166,7 @@ export namespace blocks {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): blocks.GetBlocksResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksResponse;
 
         /**
          * Decodes a GetBlocksResponse message from the specified reader or buffer, length delimited.
@@ -367,7 +175,7 @@ export namespace blocks {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): blocks.GetBlocksResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksResponse;
 
         /**
          * Verifies a GetBlocksResponse message.
@@ -381,7 +189,7 @@ export namespace blocks {
          * @param object Plain object
          * @returns GetBlocksResponse
          */
-        public static fromObject(object: { [k: string]: any }): blocks.GetBlocksResponse;
+        public static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksResponse;
 
         /**
          * Creates a plain object from a GetBlocksResponse message. Also converts values to other types if specified.
@@ -389,7 +197,7 @@ export namespace blocks {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: blocks.GetBlocksResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: getBlocks.GetBlocksResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetBlocksResponse to JSON.
@@ -453,7 +261,7 @@ export namespace blocks {
              * Constructs a new BlockHeader.
              * @param [properties] Properties to set
              */
-            constructor(properties?: blocks.GetBlocksResponse.IBlockHeader);
+            constructor(properties?: getBlocks.GetBlocksResponse.IBlockHeader);
 
             /** BlockHeader id. */
             public id: string;
@@ -502,23 +310,23 @@ export namespace blocks {
              * @param [properties] Properties to set
              * @returns BlockHeader instance
              */
-            public static create(properties?: blocks.GetBlocksResponse.IBlockHeader): blocks.GetBlocksResponse.BlockHeader;
+            public static create(properties?: getBlocks.GetBlocksResponse.IBlockHeader): getBlocks.GetBlocksResponse.BlockHeader;
 
             /**
-             * Encodes the specified BlockHeader message. Does not implicitly {@link blocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
+             * Encodes the specified BlockHeader message. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
              * @param message BlockHeader message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: blocks.GetBlocksResponse.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: getBlocks.GetBlocksResponse.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link blocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
+             * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
              * @param message BlockHeader message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encodeDelimited(message: blocks.GetBlocksResponse.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encodeDelimited(message: getBlocks.GetBlocksResponse.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Decodes a BlockHeader message from the specified reader or buffer.
@@ -528,7 +336,7 @@ export namespace blocks {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): blocks.GetBlocksResponse.BlockHeader;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksResponse.BlockHeader;
 
             /**
              * Decodes a BlockHeader message from the specified reader or buffer, length delimited.
@@ -537,7 +345,7 @@ export namespace blocks {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): blocks.GetBlocksResponse.BlockHeader;
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksResponse.BlockHeader;
 
             /**
              * Verifies a BlockHeader message.
@@ -551,7 +359,7 @@ export namespace blocks {
              * @param object Plain object
              * @returns BlockHeader
              */
-            public static fromObject(object: { [k: string]: any }): blocks.GetBlocksResponse.BlockHeader;
+            public static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksResponse.BlockHeader;
 
             /**
              * Creates a plain object from a BlockHeader message. Also converts values to other types if specified.
@@ -559,7 +367,7 @@ export namespace blocks {
              * @param [options] Conversion options
              * @returns Plain object
              */
-            public static toObject(message: blocks.GetBlocksResponse.BlockHeader, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            public static toObject(message: getBlocks.GetBlocksResponse.BlockHeader, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
             /**
              * Converts this BlockHeader to JSON.
@@ -570,287 +378,8 @@ export namespace blocks {
     }
 }
 
-/** Namespace peer. */
-export namespace peer {
-
-    /** Properties of a GetPeersRequest. */
-    interface IGetPeersRequest {
-
-        /** GetPeersRequest headers */
-        headers?: (shared.IHeaders|null);
-    }
-
-    /** Represents a GetPeersRequest. */
-    class GetPeersRequest implements IGetPeersRequest {
-
-        /**
-         * Constructs a new GetPeersRequest.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: peer.IGetPeersRequest);
-
-        /** GetPeersRequest headers. */
-        public headers?: (shared.IHeaders|null);
-
-        /**
-         * Creates a new GetPeersRequest instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns GetPeersRequest instance
-         */
-        public static create(properties?: peer.IGetPeersRequest): peer.GetPeersRequest;
-
-        /**
-         * Encodes the specified GetPeersRequest message. Does not implicitly {@link peer.GetPeersRequest.verify|verify} messages.
-         * @param message GetPeersRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: peer.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified GetPeersRequest message, length delimited. Does not implicitly {@link peer.GetPeersRequest.verify|verify} messages.
-         * @param message GetPeersRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: peer.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a GetPeersRequest message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns GetPeersRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetPeersRequest;
-
-        /**
-         * Decodes a GetPeersRequest message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns GetPeersRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetPeersRequest;
-
-        /**
-         * Verifies a GetPeersRequest message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a GetPeersRequest message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns GetPeersRequest
-         */
-        public static fromObject(object: { [k: string]: any }): peer.GetPeersRequest;
-
-        /**
-         * Creates a plain object from a GetPeersRequest message. Also converts values to other types if specified.
-         * @param message GetPeersRequest
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: peer.GetPeersRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this GetPeersRequest to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    /** Properties of a GetPeersResponse. */
-    interface IGetPeersResponse {
-
-        /** GetPeersResponse peers */
-        peers?: (peer.GetPeersResponse.IPeer[]|null);
-    }
-
-    /** Represents a GetPeersResponse. */
-    class GetPeersResponse implements IGetPeersResponse {
-
-        /**
-         * Constructs a new GetPeersResponse.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: peer.IGetPeersResponse);
-
-        /** GetPeersResponse peers. */
-        public peers: peer.GetPeersResponse.IPeer[];
-
-        /**
-         * Creates a new GetPeersResponse instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns GetPeersResponse instance
-         */
-        public static create(properties?: peer.IGetPeersResponse): peer.GetPeersResponse;
-
-        /**
-         * Encodes the specified GetPeersResponse message. Does not implicitly {@link peer.GetPeersResponse.verify|verify} messages.
-         * @param message GetPeersResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: peer.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified GetPeersResponse message, length delimited. Does not implicitly {@link peer.GetPeersResponse.verify|verify} messages.
-         * @param message GetPeersResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: peer.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a GetPeersResponse message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns GetPeersResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetPeersResponse;
-
-        /**
-         * Decodes a GetPeersResponse message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns GetPeersResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetPeersResponse;
-
-        /**
-         * Verifies a GetPeersResponse message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a GetPeersResponse message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns GetPeersResponse
-         */
-        public static fromObject(object: { [k: string]: any }): peer.GetPeersResponse;
-
-        /**
-         * Creates a plain object from a GetPeersResponse message. Also converts values to other types if specified.
-         * @param message GetPeersResponse
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: peer.GetPeersResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this GetPeersResponse to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    namespace GetPeersResponse {
-
-        /** Properties of a Peer. */
-        interface IPeer {
-
-            /** Peer ip */
-            ip?: (string|null);
-
-            /** Peer port */
-            port?: (number|null);
-        }
-
-        /** Represents a Peer. */
-        class Peer implements IPeer {
-
-            /**
-             * Constructs a new Peer.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: peer.GetPeersResponse.IPeer);
-
-            /** Peer ip. */
-            public ip: string;
-
-            /** Peer port. */
-            public port: number;
-
-            /**
-             * Creates a new Peer instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Peer instance
-             */
-            public static create(properties?: peer.GetPeersResponse.IPeer): peer.GetPeersResponse.Peer;
-
-            /**
-             * Encodes the specified Peer message. Does not implicitly {@link peer.GetPeersResponse.Peer.verify|verify} messages.
-             * @param message Peer message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: peer.GetPeersResponse.IPeer, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Peer message, length delimited. Does not implicitly {@link peer.GetPeersResponse.Peer.verify|verify} messages.
-             * @param message Peer message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: peer.GetPeersResponse.IPeer, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetPeersResponse.Peer;
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetPeersResponse.Peer;
-
-            /**
-             * Verifies a Peer message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Peer message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Peer
-             */
-            public static fromObject(object: { [k: string]: any }): peer.GetPeersResponse.Peer;
-
-            /**
-             * Creates a plain object from a Peer message. Also converts values to other types if specified.
-             * @param message Peer
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: peer.GetPeersResponse.Peer, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Peer to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-        }
-    }
+/** Namespace getCommonBlocks. */
+export namespace getCommonBlocks {
 
     /** Properties of a GetCommonBlocksRequest. */
     interface IGetCommonBlocksRequest {
@@ -869,7 +398,7 @@ export namespace peer {
          * Constructs a new GetCommonBlocksRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: peer.IGetCommonBlocksRequest);
+        constructor(properties?: getCommonBlocks.IGetCommonBlocksRequest);
 
         /** GetCommonBlocksRequest ids. */
         public ids: string[];
@@ -882,23 +411,23 @@ export namespace peer {
          * @param [properties] Properties to set
          * @returns GetCommonBlocksRequest instance
          */
-        public static create(properties?: peer.IGetCommonBlocksRequest): peer.GetCommonBlocksRequest;
+        public static create(properties?: getCommonBlocks.IGetCommonBlocksRequest): getCommonBlocks.GetCommonBlocksRequest;
 
         /**
-         * Encodes the specified GetCommonBlocksRequest message. Does not implicitly {@link peer.GetCommonBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksRequest message. Does not implicitly {@link getCommonBlocks.GetCommonBlocksRequest.verify|verify} messages.
          * @param message GetCommonBlocksRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: peer.IGetCommonBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: getCommonBlocks.IGetCommonBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GetCommonBlocksRequest message, length delimited. Does not implicitly {@link peer.GetCommonBlocksRequest.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksRequest message, length delimited. Does not implicitly {@link getCommonBlocks.GetCommonBlocksRequest.verify|verify} messages.
          * @param message GetCommonBlocksRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: peer.IGetCommonBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: getCommonBlocks.IGetCommonBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetCommonBlocksRequest message from the specified reader or buffer.
@@ -908,7 +437,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetCommonBlocksRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getCommonBlocks.GetCommonBlocksRequest;
 
         /**
          * Decodes a GetCommonBlocksRequest message from the specified reader or buffer, length delimited.
@@ -917,7 +446,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetCommonBlocksRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getCommonBlocks.GetCommonBlocksRequest;
 
         /**
          * Verifies a GetCommonBlocksRequest message.
@@ -931,7 +460,7 @@ export namespace peer {
          * @param object Plain object
          * @returns GetCommonBlocksRequest
          */
-        public static fromObject(object: { [k: string]: any }): peer.GetCommonBlocksRequest;
+        public static fromObject(object: { [k: string]: any }): getCommonBlocks.GetCommonBlocksRequest;
 
         /**
          * Creates a plain object from a GetCommonBlocksRequest message. Also converts values to other types if specified.
@@ -939,7 +468,7 @@ export namespace peer {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: peer.GetCommonBlocksRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: getCommonBlocks.GetCommonBlocksRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetCommonBlocksRequest to JSON.
@@ -952,7 +481,7 @@ export namespace peer {
     interface IGetCommonBlocksResponse {
 
         /** GetCommonBlocksResponse common */
-        common?: (peer.GetCommonBlocksResponse.ICommon|null);
+        common?: (getCommonBlocks.GetCommonBlocksResponse.ICommon|null);
     }
 
     /** Represents a GetCommonBlocksResponse. */
@@ -962,33 +491,33 @@ export namespace peer {
          * Constructs a new GetCommonBlocksResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: peer.IGetCommonBlocksResponse);
+        constructor(properties?: getCommonBlocks.IGetCommonBlocksResponse);
 
         /** GetCommonBlocksResponse common. */
-        public common?: (peer.GetCommonBlocksResponse.ICommon|null);
+        public common?: (getCommonBlocks.GetCommonBlocksResponse.ICommon|null);
 
         /**
          * Creates a new GetCommonBlocksResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetCommonBlocksResponse instance
          */
-        public static create(properties?: peer.IGetCommonBlocksResponse): peer.GetCommonBlocksResponse;
+        public static create(properties?: getCommonBlocks.IGetCommonBlocksResponse): getCommonBlocks.GetCommonBlocksResponse;
 
         /**
-         * Encodes the specified GetCommonBlocksResponse message. Does not implicitly {@link peer.GetCommonBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksResponse message. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.verify|verify} messages.
          * @param message GetCommonBlocksResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: peer.IGetCommonBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: getCommonBlocks.IGetCommonBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GetCommonBlocksResponse message, length delimited. Does not implicitly {@link peer.GetCommonBlocksResponse.verify|verify} messages.
+         * Encodes the specified GetCommonBlocksResponse message, length delimited. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.verify|verify} messages.
          * @param message GetCommonBlocksResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: peer.IGetCommonBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: getCommonBlocks.IGetCommonBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetCommonBlocksResponse message from the specified reader or buffer.
@@ -998,7 +527,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetCommonBlocksResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getCommonBlocks.GetCommonBlocksResponse;
 
         /**
          * Decodes a GetCommonBlocksResponse message from the specified reader or buffer, length delimited.
@@ -1007,7 +536,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetCommonBlocksResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getCommonBlocks.GetCommonBlocksResponse;
 
         /**
          * Verifies a GetCommonBlocksResponse message.
@@ -1021,7 +550,7 @@ export namespace peer {
          * @param object Plain object
          * @returns GetCommonBlocksResponse
          */
-        public static fromObject(object: { [k: string]: any }): peer.GetCommonBlocksResponse;
+        public static fromObject(object: { [k: string]: any }): getCommonBlocks.GetCommonBlocksResponse;
 
         /**
          * Creates a plain object from a GetCommonBlocksResponse message. Also converts values to other types if specified.
@@ -1029,7 +558,7 @@ export namespace peer {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: peer.GetCommonBlocksResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: getCommonBlocks.GetCommonBlocksResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetCommonBlocksResponse to JSON.
@@ -1057,7 +586,7 @@ export namespace peer {
              * Constructs a new Common.
              * @param [properties] Properties to set
              */
-            constructor(properties?: peer.GetCommonBlocksResponse.ICommon);
+            constructor(properties?: getCommonBlocks.GetCommonBlocksResponse.ICommon);
 
             /** Common height. */
             public height: number;
@@ -1070,23 +599,23 @@ export namespace peer {
              * @param [properties] Properties to set
              * @returns Common instance
              */
-            public static create(properties?: peer.GetCommonBlocksResponse.ICommon): peer.GetCommonBlocksResponse.Common;
+            public static create(properties?: getCommonBlocks.GetCommonBlocksResponse.ICommon): getCommonBlocks.GetCommonBlocksResponse.Common;
 
             /**
-             * Encodes the specified Common message. Does not implicitly {@link peer.GetCommonBlocksResponse.Common.verify|verify} messages.
+             * Encodes the specified Common message. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.Common.verify|verify} messages.
              * @param message Common message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: peer.GetCommonBlocksResponse.ICommon, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: getCommonBlocks.GetCommonBlocksResponse.ICommon, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Encodes the specified Common message, length delimited. Does not implicitly {@link peer.GetCommonBlocksResponse.Common.verify|verify} messages.
+             * Encodes the specified Common message, length delimited. Does not implicitly {@link getCommonBlocks.GetCommonBlocksResponse.Common.verify|verify} messages.
              * @param message Common message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encodeDelimited(message: peer.GetCommonBlocksResponse.ICommon, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encodeDelimited(message: getCommonBlocks.GetCommonBlocksResponse.ICommon, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Decodes a Common message from the specified reader or buffer.
@@ -1096,7 +625,7 @@ export namespace peer {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetCommonBlocksResponse.Common;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getCommonBlocks.GetCommonBlocksResponse.Common;
 
             /**
              * Decodes a Common message from the specified reader or buffer, length delimited.
@@ -1105,7 +634,7 @@ export namespace peer {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetCommonBlocksResponse.Common;
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getCommonBlocks.GetCommonBlocksResponse.Common;
 
             /**
              * Verifies a Common message.
@@ -1119,7 +648,7 @@ export namespace peer {
              * @param object Plain object
              * @returns Common
              */
-            public static fromObject(object: { [k: string]: any }): peer.GetCommonBlocksResponse.Common;
+            public static fromObject(object: { [k: string]: any }): getCommonBlocks.GetCommonBlocksResponse.Common;
 
             /**
              * Creates a plain object from a Common message. Also converts values to other types if specified.
@@ -1127,7 +656,7 @@ export namespace peer {
              * @param [options] Conversion options
              * @returns Plain object
              */
-            public static toObject(message: peer.GetCommonBlocksResponse.Common, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            public static toObject(message: getCommonBlocks.GetCommonBlocksResponse.Common, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
             /**
              * Converts this Common to JSON.
@@ -1136,6 +665,293 @@ export namespace peer {
             public toJSON(): { [k: string]: any };
         }
     }
+}
+
+/** Namespace getPeers. */
+export namespace getPeers {
+
+    /** Properties of a GetPeersRequest. */
+    interface IGetPeersRequest {
+
+        /** GetPeersRequest headers */
+        headers?: (shared.IHeaders|null);
+    }
+
+    /** Represents a GetPeersRequest. */
+    class GetPeersRequest implements IGetPeersRequest {
+
+        /**
+         * Constructs a new GetPeersRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: getPeers.IGetPeersRequest);
+
+        /** GetPeersRequest headers. */
+        public headers?: (shared.IHeaders|null);
+
+        /**
+         * Creates a new GetPeersRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GetPeersRequest instance
+         */
+        public static create(properties?: getPeers.IGetPeersRequest): getPeers.GetPeersRequest;
+
+        /**
+         * Encodes the specified GetPeersRequest message. Does not implicitly {@link getPeers.GetPeersRequest.verify|verify} messages.
+         * @param message GetPeersRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: getPeers.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GetPeersRequest message, length delimited. Does not implicitly {@link getPeers.GetPeersRequest.verify|verify} messages.
+         * @param message GetPeersRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: getPeers.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GetPeersRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GetPeersRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersRequest;
+
+        /**
+         * Decodes a GetPeersRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GetPeersRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersRequest;
+
+        /**
+         * Verifies a GetPeersRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GetPeersRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GetPeersRequest
+         */
+        public static fromObject(object: { [k: string]: any }): getPeers.GetPeersRequest;
+
+        /**
+         * Creates a plain object from a GetPeersRequest message. Also converts values to other types if specified.
+         * @param message GetPeersRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: getPeers.GetPeersRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GetPeersRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a GetPeersResponse. */
+    interface IGetPeersResponse {
+
+        /** GetPeersResponse peers */
+        peers?: (getPeers.GetPeersResponse.IPeer[]|null);
+    }
+
+    /** Represents a GetPeersResponse. */
+    class GetPeersResponse implements IGetPeersResponse {
+
+        /**
+         * Constructs a new GetPeersResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: getPeers.IGetPeersResponse);
+
+        /** GetPeersResponse peers. */
+        public peers: getPeers.GetPeersResponse.IPeer[];
+
+        /**
+         * Creates a new GetPeersResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GetPeersResponse instance
+         */
+        public static create(properties?: getPeers.IGetPeersResponse): getPeers.GetPeersResponse;
+
+        /**
+         * Encodes the specified GetPeersResponse message. Does not implicitly {@link getPeers.GetPeersResponse.verify|verify} messages.
+         * @param message GetPeersResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: getPeers.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GetPeersResponse message, length delimited. Does not implicitly {@link getPeers.GetPeersResponse.verify|verify} messages.
+         * @param message GetPeersResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: getPeers.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GetPeersResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GetPeersResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersResponse;
+
+        /**
+         * Decodes a GetPeersResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GetPeersResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersResponse;
+
+        /**
+         * Verifies a GetPeersResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GetPeersResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GetPeersResponse
+         */
+        public static fromObject(object: { [k: string]: any }): getPeers.GetPeersResponse;
+
+        /**
+         * Creates a plain object from a GetPeersResponse message. Also converts values to other types if specified.
+         * @param message GetPeersResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: getPeers.GetPeersResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GetPeersResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    namespace GetPeersResponse {
+
+        /** Properties of a Peer. */
+        interface IPeer {
+
+            /** Peer ip */
+            ip?: (string|null);
+
+            /** Peer port */
+            port?: (number|null);
+        }
+
+        /** Represents a Peer. */
+        class Peer implements IPeer {
+
+            /**
+             * Constructs a new Peer.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: getPeers.GetPeersResponse.IPeer);
+
+            /** Peer ip. */
+            public ip: string;
+
+            /** Peer port. */
+            public port: number;
+
+            /**
+             * Creates a new Peer instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Peer instance
+             */
+            public static create(properties?: getPeers.GetPeersResponse.IPeer): getPeers.GetPeersResponse.Peer;
+
+            /**
+             * Encodes the specified Peer message. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
+             * @param message Peer message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: getPeers.GetPeersResponse.IPeer, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Peer message, length delimited. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
+             * @param message Peer message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: getPeers.GetPeersResponse.IPeer, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Peer message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Peer
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersResponse.Peer;
+
+            /**
+             * Decodes a Peer message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Peer
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersResponse.Peer;
+
+            /**
+             * Verifies a Peer message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Peer message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Peer
+             */
+            public static fromObject(object: { [k: string]: any }): getPeers.GetPeersResponse.Peer;
+
+            /**
+             * Creates a plain object from a Peer message. Also converts values to other types if specified.
+             * @param message Peer
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: getPeers.GetPeersResponse.Peer, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Peer to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+    }
+}
+
+/** Namespace getStatus. */
+export namespace getStatus {
 
     /** Properties of a GetStatusRequest. */
     interface IGetStatusRequest {
@@ -1151,7 +967,7 @@ export namespace peer {
          * Constructs a new GetStatusRequest.
          * @param [properties] Properties to set
          */
-        constructor(properties?: peer.IGetStatusRequest);
+        constructor(properties?: getStatus.IGetStatusRequest);
 
         /** GetStatusRequest headers. */
         public headers?: (shared.IHeaders|null);
@@ -1161,23 +977,23 @@ export namespace peer {
          * @param [properties] Properties to set
          * @returns GetStatusRequest instance
          */
-        public static create(properties?: peer.IGetStatusRequest): peer.GetStatusRequest;
+        public static create(properties?: getStatus.IGetStatusRequest): getStatus.GetStatusRequest;
 
         /**
-         * Encodes the specified GetStatusRequest message. Does not implicitly {@link peer.GetStatusRequest.verify|verify} messages.
+         * Encodes the specified GetStatusRequest message. Does not implicitly {@link getStatus.GetStatusRequest.verify|verify} messages.
          * @param message GetStatusRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: peer.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: getStatus.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GetStatusRequest message, length delimited. Does not implicitly {@link peer.GetStatusRequest.verify|verify} messages.
+         * Encodes the specified GetStatusRequest message, length delimited. Does not implicitly {@link getStatus.GetStatusRequest.verify|verify} messages.
          * @param message GetStatusRequest message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: peer.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: getStatus.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetStatusRequest message from the specified reader or buffer.
@@ -1187,7 +1003,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusRequest;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusRequest;
 
         /**
          * Decodes a GetStatusRequest message from the specified reader or buffer, length delimited.
@@ -1196,7 +1012,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusRequest;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusRequest;
 
         /**
          * Verifies a GetStatusRequest message.
@@ -1210,7 +1026,7 @@ export namespace peer {
          * @param object Plain object
          * @returns GetStatusRequest
          */
-        public static fromObject(object: { [k: string]: any }): peer.GetStatusRequest;
+        public static fromObject(object: { [k: string]: any }): getStatus.GetStatusRequest;
 
         /**
          * Creates a plain object from a GetStatusRequest message. Also converts values to other types if specified.
@@ -1218,7 +1034,7 @@ export namespace peer {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: peer.GetStatusRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: getStatus.GetStatusRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetStatusRequest to JSON.
@@ -1231,10 +1047,10 @@ export namespace peer {
     interface IGetStatusResponse {
 
         /** GetStatusResponse state */
-        state?: (peer.GetStatusResponse.IState|null);
+        state?: (getStatus.GetStatusResponse.IState|null);
 
         /** GetStatusResponse config */
-        config?: (peer.GetStatusResponse.IConfig|null);
+        config?: (getStatus.GetStatusResponse.IConfig|null);
     }
 
     /** Represents a GetStatusResponse. */
@@ -1244,36 +1060,36 @@ export namespace peer {
          * Constructs a new GetStatusResponse.
          * @param [properties] Properties to set
          */
-        constructor(properties?: peer.IGetStatusResponse);
+        constructor(properties?: getStatus.IGetStatusResponse);
 
         /** GetStatusResponse state. */
-        public state?: (peer.GetStatusResponse.IState|null);
+        public state?: (getStatus.GetStatusResponse.IState|null);
 
         /** GetStatusResponse config. */
-        public config?: (peer.GetStatusResponse.IConfig|null);
+        public config?: (getStatus.GetStatusResponse.IConfig|null);
 
         /**
          * Creates a new GetStatusResponse instance using the specified properties.
          * @param [properties] Properties to set
          * @returns GetStatusResponse instance
          */
-        public static create(properties?: peer.IGetStatusResponse): peer.GetStatusResponse;
+        public static create(properties?: getStatus.IGetStatusResponse): getStatus.GetStatusResponse;
 
         /**
-         * Encodes the specified GetStatusResponse message. Does not implicitly {@link peer.GetStatusResponse.verify|verify} messages.
+         * Encodes the specified GetStatusResponse message. Does not implicitly {@link getStatus.GetStatusResponse.verify|verify} messages.
          * @param message GetStatusResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: peer.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: getStatus.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GetStatusResponse message, length delimited. Does not implicitly {@link peer.GetStatusResponse.verify|verify} messages.
+         * Encodes the specified GetStatusResponse message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.verify|verify} messages.
          * @param message GetStatusResponse message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: peer.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: getStatus.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
          * Decodes a GetStatusResponse message from the specified reader or buffer.
@@ -1283,7 +1099,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusResponse;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse;
 
         /**
          * Decodes a GetStatusResponse message from the specified reader or buffer, length delimited.
@@ -1292,7 +1108,7 @@ export namespace peer {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusResponse;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse;
 
         /**
          * Verifies a GetStatusResponse message.
@@ -1306,7 +1122,7 @@ export namespace peer {
          * @param object Plain object
          * @returns GetStatusResponse
          */
-        public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse;
+        public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse;
 
         /**
          * Creates a plain object from a GetStatusResponse message. Also converts values to other types if specified.
@@ -1314,7 +1130,7 @@ export namespace peer {
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: peer.GetStatusResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: getStatus.GetStatusResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
          * Converts this GetStatusResponse to JSON.
@@ -1338,7 +1154,7 @@ export namespace peer {
             currentSlot?: (number|null);
 
             /** State header */
-            header?: (peer.GetStatusResponse.State.IBlockHeader|null);
+            header?: (getStatus.GetStatusResponse.State.IBlockHeader|null);
         }
 
         /** Represents a State. */
@@ -1348,7 +1164,7 @@ export namespace peer {
              * Constructs a new State.
              * @param [properties] Properties to set
              */
-            constructor(properties?: peer.GetStatusResponse.IState);
+            constructor(properties?: getStatus.GetStatusResponse.IState);
 
             /** State height. */
             public height: number;
@@ -1360,30 +1176,30 @@ export namespace peer {
             public currentSlot: number;
 
             /** State header. */
-            public header?: (peer.GetStatusResponse.State.IBlockHeader|null);
+            public header?: (getStatus.GetStatusResponse.State.IBlockHeader|null);
 
             /**
              * Creates a new State instance using the specified properties.
              * @param [properties] Properties to set
              * @returns State instance
              */
-            public static create(properties?: peer.GetStatusResponse.IState): peer.GetStatusResponse.State;
+            public static create(properties?: getStatus.GetStatusResponse.IState): getStatus.GetStatusResponse.State;
 
             /**
-             * Encodes the specified State message. Does not implicitly {@link peer.GetStatusResponse.State.verify|verify} messages.
+             * Encodes the specified State message. Does not implicitly {@link getStatus.GetStatusResponse.State.verify|verify} messages.
              * @param message State message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: peer.GetStatusResponse.IState, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: getStatus.GetStatusResponse.IState, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Encodes the specified State message, length delimited. Does not implicitly {@link peer.GetStatusResponse.State.verify|verify} messages.
+             * Encodes the specified State message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.State.verify|verify} messages.
              * @param message State message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encodeDelimited(message: peer.GetStatusResponse.IState, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encodeDelimited(message: getStatus.GetStatusResponse.IState, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Decodes a State message from the specified reader or buffer.
@@ -1393,7 +1209,7 @@ export namespace peer {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusResponse.State;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.State;
 
             /**
              * Decodes a State message from the specified reader or buffer, length delimited.
@@ -1402,7 +1218,7 @@ export namespace peer {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusResponse.State;
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.State;
 
             /**
              * Verifies a State message.
@@ -1416,7 +1232,7 @@ export namespace peer {
              * @param object Plain object
              * @returns State
              */
-            public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.State;
+            public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.State;
 
             /**
              * Creates a plain object from a State message. Also converts values to other types if specified.
@@ -1424,7 +1240,7 @@ export namespace peer {
              * @param [options] Conversion options
              * @returns Plain object
              */
-            public static toObject(message: peer.GetStatusResponse.State, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            public static toObject(message: getStatus.GetStatusResponse.State, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
             /**
              * Converts this State to JSON.
@@ -1485,7 +1301,7 @@ export namespace peer {
                  * Constructs a new BlockHeader.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: peer.GetStatusResponse.State.IBlockHeader);
+                constructor(properties?: getStatus.GetStatusResponse.State.IBlockHeader);
 
                 /** BlockHeader id. */
                 public id: string;
@@ -1531,23 +1347,23 @@ export namespace peer {
                  * @param [properties] Properties to set
                  * @returns BlockHeader instance
                  */
-                public static create(properties?: peer.GetStatusResponse.State.IBlockHeader): peer.GetStatusResponse.State.BlockHeader;
+                public static create(properties?: getStatus.GetStatusResponse.State.IBlockHeader): getStatus.GetStatusResponse.State.BlockHeader;
 
                 /**
-                 * Encodes the specified BlockHeader message. Does not implicitly {@link peer.GetStatusResponse.State.BlockHeader.verify|verify} messages.
+                 * Encodes the specified BlockHeader message. Does not implicitly {@link getStatus.GetStatusResponse.State.BlockHeader.verify|verify} messages.
                  * @param message BlockHeader message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: peer.GetStatusResponse.State.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: getStatus.GetStatusResponse.State.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link peer.GetStatusResponse.State.BlockHeader.verify|verify} messages.
+                 * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.State.BlockHeader.verify|verify} messages.
                  * @param message BlockHeader message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: peer.GetStatusResponse.State.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: getStatus.GetStatusResponse.State.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a BlockHeader message from the specified reader or buffer.
@@ -1557,7 +1373,7 @@ export namespace peer {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusResponse.State.BlockHeader;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.State.BlockHeader;
 
                 /**
                  * Decodes a BlockHeader message from the specified reader or buffer, length delimited.
@@ -1566,7 +1382,7 @@ export namespace peer {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusResponse.State.BlockHeader;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.State.BlockHeader;
 
                 /**
                  * Verifies a BlockHeader message.
@@ -1580,7 +1396,7 @@ export namespace peer {
                  * @param object Plain object
                  * @returns BlockHeader
                  */
-                public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.State.BlockHeader;
+                public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.State.BlockHeader;
 
                 /**
                  * Creates a plain object from a BlockHeader message. Also converts values to other types if specified.
@@ -1588,7 +1404,7 @@ export namespace peer {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: peer.GetStatusResponse.State.BlockHeader, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: getStatus.GetStatusResponse.State.BlockHeader, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this BlockHeader to JSON.
@@ -1605,10 +1421,10 @@ export namespace peer {
             version?: (string|null);
 
             /** Config network */
-            network?: (peer.GetStatusResponse.Config.INetwork|null);
+            network?: (getStatus.GetStatusResponse.Config.INetwork|null);
 
             /** Config plugins */
-            plugins?: ({ [k: string]: peer.GetStatusResponse.Config.IPlugin }|null);
+            plugins?: ({ [k: string]: getStatus.GetStatusResponse.Config.IPlugin }|null);
         }
 
         /** Represents a Config. */
@@ -1618,39 +1434,39 @@ export namespace peer {
              * Constructs a new Config.
              * @param [properties] Properties to set
              */
-            constructor(properties?: peer.GetStatusResponse.IConfig);
+            constructor(properties?: getStatus.GetStatusResponse.IConfig);
 
             /** Config version. */
             public version: string;
 
             /** Config network. */
-            public network?: (peer.GetStatusResponse.Config.INetwork|null);
+            public network?: (getStatus.GetStatusResponse.Config.INetwork|null);
 
             /** Config plugins. */
-            public plugins: { [k: string]: peer.GetStatusResponse.Config.IPlugin };
+            public plugins: { [k: string]: getStatus.GetStatusResponse.Config.IPlugin };
 
             /**
              * Creates a new Config instance using the specified properties.
              * @param [properties] Properties to set
              * @returns Config instance
              */
-            public static create(properties?: peer.GetStatusResponse.IConfig): peer.GetStatusResponse.Config;
+            public static create(properties?: getStatus.GetStatusResponse.IConfig): getStatus.GetStatusResponse.Config;
 
             /**
-             * Encodes the specified Config message. Does not implicitly {@link peer.GetStatusResponse.Config.verify|verify} messages.
+             * Encodes the specified Config message. Does not implicitly {@link getStatus.GetStatusResponse.Config.verify|verify} messages.
              * @param message Config message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: peer.GetStatusResponse.IConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: getStatus.GetStatusResponse.IConfig, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Encodes the specified Config message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.verify|verify} messages.
+             * Encodes the specified Config message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.verify|verify} messages.
              * @param message Config message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encodeDelimited(message: peer.GetStatusResponse.IConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encodeDelimited(message: getStatus.GetStatusResponse.IConfig, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
              * Decodes a Config message from the specified reader or buffer.
@@ -1660,7 +1476,7 @@ export namespace peer {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusResponse.Config;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config;
 
             /**
              * Decodes a Config message from the specified reader or buffer, length delimited.
@@ -1669,7 +1485,7 @@ export namespace peer {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusResponse.Config;
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config;
 
             /**
              * Verifies a Config message.
@@ -1683,7 +1499,7 @@ export namespace peer {
              * @param object Plain object
              * @returns Config
              */
-            public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config;
+            public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config;
 
             /**
              * Creates a plain object from a Config message. Also converts values to other types if specified.
@@ -1691,7 +1507,7 @@ export namespace peer {
              * @param [options] Conversion options
              * @returns Plain object
              */
-            public static toObject(message: peer.GetStatusResponse.Config, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            public static toObject(message: getStatus.GetStatusResponse.Config, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
             /**
              * Converts this Config to JSON.
@@ -1715,7 +1531,7 @@ export namespace peer {
                 explorer?: (string|null);
 
                 /** Network token */
-                token?: (peer.GetStatusResponse.Config.Network.IToken|null);
+                token?: (getStatus.GetStatusResponse.Config.Network.IToken|null);
 
                 /** Network version */
                 version?: (number|null);
@@ -1728,7 +1544,7 @@ export namespace peer {
                  * Constructs a new Network.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: peer.GetStatusResponse.Config.INetwork);
+                constructor(properties?: getStatus.GetStatusResponse.Config.INetwork);
 
                 /** Network name. */
                 public name: string;
@@ -1740,7 +1556,7 @@ export namespace peer {
                 public explorer: string;
 
                 /** Network token. */
-                public token?: (peer.GetStatusResponse.Config.Network.IToken|null);
+                public token?: (getStatus.GetStatusResponse.Config.Network.IToken|null);
 
                 /** Network version. */
                 public version: number;
@@ -1750,23 +1566,23 @@ export namespace peer {
                  * @param [properties] Properties to set
                  * @returns Network instance
                  */
-                public static create(properties?: peer.GetStatusResponse.Config.INetwork): peer.GetStatusResponse.Config.Network;
+                public static create(properties?: getStatus.GetStatusResponse.Config.INetwork): getStatus.GetStatusResponse.Config.Network;
 
                 /**
-                 * Encodes the specified Network message. Does not implicitly {@link peer.GetStatusResponse.Config.Network.verify|verify} messages.
+                 * Encodes the specified Network message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.verify|verify} messages.
                  * @param message Network message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: peer.GetStatusResponse.Config.INetwork, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: getStatus.GetStatusResponse.Config.INetwork, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified Network message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.Network.verify|verify} messages.
+                 * Encodes the specified Network message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.verify|verify} messages.
                  * @param message Network message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: peer.GetStatusResponse.Config.INetwork, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: getStatus.GetStatusResponse.Config.INetwork, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a Network message from the specified reader or buffer.
@@ -1776,7 +1592,7 @@ export namespace peer {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusResponse.Config.Network;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Network;
 
                 /**
                  * Decodes a Network message from the specified reader or buffer, length delimited.
@@ -1785,7 +1601,7 @@ export namespace peer {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusResponse.Config.Network;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Network;
 
                 /**
                  * Verifies a Network message.
@@ -1799,7 +1615,7 @@ export namespace peer {
                  * @param object Plain object
                  * @returns Network
                  */
-                public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config.Network;
+                public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Network;
 
                 /**
                  * Creates a plain object from a Network message. Also converts values to other types if specified.
@@ -1807,7 +1623,7 @@ export namespace peer {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: peer.GetStatusResponse.Config.Network, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: getStatus.GetStatusResponse.Config.Network, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this Network to JSON.
@@ -1835,7 +1651,7 @@ export namespace peer {
                      * Constructs a new Token.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: peer.GetStatusResponse.Config.Network.IToken);
+                    constructor(properties?: getStatus.GetStatusResponse.Config.Network.IToken);
 
                     /** Token name. */
                     public name: string;
@@ -1848,23 +1664,23 @@ export namespace peer {
                      * @param [properties] Properties to set
                      * @returns Token instance
                      */
-                    public static create(properties?: peer.GetStatusResponse.Config.Network.IToken): peer.GetStatusResponse.Config.Network.Token;
+                    public static create(properties?: getStatus.GetStatusResponse.Config.Network.IToken): getStatus.GetStatusResponse.Config.Network.Token;
 
                     /**
-                     * Encodes the specified Token message. Does not implicitly {@link peer.GetStatusResponse.Config.Network.Token.verify|verify} messages.
+                     * Encodes the specified Token message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.Token.verify|verify} messages.
                      * @param message Token message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: peer.GetStatusResponse.Config.Network.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: getStatus.GetStatusResponse.Config.Network.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified Token message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.Network.Token.verify|verify} messages.
+                     * Encodes the specified Token message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Network.Token.verify|verify} messages.
                      * @param message Token message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: peer.GetStatusResponse.Config.Network.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: getStatus.GetStatusResponse.Config.Network.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a Token message from the specified reader or buffer.
@@ -1874,7 +1690,7 @@ export namespace peer {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusResponse.Config.Network.Token;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Network.Token;
 
                     /**
                      * Decodes a Token message from the specified reader or buffer, length delimited.
@@ -1883,7 +1699,7 @@ export namespace peer {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusResponse.Config.Network.Token;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Network.Token;
 
                     /**
                      * Verifies a Token message.
@@ -1897,7 +1713,7 @@ export namespace peer {
                      * @param object Plain object
                      * @returns Token
                      */
-                    public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config.Network.Token;
+                    public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Network.Token;
 
                     /**
                      * Creates a plain object from a Token message. Also converts values to other types if specified.
@@ -1905,7 +1721,7 @@ export namespace peer {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: peer.GetStatusResponse.Config.Network.Token, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: getStatus.GetStatusResponse.Config.Network.Token, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this Token to JSON.
@@ -1935,7 +1751,7 @@ export namespace peer {
                  * Constructs a new Plugin.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: peer.GetStatusResponse.Config.IPlugin);
+                constructor(properties?: getStatus.GetStatusResponse.Config.IPlugin);
 
                 /** Plugin port. */
                 public port: number;
@@ -1951,23 +1767,23 @@ export namespace peer {
                  * @param [properties] Properties to set
                  * @returns Plugin instance
                  */
-                public static create(properties?: peer.GetStatusResponse.Config.IPlugin): peer.GetStatusResponse.Config.Plugin;
+                public static create(properties?: getStatus.GetStatusResponse.Config.IPlugin): getStatus.GetStatusResponse.Config.Plugin;
 
                 /**
-                 * Encodes the specified Plugin message. Does not implicitly {@link peer.GetStatusResponse.Config.Plugin.verify|verify} messages.
+                 * Encodes the specified Plugin message. Does not implicitly {@link getStatus.GetStatusResponse.Config.Plugin.verify|verify} messages.
                  * @param message Plugin message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: peer.GetStatusResponse.Config.IPlugin, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: getStatus.GetStatusResponse.Config.IPlugin, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified Plugin message, length delimited. Does not implicitly {@link peer.GetStatusResponse.Config.Plugin.verify|verify} messages.
+                 * Encodes the specified Plugin message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.Config.Plugin.verify|verify} messages.
                  * @param message Plugin message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: peer.GetStatusResponse.Config.IPlugin, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: getStatus.GetStatusResponse.Config.IPlugin, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a Plugin message from the specified reader or buffer.
@@ -1977,7 +1793,7 @@ export namespace peer {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): peer.GetStatusResponse.Config.Plugin;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.Config.Plugin;
 
                 /**
                  * Decodes a Plugin message from the specified reader or buffer, length delimited.
@@ -1986,7 +1802,7 @@ export namespace peer {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): peer.GetStatusResponse.Config.Plugin;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.Config.Plugin;
 
                 /**
                  * Verifies a Plugin message.
@@ -2000,7 +1816,7 @@ export namespace peer {
                  * @param object Plain object
                  * @returns Plugin
                  */
-                public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config.Plugin;
+                public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.Config.Plugin;
 
                 /**
                  * Creates a plain object from a Plugin message. Also converts values to other types if specified.
@@ -2008,7 +1824,7 @@ export namespace peer {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: peer.GetStatusResponse.Config.Plugin, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: getStatus.GetStatusResponse.Config.Plugin, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this Plugin to JSON.
@@ -2017,6 +1833,392 @@ export namespace peer {
                 public toJSON(): { [k: string]: any };
             }
         }
+    }
+}
+
+/** Namespace postBlock. */
+export namespace postBlock {
+
+    /** Properties of a PostBlockRequest. */
+    interface IPostBlockRequest {
+
+        /** PostBlockRequest block */
+        block?: (Uint8Array|null);
+
+        /** PostBlockRequest headers */
+        headers?: (shared.IHeaders|null);
+    }
+
+    /** Represents a PostBlockRequest. */
+    class PostBlockRequest implements IPostBlockRequest {
+
+        /**
+         * Constructs a new PostBlockRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postBlock.IPostBlockRequest);
+
+        /** PostBlockRequest block. */
+        public block: Uint8Array;
+
+        /** PostBlockRequest headers. */
+        public headers?: (shared.IHeaders|null);
+
+        /**
+         * Creates a new PostBlockRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostBlockRequest instance
+         */
+        public static create(properties?: postBlock.IPostBlockRequest): postBlock.PostBlockRequest;
+
+        /**
+         * Encodes the specified PostBlockRequest message. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
+         * @param message PostBlockRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postBlock.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostBlockRequest message, length delimited. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
+         * @param message PostBlockRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postBlock.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostBlockRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostBlockRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postBlock.PostBlockRequest;
+
+        /**
+         * Decodes a PostBlockRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostBlockRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postBlock.PostBlockRequest;
+
+        /**
+         * Verifies a PostBlockRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostBlockRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostBlockRequest
+         */
+        public static fromObject(object: { [k: string]: any }): postBlock.PostBlockRequest;
+
+        /**
+         * Creates a plain object from a PostBlockRequest message. Also converts values to other types if specified.
+         * @param message PostBlockRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postBlock.PostBlockRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostBlockRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a PostBlockResponse. */
+    interface IPostBlockResponse {
+
+        /** PostBlockResponse status */
+        status?: (boolean|null);
+
+        /** PostBlockResponse height */
+        height?: (number|null);
+    }
+
+    /** Represents a PostBlockResponse. */
+    class PostBlockResponse implements IPostBlockResponse {
+
+        /**
+         * Constructs a new PostBlockResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postBlock.IPostBlockResponse);
+
+        /** PostBlockResponse status. */
+        public status: boolean;
+
+        /** PostBlockResponse height. */
+        public height: number;
+
+        /**
+         * Creates a new PostBlockResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostBlockResponse instance
+         */
+        public static create(properties?: postBlock.IPostBlockResponse): postBlock.PostBlockResponse;
+
+        /**
+         * Encodes the specified PostBlockResponse message. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
+         * @param message PostBlockResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postBlock.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostBlockResponse message, length delimited. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
+         * @param message PostBlockResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postBlock.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostBlockResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostBlockResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postBlock.PostBlockResponse;
+
+        /**
+         * Decodes a PostBlockResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostBlockResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postBlock.PostBlockResponse;
+
+        /**
+         * Verifies a PostBlockResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostBlockResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostBlockResponse
+         */
+        public static fromObject(object: { [k: string]: any }): postBlock.PostBlockResponse;
+
+        /**
+         * Creates a plain object from a PostBlockResponse message. Also converts values to other types if specified.
+         * @param message PostBlockResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postBlock.PostBlockResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostBlockResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+}
+
+/** Namespace postTransactions. */
+export namespace postTransactions {
+
+    /** Properties of a PostTransactionsRequest. */
+    interface IPostTransactionsRequest {
+
+        /** PostTransactionsRequest transactions */
+        transactions?: (Uint8Array|null);
+
+        /** PostTransactionsRequest headers */
+        headers?: (shared.IHeaders|null);
+    }
+
+    /** Represents a PostTransactionsRequest. */
+    class PostTransactionsRequest implements IPostTransactionsRequest {
+
+        /**
+         * Constructs a new PostTransactionsRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postTransactions.IPostTransactionsRequest);
+
+        /** PostTransactionsRequest transactions. */
+        public transactions: Uint8Array;
+
+        /** PostTransactionsRequest headers. */
+        public headers?: (shared.IHeaders|null);
+
+        /**
+         * Creates a new PostTransactionsRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostTransactionsRequest instance
+         */
+        public static create(properties?: postTransactions.IPostTransactionsRequest): postTransactions.PostTransactionsRequest;
+
+        /**
+         * Encodes the specified PostTransactionsRequest message. Does not implicitly {@link postTransactions.PostTransactionsRequest.verify|verify} messages.
+         * @param message PostTransactionsRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postTransactions.IPostTransactionsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostTransactionsRequest message, length delimited. Does not implicitly {@link postTransactions.PostTransactionsRequest.verify|verify} messages.
+         * @param message PostTransactionsRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postTransactions.IPostTransactionsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostTransactionsRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostTransactionsRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postTransactions.PostTransactionsRequest;
+
+        /**
+         * Decodes a PostTransactionsRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostTransactionsRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postTransactions.PostTransactionsRequest;
+
+        /**
+         * Verifies a PostTransactionsRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostTransactionsRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostTransactionsRequest
+         */
+        public static fromObject(object: { [k: string]: any }): postTransactions.PostTransactionsRequest;
+
+        /**
+         * Creates a plain object from a PostTransactionsRequest message. Also converts values to other types if specified.
+         * @param message PostTransactionsRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postTransactions.PostTransactionsRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostTransactionsRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a PostTransactionsResponse. */
+    interface IPostTransactionsResponse {
+
+        /** PostTransactionsResponse accept */
+        accept?: (string[]|null);
+    }
+
+    /** Represents a PostTransactionsResponse. */
+    class PostTransactionsResponse implements IPostTransactionsResponse {
+
+        /**
+         * Constructs a new PostTransactionsResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postTransactions.IPostTransactionsResponse);
+
+        /** PostTransactionsResponse accept. */
+        public accept: string[];
+
+        /**
+         * Creates a new PostTransactionsResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostTransactionsResponse instance
+         */
+        public static create(properties?: postTransactions.IPostTransactionsResponse): postTransactions.PostTransactionsResponse;
+
+        /**
+         * Encodes the specified PostTransactionsResponse message. Does not implicitly {@link postTransactions.PostTransactionsResponse.verify|verify} messages.
+         * @param message PostTransactionsResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postTransactions.IPostTransactionsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostTransactionsResponse message, length delimited. Does not implicitly {@link postTransactions.PostTransactionsResponse.verify|verify} messages.
+         * @param message PostTransactionsResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postTransactions.IPostTransactionsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostTransactionsResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostTransactionsResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postTransactions.PostTransactionsResponse;
+
+        /**
+         * Decodes a PostTransactionsResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostTransactionsResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postTransactions.PostTransactionsResponse;
+
+        /**
+         * Verifies a PostTransactionsResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostTransactionsResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostTransactionsResponse
+         */
+        public static fromObject(object: { [k: string]: any }): postTransactions.PostTransactionsResponse;
+
+        /**
+         * Creates a plain object from a PostTransactionsResponse message. Also converts values to other types if specified.
+         * @param message PostTransactionsResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postTransactions.PostTransactionsResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostTransactionsResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
     }
 }
 
@@ -2108,196 +2310,6 @@ export namespace shared {
 
         /**
          * Converts this Headers to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-}
-
-/** Namespace transactions. */
-export namespace transactions {
-
-    /** Properties of a PostTransactionsRequest. */
-    interface IPostTransactionsRequest {
-
-        /** PostTransactionsRequest transactions */
-        transactions?: (Uint8Array|null);
-
-        /** PostTransactionsRequest headers */
-        headers?: (shared.IHeaders|null);
-    }
-
-    /** Represents a PostTransactionsRequest. */
-    class PostTransactionsRequest implements IPostTransactionsRequest {
-
-        /**
-         * Constructs a new PostTransactionsRequest.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: transactions.IPostTransactionsRequest);
-
-        /** PostTransactionsRequest transactions. */
-        public transactions: Uint8Array;
-
-        /** PostTransactionsRequest headers. */
-        public headers?: (shared.IHeaders|null);
-
-        /**
-         * Creates a new PostTransactionsRequest instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostTransactionsRequest instance
-         */
-        public static create(properties?: transactions.IPostTransactionsRequest): transactions.PostTransactionsRequest;
-
-        /**
-         * Encodes the specified PostTransactionsRequest message. Does not implicitly {@link transactions.PostTransactionsRequest.verify|verify} messages.
-         * @param message PostTransactionsRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: transactions.IPostTransactionsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostTransactionsRequest message, length delimited. Does not implicitly {@link transactions.PostTransactionsRequest.verify|verify} messages.
-         * @param message PostTransactionsRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: transactions.IPostTransactionsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostTransactionsRequest message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostTransactionsRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): transactions.PostTransactionsRequest;
-
-        /**
-         * Decodes a PostTransactionsRequest message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostTransactionsRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): transactions.PostTransactionsRequest;
-
-        /**
-         * Verifies a PostTransactionsRequest message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostTransactionsRequest message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostTransactionsRequest
-         */
-        public static fromObject(object: { [k: string]: any }): transactions.PostTransactionsRequest;
-
-        /**
-         * Creates a plain object from a PostTransactionsRequest message. Also converts values to other types if specified.
-         * @param message PostTransactionsRequest
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: transactions.PostTransactionsRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostTransactionsRequest to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    /** Properties of a PostTransactionsResponse. */
-    interface IPostTransactionsResponse {
-
-        /** PostTransactionsResponse accept */
-        accept?: (string[]|null);
-    }
-
-    /** Represents a PostTransactionsResponse. */
-    class PostTransactionsResponse implements IPostTransactionsResponse {
-
-        /**
-         * Constructs a new PostTransactionsResponse.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: transactions.IPostTransactionsResponse);
-
-        /** PostTransactionsResponse accept. */
-        public accept: string[];
-
-        /**
-         * Creates a new PostTransactionsResponse instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostTransactionsResponse instance
-         */
-        public static create(properties?: transactions.IPostTransactionsResponse): transactions.PostTransactionsResponse;
-
-        /**
-         * Encodes the specified PostTransactionsResponse message. Does not implicitly {@link transactions.PostTransactionsResponse.verify|verify} messages.
-         * @param message PostTransactionsResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: transactions.IPostTransactionsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostTransactionsResponse message, length delimited. Does not implicitly {@link transactions.PostTransactionsResponse.verify|verify} messages.
-         * @param message PostTransactionsResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: transactions.IPostTransactionsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostTransactionsResponse message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostTransactionsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): transactions.PostTransactionsResponse;
-
-        /**
-         * Decodes a PostTransactionsResponse message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostTransactionsResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): transactions.PostTransactionsResponse;
-
-        /**
-         * Verifies a PostTransactionsResponse message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostTransactionsResponse message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostTransactionsResponse
-         */
-        public static fromObject(object: { [k: string]: any }): transactions.PostTransactionsResponse;
-
-        /**
-         * Creates a plain object from a PostTransactionsResponse message. Also converts values to other types if specified.
-         * @param message PostTransactionsResponse
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: transactions.PostTransactionsResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostTransactionsResponse to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };

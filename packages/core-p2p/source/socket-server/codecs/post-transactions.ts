@@ -1,4 +1,4 @@
-import { transactions } from "./proto/protos";
+import { postTransactions as proto } from "./proto/protos";
 
 // actual max transactions is enforced by schema but we set a hard limit for deserializing (way higher than in schema)
 const hardLimitNumberOfTransactions = 1000;
@@ -6,7 +6,7 @@ const hardLimitNumberOfTransactions = 1000;
 export const postTransactions = {
 	request: {
 		deserialize: (payload: Buffer) => {
-			const decoded = transactions.PostTransactionsRequest.decode(payload);
+			const decoded = proto.PostTransactionsRequest.decode(payload);
 			const txsBuffer = Buffer.from(decoded.transactions);
 			const txs: Buffer[] = [];
 			for (let offset = 0; offset < txsBuffer.byteLength - 4; ) {
@@ -35,12 +35,12 @@ export const postTransactions = {
 
 			object = { ...object, transactions: result };
 
-			return Buffer.from(transactions.PostTransactionsRequest.encode(object).finish());
+			return Buffer.from(proto.PostTransactionsRequest.encode(object).finish());
 		},
 	},
 	response: {
-		deserialize: (payload: Buffer) => transactions.PostTransactionsResponse.decode(payload).accept,
+		deserialize: (payload: Buffer) => proto.PostTransactionsResponse.decode(payload).accept,
 		serialize: (accept: string[]): Buffer =>
-			Buffer.from(transactions.PostTransactionsResponse.encode({ accept }).finish()),
+			Buffer.from(proto.PostTransactionsResponse.encode({ accept }).finish()),
 	},
 };

@@ -1,14 +1,14 @@
-import { peer } from "./proto/protos";
+import { getCommonBlocks as proto } from "./proto/protos";
 
 export const getCommonBlocks = {
 	request: {
-		deserialize: (payload: Buffer): peer.IGetCommonBlocksRequest => peer.GetCommonBlocksRequest.decode(payload),
-		serialize: (object: peer.IGetCommonBlocksRequest): Buffer =>
-			Buffer.from(peer.GetCommonBlocksRequest.encode(object).finish()),
+		deserialize: (payload: Buffer): proto.IGetCommonBlocksRequest => proto.GetCommonBlocksRequest.decode(payload),
+		serialize: (object: proto.IGetCommonBlocksRequest): Buffer =>
+			Buffer.from(proto.GetCommonBlocksRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): peer.IGetCommonBlocksResponse => peer.GetCommonBlocksResponse.decode(payload),
-		serialize: (object: peer.IGetCommonBlocksResponse): Buffer =>
-			Buffer.from(peer.GetCommonBlocksResponse.encode(object).finish()),
+		deserialize: (payload: Buffer): proto.IGetCommonBlocksResponse => proto.GetCommonBlocksResponse.decode(payload),
+		serialize: (object: proto.IGetCommonBlocksResponse): Buffer =>
+			Buffer.from(proto.GetCommonBlocksResponse.encode(object).finish()),
 	},
 };

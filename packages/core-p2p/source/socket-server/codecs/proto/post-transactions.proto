@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package transactions;
+package postTransactions;
 
 message PostTransactionsRequest {
     bytes transactions = 1;

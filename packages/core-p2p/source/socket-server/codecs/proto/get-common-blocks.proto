@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package getCommonBlocks;
+
+message GetCommonBlocksRequest {
+    repeated string ids = 1;
+    shared.Headers headers = 2;
+}
+
+message GetCommonBlocksResponse {
+    message Common {
+        uint32 height = 1;
+        string id = 2;
+    }
+
+    Common common = 1;
+}
