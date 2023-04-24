@@ -12,10 +12,10 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 		return false;
 	}
 
-	const configuration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
+	const cryptoConfiguration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
 
 	let minimumVersions: string[];
-	const milestones: Record<string, any> = configuration.getMilestone();
+	const milestones: Record<string, any> = cryptoConfiguration.getMilestone();
 
 	const { p2p } = milestones;
 
@@ -30,7 +30,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 		minimumVersions = configuration.getOptional<string[]>("minimumVersions", []);
 	}
 
-	const includePrerelease: boolean = configuration.get("network.name") !== "mainnet";
+	const includePrerelease: boolean = cryptoConfiguration.get("network.name") !== "mainnet";
 	return minimumVersions.some((minimumVersion: string) =>
 		// @ts-ignore - check why the peer.version errors even though we exit early
 		semver.satisfies(peer.version, minimumVersion, { includePrerelease }),
