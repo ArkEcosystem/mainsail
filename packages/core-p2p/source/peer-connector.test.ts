@@ -7,33 +7,32 @@ import { PeerConnector } from "./peer-connector";
 
 let onDelay = (timeout: number) => {};
 
-class ClientMock {
-	static onConstructor = (...arguments_) => {};
+describe<{
+	sandbox: Sandbox;
+	peerConnector: PeerConnector;
+}>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
+	class ClientMock {
+		static onConstructor = (...arguments_) => {};
 
-	constructor(...arguments_) {
-		ClientMock.onConstructor(...arguments_);
+		constructor(...arguments_) {
+			ClientMock.onConstructor(...arguments_);
+		}
+		async connect() {}
+		async request() {}
+		async terminate() {}
 	}
-	async connect() {}
-	async request() {}
-	async terminate() {}
-}
 
-const { PeerConnector: PeerConnectorProxy } = rewiremock.proxy<{ PeerConnector: Contracts.Types.Class<PeerConnector> }>(
-	"./peer-connector",
-	{
+	const { PeerConnector: PeerConnectorProxy } = rewiremock.proxy<{
+		PeerConnector: Contracts.Types.Class<PeerConnector>;
+	}>("./peer-connector", {
 		"./hapi-nes": {
 			Client: ClientMock,
 		},
 		delay: async (timeout: number) => {
 			onDelay(timeout);
 		},
-	},
-);
+	});
 
-describe<{
-	sandbox: Sandbox;
-	peerConnector: PeerConnector;
-}>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, warning: () => {} };
 	beforeEach((context) => {
 		onDelay = () => {};

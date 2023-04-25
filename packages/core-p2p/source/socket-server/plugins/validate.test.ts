@@ -6,20 +6,20 @@ import rewiremock from "rewiremock";
 
 import { ValidatePlugin } from "./validate";
 
-const utils = {
-	isValidVersion: () => true,
-};
-
-const { ValidatePlugin: ValidatePluginProxy } = rewiremock.proxy<{
-	ValidatePlugin: Contracts.Types.Class<ValidatePlugin>;
-}>("./validate", {
-	"../../utils": utils,
-});
-
 describe<{
 	sandbox: Sandbox;
 	validatePlugin: ValidatePlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
+	const utils = {
+		isValidVersion: () => true,
+	};
+
+	const { ValidatePlugin: ValidatePluginProxy } = rewiremock.proxy<{
+		ValidatePlugin: Contracts.Types.Class<ValidatePlugin>;
+	}>("./validate", {
+		"../../utils": utils,
+	});
+
 	const logger = { debug: () => {}, warning: () => {} };
 
 	const responsePayload = { status: "ok" };

@@ -4,18 +4,18 @@ import rewiremock from "rewiremock";
 
 import { GetStatusController } from "./get-status";
 
-const { GetStatusController: GetStatusControllerProxy } = rewiremock.proxy<{
-	GetStatusController: Contracts.Types.Class<GetStatusController>;
-}>("./get-status", {
-	"../utils/get-peer-config": {
-		getPeerConfig: () => ({}),
-	},
-});
-
 describe<{
 	sandbox: Sandbox;
 	controller: GetStatusController;
 }>("GetStatusController", ({ it, assert, beforeEach, stub }) => {
+	const { GetStatusController: GetStatusControllerProxy } = rewiremock.proxy<{
+		GetStatusController: Contracts.Types.Class<GetStatusController>;
+	}>("./get-status", {
+		"../utils/get-peer-config": {
+			getPeerConfig: () => ({}),
+		},
+	});
+
 	const blockchain = { getLastBlock: () => {} };
 	const slots = { getSlotInfo: () => {} };
 

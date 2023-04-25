@@ -8,27 +8,27 @@ import { Routes } from "./enums";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 
-const codec = { request: { serialize: (item) => item }, response: { deserialize: (item) => item } };
-
-const { PeerCommunicator: PeerCommunicatorProxy } = rewiremock.proxy<{
-	PeerCommunicator: Contracts.Types.Class<PeerCommunicator>;
-}>("./peer-communicator", {
-	"./socket-server/codecs": {
-		Codecs: {
-			[Routes.GetBlocks]: codec,
-			[Routes.GetCommonBlocks]: codec,
-			[Routes.GetPeers]: codec,
-			[Routes.GetStatus]: codec,
-			[Routes.PostBlock]: codec,
-			[Routes.PostTransactions]: codec,
-		},
-	},
-});
-
 describe<{
 	sandbox: Sandbox;
 	peerCommunicator: PeerCommunicator;
 }>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, spyFn, match, each }) => {
+	const codec = { request: { serialize: (item) => item }, response: { deserialize: (item) => item } };
+
+	const { PeerCommunicator: PeerCommunicatorProxy } = rewiremock.proxy<{
+		PeerCommunicator: Contracts.Types.Class<PeerCommunicator>;
+	}>("./peer-communicator", {
+		"./socket-server/codecs": {
+			Codecs: {
+				[Routes.GetBlocks]: codec,
+				[Routes.GetCommonBlocks]: codec,
+				[Routes.GetPeers]: codec,
+				[Routes.GetStatus]: codec,
+				[Routes.PostBlock]: codec,
+				[Routes.PostTransactions]: codec,
+			},
+		},
+	});
+
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, warning: () => {} };
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 	const connector = { connect: () => {}, emit: () => {}, forgetError: () => {}, setError: () => {} };
