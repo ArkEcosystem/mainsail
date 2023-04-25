@@ -9,7 +9,7 @@ jobs:
               with:
                   ref: ${{ github.head_ref }}
 
-			- uses: actions/setup-node@v3
+            - uses: actions/setup-node@v3
               with:
                   cache: pnpm
                   node-version: ${{ matrix.node-version }}
