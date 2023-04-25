@@ -7,7 +7,7 @@ import { GetPeersController } from "./get-peers";
 describe<{
 	sandbox: Sandbox;
 	controller: GetPeersController;
-}>("GetBlocksController", ({ it, assert, beforeEach, stub }) => {
+}>("GetPeersController", ({ it, assert, beforeEach, stub }) => {
 	const peerRepository = { getPeers: () => {} };
 
 	beforeEach((context) => {

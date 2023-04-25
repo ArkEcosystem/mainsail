@@ -6,7 +6,7 @@ import { PeerRepository } from "./peer-repository";
 describe<{
 	sandbox: Sandbox;
 	peerRepostiory: PeerRepository;
-}>("Peer", ({ it, assert, beforeEach }) => {
+}>("PeerRepository", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 

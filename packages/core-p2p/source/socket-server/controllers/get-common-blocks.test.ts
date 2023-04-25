@@ -6,7 +6,7 @@ import { GetCommonBlocksController } from "./get-common-blocks";
 describe<{
 	sandbox: Sandbox;
 	controller: GetCommonBlocksController;
-}>("GetBlocksController", ({ it, assert, beforeEach, stub }) => {
+}>("GetCommonBlocksController", ({ it, assert, beforeEach, stub }) => {
 	const database = { getBlock: () => {} };
 	const blockchain = {
 		getLastBlock: () => {},

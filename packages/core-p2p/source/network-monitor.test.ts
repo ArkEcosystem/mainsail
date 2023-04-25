@@ -16,7 +16,7 @@ describe<{
 	sandbox: Sandbox;
 	networkMonitor: NetworkMonitor;
 	configuration: Providers.PluginConfiguration;
-}>("NetworkState", ({ it, assert, beforeEach, stub, spy, match, each }) => {
+}>("NetworkMonitor", ({ it, assert, beforeEach, stub, spy, match, each }) => {
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, notice: () => {}, warning: () => {} };
 
 	const emitter = { dispatch: () => {} };

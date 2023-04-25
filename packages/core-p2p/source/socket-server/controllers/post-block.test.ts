@@ -21,7 +21,7 @@ const { PostBlockController: PostBlockControllerProxy } = rewiremock.proxy<{
 describe<{
 	sandbox: Sandbox;
 	controller: PostBlockController;
-}>("GetBlocksController", ({ it, assert, beforeEach, stub, spy }) => {
+}>("PostBlockController", ({ it, assert, beforeEach, stub, spy }) => {
 	const logger = { info: () => {} };
 	const configuration = { getMilestone: () => ({ block: { maxTransactions: 150 } }) };
 	const deserializer = { deserialize: () => {} };

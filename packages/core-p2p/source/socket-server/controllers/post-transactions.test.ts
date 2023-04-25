@@ -6,7 +6,7 @@ import { PostTransactionsController } from "./post-transactions";
 describe<{
 	sandbox: Sandbox;
 	controller: PostTransactionsController;
-}>("GetBlocksController", ({ it, assert, beforeEach, stub }) => {
+}>("PostTransactionsController", ({ it, assert, beforeEach, stub }) => {
 	const processor = { process: () => {} };
 
 	beforeEach((context) => {

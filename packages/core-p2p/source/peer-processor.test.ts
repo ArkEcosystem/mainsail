@@ -10,7 +10,7 @@ describe<{
 	sandbox: Sandbox;
 	peerProcessor: PeerProcessor;
 	configuration: Providers.PluginConfiguration;
-}>("Peer", ({ it, assert, beforeEach, stub }) => {
+}>("PeerProcessor", ({ it, assert, beforeEach, stub }) => {
 	const logger = { debug: () => {}, warning: () => {} };
 	const peerCommunicator = { ping: () => {} };
 	const peerConnector = { disconnect: () => {} };

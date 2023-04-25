@@ -15,7 +15,7 @@ const { GetStatusController: GetStatusControllerProxy } = rewiremock.proxy<{
 describe<{
 	sandbox: Sandbox;
 	controller: GetStatusController;
-}>("GetBlocksController", ({ it, assert, beforeEach, stub }) => {
+}>("GetStatusController", ({ it, assert, beforeEach, stub }) => {
 	const blockchain = { getLastBlock: () => {} };
 	const slots = { getSlotInfo: () => {} };
 
