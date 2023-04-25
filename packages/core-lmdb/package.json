@@ -22,7 +22,7 @@
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"lmdb": "2.4.2"
+		"lmdb": "2.7.11"
 	},
 	"devDependencies": {
 		"tmp": "0.2.1",
