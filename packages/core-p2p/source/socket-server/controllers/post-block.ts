@@ -10,10 +10,6 @@ export class PostBlockController implements Contracts.P2P.Controller {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-p2p")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
-
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
@@ -45,21 +41,14 @@ export class PostBlockController implements Contracts.P2P.Controller {
 			transactions: deserialized.transactions.map((tx) => tx.data),
 		};
 
-		const fromForger: boolean = Utils.isWhitelisted(
-			this.pluginConfiguration.getOptional<string[]>("remoteAccess", []),
-			request.info.remoteAddress,
-		);
+		if (this.blockchain.pingBlock(block)) {
+			return { height: this.blockchain.getLastHeight(), status: true };
+		}
 
-		if (!fromForger) {
-			if (this.blockchain.pingBlock(block)) {
-				return { height: this.blockchain.getLastHeight(), status: true };
-			}
+		const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
 
-			const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
-
-			if (!Utils.isBlockChained(lastDownloadedBlock, block, this.slots)) {
-				return { height: this.blockchain.getLastHeight(), status: false };
-			}
+		if (!Utils.isBlockChained(lastDownloadedBlock, block, this.slots)) {
+			return { height: this.blockchain.getLastHeight(), status: false };
 		}
 
 		this.logger.info(
@@ -70,7 +59,7 @@ export class PostBlockController implements Contracts.P2P.Controller {
 			)} from ${mapAddr(request.info.remoteAddress)}`,
 		);
 
-		await this.blockchain.handleIncomingBlock(block, fromForger);
+		await this.blockchain.handleIncomingBlock(block, false);
 
 		return { height: this.blockchain.getLastHeight(), status: true };
 	}
