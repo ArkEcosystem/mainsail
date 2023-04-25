@@ -114,9 +114,9 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 
 	public toJson(): string {
 		const data = {
-			quorum: this.getQuorum(),
 			lastBlockId: this.#lastBlockId,
 			nodeHeight: this.#nodeHeight,
+			quorum: this.getQuorum(),
 			quorumDetails: this.#quorumDetails,
 		};
 
