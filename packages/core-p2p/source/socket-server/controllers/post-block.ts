@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 import { mapAddr } from "../utils/map-addr";

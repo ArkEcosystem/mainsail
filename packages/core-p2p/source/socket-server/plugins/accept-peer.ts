@@ -2,14 +2,6 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { getPeerIp } from "../../utils/get-peer-ip";
-import {
-	GetBlocksRoute,
-	GetCommonBlocksRoute,
-	GetPeersRoute,
-	GetStausRoute,
-	PostBlockRoute,
-	PostTransactionsRoute,
-} from "../routes";
 
 @injectable()
 export class AcceptPeerPlugin {
