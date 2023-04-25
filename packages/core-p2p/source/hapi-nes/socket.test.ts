@@ -35,7 +35,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -61,7 +61,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: { onConnection } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		await client.disconnect();
@@ -76,7 +76,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const log = server.events.once("log");
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 		await client.connect();
 
@@ -108,7 +108,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -130,7 +130,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: { payload: { maxChunkChars: 5 }, onConnection } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 
 		await assert.rejects(() => client.connect({ timeout: 100 }), "Request failed - server disconnected");
@@ -154,7 +154,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -180,7 +180,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		await assert.rejects(() => client.request("something"));
@@ -203,7 +203,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		await assert.rejects(() => client.request("resource"));
@@ -223,7 +223,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Ws("http://localhost:" + server.info.port);
+		const client = new Ws("http://127.0.0.1:" + server.info.port);
 		client.onerror = Hoek.ignore;
 
 		const sendInvalid = async () =>
@@ -253,7 +253,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Ws("http://localhost:" + server.info.port);
+		const client = new Ws("http://127.0.0.1:" + server.info.port);
 		client.onerror = Hoek.ignore;
 
 		client.on("open", () => client.send(stringifyNesMessage({ id: 1, type: "request", path: "/" }), Hoek.ignore));
@@ -277,7 +277,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Ws("http://localhost:" + server.info.port);
+		const client = new Ws("http://127.0.0.1:" + server.info.port);
 		client.onerror = Hoek.ignore;
 
 		client.on("open", () =>
@@ -303,7 +303,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Ws("http://localhost:" + server.info.port);
+		const client = new Ws("http://127.0.0.1:" + server.info.port);
 		client.onerror = Hoek.ignore;
 
 		client.on("open", () => client.send(stringifyNesMessage({ id: 1, type: "??", version: "2" }), Hoek.ignore));
@@ -321,7 +321,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: {} });
 
 		await server.start();
-		const client = new Ws("http://localhost:" + server.info.port);
+		const client = new Ws("http://127.0.0.1:" + server.info.port);
 		client.onerror = Hoek.ignore;
 
 		client.on("open", () => client.send(stringifyNesMessage({ id: 1, type: "hello", version: "1" }), Hoek.ignore));
@@ -339,7 +339,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: {} });
 
 		await server.start();
-		const client = new Ws("http://localhost:" + server.info.port);
+		const client = new Ws("http://127.0.0.1:" + server.info.port);
 		client.onerror = Hoek.ignore;
 
 		client.on("open", () => client.send(stringifyNesMessage({ id: 1, type: "hello" }), Hoek.ignore));
@@ -364,7 +364,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 			});
 
 			await server.start();
-			const client = new Ws("http://localhost:" + server.info.port);
+			const client = new Ws("http://127.0.0.1:" + server.info.port);
 			client.onerror = Hoek.ignore;
 
 			const sendPingOrPong = async () =>
@@ -396,7 +396,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore

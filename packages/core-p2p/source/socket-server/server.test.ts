@@ -9,7 +9,7 @@ import { plugin } from "../hapi-nes";
 import { Server } from "./server";
 
 class HapiServerMock {
-	info = { uri: "localhost" };
+	info = { uri: "127.0.0.1" };
 
 	register() {}
 	start() {}

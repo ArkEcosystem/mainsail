@@ -56,19 +56,19 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 	});
 
 	it("defaults options.ws.maxPayload to 102400 (node) && perMessageDeflate to false", () => {
-		const client = new Client("http://localhost");
+		const client = new Client("http://127.0.0.1");
 		// @ts-ignore
 		assert.equal(client._settings.ws, { maxPayload: 102400, perMessageDeflate: false });
 	});
 
 	it("allows setting options.ws.maxPayload (node)", () => {
-		const client = new Client("http://localhost", { ws: { maxPayload: 100 } });
+		const client = new Client("http://127.0.0.1", { ws: { maxPayload: 100 } });
 		// @ts-ignore
 		assert.equal(client._settings.ws, { maxPayload: 100, perMessageDeflate: false });
 	});
 
 	it("prevents setting options.ws.perMessageDeflate (node)", () => {
-		const client = new Client("http://localhost", { ws: { perMessageDeflate: true } });
+		const client = new Client("http://127.0.0.1", { ws: { perMessageDeflate: true } });
 		// @ts-ignore
 		assert.equal(client._settings.ws, { maxPayload: 102400, perMessageDeflate: false });
 	});
@@ -77,7 +77,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin({ heartbeat: { interval: 20, timeout: 10 } });
 		await server.start();
 
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect({ reconnect: false });
 		client.onError = Hoek.ignore;
 
@@ -96,7 +96,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 		await server.start();
 
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		const team = new Teamwork.Team();
 		const orig = console.error;
@@ -119,7 +119,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const port = server1.info.port;
 		await server1.stop();
 
-		const client = new Client("http://localhost:" + port);
+		const client = new Client("http://127.0.0.1:" + port);
 		client.onError = Hoek.ignore;
 
 		const team = new Teamwork.Team({ meetings: 2 });
@@ -163,7 +163,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 		await server.start();
 
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		await client.connect({ reconnect: false });
 		await assert.rejects(() => client.connect(), "Already connected");
@@ -176,7 +176,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 		await server.start();
 
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		await client.connect();
 		await assert.rejects(() => client.connect(), "Cannot connect while client attempts to reconnect");
@@ -188,7 +188,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 		await server.start();
 
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		const team = new Teamwork.Team();
@@ -214,7 +214,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		await client.disconnect();
@@ -227,7 +227,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -240,7 +240,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		let disconnected = 0;
@@ -260,7 +260,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		const team = new Teamwork.Team();
@@ -279,7 +279,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 		await client.connect();
 
@@ -300,7 +300,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 		client.disconnect();
 		await client.connect();
@@ -328,7 +328,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		await client.request("/");
@@ -347,7 +347,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		let e = 0;
 		client.onError = (err) => {
@@ -385,7 +385,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 
 		let c = 0;
@@ -406,7 +406,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		let e = 0;
 		client.onError = (err) => {
@@ -443,7 +443,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		let c = 0;
 		const now = Date.now();
@@ -473,7 +473,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const url = "http://localhost:" + server.info.port;
+		const url = "http://127.0.0.1:" + server.info.port;
 		const client = new Client(url);
 
 		let e = 0;
@@ -485,7 +485,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 
 			++e;
 			// @ts-ignore
-			client._url = "http://localhost:" + server.info.port;
+			client._url = "http://127.0.0.1:" + server.info.port;
 		};
 
 		let r = "";
@@ -538,7 +538,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		const request = client.request("/");
@@ -553,7 +553,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 
 		await server.start();
 
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		// @ts-ignore
 		const orig = client._connect;
 		// @ts-ignore
@@ -590,7 +590,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		let c = 0;
 		client.onConnect = () => {
@@ -618,7 +618,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		const team = new Teamwork.Team();
 
@@ -653,7 +653,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -681,7 +681,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		const a = { b: 1 };
@@ -704,7 +704,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -729,7 +729,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 			});
 
 			await server.start();
-			const client = new Client("http://localhost:" + server.info.port);
+			const client = new Client("http://127.0.0.1:" + server.info.port);
 			await client.connect();
 
 			// @ts-ignore
@@ -772,7 +772,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin();
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -804,7 +804,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		let logged;
 		client.onError = (err) => {
@@ -853,7 +853,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		let logged;
 		client.onError = (err) => {
@@ -902,7 +902,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 
 		const team = new Teamwork.Team({ meetings: 2 });
 
@@ -941,7 +941,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port, { timeout: 20 });
+		const client = new Client("http://127.0.0.1:" + server.info.port, { timeout: 20 });
 
 		let logged;
 		client.onError = (err) => {
@@ -971,7 +971,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin({ heartbeat: { interval: 20, timeout: 10 } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 
 		const team = new Teamwork.Team({ meetings: 2 });
@@ -998,7 +998,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = await createServerWithPlugin({ heartbeat: { interval: 20, timeout: 10 } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 
 		const team = new Teamwork.Team();
@@ -1033,7 +1033,7 @@ describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 			});
 
 			await server.start();
-			const client = new Client("http://localhost:" + server.info.port);
+			const client = new Client("http://127.0.0.1:" + server.info.port);
 
 			await client.connect();
 

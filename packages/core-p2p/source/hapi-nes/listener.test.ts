@@ -32,7 +32,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 
 		const clients = [];
 		for (let i = 0; i < 20; ++i) {
-			const client = new Client("http://localhost:" + server.info.port);
+			const client = new Client("http://127.0.0.1:" + server.info.port);
 			client.onDisconnect = () => team.attend();
 			client.onError = Hoek.ignore;
 			await client.connect();
@@ -40,7 +40,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 			clients.push(client);
 		}
 
-		const client2 = new Client("http://localhost:" + server.info.port);
+		const client2 = new Client("http://127.0.0.1:" + server.info.port);
 		client2.onError = Hoek.ignore;
 
 		server.stop();
@@ -53,10 +53,10 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: { maxConnections: 1 } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
-		const client2 = new Client("http://localhost:" + server.info.port);
+		const client2 = new Client("http://127.0.0.1:" + server.info.port);
 		client2.onError = Hoek.ignore;
 
 		await assert.rejects(() => client2.connect());
@@ -68,10 +68,10 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 
 	it("rejects unknown origin", async () => {
 		const server = Hapi.server();
-		await server.register({ plugin: plugin, options: { origin: ["http://localhost:12345"] } });
+		await server.register({ plugin: plugin, options: { origin: ["http://127.0.0.1:12345"] } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await assert.rejects(() => client.connect());
 		await client.disconnect();
 		await server.stop();
@@ -79,10 +79,10 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 
 	it("accepts known origin", async () => {
 		const server = Hapi.server();
-		await server.register({ plugin: plugin, options: { origin: ["http://localhost:12345"] } });
+		await server.register({ plugin: plugin, options: { origin: ["http://127.0.0.1:12345"] } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port, { ws: { origin: "http://localhost:12345" } });
+		const client = new Client("http://127.0.0.1:" + server.info.port, { ws: { origin: "http://127.0.0.1:12345" } });
 		await client.connect();
 		await client.disconnect();
 		await server.stop();
@@ -98,7 +98,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: { onConnection } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port, { ws: { origin: "http://localhost:12345" } });
+		const client = new Client("http://127.0.0.1:" + server.info.port, { ws: { origin: "http://127.0.0.1:12345" } });
 		client.onError = Hoek.ignore;
 		await client.connect();
 		await server.stop();
@@ -119,7 +119,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		assert.equal(await client.request({ path: "/", payload }), {
@@ -147,7 +147,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		assert.equal(await client.request({ path: "/", payload }), {
@@ -165,7 +165,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: { heartbeat: { interval: 20, timeout: 10 } } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 
 		const team = new Teamwork.Team();
@@ -188,7 +188,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.register({ plugin: plugin, options: { heartbeat: false } });
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 		// @ts-ignore
 		assert.false(client._heartbeatTimeout);
@@ -214,7 +214,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		let e = 0;
 		client.onError = (err) => {
 			++e;
@@ -256,8 +256,8 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 		await server.start();
 
-		const client = new Client("http://localhost:" + server.info.port);
-		const canary = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
+		const canary = new Client("http://127.0.0.1:" + server.info.port);
 		await canary.connect();
 
 		const helloTeam = new Teamwork.Team();
@@ -321,7 +321,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		Socket.prototype._onMessage = Hoek.ignore; // Do not process messages
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		client.onError = Hoek.ignore;
 
 		const team = new Teamwork.Team();

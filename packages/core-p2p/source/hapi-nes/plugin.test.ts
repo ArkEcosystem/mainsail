@@ -25,7 +25,7 @@ describe("Plugin", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
 		// @ts-ignore
@@ -55,7 +55,7 @@ describe("Plugin", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 		await team.work;
 		await server.stop();
@@ -79,7 +79,7 @@ describe("Plugin", ({ it, spy, beforeEach, assert, nock, each }) => {
 		});
 
 		await server.start();
-		const client = new Client("http://localhost:" + server.info.port);
+		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 		await client.disconnect();
 		await team.work;
