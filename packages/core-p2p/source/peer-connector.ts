@@ -35,11 +35,9 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 			}
 		}
 		const connection = this.connection(peer) || (await this.create(peer));
-
 		if (maxPayload) {
 			connection.setMaxPayload(maxPayload);
 		}
-
 		return connection;
 	}
 

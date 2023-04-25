@@ -54,7 +54,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			"plugin",
 			"core-p2p",
 		);
-		const minimumNetworkReach = configuration.getOptional<number>("minimumNetworkReach", 20);
+		const minimumNetworkReach = configuration.getRequired<number>("minimumNetworkReach");
 
 		if (monitor.isColdStart()) {
 			monitor.completeColdStart();
@@ -74,9 +74,9 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		}
 
 		const networkState = new NetworkState(data.status);
-		networkState.#nodeHeight = data.#nodeHeight;
-		networkState.#lastBlockId = data.#lastBlockId;
-		Object.assign(networkState.#quorumDetails, data.#quorumDetails);
+		networkState.#nodeHeight = data.nodeHeight;
+		networkState.#lastBlockId = data.lastBlockId;
+		Object.assign(networkState.#quorumDetails, data.quorumDetails);
 
 		return networkState;
 	}
@@ -113,9 +113,12 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	}
 
 	public toJson(): string {
-		const data = { quorum: this.getQuorum() } as any;
-		Object.assign(data, this);
-		delete data.status;
+		const data = {
+			lastBlockId: this.#lastBlockId,
+			nodeHeight: this.#nodeHeight,
+			quorum: this.getQuorum(),
+			quorumDetails: this.#quorumDetails,
+		};
 
 		return JSON.stringify(data, undefined, 2);
 	}

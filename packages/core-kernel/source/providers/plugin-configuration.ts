@@ -91,7 +91,7 @@ export class PluginConfiguration {
 
 	#mergeWithGlobal(name: string): void {
 		// @@TODO better name for storing pluginOptions
-		if (!this.configRepository.has(`app.pluginOptions.${name}`)) {
+		if (!this.configRepository || !this.configRepository.has(`app.pluginOptions.${name}`)) {
 			return;
 		}
 

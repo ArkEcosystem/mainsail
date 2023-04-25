@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@arkecosystem/core-kernel";
 import Hapi from "@hapi/hapi";
 
 import { mapAddr } from "../utils/map-addr";
@@ -9,10 +9,6 @@ import { mapAddr } from "../utils/map-addr";
 export class PostBlockController implements Contracts.P2P.Controller {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-p2p")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
@@ -45,21 +41,14 @@ export class PostBlockController implements Contracts.P2P.Controller {
 			transactions: deserialized.transactions.map((tx) => tx.data),
 		};
 
-		const fromForger: boolean = Utils.isWhitelisted(
-			this.pluginConfiguration.getOptional<string[]>("remoteAccess", []),
-			request.info.remoteAddress,
-		);
+		if (this.blockchain.pingBlock(block)) {
+			return { height: this.blockchain.getLastHeight(), status: true };
+		}
 
-		if (!fromForger) {
-			if (this.blockchain.pingBlock(block)) {
-				return { height: this.blockchain.getLastHeight(), status: true };
-			}
+		const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
 
-			const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
-
-			if (!Utils.isBlockChained(lastDownloadedBlock, block, this.slots)) {
-				return { height: this.blockchain.getLastHeight(), status: false };
-			}
+		if (!Utils.isBlockChained(lastDownloadedBlock, block, this.slots)) {
+			return { height: this.blockchain.getLastHeight(), status: false };
 		}
 
 		this.logger.info(
@@ -70,7 +59,7 @@ export class PostBlockController implements Contracts.P2P.Controller {
 			)} from ${mapAddr(request.info.remoteAddress)}`,
 		);
 
-		await this.blockchain.handleIncomingBlock(block, fromForger);
+		await this.blockchain.handleIncomingBlock(block, false);
 
 		return { height: this.blockchain.getLastHeight(), status: true };
 	}

@@ -35,7 +35,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		await this.#buildServer();
 
-		return this.app.get<Server>(Identifiers.P2PServer).boot();
+		await this.app.get<Server>(Identifiers.P2PServer).boot();
 	}
 
 	public async dispose(): Promise<void> {
@@ -48,7 +48,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return true;
 	}
 
-	public configSchema(): object {
+	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
 			disableDiscovery: Joi.bool(),

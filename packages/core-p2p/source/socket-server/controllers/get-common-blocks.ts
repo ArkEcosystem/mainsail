@@ -17,9 +17,11 @@ export class GetCommonBlocksController implements Contracts.P2P.Controller {
 		common: Contracts.Crypto.IBlockData;
 		lastBlockHeight: number;
 	}> {
-		const commonBlocks: Contracts.Crypto.IBlockData[] = await Promise.all(
-			(request.payload as any).ids.map(async (blockId) => await this.databaseService.getBlock(blockId)),
-		);
+		const commonBlocks: Contracts.Crypto.IBlockData[] = (
+			await Promise.all(
+				(request.payload as any).ids.map(async (blockId) => await this.databaseService.getBlock(blockId)),
+			)
+		).filter((block) => !!block);
 
 		if (commonBlocks.length === 0) {
 			throw new Exceptions.MissingCommonBlockError();
