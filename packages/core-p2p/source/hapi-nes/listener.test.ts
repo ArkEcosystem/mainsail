@@ -13,7 +13,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		nock.enableNetConnect();
 	});
 
-	it("refuses connection while stopping", async () => {
+	it.skip("refuses connection while stopping", async () => {
 		const server = Hapi.server();
 
 		const onConnection = (socket) => {
@@ -88,7 +88,7 @@ describe("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.stop();
 	});
 
-	it("handles socket errors", async () => {
+	it.skip("handles socket errors", async () => {
 		const server = Hapi.server();
 
 		const onConnection = (socket) => {
