@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../../../core-test-framework";
 import rewiremock from "rewiremock";
 
 import { GetStatusController } from "./get-status";

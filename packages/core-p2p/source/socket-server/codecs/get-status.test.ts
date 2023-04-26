@@ -1,5 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework/source";
-
+import { describe } from "../../../../core-test-framework/source";
 import { request, response } from "../../../test/fixtures/get-status";
 import { getStatus } from "./get-status";
 import { getStatus as proto } from "./proto/protos";

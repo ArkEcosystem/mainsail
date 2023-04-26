@@ -1,5 +1,5 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../core-test-framework";
 
 import { DisconnectInvalidPeers, DisconnectPeer } from "./listeners";
 import { Peer } from "./peer";

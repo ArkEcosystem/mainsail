@@ -1,5 +1,5 @@
 import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../../../core-test-framework";
 
 import { GetCommonBlocksController } from "./get-common-blocks";
 
