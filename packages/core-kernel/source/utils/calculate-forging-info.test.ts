@@ -1,10 +1,10 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { BlockTimeCalculator } from "@arkecosystem/core-crypto-time/source/block-time-calculator";
-import { BlockTimeLookup } from "@arkecosystem/core-crypto-time/source/block-time-lookup";
-import { Slots } from "@arkecosystem/core-crypto-time/source/slots";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
+import { Configuration } from "../../../core-crypto-config";
+import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
+import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
+import { Slots } from "../../../core-crypto-time/source/slots";
 import { describe, Sandbox } from "../../../core-test-framework";
 import { calculateForgingInfo, getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 

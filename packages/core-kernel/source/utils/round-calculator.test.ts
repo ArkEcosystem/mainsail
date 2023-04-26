@@ -1,7 +1,7 @@
 import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
+import { Configuration } from "../../../core-crypto-config";
 import { describe, Sandbox } from "../../../core-test-framework";
 import { calculateRound, isNewRound } from "./round-calculator";
 
