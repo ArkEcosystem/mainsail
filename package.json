@@ -7,7 +7,7 @@
 		"plugins/*"
 	],
 	"scripts": {
-		"build": "ultra -r build",
+		"build": "turbo run build",
 		"clean": "ultra -r clean",
 		"clean:node_modules": "ultra -r del node_modules && del node_modules",
 		"deps": "cross-env-shell ./scripts/deps/update.sh",

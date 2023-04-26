@@ -1,0 +1,23 @@
+{
+	"$schema": "https://turborepo.org/schema.json",
+	"globalEnv": [
+		"BM_CACHE_PATH",
+		"BM_CONFIG_PATH",
+		"BM_DATA_PATH",
+		"BM_LOG_PATH",
+		"BM_TEMP_PATH",
+		"BMHOME",
+		"NODE_ENV",
+		"TM_BINARY",
+		"TM_SPAWN",
+		"TMHOME"
+	],
+	"pipeline": {
+		"build": {
+			"cache": true,
+			"dependsOn": ["^build"],
+			"inputs": ["*.proto", "source/**/**.ts", "package.json"],
+			"outputs": ["distribution/**"]
+		}
+	}
+}
