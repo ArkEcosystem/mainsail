@@ -1,5 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { numberToHex } from "@arkecosystem/utils";
 import { secp256k1 } from "bcrypto";
 

@@ -1,5 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { BlockJob } from "./block-job";
 import { CronJob } from "./cron-job";

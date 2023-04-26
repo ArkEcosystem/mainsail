@@ -3,7 +3,6 @@ import glob from "glob";
 import { join } from "path";
 
 import * as Contracts from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
 import { Environment } from "./environment";
 import { File, Git, NPM, Source } from "./source-providers";
 

@@ -1,7 +1,6 @@
 import { rcompare, satisfies } from "semver";
 
 import { execa } from "../execa";
-import { injectable } from "../ioc";
 
 @injectable()
 export class Installer {

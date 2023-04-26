@@ -1,5 +1,4 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts } from "@arkecosystem/core-contracts";
 import { Enums } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "./round-state";

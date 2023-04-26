@@ -1,6 +1,5 @@
 import { white } from "kleur";
 
-import { Identifiers, inject, injectable } from "../ioc";
 import { Logger } from "../services";
 
 @injectable()

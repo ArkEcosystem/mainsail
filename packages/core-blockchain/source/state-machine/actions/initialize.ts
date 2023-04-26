@@ -1,4 +1,3 @@
-import { inject, injectable } from "@arkecosystem/core-container";
 import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";

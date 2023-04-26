@@ -1,8 +1,6 @@
 import { existsSync, readdirSync } from "fs-extra";
 import prompts from "prompts";
 
-import { injectable } from "../ioc";
-
 @injectable()
 export class DiscoverNetwork {
 	public async discover(path: string, usePrompts = true): Promise<string> {

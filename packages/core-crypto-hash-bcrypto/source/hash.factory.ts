@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { Hash256, RIPEMD160, SHA256 } from "bcrypto";
 

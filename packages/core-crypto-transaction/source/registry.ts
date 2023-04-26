@@ -1,5 +1,4 @@
-import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 
 import { Transaction } from "./types";
 import { signedSchema, strictSchema } from "./validation/utils";

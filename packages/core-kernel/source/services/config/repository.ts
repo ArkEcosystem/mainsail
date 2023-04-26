@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { get, has, set, unset } from "@arkecosystem/utils";
 

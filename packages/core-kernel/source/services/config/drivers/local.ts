@@ -1,4 +1,3 @@
-import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { dotenv, get, set } from "@arkecosystem/utils";
 import { existsSync, readFileSync } from "fs";

@@ -1,5 +1,3 @@
-import { injectable } from "inversify";
-
 import { ITransaction, ITransactionData } from "../crypto";
 
 export type ProcessorError = {

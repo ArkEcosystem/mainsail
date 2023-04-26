@@ -1,5 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { Cache, Filesystem, Log, Pipeline, ProcessActions, Queue, Schedule, Triggers, Validation } from "../services";
 import { Bootstrapper } from "./interfaces";

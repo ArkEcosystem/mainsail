@@ -1,4 +1,3 @@
-import { inject, injectable } from "@arkecosystem/core-container";
 import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 

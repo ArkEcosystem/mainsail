@@ -4,7 +4,6 @@ import { existsSync, writeFileSync } from "fs-extra";
 import path from "path";
 
 import { envPaths as environmentPaths, Paths } from "../env-paths";
-import { injectable } from "../ioc";
 
 @injectable()
 export class Environment {

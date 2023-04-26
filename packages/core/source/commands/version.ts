@@ -1,5 +1,4 @@
 import { Commands, Container } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
 import { PackageJson } from "type-fest";
 
 @injectable()

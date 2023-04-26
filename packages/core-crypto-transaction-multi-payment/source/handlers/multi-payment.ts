@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import Transactions from "@arkecosystem/core-crypto-transaction";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";

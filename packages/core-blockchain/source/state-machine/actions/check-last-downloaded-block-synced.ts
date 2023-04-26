@@ -1,5 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts } from "@arkecosystem/core-contracts";
 
 import { Action } from "../contracts";
 

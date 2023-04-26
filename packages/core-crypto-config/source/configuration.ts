@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";

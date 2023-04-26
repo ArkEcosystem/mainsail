@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Exceptions } from "@arkecosystem/core-contracts";
 
 import { ActionArguments } from "../../types";

@@ -1,5 +1,3 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { Resource } from "../types";

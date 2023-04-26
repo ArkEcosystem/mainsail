@@ -1,5 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
-
 import { Resource } from "../types";
 
 @injectable()

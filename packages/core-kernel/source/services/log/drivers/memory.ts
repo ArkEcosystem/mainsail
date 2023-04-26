@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { isEmpty, prettyTime } from "@arkecosystem/utils";
 import chalk, { Chalk } from "chalk";

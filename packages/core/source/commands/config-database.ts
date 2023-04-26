@@ -1,5 +1,4 @@
-import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { inject, injectable } from "@arkecosystem/core-container";
+import { Commands, Contracts, Services } from "@arkecosystem/core-cli";
 import Joi from "joi";
 
 @injectable()

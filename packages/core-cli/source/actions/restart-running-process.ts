@@ -1,5 +1,5 @@
 import { Application } from "../application";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 

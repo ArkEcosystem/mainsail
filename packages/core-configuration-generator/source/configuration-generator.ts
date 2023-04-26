@@ -1,4 +1,3 @@
-import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 import { ensureDirSync, existsSync } from "fs-extra";

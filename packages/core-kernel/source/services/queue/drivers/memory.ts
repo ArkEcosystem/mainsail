@@ -1,5 +1,5 @@
-import { decorateInjectable, inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { decorateInjectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 

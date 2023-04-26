@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { Resource } from "../types";

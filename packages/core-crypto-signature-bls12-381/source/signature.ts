@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 import { sign, verify } from "@noble/bls12-381";

@@ -1,5 +1,3 @@
-import { injectable } from "../ioc";
-
 enum OutputVerbosity {
 	Quiet = 0,
 	Normal = 1,

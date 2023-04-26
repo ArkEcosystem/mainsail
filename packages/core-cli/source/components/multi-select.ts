@@ -1,5 +1,5 @@
 import { Application } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { Prompt } from "./prompt";
 
 @injectable()

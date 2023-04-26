@@ -1,5 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { camelCase, expandTilde, set } from "@arkecosystem/utils";
 import envPaths from "env-paths";
 import { ensureDirSync } from "fs-extra";

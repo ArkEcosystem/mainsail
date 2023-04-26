@@ -1,6 +1,5 @@
 import { Application } from "../application";
 import { InputValue, InputValues } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
 import { InputDefinition } from "./definition";
 import { InputParser } from "./parser";
 import { InputValidator } from "./validator";

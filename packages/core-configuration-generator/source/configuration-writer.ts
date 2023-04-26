@@ -1,4 +1,3 @@
-import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { Types } from "@arkecosystem/core-kernel";
 import { stringifySync } from "envfile";
@@ -6,7 +5,6 @@ import { writeFileSync, writeJSONSync } from "fs-extra";
 import path from "path";
 
 import { EnviromentData, Wallet } from "./contracts";
-import { Identifiers } from "./identifiers";
 
 @injectable()
 export class ConfigurationWriter {

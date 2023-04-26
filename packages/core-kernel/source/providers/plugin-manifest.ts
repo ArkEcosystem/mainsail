@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { get, has } from "@arkecosystem/utils";
 
 import { PackageJson } from "../types";

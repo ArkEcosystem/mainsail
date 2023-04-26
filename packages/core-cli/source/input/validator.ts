@@ -1,7 +1,5 @@
 import Joi from "joi";
 
-import { injectable } from "../ioc";
-
 @injectable()
 export class InputValidator {
 	public validate(data: object, schema: object): object {

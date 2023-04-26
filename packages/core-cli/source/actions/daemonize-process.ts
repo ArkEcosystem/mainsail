@@ -4,7 +4,7 @@ import { totalmem } from "os";
 import { Application } from "../application";
 import { Spinner } from "../components";
 import { ProcessOptions } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";

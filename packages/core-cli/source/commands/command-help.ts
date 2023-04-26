@@ -3,7 +3,7 @@ import { PackageJson } from "type-fest";
 
 import { AppHeader } from "../components";
 import { Application } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 
 @injectable()
 export class CommandHelp {

@@ -1,4 +1,3 @@
-import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 

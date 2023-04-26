@@ -1,5 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { FeeRegistry } from "@arkecosystem/core-fees";
 import { BigNumber } from "packages/utils/distribution";
 

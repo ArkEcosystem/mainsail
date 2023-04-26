@@ -1,4 +1,3 @@
-import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import Ajv, { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv/dist/2020";
 import keywords from "ajv-keywords";

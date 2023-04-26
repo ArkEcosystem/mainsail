@@ -1,5 +1,3 @@
-import { injectable } from "../ioc";
-
 @injectable()
 export class Clear {
 	public render(): void {

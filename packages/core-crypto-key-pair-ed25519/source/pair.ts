@@ -1,5 +1,4 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { getPublicKey } from "@noble/ed25519";
 import { sha256 } from "@noble/hashes/sha256";
 import { mnemonicToSeedSync } from "@scure/bip39";

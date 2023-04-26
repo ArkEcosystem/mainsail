@@ -1,5 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
-
 import { ActionArguments } from "../../types";
 
 @injectable()

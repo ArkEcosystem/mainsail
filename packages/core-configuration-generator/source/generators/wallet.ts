@@ -1,5 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
-
 import { Wallet } from "../contracts";
 import { Generator } from "./generator";
 

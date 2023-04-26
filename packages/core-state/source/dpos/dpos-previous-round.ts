@@ -1,4 +1,3 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services } from "@arkecosystem/core-kernel";
 

@@ -1,9 +1,7 @@
-import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 
 import { Wallet } from "../contracts";
-import { Identifiers as InternalIdentifiers } from "../identifiers";
 import { MnemonicGenerator } from "./mnemonic";
 
 @injectable()

@@ -7,7 +7,7 @@ import { Application, InputValue } from "../contracts";
 import { envPaths as environmentPaths } from "../env-paths";
 import { Input } from "../input";
 import { InputDefinition } from "../input/definition";
-import { Identifiers, inject, injectable, postConstruct } from "../ioc";
+import { Identifiers } from "../ioc";
 import { Output } from "../output";
 import { Config, Environment } from "../services";
 import { CommandHelp } from "./command-help";

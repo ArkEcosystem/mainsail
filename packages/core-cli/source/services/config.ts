@@ -2,7 +2,7 @@ import { ensureFileSync, readJsonSync, writeJsonSync } from "fs-extra";
 import { PackageJson } from "type-fest";
 
 import { Application } from "../contracts";
-import { Identifiers, inject, injectable, postConstruct } from "../ioc";
+import { Identifiers } from "../ioc";
 
 @injectable()
 export class Config {

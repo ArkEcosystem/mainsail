@@ -8,7 +8,7 @@ import { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } from ".
 import { Application } from "../application";
 import { Clear, Spinner, Table } from "../components";
 import { ProcessDescription } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 
 @injectable()

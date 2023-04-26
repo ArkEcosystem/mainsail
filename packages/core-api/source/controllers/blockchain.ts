@@ -1,6 +1,5 @@
 // import { Utils } from "@arkecosystem/core-kernel";
-import { inject } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { Controller } from "./controller";
 

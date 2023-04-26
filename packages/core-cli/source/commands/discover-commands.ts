@@ -1,7 +1,6 @@
 import { lstatSync, readdirSync } from "fs-extra";
 
 import { Application, CommandList } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
 import { Command } from "./command";
 
 @injectable()

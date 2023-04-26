@@ -1,5 +1,4 @@
 import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
 import { platform } from "os";

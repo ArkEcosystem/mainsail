@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { strictEqual } from "assert";
 
 @injectable()

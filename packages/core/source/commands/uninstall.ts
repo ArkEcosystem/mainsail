@@ -1,5 +1,4 @@
 import { Commands } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
 
 @injectable()
 export class Command extends Commands.Command {

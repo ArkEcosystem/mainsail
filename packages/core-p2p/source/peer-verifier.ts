@@ -1,5 +1,4 @@
 /* eslint-disable unicorn/prefer-at */
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Services, Utils } from "@arkecosystem/core-kernel";
 import assert from "assert";

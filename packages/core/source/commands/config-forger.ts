@@ -1,5 +1,4 @@
 import { Commands, Contracts } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
 import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra";
 import Joi from "joi";

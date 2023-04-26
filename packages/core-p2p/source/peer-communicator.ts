@@ -1,5 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Constants, Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";

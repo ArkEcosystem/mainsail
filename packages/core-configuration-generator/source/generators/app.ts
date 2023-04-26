@@ -1,4 +1,3 @@
-import { injectable } from "@arkecosystem/core-container";
 import { Types } from "@arkecosystem/core-kernel";
 import { readJSONSync } from "fs-extra";
 import { resolve } from "path";

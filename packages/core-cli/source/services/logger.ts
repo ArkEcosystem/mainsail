@@ -1,4 +1,3 @@
-import { Identifiers, inject, injectable } from "../ioc";
 import { Output } from "../output";
 
 @injectable()

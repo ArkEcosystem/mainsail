@@ -1,6 +1,5 @@
-import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { Commands, Contracts, Services } from "@arkecosystem/core-cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@arkecosystem/core-configuration-generator";
-import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as AppContracts } from "@arkecosystem/core-contracts";
 import envPaths from "env-paths";
 import Joi from "joi";

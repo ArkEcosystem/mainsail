@@ -1,5 +1,4 @@
-import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 
 import { TransactionHandlerProvider } from "./handler-provider";
