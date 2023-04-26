@@ -7,6 +7,6 @@ describe("parse", async ({ assert, it, nock, loader }) => {
 	});
 
 	it("should fail to parse invalid json", () => {
-		assert.throws(() => parse("{"), "Unexpected end of JSON input");
+		assert.throws(() => parse("{"), "Expected property name or '}' in JSON at position 1");
 	});
 });

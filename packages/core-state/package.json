@@ -25,7 +25,7 @@
 		"@arkecosystem/utils": "workspace:*",
 		"immutable": "4.0.0-rc.14",
 		"joi": "17.4.2",
-		"lmdb": "^2.2.4"
+		"lmdb": "2.7.11"
 	},
 	"devDependencies": {
 		"import-fresh": "3.3.0",

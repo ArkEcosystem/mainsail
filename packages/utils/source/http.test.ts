@@ -96,7 +96,10 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll }) => {
 	});
 
 	it("#get - should send a request and throw when malformed JSON is received", async () => {
-		await assert.rejects(() => http.get(`${serverURL}/malformed`), "Unexpected token s in JSON at position 0");
+		await assert.rejects(
+			() => http.get(`${serverURL}/malformed`),
+			"Unexpected token 's', \"success\" is not valid JSON",
+		);
 	});
 
 	it("#get - should send a request and throw when the request times out", async () => {
