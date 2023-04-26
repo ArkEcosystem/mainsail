@@ -1,5 +1,3 @@
-// import { Exception } from "@arkecosystem/core-contracts";
-
 import { JsonObject } from "../types";
 import { Container } from "./container";
 
