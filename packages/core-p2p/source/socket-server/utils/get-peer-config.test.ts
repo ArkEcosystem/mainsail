@@ -1,5 +1,5 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../../../core-test-framework";
 
 import { getPeerConfig } from "./get-peer-config";
 

@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../../core-test-framework";
 import rewiremock from "rewiremock";
 
 import { defaults as transactionPoolDefaults } from "../../../core-transaction-pool/source/defaults";

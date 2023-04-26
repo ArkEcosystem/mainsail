@@ -1,6 +1,6 @@
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../../../core-test-framework";
 import rewiremock from "rewiremock";
 
 import { PostBlockController } from "./post-block";

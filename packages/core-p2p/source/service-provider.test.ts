@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../core-test-framework";
 import importFresh from "import-fresh";
 
 import { defaults } from "./defaults";

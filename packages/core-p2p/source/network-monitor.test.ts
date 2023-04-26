@@ -1,6 +1,6 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../core-test-framework";
 import { BigNumber } from "@arkecosystem/utils";
 import importFresh from "import-fresh";
 import path from "path";
