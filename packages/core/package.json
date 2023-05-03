@@ -25,7 +25,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@mainsail/core-api": "workspace:*",
+		"@mainsail/api": "workspace:*",
 		"@mainsail/core-blockchain": "workspace:*",
 		"@mainsail/core-cli": "workspace:*",
 		"@mainsail/core-configuration-generator": "workspace:*",

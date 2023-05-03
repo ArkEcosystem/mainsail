@@ -31,7 +31,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 
 		version = "3.0.9";
 		appPlugins = [
-			{ options: {}, package: "@mainsail/core-api" },
+			{ options: {}, package: "@mainsail/api" },
 			{ package: "@mainsail/core-webhooks" },
 			{ package: "@mainsail/core-p2p" },
 		];
@@ -62,7 +62,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			name: () => "core-p2p",
 		};
 		serviceProviders = {
-			"@mainsail/core-api": coreApiServiceProvider,
+			"@mainsail/api": coreApiServiceProvider,
 			"@mainsail/core-p2p": coreP2PServiceProvider,
 			"@mainsail/core-webhooks": coreWebhooksServiceProvider,
 		};
@@ -91,7 +91,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 				version: mockConfig["network.pubKeyHash"],
 			},
 			plugins: {
-				"@mainsail/core-api": {
+				"@mainsail/api": {
 					enabled: true,
 					// estimateTotalCount: true,
 					port: 4003,
@@ -111,7 +111,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			port: 4003,
 		};
 
-		delete result.plugins["@mainsail/core-api"];
+		delete result.plugins["@mainsail/api"];
 		assert.equal(getPeerConfig(app), result);
 	});
 
@@ -123,7 +123,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			},
 		};
 
-		delete result.plugins["@mainsail/core-api"];
+		delete result.plugins["@mainsail/api"];
 		assert.equal(getPeerConfig(app), result);
 	});
 
@@ -135,7 +135,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			},
 		};
 
-		delete result.plugins["@mainsail/core-api"];
+		delete result.plugins["@mainsail/api"];
 		assert.equal(getPeerConfig(app), result);
 	});
 
@@ -184,7 +184,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			},
 		};
 
-		result.plugins["@mainsail/core-api"].enabled = false;
+		result.plugins["@mainsail/api"].enabled = false;
 		assert.equal(getPeerConfig(app), result);
 	});
 });

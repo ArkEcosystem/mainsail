@@ -64,7 +64,7 @@ export const versionLatest = {
 				"start:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark core:run --env=test",
 			},
 			dependencies: {
-				"@mainsail/core-api": "^2.5.24",
+				"@mainsail/api": "^2.5.24",
 				"@mainsail/core-blockchain": "^2.5.24",
 				"@mainsail/core-container": "^2.5.24",
 				"@mainsail/core-database-postgres": "^2.5.24",
@@ -250,7 +250,7 @@ export const versionNext = {
 				"start:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark core:run --env=test",
 			},
 			dependencies: {
-				"@mainsail/core-api": "^2.5.0-next.10",
+				"@mainsail/api": "^2.5.0-next.10",
 				"@mainsail/core-blockchain": "^2.5.0-next.10",
 				"@mainsail/core-container": "^2.5.0-next.10",
 				"@mainsail/core-database-postgres": "^2.5.0-next.10",

@@ -15,7 +15,7 @@ export class PortsResource implements Resource {
 
 	public transform(resource): object {
 		const result = {};
-		const keys = new Set(["@mainsail/core-p2p", "@mainsail/core-api", "@mainsail/core-webhooks"]);
+		const keys = new Set(["@mainsail/core-p2p", "@mainsail/api", "@mainsail/core-webhooks"]);
 
 		for (const serviceProvider of this.serviceProviderRepository.allLoadedProviders()) {
 			const name: string = serviceProvider.name()!;

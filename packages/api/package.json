@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-api",
+	"name": "@mainsail/api",
 	"version": "0.0.1",
 	"description": "Public API for ARK Core",
 	"license": "MIT",

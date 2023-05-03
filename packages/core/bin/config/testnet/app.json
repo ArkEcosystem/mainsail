@@ -85,7 +85,7 @@
 			"package": "@mainsail/core-blockchain"
 		},
 		{
-			"package": "@mainsail/core-api"
+			"package": "@mainsail/api"
 		},
 		{
 			"package": "@mainsail/core-webhooks"
