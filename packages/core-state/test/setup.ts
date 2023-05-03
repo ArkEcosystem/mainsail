@@ -23,7 +23,7 @@ import {
 import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
 import { PublicKeySerializer } from "../../core-crypto-key-pair-schnorr/source/serializer";
 import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
-import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
+import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import {
 	Deserializer as TransactionDeserializer,
 	Serializer,
