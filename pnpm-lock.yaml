@@ -292,6 +292,122 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3
 
+  packages/cli:
+    dependencies:
+      '@mainsail/core-container':
+        specifier: workspace:*
+        version: link:../core-container
+      '@mainsail/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      boxen:
+        specifier: 4.2.0
+        version: 4.2.0
+      cli-table3:
+        specifier: 0.6.0
+        version: 0.6.0
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
+      env-paths:
+        specifier: 2.2.0
+        version: 2.2.0
+      envfile:
+        specifier: 5.2.0
+        version: 5.2.0
+      execa:
+        specifier: 3.4.0
+        version: 3.4.0
+      fast-levenshtein:
+        specifier: 2.0.6
+        version: 2.0.6
+      fs-extra:
+        specifier: 8.1.0
+        version: 8.1.0
+      glob:
+        specifier: 7.1.7
+        version: 7.1.7
+      got:
+        specifier: 11.8.2
+        version: 11.8.2
+      inversify:
+        specifier: 5.1.1
+        version: 5.1.1
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      kleur:
+        specifier: 4.0.0
+        version: 4.0.0
+      latest-version:
+        specifier: 5.1.0
+        version: 5.1.0
+      listr:
+        specifier: 0.14.3
+        version: 0.14.3
+      nodejs-tail:
+        specifier: 1.1.1
+        version: 1.1.1
+      ora:
+        specifier: 4.1.1
+        version: 4.1.1
+      prompts:
+        specifier: 2.4.0
+        version: 2.4.0
+      read-last-lines:
+        specifier: 1.8.0
+        version: 1.8.0
+      reflect-metadata:
+        specifier: 0.1.13
+        version: 0.1.13
+      semver:
+        specifier: 6.3.0
+        version: 6.3.0
+      tar:
+        specifier: 6.1.11
+        version: 6.1.11
+      type-fest:
+        specifier: 0.21.3
+        version: 0.21.3
+      yargs-parser:
+        specifier: 20.2.9
+        version: 20.2.9
+    devDependencies:
+      '@types/fast-levenshtein':
+        specifier: 0.0.2
+        version: 0.0.2
+      '@types/fs-extra':
+        specifier: 8.1.2
+        version: 8.1.2
+      '@types/is-ci':
+        specifier: 2.0.0
+        version: 2.0.0
+      '@types/listr':
+        specifier: 0.14.4
+        version: 0.14.4
+      '@types/semver':
+        specifier: 6.2.3
+        version: 6.2.3
+      '@types/yargs-parser':
+        specifier: 20.2.1
+        version: 20.2.1
+      tmp:
+        specifier: 0.2.1
+        version: 0.2.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/cli/test/plugins/@namespace/package2: {}
+
+  packages/cli/test/plugins/package1: {}
+
   packages/core:
     dependencies:
       '@mainsail/api':
@@ -302,7 +418,7 @@ importers:
         version: link:../blockchain
       '@mainsail/core-cli':
         specifier: workspace:*
-        version: link:../core-cli
+        version: link:../cli
       '@mainsail/core-configuration-generator':
         specifier: workspace:*
         version: link:../core-configuration-generator
@@ -474,122 +590,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-cli:
-    dependencies:
-      '@mainsail/core-container':
-        specifier: workspace:*
-        version: link:../core-container
-      '@mainsail/core-contracts':
-        specifier: workspace:*
-        version: link:../core-contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      boxen:
-        specifier: 4.2.0
-        version: 4.2.0
-      cli-table3:
-        specifier: 0.6.0
-        version: 0.6.0
-      dayjs:
-        specifier: 1.10.7
-        version: 1.10.7
-      env-paths:
-        specifier: 2.2.0
-        version: 2.2.0
-      envfile:
-        specifier: 5.2.0
-        version: 5.2.0
-      execa:
-        specifier: 3.4.0
-        version: 3.4.0
-      fast-levenshtein:
-        specifier: 2.0.6
-        version: 2.0.6
-      fs-extra:
-        specifier: 8.1.0
-        version: 8.1.0
-      glob:
-        specifier: 7.1.7
-        version: 7.1.7
-      got:
-        specifier: 11.8.2
-        version: 11.8.2
-      inversify:
-        specifier: 5.1.1
-        version: 5.1.1
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      kleur:
-        specifier: 4.0.0
-        version: 4.0.0
-      latest-version:
-        specifier: 5.1.0
-        version: 5.1.0
-      listr:
-        specifier: 0.14.3
-        version: 0.14.3
-      nodejs-tail:
-        specifier: 1.1.1
-        version: 1.1.1
-      ora:
-        specifier: 4.1.1
-        version: 4.1.1
-      prompts:
-        specifier: 2.4.0
-        version: 2.4.0
-      read-last-lines:
-        specifier: 1.8.0
-        version: 1.8.0
-      reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
-      semver:
-        specifier: 6.3.0
-        version: 6.3.0
-      tar:
-        specifier: 6.1.11
-        version: 6.1.11
-      type-fest:
-        specifier: 0.21.3
-        version: 0.21.3
-      yargs-parser:
-        specifier: 20.2.9
-        version: 20.2.9
-    devDependencies:
-      '@types/fast-levenshtein':
-        specifier: 0.0.2
-        version: 0.0.2
-      '@types/fs-extra':
-        specifier: 8.1.2
-        version: 8.1.2
-      '@types/is-ci':
-        specifier: 2.0.0
-        version: 2.0.0
-      '@types/listr':
-        specifier: 0.14.4
-        version: 0.14.4
-      '@types/semver':
-        specifier: 6.2.3
-        version: 6.2.3
-      '@types/yargs-parser':
-        specifier: 20.2.1
-        version: 20.2.1
-      tmp:
-        specifier: 0.2.1
-        version: 0.2.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-
-  packages/core-cli/test/plugins/@namespace/package2: {}
-
-  packages/core-cli/test/plugins/package1: {}
 
   packages/core-configuration-generator:
     dependencies:
@@ -2486,7 +2486,7 @@ importers:
         version: link:../blockchain
       '@mainsail/core-cli':
         specifier: workspace:*
-        version: link:../core-cli
+        version: link:../cli
       '@mainsail/core-configuration-generator':
         specifier: workspace:*
         version: link:../core-configuration-generator
@@ -9158,7 +9158,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       globby: 11.1.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       is-glob: 4.0.3
       is-path-cwd: 2.2.0
       is-path-inside: 3.0.3
@@ -10375,7 +10375,7 @@ packages:
       cross-spawn: 7.0.3
       get-stream: 6.0.0
       human-signals: 2.1.0
-      is-stream: 2.0.0
+      is-stream: 2.0.1
       merge-stream: 2.0.0
       npm-run-path: 4.0.1
       onetime: 5.1.2
@@ -10811,7 +10811,7 @@ packages:
     resolution: {integrity: sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==}
     engines: {node: '>=14.14'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jsonfile: 6.1.0
       universalify: 2.0.0
     dev: true
@@ -10837,7 +10837,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       at-least-node: 1.0.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jsonfile: 6.1.0
       universalify: 2.0.0
     dev: true
@@ -11181,7 +11181,7 @@ packages:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.0.5
+      minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
     dev: true
@@ -12346,7 +12346,7 @@ packages:
       async: 3.2.4
       chalk: 4.1.2
       filelist: 1.0.4
-      minimatch: 3.0.5
+      minimatch: 3.1.2
     dev: true
 
   /jest-get-type@24.9.0:
@@ -12923,7 +12923,7 @@ packages:
     resolution: {integrity: sha512-Kx8hMakjX03tiGTLAIdJ+lL0htKnXjEZN6hk/tozf/WOuYGdZBJrZ+rCJRbVCugsjB3jMLn9746NsQIf5VjBMw==}
     engines: {node: '>=4'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       parse-json: 4.0.0
       pify: 3.0.0
       strip-bom: 3.0.0
@@ -12933,7 +12933,7 @@ packages:
     resolution: {integrity: sha512-gUD/epcRms75Cw8RT1pUdHugZYM5ce64ucs2GEISABwkRsOQr0q2wm/MV2TKThycIe5e0ytRweW2RZxclogCdQ==}
     engines: {node: '>=8'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       parse-json: 5.2.0
       strip-bom: 4.0.0
       type-fest: 0.6.0
@@ -13998,7 +13998,7 @@ packages:
     dependencies:
       env-paths: 2.2.1
       glob: 7.1.7
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       make-fetch-happen: 10.2.1
       nopt: 6.0.0
       npmlog: 6.0.2
@@ -17243,7 +17243,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       del: 6.1.1
-      is-stream: 2.0.0
+      is-stream: 2.0.1
       temp-dir: 2.0.0
       type-fest: 0.16.0
       unique-string: 2.0.0
@@ -18237,7 +18237,7 @@ packages:
   /write-file-atomic@2.4.3:
     resolution: {integrity: sha512-GaETH5wwsX+GcnzhPgKcKjJ6M2Cq3/iZp1WyY/X1CSqrW+jVNM9Y7D8EC2sM4ZG/V8wZlSniJnCKWPmBYAucRQ==}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
     dev: true
@@ -18272,7 +18272,7 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       detect-indent: 5.0.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       make-dir: 2.1.0
       pify: 4.0.1
       sort-keys: 2.0.0
