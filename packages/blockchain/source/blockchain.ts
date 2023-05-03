@@ -13,7 +13,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-blockchain")
+	@tagged("plugin", "blockchain")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.StateStore)

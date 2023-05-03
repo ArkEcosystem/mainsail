@@ -218,9 +218,9 @@ importers:
         specifier: 6.3.0
         version: 6.3.0
     devDependencies:
-      '@mainsail/core-blockchain':
+      '@mainsail/blockchain':
         specifier: workspace:*
-        version: link:../core-blockchain
+        version: link:../blockchain
       '@mainsail/core-forger':
         specifier: workspace:*
         version: link:../core-forger
@@ -249,14 +249,57 @@ importers:
         specifier: 4.5.0
         version: 4.5.0
 
+  packages/blockchain:
+    dependencies:
+      '@mainsail/core-container':
+        specifier: workspace:*
+        version: link:../core-container
+      '@mainsail/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/core-state':
+        specifier: workspace:*
+        version: link:../core-state
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      xstate:
+        specifier: 4.23.4
+        version: 4.23.4
+    devDependencies:
+      '@mainsail/core-crypto-config':
+        specifier: workspace:*
+        version: link:../core-crypto-config
+      '@types/async':
+        specifier: 3.2.7
+        version: 3.2.7
+      delay:
+        specifier: 4.4.1
+        version: 4.4.1
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      sinon:
+        specifier: ^12.0.1
+        version: 12.0.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
   packages/core:
     dependencies:
       '@mainsail/api':
         specifier: workspace:*
         version: link:../api
-      '@mainsail/core-blockchain':
+      '@mainsail/blockchain':
         specifier: workspace:*
-        version: link:../core-blockchain
+        version: link:../blockchain
       '@mainsail/core-cli':
         specifier: workspace:*
         version: link:../core-cli
@@ -431,49 +474,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-blockchain:
-    dependencies:
-      '@mainsail/core-container':
-        specifier: workspace:*
-        version: link:../core-container
-      '@mainsail/core-contracts':
-        specifier: workspace:*
-        version: link:../core-contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      xstate:
-        specifier: 4.23.4
-        version: 4.23.4
-    devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
-      '@types/async':
-        specifier: 3.2.7
-        version: 3.2.7
-      delay:
-        specifier: 4.4.1
-        version: 4.4.1
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^12.0.1
-        version: 12.0.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/core-cli:
     dependencies:
@@ -2481,9 +2481,9 @@ importers:
 
   packages/core-test-framework:
     dependencies:
-      '@mainsail/core-blockchain':
+      '@mainsail/blockchain':
         specifier: workspace:*
-        version: link:../core-blockchain
+        version: link:../blockchain
       '@mainsail/core-cli':
         specifier: workspace:*
         version: link:../core-cli
@@ -16130,7 +16130,7 @@ packages:
     resolution: {integrity: sha512-efCx3b+0Z69/LGJmm9Yvi4cqEdxnoGnxYxGxBghkkTTFeXRtTCmmhO0AnAfHz59k957uTSuy8WaHqOs8wbYUWg==}
     engines: {node: '>=6'}
     dependencies:
-      debug: 4.1.1
+      debug: 4.3.4(supports-color@8.1.1)
       module-details-from-path: 1.0.3
       resolve: 1.22.2
     transitivePeerDependencies:

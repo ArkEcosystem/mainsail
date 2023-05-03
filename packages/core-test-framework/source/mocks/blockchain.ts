@@ -1,4 +1,4 @@
-import { Blockchain } from "@mainsail/core-blockchain";
+import { Blockchain } from "@mainsail/blockchain";
 import { Contracts } from "@mainsail/core-contracts";
 
 let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;

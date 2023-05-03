@@ -82,7 +82,7 @@
 			"package": "@mainsail/core-p2p"
 		},
 		{
-			"package": "@mainsail/core-blockchain"
+			"package": "@mainsail/blockchain"
 		},
 		{
 			"package": "@mainsail/api"

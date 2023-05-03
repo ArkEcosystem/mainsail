@@ -40,7 +40,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			config: () => ({
 				all: () => coreApiServiceProviderConfiguration,
 			}),
-			name: () => "core-api",
+			name: () => "api",
 		};
 		coreWebhooksServiceProvider = {
 			config: () => ({

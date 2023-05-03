@@ -34,7 +34,7 @@
 		"semver": "6.3.0"
 	},
 	"devDependencies": {
-		"@mainsail/core-blockchain": "workspace:*",
+		"@mainsail/blockchain": "workspace:*",
 		"@mainsail/core-forger": "workspace:*",
 		"@mainsail/core-p2p": "workspace:*",
 		"@mainsail/core-state": "workspace:*",

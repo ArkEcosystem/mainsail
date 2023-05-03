@@ -22,8 +22,8 @@ jobs:
               run: pnpm run build
             - name: Test core
               run: cd packages/core && pnpm run test
-            - name: Test core-blockchain
-              run: cd packages/core-blockchain && pnpm run test
+            - name: Test blockchain
+              run: cd packages/blockchain && pnpm run test
             - name: Test core-cli
               run: cd packages/core-cli && pnpm run test
             - name: Test core-crypto-address-base58

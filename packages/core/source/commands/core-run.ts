@@ -29,7 +29,7 @@ export class Command extends Commands.Command {
 		await Utils.Builder.buildApplication({
 			flags,
 			plugins: {
-				"@mainsail/core-blockchain": {
+				"@mainsail/blockchain": {
 					networkStart: flags.networkStart,
 				},
 				"@mainsail/core-p2p": Utils.Builder.buildPeerFlags(flags),
