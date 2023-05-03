@@ -31,7 +31,7 @@
 			"package": "@mainsail/core-serializer"
 		},
 		{
-			"package": "@mainsail/core-crypto-block"
+			"package": "@mainsail/crypto-block"
 		},
 		{
 			"package": "@mainsail/core-fees"

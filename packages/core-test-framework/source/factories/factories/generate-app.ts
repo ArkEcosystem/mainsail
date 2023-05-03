@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/core-crypto-config";
 
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../../crypto-address-bech32";
-import { ServiceProvider as CoreCryptoBlock } from "../../../../core-crypto-block";
+import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../core-crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../../core-crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../core-crypto-signature-schnorr";
