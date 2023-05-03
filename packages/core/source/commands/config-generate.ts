@@ -1,5 +1,5 @@
 import { Commands, Container, Contracts, Services } from "@mainsail/cli";
-import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/core-configuration-generator";
+import { ConfigurationGenerator, Identifiers, makeApplication } from "packages/configuration-generator/distribution";
 import { inject, injectable } from "@mainsail/core-container";
 import { Contracts as AppContracts } from "@mainsail/core-contracts";
 import envPaths from "env-paths";
