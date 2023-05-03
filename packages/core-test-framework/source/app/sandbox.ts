@@ -1,4 +1,4 @@
-import { ConfigurationGenerator, makeApplication } from "packages/configuration-generator/distribution";
+import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
 import { Container, interfaces } from "@mainsail/core-container";
 import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Application, Providers, Types } from "@mainsail/core-kernel";

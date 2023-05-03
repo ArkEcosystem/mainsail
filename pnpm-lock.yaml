@@ -408,6 +408,97 @@ importers:
 
   packages/cli/test/plugins/package1: {}
 
+  packages/configuration-generator:
+    dependencies:
+      '@mainsail/core-container':
+        specifier: workspace:*
+        version: link:../core-container
+      '@mainsail/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
+      '@mainsail/core-crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
+      '@mainsail/core-crypto-block':
+        specifier: workspace:*
+        version: link:../core-crypto-block
+      '@mainsail/core-crypto-config':
+        specifier: workspace:*
+        version: link:../core-crypto-config
+      '@mainsail/core-crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../core-crypto-hash-bcrypto
+      '@mainsail/core-crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../core-crypto-key-pair-schnorr
+      '@mainsail/core-crypto-signature-schnorr':
+        specifier: workspace:*
+        version: link:../core-crypto-signature-schnorr
+      '@mainsail/core-crypto-time':
+        specifier: workspace:*
+        version: link:../core-crypto-time
+      '@mainsail/core-crypto-transaction':
+        specifier: workspace:*
+        version: link:../core-crypto-transaction
+      '@mainsail/core-crypto-transaction-transfer':
+        specifier: workspace:*
+        version: link:../core-crypto-transaction-transfer
+      '@mainsail/core-crypto-transaction-validator-registration':
+        specifier: workspace:*
+        version: link:../core-crypto-transaction-validator-registration
+      '@mainsail/core-crypto-transaction-vote':
+        specifier: workspace:*
+        version: link:../core-crypto-transaction-vote
+      '@mainsail/core-crypto-validation':
+        specifier: workspace:*
+        version: link:../core-crypto-validation
+      '@mainsail/core-crypto-wif':
+        specifier: workspace:*
+        version: link:../core-crypto-wif
+      '@mainsail/core-database':
+        specifier: workspace:*
+        version: link:../core-database
+      '@mainsail/core-fees':
+        specifier: workspace:*
+        version: link:../core-fees
+      '@mainsail/core-fees-static':
+        specifier: workspace:*
+        version: link:../core-fees-static
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/core-lmdb':
+        specifier: workspace:*
+        version: link:../core-lmdb
+      '@mainsail/core-serializer':
+        specifier: workspace:*
+        version: link:../core-serializer
+      '@mainsail/core-validation':
+        specifier: workspace:*
+        version: link:../core-validation
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      bip39:
+        specifier: 3.0.4
+        version: 3.0.4
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
+      env-paths:
+        specifier: 2.2.1
+        version: 2.2.1
+      envfile:
+        specifier: 5.2.0
+        version: 5.2.0
+      fs-extra:
+        specifier: 8.1.0
+        version: 8.1.0
+    devDependencies:
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
   packages/core:
     dependencies:
       '@mainsail/api':
@@ -419,9 +510,9 @@ importers:
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mainsail/core-configuration-generator':
+      '@mainsail/configuration-generator':
         specifier: workspace:*
-        version: link:../core-configuration-generator
+        version: link:../configuration-generator
       '@mainsail/core-container':
         specifier: workspace:*
         version: link:../core-container
@@ -590,97 +681,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-configuration-generator:
-    dependencies:
-      '@mainsail/core-container':
-        specifier: workspace:*
-        version: link:../core-container
-      '@mainsail/core-contracts':
-        specifier: workspace:*
-        version: link:../core-contracts
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
-      '@mainsail/core-crypto-block':
-        specifier: workspace:*
-        version: link:../core-crypto-block
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
-      '@mainsail/core-crypto-hash-bcrypto':
-        specifier: workspace:*
-        version: link:../core-crypto-hash-bcrypto
-      '@mainsail/core-crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../core-crypto-key-pair-schnorr
-      '@mainsail/core-crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../core-crypto-signature-schnorr
-      '@mainsail/core-crypto-time':
-        specifier: workspace:*
-        version: link:../core-crypto-time
-      '@mainsail/core-crypto-transaction':
-        specifier: workspace:*
-        version: link:../core-crypto-transaction
-      '@mainsail/core-crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../core-crypto-transaction-transfer
-      '@mainsail/core-crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../core-crypto-transaction-validator-registration
-      '@mainsail/core-crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../core-crypto-transaction-vote
-      '@mainsail/core-crypto-validation':
-        specifier: workspace:*
-        version: link:../core-crypto-validation
-      '@mainsail/core-crypto-wif':
-        specifier: workspace:*
-        version: link:../core-crypto-wif
-      '@mainsail/core-database':
-        specifier: workspace:*
-        version: link:../core-database
-      '@mainsail/core-fees':
-        specifier: workspace:*
-        version: link:../core-fees
-      '@mainsail/core-fees-static':
-        specifier: workspace:*
-        version: link:../core-fees-static
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/core-lmdb':
-        specifier: workspace:*
-        version: link:../core-lmdb
-      '@mainsail/core-serializer':
-        specifier: workspace:*
-        version: link:../core-serializer
-      '@mainsail/core-validation':
-        specifier: workspace:*
-        version: link:../core-validation
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      bip39:
-        specifier: 3.0.4
-        version: 3.0.4
-      dayjs:
-        specifier: 1.10.7
-        version: 1.10.7
-      env-paths:
-        specifier: 2.2.1
-        version: 2.2.1
-      envfile:
-        specifier: 5.2.0
-        version: 5.2.0
-      fs-extra:
-        specifier: 8.1.0
-        version: 8.1.0
-    devDependencies:
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/core-container:
     dependencies:
@@ -2487,9 +2487,9 @@ importers:
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mainsail/core-configuration-generator':
+      '@mainsail/configuration-generator':
         specifier: workspace:*
-        version: link:../core-configuration-generator
+        version: link:../configuration-generator
       '@mainsail/core-container':
         specifier: workspace:*
         version: link:../core-container

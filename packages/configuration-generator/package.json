@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-configuration-generator",
+	"name": "@mainsail/configuration-generator",
 	"version": "0.0.1",
 	"description": "Configuration generator for ARK Core",
 	"license": "MIT",
