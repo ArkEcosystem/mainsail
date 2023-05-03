@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { dotenv, get, set } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
 import importFresh from "import-fresh";

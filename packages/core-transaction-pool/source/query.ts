@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	public transactions: Contracts.Crypto.ITransaction[];

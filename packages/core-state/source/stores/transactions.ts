@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/core-kernel";
 
 // @TODO review its implementation and finally integrate it as planned in v2

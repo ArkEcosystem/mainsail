@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { Stores } from "@mainsail/core-state";
 
 let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;

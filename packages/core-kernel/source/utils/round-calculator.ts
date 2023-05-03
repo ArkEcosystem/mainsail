@@ -1,4 +1,4 @@
-import { Contracts, Exceptions } from "@mainsail/core-contracts";
+import { Contracts, Exceptions } from "@mainsail/contracts";
 
 import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 

@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/core-crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 

@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import memoize from "fast-memoize";
 
 import {

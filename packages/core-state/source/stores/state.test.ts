@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { SinonSpy } from "sinon";
 
 import { describeSkip, Factories } from "../../../core-test-framework";

@@ -1,4 +1,4 @@
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/core-kernel";
 import { describe, Sandbox } from "../../core-test-framework";
 import rewiremock from "rewiremock";

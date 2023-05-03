@@ -22,7 +22,7 @@
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/core-crypto-config": "workspace:*",
 		"@mainsail/core-crypto-transaction": "workspace:*",
 		"@mainsail/core-crypto-transaction-multi-payment": "workspace:*",

@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { FeeRegistry } from "@mainsail/core-fees";
 import { BigNumber } from "packages/utils/distribution";
 

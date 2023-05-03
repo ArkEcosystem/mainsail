@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts, Exceptions } from "@mainsail/core-contracts";
+import { Contracts, Exceptions } from "@mainsail/contracts";
 import Transactions from "@mainsail/core-crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/core-kernel";
 import { Handlers } from "@mainsail/core-transactions";

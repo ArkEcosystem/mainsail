@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/core-crypto-config";
 
 import { describe, Sandbox } from "../../core-test-framework";

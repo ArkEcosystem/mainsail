@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionRegistry } from "@mainsail/core-crypto-transaction";
 import { Providers } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";

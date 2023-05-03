@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Utils as KernelUtils } from "@mainsail/core-kernel";
 
 import { DisconnectInvalidPeers } from "./listeners";

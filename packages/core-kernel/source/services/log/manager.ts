@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 
 import { InstanceManager } from "../../support/instance-manager";
 import { MemoryLogger } from "./drivers/memory";

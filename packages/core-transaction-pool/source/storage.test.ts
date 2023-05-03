@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/core-crypto-config";
 import { Application } from "@mainsail/core-kernel";
 import fs from "fs-extra";

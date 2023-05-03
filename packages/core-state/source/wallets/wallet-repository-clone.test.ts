@@ -1,5 +1,5 @@
 import { Selectors } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 

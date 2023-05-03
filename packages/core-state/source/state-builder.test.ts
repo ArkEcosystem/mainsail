@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Application, Enums, Utils } from "@mainsail/core-kernel";
 import { SinonSpy } from "sinon";
 

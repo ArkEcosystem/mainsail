@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/core-kernel";
 import { NullEventDispatcher } from "@mainsail/core-kernel/source/services/events/drivers/null";
 import importFresh from "import-fresh";

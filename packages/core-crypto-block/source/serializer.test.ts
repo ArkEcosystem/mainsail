@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../core-test-framework";
 import { blockData, blockDataWithTransactions } from "../test/fixtures/block";

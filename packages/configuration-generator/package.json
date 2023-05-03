@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/core-crypto-address-bech32m": "workspace:*",
 		"@mainsail/core-crypto-block": "workspace:*",
 		"@mainsail/core-crypto-config": "workspace:*",

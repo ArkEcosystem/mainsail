@@ -1,4 +1,4 @@
-import { Constants } from "@mainsail/core-contracts";
+import { Constants } from "@mainsail/contracts";
 
 export const constants = {
 	// maximum number of blocks we can download at once

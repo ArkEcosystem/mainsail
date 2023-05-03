@@ -1,6 +1,6 @@
 import { Container, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
-import { AssertionException } from "@mainsail/core-contracts/distribution/exceptions";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { AssertionException } from "@mainsail/contracts/distribution/exceptions";
 import { Application, Services, Utils } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 import { spy } from "sinon";

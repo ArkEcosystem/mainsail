@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { describe, Sandbox } from "../../core-test-framework";

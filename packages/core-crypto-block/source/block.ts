@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 
 interface BlockArguments {
 	data: Contracts.Crypto.IBlockData;

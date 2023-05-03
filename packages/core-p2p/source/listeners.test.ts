@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "../../core-test-framework";
 
 import { DisconnectInvalidPeers, DisconnectPeer } from "./listeners";

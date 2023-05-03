@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@pm2/io": "4.3.5",
 		"chalk": "4.1.2",

@@ -1,5 +1,5 @@
 import { injectable, Selectors } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 import { Factories, Sandbox } from "../../core-test-framework";

@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { Services, Types } from "@mainsail/core-kernel";
 
 export class RevertTransactionAction extends Services.Triggers.Action {

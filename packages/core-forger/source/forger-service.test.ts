@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Enums, Utils as AppUtils } from "@mainsail/core-kernel";
 
 import { describe, Sandbox } from "../../core-test-framework/source";

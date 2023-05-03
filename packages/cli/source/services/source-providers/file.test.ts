@@ -1,4 +1,4 @@
-import { Exceptions } from "@mainsail/core-contracts";
+import { Exceptions } from "@mainsail/contracts";
 import fs from "fs-extra";
 import { join } from "path";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";

@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 
 import { describe } from "../../../../core-test-framework";
 import { SyncingComplete } from "./syncing-complete";

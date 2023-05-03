@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 
 export type { Class, JsonObject, PackageJson, Primitive } from "type-fest";
 

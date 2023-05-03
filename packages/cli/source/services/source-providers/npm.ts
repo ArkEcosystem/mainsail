@@ -1,4 +1,4 @@
-import { Constants } from "@mainsail/core-contracts";
+import { Constants } from "@mainsail/contracts";
 import { createWriteStream, ensureFileSync, removeSync } from "fs-extra";
 import got from "got";
 import stream from "stream";

@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Services } from "@mainsail/core-kernel";
 import { Actions } from "@mainsail/core-state";
 import { BigNumber } from "@mainsail/utils";

@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Constants, Identifiers } from "@mainsail/core-contracts";
+import { Constants, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/core-kernel";
 
 // import { Managers } from "@mainsail/crypto";

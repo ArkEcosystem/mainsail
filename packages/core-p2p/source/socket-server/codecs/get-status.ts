@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { getStatus as proto } from "./proto/protos";

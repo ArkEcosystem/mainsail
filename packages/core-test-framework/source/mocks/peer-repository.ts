@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { PeerRepository } from "@mainsail/core-p2p";
 
 let mockPeers: Contracts.P2P.Peer[] = [];

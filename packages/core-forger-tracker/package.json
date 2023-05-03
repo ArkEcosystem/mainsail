@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",
 		"@mainsail/core-p2p": "workspace:*",
 		"@mainsail/utils": "workspace:*",

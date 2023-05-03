@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { resolve } from "path";
 
 import { describe } from "../../../../../core-test-framework";

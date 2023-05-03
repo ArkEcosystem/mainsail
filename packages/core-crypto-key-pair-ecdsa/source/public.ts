@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { numberToHex } from "@mainsail/utils";
 import { secp256k1 } from "bcrypto";
 

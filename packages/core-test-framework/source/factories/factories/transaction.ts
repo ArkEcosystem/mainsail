@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/core-crypto-transaction";
 import { MultiPaymentBuilder } from "@mainsail/core-crypto-transaction-multi-payment";
 import { MultiSignatureBuilder } from "@mainsail/core-crypto-transaction-multi-signature-registration";

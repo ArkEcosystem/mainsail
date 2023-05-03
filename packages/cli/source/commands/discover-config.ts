@@ -1,4 +1,4 @@
-import { Constants } from "@mainsail/core-contracts";
+import { Constants } from "@mainsail/contracts";
 import { readJSON } from "fs-extra";
 import path from "path";
 

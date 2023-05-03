@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Types } from "@mainsail/core-kernel";
 
 import { RoundState } from "../round-state";

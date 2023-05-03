@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/core-kernel";
 import { Wallets } from "@mainsail/core-state";
 import { generateMnemonic } from "bip39";

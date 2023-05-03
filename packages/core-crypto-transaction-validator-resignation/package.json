@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/core-crypto-transaction": "workspace:*",
 		"@mainsail/core-crypto-transaction-validator-registration": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",

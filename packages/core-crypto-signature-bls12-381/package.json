@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@noble/bls12-381": "^1.2.0"

@@ -1,5 +1,5 @@
 import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/core-kernel";
 
 import { TransactionHandlerProvider } from "./handler-provider";

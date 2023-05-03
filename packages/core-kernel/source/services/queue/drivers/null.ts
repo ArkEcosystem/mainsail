@@ -1,5 +1,5 @@
 import { decorateInjectable, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { EventEmitter } from "events";
 
 decorateInjectable(EventEmitter);

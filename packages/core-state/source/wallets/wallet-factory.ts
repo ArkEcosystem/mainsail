@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/core-kernel";
 
 import { Wallet } from "./wallet";

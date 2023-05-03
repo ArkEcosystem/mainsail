@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import Utils from "@mainsail/utils";
 import { SinonSpy } from "sinon";
 

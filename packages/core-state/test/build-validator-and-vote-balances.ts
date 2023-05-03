@@ -1,5 +1,5 @@
 import { Wallet, WalletRepository } from "../source/wallets";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export const buildValidatorAndVoteWallets = async (

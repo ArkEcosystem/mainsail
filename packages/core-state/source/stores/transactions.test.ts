@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 import { describe, Factories } from "../../../core-test-framework";

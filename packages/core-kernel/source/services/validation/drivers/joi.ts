@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { AnySchema, ValidationErrorItem } from "joi";
 
 import { JsonObject } from "../../../types";

@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bcrypto": "5.4.0",

@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Cache, Filesystem, Log, Pipeline, ProcessActions, Queue, Schedule, Triggers, Validation } from "../services";
 import { Bootstrapper } from "./interfaces";

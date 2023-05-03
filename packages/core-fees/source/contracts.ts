@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 
 export interface FeeMatcher {
 	throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void>;

@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { getHeaders } from "./get-headers";

@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { FormatDefinition } from "ajv";
 
 export const makeFormats = (configuration: Contracts.Crypto.IConfiguration) => {

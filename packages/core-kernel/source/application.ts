@@ -1,4 +1,4 @@
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { existsSync, removeSync, writeFileSync } from "fs-extra";
 import { join } from "path";
 

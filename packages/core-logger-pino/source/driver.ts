@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/core-kernel";
 import chalk, { Chalk } from "chalk";
 import { error as console_error } from "console";

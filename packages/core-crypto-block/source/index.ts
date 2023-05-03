@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/core-kernel";
 
 import { Deserializer } from "./deserializer";

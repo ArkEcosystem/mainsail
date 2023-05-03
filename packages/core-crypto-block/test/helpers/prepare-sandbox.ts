@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/core-crypto-transaction";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";

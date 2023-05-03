@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Types, Utils as AppUtils } from "@mainsail/core-kernel";
 import { NetworkStateStatus } from "@mainsail/core-p2p";
 

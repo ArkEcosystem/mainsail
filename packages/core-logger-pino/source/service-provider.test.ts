@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Application, Providers, Services } from "@mainsail/core-kernel";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";

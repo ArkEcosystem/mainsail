@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
-		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@polkadot/util": "^8.4.1",

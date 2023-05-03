@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 
 let mockTransactions: Partial<Contracts.Crypto.ITransaction>[] = [];
 

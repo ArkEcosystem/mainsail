@@ -1,6 +1,6 @@
-// import { IBlock, ITransaction } from "@mainsail/core-contracts";
+// import { IBlock, ITransaction } from "@mainsail/contracts";
 
-import { Exceptions } from "@mainsail/core-contracts";
+import { Exceptions } from "@mainsail/contracts";
 
 const assertType = (condition: boolean, description: string): asserts condition => {
 	if (!condition) {

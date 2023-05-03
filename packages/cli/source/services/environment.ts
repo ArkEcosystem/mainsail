@@ -1,4 +1,4 @@
-import { Constants } from "@mainsail/core-contracts";
+import { Constants } from "@mainsail/contracts";
 import { parseFileSync, stringifySync } from "envfile";
 import { existsSync, writeFileSync } from "fs-extra";
 import path from "path";

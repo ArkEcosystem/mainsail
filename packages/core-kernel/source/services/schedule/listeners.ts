@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 
 export class ExecuteCallbackWhenReady implements Contracts.Kernel.EventListener {
 	readonly #blockCount!: number;

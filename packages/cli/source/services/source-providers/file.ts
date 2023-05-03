@@ -1,4 +1,4 @@
-import { Exceptions } from "@mainsail/core-contracts";
+import { Exceptions } from "@mainsail/contracts";
 import { existsSync } from "fs-extra";
 import { extract } from "tar";
 

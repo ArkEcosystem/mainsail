@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Application, Enums } from "@mainsail/core-kernel";
 import Utils from "@mainsail/utils";
 

@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/core-kernel";
 
 import { FeeRegistry } from "./registry";

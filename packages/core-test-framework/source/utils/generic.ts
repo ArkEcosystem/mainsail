@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 import cloneDeep from "lodash.clonedeep";

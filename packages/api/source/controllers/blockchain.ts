@@ -1,6 +1,6 @@
 // import { Utils } from "@mainsail/core-kernel";
 import { inject } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Controller } from "./controller";
 

@@ -1,4 +1,4 @@
-import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/core-kernel";
 
 import { NetworkStateStatus } from "./enums";

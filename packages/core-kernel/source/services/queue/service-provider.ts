@@ -1,5 +1,5 @@
 import { interfaces } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { QueueManager } from "./manager";

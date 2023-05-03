@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { get, has, set, unset } from "@mainsail/utils";
 
 import { JsonObject, KeyValuePair } from "../../types";

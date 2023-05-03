@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import {
 	extendSchema,
 	Serializer,

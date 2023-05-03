@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/core-crypto-config";
 import { makeKeywords } from "@mainsail/core-crypto-validation";
 import { Validator } from "@mainsail/core-validation/source/validator";

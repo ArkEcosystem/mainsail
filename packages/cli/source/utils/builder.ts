@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/core-kernel";
 
 import { AnyObject } from "../contracts";

@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
-// import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "@mainsail/core-contracts";
+// import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "@mainsail/contracts";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {

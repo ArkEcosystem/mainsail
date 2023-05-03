@@ -1,4 +1,4 @@
-import { Exceptions } from "@mainsail/core-contracts";
+import { Exceptions } from "@mainsail/contracts";
 
 import { describe } from "../../../../core-test-framework";
 import { ActionArguments } from "../../types";

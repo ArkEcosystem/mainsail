@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 import { sign, verify } from "@noble/ed25519";
 

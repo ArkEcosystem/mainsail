@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application, Utils } from "@mainsail/core-kernel";
 
 import { Configuration } from "../../../core-crypto-config";

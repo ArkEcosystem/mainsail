@@ -1,4 +1,4 @@
-import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/core-crypto-transaction-validator-registration";
 import { Enums as AppEnums } from "@mainsail/core-kernel";
 import { Handlers } from "@mainsail/core-transactions";

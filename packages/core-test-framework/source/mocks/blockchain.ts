@@ -1,5 +1,5 @@
 import { Blockchain } from "@mainsail/blockchain";
-import { Contracts } from "@mainsail/core-contracts";
+import { Contracts } from "@mainsail/contracts";
 
 let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;
 let mockIsSynced = true;

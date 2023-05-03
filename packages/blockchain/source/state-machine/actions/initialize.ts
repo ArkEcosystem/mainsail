@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/core-kernel";
 import { DatabaseInteraction } from "@mainsail/core-state";
 

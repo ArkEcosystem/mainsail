@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/core-crypto-config";
 import { KeyPairFactory } from "@mainsail/core-crypto-key-pair-schnorr/source/pair";
 

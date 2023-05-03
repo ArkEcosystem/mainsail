@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/core-contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/core-kernel";
 
 import { Configuration } from "../../core-crypto-config";

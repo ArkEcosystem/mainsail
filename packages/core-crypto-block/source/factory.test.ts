@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import clone from "lodash.clone";
 
 import crypto from "../../core/bin/config/testnet/crypto.json";
