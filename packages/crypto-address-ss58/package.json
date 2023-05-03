@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-address-ss58",
+	"name": "@mainsail/crypto-address-ss58",
 	"version": "0.0.1",
 	"description": "ss58 Address Derivation",
 	"license": "MIT",
