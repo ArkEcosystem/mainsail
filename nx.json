@@ -1,4 +1,7 @@
 {
+	"namedInputs": {
+		"default": ["{projectRoot}/source/**/!(*.test).ts"]
+	},
 	"tasksRunnerOptions": {
 		"default": {
 			"runner": "nx/tasks-runners/default",
@@ -11,6 +14,7 @@
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
+			"inputs": ["default"],
 			"outputs": ["{projectRoot}/distribution"]
 		}
 	}
