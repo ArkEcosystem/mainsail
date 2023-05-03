@@ -1,6 +1,7 @@
 {
 	"namedInputs": {
-		"default": ["{projectRoot}/source/**/!(*.test).ts"]
+		"default": ["{projectRoot}/source/**/!(*.test).ts"],
+		"production": ["default"]
 	},
 	"tasksRunnerOptions": {
 		"default": {
@@ -17,5 +18,6 @@
 			"inputs": ["default"],
 			"outputs": ["{projectRoot}/distribution"]
 		}
-	}
+	},
+	"$schema": "./node_modules/nx/schemas/nx-schema.json"
 }
