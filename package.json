@@ -7,9 +7,9 @@
 		"plugins/*"
 	],
 	"scripts": {
-		"build": "ultra -r build",
-		"clean": "ultra -r clean",
-		"clean:node_modules": "ultra -r del node_modules && del node_modules",
+		"build": "lerna run build",
+		"clean": "lerna run clean --parralel",
+		"clean:node_modules": "del packages/*/node_modules && del node_modules",
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
 		"deps:missing": "node ./scripts/deps/missing.js",
 		"deps:types": "./node_modules/typesync/bin/typesync",
@@ -21,7 +21,6 @@
 		"madge:circular": "node ./scripts/circular.js",
 		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/source",
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
-		"rebuild": "pnpm run clean && ultra -r rebuild",
 		"setup": "pnpm install && pnpm run build",
 		"sort": "sort-package-json \"package.json\" \"packages/*/package.json\"",
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
