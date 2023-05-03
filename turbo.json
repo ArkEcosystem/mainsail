@@ -16,8 +16,14 @@
 		"build": {
 			"cache": true,
 			"dependsOn": ["^build"],
-			"inputs": ["*.proto", "source/**/**.ts", "package.json"],
+			"inputs": ["*.proto", "source/*.ts", "package.json"],
 			"outputs": ["distribution/**"]
+		},
+		"clean": {
+			"cache": false
+		},
+		"clean:full": {
+			"cache": false
 		}
 	}
 }

@@ -14,6 +14,7 @@
 		"build:proto": "pnpm pbjs && pnpm pbts",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
+		"clean:full": "del distribution && del node_modules && del .turbo",
 		"pbjs": "pbjs -t static-module -w commonjs source/socket-server/codecs/proto/*.proto -o source/socket-server/codecs/proto/protos.js",
 		"pbts": "pbts source/socket-server/codecs/proto/protos.js -o source/socket-server/codecs/proto/protos.d.ts",
 		"test": "uvu -r tsm source .test.ts",

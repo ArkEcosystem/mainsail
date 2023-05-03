@@ -705,9 +705,6 @@ importers:
 
   packages/core-contracts:
     dependencies:
-      '@arkecosystem/core-contracts':
-        specifier: workspace:*
-        version: 'link:'
       '@arkecosystem/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2176,12 +2173,6 @@ importers:
         specifier: 0.21.3
         version: 0.21.3
     devDependencies:
-      '@arkecosystem/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
-      '@arkecosystem/core-crypto-time':
-        specifier: workspace:*
-        version: link:../core-crypto-time
       '@types/cron':
         specifier: 1.7.3
         version: 1.7.3
@@ -2407,9 +2398,6 @@ importers:
       '@arkecosystem/core-state':
         specifier: workspace:*
         version: link:../core-state
-      '@arkecosystem/core-test-framework':
-        specifier: workspace:*
-        version: link:../core-test-framework
       '@arkecosystem/utils':
         specifier: workspace:*
         version: link:../utils
