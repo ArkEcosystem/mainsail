@@ -31,7 +31,7 @@
 		"@mainsail/configuration-generator": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/core-crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/core-crypto-block": "workspace:*",
 		"@mainsail/core-crypto-config": "workspace:*",
 		"@mainsail/core-crypto-hash-bcrypto": "workspace:*",

@@ -28,7 +28,7 @@
 		"lmdb": "2.4.2"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/core-crypto-block": "workspace:*",
 		"@mainsail/core-crypto-config": "workspace:*",
 		"@mainsail/core-crypto-hash-bcrypto": "workspace:*",

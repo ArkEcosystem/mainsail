@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
+import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../core-crypto-config";
 import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";

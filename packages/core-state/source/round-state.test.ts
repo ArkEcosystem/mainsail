@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application, Enums } from "@mainsail/core-kernel";
 import Utils from "@mainsail/utils";
 
-import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
+import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
 import { describeSkip, Sandbox } from "../../core-test-framework";

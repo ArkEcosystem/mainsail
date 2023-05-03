@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ServiceProvider as CoreCryptoAddressBeach32m } from "@mainsail/core-crypto-address-bech32m";
+import { ServiceProvider as CoreCryptoAddressBeach32m } from "@mainsail/crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/core-crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/core-crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/core-crypto-hash-bcrypto";

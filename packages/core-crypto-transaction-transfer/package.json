@@ -28,7 +28,7 @@
 		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/core-crypto-config": "workspace:*",
 		"@mainsail/core-crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/core-crypto-validation": "workspace:*",

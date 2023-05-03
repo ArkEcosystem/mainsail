@@ -22,7 +22,7 @@
 			"package": "@mainsail/core-crypto-key-pair-schnorr"
 		},
 		{
-			"package": "@mainsail/core-crypto-address-bech32m"
+			"package": "@mainsail/crypto-address-bech32m"
 		},
 		{
 			"package": "@mainsail/core-crypto-wif"

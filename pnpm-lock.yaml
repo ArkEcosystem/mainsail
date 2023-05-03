@@ -416,9 +416,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-block':
         specifier: workspace:*
         version: link:../core-crypto-block
@@ -476,6 +473,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-block':
         specifier: workspace:*
         version: link:../core-crypto-block
@@ -660,6 +657,9 @@ importers:
       '@mainsail/core-webhooks':
         specifier: workspace:*
         version: link:../core-webhooks
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,46 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-crypto-address-bech32:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      '@scure/base':
-        specifier: ^1.0.0
-        version: 1.0.0
-    devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
-      '@mainsail/core-crypto-key-pair-ecdsa':
-        specifier: workspace:*
-        version: link:../core-crypto-key-pair-ecdsa
-      '@mainsail/core-crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../core-crypto-key-pair-schnorr
-      '@mainsail/core-crypto-validation':
-        specifier: workspace:*
-        version: link:../core-crypto-validation
-      '@mainsail/core-validation':
-        specifier: workspace:*
-        version: link:../core-validation
-      bip39:
-        specifier: 3.0.4
-        version: 3.0.4
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/core-crypto-address-bech32m:
     dependencies:
@@ -956,15 +916,15 @@ importers:
         specifier: 4.3.2
         version: 4.3.2
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
       '@mainsail/core-crypto-validation':
         specifier: workspace:*
         version: link:../core-crypto-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       '@types/bip32':
         specifier: 2.0.0
         version: 2.0.0
@@ -1495,9 +1455,6 @@ importers:
         specifier: 8.11.0
         version: 8.11.0
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
@@ -1507,6 +1464,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       uvu:
         specifier: 0.5.3
         version: 0.5.3
@@ -1538,9 +1498,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
@@ -1550,6 +1507,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       uvu:
         specifier: 0.5.3
         version: 0.5.3
@@ -1578,9 +1538,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-config':
         specifier: workspace:*
         version: link:../core-crypto-config
@@ -1593,6 +1550,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       uvu:
         specifier: 0.5.3
         version: 0.5.3
@@ -1621,9 +1581,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-config':
         specifier: workspace:*
         version: link:../core-crypto-config
@@ -1636,6 +1593,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -1667,9 +1627,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-config':
         specifier: workspace:*
         version: link:../core-crypto-config
@@ -1682,6 +1639,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       uvu:
         specifier: 0.5.3
         version: 0.5.3
@@ -1716,9 +1676,6 @@ importers:
         specifier: 8.11.0
         version: 8.11.0
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-config':
         specifier: workspace:*
         version: link:../core-crypto-config
@@ -1731,6 +1688,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -1836,9 +1796,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@mainsail/core-crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../core-crypto-address-bech32m
       '@mainsail/core-crypto-block':
         specifier: workspace:*
         version: link:../core-crypto-block
@@ -1878,6 +1835,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../core-crypto-address-bech32m
       tmp:
         specifier: 0.2.1
         version: 0.2.1
@@ -2728,6 +2688,46 @@ importers:
       bstring:
         specifier: 0.3.9
         version: 0.3.9
+    devDependencies:
+      '@mainsail/core-crypto-config':
+        specifier: workspace:*
+        version: link:../core-crypto-config
+      '@mainsail/core-crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../core-crypto-key-pair-ecdsa
+      '@mainsail/core-crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../core-crypto-key-pair-schnorr
+      '@mainsail/core-crypto-validation':
+        specifier: workspace:*
+        version: link:../core-crypto-validation
+      '@mainsail/core-validation':
+        specifier: workspace:*
+        version: link:../core-validation
+      bip39:
+        specifier: 3.0.4
+        version: 3.0.4
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/crypto-address-bech32:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@scure/base':
+        specifier: ^1.0.0
+        version: 1.0.0
     devDependencies:
       '@mainsail/core-crypto-config':
         specifier: workspace:*
