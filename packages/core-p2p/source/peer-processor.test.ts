@@ -1,6 +1,6 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers } from "@arkecosystem/core-kernel";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../core-test-framework";
 
 import { defaults } from "./defaults";
 import { Peer } from "./peer";

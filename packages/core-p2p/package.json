@@ -27,7 +27,6 @@
 		"@arkecosystem/core-crypto-validation": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"@hapi/boom": "9.0.0",
 		"@hapi/bounce": "2.0.0",

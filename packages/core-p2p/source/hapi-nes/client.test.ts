@@ -1,5 +1,5 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../../core-test-framework";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";

@@ -1,6 +1,6 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Enums } from "@arkecosystem/core-kernel";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "../../core-test-framework";
 
 import { EventListener } from "./event-listener";
 import { DisconnectPeer } from "./listeners";

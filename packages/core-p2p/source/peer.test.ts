@@ -1,5 +1,5 @@
 import { Contracts } from "@arkecosystem/core-contracts";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import dayjs from "dayjs";
 
 import { Peer } from "./peer";

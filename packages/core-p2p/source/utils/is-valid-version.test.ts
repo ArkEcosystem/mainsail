@@ -1,7 +1,7 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
 
+import { describe, Sandbox } from "../../../core-test-framework";
 import { defaults } from "../defaults";
 import { Peer } from "../peer";
 import { isValidVersion } from "./is-valid-version";

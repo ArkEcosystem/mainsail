@@ -43,8 +43,6 @@
 		"type-fest": "0.21.3"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-config": "workspace:*",
-		"@arkecosystem/core-crypto-time": "workspace:*",
 		"@types/cron": "1.7.3",
 		"@types/fs-extra": "8.1.2",
 		"@types/functional-red-black-tree": "1.0.1",
