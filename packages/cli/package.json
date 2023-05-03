@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-cli",
+	"name": "@mainsail/cli",
 	"version": "0.0.1",
 	"description": "Core of the ARK Blockchain",
 	"license": "MIT",

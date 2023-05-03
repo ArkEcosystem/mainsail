@@ -1,4 +1,4 @@
-import { Container, Contracts } from "@mainsail/core-cli";
+import { Container, Contracts } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/core-test-framework";
 import execa from "execa";
 

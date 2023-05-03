@@ -1,4 +1,4 @@
-import { Commands, Container, Contracts } from "@mainsail/core-cli";
+import { Commands, Container, Contracts } from "@mainsail/cli";
 import { injectable } from "@mainsail/core-container";
 import boxen from "boxen";
 import { blue, cyan } from "kleur";

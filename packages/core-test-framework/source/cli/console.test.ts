@@ -1,4 +1,4 @@
-import { Commands, Container } from "@mainsail/core-cli";
+import { Commands, Container } from "@mainsail/cli";
 import Joi from "joi";
 
 import { describe } from "../index";

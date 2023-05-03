@@ -1,4 +1,4 @@
-import { Commands, Container } from "@mainsail/core-cli";
+import { Commands, Container } from "@mainsail/cli";
 import { injectable } from "@mainsail/core-container";
 import { PackageJson } from "type-fest";
 

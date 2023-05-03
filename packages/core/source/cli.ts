@@ -1,4 +1,4 @@
-import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@mainsail/core-cli";
+import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@mainsail/cli";
 import { injectable } from "@mainsail/core-container";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";

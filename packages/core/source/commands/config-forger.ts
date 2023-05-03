@@ -1,4 +1,4 @@
-import { Commands, Contracts } from "@mainsail/core-cli";
+import { Commands, Contracts } from "@mainsail/cli";
 import { injectable } from "@mainsail/core-container";
 import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra";

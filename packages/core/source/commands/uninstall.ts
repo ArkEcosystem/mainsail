@@ -1,4 +1,4 @@
-import { Commands } from "@mainsail/core-cli";
+import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/core-container";
 
 @injectable()

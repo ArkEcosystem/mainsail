@@ -27,7 +27,7 @@
 	"dependencies": {
 		"@mainsail/api": "workspace:*",
 		"@mainsail/blockchain": "workspace:*",
-		"@mainsail/core-cli": "workspace:*",
+		"@mainsail/cli": "workspace:*",
 		"@mainsail/core-configuration-generator": "workspace:*",
 		"@mainsail/core-container": "workspace:*",
 		"@mainsail/core-contracts": "workspace:*",

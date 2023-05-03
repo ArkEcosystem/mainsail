@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/core-cli";
+import { Container } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/core-test-framework";
 import fs from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";

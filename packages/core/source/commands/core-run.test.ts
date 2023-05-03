@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/core-cli";
+import { Utils } from "@mainsail/cli";
 import { Utils as AppUtils } from "@mainsail/core-kernel";
 import { Console, describe } from "@mainsail/core-test-framework";
 import { writeJSONSync } from "fs-extra";

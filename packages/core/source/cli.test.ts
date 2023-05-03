@@ -1,4 +1,4 @@
-import { Commands, Services } from "@mainsail/core-cli";
+import { Commands, Services } from "@mainsail/cli";
 import envPaths from "env-paths";
 import { join } from "path";
 import prompts from "prompts";
