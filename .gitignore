@@ -44,8 +44,7 @@ docs
 # Optional npm cache directory
 .npm
 package-lock.json
-.ultra.cache.json
-
+.turbo
 # Mac OS X local settings
 .DS_Store
 .tags

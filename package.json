@@ -23,7 +23,6 @@
 		"madge:circular": "node ./scripts/circular.js",
 		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/source",
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
-		"rebuild": "pnpm run clean && ultra -r rebuild",
 		"setup": "pnpm install && pnpm run build",
 		"sort": "sort-package-json \"package.json\" \"packages/*/package.json\"",
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
@@ -84,7 +83,6 @@
 		"typedoc": "0.21.9",
 		"typescript": "4.5.5",
 		"typesync": "0.8.0",
-		"ultra-runner": "^3.10.5",
 		"uuid": "8.3.2",
 		"yaml": "^1.10.2"
 	}

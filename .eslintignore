@@ -1,5 +1,5 @@
 .test.ts
-.ultra.cache.json
+.turbo
 *.d.ts
 bin
 dist

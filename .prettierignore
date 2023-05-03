@@ -1,5 +1,5 @@
 .coverage
-.ultra.cache.json
+.turbo
 dist
 distribution
 docs
