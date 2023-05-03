@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-address-keccak256",
+	"name": "@mainsail/crypto-address-keccak256",
 	"version": "0.0.1",
 	"description": "keccak256 Address Derivation",
 	"license": "MIT",
