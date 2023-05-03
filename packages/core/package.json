@@ -19,6 +19,7 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"clean:full": "del distribution && del node_modules && del .turbo",
+		"clean:node_modules": "del node_modules",
 		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test --token=ark --network=testnet",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
