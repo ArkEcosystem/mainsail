@@ -111,3 +111,6 @@ tags
 
 # Pnpm
 .pnpm-store
+
+# Lerna
+.cache
