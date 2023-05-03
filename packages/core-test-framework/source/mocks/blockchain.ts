@@ -1,5 +1,5 @@
-import { Blockchain } from "@arkecosystem/core-blockchain";
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Blockchain } from "@mainsail/core-blockchain";
+import { Contracts } from "@mainsail/core-contracts";
 
 let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;
 let mockIsSynced = true;

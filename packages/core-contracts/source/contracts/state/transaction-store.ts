@@ -1,4 +1,4 @@
-import { CappedMap } from "@arkecosystem/utils";
+import { CappedMap } from "@mainsail/utils";
 
 import { ITransactionData } from "../crypto";
 

@@ -1,5 +1,5 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Enums, Utils } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Application, Enums, Utils } from "@mainsail/core-kernel";
 import { SinonSpy } from "sinon";
 
 import { Configuration } from "../../core-crypto-config";

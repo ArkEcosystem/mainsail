@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Utils as AppUtils } from "@mainsail/core-kernel";
 
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {

@@ -1,4 +1,4 @@
-import { Enums } from "@arkecosystem/core-kernel";
+import { Enums } from "@mainsail/core-kernel";
 
 import { describe } from "../../../core-test-framework";
 import { Context, ServerHelper } from "../../test/helpers/server";

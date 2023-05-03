@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Services, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Services, Utils } from "@mainsail/core-kernel";
 
 @injectable()
 export class ValidatorTracker {

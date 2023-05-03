@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { FeeRegistry } from "@arkecosystem/core-fees";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { FeeRegistry } from "@mainsail/core-fees";
 import { BigNumber } from "packages/utils/distribution";
 
 @injectable()

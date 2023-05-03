@@ -1,4 +1,4 @@
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 import { format } from "concordance";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";

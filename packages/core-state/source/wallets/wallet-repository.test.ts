@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { BigNumber } from "@mainsail/utils";
 
 import { describeSkip } from "../../../core-test-framework";
 import { setUp } from "../../test/setup";

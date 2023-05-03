@@ -1,8 +1,8 @@
-// import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-// import { Configuration } from "@arkecosystem/core-crypto-config";
-// import { Services } from "@arkecosystem/core-kernel";
-// import { Actions } from "@arkecosystem/core-state";
-// import { BigNumber } from "@arkecosystem/utils";
+// import { Contracts, Identifiers } from "@mainsail/core-contracts";
+// import { Configuration } from "@mainsail/core-crypto-config";
+// import { Services } from "@mainsail/core-kernel";
+// import { Actions } from "@mainsail/core-state";
+// import { BigNumber } from "@mainsail/utils";
 
 // import { describe, Sandbox } from "../../../core-test-framework";
 // import { BlockProcessor } from "./block-processor";

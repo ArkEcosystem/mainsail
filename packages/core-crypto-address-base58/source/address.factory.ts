@@ -1,5 +1,5 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { RIPEMD160, SHA256 } from "bcrypto";
 import { base58 } from "bstring";
 

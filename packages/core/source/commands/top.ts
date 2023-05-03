@@ -1,6 +1,6 @@
-import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { inject, injectable } from "@arkecosystem/core-container";
-import { prettyBytes, prettyTime } from "@arkecosystem/utils";
+import { Commands, Container, Contracts, Services } from "@mainsail/core-cli";
+import { inject, injectable } from "@mainsail/core-container";
+import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 import Joi from "joi";
 

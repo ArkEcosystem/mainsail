@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-hash-wasm",
+	"name": "@mainsail/core-crypto-hash-wasm",
 	"version": "0.0.1",
 	"description": "Hashing powered by WASM",
 	"license": "MIT",
@@ -19,9 +19,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"hash-wasm": "^4.9.0"
 	},
 	"devDependencies": {

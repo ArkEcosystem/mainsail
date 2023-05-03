@@ -1,6 +1,6 @@
-import { Services } from "@arkecosystem/core-kernel";
-import { Wallets } from "@arkecosystem/core-state";
-import { Identities } from "@arkecosystem/crypto";
+import { Services } from "@mainsail/core-kernel";
+import { Wallets } from "@mainsail/core-state";
+import { Identities } from "@mainsail/crypto";
 
 export const calculateActiveDelegates = (): Wallets.Wallet[] => {
 	const activeDelegates = [];

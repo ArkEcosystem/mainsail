@@ -1,5 +1,5 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Boom, notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 

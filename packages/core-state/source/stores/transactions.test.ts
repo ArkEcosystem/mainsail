@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { Contracts } from "@mainsail/core-contracts";
+import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 import { describe, Factories } from "../../../core-test-framework";
 import { TransactionStore } from "./transactions";

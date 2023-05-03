@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 let mockTransactions: Partial<Contracts.Crypto.ITransaction>[] = [];
 

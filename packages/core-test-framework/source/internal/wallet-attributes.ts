@@ -1,4 +1,4 @@
-import { Services } from "@arkecosystem/core-kernel";
+import { Services } from "@mainsail/core-kernel";
 
 export function getWalletAttributeSet(): Services.Attributes.AttributeSet {
 	const attributes: Services.Attributes.AttributeSet = new Services.Attributes.AttributeSet();

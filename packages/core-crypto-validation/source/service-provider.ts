@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers } from "@mainsail/core-kernel";
 
 import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";

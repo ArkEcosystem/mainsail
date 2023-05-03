@@ -1,8 +1,8 @@
-import { Container, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { AssertionException } from "@arkecosystem/core-contracts/distribution/exceptions";
-import { Application, Services, Utils } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { Container, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { AssertionException } from "@mainsail/core-contracts/distribution/exceptions";
+import { Application, Services, Utils } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 import { spy } from "sinon";
 
 import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";

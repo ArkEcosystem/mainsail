@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@mainsail/core-contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { Schedule } from "./schedule";

@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 type BlockChainedDetails = {
 	followsPrevious: boolean;

@@ -1,6 +1,6 @@
 import { Wallet, WalletRepository } from "../source/wallets";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts } from "@mainsail/core-contracts";
+import { BigNumber } from "@mainsail/utils";
 
 export const buildValidatorAndVoteWallets = async (
 	addressFactory: Contracts.Crypto.IAddressFactory,

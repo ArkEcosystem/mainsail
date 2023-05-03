@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prefer-at */
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Services, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Services, Utils } from "@mainsail/core-kernel";
 import assert from "assert";
 import pluralize from "pluralize";
 import { inspect } from "util";

@@ -1,4 +1,4 @@
-import { Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@mainsail/core-kernel";
 import { strictEqual } from "assert";
 
 import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types";

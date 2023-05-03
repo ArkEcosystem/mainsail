@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
 
 import { describe, Sandbox } from "../../core-test-framework";
 import milestones from "../test/fixtures/block-time-milestones.json";

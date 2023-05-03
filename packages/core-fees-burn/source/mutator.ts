@@ -1,7 +1,7 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class BurnFeeMutator implements Contracts.State.ValidatorMutator {

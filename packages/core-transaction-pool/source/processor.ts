@@ -1,6 +1,6 @@
-import { inject, injectable, multiInject, optional } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { inject, injectable, multiInject, optional } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {

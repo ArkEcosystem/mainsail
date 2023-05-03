@@ -1,7 +1,7 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Providers } from "@arkecosystem/core-kernel";
-import { NullEventDispatcher } from "@arkecosystem/core-kernel/source/services/events/drivers/null";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Application, Providers } from "@mainsail/core-kernel";
+import { NullEventDispatcher } from "@mainsail/core-kernel/source/services/events/drivers/null";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";

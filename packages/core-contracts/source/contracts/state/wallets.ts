@@ -1,4 +1,4 @@
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 
 import { IBlockData, IMultiSignatureAsset } from "../crypto";
 

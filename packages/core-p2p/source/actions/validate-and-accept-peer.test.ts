@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@mainsail/core-contracts";
 import { describe, Sandbox } from "../../../core-test-framework";
 
 import { ValidateAndAcceptPeerAction } from "./validate-and-accept-peer";

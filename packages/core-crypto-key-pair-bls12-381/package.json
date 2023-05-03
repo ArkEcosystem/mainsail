@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-key-pair-bls12-381",
+	"name": "@mainsail/core-crypto-key-pair-bls12-381",
 	"version": "0.0.1",
 	"description": "BLS12-381 Key Derivation",
 	"license": "MIT",
@@ -19,11 +19,11 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-crypto-config": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-crypto-config": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@noble/bls12-381": "^1.2.0",
 		"@scure/bip39": "^1.0.0",
 		"bcrypto": "^5.4.0",
@@ -31,8 +31,8 @@
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-validation": "workspace:*",
-		"@arkecosystem/core-validation": "workspace:*",
+		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/core-validation": "workspace:*",
 		"bip39": "3.0.4",
 		"uvu": "^0.5.3"
 	}

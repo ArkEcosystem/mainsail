@@ -33,7 +33,7 @@ describe<{
 		const removeSync = stub(fs, "removeSync");
 		const spyOnExeca = stub(execa, "sync").callsFake(() => {
 			fs.ensureDirSync(join(tempPath, "package"));
-			fs.writeJSONSync(join(tempPath, "package", "package.json"), { name: "@arkecosystem/utils" });
+			fs.writeJSONSync(join(tempPath, "package", "package.json"), { name: "@mainsail/utils" });
 		});
 
 		// Act
@@ -41,7 +41,7 @@ describe<{
 		await source.install(repository);
 
 		// Assert
-		const packageName = "@arkecosystem/utils";
+		const packageName = "@mainsail/utils";
 		const targetPath = `${dataPath}/${packageName}`;
 		removeSync.calledWith(targetPath);
 		removeSync.calledWith(join(tempPath, "package"));
@@ -56,7 +56,7 @@ describe<{
 		const spyOnExeca = stub(execa, "sync");
 
 		// Act
-		const packageName = "@arkecosystem/utils";
+		const packageName = "@mainsail/utils";
 		await source.update(packageName);
 
 		// Assert

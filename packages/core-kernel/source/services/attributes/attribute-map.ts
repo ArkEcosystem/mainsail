@@ -1,4 +1,4 @@
-import { cloneDeep, get, has, set, unset } from "@arkecosystem/utils";
+import { cloneDeep, get, has, set, unset } from "@mainsail/utils";
 import { strictEqual } from "assert";
 
 import { assert } from "../../utils";

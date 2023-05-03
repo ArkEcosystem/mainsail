@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-webhooks",
+	"name": "@mainsail/core-webhooks",
 	"version": "0.0.1",
 	"description": "Webhooks for ARK Core",
 	"license": "MIT",
@@ -18,10 +18,10 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@hapi/boom": "9.0.0",
 		"@hapi/hapi": "20.1.5",
 		"fs-extra": "8.1.0",

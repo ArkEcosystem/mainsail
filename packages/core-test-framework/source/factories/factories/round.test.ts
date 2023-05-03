@@ -1,5 +1,5 @@
-import { Wallets } from "@arkecosystem/core-state";
-import { BigNumber } from "@arkecosystem/utils";
+import { Wallets } from "@mainsail/core-state";
+import { BigNumber } from "@mainsail/utils";
 
 import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../index";

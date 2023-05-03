@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@mainsail/core-contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { getPeerConfig } from "./get-peer-config";
@@ -31,9 +31,9 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 
 		version = "3.0.9";
 		appPlugins = [
-			{ options: {}, package: "@arkecosystem/core-api" },
-			{ package: "@arkecosystem/core-webhooks" },
-			{ package: "@arkecosystem/core-p2p" },
+			{ options: {}, package: "@mainsail/core-api" },
+			{ package: "@mainsail/core-webhooks" },
+			{ package: "@mainsail/core-p2p" },
 		];
 
 		coreApiServiceProvider = {
@@ -62,9 +62,9 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			name: () => "core-p2p",
 		};
 		serviceProviders = {
-			"@arkecosystem/core-api": coreApiServiceProvider,
-			"@arkecosystem/core-p2p": coreP2PServiceProvider,
-			"@arkecosystem/core-webhooks": coreWebhooksServiceProvider,
+			"@mainsail/core-api": coreApiServiceProvider,
+			"@mainsail/core-p2p": coreP2PServiceProvider,
+			"@mainsail/core-webhooks": coreWebhooksServiceProvider,
 		};
 		const configRepository = { get: () => appPlugins }; // get("app.plugins")
 		const serviceProviderRepository = { get: (plugin) => serviceProviders[plugin] };
@@ -91,12 +91,12 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 				version: mockConfig["network.pubKeyHash"],
 			},
 			plugins: {
-				"@arkecosystem/core-api": {
+				"@mainsail/core-api": {
 					enabled: true,
 					// estimateTotalCount: true,
 					port: 4003,
 				},
-				"@arkecosystem/core-webhooks": {
+				"@mainsail/core-webhooks": {
 					enabled: true,
 					port: 4004,
 				},
@@ -111,7 +111,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			port: 4003,
 		};
 
-		delete result.plugins["@arkecosystem/core-api"];
+		delete result.plugins["@mainsail/core-api"];
 		assert.equal(getPeerConfig(app), result);
 	});
 
@@ -123,7 +123,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			},
 		};
 
-		delete result.plugins["@arkecosystem/core-api"];
+		delete result.plugins["@mainsail/core-api"];
 		assert.equal(getPeerConfig(app), result);
 	});
 
@@ -135,7 +135,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			},
 		};
 
-		delete result.plugins["@arkecosystem/core-api"];
+		delete result.plugins["@mainsail/core-api"];
 		assert.equal(getPeerConfig(app), result);
 	});
 
@@ -184,7 +184,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			},
 		};
 
-		result.plugins["@arkecosystem/core-api"].enabled = false;
+		result.plugins["@mainsail/core-api"].enabled = false;
 		assert.equal(getPeerConfig(app), result);
 	});
 });

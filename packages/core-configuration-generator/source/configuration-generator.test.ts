@@ -1,5 +1,5 @@
-import { Application } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { Application } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";

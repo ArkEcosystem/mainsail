@@ -1,5 +1,5 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 
 // @TODO revisit the implementation of the class and see if it can be removed
 // import { Class } from "../types";

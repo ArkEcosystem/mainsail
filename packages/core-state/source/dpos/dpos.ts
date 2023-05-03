@@ -1,7 +1,7 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class DposState implements Contracts.State.DposState {

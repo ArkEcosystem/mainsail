@@ -1,8 +1,8 @@
-// import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-// import { Application } from "@arkecosystem/core-kernel";
+// import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+// import { Application } from "@mainsail/core-kernel";
 // import { Stores, Wallets } from "../../../core-state";
 // import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "../../../core-test-framework";
-// // import { Crypto, Enums, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+// // import { Crypto, Enums, Managers, Transactions, Utils } from "@mainsail/crypto";
 //
 // import {
 // 	buildMultiSignatureWallet,

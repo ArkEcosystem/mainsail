@@ -1,4 +1,4 @@
-import { Providers } from "@arkecosystem/core-kernel";
+import { Providers } from "@mainsail/core-kernel";
 
 let mockServiceProviders: Providers.ServiceProvider[] = [];
 

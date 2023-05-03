@@ -1,7 +1,7 @@
-import { Selectors } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Services } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { Selectors } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Services } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 
 import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../core-crypto-config";

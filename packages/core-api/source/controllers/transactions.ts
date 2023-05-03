@@ -1,7 +1,7 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { Handlers } from "@mainsail/core-transactions";
 import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 

@@ -1,5 +1,5 @@
-import { Container } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 
 import { describe } from "../../../../core-test-framework";
 import { Application } from "../../application";

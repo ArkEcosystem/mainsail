@@ -1,5 +1,5 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@mainsail/core-container";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
 import { resolve } from "path";
 
 import { assert } from "../utils";

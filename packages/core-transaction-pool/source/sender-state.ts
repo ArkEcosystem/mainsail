@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers, Services } from "@mainsail/core-kernel";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {

@@ -1,6 +1,6 @@
-import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/core-container";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers, Utils as KernelUtils } from "@mainsail/core-kernel";
 
 import { DisconnectInvalidPeers } from "./listeners";
 import { isValidPeer } from "./validation";

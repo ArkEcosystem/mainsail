@@ -1,4 +1,4 @@
-import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions } from "@mainsail/core-contracts";
 
 import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 

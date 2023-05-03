@@ -1,5 +1,5 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { getPublicKey } from "@noble/ed25519";
 import { sha256 } from "@noble/hashes/sha256";
 import { mnemonicToSeedSync } from "@scure/bip39";

@@ -1,4 +1,4 @@
-import { Services, Types } from "@arkecosystem/core-kernel";
+import { Services, Types } from "@mainsail/core-kernel";
 
 import { DposState } from "../dpos";
 

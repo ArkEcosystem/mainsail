@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { Types } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { Types } from "@mainsail/core-kernel";
 import { stringifySync } from "envfile";
 import { writeFileSync, writeJSONSync } from "fs-extra";
 import path from "path";

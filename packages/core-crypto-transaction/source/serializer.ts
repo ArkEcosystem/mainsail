@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.ITransactionSerializer {

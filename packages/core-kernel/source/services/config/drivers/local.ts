@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { dotenv, get, set } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { dotenv, get, set } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
 import importFresh from "import-fresh";
 import Joi from "joi";

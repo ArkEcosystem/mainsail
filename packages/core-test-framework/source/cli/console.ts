@@ -1,12 +1,12 @@
-import { Application, ApplicationFactory, Commands, Container as CLI, Services, Utils } from "@arkecosystem/core-cli";
-import { Container } from "@arkecosystem/core-container";
+import { Application, ApplicationFactory, Commands, Container as CLI, Services, Utils } from "@mainsail/core-cli";
+import { Container } from "@mainsail/core-container";
 
 export class Console {
 	public app: Application;
 
 	public pkg = {
 		description: "Core of the ARK Blockchain",
-		name: "@arkecosystem/core",
+		name: "@mainsail/core",
 		version: "3.0.0-next.0",
 	};
 

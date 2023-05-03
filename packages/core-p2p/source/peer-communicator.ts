@@ -1,6 +1,6 @@
-import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Constants, Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/core-container";
+import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers, Types, Utils } from "@mainsail/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
 

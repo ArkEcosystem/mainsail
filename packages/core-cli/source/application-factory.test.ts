@@ -6,7 +6,7 @@ describe("ApplicationFactory", ({ it, stub, assert }) => {
 		assert.instance(
 			ApplicationFactory.make(new Container.Container(), {
 				description: "Core of the ARK Blockchain",
-				name: "@arkecosystem/core",
+				name: "@mainsail/core",
 				version: "3.0.0-next.0",
 			}),
 			Application,
@@ -16,7 +16,7 @@ describe("ApplicationFactory", ({ it, stub, assert }) => {
 	it("should expose the ProcessFactory", () => {
 		const app = ApplicationFactory.make(new Container.Container(), {
 			description: "Core of the ARK Blockchain",
-			name: "@arkecosystem/core",
+			name: "@mainsail/core",
 			version: "3.0.0-next.0",
 		});
 

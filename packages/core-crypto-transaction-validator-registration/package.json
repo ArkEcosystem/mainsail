@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-transaction-validator-registration",
+	"name": "@mainsail/core-crypto-transaction-validator-registration",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
@@ -19,20 +19,20 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-crypto-transaction": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-crypto-transaction": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/core-transactions": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
-		"@arkecosystem/utils": "workspace:*"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
-		"@arkecosystem/core-crypto-config": "workspace:*",
-		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
-		"@arkecosystem/core-crypto-validation": "workspace:*",
-		"@arkecosystem/core-validation": "workspace:*",
+		"@mainsail/core-crypto-address-bech32m": "workspace:*",
+		"@mainsail/core-crypto-config": "workspace:*",
+		"@mainsail/core-crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/core-validation": "workspace:*",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

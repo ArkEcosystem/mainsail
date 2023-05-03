@@ -1,5 +1,5 @@
-import { interfaces } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { interfaces } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { LogManager } from "./manager";

@@ -1,7 +1,7 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Services } from "@arkecosystem/core-kernel";
-import { Actions } from "@arkecosystem/core-state";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Services } from "@mainsail/core-kernel";
+import { Actions } from "@mainsail/core-state";
+import { BigNumber } from "@mainsail/utils";
 import delay from "delay";
 import sinon from "sinon";
 

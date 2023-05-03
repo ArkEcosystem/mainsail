@@ -1,5 +1,5 @@
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Utils } from "@arkecosystem/core-kernel";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Utils } from "@mainsail/core-kernel";
 
 import { NetworkStateStatus } from "./enums";
 

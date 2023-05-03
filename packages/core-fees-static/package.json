@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-fees-static",
+	"name": "@mainsail/core-fees-static",
 	"version": "0.0.1",
 	"description": "Transaction Pool Manager for ARK Core",
 	"license": "MIT",
@@ -19,11 +19,11 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-fees": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/utils": "workspace:*"
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-fees": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*"
 	},
 	"engines": {
 		"node": ">=16.x"

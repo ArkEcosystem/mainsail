@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 
 const findIndex = async (
 	height: number,

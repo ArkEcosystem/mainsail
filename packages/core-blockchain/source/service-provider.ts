@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Services } from "@mainsail/core-kernel";
 import Joi from "joi";
 
 import { ProcessBlockAction } from "./actions";

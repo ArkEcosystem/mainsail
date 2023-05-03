@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Utils } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Application, Utils } from "@mainsail/core-kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../core-test-framework/source";

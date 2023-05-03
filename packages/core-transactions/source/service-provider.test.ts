@@ -1,5 +1,5 @@
-import { Container } from "@arkecosystem/core-container";
-import { Application } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Application } from "@mainsail/core-kernel";
 
 import { describe } from "../../core-test-framework/source";
 import { ServiceProvider } from "./service-provider";

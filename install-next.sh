@@ -214,7 +214,7 @@ success "Installed system updates!"
 
 heading "Installing ARK Core..."
 
-while ! yarn global add @arkecosystem/core@next ; do
+while ! yarn global add @mainsail/core@next ; do
     read -p "Installing ARK Core failed, do you want to retry? [y/N]: " choice
     if [[ ! "$choice" =~ ^(yes|y|Y) ]] ; then
         exit 1

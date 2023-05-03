@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Utils } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Application, Utils } from "@mainsail/core-kernel";
 
 import { Configuration } from "../../../core-crypto-config";
 import { VoteBuilder } from "../../../core-crypto-transaction-vote";

@@ -1,5 +1,5 @@
-import { Container, injectable, interfaces } from "@arkecosystem/core-container";
-import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, injectable, interfaces } from "@mainsail/core-container";
+import { Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { resolve } from "path";
 import { dirSync } from "tmp";
 

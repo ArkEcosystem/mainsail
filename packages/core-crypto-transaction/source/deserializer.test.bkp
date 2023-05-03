@@ -1,4 +1,4 @@
-import { describe, Generators } from "@arkecosystem/core-test-framework";
+import { describe, Generators } from "@mainsail/core-test-framework";
 import ByteBuffer from "bytebuffer";
 
 import { legacyMultiSignatureRegistration } from "../../test/fixtures/transaction";

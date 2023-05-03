@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Providers, Services } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Application, Providers, Services } from "@mainsail/core-kernel";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 

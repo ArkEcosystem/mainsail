@@ -1,5 +1,5 @@
-import { describe, Generators } from "@arkecosystem/core-test-framework";
-import { TransactionFactory } from "@arkecosystem/core-test-framework/source/utils/transaction-factory";
+import { describe, Generators } from "@mainsail/core-test-framework";
+import { TransactionFactory } from "@mainsail/core-test-framework/source/utils/transaction-factory";
 
 import { TransactionVersionError } from "../errors";
 import { Keys } from "../identities";

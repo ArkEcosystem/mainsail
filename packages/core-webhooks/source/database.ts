@@ -1,5 +1,5 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { ensureFileSync, existsSync } from "fs-extra";
 import lowdb from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";

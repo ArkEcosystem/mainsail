@@ -1,8 +1,8 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { FeeRegistry } from "@arkecosystem/core-fees";
-import { Providers } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { FeeRegistry } from "@mainsail/core-fees";
+import { Providers } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {

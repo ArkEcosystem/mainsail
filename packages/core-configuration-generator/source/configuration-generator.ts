@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Application } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Application } from "@mainsail/core-kernel";
 import { ensureDirSync, existsSync } from "fs-extra";
 
 import { ConfigurationWriter } from "./configuration-writer";

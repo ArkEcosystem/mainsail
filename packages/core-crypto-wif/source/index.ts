@@ -1,5 +1,5 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Providers } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Providers } from "@mainsail/core-kernel";
 
 import { WIFFactory } from "./wif.factory";
 

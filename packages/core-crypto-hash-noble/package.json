@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-hash-noble",
+	"name": "@mainsail/core-crypto-hash-noble",
 	"version": "0.0.1",
 	"description": "Hashing powered by @noble/hashes",
 	"license": "MIT",
@@ -19,9 +19,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"@noble/hashes": "^1.0.0"
 	},
 	"devDependencies": {

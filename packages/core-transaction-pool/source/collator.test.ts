@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
 
 import { describe } from "../../core-test-framework";
 import { Collator } from ".";

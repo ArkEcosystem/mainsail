@@ -1,5 +1,5 @@
-import { injectable } from "@arkecosystem/core-container";
-import { get, has } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { get, has } from "@mainsail/utils";
 
 import { PackageJson } from "../types";
 

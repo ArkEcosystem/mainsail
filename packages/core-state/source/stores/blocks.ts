@@ -1,6 +1,6 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { Utils } from "@arkecosystem/core-kernel";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { Utils } from "@mainsail/core-kernel";
 import assert from "assert";
 
 // @TODO review its implementation and finally integrate it as planned in v2

@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { BigNumber } from "@arkecosystem/utils";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { BigNumber } from "@mainsail/utils";
 
 import { Resource } from "../types";
 

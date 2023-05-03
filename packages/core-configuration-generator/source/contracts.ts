@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 type PartialRecord<K extends keyof any, T> = {
 	[P in K]?: T;

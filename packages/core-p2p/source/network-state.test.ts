@@ -1,7 +1,7 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers } from "@mainsail/core-kernel";
 import { describe, Sandbox } from "../../core-test-framework";
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 
 import { defaults } from "./defaults";
 import { NetworkStateStatus } from "./enums";

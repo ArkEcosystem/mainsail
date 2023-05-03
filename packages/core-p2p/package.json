@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-p2p",
+	"name": "@mainsail/core-p2p",
 	"version": "0.0.1",
 	"description": "P2P API for ARK Core",
 	"license": "MIT",
@@ -22,12 +22,12 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-crypto-validation": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/core-state": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@hapi/boom": "9.0.0",
 		"@hapi/bounce": "2.0.0",
 		"@hapi/hapi": "20.1.5",
@@ -48,7 +48,7 @@
 		"ws": "7.5.5"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-validation": "workspace:*",
+		"@mainsail/core-validation": "workspace:*",
 		"@types/better-sqlite3": "5.4.3",
 		"@types/fs-extra": "8.1.2",
 		"@types/hapi__sntp": "3.1.2",

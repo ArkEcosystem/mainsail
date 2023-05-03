@@ -1,7 +1,7 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Application } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
+import { Application } from "@mainsail/core-kernel";
 import fs from "fs-extra";
 
 import { describe } from "../../core-test-framework";

@@ -1,8 +1,8 @@
-import { InsufficientBalanceError } from "@arkecosystem/core-errors";
-import { Application, Exceptions } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@arkecosystem/core-state";
-import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
-import { Crypto, Enums, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { InsufficientBalanceError } from "@mainsail/core-errors";
+import { Application, Exceptions } from "@mainsail/core-kernel";
+import { Stores, Wallets } from "@mainsail/core-state";
+import { describe, Factories, Generators, passphrases } from "@mainsail/core-test-framework";
+import { Crypto, Enums, Managers, Transactions, Utils } from "@mainsail/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";

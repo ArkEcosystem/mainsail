@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Types, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Types, Utils } from "@mainsail/core-kernel";
 import { badData } from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { readFileSync } from "fs";

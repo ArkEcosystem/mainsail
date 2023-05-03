@@ -1,6 +1,6 @@
-import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable, multiInject, postConstruct } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Utils } from "@mainsail/core-kernel";
 
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandler } from "./transaction";

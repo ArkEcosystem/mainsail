@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts } from "@mainsail/core-contracts";
+import { BigNumber } from "@mainsail/utils";
 
 import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../index";

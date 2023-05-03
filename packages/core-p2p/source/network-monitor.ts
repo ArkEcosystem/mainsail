@@ -1,6 +1,6 @@
-import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/core-container";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers, Services, Utils } from "@mainsail/core-kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";

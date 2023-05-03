@@ -1,6 +1,6 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Services } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Application, Services } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 import { SinonSpy } from "sinon";
 
 import { describe, describeSkip, getWalletAttributeSet } from "../../../core-test-framework";

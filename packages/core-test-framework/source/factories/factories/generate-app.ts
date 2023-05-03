@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
 
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../../core-crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "../../../../core-crypto-block";

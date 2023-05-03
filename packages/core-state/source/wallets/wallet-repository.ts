@@ -1,7 +1,7 @@
-import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { inject, injectable, multiInject, postConstruct } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 
 import { WalletIndex } from "./wallet-index";
 

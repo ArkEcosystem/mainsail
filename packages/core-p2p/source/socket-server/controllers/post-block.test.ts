@@ -1,5 +1,5 @@
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils } from "@arkecosystem/core-kernel";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Utils } from "@mainsail/core-kernel";
 import { describe, Sandbox } from "../../../../core-test-framework";
 import rewiremock from "rewiremock";
 
@@ -13,7 +13,7 @@ const utilsMock = {
 const { PostBlockController: PostBlockControllerProxy } = rewiremock.proxy<{
 	PostBlockController: Contracts.Types.Class<PostBlockController>;
 }>("./post-block", {
-	"@arkecosystem/core-kernel": {
+	"@mainsail/core-kernel": {
 		Utils: utilsMock,
 	},
 });

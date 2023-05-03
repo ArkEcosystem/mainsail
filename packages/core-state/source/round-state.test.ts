@@ -1,6 +1,6 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Enums } from "@arkecosystem/core-kernel";
-import Utils from "@arkecosystem/utils";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Application, Enums } from "@mainsail/core-kernel";
+import Utils from "@mainsail/utils";
 
 import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
 import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";

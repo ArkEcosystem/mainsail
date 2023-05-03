@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-contracts",
+	"name": "@mainsail/core-contracts",
 	"version": "0.0.1",
 	"description": "Kernel of ARK Core",
 	"license": "MIT",
@@ -19,7 +19,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@hapi/hapi": "20.1.5",
 		"ajv": "8.11.0",
 		"dayjs": "1.10.7",

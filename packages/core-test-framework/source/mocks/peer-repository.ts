@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { PeerRepository } from "@arkecosystem/core-p2p";
+import { Contracts } from "@mainsail/core-contracts";
+import { PeerRepository } from "@mainsail/core-p2p";
 
 let mockPeers: Contracts.P2P.Peer[] = [];
 

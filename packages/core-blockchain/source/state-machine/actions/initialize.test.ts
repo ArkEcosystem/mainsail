@@ -1,8 +1,8 @@
-import { Container } from "@arkecosystem/core-container";
-import { Constants, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Constants, Identifiers } from "@mainsail/core-contracts";
+import { Utils } from "@mainsail/core-kernel";
 
-// import { Managers } from "@arkecosystem/crypto";
+// import { Managers } from "@mainsail/crypto";
 import { describe } from "../../../../core-test-framework";
 import { Initialize } from "./initialize";
 

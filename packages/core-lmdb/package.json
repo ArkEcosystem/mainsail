@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-lmdb",
+	"name": "@mainsail/core-lmdb",
 	"version": "0.0.1",
 	"description": "Database Interface for ARK Core",
 	"license": "MIT",
@@ -19,9 +19,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"lmdb": "2.7.11"
 	},
 	"devDependencies": {

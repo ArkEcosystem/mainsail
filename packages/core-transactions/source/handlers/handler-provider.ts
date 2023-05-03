@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Services, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Services, Utils } from "@mainsail/core-kernel";
 
 import { TransactionHandlerConstructor } from "./transaction";
 

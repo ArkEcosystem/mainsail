@@ -1,4 +1,4 @@
-import { ByteBuffer } from "@arkecosystem/utils";
+import { ByteBuffer } from "@mainsail/utils";
 
 import { IMultiSignatureAsset } from "./transactions";
 

@@ -1,5 +1,5 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Types } from "@arkecosystem/core-kernel";
+import { injectable } from "@mainsail/core-container";
+import { Types } from "@mainsail/core-kernel";
 import { readJSONSync } from "fs-extra";
 import { resolve } from "path";
 

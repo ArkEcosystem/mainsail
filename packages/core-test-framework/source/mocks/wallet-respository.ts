@@ -1,5 +1,5 @@
-import { Wallets } from "@arkecosystem/core-state";
-import { BigNumber } from "@arkecosystem/utils";
+import { Wallets } from "@mainsail/core-state";
+import { BigNumber } from "@mainsail/utils";
 
 let mockNonce: BigNumber = BigNumber.make(1);
 

@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-transaction",
+	"name": "@mainsail/core-crypto-transaction",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
@@ -19,15 +19,15 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-crypto-config": "workspace:*",
-		"@arkecosystem/core-crypto-time": "workspace:*",
-		"@arkecosystem/core-crypto-validation": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-validation": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-crypto-config": "workspace:*",
+		"@mainsail/core-crypto-time": "workspace:*",
+		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/core-validation": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"ajv": "8.11.0",
 		"bcrypto": "5.4.0",
 		"bip32": "2.0.6",
@@ -44,7 +44,7 @@
 		"lodash.set": "4.3.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/core-crypto-key-pair-schnorr": "workspace:*",
 		"@types/bip32": "2.0.0",
 		"@types/bip39": "2.4.2",
 		"@types/buffer-xor": "2.0.0",

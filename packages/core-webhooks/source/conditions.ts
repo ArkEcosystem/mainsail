@@ -1,4 +1,4 @@
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 
 const toBoolean = (value): boolean => value.toString().toLowerCase().trim() === "true";
 

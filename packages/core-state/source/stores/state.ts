@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers, Utils } from "@mainsail/core-kernel";
 import assert from "assert";
 import { OrderedMap, OrderedSet, Seq } from "immutable";
 

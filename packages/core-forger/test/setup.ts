@@ -1,8 +1,8 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Services } from "@arkecosystem/core-kernel";
-import { Actions } from "@arkecosystem/core-state";
-import { Wallet } from "@arkecosystem/core-state/source/wallets";
+import { injectable } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Services } from "@mainsail/core-kernel";
+import { Actions } from "@mainsail/core-state";
+import { Wallet } from "@mainsail/core-state/source/wallets";
 import { spy } from "sinon";
 
 import { Sandbox } from "../../core-test-framework/source";

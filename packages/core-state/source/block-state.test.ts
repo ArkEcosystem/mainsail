@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import Utils from "@arkecosystem/utils";
+import { Contracts } from "@mainsail/core-contracts";
+import Utils from "@mainsail/utils";
 import { SinonSpy } from "sinon";
 
 import { describeSkip, Factories, Sandbox } from "../../core-test-framework";

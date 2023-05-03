@@ -1,7 +1,7 @@
-import { ConfigurationGenerator, makeApplication } from "@arkecosystem/core-configuration-generator";
-import { Container, interfaces } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Providers, Types } from "@arkecosystem/core-kernel";
+import { ConfigurationGenerator, makeApplication } from "@mainsail/core-configuration-generator";
+import { Container, interfaces } from "@mainsail/core-container";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Application, Providers, Types } from "@mainsail/core-kernel";
 import { readJSONSync, removeSync } from "fs-extra";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";

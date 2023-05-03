@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@mainsail/core-contracts";
 import moment from "moment-timezone";
 
 import { describe, Sandbox } from "../../../../core-test-framework";

@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Services } from "@mainsail/core-kernel";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
 import { GetCurrentRoundAction } from "./actions/get-current-round";

@@ -1,6 +1,6 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class AddressSerializer implements Contracts.Crypto.IAddressSerializer {

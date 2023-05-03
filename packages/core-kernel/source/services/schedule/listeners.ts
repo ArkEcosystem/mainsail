@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 export class ExecuteCallbackWhenReady implements Contracts.Kernel.EventListener {
 	readonly #blockCount!: number;

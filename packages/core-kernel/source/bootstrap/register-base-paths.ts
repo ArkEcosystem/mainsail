@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { camelCase, expandTilde, set } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { camelCase, expandTilde, set } from "@mainsail/utils";
 import envPaths from "env-paths";
 import { ensureDirSync } from "fs-extra";
 import { resolve } from "path";

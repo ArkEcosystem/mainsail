@@ -1,4 +1,4 @@
-import { Exceptions } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@mainsail/core-contracts";
 import fs from "fs-extra";
 import { join } from "path";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
@@ -40,7 +40,7 @@ describe<{
 		await source.install(fileName);
 
 		// Assert
-		const packageName = "@arkecosystem/utils";
+		const packageName = "@mainsail/utils";
 		removeSync.calledWith(join(dataPath, packageName));
 		removeSync.calledWith(join(temporaryPath, "package"));
 		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {
@@ -75,7 +75,7 @@ describe<{
 		await source.update(fileName);
 
 		// Assert
-		const packageName = "@arkecosystem/utils";
+		const packageName = "@mainsail/utils";
 		removeSync.calledWith(join(dataPath, packageName));
 		removeSync.calledWith(join(temporaryPath, "package"));
 		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {

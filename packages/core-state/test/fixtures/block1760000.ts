@@ -1,4 +1,4 @@
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 
 export default {
 	id: "17605317082329008056",

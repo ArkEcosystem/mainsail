@@ -1,11 +1,11 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
-import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
+import { ServiceProvider as ECDSA } from "@mainsail/core-crypto-key-pair-ecdsa";
+import { ServiceProvider as Schnorr } from "@mainsail/core-crypto-key-pair-schnorr";
+import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
 
-import { Application } from "@arkecosystem/core-kernel";
+import { Application } from "@mainsail/core-kernel";
 
 import { describe } from "../../core-test-framework/source";
 import { AddressFactory } from "./address.factory";

@@ -1,6 +1,6 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Utils } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
+import { Utils } from "@mainsail/core-kernel";
 
 import { describe, Sandbox } from "../../../../core-test-framework";
 import { BlockProcessorResult } from "../contracts";

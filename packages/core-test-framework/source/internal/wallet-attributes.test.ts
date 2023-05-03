@@ -1,4 +1,4 @@
-import { Services } from "@arkecosystem/core-kernel";
+import { Services } from "@mainsail/core-kernel";
 
 import { describe } from "../index";
 import { getWalletAttributeSet, knownAttributes } from "./wallet-attributes";

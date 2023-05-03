@@ -1,4 +1,4 @@
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 
 export const toBytesHex = (data): string => {
 	const temporary: string = data ? BigNumber.make(data).toString(16) : "";

@@ -1,4 +1,4 @@
-import { Application } from "@arkecosystem/core-kernel";
+import { Application } from "@mainsail/core-kernel";
 
 import { describe } from "../../../core-test-framework";
 import { Builder } from "./builder";

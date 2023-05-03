@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 export const makeSchemas = (configuration: Contracts.Crypto.IConfiguration) => {
 	const address = {

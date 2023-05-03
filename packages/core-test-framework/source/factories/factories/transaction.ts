@@ -1,12 +1,12 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
-import { MultiPaymentBuilder } from "@arkecosystem/core-crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { ValidatorResignationBuilder } from "@arkecosystem/core-crypto-transaction-validator-resignation";
-import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { TransactionBuilder } from "@mainsail/core-crypto-transaction";
+import { MultiPaymentBuilder } from "@mainsail/core-crypto-transaction-multi-payment";
+import { MultiSignatureBuilder } from "@mainsail/core-crypto-transaction-multi-signature-registration";
+import { TransferBuilder } from "@mainsail/core-crypto-transaction-transfer";
+import { ValidatorRegistrationBuilder } from "@mainsail/core-crypto-transaction-validator-registration";
+import { ValidatorResignationBuilder } from "@mainsail/core-crypto-transaction-validator-resignation";
+import { VoteBuilder } from "@mainsail/core-crypto-transaction-vote";
+import { BigNumber } from "@mainsail/utils";
 import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";

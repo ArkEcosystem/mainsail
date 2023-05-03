@@ -1,7 +1,7 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Services, Utils as AppUtils } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 import assert from "assert";
 
 @injectable()

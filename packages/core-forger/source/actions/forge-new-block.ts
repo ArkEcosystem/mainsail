@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Services, Types, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Services, Types, Utils as AppUtils } from "@mainsail/core-kernel";
 
 import { Utils } from "../utils";
 

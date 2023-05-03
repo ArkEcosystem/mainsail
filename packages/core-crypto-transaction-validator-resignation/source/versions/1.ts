@@ -1,7 +1,7 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/core-crypto-transaction";
+import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class ValidatorResignationTransaction extends Transaction {

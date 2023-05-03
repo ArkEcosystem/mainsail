@@ -1,6 +1,6 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { get, has, set, unset } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { get, has, set, unset } from "@mainsail/utils";
 
 import { JsonObject, KeyValuePair } from "../../types";
 import { assert } from "../../utils";

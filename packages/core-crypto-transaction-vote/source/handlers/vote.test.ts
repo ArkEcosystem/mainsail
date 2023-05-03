@@ -1,7 +1,7 @@
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { ValidatorRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { Enums as AppEnums } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { ValidatorRegistrationTransactionHandler } from "@mainsail/core-crypto-transaction-validator-registration";
+import { Enums as AppEnums } from "@mainsail/core-kernel";
+import { Handlers } from "@mainsail/core-transactions";
 
 import { describe, Sandbox } from "../../../core-test-framework";
 import { VoteTransaction } from "../versions";

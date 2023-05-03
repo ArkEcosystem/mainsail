@@ -1,6 +1,6 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts } from "@mainsail/core-contracts";
+import { TransactionBuilder } from "@mainsail/core-crypto-transaction";
+import { BigNumber } from "@mainsail/utils";
 
 import { registerTransactionFactory } from "../factories/factories/transaction";
 import { FactoryBuilder } from "../factories/factory-builder";

@@ -1,4 +1,4 @@
-import { Constants } from "@arkecosystem/core-contracts";
+import { Constants } from "@mainsail/core-contracts";
 import { totalmem } from "os";
 
 import { Application } from "../application";

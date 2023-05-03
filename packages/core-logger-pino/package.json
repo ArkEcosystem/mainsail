@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-logger-pino",
+	"name": "@mainsail/core-logger-pino",
 	"version": "0.0.1",
 	"description": "Webhooks for ARK Core",
 	"license": "MIT",
@@ -18,9 +18,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"chalk": "4.1.2",
 		"joi": "17.4.2",
 		"pino": "6.13.2",
@@ -32,7 +32,7 @@
 		"split2": "3.2.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@types/pino": "6.3.11",
 		"@types/pump": "1.1.1",
 		"@types/readable-stream": "2.3.11",

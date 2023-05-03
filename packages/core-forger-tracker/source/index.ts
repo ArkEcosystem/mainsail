@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers } from "@mainsail/core-kernel";
 
 import { ValidatorTracker } from "./tracker";
 

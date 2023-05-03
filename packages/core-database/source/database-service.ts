@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { BigNumber, sortBy, sortByDesc } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { BigNumber, sortBy, sortByDesc } from "@mainsail/utils";
 import { Database } from "lmdb";
 
 @injectable()

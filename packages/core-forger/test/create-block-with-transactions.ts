@@ -1,6 +1,6 @@
 import { BIP39 } from "../source/methods/bip39";
 import { TransactionFactory } from "../../core-test-framework/source";
-import { Utils } from "@arkecosystem/crypto";
+import { Utils } from "@mainsail/crypto";
 
 export const dummy = {
 	plainPassphrase: "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire",

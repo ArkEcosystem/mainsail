@@ -1,5 +1,5 @@
-import { Container } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 import {
 	extendSchema,
 	Serializer,
@@ -9,9 +9,9 @@ import {
 	TransactionTypeFactory,
 	Utils,
 	Verifier,
-} from "@arkecosystem/core-crypto-transaction";
-import { Application, Services } from "@arkecosystem/core-kernel";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+} from "@mainsail/core-crypto-transaction";
+import { Application, Services } from "@mainsail/core-kernel";
+import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../core-crypto-config";

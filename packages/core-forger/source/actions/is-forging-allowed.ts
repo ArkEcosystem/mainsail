@@ -1,7 +1,7 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Services, Types, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { NetworkStateStatus } from "@arkecosystem/core-p2p";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Services, Types, Utils as AppUtils } from "@mainsail/core-kernel";
+import { NetworkStateStatus } from "@mainsail/core-p2p";
 
 @injectable()
 export class IsForgingAllowedAction extends Services.Triggers.Action {

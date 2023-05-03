@@ -1,6 +1,6 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Wallets } from "@arkecosystem/core-state";
-import { BigNumber } from "@arkecosystem/utils";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Wallets } from "@mainsail/core-state";
+import { BigNumber } from "@mainsail/utils";
 import { join } from "path";
 
 import passphrases from "../../internal/passphrases.json";

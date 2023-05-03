@@ -1,6 +1,6 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Services } from "@arkecosystem/core-kernel";
-import { Wallets } from "@arkecosystem/core-state";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Services } from "@mainsail/core-kernel";
+import { Wallets } from "@mainsail/core-state";
 import { generateMnemonic } from "bip39";
 import { join } from "path";
 

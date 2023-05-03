@@ -1,4 +1,4 @@
-import { injectable } from "@arkecosystem/core-container";
+import { injectable } from "@mainsail/core-container";
 import logProcessErrors from "log-process-errors";
 
 import { Bootstrapper } from "./interfaces";

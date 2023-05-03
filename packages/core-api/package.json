@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-api",
+	"name": "@mainsail/core-api",
 	"version": "0.0.1",
 	"description": "Public API for ARK Core",
 	"license": "MIT",
@@ -19,11 +19,11 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/core-transactions": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@hapi/boom": "9.1.4",
 		"@hapi/hapi": "20.1.5",
 		"@hapi/hoek": "9.2.0",
@@ -34,11 +34,11 @@
 		"semver": "6.3.0"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-blockchain": "workspace:*",
-		"@arkecosystem/core-forger": "workspace:*",
-		"@arkecosystem/core-p2p": "workspace:*",
-		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
+		"@mainsail/core-blockchain": "workspace:*",
+		"@mainsail/core-forger": "workspace:*",
+		"@mainsail/core-p2p": "workspace:*",
+		"@mainsail/core-state": "workspace:*",
+		"@mainsail/core-test-framework": "workspace:*",
 		"@types/hapi__boom": "7.4.1",
 		"@types/hapi__joi": "17.1.7",
 		"@types/ip": "1.1.0",

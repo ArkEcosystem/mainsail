@@ -1,5 +1,5 @@
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services, Types, Utils } from "@arkecosystem/core-kernel";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Services, Types, Utils } from "@mainsail/core-kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";

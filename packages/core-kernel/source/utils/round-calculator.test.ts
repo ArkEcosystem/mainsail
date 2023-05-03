@@ -1,4 +1,4 @@
-import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Exceptions, Identifiers } from "@mainsail/core-contracts";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { Configuration } from "../../../core-crypto-config";

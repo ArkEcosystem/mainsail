@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-config",
+	"name": "@mainsail/core-crypto-config",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
@@ -19,9 +19,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"deepmerge": "4.2.2",
 		"lodash.clone": "4.5.0",
 		"lodash.get": "4.4.2",

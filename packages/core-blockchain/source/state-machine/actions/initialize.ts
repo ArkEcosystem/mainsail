@@ -1,7 +1,7 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Constants, Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { DatabaseInteraction } from "@arkecosystem/core-state";
+import { inject, injectable } from "@mainsail/core-container";
+import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { DatabaseInteraction } from "@mainsail/core-state";
 
 import { Action } from "../contracts";
 

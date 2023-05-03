@@ -1,8 +1,8 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { TransactionFactory } from "@mainsail/core-crypto-transaction";
+import { ByteBuffer } from "@mainsail/utils";
 
 import { IDFactory } from "./id.factory";
 

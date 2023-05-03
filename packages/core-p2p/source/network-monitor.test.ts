@@ -1,7 +1,7 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Utils } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers, Utils } from "@mainsail/core-kernel";
 import { describe, Sandbox } from "../../core-test-framework";
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 import path from "path";
 

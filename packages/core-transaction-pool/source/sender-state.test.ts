@@ -1,9 +1,9 @@
-import { Container } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { BlockTimeCalculator } from "@arkecosystem/core-crypto-time/source/block-time-calculator";
-import { Slots } from "@arkecosystem/core-crypto-time/source/slots";
-import { Enums } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
+import { BlockTimeCalculator } from "@mainsail/core-crypto-time/source/block-time-calculator";
+import { Slots } from "@mainsail/core-crypto-time/source/slots";
+import { Enums } from "@mainsail/core-kernel";
 
 import { describe } from "../../core-test-framework";
 import { SenderState } from ".";

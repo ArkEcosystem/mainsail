@@ -1,5 +1,5 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
 import {
 	copyFile,
 	ensureDir,

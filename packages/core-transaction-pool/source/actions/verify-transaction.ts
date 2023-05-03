@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { Services, Types } from "@arkecosystem/core-kernel";
+import { Contracts } from "@mainsail/core-contracts";
+import { Services, Types } from "@mainsail/core-kernel";
 
 export class VerifyTransactionAction extends Services.Triggers.Action {
 	public async execute(arguments_: Types.ActionArguments): Promise<boolean> {

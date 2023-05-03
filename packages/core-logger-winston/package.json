@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-logger-winston",
+	"name": "@mainsail/core-logger-winston",
 	"version": "0.0.1",
 	"description": "Webhooks for ARK Core",
 	"license": "MIT",
@@ -18,9 +18,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"joi": "17.4.2",
 		"winston": "^3.6.0"
 	},

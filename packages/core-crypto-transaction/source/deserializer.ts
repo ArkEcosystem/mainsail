@@ -1,8 +1,8 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
-// import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "@arkecosystem/core-contracts";
+// import { DuplicateParticipantInMultiSignatureError, InvalidTransactionBytesError } from "@mainsail/core-contracts";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {

@@ -1,5 +1,5 @@
-import { Container, Services } from "@arkecosystem/core-cli";
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Container, Services } from "@mainsail/core-cli";
+import { Console, describe } from "@mainsail/core-test-framework";
 
 import { Command } from "./plugin-update";
 

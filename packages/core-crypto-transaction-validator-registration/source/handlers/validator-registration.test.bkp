@@ -3,12 +3,12 @@ import {
 	NotSupportedForMultiSignatureWalletError,
 	WalletIsAlreadyDelegateError,
 	WalletUsernameAlreadyRegisteredError,
-} from "@arkecosystem/core-errors";
-import { Application, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@arkecosystem/core-state";
-import { describe, Factories, Generators, Mocks, passphrases } from "@arkecosystem/core-test-framework";
-import { Mempool } from "@arkecosystem/core-transaction-pool";
-import { Crypto, Enums, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+} from "@mainsail/core-errors";
+import { Application, Enums as KernelEnums, Exceptions } from "@mainsail/core-kernel";
+import { Stores, Wallets } from "@mainsail/core-state";
+import { describe, Factories, Generators, Mocks, passphrases } from "@mainsail/core-test-framework";
+import { Mempool } from "@mainsail/core-transaction-pool";
+import { Crypto, Enums, Identities, Managers, Transactions, Utils } from "@mainsail/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";

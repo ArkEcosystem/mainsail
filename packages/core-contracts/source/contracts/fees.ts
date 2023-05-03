@@ -1,4 +1,4 @@
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber } from "@mainsail/utils";
 
 export interface IFeeRegistry {
 	get(transaction: string, version: number): BigNumber;

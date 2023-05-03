@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { Services, Types } from "@arkecosystem/core-kernel";
+import { Contracts } from "@mainsail/core-contracts";
+import { Services, Types } from "@mainsail/core-kernel";
 
 import { BlockProcessor, BlockProcessorResult } from "../processor";
 

@@ -1,7 +1,7 @@
-import { injectable, Selectors } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { injectable, Selectors } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Services } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 import { Factories, Sandbox } from "../../core-test-framework";
 import { Configuration } from "../../core-crypto-config";
 import { SinonSpy, spy } from "sinon";

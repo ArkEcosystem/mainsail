@@ -1,4 +1,4 @@
-import { Exceptions } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@mainsail/core-contracts";
 import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra";
 import { join } from "path";
 

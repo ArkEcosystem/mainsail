@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../index";

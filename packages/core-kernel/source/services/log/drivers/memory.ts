@@ -1,6 +1,6 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { isEmpty, prettyTime } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { isEmpty, prettyTime } from "@mainsail/utils";
 import chalk, { Chalk } from "chalk";
 import dayjs, { Dayjs } from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";

@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@mainsail/core-contracts";
 import { RootDatabase } from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 

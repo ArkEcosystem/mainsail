@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Utils } from "@mainsail/core-kernel";
 
 import { describe, Sandbox } from "../../core-test-framework";
 import { Blocks } from "../test/fixtures";

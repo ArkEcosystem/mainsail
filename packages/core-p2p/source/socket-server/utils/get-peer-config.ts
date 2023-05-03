@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services, Utils } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Services, Utils } from "@mainsail/core-kernel";
 
 type PluginConfig = { package: string; options: any };
 

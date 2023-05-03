@@ -1,5 +1,5 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Enums, Utils as AppUtils } from "@mainsail/core-kernel";
 
 import { describe, Sandbox } from "../../core-test-framework/source";
 import { ForgerService } from "./forger-service";

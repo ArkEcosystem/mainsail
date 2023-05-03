@@ -1,4 +1,4 @@
-import { Peer } from "@arkecosystem/core-p2p";
+import { Peer } from "@mainsail/core-p2p";
 import Chance from "chance";
 
 import { FactoryBuilder } from "../factory-builder";

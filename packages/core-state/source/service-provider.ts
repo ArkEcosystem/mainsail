@@ -1,6 +1,6 @@
-import { interfaces, Selectors } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services } from "@arkecosystem/core-kernel";
+import { interfaces, Selectors } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Services } from "@mainsail/core-kernel";
 import Joi from "joi";
 
 import { BuildValidatorRankingAction, GetActiveValidatorsAction } from "./actions";
@@ -104,7 +104,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async bootWhen(serviceProvider?: string): Promise<boolean> {
-		return serviceProvider === "@arkecosystem/core-database";
+		return serviceProvider === "@mainsail/core-database";
 	}
 
 	public configSchema(): object {

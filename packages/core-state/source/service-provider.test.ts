@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Services } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Application, Services } from "@mainsail/core-kernel";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 
@@ -42,7 +42,7 @@ describe<{
 	it("should boot when the package is core-database", async (context) => {
 		assert.false(await context.serviceProvider.bootWhen());
 		assert.false(await context.serviceProvider.bootWhen("not-core-database"));
-		assert.true(await context.serviceProvider.bootWhen("@arkecosystem/core-database"));
+		assert.true(await context.serviceProvider.bootWhen("@mainsail/core-database"));
 	});
 });
 

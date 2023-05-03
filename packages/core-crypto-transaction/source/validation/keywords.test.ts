@@ -1,6 +1,6 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Validator } from "@arkecosystem/core-validation/source/validator";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
+import { Validator } from "@mainsail/core-validation/source/validator";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework";

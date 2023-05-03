@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 import { InstanceManager } from "../../support/instance-manager";
 import { Pm2ProcessActionsService } from "./drivers/pm2";

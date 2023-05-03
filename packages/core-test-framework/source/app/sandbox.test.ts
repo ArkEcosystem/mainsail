@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { readJSONSync } from "fs-extra";
 import { join } from "path";
 
@@ -91,9 +91,9 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
 
 		const serviceProviderOptions = {
-			klass: require("@arkecosystem/core-validation").ServiceProvider,
-			name: "@arkecosystem/core-validation",
-			path: "@arkecosystem/core-validation",
+			klass: require("@mainsail/core-validation").ServiceProvider,
+			name: "@mainsail/core-validation",
+			path: "@mainsail/core-validation",
 		};
 
 		assert.equal(await sandbox.registerServiceProvider(serviceProviderOptions), sandbox);

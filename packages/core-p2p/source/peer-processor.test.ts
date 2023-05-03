@@ -1,5 +1,5 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers } from "@mainsail/core-kernel";
 import { describe, Sandbox } from "../../core-test-framework";
 
 import { defaults } from "./defaults";

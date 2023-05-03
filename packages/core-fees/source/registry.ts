@@ -1,6 +1,6 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { BigNumber, get, set } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { BigNumber, get, set } from "@mainsail/utils";
 
 @injectable()
 export class FeeRegistry implements Contracts.Fee.IFeeRegistry {

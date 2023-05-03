@@ -1,5 +1,5 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
 import { ripemd160 } from "@noble/hashes/ripemd160";
 import { sha256 } from "@noble/hashes/sha256";
 

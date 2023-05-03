@@ -1,8 +1,8 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
-import { Providers } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { TransactionRegistry } from "@mainsail/core-crypto-transaction";
+import { Providers } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 
 import { ValidatorRegistrationTransactionHandler } from "./handlers";
 import { schemas } from "./validation/schemas";

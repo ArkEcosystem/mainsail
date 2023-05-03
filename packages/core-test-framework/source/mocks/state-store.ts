@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { Stores } from "@arkecosystem/core-state";
+import { Contracts } from "@mainsail/core-contracts";
+import { Stores } from "@mainsail/core-state";
 
 let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;
 let lastHeight = 0;

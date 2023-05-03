@@ -1,4 +1,4 @@
-import { Constants } from "@arkecosystem/core-contracts";
+import { Constants } from "@mainsail/core-contracts";
 
 export const defaults = {
 	enabled: !!process.env[Constants.Flags.CORE_WEBHOOKS_ENABLED],

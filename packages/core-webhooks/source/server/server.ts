@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Types, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Types, Utils } from "@mainsail/core-kernel";
 import Boom, { badData } from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { randomBytes } from "crypto";

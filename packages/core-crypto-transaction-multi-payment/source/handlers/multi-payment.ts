@@ -1,9 +1,9 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
-import Transactions from "@arkecosystem/core-crypto-transaction";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
-import { BigNumber } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts, Exceptions } from "@mainsail/core-contracts";
+import Transactions from "@mainsail/core-crypto-transaction";
+import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { Handlers } from "@mainsail/core-transactions";
+import { BigNumber } from "@mainsail/utils";
 
 import { MultiPaymentTransaction } from "../versions";
 

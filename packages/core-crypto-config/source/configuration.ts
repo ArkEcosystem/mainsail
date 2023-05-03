@@ -1,5 +1,5 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { injectable } from "@mainsail/core-container";
+import { Contracts, Exceptions } from "@mainsail/core-contracts";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";
 import get from "lodash.get";

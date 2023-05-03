@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 export const addTransactionsToBlock = (txs: Contracts.Crypto.ITransaction[], block: Contracts.Crypto.IBlock) => {
 	const { data } = block;

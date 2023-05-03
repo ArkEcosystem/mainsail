@@ -1,5 +1,5 @@
-import { Contracts } from "@arkecosystem/core-contracts";
-import { Services } from "@arkecosystem/core-kernel";
+import { Contracts } from "@mainsail/core-contracts";
+import { Services } from "@mainsail/core-kernel";
 
 import { Wallet } from "./wallet";
 

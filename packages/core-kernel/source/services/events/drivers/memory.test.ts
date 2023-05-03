@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 import { describe } from "../../../../../core-test-framework";
 import { MemoryEventDispatcher } from "./memory";

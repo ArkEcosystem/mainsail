@@ -1,5 +1,5 @@
-import { injectable } from "@arkecosystem/core-container";
-import { BigNumber } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { BigNumber } from "@mainsail/utils";
 
 import { Resource } from "../types";
 

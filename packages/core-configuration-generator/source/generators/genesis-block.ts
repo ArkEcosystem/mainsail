@@ -1,9 +1,9 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
-import { BigNumber } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { TransferBuilder } from "@mainsail/core-crypto-transaction-transfer";
+import { ValidatorRegistrationBuilder } from "@mainsail/core-crypto-transaction-validator-registration";
+import { VoteBuilder } from "@mainsail/core-crypto-transaction-vote";
+import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import { Wallet } from "../contracts";

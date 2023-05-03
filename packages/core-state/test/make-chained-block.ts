@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 export const makeChainedBlocks = (length: number, blockFactory): Contracts.Crypto.IBlock[] => {
 	const entitites: Contracts.Crypto.IBlock[] = [];

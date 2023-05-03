@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Container } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
 
 import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
 import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";

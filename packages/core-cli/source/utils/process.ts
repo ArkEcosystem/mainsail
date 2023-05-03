@@ -1,5 +1,5 @@
-import { Utils } from "@arkecosystem/core-kernel";
-import { prettyBytes, prettyTime } from "@arkecosystem/utils";
+import { Utils } from "@mainsail/core-kernel";
+import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 import Tail from "nodejs-tail";
 import readLastLines from "read-last-lines";

@@ -23,9 +23,9 @@ describe<{
 			stdout: "stdout",
 		});
 
-		installer.install("@arkecosystem/core");
+		installer.install("@mainsail/core");
 
-		spySync.calledWith("yarn global add @arkecosystem/core@latest --force", { shell: true });
+		spySync.calledWith("yarn global add @mainsail/core@latest --force", { shell: true });
 	});
 
 	it("#install - should install specific package when tag is provided", ({ installer }) => {
@@ -36,9 +36,9 @@ describe<{
 			stdout: "stdout",
 		});
 
-		installer.install("@arkecosystem/core", "3.0.0");
+		installer.install("@mainsail/core", "3.0.0");
 
-		spySync.calledWith("yarn global add @arkecosystem/core@3.0.0 --force", { shell: true });
+		spySync.calledWith("yarn global add @mainsail/core@3.0.0 --force", { shell: true });
 	});
 
 	it("#install - should throw when exit code isn't 0", ({ installer }) => {
@@ -49,9 +49,9 @@ describe<{
 			stderr: "stderr",
 		});
 
-		assert.throws(() => installer.install("@arkecosystem/core"), "stderr");
+		assert.throws(() => installer.install("@mainsail/core"), "stderr");
 
-		spySync.calledWith("yarn global add @arkecosystem/core@latest --force", { shell: true });
+		spySync.calledWith("yarn global add @mainsail/core@latest --force", { shell: true });
 	});
 
 	it("#installPeerDependencies - should install each peer dependency", ({ installer }) => {
@@ -62,9 +62,9 @@ describe<{
 			stdout: JSON.stringify({ data: { pm2: "4.5.0", somepkg: "^1.0.0" } }),
 		});
 
-		installer.installPeerDependencies("@arkecosystem/core", "3.0.0");
+		installer.installPeerDependencies("@mainsail/core", "3.0.0");
 
-		spySync.calledWith("yarn info @arkecosystem/core@3.0.0 peerDependencies --json", {
+		spySync.calledWith("yarn info @mainsail/core@3.0.0 peerDependencies --json", {
 			shell: true,
 		});
 
@@ -80,9 +80,9 @@ describe<{
 			stdout: JSON.stringify({}),
 		});
 
-		installer.installPeerDependencies("@arkecosystem/core", "3.0.0");
+		installer.installPeerDependencies("@mainsail/core", "3.0.0");
 
-		spySync.calledWith("yarn info @arkecosystem/core@3.0.0 peerDependencies --json", {
+		spySync.calledWith("yarn info @mainsail/core@3.0.0 peerDependencies --json", {
 			shell: true,
 		});
 
@@ -95,9 +95,9 @@ describe<{
 			stderr: "stderr",
 		});
 
-		assert.throws(() => installer.installPeerDependencies("@arkecosystem/core"), "stderr");
+		assert.throws(() => installer.installPeerDependencies("@mainsail/core"), "stderr");
 
-		spySync.calledWith("yarn info @arkecosystem/core@latest peerDependencies --json", {
+		spySync.calledWith("yarn info @mainsail/core@latest peerDependencies --json", {
 			shell: true,
 		});
 	});
@@ -110,13 +110,13 @@ describe<{
 			stdout: JSON.stringify({ data: ["3.0.0", "3.1.0", "3.0.0-next.9"] }),
 		});
 
-		installer.installRangeLatest("@arkecosystem/core", "^3.0.0 <3.4.0");
+		installer.installRangeLatest("@mainsail/core", "^3.0.0 <3.4.0");
 
-		spySync.calledWith("yarn info @arkecosystem/core versions --json", {
+		spySync.calledWith("yarn info @mainsail/core versions --json", {
 			shell: true,
 		});
 
-		spyInstall.calledWith("@arkecosystem/core", "3.1.0");
+		spyInstall.calledWith("@mainsail/core", "3.1.0");
 	});
 
 	it("#installRangeLatest - should throw error when command fails", ({ installer }) => {
@@ -125,9 +125,9 @@ describe<{
 			stderr: "stderr",
 		});
 
-		assert.throws(() => installer.installRangeLatest("@arkecosystem/core", "^3.0.0 <3.4.0"), "stderr");
+		assert.throws(() => installer.installRangeLatest("@mainsail/core", "^3.0.0 <3.4.0"), "stderr");
 
-		spySync.calledWith("yarn info @arkecosystem/core versions --json", {
+		spySync.calledWith("yarn info @mainsail/core versions --json", {
 			shell: true,
 		});
 	});
@@ -141,11 +141,11 @@ describe<{
 		});
 
 		assert.throws(
-			() => installer.installRangeLatest("@arkecosystem/core", "^4.0.0 <4.4.0"),
-			"No @arkecosystem/core version to satisfy ^4.0.0 <4.4.0".replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&"),
+			() => installer.installRangeLatest("@mainsail/core", "^4.0.0 <4.4.0"),
+			"No @mainsail/core version to satisfy ^4.0.0 <4.4.0".replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&"),
 		);
 
-		spySync.calledWith("yarn info @arkecosystem/core versions --json", {
+		spySync.calledWith("yarn info @mainsail/core versions --json", {
 			shell: true,
 		});
 	});

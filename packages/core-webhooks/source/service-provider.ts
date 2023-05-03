@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Types } from "@arkecosystem/core-kernel";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Providers, Types } from "@mainsail/core-kernel";
 import Joi from "joi";
 
 import { Database } from "./database";

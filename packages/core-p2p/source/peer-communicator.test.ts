@@ -1,5 +1,5 @@
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Providers } from "@arkecosystem/core-kernel";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Providers } from "@mainsail/core-kernel";
 import { describe, Sandbox } from "../../core-test-framework";
 import rewiremock from "rewiremock";
 

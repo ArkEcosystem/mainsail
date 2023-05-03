@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Constants, Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { inject, injectable, tagged } from "@mainsail/core-container";
+import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
+import { Enums, Providers, Utils as AppUtils } from "@mainsail/core-kernel";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {

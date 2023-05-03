@@ -1,4 +1,4 @@
-import { Validator } from "@arkecosystem/core-validation/source/validator";
+import { Validator } from "@mainsail/core-validation/source/validator";
 
 import { describe, Sandbox } from "../../../core-test-framework";
 import { makeFormats } from "./formats";

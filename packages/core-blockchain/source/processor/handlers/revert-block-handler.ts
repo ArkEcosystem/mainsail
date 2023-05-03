@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseInteraction } from "@arkecosystem/core-state";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { DatabaseInteraction } from "@mainsail/core-state";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
 

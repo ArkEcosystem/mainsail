@@ -1,7 +1,7 @@
-import { Container } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Application } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { Container } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Application } from "@mainsail/core-kernel";
+import { BigNumber } from "@mainsail/utils";
 
 import { describe } from "../../core-test-framework";
 import { Validator } from "./validator";

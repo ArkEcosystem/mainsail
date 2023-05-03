@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 export interface FeeMatcher {
 	throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void>;

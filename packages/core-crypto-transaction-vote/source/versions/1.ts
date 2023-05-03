@@ -1,7 +1,7 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/core-crypto-transaction";
+import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class VoteTransaction extends Transaction {

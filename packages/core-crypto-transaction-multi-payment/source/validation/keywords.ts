@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => {

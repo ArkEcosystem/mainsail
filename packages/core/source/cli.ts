@@ -1,5 +1,5 @@
-import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
+import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@mainsail/core-cli";
+import { injectable } from "@mainsail/core-container";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
 import { platform } from "os";
@@ -13,7 +13,7 @@ export class CommandLineInterface {
 	public constructor(private readonly argv: string[]) {}
 
 	public async execute(dirname = __dirname): Promise<void> {
-		// Set NODE_PATHS. Only required for plugins that uses @arkecosystem as peer dependencies.
+		// Set NODE_PATHS. Only required for plugins that uses @mainsail as peer dependencies.
 		this.#setNodePath();
 
 		// Load the package information. Only needed for updates and installations.

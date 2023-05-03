@@ -1,6 +1,6 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Enums } from "@arkecosystem/core-kernel";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Enums } from "@mainsail/core-kernel";
 
 import { Configuration } from "../../core-crypto-config";
 import { DatabaseService } from "../../core-database/source/database-service";

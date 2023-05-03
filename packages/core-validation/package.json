@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-validation",
+	"name": "@mainsail/core-validation",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
@@ -19,9 +19,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"ajv": "8.11.0",
 		"ajv-keywords": "5.1.0"
 	},

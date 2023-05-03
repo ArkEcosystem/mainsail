@@ -1,9 +1,9 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { schemas as baseSchemas } from "@arkecosystem/core-crypto-validation";
-import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
-import { Validator } from "@arkecosystem/core-validation/source/validator";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { Configuration } from "@mainsail/core-crypto-config";
+import { ServiceProvider as Schnorr } from "@mainsail/core-crypto-key-pair-schnorr";
+import { schemas as baseSchemas } from "@mainsail/core-crypto-validation";
+import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
+import { Validator } from "@mainsail/core-validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";

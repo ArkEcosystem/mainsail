@@ -1,6 +1,6 @@
-import { injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
+import { ByteBuffer } from "@mainsail/utils";
 import { sign, verify } from "@noble/bls12-381";
 
 @injectable()

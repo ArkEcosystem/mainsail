@@ -1,6 +1,6 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Providers } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Providers } from "@mainsail/core-kernel";
 
 import { Resource } from "../types";
 
@@ -15,7 +15,7 @@ export class PortsResource implements Resource {
 
 	public transform(resource): object {
 		const result = {};
-		const keys = new Set(["@arkecosystem/core-p2p", "@arkecosystem/core-api", "@arkecosystem/core-webhooks"]);
+		const keys = new Set(["@mainsail/core-p2p", "@mainsail/core-api", "@mainsail/core-webhooks"]);
 
 		for (const serviceProvider of this.serviceProviderRepository.allLoadedProviders()) {
 			const name: string = serviceProvider.name()!;

@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 import { VoteBuilder } from "../../core-crypto-transaction-vote";
 
 export const makeVoteTransactions = async (

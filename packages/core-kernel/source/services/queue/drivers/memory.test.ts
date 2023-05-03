@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { sleep } from "@arkecosystem/utils";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
+import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 

@@ -1,4 +1,4 @@
-import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { describe, Sandbox } from "../../../../core-test-framework";
 
 import { GetCommonBlocksController } from "./get-common-blocks";

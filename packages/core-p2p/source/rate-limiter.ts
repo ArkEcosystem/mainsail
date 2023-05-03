@@ -1,4 +1,4 @@
-import { Utils } from "@arkecosystem/core-kernel";
+import { Utils } from "@mainsail/core-kernel";
 import { RateLimiterMemory, RLWrapperBlackAndWhite } from "rate-limiter-flexible";
 
 export interface RateLimiterConfiguration {

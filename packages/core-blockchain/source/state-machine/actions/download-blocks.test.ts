@@ -1,5 +1,5 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
 import delay from "delay";
 
 import { describe } from "../../../../core-test-framework";

@@ -1,10 +1,10 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { schemas as addressSchemas } from "@arkecosystem/core-crypto-address-bech32m";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { schemas as kayPairSchemas } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { schemas as transactionSchemas } from "@arkecosystem/core-crypto-transaction";
-import { makeKeywords, schemas as sharedSchemas } from "@arkecosystem/core-crypto-validation";
-import { Validator } from "@arkecosystem/core-validation/source/validator";
+import { Identifiers } from "@mainsail/core-contracts";
+import { schemas as addressSchemas } from "@mainsail/core-crypto-address-bech32m";
+import { Configuration } from "@mainsail/core-crypto-config";
+import { schemas as kayPairSchemas } from "@mainsail/core-crypto-key-pair-schnorr";
+import { schemas as transactionSchemas } from "@mainsail/core-crypto-transaction";
+import { makeKeywords, schemas as sharedSchemas } from "@mainsail/core-crypto-validation";
+import { Validator } from "@mainsail/core-validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";

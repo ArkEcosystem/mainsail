@@ -1,5 +1,5 @@
-import { decorateInjectable, injectable } from "@arkecosystem/core-container";
-import { Contracts } from "@arkecosystem/core-contracts";
+import { decorateInjectable, injectable } from "@mainsail/core-container";
+import { Contracts } from "@mainsail/core-contracts";
 import { EventEmitter } from "events";
 
 decorateInjectable(EventEmitter);

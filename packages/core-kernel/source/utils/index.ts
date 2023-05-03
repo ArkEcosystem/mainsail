@@ -3,7 +3,7 @@ import { calculateRound, isNewRound } from "./round-calculator";
 export * from "./assert";
 export * as IpAddress from "./ip-address";
 export * from "./lock";
-export * from "@arkecosystem/utils";
+export * from "@mainsail/utils";
 
 export const roundCalculator = { calculateRound, isNewRound };
 export const forgingInfoCalculator = { calculateForgingInfo };

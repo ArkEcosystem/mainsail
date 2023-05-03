@@ -1,7 +1,7 @@
-import { Container } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Application } from "@arkecosystem/core-kernel";
-import { sleep } from "@arkecosystem/utils";
+import { Container } from "@mainsail/core-container";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Application } from "@mainsail/core-kernel";
+import { sleep } from "@mainsail/utils";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
 import { Writable } from "stream";

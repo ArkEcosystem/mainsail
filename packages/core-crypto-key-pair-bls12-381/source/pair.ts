@@ -1,5 +1,5 @@
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable } from "@mainsail/core-container";
+import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { getPublicKey } from "@noble/bls12-381";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";

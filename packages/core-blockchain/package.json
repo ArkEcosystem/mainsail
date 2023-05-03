@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-blockchain",
+	"name": "@mainsail/core-blockchain",
 	"version": "0.0.1",
 	"description": "Blockchain Manager for ARK Core",
 	"license": "MIT",
@@ -19,16 +19,16 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/core-state": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"joi": "17.4.2",
 		"xstate": "4.23.4"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@mainsail/core-crypto-config": "workspace:*",
 		"@types/async": "3.2.7",
 		"delay": "4.4.1",
 		"import-fresh": "3.3.0",

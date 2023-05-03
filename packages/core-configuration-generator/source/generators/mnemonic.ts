@@ -1,4 +1,4 @@
-import { injectable } from "@arkecosystem/core-container";
+import { injectable } from "@mainsail/core-container";
 import { generateMnemonic } from "bip39";
 
 @injectable()

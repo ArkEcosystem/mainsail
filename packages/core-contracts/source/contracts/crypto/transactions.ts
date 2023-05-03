@@ -1,4 +1,4 @@
-import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 import { IKeyPair } from "./identities";
 import { ISchemaValidationResult } from "./validator";

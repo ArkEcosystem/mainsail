@@ -1,4 +1,4 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+import { Contracts } from "@mainsail/core-contracts";
 
 export const request = {
 	headers: {
@@ -16,8 +16,8 @@ export const response: Contracts.P2P.PeerPingResponse = {
 			version: 30,
 		},
 		plugins: {
-			"@arkecosystem/core-api": { enabled: true, port: 4003 },
-			"@arkecosystem/core-webhooks": { enabled: false, port: 4004 },
+			"@mainsail/core-api": { enabled: true, port: 4003 },
+			"@mainsail/core-webhooks": { enabled: false, port: 4004 },
 		},
 		version: "0.0.1",
 	},

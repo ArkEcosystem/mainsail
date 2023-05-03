@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-signature-bls12-381",
+	"name": "@mainsail/core-crypto-signature-bls12-381",
 	"version": "0.0.1",
 	"description": "BLS12-381 Signatures",
 	"license": "MIT",
@@ -19,10 +19,10 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@noble/bls12-381": "^1.2.0"
 	},
 	"devDependencies": {

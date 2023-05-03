@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@mainsail/core-contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { getHeaders } from "./get-headers";

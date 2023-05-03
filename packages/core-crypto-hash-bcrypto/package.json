@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-crypto-hash-bcrypto",
+	"name": "@mainsail/core-crypto-hash-bcrypto",
 	"version": "0.0.1",
 	"description": "Hashing powered by bcrypto",
 	"license": "MIT",
@@ -19,9 +19,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
+		"@mainsail/core-container": "workspace:*",
+		"@mainsail/core-contracts": "workspace:*",
+		"@mainsail/core-kernel": "workspace:*",
 		"bcrypto": "5.4.0"
 	},
 	"devDependencies": {

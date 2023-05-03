@@ -1,6 +1,6 @@
-// import { IBlock, ITransaction } from "@arkecosystem/core-contracts";
+// import { IBlock, ITransaction } from "@mainsail/core-contracts";
 
-import { Exceptions } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@mainsail/core-contracts";
 
 const assertType = (condition: boolean, description: string): asserts condition => {
 	if (!condition) {

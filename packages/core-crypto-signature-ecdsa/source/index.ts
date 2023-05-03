@@ -1,6 +1,6 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
-import { Providers } from "@arkecosystem/core-kernel";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { Identifiers } from "@mainsail/core-contracts";
+import { Providers } from "@mainsail/core-kernel";
+import { ByteBuffer } from "@mainsail/utils";
 
 import { Signature } from "./signature";
 
