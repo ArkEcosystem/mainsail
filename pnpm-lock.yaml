@@ -273,9 +273,9 @@ importers:
         specifier: 4.23.4
         version: 4.23.4
     devDependencies:
-      '@mainsail/core-crypto-config':
+      '@mainsail/crypto-config':
         specifier: workspace:*
-        version: link:../core-crypto-config
+        version: link:../crypto-config
       '@types/async':
         specifier: 3.2.7
         version: 3.2.7
@@ -416,9 +416,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../core-crypto-hash-bcrypto
@@ -476,6 +473,9 @@ importers:
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../core-crypto-hash-bcrypto
@@ -660,6 +657,9 @@ importers:
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,30 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-crypto-config:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      deepmerge:
-        specifier: 4.2.2
-        version: 4.2.2
-      lodash.clone:
-        specifier: 4.5.0
-        version: 4.5.0
-      lodash.get:
-        specifier: 4.4.2
-        version: 4.4.2
-      lodash.set:
-        specifier: 4.3.2
-        version: 4.3.2
 
   packages/core-crypto-hash-bcrypto:
     dependencies:
@@ -810,12 +786,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -856,12 +832,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -893,12 +869,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -936,12 +912,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1068,9 +1044,9 @@ importers:
         specifier: 1.10.7
         version: 1.10.7
     devDependencies:
-      '@mainsail/core-crypto-config':
+      '@mainsail/crypto-config':
         specifier: workspace:*
-        version: link:../core-crypto-config
+        version: link:../crypto-config
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -1086,9 +1062,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-time':
         specifier: workspace:*
         version: link:../core-crypto-time
@@ -1101,6 +1074,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1195,9 +1171,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-transaction':
         specifier: workspace:*
         version: link:../core-crypto-transaction
@@ -1207,6 +1180,9 @@ importers:
       '@mainsail/core-transactions':
         specifier: workspace:*
         version: link:../core-transactions
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1241,9 +1217,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-transaction':
         specifier: workspace:*
         version: link:../core-crypto-transaction
@@ -1253,6 +1226,9 @@ importers:
       '@mainsail/core-transactions':
         specifier: workspace:*
         version: link:../core-transactions
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1297,9 +1273,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
@@ -1312,6 +1285,9 @@ importers:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       uvu:
         specifier: 0.5.3
         version: 0.5.3
@@ -1340,9 +1316,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
@@ -1355,6 +1328,9 @@ importers:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -1386,9 +1362,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
@@ -1401,6 +1374,9 @@ importers:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       uvu:
         specifier: 0.5.3
         version: 0.5.3
@@ -1435,9 +1411,6 @@ importers:
         specifier: 8.11.0
         version: 8.11.0
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
@@ -1450,6 +1423,9 @@ importers:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -1462,12 +1438,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1500,12 +1476,12 @@ importers:
         specifier: ^2.0.6
         version: 2.0.6
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-schnorr
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@types/tmp':
         specifier: ^0.2.0
         version: 0.2.0
@@ -1555,9 +1531,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../core-crypto-hash-bcrypto
@@ -1597,6 +1570,9 @@ importers:
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       tmp:
         specifier: 0.2.1
         version: 0.2.1
@@ -2172,9 +2148,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-transaction':
         specifier: workspace:*
         version: link:../core-crypto-transaction
@@ -2211,6 +2184,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2306,12 +2282,12 @@ importers:
         specifier: 17.4.2
         version: 17.4.2
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-time':
         specifier: workspace:*
         version: link:../core-crypto-time
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@types/better-sqlite3':
         specifier: 5.4.3
         version: 5.4.3
@@ -2448,9 +2424,6 @@ importers:
         specifier: 0.3.9
         version: 0.3.9
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-ecdsa
@@ -2463,6 +2436,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       bip39:
         specifier: 3.0.4
         version: 3.0.4
@@ -2488,9 +2464,6 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-ecdsa
@@ -2503,6 +2476,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       bip39:
         specifier: 3.0.4
         version: 3.0.4
@@ -2528,9 +2504,6 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-ecdsa
@@ -2543,6 +2516,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       bip39:
         specifier: 3.0.4
         version: 3.0.4
@@ -2558,12 +2534,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2611,9 +2587,6 @@ importers:
         specifier: ^8.4.1
         version: 8.4.1(@polkadot/util@8.4.1)
     devDependencies:
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../core-crypto-key-pair-ecdsa
@@ -2626,6 +2599,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       bip39:
         specifier: 3.0.4
         version: 3.0.4
@@ -2644,9 +2620,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-config':
-        specifier: workspace:*
-        version: link:../core-crypto-config
       '@mainsail/core-crypto-time':
         specifier: workspace:*
         version: link:../core-crypto-time
@@ -2659,6 +2632,9 @@ importers:
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/utils':
         specifier: 1.3.1
         version: link:../utils
@@ -2750,6 +2726,30 @@ importers:
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
+
+  packages/crypto-config:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      deepmerge:
+        specifier: 4.2.2
+        version: 4.2.2
+      lodash.clone:
+        specifier: 4.5.0
+        version: 4.5.0
+      lodash.get:
+        specifier: 4.4.2
+        version: 4.4.2
+      lodash.set:
+        specifier: 4.3.2
+        version: 4.3.2
 
   packages/utils:
     dependencies:

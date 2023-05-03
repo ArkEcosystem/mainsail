@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
-import { Configuration } from "../../../core-crypto-config";
+import { Configuration } from "../../../crypto-config";
 import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
 import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
 import { Slots } from "../../../core-crypto-time/source/slots";

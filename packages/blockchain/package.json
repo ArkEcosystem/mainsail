@@ -28,7 +28,7 @@
 		"xstate": "4.23.4"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-config": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"@types/async": "3.2.7",
 		"delay": "4.4.1",
 		"import-fresh": "3.3.0",

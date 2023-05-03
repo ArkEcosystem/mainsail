@@ -27,7 +27,7 @@
 		"@polkadot/util-crypto": "^8.4.1"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-config": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/core-crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/core-crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/core-crypto-validation": "workspace:*",

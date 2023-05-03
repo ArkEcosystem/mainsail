@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Configuration } from "@mainsail/core-crypto-config";
+import { Configuration } from "@mainsail/crypto-config";
 import { schemas as baseSchemas } from "@mainsail/core-crypto-validation";
 import { Validator } from "@mainsail/core-validation/source/validator";
 import { generateMnemonic } from "bip39";

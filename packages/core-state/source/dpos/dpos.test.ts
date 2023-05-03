@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 import { spy } from "sinon";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
-import { Configuration } from "../../../core-crypto-config";
+import { Configuration } from "../../../crypto-config";
 import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
 import { describe } from "../../../core-test-framework";

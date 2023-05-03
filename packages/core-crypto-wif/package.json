@@ -25,7 +25,7 @@
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-config": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/core-crypto-key-pair-schnorr": "workspace:*",
 		"@types/tmp": "^0.2.0",
 		"@types/uuid": "^8.0.0",

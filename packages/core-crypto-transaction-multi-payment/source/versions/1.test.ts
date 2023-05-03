@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-bech32m";
-import { Configuration } from "@mainsail/core-crypto-config";
+import { Configuration } from "@mainsail/crypto-config";
 import { schemas as kayParSchemas } from "@mainsail/core-crypto-key-pair-schnorr";
 import {
 	makeFormats,

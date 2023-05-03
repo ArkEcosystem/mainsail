@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/core-kernel";
 
-import { Configuration } from "../../core-crypto-config";
+import { Configuration } from "../../crypto-config";
 import { DatabaseService } from "../../core-database/source/database-service";
 import { describe } from "../../core-test-framework";
 import { DatabaseInteraction } from "./database-interactions";

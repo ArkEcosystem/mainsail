@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../../../core/bin/config/testnet/crypto.json";
-import { Configuration } from "../../../../core-crypto-config";
+import { Configuration } from "../../../../crypto-config";
 import { describe, Sandbox } from "../../../../core-test-framework";
 import { BlockEvent, ScheduleEvent } from "../../enums";
 import { MemoryEventDispatcher } from "../events";

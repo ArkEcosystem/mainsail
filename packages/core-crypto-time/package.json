@@ -25,7 +25,7 @@
 		"dayjs": "1.10.7"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-config": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

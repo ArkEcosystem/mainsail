@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application, Enums, Utils } from "@mainsail/core-kernel";
 import { SinonSpy } from "sinon";
 
-import { Configuration } from "../../core-crypto-config";
+import { Configuration } from "../../crypto-config";
 import { describeSkip } from "../../core-test-framework";
 import { setUp, setUpDefaults } from "../test/setup";
 import { StateBuilder } from "./state-builder";

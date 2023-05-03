@@ -4,7 +4,7 @@
 			"package": "@mainsail/core-validation"
 		},
 		{
-			"package": "@mainsail/core-crypto-config"
+			"package": "@mainsail/crypto-config"
 		},
 		{
 			"package": "@mainsail/core-crypto-time"

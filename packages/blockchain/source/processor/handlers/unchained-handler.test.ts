@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Configuration } from "@mainsail/core-crypto-config";
+import { Configuration } from "@mainsail/crypto-config";
 import { Utils } from "@mainsail/core-kernel";
 
 import { describe, Sandbox } from "../../../../core-test-framework";

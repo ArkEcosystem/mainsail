@@ -3,8 +3,8 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/core-crypto-
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32";
-import { ServiceProvider as CoreCryptoConfig } from "../../../core-crypto-config/distribution";
-import { Configuration } from "../../../core-crypto-config/source/configuration";
+import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config/distribution";
+import { Configuration } from "../../../crypto-config/source/configuration";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../core-crypto-hash-bcrypto/distribution";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../core-crypto-key-pair-schnorr/distribution";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../core-crypto-signature-schnorr/distribution";

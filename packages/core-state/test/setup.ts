@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 import { Factories, Sandbox } from "../../core-test-framework";
-import { Configuration } from "../../core-crypto-config";
+import { Configuration } from "../../crypto-config";
 import { SinonSpy, spy } from "sinon";
 
 import { walletFactory } from "../source/wallets/wallet-factory";
