@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, optional } from "@mainsail/core-container";
+import { inject, injectable, multiInject, optional } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { ByteBuffer } from "@mainsail/utils";
 

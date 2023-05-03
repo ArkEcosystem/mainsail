@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/core-container";
+import { Container } from "@mainsail/container";
 import { Constants, Identifiers } from "@mainsail/core-contracts";
 import { Utils } from "@mainsail/core-kernel";
 

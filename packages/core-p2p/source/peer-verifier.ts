@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prefer-at */
-import { inject, injectable, tagged } from "@mainsail/core-container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Services, Utils } from "@mainsail/core-kernel";
 import assert from "assert";

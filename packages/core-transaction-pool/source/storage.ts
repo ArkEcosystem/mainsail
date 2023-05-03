@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/core-container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Providers } from "@mainsail/core-kernel";
 import BetterSqlite3 from "better-sqlite3";

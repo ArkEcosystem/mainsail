@@ -1,4 +1,4 @@
-import { injectable, postConstruct } from "@mainsail/core-container";
+import { injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions } from "@mainsail/core-contracts";
 import { TransactionBuilder } from "@mainsail/core-crypto-transaction";
 import { BigNumber } from "@mainsail/utils";

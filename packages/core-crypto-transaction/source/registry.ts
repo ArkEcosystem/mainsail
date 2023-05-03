@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/core-container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 
 import { Transaction } from "./types";

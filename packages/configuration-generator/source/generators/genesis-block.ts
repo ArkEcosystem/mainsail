@@ -1,4 +1,4 @@
-import { injectable } from "@mainsail/core-container";
+import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { TransferBuilder } from "@mainsail/core-crypto-transaction-transfer";
 import { ValidatorRegistrationBuilder } from "@mainsail/core-crypto-transaction-validator-registration";

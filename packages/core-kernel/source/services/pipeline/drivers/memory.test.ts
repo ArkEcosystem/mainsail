@@ -1,4 +1,4 @@
-import { Container, injectable } from "@mainsail/core-container";
+import { Container, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/core-contracts";
 
 import { describe } from "../../../../../core-test-framework";

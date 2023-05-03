@@ -1,4 +1,4 @@
-import { Container, injectable } from "@mainsail/core-container";
+import { Container, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { AssertionException } from "@mainsail/core-contracts/distribution/exceptions";
 import { Application, Services, Utils } from "@mainsail/core-kernel";

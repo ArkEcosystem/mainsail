@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/core-container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { Enums, Providers, Services } from "@mainsail/core-kernel";
 

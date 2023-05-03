@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, postConstruct } from "@mainsail/core-container";
+import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { Utils as AppUtils } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";

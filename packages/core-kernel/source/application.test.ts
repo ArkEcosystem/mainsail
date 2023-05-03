@@ -1,4 +1,4 @@
-import { Container, injectable, interfaces } from "@mainsail/core-container";
+import { Container, injectable, interfaces } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { resolve } from "path";
 import { dirSync } from "tmp";

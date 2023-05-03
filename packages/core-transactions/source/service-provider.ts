@@ -1,4 +1,4 @@
-import { interfaces, Selectors } from "@mainsail/core-container";
+import { interfaces, Selectors } from "@mainsail/container";
 import { Identifiers } from "@mainsail/core-contracts";
 import { Providers, Services } from "@mainsail/core-kernel";
 

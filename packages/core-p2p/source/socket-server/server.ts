@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Types } from "@mainsail/core-kernel";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";

@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/core-container";
+import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@mainsail/core-crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/core-crypto-block";

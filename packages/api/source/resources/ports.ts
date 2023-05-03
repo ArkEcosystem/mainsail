@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/core-contracts";
 import { Providers } from "@mainsail/core-kernel";
 

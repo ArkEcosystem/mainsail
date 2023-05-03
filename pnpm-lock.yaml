@@ -187,9 +187,9 @@ importers:
       '@hapi/hoek':
         specifier: 9.2.0
         version: 9.2.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -251,9 +251,9 @@ importers:
 
   packages/blockchain:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -294,9 +294,9 @@ importers:
 
   packages/cli:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -410,9 +410,9 @@ importers:
 
   packages/configuration-generator:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -499,6 +499,15 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3
 
+  packages/container:
+    dependencies:
+      inversify:
+        specifier: 5.1.1
+        version: 5.1.1
+      reflect-metadata:
+        specifier: 0.1.13
+        version: 0.1.13
+
   packages/core:
     dependencies:
       '@mainsail/api':
@@ -513,9 +522,9 @@ importers:
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -682,15 +691,6 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
 
-  packages/core-container:
-    dependencies:
-      inversify:
-        specifier: 5.1.1
-        version: 5.1.1
-      reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
-
   packages/core-contracts:
     dependencies:
       '@hapi/hapi':
@@ -723,9 +723,9 @@ importers:
 
   packages/core-crypto-address-base58:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -766,9 +766,9 @@ importers:
 
   packages/core-crypto-address-bech32:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -806,9 +806,9 @@ importers:
 
   packages/core-crypto-address-bech32m:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -846,9 +846,9 @@ importers:
 
   packages/core-crypto-address-keccak256:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -886,9 +886,9 @@ importers:
 
   packages/core-crypto-address-ss58:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -932,9 +932,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1047,9 +1047,9 @@ importers:
 
   packages/core-crypto-config:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1071,9 +1071,9 @@ importers:
 
   packages/core-crypto-hash-bcrypto:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1090,9 +1090,9 @@ importers:
 
   packages/core-crypto-hash-noble:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1109,9 +1109,9 @@ importers:
 
   packages/core-crypto-hash-wasm:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1128,9 +1128,9 @@ importers:
 
   packages/core-crypto-key-pair-bls12-381:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1174,9 +1174,9 @@ importers:
 
   packages/core-crypto-key-pair-ecdsa:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1211,9 +1211,9 @@ importers:
 
   packages/core-crypto-key-pair-ed25519:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1254,9 +1254,9 @@ importers:
 
   packages/core-crypto-key-pair-schnorr:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1291,9 +1291,9 @@ importers:
 
   packages/core-crypto-signature-bls12-381:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1313,9 +1313,9 @@ importers:
 
   packages/core-crypto-signature-ecdsa:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1335,9 +1335,9 @@ importers:
 
   packages/core-crypto-signature-ed25519:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1357,9 +1357,9 @@ importers:
 
   packages/core-crypto-signature-schnorr:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1379,9 +1379,9 @@ importers:
 
   packages/core-crypto-time:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1404,9 +1404,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1513,9 +1513,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1559,9 +1559,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1602,9 +1602,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1645,9 +1645,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1688,9 +1688,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1734,9 +1734,9 @@ importers:
       '@arkecosystem/crypto-identities':
         specifier: ^1.0.0
         version: 1.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1780,9 +1780,9 @@ importers:
 
   packages/core-crypto-validation:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1811,9 +1811,9 @@ importers:
 
   packages/core-crypto-wif:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1857,9 +1857,9 @@ importers:
 
   packages/core-database:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1930,9 +1930,9 @@ importers:
 
   packages/core-fees:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1945,9 +1945,9 @@ importers:
 
   packages/core-fees-burn:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1963,9 +1963,9 @@ importers:
 
   packages/core-fees-managed:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -1984,9 +1984,9 @@ importers:
 
   packages/core-fees-static:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2002,9 +2002,9 @@ importers:
 
   packages/core-forger:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2048,9 +2048,9 @@ importers:
 
   packages/core-forger-tracker:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2094,9 +2094,9 @@ importers:
 
   packages/core-kernel:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2189,9 +2189,9 @@ importers:
 
   packages/core-lmdb:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2211,9 +2211,9 @@ importers:
 
   packages/core-logger-pino:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2272,9 +2272,9 @@ importers:
 
   packages/core-logger-winston:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2290,9 +2290,9 @@ importers:
 
   packages/core-networking-dns:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2311,9 +2311,9 @@ importers:
       '@hapi/sntp':
         specifier: 4.0.0
         version: 4.0.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2347,9 +2347,9 @@ importers:
       '@hapi/teamwork':
         specifier: 5.1.0
         version: 5.1.0
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2432,9 +2432,9 @@ importers:
 
   packages/core-serializer:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2447,9 +2447,9 @@ importers:
 
   packages/core-state:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2490,9 +2490,9 @@ importers:
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2608,9 +2608,9 @@ importers:
 
   packages/core-transaction-pool:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2654,9 +2654,9 @@ importers:
 
   packages/core-transactions:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2676,9 +2676,9 @@ importers:
 
   packages/core-validation:
     dependencies:
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
@@ -2704,9 +2704,9 @@ importers:
       '@hapi/hapi':
         specifier: 20.1.5
         version: 20.1.5
-      '@mainsail/core-container':
+      '@mainsail/container':
         specifier: workspace:*
-        version: link:../core-container
+        version: link:../container
       '@mainsail/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts

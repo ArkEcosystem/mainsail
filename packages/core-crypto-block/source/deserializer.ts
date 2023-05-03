@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { TransactionFactory } from "@mainsail/core-crypto-transaction";
 import { ByteBuffer } from "@mainsail/utils";

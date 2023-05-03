@@ -1,4 +1,4 @@
-import { injectable } from "@mainsail/core-container";
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/core-contracts";
 import { isEmpty, prettyTime } from "@mainsail/utils";
 import chalk, { Chalk } from "chalk";

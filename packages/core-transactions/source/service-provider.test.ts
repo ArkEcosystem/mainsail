@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/core-container";
+import { Container } from "@mainsail/container";
 import { Application } from "@mainsail/core-kernel";
 
 import { describe } from "../../core-test-framework/source";

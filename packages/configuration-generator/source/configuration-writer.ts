@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/core-contracts";
 import { Types } from "@mainsail/core-kernel";
 import { stringifySync } from "envfile";

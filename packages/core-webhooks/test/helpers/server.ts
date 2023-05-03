@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/core-container";
+import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/core-contracts";
 import { Application, Services } from "@mainsail/core-kernel";
 import { dirSync, setGracefulCleanup } from "tmp";

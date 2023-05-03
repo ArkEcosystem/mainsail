@@ -1,4 +1,4 @@
-import { injectable } from "@mainsail/core-container";
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/core-contracts";
 import { ripemd160, sha256 } from "hash-wasm";
 

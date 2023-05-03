@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/core-container";
+import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/core-contracts";
 import { Application } from "@mainsail/core-kernel";
 

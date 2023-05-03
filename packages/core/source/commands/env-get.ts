@@ -1,5 +1,5 @@
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/core-container";
+import { injectable } from "@mainsail/container";
 import { parseFileSync } from "envfile";
 import { existsSync } from "fs-extra";
 import Joi from "joi";

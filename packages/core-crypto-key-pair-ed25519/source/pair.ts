@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { getPublicKey } from "@noble/ed25519";
 import { sha256 } from "@noble/hashes/sha256";

@@ -66,7 +66,7 @@ export const versionLatest = {
 			dependencies: {
 				"@mainsail/api": "^2.5.24",
 				"@mainsail/blockchain": "^2.5.24",
-				"@mainsail/core-container": "^2.5.24",
+				"@mainsail/container": "^2.5.24",
 				"@mainsail/core-database-postgres": "^2.5.24",
 				"@mainsail/core-event-emitter": "^2.5.24",
 				"@mainsail/core-exchange-json-rpc": "^2.5.24",
@@ -252,7 +252,7 @@ export const versionNext = {
 			dependencies: {
 				"@mainsail/api": "^2.5.0-next.10",
 				"@mainsail/blockchain": "^2.5.0-next.10",
-				"@mainsail/core-container": "^2.5.0-next.10",
+				"@mainsail/container": "^2.5.0-next.10",
 				"@mainsail/core-database-postgres": "^2.5.0-next.10",
 				"@mainsail/core-event-emitter": "^2.5.0-next.10",
 				"@mainsail/core-exchange-json-rpc": "^2.5.0-next.10",

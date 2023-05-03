@@ -22,7 +22,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@mainsail/core-container": "workspace:*",
+		"@mainsail/container": "workspace:*",
 		"@mainsail/core-contracts": "workspace:*",
 		"@mainsail/core-crypto-validation": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",

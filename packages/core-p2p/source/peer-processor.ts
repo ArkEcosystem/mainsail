@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/core-container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Enums, Providers, Utils as KernelUtils } from "@mainsail/core-kernel";
 

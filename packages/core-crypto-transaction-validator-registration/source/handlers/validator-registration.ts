@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 import Transactions from "@mainsail/core-crypto-transaction";
 import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/core-kernel";

@@ -1,4 +1,4 @@
-import { injectable, Selectors } from "@mainsail/core-container";
+import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Providers, Services } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";

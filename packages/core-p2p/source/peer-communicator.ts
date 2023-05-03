@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/core-container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { Enums, Providers, Types, Utils } from "@mainsail/core-kernel";
 import dayjs from "dayjs";

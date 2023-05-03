@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/core-container";
+import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/core-contracts";
 import { Configuration } from "@mainsail/core-crypto-config";
 import { BlockTimeCalculator } from "@mainsail/core-crypto-time/source/block-time-calculator";

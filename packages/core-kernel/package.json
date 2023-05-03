@@ -19,7 +19,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@mainsail/core-container": "workspace:*",
+		"@mainsail/container": "workspace:*",
 		"@mainsail/core-contracts": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@pm2/io": "4.3.5",

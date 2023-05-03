@@ -1,4 +1,4 @@
-import { injectable } from "@mainsail/core-container";
+import { injectable } from "@mainsail/container";
 import { get, has } from "@mainsail/utils";
 
 import { PackageJson } from "../types";

@@ -1,5 +1,5 @@
 import { Commands, Container, Contracts, Services } from "@mainsail/cli";
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import Joi from "joi";
 import { resolve } from "path";

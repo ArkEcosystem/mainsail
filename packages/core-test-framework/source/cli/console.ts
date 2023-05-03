@@ -1,5 +1,5 @@
 import { Application, ApplicationFactory, Commands, Container as CLI, Services, Utils } from "@mainsail/cli";
-import { Container } from "@mainsail/core-container";
+import { Container } from "@mainsail/container";
 
 export class Console {
 	public app: Application;

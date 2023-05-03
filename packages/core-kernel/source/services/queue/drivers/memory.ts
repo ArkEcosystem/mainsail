@@ -1,4 +1,4 @@
-import { decorateInjectable, inject, injectable } from "@mainsail/core-container";
+import { decorateInjectable, inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";

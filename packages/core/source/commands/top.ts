@@ -1,5 +1,5 @@
 import { Commands, Container, Contracts, Services } from "@mainsail/cli";
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 import Joi from "joi";

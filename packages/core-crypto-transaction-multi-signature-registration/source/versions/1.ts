@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/core-container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/core-contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/core-crypto-transaction";
 import { ByteBuffer } from "@mainsail/utils";

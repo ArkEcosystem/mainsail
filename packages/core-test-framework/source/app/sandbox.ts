@@ -1,5 +1,5 @@
 import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
-import { Container, interfaces } from "@mainsail/core-container";
+import { Container, interfaces } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/core-contracts";
 import { Application, Providers, Types } from "@mainsail/core-kernel";
 import { readJSONSync, removeSync } from "fs-extra";

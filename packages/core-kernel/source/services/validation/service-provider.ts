@@ -1,4 +1,4 @@
-import { interfaces } from "@mainsail/core-container";
+import { interfaces } from "@mainsail/container";
 import { Identifiers } from "@mainsail/core-contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers";

@@ -29,7 +29,7 @@
 		"@mainsail/blockchain": "workspace:*",
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",
-		"@mainsail/core-container": "workspace:*",
+		"@mainsail/container": "workspace:*",
 		"@mainsail/core-contracts": "workspace:*",
 		"@mainsail/core-crypto-address-bech32m": "workspace:*",
 		"@mainsail/core-crypto-block": "workspace:*",
