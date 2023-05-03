@@ -370,15 +370,9 @@ importers:
       '@arkecosystem/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
-      '@arkecosystem/core-database':
-        specifier: workspace:*
-        version: link:../core-database
       '@arkecosystem/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
-      '@arkecosystem/core-transaction-pool':
-        specifier: workspace:*
-        version: link:../core-transaction-pool
       '@arkecosystem/core-transactions':
         specifier: workspace:*
         version: link:../core-transactions
