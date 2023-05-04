@@ -721,28 +721,6 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
 
-  packages/core-crypto-signature-bls12-381:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      '@noble/bls12-381':
-        specifier: ^1.2.0
-        version: 1.2.0
-    devDependencies:
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-
   packages/core-crypto-signature-ecdsa:
     dependencies:
       '@mainsail/container':
@@ -2747,6 +2725,28 @@ importers:
       bip39:
         specifier: 3.0.4
         version: 3.0.4
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/crypto-signature-bls12-381:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@noble/bls12-381':
+        specifier: ^1.2.0
+        version: 1.2.0
+    devDependencies:
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
