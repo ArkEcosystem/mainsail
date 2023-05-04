@@ -1,7 +1,7 @@
 {
 	"name": "core",
 	"private": true,
-	"description": "The packages that make up the ARK Core",
+	"description": "The packages that make up the Mainsail",
 	"workspaces": [
 		"packages/*",
 		"plugins/*"

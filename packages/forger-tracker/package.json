@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/forger-tracker",
 	"version": "0.0.1",
-	"description": "Forger for ARK Core",
+	"description": "Forger for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

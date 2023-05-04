@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/logger-winston",
 	"version": "0.0.1",
-	"description": "Webhooks for ARK Core",
+	"description": "Webhooks for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

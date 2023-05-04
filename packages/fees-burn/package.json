@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/fees-burn",
 	"version": "0.0.1",
-	"description": "State Management for ARK Core",
+	"description": "State Management for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

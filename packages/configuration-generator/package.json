@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/configuration-generator",
 	"version": "0.0.1",
-	"description": "Configuration generator for ARK Core",
+	"description": "Configuration generator for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

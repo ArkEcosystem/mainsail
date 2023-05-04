@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/transactions",
 	"version": "0.0.1",
-	"description": "Transaction Services for ARK Core",
+	"description": "Transaction Services for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

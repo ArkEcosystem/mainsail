@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/fees-managed",
 	"version": "0.0.1",
-	"description": "Transaction Pool Manager for ARK Core",
+	"description": "Transaction Pool Manager for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

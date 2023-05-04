@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/database",
 	"version": "0.0.1",
-	"description": "Database Interface for ARK Core",
+	"description": "Database Interface for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

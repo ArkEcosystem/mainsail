@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/networking-ntp",
 	"version": "0.0.1",
-	"description": "P2P API for ARK Core",
+	"description": "P2P API for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
