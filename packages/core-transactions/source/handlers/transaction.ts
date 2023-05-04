@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 
-// @TODO revisit the implementation, container usage and arguments after core-database rework
+// @TODO revisit the implementation, container usage and arguments after database rework
 @injectable()
 export abstract class TransactionHandler {
 	@inject(Identifiers.Application)

@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/core-kernel";
 
 import { Configuration } from "../../crypto-config";
-import { DatabaseService } from "../../core-database/source/database-service";
+import { DatabaseService } from "../../database/source/database-service";
 import { describe } from "../../core-test-framework";
 import { DatabaseInteraction } from "./database-interactions";
 

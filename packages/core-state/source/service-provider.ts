@@ -104,7 +104,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async bootWhen(serviceProvider?: string): Promise<boolean> {
-		return serviceProvider === "@mainsail/core-database";
+		return serviceProvider === "@mainsail/database";
 	}
 
 	public configSchema(): object {

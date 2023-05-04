@@ -39,10 +39,10 @@ describe<{
 		stubbedApp.restore();
 	});
 
-	it("should boot when the package is core-database", async (context) => {
+	it("should boot when the package is database", async (context) => {
 		assert.false(await context.serviceProvider.bootWhen());
-		assert.false(await context.serviceProvider.bootWhen("not-core-database"));
-		assert.true(await context.serviceProvider.bootWhen("@mainsail/core-database"));
+		assert.false(await context.serviceProvider.bootWhen("not-database"));
+		assert.true(await context.serviceProvider.bootWhen("@mainsail/database"));
 	});
 });
 
