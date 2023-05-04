@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
 import { ServiceProvider as CoreCryptoValidation } from "../../../../crypto-validation";
-import { ServiceProvider as CoreCryptoWif } from "../../../../core-crypto-wif";
+import { ServiceProvider as CoreCryptoWif } from "../../../../crypto-wif";
 import { ServiceProvider as CoreSerializer } from "../../../../core-serializer";
 import { ServiceProvider as CoreValidation } from "../../../../core-validation";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../../crypto-address-bech32";

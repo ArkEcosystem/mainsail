@@ -12,7 +12,7 @@ import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/cryp
 import { ServiceProvider as CoreCryptoTransactionValidatorRegistration } from "@mainsail/crypto-transaction-validator-registration";
 import { ServiceProvider as CoreCryptoTransactionVote } from "@mainsail/crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
-import { ServiceProvider as CoreCryptoWif } from "@mainsail/core-crypto-wif";
+import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreFees } from "@mainsail/core-fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/core-fees-static";
 import { Application } from "@mainsail/core-kernel";

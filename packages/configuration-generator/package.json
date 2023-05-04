@@ -33,7 +33,7 @@
 		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
 		"@mainsail/crypto-transaction-vote": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/core-crypto-wif": "workspace:*",
+		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/core-database": "workspace:*",
 		"@mainsail/core-fees": "workspace:*",
 		"@mainsail/core-fees-static": "workspace:*",
