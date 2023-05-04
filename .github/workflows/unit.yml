@@ -31,6 +31,13 @@ jobs:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: ${{ runner.os }}-pnpm-
 
+            - name: Cache lerna
+              uses: actions/cache@v3
+              with:
+                  path: ./.cache
+                  key: ${{ runner.os }}-lerna
+                  restore-keys: ${{ runner.os }}-lerna-
+
             - name: Install dependencies
               run: pnpm install
 
