@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-key-pair-ecdsa",
+	"name": "@mainsail/crypto-key-pair-ecdsa",
 	"version": "0.0.1",
 	"description": "secp256k1 Key Derivation",
 	"license": "MIT",

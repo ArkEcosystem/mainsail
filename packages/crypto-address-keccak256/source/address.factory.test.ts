@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as ECDSA } from "@mainsail/core-crypto-key-pair-ecdsa";
+import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@mainsail/core-crypto-key-pair-schnorr";
 import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
 
