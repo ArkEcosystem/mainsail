@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-hash-bcrypto",
+	"name": "@mainsail/crypto-hash-bcrypto",
 	"version": "0.0.1",
 	"description": "Hashing powered by bcrypto",
 	"license": "MIT",

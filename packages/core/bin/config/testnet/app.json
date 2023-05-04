@@ -13,7 +13,7 @@
 			"package": "@mainsail/core-crypto-validation"
 		},
 		{
-			"package": "@mainsail/core-crypto-hash-bcrypto"
+			"package": "@mainsail/crypto-hash-bcrypto"
 		},
 		{
 			"package": "@mainsail/core-crypto-signature-schnorr"

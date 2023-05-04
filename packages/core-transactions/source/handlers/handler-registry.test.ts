@@ -15,7 +15,7 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../crypto-config";
-import { HashFactory } from "../../../core-crypto-hash-bcrypto/source/hash.factory";
+import { HashFactory } from "../../../crypto-hash-bcrypto/source/hash.factory";
 import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
 import { Signature } from "../../../core-crypto-signature-schnorr/source/signature";
