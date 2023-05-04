@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-logger-pino':
-        specifier: workspace:*
-        version: link:../core-logger-pino
       '@mainsail/core-networking-dns':
         specifier: workspace:*
         version: link:../core-networking-dns
@@ -657,6 +654,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/logger-pino':
+        specifier: workspace:*
+        version: link:../logger-pino
       '@mainsail/storage-lmdb':
         specifier: workspace:*
         version: link:../storage-lmdb
@@ -720,85 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-logger-pino:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      chalk:
-        specifier: 4.1.2
-        version: 4.1.2
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      pino:
-        specifier: 6.13.2
-        version: 6.13.2
-      pino-pretty:
-        specifier: 4.8.0
-        version: 4.8.0
-      pump:
-        specifier: 3.0.0
-        version: 3.0.0
-      pumpify:
-        specifier: 2.0.1
-        version: 2.0.1
-      readable-stream:
-        specifier: 3.6.0
-        version: 3.6.0
-      rotating-file-stream:
-        specifier: 2.1.5
-        version: 2.1.5
-      split2:
-        specifier: 3.2.2
-        version: 3.2.2
-    devDependencies:
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      '@types/pino':
-        specifier: 6.3.11
-        version: 6.3.11
-      '@types/pump':
-        specifier: 1.1.1
-        version: 1.1.1
-      '@types/readable-stream':
-        specifier: 2.3.11
-        version: 2.3.11
-      '@types/split2':
-        specifier: 2.1.6
-        version: 2.1.6
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-
-  packages/core-logger-winston:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      winston:
-        specifier: ^3.6.0
-        version: 3.6.0
 
   packages/core-networking-dns:
     dependencies:
@@ -2728,6 +2649,85 @@ importers:
   packages/kernel/test/stubs/stub-plugin: {}
 
   packages/kernel/test/stubs/stub-plugin-with-defaults: {}
+
+  packages/logger-pino:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      chalk:
+        specifier: 4.1.2
+        version: 4.1.2
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      pino:
+        specifier: 6.13.2
+        version: 6.13.2
+      pino-pretty:
+        specifier: 4.8.0
+        version: 4.8.0
+      pump:
+        specifier: 3.0.0
+        version: 3.0.0
+      pumpify:
+        specifier: 2.0.1
+        version: 2.0.1
+      readable-stream:
+        specifier: 3.6.0
+        version: 3.6.0
+      rotating-file-stream:
+        specifier: 2.1.5
+        version: 2.1.5
+      split2:
+        specifier: 3.2.2
+        version: 3.2.2
+    devDependencies:
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@types/pino':
+        specifier: 6.3.11
+        version: 6.3.11
+      '@types/pump':
+        specifier: 1.1.1
+        version: 1.1.1
+      '@types/readable-stream':
+        specifier: 2.3.11
+        version: 2.3.11
+      '@types/split2':
+        specifier: 2.1.6
+        version: 2.1.6
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/logger-winston:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      winston:
+        specifier: ^3.6.0
+        version: 3.6.0
 
   packages/storage-lmdb:
     dependencies:

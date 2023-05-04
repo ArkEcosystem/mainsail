@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-logger-pino",
+	"name": "@mainsail/logger-pino",
 	"version": "0.0.1",
 	"description": "Webhooks for ARK Core",
 	"license": "MIT",

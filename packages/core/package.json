@@ -54,7 +54,7 @@
 		"@mainsail/forger-tracker": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/storage-lmdb": "workspace:*",
-		"@mainsail/core-logger-pino": "workspace:*",
+		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/core-networking-dns": "workspace:*",
 		"@mainsail/core-networking-ntp": "workspace:*",
 		"@mainsail/core-p2p": "workspace:*",
