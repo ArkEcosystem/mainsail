@@ -13,10 +13,21 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - uses: pnpm/action-setup@v2
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
               with:
-                  run_install: true
                   version: latest
+                  run_install: false
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v3
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Install dependencies
+              run: pnpm install
 
             - name: Build
               run: pnpm run build
