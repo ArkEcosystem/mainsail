@@ -10,6 +10,6 @@ export class ExitApp implements Action {
 
 	public async handle(): Promise<void> {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.app.terminate("Failed to startup blockchain. Exiting ARK Core!");
+		this.app.terminate("Failed to startup blockchain. Exiting Mainsail!");
 	}
 }

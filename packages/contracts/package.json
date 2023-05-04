@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/contracts",
 	"version": "0.0.1",
-	"description": "Kernel of ARK Core",
+	"description": "Contracts of Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

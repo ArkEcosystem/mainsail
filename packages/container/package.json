@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/container",
 	"version": "0.0.1",
-	"description": "Kernel of ARK Core",
+	"description": "Container of Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

@@ -353,7 +353,7 @@ export const versionNext = {
 				},
 				plugins: ["@oclif/plugin-autocomplete", "@oclif/plugin-commands", "@oclif/plugin-help"],
 			},
-			readme: '# ARK Core - Core\n\n<p align="center">\n    <img src="https://raw.githubusercontent.com/ARKEcosystem/core/master/banner.png" />\n</p>\n\n## Documentation\n\nYou can find installation instructions and detailed instructions on how to use this package at the [dedicated documentation site](https://docs.ark.io/guidebook/core/plugins/required/core.html).\n\n## Security\n\nIf you discover a security vulnerability within this package, please send an e-mail to security@ark.io. All security vulnerabilities will be promptly addressed.\n\n## Credits\n\nThis project exists thanks to all the people who [contribute](../../../../contributors).\n\n## License\n\n[MIT](LICENSE) © [ARK Ecosystem](https://ark.io)\n',
+			readme: '# Mainsail - Core\n\n<p align="center">\n    <img src="https://raw.githubusercontent.com/ARKEcosystem/core/master/banner.png" />\n</p>\n\n## Documentation\n\nYou can find installation instructions and detailed instructions on how to use this package at the [dedicated documentation site](https://docs.ark.io/guidebook/core/plugins/required/core.html).\n\n## Security\n\nIf you discover a security vulnerability within this package, please send an e-mail to security@ark.io. All security vulnerabilities will be promptly addressed.\n\n## Credits\n\nThis project exists thanks to all the people who [contribute](../../../../contributors).\n\n## License\n\n[MIT](LICENSE) © [ARK Ecosystem](https://ark.io)\n',
 			readmeFilename: "README.md",
 			_id: "@mainsail/core@2.5.0-next.10",
 			_nodeVersion: "10.16.0",

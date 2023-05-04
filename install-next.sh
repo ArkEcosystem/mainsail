@@ -212,10 +212,10 @@ fi
 
 success "Installed system updates!"
 
-heading "Installing ARK Core..."
+heading "Installing Mainsail..."
 
 while ! yarn global add @mainsail/core@next ; do
-    read -p "Installing ARK Core failed, do you want to retry? [y/N]: " choice
+    read -p "Installing Mainsail failed, do you want to retry? [y/N]: " choice
     if [[ ! "$choice" =~ ^(yes|y|Y) ]] ; then
         exit 1
     fi
@@ -225,7 +225,7 @@ echo 'export PATH=$(yarn global bin):$PATH' >> ~/.bashrc
 export PATH=$(yarn global bin):$PATH
 ark config:publish --network=devnet
 
-success "Installed ARK Core!"
+success "Installed Mainsail!"
 
 readNonempty() {
     prompt=${1}
