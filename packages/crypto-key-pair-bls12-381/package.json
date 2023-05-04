@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-key-pair-bls12-381",
+	"name": "@mainsail/crypto-key-pair-bls12-381",
 	"version": "0.0.1",
 	"description": "BLS12-381 Key Derivation",
 	"license": "MIT",

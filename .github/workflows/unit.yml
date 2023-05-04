@@ -44,8 +44,8 @@ jobs:
               run: cd packages/crypto-hash-noble && pnpm run test
             - name: Test crypto-hash-wasm
               run: cd packages/crypto-hash-wasm && pnpm run test
-            - name: Test core-crypto-key-pair-bls12-381
-              run: cd packages/core-crypto-key-pair-bls12-381 && pnpm run test
+            - name: Test crypto-key-pair-bls12-381
+              run: cd packages/crypto-key-pair-bls12-381 && pnpm run test
             - name: Test core-crypto-key-pair-ecdsa
               run: cd packages/core-crypto-key-pair-ecdsa && pnpm run test
             - name: Test core-crypto-key-pair-ed25519
