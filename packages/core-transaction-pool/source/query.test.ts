@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { BigNumber } from "../../utils";
 import { Query, QueryIterable } from ".";
 

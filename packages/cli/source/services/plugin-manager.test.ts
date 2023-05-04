@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { Identifiers } from "../ioc";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";

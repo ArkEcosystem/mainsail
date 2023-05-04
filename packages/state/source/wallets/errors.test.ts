@@ -1,6 +1,6 @@
 import { Exceptions } from "@mainsail/contracts";
 
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 
 describe("WalletErrors", ({ it, assert }) => {
 	it("should construct base wallet error", () => {

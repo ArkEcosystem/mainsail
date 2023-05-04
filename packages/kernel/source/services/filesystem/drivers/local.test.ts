@@ -1,6 +1,6 @@
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../../../core-test-framework";
+import { describe } from "../../../../../test-framework";
 import { LocalFilesystem } from "./local";
 
 describe<{

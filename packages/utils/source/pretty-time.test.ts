@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { prettyTime } from "./pretty-time";
 
 describe("prettyTime", async ({ assert, it, nock, loader }) => {

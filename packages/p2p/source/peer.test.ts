@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import dayjs from "dayjs";
 
 import { Peer } from "./peer";

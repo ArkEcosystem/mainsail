@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { Address } from "../identities";
 import { configManager } from "../managers";
 import { devnet } from "../networks";

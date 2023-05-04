@@ -1,4 +1,4 @@
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 import { cleanAddress, isIPv6Address, isValidAddress, normalizeAddress } from "./ip-address";
 
 describe("isValidAddress", ({ assert, it }) => {

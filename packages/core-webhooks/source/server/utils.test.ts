@@ -1,7 +1,7 @@
 import { Enums } from "@mainsail/kernel";
 import { notFound } from "@hapi/boom";
 
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 import { Webhook } from "../interfaces";
 import { respondWithResource } from "./utils";
 

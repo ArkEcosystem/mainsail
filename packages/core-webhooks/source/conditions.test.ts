@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../test-framework/source";
 import { conditions } from "./conditions";
 const { between, contains, eq, falsy, gt, gte, lt, lte, ne, notBetween, regexp, truthy } = conditions;
 

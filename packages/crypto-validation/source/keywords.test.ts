@@ -4,7 +4,7 @@ import { Validator } from "@mainsail/core-validation/source/validator";
 import { BigNumber } from "@mainsail/utils";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import { makeKeywords } from "./keywords";
 
 type Context = {

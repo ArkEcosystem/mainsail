@@ -5,8 +5,8 @@ import { Configuration } from "@mainsail/crypto-config";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
-import { describe } from "../../core-test-framework";
-import { Stub } from "../../core-test-framework/source/uvu/stub";
+import { describe } from "../../test-framework";
+import { Stub } from "../../test-framework/source/uvu/stub";
 import { Mempool } from ".";
 
 describe<{

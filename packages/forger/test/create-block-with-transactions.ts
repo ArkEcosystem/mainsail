@@ -1,5 +1,5 @@
 import { BIP39 } from "../source/methods/bip39";
-import { TransactionFactory } from "../../core-test-framework/source";
+import { TransactionFactory } from "../../test-framework/source";
 import { Utils } from "@mainsail/crypto";
 
 export const dummy = {

@@ -4,7 +4,7 @@ import { Application, Providers, Services } from "@mainsail/kernel";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { ServiceProvider } from "./service-provider";
 
 const loadDefaults = (): { defaults: Record<string, any> } => importFresh("./defaults");

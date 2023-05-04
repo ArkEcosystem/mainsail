@@ -28,7 +28,7 @@ import { TransferTransactionHandler } from "../../../crypto-transaction-transfer
 import { ValidatorRegistrationTransactionHandler } from "../../../crypto-transaction-validator-registration/source/handlers";
 import { ValidatorResignationTransactionHandler } from "../../../crypto-transaction-validator-resignation/source/handlers";
 import { VoteTransactionHandler } from "../../../crypto-transaction-vote/source/handlers";
-import { describe } from "../../../core-test-framework/source";
+import { describe } from "../../../test-framework/source";
 import { Validator } from "../../../core-validation/source/validator";
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";

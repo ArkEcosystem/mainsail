@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 
 import { EventListener } from "./event-listener";
 import { DisconnectPeer } from "./listeners";

@@ -1,4 +1,4 @@
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";

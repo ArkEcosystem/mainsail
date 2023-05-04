@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { BlockTimeCalculator } from "@mainsail/crypto-time/source/block-time-calculator";
 import { Slots } from "@mainsail/crypto-time/source/slots";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { ExpirationService } from ".";
 
 describe<{

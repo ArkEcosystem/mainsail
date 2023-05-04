@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import Utils from "@mainsail/utils";
 import { SinonSpy } from "sinon";
 
-import { describeSkip, Factories, Sandbox } from "../../core-test-framework";
+import { describeSkip, Factories, Sandbox } from "../../test-framework";
 import { makeChainedBlocks } from "../test/make-chained-block";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { setUp } from "../test/setup";

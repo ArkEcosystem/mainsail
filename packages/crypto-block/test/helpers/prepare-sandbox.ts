@@ -15,7 +15,7 @@ import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif/distributi
 import { ServiceProvider as CoreFees } from "../../../fees/distribution";
 import { ServiceProvider as CoreFeesStatic } from "../../../fees-static/distribution";
 import { ServiceProvider as CoreSerializer } from "../../../serializer/distribution";
-import { Sandbox } from "../../../core-test-framework/distribution";
+import { Sandbox } from "../../../test-framework/distribution";
 import { ServiceProvider as CoreValidation } from "../../../core-validation/distribution";
 import { Deserializer } from "../../source/deserializer";
 import { IDFactory } from "../../source/id.factory";

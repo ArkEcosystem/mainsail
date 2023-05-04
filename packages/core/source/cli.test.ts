@@ -3,7 +3,7 @@ import envPaths from "env-paths";
 import { join } from "path";
 import prompts from "prompts";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { CommandLineInterface } from "./cli";
 
 describe("CLI", ({ beforeEach, it, assert, stub }) => {

@@ -1,6 +1,6 @@
 import { Exceptions } from "@mainsail/contracts";
 
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { ActionArguments } from "../../types";
 import { Action } from "./action";
 import { Triggers } from "./triggers";

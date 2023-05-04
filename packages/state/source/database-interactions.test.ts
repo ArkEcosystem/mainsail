@@ -4,7 +4,7 @@ import { Enums } from "@mainsail/kernel";
 
 import { Configuration } from "../../crypto-config";
 import { DatabaseService } from "../../database/source/database-service";
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { DatabaseInteraction } from "./database-interactions";
 
 describe<{

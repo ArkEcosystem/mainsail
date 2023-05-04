@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import { blockData } from "../test/fixtures/block";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { IDFactory } from "./id.factory";

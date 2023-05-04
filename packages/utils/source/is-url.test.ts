@@ -1,6 +1,6 @@
 import { URL } from "url";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { isURL } from "./is-url";
 
 describe("#isURL", ({ it, assert }) => {

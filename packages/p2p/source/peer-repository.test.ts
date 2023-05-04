@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 
 import { Peer } from "./peer";
 import { PeerRepository } from "./peer-repository";

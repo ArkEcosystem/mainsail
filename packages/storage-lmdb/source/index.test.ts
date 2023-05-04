@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { RootDatabase } from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import { ServiceProvider } from "./index";
 
 describe<{

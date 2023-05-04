@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { Application } from "../../application";
 import { Pm2ProcessActionsService } from "./drivers/pm2";
 import { ServiceProvider } from "./service-provider";

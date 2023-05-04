@@ -3,7 +3,7 @@ import { Application, Utils } from "@mainsail/kernel";
 
 import { Configuration } from "../../../crypto-config";
 import { VoteBuilder } from "../../../crypto-transaction-vote";
-import { describeSkip, Factories } from "../../../core-test-framework";
+import { describeSkip, Factories } from "../../../test-framework";
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { makeVoteTransactions } from "../../test/make-vote-transactions";

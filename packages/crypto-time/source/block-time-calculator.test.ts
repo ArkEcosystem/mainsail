@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import milestones from "../test/fixtures/block-time-milestones.json";
 import { BlockTimeCalculator } from "./block-time-calculator";
 

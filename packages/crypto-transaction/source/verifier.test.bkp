@@ -1,5 +1,5 @@
-import { describe, Generators } from "@mainsail/core-test-framework/source";
-import { TransactionFactory } from "@mainsail/core-test-framework/source/utils/transaction-factory";
+import { describe, Generators } from "@mainsail/test-framework/source";
+import { TransactionFactory } from "@mainsail/test-framework/source/utils/transaction-factory";
 
 import { configManager } from "../../../../packages/crypto/source/managers";
 import { createRandomTx } from "../../test/support";

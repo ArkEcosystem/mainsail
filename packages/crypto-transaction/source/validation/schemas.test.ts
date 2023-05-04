@@ -6,7 +6,7 @@ import { Validator } from "@mainsail/core-validation/source/validator";
 import { BigNumber } from "@mainsail/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
-import { describe, Sandbox } from "../../../core-test-framework/distribution";
+import { describe, Sandbox } from "../../../test-framework/distribution";
 import { makeKeywords } from "./keywords";
 import { schemas, transactionBaseSchema } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utils";

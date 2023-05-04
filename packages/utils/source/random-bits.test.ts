@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { randomBits } from "./random-bits";
 
 describe("#randomBits", ({ it, each, assert }) => {

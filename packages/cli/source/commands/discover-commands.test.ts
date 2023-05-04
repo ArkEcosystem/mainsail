@@ -1,7 +1,7 @@
 import { resolve } from "path";
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { DiscoverCommands } from "./discover-commands";
 
 describe<{ DiscoverCommands; cmd: DiscoverCommands }>("DiscoverCommands", ({ beforeEach, afterAll, it, assert }) => {

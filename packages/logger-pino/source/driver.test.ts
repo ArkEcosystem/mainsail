@@ -7,7 +7,7 @@ import { readdirSync } from "fs-extra";
 import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../test-framework/source";
 import { PinoLogger } from "./driver";
 
 describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {

@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Application } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { BlockTimeCalculator } from "./block-time-calculator";
 import { Slots } from "./slots";
 

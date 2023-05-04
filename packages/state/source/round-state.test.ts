@@ -5,7 +5,7 @@ import Utils from "@mainsail/utils";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
-import { describeSkip, Sandbox } from "../../core-test-framework";
+import { describeSkip, Sandbox } from "../../test-framework";
 import block1760000 from "../test/fixtures/block1760000";
 import { RoundState } from "./round-state";
 

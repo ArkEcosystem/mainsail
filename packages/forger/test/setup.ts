@@ -5,7 +5,7 @@ import { Actions } from "@mainsail/state";
 import { Wallet } from "@mainsail/state/source/wallets";
 import { spy } from "sinon";
 
-import { Sandbox } from "../../core-test-framework/source";
+import { Sandbox } from "../../test-framework/source";
 import { ValidatorTracker } from "../source/validator-tracker";
 
 export const mockLastBlock = {

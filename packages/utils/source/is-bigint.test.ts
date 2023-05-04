@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { isBigInt } from "./is-bigint";
 
 describe("isBigInt", async ({ assert, it, nock, loader }) => {

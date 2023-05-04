@@ -3,7 +3,7 @@ import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
-import { describe, Sandbox } from "../../../../../core-test-framework";
+import { describe, Sandbox } from "../../../../../test-framework";
 import { QueueEvent } from "../../../enums";
 import { MemoryQueue } from "./memory";
 

@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { InputDefinition } from "./definition";
 import { Input } from "./input";
 

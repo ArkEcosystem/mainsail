@@ -1,6 +1,6 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import rewiremock from "rewiremock";
 
 import { defaults } from "./defaults";

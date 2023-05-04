@@ -2,7 +2,7 @@ import { ensureDirSync, writeJSON } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { envPaths as environmentPaths } from "../env-paths";
 import { DiscoverConfig } from "./discover-config";
 

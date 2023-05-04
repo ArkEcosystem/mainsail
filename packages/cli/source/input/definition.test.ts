@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 import { InputDefinition } from "./definition";
 
 describe("InputDefinition", ({ it, assert }) => {

@@ -3,7 +3,7 @@ import { Application, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy } from "sinon";
 
-import { describe, describeSkip, getWalletAttributeSet } from "../../../core-test-framework";
+import { describe, describeSkip, getWalletAttributeSet } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletEvent } from ".";
 

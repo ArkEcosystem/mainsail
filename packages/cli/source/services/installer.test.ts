@@ -1,6 +1,6 @@
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { execa } from "../execa";
 import { Installer } from "./installer";
 

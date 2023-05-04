@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { BigNumber } from "../../utils/source/big-number";
 import { SenderMempool } from ".";
 

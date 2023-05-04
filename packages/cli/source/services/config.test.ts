@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs";
 import { setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { Config } from "./config";
 
 describe<{

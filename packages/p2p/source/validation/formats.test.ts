@@ -1,6 +1,6 @@
 import { Validator } from "@mainsail/core-validation/source/validator";
 
-import { describe, Sandbox } from "../../../core-test-framework";
+import { describe, Sandbox } from "../../../test-framework";
 import { makeFormats } from "./formats";
 
 describe<{

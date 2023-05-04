@@ -1,7 +1,7 @@
 import nock from "nock";
 import prompts from "prompts";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { versionNext } from "../../test/fixtures/latest-version";
 import { Identifiers } from "../ioc";
 import { Config } from "./config";

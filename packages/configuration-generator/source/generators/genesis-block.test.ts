@@ -1,4 +1,4 @@
-import { describe } from "../../../core-test-framework/distribution";
+import { describe } from "../../../test-framework/distribution";
 import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
 import { GenesisBlockGenerator } from "./genesis-block";

@@ -5,7 +5,7 @@ import { BlockTimeCalculator } from "@mainsail/crypto-time/source/block-time-cal
 import { Slots } from "@mainsail/crypto-time/source/slots";
 import { Enums } from "@mainsail/kernel";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { SenderState } from ".";
 
 describe<{

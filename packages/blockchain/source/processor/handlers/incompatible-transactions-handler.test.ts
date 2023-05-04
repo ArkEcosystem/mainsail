@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { BlockProcessorResult } from "../contracts";
 import { IncompatibleTransactionsHandler } from "./incompatible-transactions-handler";
 

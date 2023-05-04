@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-test-framework",
+	"name": "@mainsail/test-framework",
 	"version": "0.0.1",
 	"description": "Test Framework for ARK Core",
 	"license": "MIT",

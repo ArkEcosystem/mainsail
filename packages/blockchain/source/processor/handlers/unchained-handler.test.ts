@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Utils } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../../../core-test-framework";
+import { describe, Sandbox } from "../../../../test-framework";
 import { BlockProcessorResult } from "../contracts";
 import { UnchainedHandler } from "./unchained-handler";
 

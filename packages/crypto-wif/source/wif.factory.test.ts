@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-schnorr/source/pair";
 
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import { mnemonic, wif } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
 import { WIFFactory } from "./wif.factory";

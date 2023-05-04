@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
-import { describe, Sandbox } from "../../../core-test-framework";
+import { describe, Sandbox } from "../../../test-framework";
 import { blockchainMachine } from "./machine";
 import { StateMachine } from "./state-machine";
 

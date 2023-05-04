@@ -5,7 +5,7 @@ import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../test-framework/source";
 import { ServiceProvider } from "./service-provider";
 
 const loadDefaults = () => importFresh("./defaults").defaults;

@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { execa } from "../../execa";
 import { Git } from "./git";
 

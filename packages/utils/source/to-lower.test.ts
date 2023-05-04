@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { toLower } from "./to-lower";
 
 describe("toLower", async ({ assert, it, nock, loader }) => {

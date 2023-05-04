@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { CappedMap } from "./capped-map";
 
 describe("Capped Map", ({ it, assert }) => {

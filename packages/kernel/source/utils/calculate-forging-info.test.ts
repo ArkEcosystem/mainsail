@@ -5,7 +5,7 @@ import { Configuration } from "../../../crypto-config";
 import { BlockTimeCalculator } from "../../../crypto-time/source/block-time-calculator";
 import { BlockTimeLookup } from "../../../crypto-time/source/block-time-lookup";
 import { Slots } from "../../../crypto-time/source/slots";
-import { describe, Sandbox } from "../../../core-test-framework";
+import { describe, Sandbox } from "../../../test-framework";
 import { calculateForgingInfo, getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 
 describe<{

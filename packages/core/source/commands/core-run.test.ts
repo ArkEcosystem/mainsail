@@ -1,6 +1,6 @@
 import { Utils } from "@mainsail/cli";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { Console, describe } from "@mainsail/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import { writeJSONSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 

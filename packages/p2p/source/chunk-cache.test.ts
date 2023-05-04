@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe, Sandbox } from "../../test-framework";
 
 import { ChunkCache } from "./chunk-cache";
 

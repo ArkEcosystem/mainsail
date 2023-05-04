@@ -1,6 +1,6 @@
 import { yellow } from "kleur";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { Identifiers } from "../ioc";
 import { Title } from "./title";
 describe<{

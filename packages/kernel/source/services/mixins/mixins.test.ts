@@ -1,4 +1,4 @@
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { Constructor } from "../../types/container";
 import { MixinService } from "./mixins";
 

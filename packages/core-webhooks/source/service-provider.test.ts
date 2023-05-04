@@ -6,7 +6,7 @@ import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../test-framework/source";
 import { defaults } from "./defaults";
 import { ServiceProvider } from "./service-provider";
 

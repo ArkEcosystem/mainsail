@@ -38,7 +38,7 @@
 		"@mainsail/forger": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
 		"@mainsail/state": "workspace:*",
-		"@mainsail/core-test-framework": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
 		"@types/hapi__boom": "7.4.1",
 		"@types/hapi__joi": "17.1.7",
 		"@types/ip": "1.1.0",

@@ -1,4 +1,4 @@
-import { describe } from "../../../core-test-framework/distribution";
+import { describe } from "../../../test-framework/distribution";
 import { PeersGenerator } from "./peers";
 
 describe<{

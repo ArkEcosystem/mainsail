@@ -1,7 +1,7 @@
 import { Options as OraOptions, Ora } from "ora";
 import os from "os";
 
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
 import { Container, Identifiers } from "../ioc";

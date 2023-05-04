@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { BlockchainReady } from "./blockchain-ready";
 
 describe<{

@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { findIndex } from "./find-index";
 
 describe("#findIndex", ({ it, assert }) => {

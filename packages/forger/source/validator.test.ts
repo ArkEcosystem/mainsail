@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { Validator } from "./validator";
 
 describe<{

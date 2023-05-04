@@ -3,7 +3,7 @@ import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transa
 import { Enums as AppEnums } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/core-transactions";
 
-import { describe, Sandbox } from "../../../core-test-framework";
+import { describe, Sandbox } from "../../../test-framework";
 import { VoteTransaction } from "../versions";
 import { VoteTransactionHandler } from "./index";
 

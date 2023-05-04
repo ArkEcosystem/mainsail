@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/cli";
-import { Console, describe } from "@mainsail/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 

@@ -2,7 +2,7 @@ import { Exceptions, Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { Configuration } from "../../../crypto-config";
-import { describe, Sandbox } from "../../../core-test-framework";
+import { describe, Sandbox } from "../../../test-framework";
 import { calculateRound, isNewRound } from "./round-calculator";
 
 type Context = {

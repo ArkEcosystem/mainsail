@@ -3,7 +3,7 @@ import nock from "nock";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { execa } from "../../execa";
 import { NPM } from "./npm";
 

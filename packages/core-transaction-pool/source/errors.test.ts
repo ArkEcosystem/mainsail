@@ -1,7 +1,7 @@
 import { Contracts, Exceptions } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 
 describe<{
 	transaction: any;

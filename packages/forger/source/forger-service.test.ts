@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Enums, Utils as AppUtils } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../core-test-framework/source";
+import { describe, Sandbox } from "../../test-framework/source";
 import { ForgerService } from "./forger-service";
 import { Utils } from "./utils";
 

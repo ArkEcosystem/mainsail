@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../../../core-test-framework";
+import { describe, Sandbox } from "../../../../test-framework";
 import { Server } from "@hapi/hapi";
 
 import { defaults as transactionPoolDefaults } from "../../../../core-transaction-pool/source/defaults";

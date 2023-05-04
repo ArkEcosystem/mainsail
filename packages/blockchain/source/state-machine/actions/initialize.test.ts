@@ -3,7 +3,7 @@ import { Constants, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 // import { Managers } from "@mainsail/crypto";
-import { describe } from "../../../../core-test-framework";
+import { describe } from "../../../../test-framework";
 import { Initialize } from "./initialize";
 
 describe<{

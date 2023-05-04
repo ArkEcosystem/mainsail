@@ -1,4 +1,4 @@
-import { describeWithContext } from "../../core-test-framework";
+import { describeWithContext } from "../../test-framework";
 import { upperFirst } from "./upper-first";
 
 describeWithContext(

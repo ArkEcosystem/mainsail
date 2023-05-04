@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../test-framework/source";
 import { KeyPairFactory } from "./pair";
 import { PrivateKeyFactory } from "./private";
 

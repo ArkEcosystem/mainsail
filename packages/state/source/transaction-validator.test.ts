@@ -2,7 +2,7 @@ import { Utils } from "@mainsail/kernel";
 import { AssertionError } from "assert";
 import { SinonSpy } from "sinon";
 
-import { describeSkip } from "../../core-test-framework";
+import { describeSkip } from "../../test-framework";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { setUp } from "../test/setup";
 import { TransactionValidator } from "./transaction-validator";

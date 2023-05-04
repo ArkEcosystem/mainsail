@@ -7,7 +7,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
 
 import { Application } from "@mainsail/kernel";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =

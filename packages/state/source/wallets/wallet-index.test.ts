@@ -1,4 +1,4 @@
-import { describeSkip, Factories } from "../../../core-test-framework";
+import { describeSkip, Factories } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallets } from "..";
 import { WalletIndex } from ".";

@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { describeSkip } from "../../../core-test-framework";
+import { describeSkip } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository } from ".";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";

@@ -1,6 +1,6 @@
 import { Enums } from "@mainsail/kernel";
 
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 import { Context, ServerHelper } from "../../test/helpers/server";
 
 describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) => {

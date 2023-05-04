@@ -1,5 +1,5 @@
 import { Exceptions, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../../../core-test-framework";
+import { describe, Sandbox } from "../../../../test-framework";
 
 import { GetCommonBlocksController } from "./get-common-blocks";
 

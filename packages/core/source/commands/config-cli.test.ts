@@ -1,5 +1,5 @@
 import { Container, Contracts } from "@mainsail/cli";
-import { Console, describe } from "@mainsail/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import execa from "execa";
 
 import { Command } from "./config-cli";

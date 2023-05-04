@@ -221,9 +221,6 @@ importers:
       '@mainsail/blockchain':
         specifier: workspace:*
         version: link:../blockchain
-      '@mainsail/core-test-framework':
-        specifier: workspace:*
-        version: link:../core-test-framework
       '@mainsail/forger':
         specifier: workspace:*
         version: link:../forger
@@ -233,6 +230,9 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../state
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@types/hapi__boom':
         specifier: 7.4.1
         version: 7.4.1
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-test-framework':
-        specifier: workspace:*
-        version: link:../core-test-framework
       '@mainsail/core-transaction-pool':
         specifier: workspace:*
         version: link:../core-transaction-pool
@@ -660,6 +657,9 @@ importers:
       '@mainsail/storage-lmdb':
         specifier: workspace:*
         version: link:../storage-lmdb
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,133 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-test-framework:
-    dependencies:
-      '@mainsail/blockchain':
-        specifier: workspace:*
-        version: link:../blockchain
-      '@mainsail/cli':
-        specifier: workspace:*
-        version: link:../cli
-      '@mainsail/configuration-generator':
-        specifier: workspace:*
-        version: link:../configuration-generator
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-validation':
-        specifier: workspace:*
-        version: link:../core-validation
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../crypto-transaction-vote
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/p2p':
-        specifier: workspace:*
-        version: link:../p2p
-      '@mainsail/serializer':
-        specifier: workspace:*
-        version: link:../serializer
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../state
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      bip39:
-        specifier: 3.0.4
-        version: 3.0.4
-      bs58:
-        specifier: 4.0.1
-        version: 4.0.1
-      chance:
-        specifier: 1.1.8
-        version: 1.1.8
-      concordance:
-        specifier: ~5.0.4
-        version: 5.0.4
-      dayjs:
-        specifier: 1.10.7
-        version: 1.10.7
-      env-paths:
-        specifier: 2.2.0
-        version: 2.2.0
-      fast-memoize:
-        specifier: 2.5.2
-        version: 2.5.2
-      fs-extra:
-        specifier: 8.1.0
-        version: 8.1.0
-      got:
-        specifier: 11.8.2
-        version: 11.8.2
-      kleur:
-        specifier: ~4.1.4
-        version: 4.1.4
-      lodash.clonedeep:
-        specifier: 4.5.0
-        version: 4.5.0
-      nock:
-        specifier: ^13.2.2
-        version: 13.2.2
-      sinon:
-        specifier: ^12.0.1
-        version: 12.0.1
-      string-kit:
-        specifier: ~0.16.0
-        version: 0.16.0
-      tmp:
-        specifier: 0.2.1
-        version: 0.2.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-      xstate:
-        specifier: 4.23.4
-        version: 4.23.4
-      zod:
-        specifier: ~3.11.6
-        version: 3.11.6
-    devDependencies:
-      '@hapi/hapi':
-        specifier: 20.1.5
-        version: 20.1.5
-      '@types/got':
-        specifier: 9.6.12
-        version: 9.6.12
-      '@types/sinon':
-        specifier: ^10.0.6
-        version: 10.0.6
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
 
   packages/core-transaction-pool:
     dependencies:
@@ -2750,6 +2623,133 @@ importers:
       uvu:
         specifier: 0.5.3
         version: 0.5.3
+
+  packages/test-framework:
+    dependencies:
+      '@mainsail/blockchain':
+        specifier: workspace:*
+        version: link:../blockchain
+      '@mainsail/cli':
+        specifier: workspace:*
+        version: link:../cli
+      '@mainsail/configuration-generator':
+        specifier: workspace:*
+        version: link:../configuration-generator
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-validation':
+        specifier: workspace:*
+        version: link:../core-validation
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-multi-payment':
+        specifier: workspace:*
+        version: link:../crypto-transaction-multi-payment
+      '@mainsail/crypto-transaction-multi-signature-registration':
+        specifier: workspace:*
+        version: link:../crypto-transaction-multi-signature-registration
+      '@mainsail/crypto-transaction-transfer':
+        specifier: workspace:*
+        version: link:../crypto-transaction-transfer
+      '@mainsail/crypto-transaction-validator-registration':
+        specifier: workspace:*
+        version: link:../crypto-transaction-validator-registration
+      '@mainsail/crypto-transaction-validator-resignation':
+        specifier: workspace:*
+        version: link:../crypto-transaction-validator-resignation
+      '@mainsail/crypto-transaction-vote':
+        specifier: workspace:*
+        version: link:../crypto-transaction-vote
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/p2p':
+        specifier: workspace:*
+        version: link:../p2p
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      bip39:
+        specifier: 3.0.4
+        version: 3.0.4
+      bs58:
+        specifier: 4.0.1
+        version: 4.0.1
+      chance:
+        specifier: 1.1.8
+        version: 1.1.8
+      concordance:
+        specifier: ~5.0.4
+        version: 5.0.4
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
+      env-paths:
+        specifier: 2.2.0
+        version: 2.2.0
+      fast-memoize:
+        specifier: 2.5.2
+        version: 2.5.2
+      fs-extra:
+        specifier: 8.1.0
+        version: 8.1.0
+      got:
+        specifier: 11.8.2
+        version: 11.8.2
+      kleur:
+        specifier: ~4.1.4
+        version: 4.1.4
+      lodash.clonedeep:
+        specifier: 4.5.0
+        version: 4.5.0
+      nock:
+        specifier: ^13.2.2
+        version: 13.2.2
+      sinon:
+        specifier: ^12.0.1
+        version: 12.0.1
+      string-kit:
+        specifier: ~0.16.0
+        version: 0.16.0
+      tmp:
+        specifier: 0.2.1
+        version: 0.2.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+      xstate:
+        specifier: 4.23.4
+        version: 4.23.4
+      zod:
+        specifier: ~3.11.6
+        version: 3.11.6
+    devDependencies:
+      '@hapi/hapi':
+        specifier: 20.1.5
+        version: 20.1.5
+      '@types/got':
+        specifier: 9.6.12
+        version: 9.6.12
+      '@types/sinon':
+        specifier: ^10.0.6
+        version: 10.0.6
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
 
   packages/utils:
     dependencies:
@@ -8594,7 +8594,7 @@ packages:
       esutils: 2.0.3
       fast-diff: 1.2.0
       js-string-escape: 1.0.1
-      lodash: 4.17.20
+      lodash: 4.17.21
       md5-hex: 3.0.1
       semver: 7.5.0
       well-known-symbols: 2.0.0

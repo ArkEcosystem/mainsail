@@ -1,4 +1,4 @@
-import { Console, describe } from "@mainsail/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";

@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../test-framework";
 import { BlockStore } from "./blocks";
 
 describe("BlockStore", ({ it, assert }) => {

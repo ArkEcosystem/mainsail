@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { SinonSpy } from "sinon";
 
-import { describeSkip, Factories } from "../../../core-test-framework";
+import { describeSkip, Factories } from "../../../test-framework";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { setUp } from "../../test/setup";
 import { StateStore } from ".";

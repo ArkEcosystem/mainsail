@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Application } from "@mainsail/kernel";
 
-import { describe } from "../../core-test-framework/source";
+import { describe } from "../../test-framework/source";
 import { ServiceProvider } from "./service-provider";
 
 describe<{

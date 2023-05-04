@@ -4,7 +4,7 @@ import { makeKeywords } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/core-validation/source/validator";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
-import { describe, Sandbox } from "../../../core-test-framework";
+import { describe, Sandbox } from "../../../test-framework";
 import { schemas } from "./schemas";
 
 describe<{

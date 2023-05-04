@@ -1,6 +1,6 @@
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../core-test-framework/distribution";
+import { describe } from "../../../test-framework/distribution";
 import { EnvironmentGenerator } from "./environment";
 
 describe<{

@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { keyBy } from "./key-by";
 
 describe("keyBy", async ({ assert, it, nock, loader }) => {

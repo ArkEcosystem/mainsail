@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { isEnumerable } from "./is-enumerable";
 
 describe("isEnumerable", async ({ assert, it, nock, loader }) => {

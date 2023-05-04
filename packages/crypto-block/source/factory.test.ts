@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import clone from "lodash.clone";
 
 import crypto from "../../core/bin/config/testnet/crypto.json";
-import { describe, Factories, Sandbox } from "../../core-test-framework";
+import { describe, Factories, Sandbox } from "../../test-framework";
 import {
 	blockData,
 	blockDataJson,

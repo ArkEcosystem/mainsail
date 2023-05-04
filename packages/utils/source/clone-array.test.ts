@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { cloneArray } from "./clone-array";
 
 describe("#cloneArray", ({ it, assert }) => {

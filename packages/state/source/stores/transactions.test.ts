@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
-import { describe, Factories } from "../../../core-test-framework";
+import { describe, Factories } from "../../../test-framework";
 import { TransactionStore } from "./transactions";
 
 describe<{

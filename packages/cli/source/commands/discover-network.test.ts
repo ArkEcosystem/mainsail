@@ -2,7 +2,7 @@ import { ensureDirSync } from "fs-extra";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { DiscoverNetwork } from "./discover-network";
 
 describe<{

@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { envPaths as environmentPaths } from "./env-paths";
 import { Application, Container } from "./index";
 

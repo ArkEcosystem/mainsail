@@ -1,7 +1,7 @@
 import envfile from "envfile";
 import fs from "fs-extra";
 
-import { Console, describe } from "../../../core-test-framework";
+import { Console, describe } from "../../../test-framework";
 import { Environment } from "./environment";
 
 describe<{

@@ -3,7 +3,7 @@ import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { resolve } from "path";
 import { dirSync } from "tmp";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { Application } from "./application";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";

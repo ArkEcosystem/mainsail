@@ -92,8 +92,8 @@ jobs:
               run: cd packages/core-configuration-generator && pnpm run test
             - name: Test state
               run: cd packages/state && pnpm run test
-            - name: Test core-test-framework
-              run: cd packages/core-test-framework && pnpm run test
+            - name: Test test-framework
+              run: cd packages/test-framework && pnpm run test
             - name: Test core-transaction-pool
               run: cd packages/core-transaction-pool && pnpm run test
             - name: Test core-transactions

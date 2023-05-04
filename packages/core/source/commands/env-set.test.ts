@@ -1,4 +1,4 @@
-import { Console, describe } from "@mainsail/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import envfile from "envfile";
 import { ensureFileSync, removeSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";

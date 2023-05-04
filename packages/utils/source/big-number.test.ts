@@ -1,6 +1,6 @@
 import BigNum from "bignumber.js";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { BigNumber } from "./big-number";
 
 describe("#BigNumber", ({ it, assert }) => {
