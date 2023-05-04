@@ -721,49 +721,6 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
 
-  packages/core-crypto-key-pair-ed25519:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      '@noble/ed25519':
-        specifier: ^1.6.0
-        version: 1.6.0
-      '@noble/hashes':
-        specifier: ^1.0.0
-        version: 1.0.0
-      '@scure/bip39':
-        specifier: ^1.0.0
-        version: 1.0.0
-      wif:
-        specifier: ^2.0.6
-        version: 2.0.6
-    devDependencies:
-      '@mainsail/core-crypto-validation':
-        specifier: workspace:*
-        version: link:../core-crypto-validation
-      '@mainsail/core-validation':
-        specifier: workspace:*
-        version: link:../core-validation
-      bip39:
-        specifier: 3.0.4
-        version: 3.0.4
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-
   packages/core-crypto-key-pair-schnorr:
     dependencies:
       '@mainsail/container':
@@ -2734,6 +2691,49 @@ importers:
       bcrypto:
         specifier: 5.4.0
         version: 5.4.0
+      wif:
+        specifier: ^2.0.6
+        version: 2.0.6
+    devDependencies:
+      '@mainsail/core-crypto-validation':
+        specifier: workspace:*
+        version: link:../core-crypto-validation
+      '@mainsail/core-validation':
+        specifier: workspace:*
+        version: link:../core-validation
+      bip39:
+        specifier: 3.0.4
+        version: 3.0.4
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/crypto-key-pair-ed25519:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@noble/ed25519':
+        specifier: ^1.6.0
+        version: 1.6.0
+      '@noble/hashes':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@scure/bip39':
+        specifier: ^1.0.0
+        version: 1.0.0
       wif:
         specifier: ^2.0.6
         version: 2.0.6
