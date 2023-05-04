@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { FeeRegistry } from "@mainsail/core-fees";
+import { FeeRegistry } from "@mainsail/fees";
 import { Providers } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 
@@ -16,7 +16,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	private readonly feeRegistry: FeeRegistry;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-fees-managed")
+	@tagged("plugin", "fees-managed")
 	private readonly pluginConfiguration: Providers.PluginConfiguration;
 
 	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {

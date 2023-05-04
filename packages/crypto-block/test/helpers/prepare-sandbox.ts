@@ -12,8 +12,8 @@ import { ServiceProvider as CoreCryptoTime } from "../../../crypto-time/distribu
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../crypto-transaction-transfer/distribution";
 import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation/distribution";
 import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif/distribution";
-import { ServiceProvider as CoreFees } from "../../../core-fees/distribution";
-import { ServiceProvider as CoreFeesStatic } from "../../../core-fees-static/distribution";
+import { ServiceProvider as CoreFees } from "../../../fees/distribution";
+import { ServiceProvider as CoreFeesStatic } from "../../../fees-static/distribution";
 import { ServiceProvider as CoreSerializer } from "../../../core-serializer/distribution";
 import { Sandbox } from "../../../core-test-framework/distribution";
 import { ServiceProvider as CoreValidation } from "../../../core-validation/distribution";

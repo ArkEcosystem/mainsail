@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-fees-managed",
+	"name": "@mainsail/fees",
 	"version": "0.0.1",
 	"description": "Transaction Pool Manager for ARK Core",
 	"license": "MIT",
@@ -21,10 +21,8 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/core-fees": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"joi": "17.4.2"
+		"@mainsail/utils": "workspace:*"
 	},
 	"engines": {
 		"node": ">=16.x"

@@ -9,7 +9,7 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 	private readonly walletRepository: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-fees-managed")
+	@tagged("plugin", "fees-managed")
 	private readonly pluginConfiguration: Providers.PluginConfiguration;
 
 	public async apply(wallet: Contracts.State.Wallet, block: Contracts.Crypto.IBlockData): Promise<void> {

@@ -416,12 +416,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-fees':
-        specifier: workspace:*
-        version: link:../core-fees
-      '@mainsail/core-fees-static':
-        specifier: workspace:*
-        version: link:../core-fees-static
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
@@ -476,6 +470,12 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../database
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../fees
+      '@mainsail/fees-static':
+        specifier: workspace:*
+        version: link:../fees-static
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -558,12 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-fees':
-        specifier: workspace:*
-        version: link:../core-fees
-      '@mainsail/core-fees-static':
-        specifier: workspace:*
-        version: link:../core-fees-static
       '@mainsail/core-forger':
         specifier: workspace:*
         version: link:../core-forger
@@ -660,6 +654,12 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../database
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../fees
+      '@mainsail/fees-static':
+        specifier: workspace:*
+        version: link:../fees-static
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,78 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-fees:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-
-  packages/core-fees-burn:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-
-  packages/core-fees-managed:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-fees':
-        specifier: workspace:*
-        version: link:../core-fees
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-
-  packages/core-fees-static:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-fees':
-        specifier: workspace:*
-        version: link:../core-fees
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
 
   packages/core-forger:
     dependencies:
@@ -2702,12 +2630,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@mainsail/core-fees':
-        specifier: workspace:*
-        version: link:../core-fees
-      '@mainsail/core-fees-static':
-        specifier: workspace:*
-        version: link:../core-fees-static
       '@mainsail/core-lmdb':
         specifier: workspace:*
         version: link:../core-lmdb
@@ -2744,12 +2666,90 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../fees
+      '@mainsail/fees-static':
+        specifier: workspace:*
+        version: link:../fees-static
       tmp:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
         specifier: 0.5.3
         version: 0.5.3
+
+  packages/fees:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+
+  packages/fees-burn:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+
+  packages/fees-managed:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../fees
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+
+  packages/fees-static:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../fees
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
 
   packages/utils:
     dependencies:

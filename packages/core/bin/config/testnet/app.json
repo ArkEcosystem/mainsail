@@ -34,10 +34,10 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
-			"package": "@mainsail/core-fees"
+			"package": "@mainsail/fees"
 		},
 		{
-			"package": "@mainsail/core-fees-static"
+			"package": "@mainsail/fees-static"
 		},
 		{
 			"package": "@mainsail/crypto-transaction"

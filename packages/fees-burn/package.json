@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-fees-burn",
+	"name": "@mainsail/fees-burn",
 	"version": "0.0.1",
 	"description": "State Management for ARK Core",
 	"license": "MIT",
