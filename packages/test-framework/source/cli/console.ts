@@ -5,7 +5,7 @@ export class Console {
 	public app: Application;
 
 	public pkg = {
-		description: "Core of the ARK Blockchain",
+		description: "Core of the Mainsail Blockchain",
 		name: "@mainsail/core",
 		version: "3.0.0-next.0",
 	};

@@ -10,7 +10,7 @@ export const versionLatest = {
 		"2.5.24": {
 			name: "@mainsail/core",
 			version: "2.5.24",
-			description: "Core of the ARK Blockchain",
+			description: "Core of the Mainsail Blockchain",
 			license: "MIT",
 			contributors: [
 				{
@@ -196,7 +196,7 @@ export const versionNext = {
 		"2.5.0-next.10": {
 			name: "@mainsail/core",
 			version: "2.5.0-next.10",
-			description: "Core of the ARK Blockchain",
+			description: "Core of the Mainsail Blockchain",
 			license: "MIT",
 			contributors: [
 				{

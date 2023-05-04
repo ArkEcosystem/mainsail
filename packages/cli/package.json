@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/cli",
 	"version": "0.0.1",
-	"description": "Core of the ARK Blockchain",
+	"description": "Core of the Mainsail Blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
