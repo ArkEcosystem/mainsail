@@ -1,6 +1,6 @@
-import { Utils } from "@arkecosystem/core-cli";
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Utils } from "@mainsail/cli";
+import { Utils as AppUtils } from "@mainsail/kernel";
+import { Console, describe } from "@mainsail/test-framework";
 import { writeJSONSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 

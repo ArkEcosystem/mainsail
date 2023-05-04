@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { hasSomeProperty } from "./has-some-property";
 
 describe("hasSomeProperty", async ({ assert, beforeEach, it, nock, loader }) => {

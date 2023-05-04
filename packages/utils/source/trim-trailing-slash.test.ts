@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { trimTrailingSlash } from "./trim-trailing-slash";
 
 describe("trimTrailingSlash", async ({ assert, it, nock, loader }) => {

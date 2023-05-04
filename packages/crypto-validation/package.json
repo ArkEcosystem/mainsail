@@ -1,0 +1,37 @@
+{
+	"name": "@mainsail/crypto-validation",
+	"version": "0.0.1",
+	"description": "Crypto utilities for the Mainsail Blockchain",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"ajv": "8.11.0",
+		"ipaddr.js": "2.0.1",
+		"uvu": "^0.5.3"
+	},
+	"devDependencies": {
+		"@mainsail/validation": "workspace:*"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}

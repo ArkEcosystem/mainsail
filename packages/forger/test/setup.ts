@@ -1,0 +1,86 @@
+import { injectable } from "@mainsail/container";
+import { Identifiers } from "@mainsail/contracts";
+import { Services } from "@mainsail/kernel";
+import { Actions } from "@mainsail/state";
+import { Wallet } from "@mainsail/state/source/wallets";
+import { spy } from "sinon";
+
+import { Sandbox } from "../../test-framework/source";
+import { ValidatorTracker } from "../source/validator-tracker";
+
+export const mockLastBlock = {
+	data: { height: 3, timestamp: 16 },
+};
+
+export const setup = async (activeDelegates) => {
+	const sandbox = new Sandbox();
+
+	const logger = {
+		debug: spy(),
+		error: spy(),
+		warning: spy(),
+	};
+
+	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+
+	@injectable()
+	class MockDatabaseService {
+		public async getActiveDelegates(): Promise<Wallet[]> {
+			return activeDelegates;
+		}
+	}
+
+	@injectable()
+	class MockRoundState {
+		public async getActiveDelegates(): Promise<Wallet[]> {
+			return activeDelegates;
+		}
+	}
+
+	@injectable()
+	class MockWalletRepository {
+		public findByPublicKey(publicKey: string) {
+			return {
+				getAttribute: () => activeDelegates.find((wallet) => wallet.publicKey === publicKey).publicKey,
+			};
+		}
+	}
+
+	@injectable()
+	class MockBlockchainService {
+		public getLastBlock() {
+			return mockLastBlock;
+		}
+	}
+
+	sandbox.app.bind(Identifiers.DatabaseService).to(MockDatabaseService);
+
+	sandbox.app.bind(Identifiers.RoundState).to(MockRoundState);
+
+	sandbox.app.bind(Identifiers.BlockchainService).to(MockBlockchainService);
+
+	sandbox.app.bind(Identifiers.WalletRepository).to(MockWalletRepository);
+
+	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+
+	sandbox.app
+		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+		.bind("getActiveDelegates", new Actions.GetActiveDelegatesAction(sandbox.app));
+
+	const delegateTracker = sandbox.app.resolve(ValidatorTracker);
+
+	await sandbox.boot();
+
+	// todo: get rid of the need for this, requires an instance based crypto package
+	Managers.configManager.setConfig(
+		sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("crypto"),
+	);
+
+	return {
+		delegateTracker,
+		sandbox,
+		spies: {
+			logger,
+		},
+	};
+};

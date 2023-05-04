@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { isNotBetween } from "./is-not-between";
 
 describe("isNotBetween", async ({ assert, it, nock, loader }) => {

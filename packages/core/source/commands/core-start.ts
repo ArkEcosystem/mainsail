@@ -1,5 +1,5 @@
-import { Commands, Contracts, Utils } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
+import { Commands, Contracts, Utils } from "@mainsail/cli";
+import { injectable } from "@mainsail/container";
 import Joi from "joi";
 import { resolve } from "path";
 

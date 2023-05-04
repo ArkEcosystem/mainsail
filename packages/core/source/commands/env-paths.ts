@@ -1,6 +1,6 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import { Commands, Container } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
+import { Commands, Container } from "@mainsail/cli";
+import { injectable } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()

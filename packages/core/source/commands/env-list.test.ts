@@ -1,4 +1,4 @@
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import { removeSync, writeFileSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 

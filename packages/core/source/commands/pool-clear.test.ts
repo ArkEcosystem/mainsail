@@ -1,4 +1,4 @@
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import fs from "fs-extra";
 import prompts from "prompts";
 

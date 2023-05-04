@@ -1,5 +1,5 @@
-import { Container, Services } from "@arkecosystem/core-cli";
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Container, Services } from "@mainsail/cli";
+import { Console, describe } from "@mainsail/test-framework";
 import { writeJSONSync } from "fs-extra";
 import { resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";

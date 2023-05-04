@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { castArray } from "./cast-array";
 
 describe("#castArray", ({ it, assert }) => {

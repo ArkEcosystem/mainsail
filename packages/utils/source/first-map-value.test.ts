@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { firstMapValue } from "./first-map-value";
 
 describe("#firstMapValue", ({ it, assert }) => {

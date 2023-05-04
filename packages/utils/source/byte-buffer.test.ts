@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { ByteBuffer } from "./byte-buffer";
 
 describe("ByteBuffer", ({ it, assert }) => {

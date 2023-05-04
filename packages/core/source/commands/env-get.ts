@@ -1,5 +1,5 @@
-import { Commands } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
+import { Commands } from "@mainsail/cli";
+import { injectable } from "@mainsail/container";
 import { parseFileSync } from "envfile";
 import { existsSync } from "fs-extra";
 import Joi from "joi";

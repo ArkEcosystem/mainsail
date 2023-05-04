@@ -1,5 +1,5 @@
-import { Console, describe } from "@arkecosystem/core-test-framework";
-import { BigNumber } from "@arkecosystem/utils";
+import { Console, describe } from "@mainsail/test-framework";
+import { BigNumber } from "@mainsail/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";

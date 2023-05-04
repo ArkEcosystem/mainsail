@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { intersection } from "./intersection";
 
 describe("intersection", async ({ assert, it, nock, loader }) => {

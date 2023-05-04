@@ -1,5 +1,5 @@
-import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
+import { Commands, Container, Contracts } from "@mainsail/cli";
+import { injectable } from "@mainsail/container";
 import boxen from "boxen";
 import { blue, cyan } from "kleur";
 

@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { pascalCase } from "./pascal-case";
 
 describe("pascalCase", async ({ assert, it, nock, loader }) => {

@@ -1,4 +1,4 @@
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "@mainsail/test-framework";
 import envPaths, { Paths } from "env-paths";
 
 import { Command } from "./env-paths";

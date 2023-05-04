@@ -1,0 +1,30 @@
+{
+	"name": "@mainsail/logger-winston",
+	"version": "0.0.1",
+	"description": "Webhooks for Mainsail",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"joi": "17.4.2",
+		"winston": "^3.6.0"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}

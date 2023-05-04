@@ -1,5 +1,5 @@
-import { Commands, Contracts, Utils } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
+import { Commands, Contracts, Utils } from "@mainsail/cli";
+import { injectable } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()
@@ -29,10 +29,10 @@ export class Command extends Commands.Command {
 		await Utils.Builder.buildApplication({
 			flags,
 			plugins: {
-				"@arkecosystem/core-blockchain": {
+				"@mainsail/blockchain": {
 					networkStart: flags.networkStart,
 				},
-				"@arkecosystem/core-p2p": Utils.Builder.buildPeerFlags(flags),
+				"@mainsail/p2p": Utils.Builder.buildPeerFlags(flags),
 			},
 		});
 

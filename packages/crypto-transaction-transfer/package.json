@@ -1,0 +1,41 @@
+{
+	"name": "@mainsail/crypto-transaction-transfer",
+	"version": "0.0.1",
+	"description": "Crypto utilities for the Mainsail Blockchain",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@arkecosystem/crypto-identities": "^1.0.0",
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
+		"@mainsail/utils": "workspace:*"
+	},
+	"devDependencies": {
+		"@mainsail/crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
+		"uvu": "0.5.3"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}

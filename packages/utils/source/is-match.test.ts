@@ -1,4 +1,4 @@
-import { describe } from "../../core-test-framework";
+import { describe } from "../../test-framework";
 import { isMatch } from "./is-match";
 
 describe("isMatch", async ({ assert, it, nock, loader }) => {

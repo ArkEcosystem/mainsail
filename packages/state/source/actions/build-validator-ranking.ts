@@ -1,0 +1,11 @@
+import { Services, Types } from "@mainsail/kernel";
+
+import { DposState } from "../dpos";
+
+export class BuildValidatorRankingAction extends Services.Triggers.Action {
+	public async execute(arguments_: Types.ActionArguments): Promise<void> {
+		const dposState: DposState = arguments_.dposState;
+
+		return dposState.buildValidatorRanking();
+	}
+}

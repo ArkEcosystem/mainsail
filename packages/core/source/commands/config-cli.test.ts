@@ -1,5 +1,5 @@
-import { Container, Contracts } from "@arkecosystem/core-cli";
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Container, Contracts } from "@mainsail/cli";
+import { Console, describe } from "@mainsail/test-framework";
 import execa from "execa";
 
 import { Command } from "./config-cli";
@@ -44,17 +44,17 @@ describe<{
 		await cli.withFlags({ channel: "latest" }).execute(Command);
 
 		assert.equal(config.get("channel"), "latest");
-		install.calledWith("@arkecosystem/core", "latest");
+		install.calledWith("@mainsail/core", "latest");
 
 		await cli.withFlags({ channel: "next" }).execute(Command);
 
 		assert.equal(config.get("channel"), "next");
-		install.calledWith("@arkecosystem/core", "next");
+		install.calledWith("@mainsail/core", "next");
 
 		await cli.withFlags({ channel: "latest" }).execute(Command);
 
 		assert.equal(config.get("channel"), "latest");
-		install.calledWith("@arkecosystem/core", "latest");
+		install.calledWith("@mainsail/core", "latest");
 	});
 
 	it("should fail to change the channel if the new and old are the same", async ({ cli, config }) => {

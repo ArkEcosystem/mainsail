@@ -1,0 +1,38 @@
+{
+	"name": "@mainsail/crypto-address-ss58",
+	"version": "0.0.1",
+	"description": "ss58 Address Derivation",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"@polkadot/util": "^8.4.1",
+		"@polkadot/util-crypto": "^8.4.1"
+	},
+	"devDependencies": {
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
+		"bip39": "3.0.4",
+		"uvu": "^0.5.3"
+	}
+}
