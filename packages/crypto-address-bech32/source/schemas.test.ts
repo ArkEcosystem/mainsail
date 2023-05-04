@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { ServiceProvider as Schnorr } from "@mainsail/core-crypto-key-pair-schnorr";
+import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { schemas as baseSchemas } from "@mainsail/core-crypto-validation";
 import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
 import { Validator } from "@mainsail/core-validation/source/validator";

@@ -6,7 +6,7 @@ import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-add
 import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config/distribution";
 import { Configuration } from "../../../crypto-config/source/configuration";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../crypto-hash-bcrypto/distribution";
-import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../core-crypto-key-pair-schnorr/distribution";
+import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key-pair-schnorr/distribution";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../core-crypto-signature-schnorr/distribution";
 import { ServiceProvider as CoreCryptoTime } from "../../../core-crypto-time/distribution";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../core-crypto-transaction-transfer/distribution";

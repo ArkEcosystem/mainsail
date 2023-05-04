@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { KeyPairFactory } from "@mainsail/core-crypto-key-pair-schnorr/source/pair";
+import { KeyPairFactory } from "@mainsail/crypto-key-pair-schnorr/source/pair";
 
 import { describe, Sandbox } from "../../core-test-framework";
 import { mnemonic, wif } from "../test/identity.json";

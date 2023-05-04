@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as keyPairSchemas } from "@mainsail/core-crypto-key-pair-schnorr/distribution/schemas";
+import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-schnorr/distribution/schemas";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/core-crypto-validation";
 import { Validator } from "@mainsail/core-validation/source/validator";
 import { BigNumber } from "@mainsail/utils";

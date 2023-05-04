@@ -3,7 +3,7 @@ import { ServiceProvider as CoreCryptoAddressBeach32m } from "@mainsail/crypto-a
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
-import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/core-crypto-key-pair-schnorr";
+import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/core-crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/core-crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/core-crypto-transaction-transfer";

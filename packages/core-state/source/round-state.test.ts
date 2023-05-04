@@ -3,8 +3,8 @@ import { Application, Enums } from "@mainsail/core-kernel";
 import Utils from "@mainsail/utils";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
-import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
-import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
+import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { describeSkip, Sandbox } from "../../core-test-framework";
 import block1760000 from "../test/fixtures/block1760000";
 import { RoundState } from "./round-state";

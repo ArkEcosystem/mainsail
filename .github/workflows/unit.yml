@@ -50,8 +50,8 @@ jobs:
               run: cd packages/crypto-key-pair-ecdsa && pnpm run test
             - name: Test crypto-key-pair-ed25519
               run: cd packages/crypto-key-pair-ed25519 && pnpm run test
-            - name: Test core-crypto-key-pair-schnorr
-              run: cd packages/core-crypto-key-pair-schnorr && pnpm run test
+            - name: Test crypto-key-pair-schnorr
+              run: cd packages/crypto-key-pair-schnorr && pnpm run test
             - name: Test core-crypto-signature-bls12-381
               run: cd packages/core-crypto-signature-bls12-381 && pnpm run test
             - name: Test core-crypto-signature-ecdsa

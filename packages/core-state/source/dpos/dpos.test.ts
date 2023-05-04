@@ -7,8 +7,8 @@ import { spy } from "sinon";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../crypto-config";
-import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
-import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
+import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
 import { describe } from "../../../core-test-framework";
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { registerIndexers, WalletRepository } from "../wallets";

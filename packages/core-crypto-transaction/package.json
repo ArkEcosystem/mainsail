@@ -44,7 +44,7 @@
 		"lodash.set": "4.3.2"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@types/bip32": "2.0.0",
 		"@types/bip39": "2.4.2",
 		"@types/buffer-xor": "2.0.0",

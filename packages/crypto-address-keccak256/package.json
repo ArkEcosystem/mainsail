@@ -28,7 +28,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
-		"@mainsail/core-crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/core-crypto-validation": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"bip39": "3.0.4",

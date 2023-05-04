@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-bech32m";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as kayPairSchemas } from "@mainsail/core-crypto-key-pair-schnorr";
+import { schemas as kayPairSchemas } from "@mainsail/crypto-key-pair-schnorr";
 import { schemas as transactionSchemas } from "@mainsail/core-crypto-transaction";
 import { makeKeywords, schemas as sharedSchemas } from "@mainsail/core-crypto-validation";
 import { Validator } from "@mainsail/core-validation/source/validator";

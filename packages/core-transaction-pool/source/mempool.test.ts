@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
-import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
-import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
+import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { describe } from "../../core-test-framework";
 import { Stub } from "../../core-test-framework/source/uvu/stub";
 import { Mempool } from ".";
