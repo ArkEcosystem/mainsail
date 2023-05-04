@@ -76,8 +76,8 @@ jobs:
               run: cd packages/crypto-transaction-validator-resignation && pnpm run test
             - name: Test crypto-transaction-vote
               run: cd packages/crypto-transaction-vote && pnpm run test
-            - name: Test core-crypto-validation
-              run: cd packages/core-crypto-validation && pnpm run test
+            - name: Test crypto-validation
+              run: cd packages/crypto-validation && pnpm run test
             - name: Test core-crypto-wif
               run: cd packages/core-crypto-wif && pnpm run test
             - name: Test core-forger

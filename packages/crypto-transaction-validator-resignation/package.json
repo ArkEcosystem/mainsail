@@ -32,7 +32,7 @@
 		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
-		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"uvu": "0.5.3"
 	},

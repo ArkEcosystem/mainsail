@@ -46,7 +46,7 @@
 	"devDependencies": {
 		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
-		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@types/bip32": "2.0.0",
 		"@types/bip39": "2.4.2",
 		"@types/buffer-xor": "2.0.0",

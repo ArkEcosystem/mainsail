@@ -29,7 +29,7 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
-		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"bip39": "3.0.4",
 		"uvu": "^0.5.3"

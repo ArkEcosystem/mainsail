@@ -36,7 +36,7 @@
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-transfer": "workspace:*",
-		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/core-fees": "workspace:*",
 		"@mainsail/core-fees-static": "workspace:*",
 		"@mainsail/core-lmdb": "workspace:*",

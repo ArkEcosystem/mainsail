@@ -7,7 +7,7 @@ import {
 	makeKeywords as makeTransactionKeywords,
 	schemas as transactionSchemas,
 } from "@mainsail/crypto-transaction";
-import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/core-crypto-validation";
+import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/core-validation";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 

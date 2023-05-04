@@ -10,7 +10,7 @@
 			"package": "@mainsail/crypto-time"
 		},
 		{
-			"package": "@mainsail/core-crypto-validation"
+			"package": "@mainsail/crypto-validation"
 		},
 		{
 			"package": "@mainsail/crypto-hash-bcrypto"

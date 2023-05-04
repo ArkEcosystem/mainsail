@@ -7,7 +7,7 @@ import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-ke
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
-import { ServiceProvider as CoreCryptoValidation } from "@mainsail/core-crypto-validation";
+import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreFees } from "@mainsail/core-fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/core-fees-static";
 import { ServiceProvider as CoreLmdb } from "@mainsail/core-lmdb";

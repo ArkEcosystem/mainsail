@@ -31,7 +31,7 @@
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {
-		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"bip39": "3.0.4",
 		"uvu": "^0.5.3"

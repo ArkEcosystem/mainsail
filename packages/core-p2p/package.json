@@ -24,7 +24,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/core-crypto-validation": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/core-kernel": "workspace:*",
 		"@mainsail/core-state": "workspace:*",
 		"@mainsail/utils": "workspace:*",

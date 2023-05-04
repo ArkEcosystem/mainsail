@@ -10,7 +10,7 @@ import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr/distribution";
 import { ServiceProvider as CoreCryptoTime } from "../../../crypto-time/distribution";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../crypto-transaction-transfer/distribution";
-import { ServiceProvider as CoreCryptoValidation } from "../../../core-crypto-validation/distribution";
+import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation/distribution";
 import { ServiceProvider as CoreCryptoWif } from "../../../core-crypto-wif/distribution";
 import { ServiceProvider as CoreFees } from "../../../core-fees/distribution";
 import { ServiceProvider as CoreFeesStatic } from "../../../core-fees-static/distribution";

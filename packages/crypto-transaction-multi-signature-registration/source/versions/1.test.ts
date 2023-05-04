@@ -3,7 +3,7 @@ import { schemas as addressSchemas } from "@mainsail/crypto-address-bech32m";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-schnorr";
 import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
-import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/core-crypto-validation";
+import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/core-validation";
 import { BigNumber } from "@mainsail/utils";
 
