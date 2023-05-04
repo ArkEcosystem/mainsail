@@ -7,7 +7,7 @@ import util from "util";
 @injectable()
 export class Checker {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-networking-dns")
+	@tagged("plugin", "networking-dns")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.LogService)

@@ -6,7 +6,7 @@ import Sntp from "@hapi/sntp";
 @injectable()
 export class Checker {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-networking-dns")
+	@tagged("plugin", "networking-dns")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.LogService)

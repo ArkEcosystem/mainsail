@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-networking-dns",
+	"name": "@mainsail/networking-dns",
 	"version": "0.0.1",
 	"description": "P2P API for ARK Core",
 	"license": "MIT",
