@@ -40,7 +40,7 @@ describe<{
 		await source.install(fileName);
 
 		// Assert
-		const packageName = "@mainsail/utils";
+		const packageName = "@arkecosystem/utils";
 		removeSync.calledWith(join(dataPath, packageName));
 		removeSync.calledWith(join(temporaryPath, "package"));
 		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {
@@ -75,7 +75,7 @@ describe<{
 		await source.update(fileName);
 
 		// Assert
-		const packageName = "@mainsail/utils";
+		const packageName = "@arkecosystem/utils";
 		removeSync.calledWith(join(dataPath, packageName));
 		removeSync.calledWith(join(temporaryPath, "package"));
 		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {

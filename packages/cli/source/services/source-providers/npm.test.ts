@@ -29,68 +29,68 @@ describe<{
 
 	it("#exists - should return true if the file exists", async ({ source }) => {
 		nock(/.*/)
-			.get("/@mainsail/utils")
+			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
 					latest: "0.9.1",
 				},
-				name: "@mainsail/utils",
+				name: "@arkecosystem/utils",
 				versions: {
 					"0.9.1": {
 						dist: {
-							tarball: "https://registry.npmjs.org/@mainsail/utils/-/utils-0.9.1.tgz",
+							tarball: "https://registry.npmjs.org/@arkecosystem/utils/-/utils-0.9.1.tgz",
 						},
-						name: "@mainsail/utils",
+						name: "@arkecosystem/utils",
 						version: "0.9.1",
 					},
 				},
 			});
 
-		assert.true(await source.exists("@mainsail/utils"));
+		assert.true(await source.exists("@arkecosystem/utils"));
 	});
 
 	it("#exists - should return true if the file by version exists", async ({ source }) => {
 		nock(/.*/)
-			.get("/@mainsail/utils")
+			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
 					latest: "0.9.1",
 				},
-				name: "@mainsail/utils",
+				name: "@arkecosystem/utils",
 				versions: {
 					"0.9.1": {
 						dist: {
-							tarball: "https://registry.npmjs.org/@mainsail/utils/-/utils-0.9.1.tgz",
+							tarball: "https://registry.npmjs.org/@arkecosystem/utils/-/utils-0.9.1.tgz",
 						},
-						name: "@mainsail/utils",
+						name: "@arkecosystem/utils",
 						version: "0.9.1",
 					},
 				},
 			});
 
-		assert.true(await source.exists("@mainsail/utils", "0.9.1"));
+		assert.true(await source.exists("@arkecosystem/utils", "0.9.1"));
 	});
 
 	it("#exists - should return false if the file by version doesn't exists", async ({ source }) => {
 		nock(/.*/)
-			.get("/@mainsail/utils")
+			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
 					latest: "0.9.1",
 				},
-				name: "@mainsail/utils",
+				name: "@arkecosystem/utils",
 				versions: {
 					"0.9.1": {
 						dist: {
-							tarball: "https://registry.npmjs.org/@mainsail/utils/-/utils-0.9.1.tgz",
+							tarball: "https://registry.npmjs.org/@arkecosystem/utils/-/utils-0.9.1.tgz",
 						},
-						name: "@mainsail/utils",
+						name: "@arkecosystem/utils",
 						version: "0.9.1",
 					},
 				},
 			});
 
-		assert.false(await source.exists("@mainsail/utils", "0.5.5"));
+		assert.false(await source.exists("@arkecosystem/utils", "0.5.5"));
 	});
 
 	it("#exists - should return false if the file does not exists", async ({ source }) => {
@@ -99,25 +99,25 @@ describe<{
 
 	it("#update - should successfully install the plugin", async ({ source, tempPath, dataPath }) => {
 		nock(/.*/)
-			.get("/@mainsail/utils")
+			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
 					latest: "0.9.1",
 				},
-				name: "@mainsail/utils",
+				name: "@arkecosystem/utils",
 				versions: {
 					"0.9.1": {
 						dist: {
-							tarball: "https://registry.npmjs.org/@mainsail/utils/-/utils-0.9.1.tgz",
+							tarball: "https://registry.npmjs.org/@arkecosystem/utils/-/utils-0.9.1.tgz",
 						},
-						name: "@mainsail/utils",
+						name: "@arkecosystem/utils",
 						version: "0.9.1",
 					},
 				},
 			});
 
 		nock(/.*/)
-			.get("/@mainsail/utils/-/utils-0.9.1.tgz")
+			.get("/@arkecosystem/utils/-/utils-0.9.1.tgz")
 			.reply(200, fs.readFileSync(resolve(__dirname, "../../../test/files", "utils-0.9.1.tgz")));
 
 		// Arrange
@@ -127,7 +127,7 @@ describe<{
 		const spyOnExeca = stub(execa, "sync");
 
 		// Act
-		const packageName = "@mainsail/utils";
+		const packageName = "@arkecosystem/utils";
 		await source.update(packageName);
 
 		// Assert
