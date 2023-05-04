@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-signature-ecdsa",
+	"name": "@mainsail/crypto-signature-ecdsa",
 	"version": "0.0.1",
 	"description": "Elliptic Curve Cryptography (ECDSA)",
 	"license": "MIT",
