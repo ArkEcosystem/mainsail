@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-webhooks':
-        specifier: workspace:*
-        version: link:../core-webhooks
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
@@ -663,6 +660,9 @@ importers:
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
+      '@mainsail/webhooks':
+        specifier: workspace:*
+        version: link:../webhooks
       argon2:
         specifier: 0.28.2
         version: 0.28.2
@@ -720,61 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-webhooks:
-    dependencies:
-      '@hapi/boom':
-        specifier: 9.0.0
-        version: 9.0.0
-      '@hapi/hapi':
-        specifier: 20.1.5
-        version: 20.1.5
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      fs-extra:
-        specifier: 8.1.0
-        version: 8.1.0
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      lowdb:
-        specifier: 1.0.0
-        version: 1.0.0
-      uuid:
-        specifier: 8.3.2
-        version: 8.3.2
-    devDependencies:
-      '@types/fs-extra':
-        specifier: 8.1.2
-        version: 8.1.2
-      '@types/hapi__boom':
-        specifier: 7.4.1
-        version: 7.4.1
-      '@types/hapi__joi':
-        specifier: 17.1.7
-        version: 17.1.7
-      '@types/uuid':
-        specifier: 8.3.1
-        version: 8.3.1
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      tmp:
-        specifier: 0.2.1
-        version: 0.2.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/crypto-address-base58:
     dependencies:
@@ -2814,6 +2759,61 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(ajv@8.11.0)
     devDependencies:
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/webhooks:
+    dependencies:
+      '@hapi/boom':
+        specifier: 9.0.0
+        version: 9.0.0
+      '@hapi/hapi':
+        specifier: 20.1.5
+        version: 20.1.5
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      fs-extra:
+        specifier: 8.1.0
+        version: 8.1.0
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      lowdb:
+        specifier: 1.0.0
+        version: 1.0.0
+      uuid:
+        specifier: 8.3.2
+        version: 8.3.2
+    devDependencies:
+      '@types/fs-extra':
+        specifier: 8.1.2
+        version: 8.1.2
+      '@types/hapi__boom':
+        specifier: 7.4.1
+        version: 7.4.1
+      '@types/hapi__joi':
+        specifier: 17.1.7
+        version: 17.1.7
+      '@types/uuid':
+        specifier: 8.3.1
+        version: 8.3.1
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      tmp:
+        specifier: 0.2.1
+        version: 0.2.1
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -13043,6 +13043,7 @@ packages:
 
   /lodash@4.17.20:
     resolution: {integrity: sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==}
+    dev: true
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -13134,7 +13135,7 @@ packages:
     dependencies:
       graceful-fs: 4.2.11
       is-promise: 2.2.2
-      lodash: 4.17.20
+      lodash: 4.17.21
       pify: 3.0.0
       steno: 0.4.4
     dev: false

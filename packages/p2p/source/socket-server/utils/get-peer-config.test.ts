@@ -32,7 +32,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 		version = "3.0.9";
 		appPlugins = [
 			{ options: {}, package: "@mainsail/api" },
-			{ package: "@mainsail/core-webhooks" },
+			{ package: "@mainsail/webhooks" },
 			{ package: "@mainsail/p2p" },
 		];
 
@@ -53,7 +53,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 					},
 				}),
 			}),
-			name: () => "core-webhooks",
+			name: () => "webhooks",
 		};
 		coreP2PServiceProvider = {
 			config: () => ({
@@ -64,7 +64,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 		serviceProviders = {
 			"@mainsail/api": coreApiServiceProvider,
 			"@mainsail/p2p": coreP2PServiceProvider,
-			"@mainsail/core-webhooks": coreWebhooksServiceProvider,
+			"@mainsail/webhooks": coreWebhooksServiceProvider,
 		};
 		const configRepository = { get: () => appPlugins }; // get("app.plugins")
 		const serviceProviderRepository = { get: (plugin) => serviceProviders[plugin] };
@@ -96,7 +96,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 					// estimateTotalCount: true,
 					port: 4003,
 				},
-				"@mainsail/core-webhooks": {
+				"@mainsail/webhooks": {
 					enabled: true,
 					port: 4004,
 				},

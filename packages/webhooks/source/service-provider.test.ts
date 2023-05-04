@@ -42,7 +42,7 @@ const init = (context: Context) => {
 
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
 	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration);
-	context.serviceProvider.setConfig(context.pluginConfiguration.from("core-webhooks", defaults));
+	context.serviceProvider.setConfig(context.pluginConfiguration.from("webhooks", defaults));
 };
 
 const importDefaults = () =>
@@ -65,7 +65,7 @@ describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
 
 	it("should bootWhen be true when enabled", async ({ serviceProvider, pluginConfiguration }) => {
 		defaults.enabled = true;
-		const instance = pluginConfiguration.from("core-webhooks", defaults);
+		const instance = pluginConfiguration.from("webhooks", defaults);
 		serviceProvider.setConfig(instance);
 
 		assert.true(await serviceProvider.bootWhen());

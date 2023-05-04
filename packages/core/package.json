@@ -64,7 +64,7 @@
 		"@mainsail/transaction-pool": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@mainsail/core-webhooks": "workspace:*",
+		"@mainsail/webhooks": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"argon2": "0.28.2",
 		"bip39": "3.0.4",

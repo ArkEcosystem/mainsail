@@ -17,7 +17,7 @@ export const response: Contracts.P2P.PeerPingResponse = {
 		},
 		plugins: {
 			"@mainsail/api": { enabled: true, port: 4003 },
-			"@mainsail/core-webhooks": { enabled: false, port: 4004 },
+			"@mainsail/webhooks": { enabled: false, port: 4004 },
 		},
 		version: "0.0.1",
 	},

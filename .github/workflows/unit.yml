@@ -100,8 +100,8 @@ jobs:
               run: cd packages/transactions && pnpm run test
             - name: Test validation
               run: cd packages/validation && pnpm run test
-            - name: Test core-webhooks
-              run: cd packages/core-webhooks && pnpm run test
+            - name: Test webhooks
+              run: cd packages/webhooks && pnpm run test
             - name: Test utils
               run: cd packages/utils && pnpm run test
         strategy:

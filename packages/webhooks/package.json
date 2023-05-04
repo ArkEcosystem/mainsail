@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-webhooks",
+	"name": "@mainsail/webhooks",
 	"version": "0.0.1",
 	"description": "Webhooks for ARK Core",
 	"license": "MIT",
