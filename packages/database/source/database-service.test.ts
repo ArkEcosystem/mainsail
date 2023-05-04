@@ -10,7 +10,7 @@ import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/cryp
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
-import { ServiceProvider as CoreLmdb } from "@mainsail/core-lmdb";
+import { ServiceProvider as CoreLmdb } from "@mainsail/storage-lmdb";
 import { ServiceProvider as CoreSerializer } from "@mainsail/core-serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
 import { BigNumber } from "@mainsail/utils";

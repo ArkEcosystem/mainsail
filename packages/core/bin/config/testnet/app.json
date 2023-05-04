@@ -67,7 +67,7 @@
 			"package": "@mainsail/core-state"
 		},
 		{
-			"package": "@mainsail/core-lmdb"
+			"package": "@mainsail/storage-lmdb"
 		},
 		{
 			"package": "@mainsail/database"

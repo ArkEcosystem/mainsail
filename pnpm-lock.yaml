@@ -416,9 +416,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-lmdb':
-        specifier: workspace:*
-        version: link:../core-lmdb
       '@mainsail/core-serializer':
         specifier: workspace:*
         version: link:../core-serializer
@@ -476,6 +473,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/storage-lmdb':
+        specifier: workspace:*
+        version: link:../storage-lmdb
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-lmdb':
-        specifier: workspace:*
-        version: link:../core-lmdb
       '@mainsail/core-logger-pino':
         specifier: workspace:*
         version: link:../core-logger-pino
@@ -660,6 +657,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/storage-lmdb':
+        specifier: workspace:*
+        version: link:../storage-lmdb
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,28 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-lmdb:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      lmdb:
-        specifier: 2.7.11
-        version: 2.7.11
-    devDependencies:
-      tmp:
-        specifier: 0.2.1
-        version: 0.2.1
-      uvu:
-        specifier: 0.5.3
-        version: 0.5.3
 
   packages/core-logger-pino:
     dependencies:
@@ -2443,9 +2421,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@mainsail/core-lmdb':
-        specifier: workspace:*
-        version: link:../core-lmdb
       '@mainsail/core-serializer':
         specifier: workspace:*
         version: link:../core-serializer
@@ -2485,6 +2460,9 @@ importers:
       '@mainsail/fees-static':
         specifier: workspace:*
         version: link:../fees-static
+      '@mainsail/storage-lmdb':
+        specifier: workspace:*
+        version: link:../storage-lmdb
       tmp:
         specifier: 0.2.1
         version: 0.2.1
@@ -2750,6 +2728,28 @@ importers:
   packages/kernel/test/stubs/stub-plugin: {}
 
   packages/kernel/test/stubs/stub-plugin-with-defaults: {}
+
+  packages/storage-lmdb:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      lmdb:
+        specifier: 2.7.11
+        version: 2.7.11
+    devDependencies:
+      tmp:
+        specifier: 0.2.1
+        version: 0.2.1
+      uvu:
+        specifier: 0.5.3
+        version: 0.5.3
 
   packages/utils:
     dependencies:

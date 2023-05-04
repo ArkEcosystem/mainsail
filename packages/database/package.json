@@ -39,7 +39,7 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
-		"@mainsail/core-lmdb": "workspace:*",
+		"@mainsail/storage-lmdb": "workspace:*",
 		"@mainsail/core-serializer": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"tmp": "0.2.1",

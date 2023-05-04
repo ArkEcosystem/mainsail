@@ -38,7 +38,7 @@
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/core-lmdb": "workspace:*",
+		"@mainsail/storage-lmdb": "workspace:*",
 		"@mainsail/core-serializer": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"@mainsail/utils": "workspace:*",
