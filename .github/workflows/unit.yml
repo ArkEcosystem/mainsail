@@ -24,20 +24,20 @@ jobs:
               run: cd packages/core && pnpm run test
             - name: Test blockchain
               run: cd packages/blockchain && pnpm run test
-            - name: Test core-cli
-              run: cd packages/core-cli && pnpm run test
-            - name: Test core-crypto-address-base58
-              run: cd packages/core-crypto-address-base58 && pnpm run test
-            - name: Test core-crypto-address-bech32
-              run: cd packages/core-crypto-address-bech32 && pnpm run test
-            - name: Test core-crypto-address-bech32m
-              run: cd packages/core-crypto-address-bech32m && pnpm run test
-            - name: Test core-crypto-address-keccak256
-              run: cd packages/core-crypto-address-keccak256 && pnpm run test
-            - name: Test core-crypto-address-ss58
-              run: cd packages/core-crypto-address-ss58 && pnpm run test
-            - name: Test core-crypto-block
-              run: cd packages/core-crypto-block && pnpm run test
+            - name: Test cli
+              run: cd packages/cli && pnpm run test
+            - name: Test crypto-address-base58
+              run: cd packages/crypto-address-base58 && pnpm run test
+            - name: Test crypto-address-bech32
+              run: cd packages/crypto-address-bech32 && pnpm run test
+            - name: Test crypto-address-bech32m
+              run: cd packages/crypto-address-bech32m && pnpm run test
+            - name: Test crypto-address-keccak256
+              run: cd packages/crypto-address-keccak256 && pnpm run test
+            - name: Test crypto-address-ss58
+              run: cd packages/crypto-address-ss58 && pnpm run test
+            - name: Test crypto-block
+              run: cd packages/crypto-block && pnpm run test
             - name: Test crypto-hash-bcrypto
               run: cd packages/crypto-hash-bcrypto && pnpm run test
             - name: Test crypto-hash-noble
@@ -88,8 +88,8 @@ jobs:
               run: cd packages/logger-pino && pnpm run test
             - name: Test p2p
               run: cd packages/p2p && pnpm run test
-            - name: Test core-configuration-generator
-              run: cd packages/core-configuration-generator && pnpm run test
+            - name: Test configuration-generator
+              run: cd packages/configuration-generator && pnpm run test
             - name: Test state
               run: cd packages/state && pnpm run test
             - name: Test test-framework
