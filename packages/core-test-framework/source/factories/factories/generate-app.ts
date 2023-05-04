@@ -5,7 +5,7 @@ import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../../crypto-
 import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../../crypto-key-pair-schnorr";
-import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../core-crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction, TransactionRegistry } from "../../../../core-crypto-transaction";
 import { MultiPaymentTransaction } from "../../../../core-crypto-transaction-multi-payment";
 import { MultiSignatureRegistrationTransaction } from "../../../../core-crypto-transaction-multi-signature-registration";

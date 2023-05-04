@@ -18,7 +18,7 @@ import { Configuration } from "../../../crypto-config";
 import { HashFactory } from "../../../crypto-hash-bcrypto/source/hash.factory";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
-import { Signature } from "../../../core-crypto-signature-schnorr/source/signature";
+import { Signature } from "../../../crypto-signature-schnorr/source/signature";
 import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
 import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
 import { Slots } from "../../../core-crypto-time/source/slots";

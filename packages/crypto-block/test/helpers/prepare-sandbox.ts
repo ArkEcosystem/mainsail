@@ -7,7 +7,7 @@ import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config/dist
 import { Configuration } from "../../../crypto-config/source/configuration";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../crypto-hash-bcrypto/distribution";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key-pair-schnorr/distribution";
-import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../core-crypto-signature-schnorr/distribution";
+import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr/distribution";
 import { ServiceProvider as CoreCryptoTime } from "../../../core-crypto-time/distribution";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../core-crypto-transaction-transfer/distribution";
 import { ServiceProvider as CoreCryptoValidation } from "../../../core-crypto-validation/distribution";

@@ -416,9 +416,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../core-crypto-signature-schnorr
       '@mainsail/core-crypto-time':
         specifier: workspace:*
         version: link:../core-crypto-time
@@ -476,6 +473,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-signature-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-signature-schnorr
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../core-crypto-signature-schnorr
       '@mainsail/core-crypto-time':
         specifier: workspace:*
         version: link:../core-crypto-time
@@ -660,6 +657,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-signature-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-signature-schnorr
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,28 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-crypto-signature-schnorr:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      bcrypto:
-        specifier: 5.4.0
-        version: 5.4.0
-    devDependencies:
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/core-crypto-time:
     dependencies:
@@ -1245,9 +1223,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@mainsail/core-crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../core-crypto-signature-schnorr
       '@mainsail/core-crypto-transaction':
         specifier: workspace:*
         version: link:../core-crypto-transaction
@@ -1287,6 +1262,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-signature-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-signature-schnorr
       tmp:
         specifier: 0.2.1
         version: 0.2.1
@@ -2746,6 +2724,28 @@ importers:
       '@noble/ed25519':
         specifier: ^1.6.0
         version: 1.6.0
+    devDependencies:
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/crypto-signature-schnorr:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      bcrypto:
+        specifier: 5.4.0
+        version: 5.4.0
     devDependencies:
       uvu:
         specifier: ^0.5.3

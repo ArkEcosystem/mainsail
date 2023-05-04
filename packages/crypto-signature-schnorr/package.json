@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-signature-schnorr",
+	"name": "@mainsail/crypto-signature-schnorr",
 	"version": "0.0.1",
 	"description": "Schnorr (BIP340)",
 	"license": "MIT",

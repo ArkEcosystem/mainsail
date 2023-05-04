@@ -33,7 +33,7 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
-		"@mainsail/core-crypto-signature-schnorr": "workspace:*",
+		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/core-crypto-transaction": "workspace:*",
 		"@mainsail/core-crypto-transaction-transfer": "workspace:*",
 		"@mainsail/core-crypto-validation": "workspace:*",

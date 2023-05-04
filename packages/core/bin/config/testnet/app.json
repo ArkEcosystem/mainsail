@@ -16,7 +16,7 @@
 			"package": "@mainsail/crypto-hash-bcrypto"
 		},
 		{
-			"package": "@mainsail/core-crypto-signature-schnorr"
+			"package": "@mainsail/crypto-signature-schnorr"
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-schnorr"
