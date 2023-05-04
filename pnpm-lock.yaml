@@ -221,9 +221,6 @@ importers:
       '@mainsail/blockchain':
         specifier: workspace:*
         version: link:../blockchain
-      '@mainsail/core-p2p':
-        specifier: workspace:*
-        version: link:../core-p2p
       '@mainsail/core-state':
         specifier: workspace:*
         version: link:../core-state
@@ -233,6 +230,9 @@ importers:
       '@mainsail/forger':
         specifier: workspace:*
         version: link:../forger
+      '@mainsail/p2p':
+        specifier: workspace:*
+        version: link:../p2p
       '@types/hapi__boom':
         specifier: 7.4.1
         version: 7.4.1
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-p2p':
-        specifier: workspace:*
-        version: link:../core-p2p
       '@mainsail/core-serializer':
         specifier: workspace:*
         version: link:../core-serializer
@@ -657,6 +654,9 @@ importers:
       '@mainsail/networking-ntp':
         specifier: workspace:*
         version: link:../networking-ntp
+      '@mainsail/p2p':
+        specifier: workspace:*
+        version: link:../p2p
       '@mainsail/storage-lmdb':
         specifier: workspace:*
         version: link:../storage-lmdb
@@ -720,109 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-p2p:
-    dependencies:
-      '@hapi/boom':
-        specifier: 9.0.0
-        version: 9.0.0
-      '@hapi/bounce':
-        specifier: 2.0.0
-        version: 2.0.0
-      '@hapi/hapi':
-        specifier: 20.1.5
-        version: 20.1.5
-      '@hapi/hoek':
-        specifier: 9.2.0
-        version: 9.2.0
-      '@hapi/sntp':
-        specifier: 4.0.0
-        version: 4.0.0
-      '@hapi/teamwork':
-        specifier: 5.1.0
-        version: 5.1.0
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      ajv:
-        specifier: 8.11.0
-        version: 8.11.0
-      dayjs:
-        specifier: 1.10.7
-        version: 1.10.7
-      delay:
-        specifier: 4.4.1
-        version: 4.4.1
-      ip:
-        specifier: 1.1.5
-        version: 1.1.5
-      ipaddr.js:
-        specifier: 2.0.1
-        version: 2.0.1
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      pluralize:
-        specifier: 8.0.0
-        version: 8.0.0
-      pretty-ms:
-        specifier: 7.0.1
-        version: 7.0.1
-      protobufjs:
-        specifier: 6.10.2
-        version: 6.10.2
-      rate-limiter-flexible:
-        specifier: 1.3.2
-        version: 1.3.2
-      semver:
-        specifier: 6.3.0
-        version: 6.3.0
-      ws:
-        specifier: 7.5.5
-        version: 7.5.5
-    devDependencies:
-      '@mainsail/core-validation':
-        specifier: workspace:*
-        version: link:../core-validation
-      '@types/better-sqlite3':
-        specifier: 5.4.3
-        version: 5.4.3
-      '@types/fs-extra':
-        specifier: 8.1.2
-        version: 8.1.2
-      '@types/hapi__sntp':
-        specifier: 3.1.2
-        version: 3.1.2
-      '@types/ip':
-        specifier: 1.1.0
-        version: 1.1.0
-      '@types/semver':
-        specifier: 6.2.3
-        version: 6.2.3
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      rewiremock:
-        specifier: 3.14.5
-        version: 3.14.5
-      uvu:
-        specifier: 0.5.3
-        version: 0.5.3
 
   packages/core-serializer:
     dependencies:
@@ -890,9 +787,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-p2p':
-        specifier: workspace:*
-        version: link:../core-p2p
       '@mainsail/core-serializer':
         specifier: workspace:*
         version: link:../core-serializer
@@ -929,6 +823,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/p2p':
+        specifier: workspace:*
+        version: link:../p2p
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2432,12 +2329,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-p2p':
-        specifier: workspace:*
-        version: link:../core-p2p
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/p2p':
+        specifier: workspace:*
+        version: link:../p2p
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2478,12 +2375,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-p2p':
-        specifier: workspace:*
-        version: link:../core-p2p
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/p2p':
+        specifier: workspace:*
+        version: link:../p2p
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2728,6 +2625,109 @@ importers:
       joi:
         specifier: 17.4.2
         version: 17.4.2
+
+  packages/p2p:
+    dependencies:
+      '@hapi/boom':
+        specifier: 9.0.0
+        version: 9.0.0
+      '@hapi/bounce':
+        specifier: 2.0.0
+        version: 2.0.0
+      '@hapi/hapi':
+        specifier: 20.1.5
+        version: 20.1.5
+      '@hapi/hoek':
+        specifier: 9.2.0
+        version: 9.2.0
+      '@hapi/sntp':
+        specifier: 4.0.0
+        version: 4.0.0
+      '@hapi/teamwork':
+        specifier: 5.1.0
+        version: 5.1.0
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-state':
+        specifier: workspace:*
+        version: link:../core-state
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      ajv:
+        specifier: 8.11.0
+        version: 8.11.0
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
+      delay:
+        specifier: 4.4.1
+        version: 4.4.1
+      ip:
+        specifier: 1.1.5
+        version: 1.1.5
+      ipaddr.js:
+        specifier: 2.0.1
+        version: 2.0.1
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      pluralize:
+        specifier: 8.0.0
+        version: 8.0.0
+      pretty-ms:
+        specifier: 7.0.1
+        version: 7.0.1
+      protobufjs:
+        specifier: 6.10.2
+        version: 6.10.2
+      rate-limiter-flexible:
+        specifier: 1.3.2
+        version: 1.3.2
+      semver:
+        specifier: 6.3.0
+        version: 6.3.0
+      ws:
+        specifier: 7.5.5
+        version: 7.5.5
+    devDependencies:
+      '@mainsail/core-validation':
+        specifier: workspace:*
+        version: link:../core-validation
+      '@types/better-sqlite3':
+        specifier: 5.4.3
+        version: 5.4.3
+      '@types/fs-extra':
+        specifier: 8.1.2
+        version: 8.1.2
+      '@types/hapi__sntp':
+        specifier: 3.1.2
+        version: 3.1.2
+      '@types/ip':
+        specifier: 1.1.0
+        version: 1.1.0
+      '@types/semver':
+        specifier: 6.2.3
+        version: 6.2.3
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      rewiremock:
+        specifier: 3.14.5
+        version: 3.14.5
+      uvu:
+        specifier: 0.5.3
+        version: 0.5.3
 
   packages/storage-lmdb:
     dependencies:

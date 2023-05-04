@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-p2p",
+	"name": "@mainsail/p2p",
 	"version": "0.0.1",
 	"description": "P2P API for ARK Core",
 	"license": "MIT",

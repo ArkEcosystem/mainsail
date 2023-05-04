@@ -24,7 +24,7 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
-			.whenTargetTagged("plugin", "core-p2p");
+			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);
 	});
 

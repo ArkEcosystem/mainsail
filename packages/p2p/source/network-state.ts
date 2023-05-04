@@ -52,7 +52,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		const configuration = monitor.app.getTagged<Providers.PluginConfiguration>(
 			Identifiers.PluginConfiguration,
 			"plugin",
-			"core-p2p",
+			"p2p",
 		);
 		const minimumNetworkReach = configuration.getRequired<number>("minimumNetworkReach");
 

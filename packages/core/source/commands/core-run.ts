@@ -32,7 +32,7 @@ export class Command extends Commands.Command {
 				"@mainsail/blockchain": {
 					networkStart: flags.networkStart,
 				},
-				"@mainsail/core-p2p": Utils.Builder.buildPeerFlags(flags),
+				"@mainsail/p2p": Utils.Builder.buildPeerFlags(flags),
 			},
 		});
 

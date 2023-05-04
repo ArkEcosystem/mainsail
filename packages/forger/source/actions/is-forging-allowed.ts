@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Types, Utils as AppUtils } from "@mainsail/kernel";
-import { NetworkStateStatus } from "@mainsail/core-p2p";
+import { NetworkStateStatus } from "@mainsail/p2p";
 
 @injectable()
 export class IsForgingAllowedAction extends Services.Triggers.Action {

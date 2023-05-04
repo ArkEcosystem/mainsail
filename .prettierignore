@@ -3,4 +3,4 @@ dist
 distribution
 docs
 
-packages/core-p2p/source/socket-server/codecs/proto/protos.*
+packages/p2p/source/socket-server/codecs/proto/protos.*

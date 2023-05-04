@@ -33,7 +33,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 		appPlugins = [
 			{ options: {}, package: "@mainsail/api" },
 			{ package: "@mainsail/core-webhooks" },
-			{ package: "@mainsail/core-p2p" },
+			{ package: "@mainsail/p2p" },
 		];
 
 		coreApiServiceProvider = {
@@ -59,11 +59,11 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			config: () => ({
 				all: () => ({}),
 			}),
-			name: () => "core-p2p",
+			name: () => "p2p",
 		};
 		serviceProviders = {
 			"@mainsail/api": coreApiServiceProvider,
-			"@mainsail/core-p2p": coreP2PServiceProvider,
+			"@mainsail/p2p": coreP2PServiceProvider,
 			"@mainsail/core-webhooks": coreWebhooksServiceProvider,
 		};
 		const configRepository = { get: () => appPlugins }; // get("app.plugins")

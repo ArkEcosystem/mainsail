@@ -25,7 +25,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 		const configuration = app.getTagged<Providers.PluginConfiguration>(
 			Identifiers.PluginConfiguration,
 			"plugin",
-			"core-p2p",
+			"p2p",
 		);
 		minimumVersions = configuration.getOptional<string[]>("minimumVersions", []);
 	}

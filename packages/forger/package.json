@@ -22,7 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/core-p2p": "workspace:*",
+		"@mainsail/p2p": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "17.4.2",
 		"node-forge": "1.2.1",

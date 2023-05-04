@@ -45,10 +45,10 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
-			.whenTargetTagged("plugin", "core-p2p");
+			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchainService);
 
-		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "core-p2p");
+		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
 
 		networkMonitor.app = context.sandbox.app;
 	});

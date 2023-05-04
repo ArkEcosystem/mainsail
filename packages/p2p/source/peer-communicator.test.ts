@@ -50,7 +50,7 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
-			.whenTargetTagged("plugin", "core-p2p");
+			.whenTargetTagged("plugin", "p2p");
 
 		context.sandbox.app.bind(Identifiers.ApplicationVersion).toConstantValue("0.0.1");
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);

@@ -19,7 +19,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-p2p")
+	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)

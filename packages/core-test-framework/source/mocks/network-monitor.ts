@@ -1,4 +1,4 @@
-import { NetworkMonitor } from "@mainsail/core-p2p";
+import { NetworkMonitor } from "@mainsail/p2p";
 
 let mockNetworkHeight = 0;
 

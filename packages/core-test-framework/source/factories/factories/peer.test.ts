@@ -1,4 +1,4 @@
-import { Peer } from "@mainsail/core-p2p";
+import { Peer } from "@mainsail/p2p";
 
 import { describe } from "../../index";
 import { FactoryBuilder } from "../factory-builder";

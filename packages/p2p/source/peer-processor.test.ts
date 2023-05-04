@@ -30,7 +30,7 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
-			.whenTargetTagged("plugin", "core-p2p");
+			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
 		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(peerCommunicator);
 		context.sandbox.app.bind(Identifiers.PeerConnector).toConstantValue(peerConnector);
@@ -39,7 +39,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.PeerFactory).toFactory<Peer>(() => (ip: string) => new Peer(ip, 4002));
 
-		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "core-p2p");
+		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
 
 		context.peerProcessor = context.sandbox.app.resolve(PeerProcessor);
 	});

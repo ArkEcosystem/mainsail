@@ -32,7 +32,7 @@
 		"@mainsail/crypto-transaction-validator-resignation": "workspace:*",
 		"@mainsail/crypto-transaction-vote": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/core-p2p": "workspace:*",
+		"@mainsail/p2p": "workspace:*",
 		"@mainsail/core-serializer": "workspace:*",
 		"@mainsail/core-state": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",

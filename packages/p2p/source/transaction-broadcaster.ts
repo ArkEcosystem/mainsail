@@ -10,7 +10,7 @@ export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcas
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-p2p")
+	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.PeerRepository)

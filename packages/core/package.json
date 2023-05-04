@@ -57,7 +57,7 @@
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/networking-dns": "workspace:*",
 		"@mainsail/networking-ntp": "workspace:*",
-		"@mainsail/core-p2p": "workspace:*",
+		"@mainsail/p2p": "workspace:*",
 		"@mainsail/core-serializer": "workspace:*",
 		"@mainsail/core-state": "workspace:*",
 		"@mainsail/core-test-framework": "workspace:*",

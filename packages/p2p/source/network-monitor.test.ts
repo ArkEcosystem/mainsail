@@ -40,7 +40,7 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", importFresh("./defaults").defaults))
-			.whenTargetTagged("plugin", "core-p2p");
+			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.bind(Identifiers.ApplicationVersion).toConstantValue("0.0.1");
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
@@ -53,7 +53,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
 		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(slots);
 
-		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "core-p2p");
+		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
 		context.networkMonitor = context.sandbox.app.resolve(NetworkMonitor);
 	});
 

@@ -16,7 +16,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-p2p")
+	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.PeerCommunicator)

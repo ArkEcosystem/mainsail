@@ -79,7 +79,7 @@
 			"package": "@mainsail/core-transaction-pool"
 		},
 		{
-			"package": "@mainsail/core-p2p"
+			"package": "@mainsail/p2p"
 		},
 		{
 			"package": "@mainsail/blockchain"
