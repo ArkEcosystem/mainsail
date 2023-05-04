@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 
 export class RestClient {
 	public static async get(path: string, options?: Utils.HttpOptions): Promise<Utils.HttpResponse> {

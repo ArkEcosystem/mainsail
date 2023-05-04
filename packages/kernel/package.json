@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-kernel",
+	"name": "@mainsail/kernel",
 	"version": "0.0.1",
 	"description": "Kernel of ARK Core",
 	"license": "MIT",

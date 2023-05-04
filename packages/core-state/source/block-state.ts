@@ -1,6 +1,6 @@
 import { inject, injectable, multiInject } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 // @TODO review the implementation

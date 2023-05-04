@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
 import Tail from "nodejs-tail";

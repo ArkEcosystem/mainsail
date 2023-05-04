@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils as AppUtils } from "@mainsail/core-kernel";
+import { Enums, Providers, Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {

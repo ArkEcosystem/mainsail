@@ -22,7 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@noble/ed25519": "^1.6.0",
 		"@noble/hashes": "^1.0.0",

@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/core-kernel";
+import { Enums } from "@mainsail/kernel";
 
 import { Configuration } from "../../crypto-config";
 import { DatabaseService } from "../../database/source/database-service";

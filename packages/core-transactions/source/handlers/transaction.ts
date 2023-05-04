@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 // @TODO revisit the implementation, container usage and arguments after database rework

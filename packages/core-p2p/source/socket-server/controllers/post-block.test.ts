@@ -1,5 +1,5 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import { describe, Sandbox } from "../../../../core-test-framework";
 import rewiremock from "rewiremock";
 
@@ -13,7 +13,7 @@ const utilsMock = {
 const { PostBlockController: PostBlockControllerProxy } = rewiremock.proxy<{
 	PostBlockController: Contracts.Types.Class<PostBlockController>;
 }>("./post-block", {
-	"@mainsail/core-kernel": {
+	"@mainsail/kernel": {
 		Utils: utilsMock,
 	},
 });

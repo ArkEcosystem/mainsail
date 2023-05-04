@@ -1,6 +1,6 @@
 import { Commands, Container, Contracts } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 @injectable()

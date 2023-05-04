@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Application, Utils } from "@mainsail/core-kernel";
+import { Application, Utils } from "@mainsail/kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../core-test-framework/source";

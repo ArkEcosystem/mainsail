@@ -23,7 +23,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"@mainsail/core-transactions": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@mainsail/utils": "workspace:*",

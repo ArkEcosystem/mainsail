@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import { AssertionError } from "assert";
 import { SinonSpy } from "sinon";
 

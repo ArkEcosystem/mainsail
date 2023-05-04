@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application } from "@mainsail/core-kernel";
+import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { describe } from "../../core-test-framework";

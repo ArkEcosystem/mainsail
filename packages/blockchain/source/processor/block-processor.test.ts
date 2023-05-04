@@ -1,6 +1,6 @@
 // import { Contracts, Identifiers } from "@mainsail/contracts";
 // import { Configuration } from "@mainsail/crypto-config";
-// import { Services } from "@mainsail/core-kernel";
+// import { Services } from "@mainsail/kernel";
 // import { Actions } from "@mainsail/core-state";
 // import { BigNumber } from "@mainsail/utils";
 

@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Application } from "@mainsail/core-kernel/source/application";
+import { Application } from "@mainsail/kernel/source/application";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../core-test-framework";

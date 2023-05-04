@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Types, Utils } from "@mainsail/core-kernel";
+import { Enums, Providers, Types, Utils } from "@mainsail/kernel";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
 import { StateMachine } from "./state-machine";

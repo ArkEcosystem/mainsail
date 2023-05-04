@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Application, Providers } from "@mainsail/core-kernel";
-import { NullEventDispatcher } from "@mainsail/core-kernel/source/services/events/drivers/null";
+import { Application, Providers } from "@mainsail/kernel";
+import { NullEventDispatcher } from "@mainsail/kernel/source/services/events/drivers/null";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";

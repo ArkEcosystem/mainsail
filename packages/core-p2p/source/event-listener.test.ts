@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/core-kernel";
+import { Enums } from "@mainsail/kernel";
 import { describe, Sandbox } from "../../core-test-framework";
 
 import { EventListener } from "./event-listener";

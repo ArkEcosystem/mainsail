@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers } from "@mainsail/core-kernel";
+import { Enums, Providers } from "@mainsail/kernel";
 
 import { ValidatorTracker } from "./tracker";
 

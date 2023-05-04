@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/core-kernel";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { BurnFeeMutator } from "./mutator";

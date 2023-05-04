@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services, Types } from "@mainsail/core-kernel";
+import { Services, Types } from "@mainsail/kernel";
 
 import { PeerProcessor } from "../peer-processor";
 

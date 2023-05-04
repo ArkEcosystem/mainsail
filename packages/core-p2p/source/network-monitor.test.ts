@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils } from "@mainsail/core-kernel";
+import { Enums, Providers, Utils } from "@mainsail/kernel";
 import { describe, Sandbox } from "../../core-test-framework";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";

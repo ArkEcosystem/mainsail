@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Services } from "@mainsail/core-kernel";
+import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { WalletEvent } from "./wallet-event";

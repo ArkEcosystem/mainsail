@@ -53,7 +53,7 @@ bundle.min.js
 # Build
 packages/**/dist/
 packages/**/distribution/
-!packages/core-kernel/test/stubs/**
+!packages/kernel/test/stubs/**
 
 # Microsoft Visual Studio settings
 .vs

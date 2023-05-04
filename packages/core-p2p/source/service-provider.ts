@@ -1,5 +1,5 @@
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Types, Utils } from "@mainsail/core-kernel";
+import { Providers, Services, Types, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";

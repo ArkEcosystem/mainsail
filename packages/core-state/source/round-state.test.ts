@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Application, Enums } from "@mainsail/core-kernel";
+import { Application, Enums } from "@mainsail/kernel";
 import Utils from "@mainsail/utils";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";

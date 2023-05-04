@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/core-kernel";
+import { Services } from "@mainsail/kernel";
 
 @injectable()
 export class DposPreviousRoundState implements Contracts.State.DposPreviousRoundState {

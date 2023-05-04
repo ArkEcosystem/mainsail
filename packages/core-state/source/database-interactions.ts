@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/core-kernel";
+import { Enums } from "@mainsail/kernel";
 
 import { RoundState } from "./round-state";
 

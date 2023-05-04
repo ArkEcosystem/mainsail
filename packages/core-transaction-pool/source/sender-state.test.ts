@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { BlockTimeCalculator } from "@mainsail/crypto-time/source/block-time-calculator";
 import { Slots } from "@mainsail/crypto-time/source/slots";
-import { Enums } from "@mainsail/core-kernel";
+import { Enums } from "@mainsail/kernel";
 
 import { describe } from "../../core-test-framework";
 import { SenderState } from ".";

@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/core-kernel";
+import { Providers } from "@mainsail/kernel";
 import { open } from "lmdb";
 
 export class ServiceProvider extends Providers.ServiceProvider {

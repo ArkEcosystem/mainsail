@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 
 import { describe, Sandbox } from "../../../../core-test-framework";
 import { BlockProcessorResult } from "../contracts";

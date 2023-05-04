@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/core-transactions";
 import { BigNumber } from "@mainsail/utils";
 

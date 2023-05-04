@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"@mainsail/core-transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@hapi/boom": "9.1.4",

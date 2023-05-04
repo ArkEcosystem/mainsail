@@ -1,6 +1,6 @@
 // Based on https://github.com/fknop/hapi-pagination
 
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import Hoek from "@hapi/hoek";
 import Qs from "querystring";
 

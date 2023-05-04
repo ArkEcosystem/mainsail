@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Types } from "@mainsail/core-kernel";
+import { Types } from "@mainsail/kernel";
 import { readJSONSync } from "fs-extra";
 import { resolve } from "path";
 

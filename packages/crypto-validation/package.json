@@ -22,7 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.11.0",
 		"ipaddr.js": "2.0.1",

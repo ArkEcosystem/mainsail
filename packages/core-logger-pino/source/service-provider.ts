@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/core-kernel";
+import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { PinoLogger } from "./driver";

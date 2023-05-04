@@ -1,4 +1,4 @@
-import { Services } from "@mainsail/core-kernel";
+import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/core-state";
 import { Identities } from "@mainsail/crypto";
 

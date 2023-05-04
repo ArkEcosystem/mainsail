@@ -31,7 +31,7 @@
 		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
 		"@mainsail/crypto-transaction-validator-resignation": "workspace:*",
 		"@mainsail/crypto-transaction-vote": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"@mainsail/core-p2p": "workspace:*",
 		"@mainsail/core-serializer": "workspace:*",
 		"@mainsail/core-state": "workspace:*",

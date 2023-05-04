@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/core-kernel";
+import { Utils as AppUtils } from "@mainsail/kernel";
 
 import { Resource } from "../types";
 

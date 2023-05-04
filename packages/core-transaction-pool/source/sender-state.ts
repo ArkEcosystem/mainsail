@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Services } from "@mainsail/core-kernel";
+import { Enums, Providers, Services } from "@mainsail/kernel";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {

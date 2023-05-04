@@ -1,6 +1,6 @@
 import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/core-kernel";
+import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";

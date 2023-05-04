@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/core-kernel";
+import { Providers, Services } from "@mainsail/kernel";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
 import { GetCurrentRoundAction } from "./actions/get-current-round";

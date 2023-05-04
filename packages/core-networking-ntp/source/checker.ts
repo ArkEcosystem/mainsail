@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/core-kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import Sntp from "@hapi/sntp";
 
 @injectable()

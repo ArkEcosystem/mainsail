@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 
 import { execa } from "../../execa";
 import { AbstractSource } from "./abstract-source";

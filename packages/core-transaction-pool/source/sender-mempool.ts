@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils as AppUtils } from "@mainsail/core-kernel";
+import { Providers, Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {

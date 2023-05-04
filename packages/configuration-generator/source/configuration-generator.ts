@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application } from "@mainsail/core-kernel";
+import { Application } from "@mainsail/kernel";
 import { ensureDirSync, existsSync } from "fs-extra";
 
 import { ConfigurationWriter } from "./configuration-writer";

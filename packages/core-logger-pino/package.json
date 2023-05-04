@@ -20,7 +20,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"chalk": "4.1.2",
 		"joi": "17.4.2",
 		"pino": "6.13.2",

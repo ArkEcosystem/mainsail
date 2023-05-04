@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Utils } from "@mainsail/core-kernel";
+import { Providers, Services, Utils } from "@mainsail/kernel";
 
 type PluginConfig = { package: string; options: any };
 

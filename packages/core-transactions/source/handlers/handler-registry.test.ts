@@ -10,7 +10,7 @@ import {
 	Utils,
 	Verifier,
 } from "@mainsail/crypto-transaction";
-import { Application, Services } from "@mainsail/core-kernel";
+import { Application, Services } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";

@@ -1,5 +1,5 @@
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/core-kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 
 import { NetworkStateStatus } from "./enums";
 

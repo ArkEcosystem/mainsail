@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Application } from "@mainsail/core-kernel";
+import { Application } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";

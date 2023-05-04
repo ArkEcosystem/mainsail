@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Services } from "@mainsail/core-kernel";
+import { Services } from "@mainsail/kernel";
 
 import { Wallet } from "./wallet";
 

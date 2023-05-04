@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services, Utils } from "@mainsail/core-kernel";
+import { Services, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ValidatorTracker {

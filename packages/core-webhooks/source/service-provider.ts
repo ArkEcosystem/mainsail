@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Types } from "@mainsail/core-kernel";
+import { Providers, Types } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { Database } from "./database";

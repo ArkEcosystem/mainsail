@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { Application } from "@mainsail/core-kernel";
+import { Application } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 import { describe } from "../../core-test-framework";

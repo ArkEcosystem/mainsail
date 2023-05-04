@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/core-kernel";
+import { Providers } from "@mainsail/kernel";
 
 import { AddressFactory } from "./address.factory";
 import { schemas } from "./schemas";

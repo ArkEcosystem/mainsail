@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 
 import { describe, Sandbox } from "../../core-test-framework";
 import { Blocks } from "../test/fixtures";

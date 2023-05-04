@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application, Utils } from "@mainsail/core-kernel";
+import { Application, Utils } from "@mainsail/kernel";
 
 import { Configuration } from "../../../crypto-config";
 import { VoteBuilder } from "../../../crypto-transaction-vote";

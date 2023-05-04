@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Services, Types } from "@mainsail/core-kernel";
+import { Services, Types } from "@mainsail/kernel";
 
 import { BlockProcessor, BlockProcessorResult } from "../processor";
 

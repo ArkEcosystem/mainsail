@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import { strictEqual } from "assert";
 
 import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types";

@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Enums, Providers } from "@mainsail/core-kernel";
+import { Enums, Providers } from "@mainsail/kernel";
 import { describe, Sandbox } from "../../core-test-framework";
 
 import { defaults } from "./defaults";

@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"deepmerge": "4.2.2",
 		"lodash.clone": "4.5.0",
 		"lodash.get": "4.4.2",

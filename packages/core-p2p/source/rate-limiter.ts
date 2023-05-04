@@ -1,4 +1,4 @@
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 import { RateLimiterMemory, RLWrapperBlackAndWhite } from "rate-limiter-flexible";
 
 export interface RateLimiterConfiguration {

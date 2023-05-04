@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application, Services } from "@mainsail/core-kernel";
+import { Application, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy } from "sinon";
 

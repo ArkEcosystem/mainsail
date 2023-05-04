@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Constants, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/core-kernel";
+import { Utils } from "@mainsail/kernel";
 
 // import { Managers } from "@mainsail/crypto";
 import { describe } from "../../../../core-test-framework";

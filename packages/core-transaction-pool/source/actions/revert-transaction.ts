@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Services, Types } from "@mainsail/core-kernel";
+import { Services, Types } from "@mainsail/kernel";
 
 export class RevertTransactionAction extends Services.Triggers.Action {
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {

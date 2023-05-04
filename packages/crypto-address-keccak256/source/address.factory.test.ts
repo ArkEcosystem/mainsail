@@ -5,7 +5,7 @@ import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
 
-import { Application } from "@mainsail/core-kernel";
+import { Application } from "@mainsail/kernel";
 
 import { describe } from "../../core-test-framework/source";
 import { AddressFactory } from "./address.factory";

@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Application, Enums, Utils } from "@mainsail/core-kernel";
+import { Application, Enums, Utils } from "@mainsail/kernel";
 import { SinonSpy } from "sinon";
 
 import { Configuration } from "../../crypto-config";

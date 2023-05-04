@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/core-kernel";
+import { Providers } from "@mainsail/kernel";
 
 import { BlockTimeCalculator } from "./block-time-calculator";
 import { BlockTimeLookup } from "./block-time-lookup";

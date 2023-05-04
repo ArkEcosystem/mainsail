@@ -1,6 +1,6 @@
 import { interfaces, Selectors } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/core-kernel";
+import { Providers, Services } from "@mainsail/kernel";
 
 import { TransactionHandlerConstructor, TransactionHandlerProvider } from "./handlers";
 import { TransactionHandlerRegistry } from "./handlers/handler-registry";

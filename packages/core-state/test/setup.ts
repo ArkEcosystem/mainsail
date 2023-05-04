@@ -1,6 +1,6 @@
 import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/core-kernel";
+import { Providers, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { Factories, Sandbox } from "../../core-test-framework";
 import { Configuration } from "../../crypto-config";

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application } from "@mainsail/core-kernel";
+import { Application } from "@mainsail/kernel";
 
 import { Wallet } from "../contracts";
 import { Identifiers as InternalIdentifiers } from "../identifiers";

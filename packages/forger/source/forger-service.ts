@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Services, Utils as AppUtils } from "@mainsail/core-kernel";
+import { Enums, Services, Utils as AppUtils } from "@mainsail/kernel";
 
 import { Utils } from "./utils";
 

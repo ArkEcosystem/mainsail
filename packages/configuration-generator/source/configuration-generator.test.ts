@@ -1,4 +1,4 @@
-import { Application } from "@mainsail/core-kernel";
+import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";

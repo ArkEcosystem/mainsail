@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Services, Utils } from "@mainsail/core-kernel";
+import { Services, Utils } from "@mainsail/kernel";
 
 import { TransactionHandlerConstructor } from "./transaction";
 

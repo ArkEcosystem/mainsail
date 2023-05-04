@@ -22,7 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/core-kernel": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@noble/bls12-381": "^1.2.0",
 		"@scure/bip39": "^1.0.0",
