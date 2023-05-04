@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-transactions",
+	"name": "@mainsail/transactions",
 	"version": "0.0.1",
 	"description": "Transaction Services for ARK Core",
 	"license": "MIT",

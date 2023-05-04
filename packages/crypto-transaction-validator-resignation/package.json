@@ -24,7 +24,7 @@
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/core-transactions": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@mainsail/utils": "workspace:*"
 	},

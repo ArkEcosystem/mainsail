@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { Handlers } from "@mainsail/core-transactions";
+import { Handlers } from "@mainsail/transactions";
 import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 

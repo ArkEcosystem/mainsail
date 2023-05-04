@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
 import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/kernel";
-import { Handlers } from "@mainsail/core-transactions";
+import { Handlers } from "@mainsail/transactions";
 
 import { ValidatorResignationTransaction } from "../versions";
 

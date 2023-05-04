@@ -193,12 +193,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
@@ -660,6 +657,9 @@ importers:
       '@mainsail/transaction-pool':
         specifier: workspace:*
         version: link:../transaction-pool
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,28 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-transactions:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/core-validation:
     dependencies:
@@ -1618,9 +1596,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1630,6 +1605,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1664,9 +1642,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
@@ -1676,6 +1651,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1707,15 +1685,15 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1750,15 +1728,15 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1793,9 +1771,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1805,6 +1780,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1839,9 +1817,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transactions':
-        specifier: workspace:*
-        version: link:../core-transactions
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1851,6 +1826,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2747,6 +2725,28 @@ importers:
       sinon:
         specifier: ^13.0.1
         version: 13.0.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/transactions:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
       uvu:
         specifier: ^0.5.3
         version: 0.5.3

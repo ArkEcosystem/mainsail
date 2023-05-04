@@ -62,7 +62,7 @@
 		"@mainsail/state": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/transaction-pool": "workspace:*",
-		"@mainsail/core-transactions": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"@mainsail/core-webhooks": "workspace:*",
 		"@mainsail/utils": "workspace:*",

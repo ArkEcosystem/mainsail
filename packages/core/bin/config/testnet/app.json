@@ -73,7 +73,7 @@
 			"package": "@mainsail/database"
 		},
 		{
-			"package": "@mainsail/core-transactions"
+			"package": "@mainsail/transactions"
 		},
 		{
 			"package": "@mainsail/transaction-pool"

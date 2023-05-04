@@ -10,7 +10,7 @@ export class BalanceMutator implements Contracts.State.ValidatorMutator {
 	public async apply(wallet: Contracts.State.Wallet, block: Contracts.Crypto.IBlockData): Promise<void> {
 		const amount = block.reward.plus(block.totalFee);
 
-		// ? packages/core-transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
+		// ? packages/transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
 		// ? is it guaranteed that validator wallet exists, so validatorWallet.getAttribute("validator.voteBalance") is safe?
 		if (wallet.hasVoted()) {
 			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(

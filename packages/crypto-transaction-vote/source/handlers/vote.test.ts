@@ -1,7 +1,7 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
 import { Enums as AppEnums } from "@mainsail/kernel";
-import { Handlers } from "@mainsail/core-transactions";
+import { Handlers } from "@mainsail/transactions";
 
 import { describe, Sandbox } from "../../../test-framework";
 import { VoteTransaction } from "../versions";

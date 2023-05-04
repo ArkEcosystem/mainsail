@@ -9,7 +9,7 @@
 // 	buildRecipientWallet,
 // 	buildSenderWallet,
 // 	initApp,
-// } from "../../../core-transactions/test/app";
+// } from "../../../transactions/test/app";
 // import { TransactionHandlerRegistry } from "../handler-registry";
 // import { TransactionHandler } from "../transaction";
 //
