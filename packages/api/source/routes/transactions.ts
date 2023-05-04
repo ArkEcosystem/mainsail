@@ -1,6 +1,6 @@
+import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions";

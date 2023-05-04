@@ -1,7 +1,7 @@
+import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import Hapi from "@hapi/hapi";
 
 import { mapAddr } from "../utils/map-addr";
 

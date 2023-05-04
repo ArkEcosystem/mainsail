@@ -1,7 +1,7 @@
-import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Boom, notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { WalletResource } from "../resources";
 import { Controller } from "./controller";

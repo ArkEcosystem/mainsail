@@ -1,9 +1,9 @@
+import { notFound } from "@hapi/boom";
+import Hapi from "@hapi/hapi";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
-import { notFound } from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 
 import { TransactionResource } from "../resources";
 import { Pagination } from "../types";

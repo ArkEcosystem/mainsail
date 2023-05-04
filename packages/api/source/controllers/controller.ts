@@ -1,8 +1,8 @@
+import Boom from "@hapi/boom";
+import Hapi from "@hapi/hapi";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import Boom from "@hapi/boom";
-import Hapi from "@hapi/hapi";
 
 import { SchemaObject } from "../schemas";
 import { Options, Pagination, Resource, ResultsPage, Sorting } from "../types";

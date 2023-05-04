@@ -19,14 +19,14 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
+		"@hapi/boom": "9.1.4",
+		"@hapi/hapi": "20.1.5",
+		"@hapi/hoek": "9.2.0",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@hapi/boom": "9.1.4",
-		"@hapi/hapi": "20.1.5",
-		"@hapi/hoek": "9.2.0",
 		"joi": "17.4.2",
 		"nanomatch": "1.2.13",
 		"node-cache": "5.1.2",

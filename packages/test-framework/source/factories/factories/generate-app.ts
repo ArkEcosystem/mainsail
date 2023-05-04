@@ -1,10 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
-import { ServiceProvider as CoreCryptoValidation } from "../../../../crypto-validation";
-import { ServiceProvider as CoreCryptoWif } from "../../../../crypto-wif";
-import { ServiceProvider as CoreSerializer } from "../../../../serializer";
-import { ServiceProvider as CoreValidation } from "../../../../validation";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../../crypto-address-bech32";
 import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-hash-bcrypto";
@@ -17,6 +13,10 @@ import { TransferTransaction } from "../../../../crypto-transaction-transfer";
 import { ValidatorRegistrationTransaction } from "../../../../crypto-transaction-validator-registration";
 import { ValidatorResignationTransaction } from "../../../../crypto-transaction-validator-resignation";
 import { VoteTransaction } from "../../../../crypto-transaction-vote";
+import { ServiceProvider as CoreCryptoValidation } from "../../../../crypto-validation";
+import { ServiceProvider as CoreCryptoWif } from "../../../../crypto-wif";
+import { ServiceProvider as CoreSerializer } from "../../../../serializer";
+import { ServiceProvider as CoreValidation } from "../../../../validation";
 import { Sandbox } from "../../app/sandbox";
 
 export const generateApp = async (

@@ -1,6 +1,6 @@
+import { Server } from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Server } from "@hapi/hapi";
 
 @injectable()
 export class AwaitBlockPlugin {

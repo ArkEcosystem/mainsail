@@ -1,6 +1,6 @@
+import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 export type Codec = {

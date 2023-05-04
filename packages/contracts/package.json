@@ -19,8 +19,8 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@mainsail/utils": "workspace:*",
 		"@hapi/hapi": "20.1.5",
+		"@mainsail/utils": "workspace:*",
 		"ajv": "8.11.0",
 		"dayjs": "1.10.7",
 		"inversify": "5.1.1",

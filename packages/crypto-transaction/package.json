@@ -19,15 +19,15 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
+		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-time": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/validation": "workspace:*",
-		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@mainsail/utils": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"ajv": "8.11.0",
 		"bcrypto": "5.4.0",
 		"bip32": "2.0.6",

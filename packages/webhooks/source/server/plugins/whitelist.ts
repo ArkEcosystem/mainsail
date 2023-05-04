@@ -1,5 +1,5 @@
-import { Utils } from "@mainsail/kernel";
 import Boom from "@hapi/boom";
+import { Utils } from "@mainsail/kernel";
 
 export const whitelist = {
 	name: "whitelist",

@@ -1,6 +1,6 @@
+import Boom from "@hapi/boom";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import Boom from "@hapi/boom";
 
 import { isValidVersion } from "../../utils";
 import {

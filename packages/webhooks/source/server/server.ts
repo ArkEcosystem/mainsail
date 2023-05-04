@@ -1,8 +1,8 @@
+import Boom, { badData } from "@hapi/boom";
+import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Types, Utils } from "@mainsail/kernel";
-import Boom, { badData } from "@hapi/boom";
-import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { randomBytes } from "crypto";
 
 import { Database } from "../database";

@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
 import Hapi from "@hapi/hapi";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
