@@ -40,8 +40,8 @@ jobs:
               run: cd packages/core-crypto-block && pnpm run test
             - name: Test crypto-hash-bcrypto
               run: cd packages/crypto-hash-bcrypto && pnpm run test
-            - name: Test core-crypto-hash-noble
-              run: cd packages/core-crypto-hash-noble && pnpm run test
+            - name: Test crypto-hash-noble
+              run: cd packages/crypto-hash-noble && pnpm run test
             - name: Test core-crypto-hash-wasm
               run: cd packages/core-crypto-hash-wasm && pnpm run test
             - name: Test core-crypto-key-pair-bls12-381

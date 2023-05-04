@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-hash-noble",
+	"name": "@mainsail/crypto-hash-noble",
 	"version": "0.0.1",
 	"description": "Hashing powered by @noble/hashes",
 	"license": "MIT",
