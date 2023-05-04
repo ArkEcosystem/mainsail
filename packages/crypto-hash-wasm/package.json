@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-hash-wasm",
+	"name": "@mainsail/crypto-hash-wasm",
 	"version": "0.0.1",
 	"description": "Hashing powered by WASM",
 	"license": "MIT",

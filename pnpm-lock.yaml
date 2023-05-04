@@ -721,25 +721,6 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
 
-  packages/core-crypto-hash-wasm:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      hash-wasm:
-        specifier: ^4.9.0
-        version: 4.9.0
-    devDependencies:
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-
   packages/core-crypto-key-pair-bls12-381:
     dependencies:
       '@mainsail/container':
@@ -2746,6 +2727,25 @@ importers:
       '@noble/hashes':
         specifier: ^1.0.0
         version: 1.0.0
+    devDependencies:
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/crypto-hash-wasm:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      hash-wasm:
+        specifier: ^4.9.0
+        version: 4.9.0
     devDependencies:
       uvu:
         specifier: ^0.5.3
