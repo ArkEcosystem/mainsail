@@ -32,10 +32,15 @@ jobs:
                   version: latest
                   run_install: false
 
+			- name: Get pnpm store directory
+              id: pnpm-cache
+              shell: bash
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
             - name: Cache pnpm modules
               uses: actions/cache@v3
               with:
-                  path: ~/.pnpm-store
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: ${{ runner.os }}-pnpm-
 
