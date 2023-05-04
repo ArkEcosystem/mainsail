@@ -56,8 +56,8 @@ jobs:
               run: cd packages/crypto-signature-bls12-381 && pnpm run test
             - name: Test crypto-signature-ecdsa
               run: cd packages/crypto-signature-ecdsa && pnpm run test
-            - name: Test core-crypto-signature-ed25519
-              run: cd packages/core-crypto-signature-ed25519 && pnpm run test
+            - name: Test crypto-signature-ed25519
+              run: cd packages/crypto-signature-ed25519 && pnpm run test
             - name: Test core-crypto-signature-schnorr
               run: cd packages/core-crypto-signature-schnorr && pnpm run test
             - name: Test core-crypto-time
