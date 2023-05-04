@@ -13,10 +13,33 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - uses: pnpm/action-setup@v2
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
               with:
-                  run_install: true
                   version: latest
+                  run_install: false
+
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              shell: bash
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v3
+              with:
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Cache lerna
+              uses: actions/cache@v3
+              with:
+                  path: ./.cache
+                  key: ${{ runner.os }}-lerna
+                  restore-keys: ${{ runner.os }}-lerna-
+
+            - name: Install dependencies
+              run: pnpm install
 
             - name: Build
               run: pnpm run build
