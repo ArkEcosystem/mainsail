@@ -416,9 +416,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-serializer':
-        specifier: workspace:*
-        version: link:../core-serializer
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
@@ -473,6 +470,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
       '@mainsail/storage-lmdb':
         specifier: workspace:*
         version: link:../storage-lmdb
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-serializer':
-        specifier: workspace:*
-        version: link:../core-serializer
       '@mainsail/core-state':
         specifier: workspace:*
         version: link:../core-state
@@ -657,6 +654,9 @@ importers:
       '@mainsail/p2p':
         specifier: workspace:*
         version: link:../p2p
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
       '@mainsail/storage-lmdb':
         specifier: workspace:*
         version: link:../storage-lmdb
@@ -721,21 +721,6 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
 
-  packages/core-serializer:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-
   packages/core-state:
     dependencies:
       '@mainsail/container':
@@ -787,9 +772,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-serializer':
-        specifier: workspace:*
-        version: link:../core-serializer
       '@mainsail/core-state':
         specifier: workspace:*
         version: link:../core-state
@@ -826,6 +808,9 @@ importers:
       '@mainsail/p2p':
         specifier: workspace:*
         version: link:../p2p
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2200,9 +2185,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@mainsail/core-serializer':
-        specifier: workspace:*
-        version: link:../core-serializer
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
@@ -2239,6 +2221,9 @@ importers:
       '@mainsail/fees-static':
         specifier: workspace:*
         version: link:../fees-static
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
       '@mainsail/storage-lmdb':
         specifier: workspace:*
         version: link:../storage-lmdb
@@ -2728,6 +2713,21 @@ importers:
       uvu:
         specifier: 0.5.3
         version: 0.5.3
+
+  packages/serializer:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
 
   packages/storage-lmdb:
     dependencies:

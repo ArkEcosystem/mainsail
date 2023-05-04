@@ -16,7 +16,7 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { Application } from "@mainsail/kernel";
-import { ServiceProvider as CoreSerializer } from "@mainsail/core-serializer";
+import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
 
 import { ConfigurationGenerator } from "./configuration-generator";

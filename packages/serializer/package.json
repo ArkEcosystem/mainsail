@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-serializer",
+	"name": "@mainsail/serializer",
 	"version": "0.0.1",
 	"description": "Transaction Pool Manager for ARK Core",
 	"license": "MIT",

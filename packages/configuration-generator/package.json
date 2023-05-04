@@ -39,7 +39,7 @@
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/storage-lmdb": "workspace:*",
-		"@mainsail/core-serializer": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bip39": "3.0.4",

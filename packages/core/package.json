@@ -58,7 +58,7 @@
 		"@mainsail/networking-dns": "workspace:*",
 		"@mainsail/networking-ntp": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
-		"@mainsail/core-serializer": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
 		"@mainsail/core-state": "workspace:*",
 		"@mainsail/core-test-framework": "workspace:*",
 		"@mainsail/core-transaction-pool": "workspace:*",

@@ -40,7 +40,7 @@
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/storage-lmdb": "workspace:*",
-		"@mainsail/core-serializer": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
 		"@mainsail/core-validation": "workspace:*",
 		"tmp": "0.2.1",
 		"uvu": "0.5.3"

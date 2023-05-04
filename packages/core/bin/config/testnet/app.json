@@ -28,7 +28,7 @@
 			"package": "@mainsail/crypto-wif"
 		},
 		{
-			"package": "@mainsail/core-serializer"
+			"package": "@mainsail/serializer"
 		},
 		{
 			"package": "@mainsail/crypto-block"
