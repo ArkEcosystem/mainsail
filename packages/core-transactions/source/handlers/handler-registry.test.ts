@@ -9,7 +9,7 @@ import {
 	TransactionTypeFactory,
 	Utils,
 	Verifier,
-} from "@mainsail/core-crypto-transaction";
+} from "@mainsail/crypto-transaction";
 import { Application, Services } from "@mainsail/core-kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
@@ -22,12 +22,12 @@ import { Signature } from "../../../crypto-signature-schnorr/source/signature";
 import { BlockTimeCalculator } from "../../../crypto-time/source/block-time-calculator";
 import { BlockTimeLookup } from "../../../crypto-time/source/block-time-lookup";
 import { Slots } from "../../../crypto-time/source/slots";
-import { MultiPaymentTransactionHandler } from "../../../core-crypto-transaction-multi-payment/source/handlers";
-import { MultiSignatureRegistrationTransactionHandler } from "../../../core-crypto-transaction-multi-signature-registration/source/handlers";
-import { TransferTransactionHandler } from "../../../core-crypto-transaction-transfer/source/handlers";
-import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
-import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
-import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
+import { MultiPaymentTransactionHandler } from "../../../crypto-transaction-multi-payment/source/handlers";
+import { MultiSignatureRegistrationTransactionHandler } from "../../../crypto-transaction-multi-signature-registration/source/handlers";
+import { TransferTransactionHandler } from "../../../crypto-transaction-transfer/source/handlers";
+import { ValidatorRegistrationTransactionHandler } from "../../../crypto-transaction-validator-registration/source/handlers";
+import { ValidatorResignationTransactionHandler } from "../../../crypto-transaction-validator-resignation/source/handlers";
+import { VoteTransactionHandler } from "../../../crypto-transaction-vote/source/handlers";
 import { describe } from "../../../core-test-framework/source";
 import { Validator } from "../../../core-validation/source/validator";
 import { ServiceProvider } from "../service-provider";

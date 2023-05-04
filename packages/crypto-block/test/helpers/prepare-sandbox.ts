@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/core-crypto-transaction";
+import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32";
@@ -9,7 +9,7 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../crypto-hash-b
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key-pair-schnorr/distribution";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr/distribution";
 import { ServiceProvider as CoreCryptoTime } from "../../../crypto-time/distribution";
-import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../core-crypto-transaction-transfer/distribution";
+import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../crypto-transaction-transfer/distribution";
 import { ServiceProvider as CoreCryptoValidation } from "../../../core-crypto-validation/distribution";
 import { ServiceProvider as CoreCryptoWif } from "../../../core-crypto-wif/distribution";
 import { ServiceProvider as CoreFees } from "../../../core-fees/distribution";

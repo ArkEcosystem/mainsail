@@ -1,11 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { TransactionBuilder } from "@mainsail/core-crypto-transaction";
-import { MultiPaymentBuilder } from "@mainsail/core-crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "@mainsail/core-crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "@mainsail/core-crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "@mainsail/core-crypto-transaction-validator-registration";
-import { ValidatorResignationBuilder } from "@mainsail/core-crypto-transaction-validator-resignation";
-import { VoteBuilder } from "@mainsail/core-crypto-transaction-vote";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
+import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
+import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
+import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
+import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
+import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
+import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { BigNumber } from "@mainsail/utils";
 import { join } from "path";
 

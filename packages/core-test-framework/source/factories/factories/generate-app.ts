@@ -1,22 +1,22 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
+import { ServiceProvider as CoreCryptoValidation } from "../../../../core-crypto-validation";
+import { ServiceProvider as CoreCryptoWif } from "../../../../core-crypto-wif";
+import { ServiceProvider as CoreSerializer } from "../../../../core-serializer";
+import { ServiceProvider as CoreValidation } from "../../../../core-validation";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../../crypto-address-bech32";
 import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../../crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr";
-import { ServiceProvider as CoreCryptoTransaction, TransactionRegistry } from "../../../../core-crypto-transaction";
-import { MultiPaymentTransaction } from "../../../../core-crypto-transaction-multi-payment";
-import { MultiSignatureRegistrationTransaction } from "../../../../core-crypto-transaction-multi-signature-registration";
-import { TransferTransaction } from "../../../../core-crypto-transaction-transfer";
-import { ValidatorRegistrationTransaction } from "../../../../core-crypto-transaction-validator-registration";
-import { ValidatorResignationTransaction } from "../../../../core-crypto-transaction-validator-resignation";
-import { VoteTransaction } from "../../../../core-crypto-transaction-vote";
-import { ServiceProvider as CoreCryptoValidation } from "../../../../core-crypto-validation";
-import { ServiceProvider as CoreCryptoWif } from "../../../../core-crypto-wif";
-import { ServiceProvider as CoreSerializer } from "../../../../core-serializer";
-import { ServiceProvider as CoreValidation } from "../../../../core-validation";
+import { ServiceProvider as CoreCryptoTransaction, TransactionRegistry } from "../../../../crypto-transaction";
+import { MultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment";
+import { MultiSignatureRegistrationTransaction } from "../../../../crypto-transaction-multi-signature-registration";
+import { TransferTransaction } from "../../../../crypto-transaction-transfer";
+import { ValidatorRegistrationTransaction } from "../../../../crypto-transaction-validator-registration";
+import { ValidatorResignationTransaction } from "../../../../crypto-transaction-validator-resignation";
+import { VoteTransaction } from "../../../../crypto-transaction-vote";
 import { Sandbox } from "../../app/sandbox";
 
 export const generateApp = async (

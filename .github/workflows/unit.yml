@@ -62,20 +62,20 @@ jobs:
               run: cd packages/crypto-signature-schnorr && pnpm run test
             - name: Test crypto-time
               run: cd packages/crypto-time && pnpm run test
-            - name: Test core-crypto-transaction
-              run: cd packages/core-crypto-transaction && pnpm run test
-            - name: Test core-crypto-transaction-multi-payment
-              run: cd packages/core-crypto-transaction-multi-payment && pnpm run test
-            - name: Test core-crypto-transaction-multi-signature-registration
-              run: cd packages/core-crypto-transaction-multi-signature-registration && pnpm run test
-            - name: Test core-crypto-transaction-transfer
-              run: cd packages/core-crypto-transaction-transfer && pnpm run test
-            - name: Test core-crypto-transaction-validator-registration
-              run: cd packages/core-crypto-transaction-validator-registration && pnpm run test
-            - name: Test core-crypto-transaction-validator-resignation
-              run: cd packages/core-crypto-transaction-validator-resignation && pnpm run test
-            - name: Test core-crypto-transaction-vote
-              run: cd packages/core-crypto-transaction-vote && pnpm run test
+            - name: Test crypto-transaction
+              run: cd packages/crypto-transaction && pnpm run test
+            - name: Test crypto-transaction-multi-payment
+              run: cd packages/crypto-transaction-multi-payment && pnpm run test
+            - name: Test crypto-transaction-multi-signature-registration
+              run: cd packages/crypto-transaction-multi-signature-registration && pnpm run test
+            - name: Test crypto-transaction-transfer
+              run: cd packages/crypto-transaction-transfer && pnpm run test
+            - name: Test crypto-transaction-validator-registration
+              run: cd packages/crypto-transaction-validator-registration && pnpm run test
+            - name: Test crypto-transaction-validator-resignation
+              run: cd packages/crypto-transaction-validator-resignation && pnpm run test
+            - name: Test crypto-transaction-vote
+              run: cd packages/crypto-transaction-vote && pnpm run test
             - name: Test core-crypto-validation
               run: cd packages/core-crypto-validation && pnpm run test
             - name: Test core-crypto-wif

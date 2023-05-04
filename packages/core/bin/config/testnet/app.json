@@ -40,25 +40,25 @@
 			"package": "@mainsail/core-fees-static"
 		},
 		{
-			"package": "@mainsail/core-crypto-transaction"
+			"package": "@mainsail/crypto-transaction"
 		},
 		{
-			"package": "@mainsail/core-crypto-transaction-validator-registration"
+			"package": "@mainsail/crypto-transaction-validator-registration"
 		},
 		{
-			"package": "@mainsail/core-crypto-transaction-validator-resignation"
+			"package": "@mainsail/crypto-transaction-validator-resignation"
 		},
 		{
-			"package": "@mainsail/core-crypto-transaction-multi-payment"
+			"package": "@mainsail/crypto-transaction-multi-payment"
 		},
 		{
-			"package": "@mainsail/core-crypto-transaction-multi-signature-registration"
+			"package": "@mainsail/crypto-transaction-multi-signature-registration"
 		},
 		{
-			"package": "@mainsail/core-crypto-transaction-transfer"
+			"package": "@mainsail/crypto-transaction-transfer"
 		},
 		{
-			"package": "@mainsail/core-crypto-transaction-vote"
+			"package": "@mainsail/crypto-transaction-vote"
 		},
 		{
 			"package": "@mainsail/core-logger-pino"

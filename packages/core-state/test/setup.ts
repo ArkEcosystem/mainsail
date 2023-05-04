@@ -32,7 +32,7 @@ import {
 	TransactionTypeFactory,
 	Utils,
 	Verifier,
-} from "../../core-crypto-transaction";
+} from "../../crypto-transaction";
 import { Validator } from "../../core-validation/source/validator";
 import { Signature } from "../../crypto-signature-schnorr/source/signature";
 import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";

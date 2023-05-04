@@ -3,12 +3,12 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/core-kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "../../../core-crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration";
-import { ValidatorResignationBuilder } from "../../../core-crypto-transaction-validator-resignation";
-import { VoteBuilder } from "../../../core-crypto-transaction-vote";
+import { MultiPaymentBuilder } from "../../../crypto-transaction-multi-payment";
+import { MultiSignatureBuilder } from "../../../crypto-transaction-multi-signature-registration";
+import { TransferBuilder } from "../../../crypto-transaction-transfer";
+import { ValidatorRegistrationBuilder } from "../../../crypto-transaction-validator-registration";
+import { ValidatorResignationBuilder } from "../../../crypto-transaction-validator-resignation";
+import { VoteBuilder } from "../../../crypto-transaction-vote";
 import secrets from "../internal/passphrases.json";
 import { getWalletNonce } from "./generic";
 

@@ -7,10 +7,10 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTime } from "@mainsail/crypto-time";
-import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/core-crypto-transaction";
-import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/core-crypto-transaction-transfer";
-import { ServiceProvider as CoreCryptoTransactionValidatorRegistration } from "@mainsail/core-crypto-transaction-validator-registration";
-import { ServiceProvider as CoreCryptoTransactionVote } from "@mainsail/core-crypto-transaction-vote";
+import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
+import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
+import { ServiceProvider as CoreCryptoTransactionValidatorRegistration } from "@mainsail/crypto-transaction-validator-registration";
+import { ServiceProvider as CoreCryptoTransactionVote } from "@mainsail/crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/core-crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/core-crypto-wif";
 import { ServiceProvider as CoreFees } from "@mainsail/core-fees";

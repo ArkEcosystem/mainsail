@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { TransactionBuilder } from "@mainsail/core-crypto-transaction";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
 import { registerTransactionFactory } from "../factories/factories/transaction";

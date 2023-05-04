@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application, Utils } from "@mainsail/core-kernel";
 
 import { Configuration } from "../../../crypto-config";
-import { VoteBuilder } from "../../../core-crypto-transaction-vote";
+import { VoteBuilder } from "../../../crypto-transaction-vote";
 import { describeSkip, Factories } from "../../../core-test-framework";
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { makeChainedBlocks } from "../../test/make-chained-block";
