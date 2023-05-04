@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/core-validation/source/validator";
+import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";

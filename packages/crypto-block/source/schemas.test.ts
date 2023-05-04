@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { schemas as kayPairSchemas } from "@mainsail/crypto-key-pair-schnorr";
 import { schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { makeKeywords, schemas as sharedSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/core-validation/source/validator";
+import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../test-framework";

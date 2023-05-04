@@ -63,7 +63,7 @@
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/transaction-pool": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
-		"@mainsail/core-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@mainsail/core-webhooks": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"argon2": "0.28.2",

@@ -25,7 +25,7 @@
 		"@mainsail/crypto-time": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/core-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@mainsail/utils": "1.3.1",
 		"ajv": "8.11.0",

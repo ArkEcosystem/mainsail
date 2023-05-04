@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
-import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
+import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import { Application } from "@mainsail/kernel";
 

@@ -35,7 +35,7 @@
 		"@mainsail/p2p": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/state": "workspace:*",
-		"@mainsail/core-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bip39": "3.0.4",
 		"bs58": "4.0.1",

@@ -40,7 +40,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/storage-lmdb": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
-		"@mainsail/core-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bip39": "3.0.4",
 		"dayjs": "1.10.7",

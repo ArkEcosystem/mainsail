@@ -91,9 +91,9 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
 
 		const serviceProviderOptions = {
-			klass: require("@mainsail/core-validation").ServiceProvider,
-			name: "@mainsail/core-validation",
-			path: "@mainsail/core-validation",
+			klass: require("@mainsail/validation").ServiceProvider,
+			name: "@mainsail/validation",
+			path: "@mainsail/validation",
 		};
 
 		assert.equal(await sandbox.registerServiceProvider(serviceProviderOptions), sandbox);

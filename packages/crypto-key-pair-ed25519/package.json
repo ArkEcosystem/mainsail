@@ -31,7 +31,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/core-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"bip39": "3.0.4",
 		"uvu": "^0.5.3"
 	}

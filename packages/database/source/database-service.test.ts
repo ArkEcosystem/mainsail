@@ -12,7 +12,7 @@ import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { ServiceProvider as CoreLmdb } from "@mainsail/storage-lmdb";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
+import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { BigNumber } from "@mainsail/utils";
 import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";

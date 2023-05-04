@@ -17,7 +17,7 @@ import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreValidation } from "@mainsail/core-validation";
+import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import { ConfigurationGenerator } from "./configuration-generator";
 import { ConfigurationWriter } from "./configuration-writer";

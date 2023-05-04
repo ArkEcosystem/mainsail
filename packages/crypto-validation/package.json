@@ -29,7 +29,7 @@
 		"uvu": "^0.5.3"
 	},
 	"devDependencies": {
-		"@mainsail/core-validation": "workspace:*"
+		"@mainsail/validation": "workspace:*"
 	},
 	"engines": {
 		"node": ">=16.x"

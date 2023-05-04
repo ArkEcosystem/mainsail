@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-validation",
+	"name": "@mainsail/validation",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",

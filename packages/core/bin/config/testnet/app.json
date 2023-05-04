@@ -1,7 +1,7 @@
 {
 	"plugins": [
 		{
-			"package": "@mainsail/core-validation"
+			"package": "@mainsail/validation"
 		},
 		{
 			"package": "@mainsail/crypto-config"

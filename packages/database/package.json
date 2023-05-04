@@ -41,7 +41,7 @@
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/storage-lmdb": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
-		"@mainsail/core-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"tmp": "0.2.1",
 		"uvu": "0.5.3"
 	},
