@@ -3,7 +3,7 @@ import { Providers } from "@mainsail/kernel";
 import { describe, Sandbox } from "../../../../test-framework";
 import { Server } from "@hapi/hapi";
 
-import { defaults as transactionPoolDefaults } from "../../../../core-transaction-pool/source/defaults";
+import { defaults as transactionPoolDefaults } from "../../../../transaction-pool/source/defaults";
 import { defaults } from "../../defaults";
 import { AcceptPeerPlugin } from "./accept-peer";
 
@@ -24,7 +24,7 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
-			.whenTargetTagged("plugin", "core-transaction-pool");
+			.whenTargetTagged("plugin", "transaction-pool");
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue(peerProcessor);
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue({});

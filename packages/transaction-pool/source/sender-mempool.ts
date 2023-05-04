@@ -5,7 +5,7 @@ import { Providers, Utils as AppUtils } from "@mainsail/kernel";
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-transaction-pool")
+	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.TransactionPoolSenderState)

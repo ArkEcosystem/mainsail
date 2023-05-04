@@ -3,7 +3,7 @@ import { Providers } from "@mainsail/kernel";
 import { describe, Sandbox } from "../../../test-framework";
 import rewiremock from "rewiremock";
 
-import { defaults as transactionPoolDefaults } from "../../../core-transaction-pool/source/defaults";
+import { defaults as transactionPoolDefaults } from "../../../transaction-pool/source/defaults";
 import { defaults } from "../defaults";
 import { plugin } from "../hapi-nes";
 import { Server } from "./server";
@@ -42,7 +42,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
-			.whenTargetTagged("plugin", "core-transaction-pool");
+			.whenTargetTagged("plugin", "transaction-pool");
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});

@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-transaction-pool':
-        specifier: workspace:*
-        version: link:../core-transaction-pool
       '@mainsail/core-transactions':
         specifier: workspace:*
         version: link:../core-transactions
@@ -660,6 +657,9 @@ importers:
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
+      '@mainsail/transaction-pool':
+        specifier: workspace:*
+        version: link:../transaction-pool
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,52 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-transaction-pool:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      better-sqlite3:
-        specifier: 8.3.0
-        version: 8.3.0
-      fs-extra:
-        specifier: 8.1.0
-        version: 8.1.0
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-    devDependencies:
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-time':
-        specifier: workspace:*
-        version: link:../crypto-time
-      '@types/better-sqlite3':
-        specifier: 5.4.3
-        version: 5.4.3
-      '@types/fs-extra':
-        specifier: 8.1.2
-        version: 8.1.2
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^13.0.1
-        version: 13.0.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/core-transactions:
     dependencies:
@@ -2750,6 +2704,52 @@ importers:
       joi:
         specifier: 17.4.2
         version: 17.4.2
+
+  packages/transaction-pool:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      better-sqlite3:
+        specifier: 8.3.0
+        version: 8.3.0
+      fs-extra:
+        specifier: 8.1.0
+        version: 8.1.0
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+    devDependencies:
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-time':
+        specifier: workspace:*
+        version: link:../crypto-time
+      '@types/better-sqlite3':
+        specifier: 5.4.3
+        version: 5.4.3
+      '@types/fs-extra':
+        specifier: 8.1.2
+        version: 8.1.2
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      sinon:
+        specifier: ^13.0.1
+        version: 13.0.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
 
   packages/utils:
     dependencies:

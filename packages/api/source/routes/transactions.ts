@@ -25,7 +25,7 @@ export const register = (server: Hapi.Server): void => {
 									.getTagged<Providers.PluginConfiguration>(
 										Identifiers.PluginConfiguration,
 										"plugin",
-										"core-transaction-pool",
+										"transaction-pool",
 									)
 									.get<number>("maxTransactionsPerRequest"),
 								minItems: 1,

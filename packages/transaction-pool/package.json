@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-transaction-pool",
+	"name": "@mainsail/transaction-pool",
 	"version": "0.0.1",
 	"description": "Transaction Pool Manager for ARK Core",
 	"license": "MIT",

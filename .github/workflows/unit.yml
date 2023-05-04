@@ -94,8 +94,8 @@ jobs:
               run: cd packages/state && pnpm run test
             - name: Test test-framework
               run: cd packages/test-framework && pnpm run test
-            - name: Test core-transaction-pool
-              run: cd packages/core-transaction-pool && pnpm run test
+            - name: Test transaction-pool
+              run: cd packages/transaction-pool && pnpm run test
             - name: Test core-transactions
               run: cd packages/core-transactions && pnpm run test
             - name: Test core-validation

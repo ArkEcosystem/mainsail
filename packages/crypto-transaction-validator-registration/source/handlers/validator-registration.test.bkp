@@ -7,7 +7,7 @@ import {
 import { Application, Enums as KernelEnums, Exceptions } from "@mainsail/kernel";
 import { Stores, Wallets } from "@mainsail/state";
 import { describe, Factories, Generators, Mocks, passphrases } from "@mainsail/test-framework";
-import { Mempool } from "@mainsail/core-transaction-pool";
+import { Mempool } from "@mainsail/transaction-pool";
 import { Crypto, Enums, Identities, Managers, Transactions, Utils } from "@mainsail/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";

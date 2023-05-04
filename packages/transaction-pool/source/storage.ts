@@ -7,7 +7,7 @@ import { ensureFileSync } from "fs-extra";
 @injectable()
 export class Storage implements Contracts.TransactionPool.Storage {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-transaction-pool")
+	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	#database!: BetterSqlite3.Database;

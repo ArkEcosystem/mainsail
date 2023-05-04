@@ -5,7 +5,7 @@ import { Enums, Providers, Utils as AppUtils } from "@mainsail/kernel";
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-transaction-pool")
+	@tagged("plugin", "transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.StateStore)

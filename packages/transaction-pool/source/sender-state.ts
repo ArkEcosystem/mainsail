@@ -5,7 +5,7 @@ import { Enums, Providers, Services } from "@mainsail/kernel";
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-transaction-pool")
+	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
