@@ -7,7 +7,7 @@ import {
 	MultiSignatureMinimumKeysError,
 } from "@mainsail/core-errors";
 import { Application, Exceptions, Services } from "@mainsail/kernel";
-import { Stores, Wallets } from "@mainsail/core-state";
+import { Stores, Wallets } from "@mainsail/state";
 import { describe, Factories, Generators, getWalletAttributeSet, passphrases } from "@mainsail/core-test-framework";
 import { Mempool } from "@mainsail/core-transaction-pool";
 import { Crypto, Enums, Errors, Identities, Managers, Transactions, Utils } from "@mainsail/crypto";

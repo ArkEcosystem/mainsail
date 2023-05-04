@@ -1,4 +1,4 @@
-import { Wallets } from "@mainsail/core-state";
+import { Wallets } from "@mainsail/state";
 import { BigNumber } from "@mainsail/utils";
 
 let mockNonce: BigNumber = BigNumber.make(1);

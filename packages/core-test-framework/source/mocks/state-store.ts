@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Stores } from "@mainsail/core-state";
+import { Stores } from "@mainsail/state";
 
 let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;
 let lastHeight = 0;

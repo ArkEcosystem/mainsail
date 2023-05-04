@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
-import { DatabaseInteraction } from "@mainsail/core-state";
+import { DatabaseInteraction } from "@mainsail/state";
 
 @injectable()
 export class GetCurrentRoundAction extends Services.Triggers.Action {

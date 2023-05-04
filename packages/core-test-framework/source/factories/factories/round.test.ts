@@ -1,4 +1,4 @@
-import { Wallets } from "@mainsail/core-state";
+import { Wallets } from "@mainsail/state";
 import { BigNumber } from "@mainsail/utils";
 
 import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";

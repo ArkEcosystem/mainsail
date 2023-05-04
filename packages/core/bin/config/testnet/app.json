@@ -64,7 +64,7 @@
 			"package": "@mainsail/logger-pino"
 		},
 		{
-			"package": "@mainsail/core-state"
+			"package": "@mainsail/state"
 		},
 		{
 			"package": "@mainsail/storage-lmdb"

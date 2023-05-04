@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Services } from "@mainsail/kernel";
-import { Actions } from "@mainsail/core-state";
+import { Actions } from "@mainsail/state";
 import { BigNumber } from "@mainsail/utils";
 import delay from "delay";
 import sinon from "sinon";

@@ -12,7 +12,7 @@ export class StateStore implements Contracts.State.StateStore {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-state")
+	@tagged("plugin", "state")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.LogService)

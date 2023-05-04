@@ -1,7 +1,7 @@
 // import { Contracts, Identifiers } from "@mainsail/contracts";
 // import { Configuration } from "@mainsail/crypto-config";
 // import { Services } from "@mainsail/kernel";
-// import { Actions } from "@mainsail/core-state";
+// import { Actions } from "@mainsail/state";
 // import { BigNumber } from "@mainsail/utils";
 
 // import { describe, Sandbox } from "../../../core-test-framework";

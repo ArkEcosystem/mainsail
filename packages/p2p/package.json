@@ -26,7 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/core-state": "workspace:*",
+		"@mainsail/state": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@hapi/boom": "9.0.0",
 		"@hapi/bounce": "2.0.0",

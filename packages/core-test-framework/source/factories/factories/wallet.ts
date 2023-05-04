@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
-import { Wallets } from "@mainsail/core-state";
+import { Wallets } from "@mainsail/state";
 import { generateMnemonic } from "bip39";
 import { join } from "path";
 

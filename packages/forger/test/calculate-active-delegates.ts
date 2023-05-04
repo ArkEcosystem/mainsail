@@ -1,5 +1,5 @@
 import { Services } from "@mainsail/kernel";
-import { Wallets } from "@mainsail/core-state";
+import { Wallets } from "@mainsail/state";
 import { Identities } from "@mainsail/crypto";
 
 export const calculateActiveDelegates = (): Wallets.Wallet[] => {

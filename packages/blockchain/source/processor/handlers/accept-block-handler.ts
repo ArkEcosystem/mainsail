@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { DatabaseInteraction } from "@mainsail/core-state";
+import { DatabaseInteraction } from "@mainsail/state";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
 import { RevertBlockHandler } from "./revert-block-handler";

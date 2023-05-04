@@ -221,9 +221,6 @@ importers:
       '@mainsail/blockchain':
         specifier: workspace:*
         version: link:../blockchain
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
       '@mainsail/core-test-framework':
         specifier: workspace:*
         version: link:../core-test-framework
@@ -233,6 +230,9 @@ importers:
       '@mainsail/p2p':
         specifier: workspace:*
         version: link:../p2p
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
       '@types/hapi__boom':
         specifier: 7.4.1
         version: 7.4.1
@@ -257,12 +257,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -558,9 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
       '@mainsail/core-test-framework':
         specifier: workspace:*
         version: link:../core-test-framework
@@ -657,6 +654,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
       '@mainsail/storage-lmdb':
         specifier: workspace:*
         version: link:../storage-lmdb
@@ -721,40 +721,6 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
 
-  packages/core-state:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      immutable:
-        specifier: 4.0.0-rc.14
-        version: 4.0.0-rc.14
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      lmdb:
-        specifier: 2.7.11
-        version: 2.7.11
-    devDependencies:
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^13.0.1
-        version: 13.0.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-
   packages/core-test-framework:
     dependencies:
       '@mainsail/blockchain':
@@ -772,9 +738,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
       '@mainsail/core-validation':
         specifier: workspace:*
         version: link:../core-validation
@@ -811,6 +774,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2333,9 +2299,9 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
     devDependencies:
-      '@mainsail/core-state':
+      '@mainsail/state':
         specifier: workspace:*
-        version: link:../core-state
+        version: link:../state
       '@types/node-forge':
         specifier: 0.10.4
         version: 0.10.4
@@ -2379,9 +2345,9 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
     devDependencies:
-      '@mainsail/core-state':
+      '@mainsail/state':
         specifier: workspace:*
-        version: link:../core-state
+        version: link:../state
       '@types/node-forge':
         specifier: 0.10.4
         version: 0.10.4
@@ -2637,15 +2603,15 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2728,6 +2694,40 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+
+  packages/state:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      immutable:
+        specifier: 4.0.0-rc.14
+        version: 4.0.0-rc.14
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      lmdb:
+        specifier: 2.7.11
+        version: 2.7.11
+    devDependencies:
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      sinon:
+        specifier: ^13.0.1
+        version: 13.0.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
 
   packages/storage-lmdb:
     dependencies:

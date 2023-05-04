@@ -22,7 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/core-state": "workspace:*",
+		"@mainsail/state": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "17.4.2",
 		"xstate": "4.23.4"

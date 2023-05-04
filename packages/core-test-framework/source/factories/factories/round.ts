@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Wallets } from "@mainsail/core-state";
+import { Wallets } from "@mainsail/state";
 import { BigNumber } from "@mainsail/utils";
 import { join } from "path";
 

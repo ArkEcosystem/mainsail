@@ -1,8 +1,8 @@
 import { injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
-import { Actions } from "@mainsail/core-state";
-import { Wallet } from "@mainsail/core-state/source/wallets";
+import { Actions } from "@mainsail/state";
+import { Wallet } from "@mainsail/state/source/wallets";
 import { spy } from "sinon";
 
 import { Sandbox } from "../../core-test-framework/source";

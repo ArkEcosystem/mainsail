@@ -37,7 +37,7 @@
 		"@mainsail/blockchain": "workspace:*",
 		"@mainsail/forger": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
-		"@mainsail/core-state": "workspace:*",
+		"@mainsail/state": "workspace:*",
 		"@mainsail/core-test-framework": "workspace:*",
 		"@types/hapi__boom": "7.4.1",
 		"@types/hapi__joi": "17.1.7",

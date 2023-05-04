@@ -1,6 +1,6 @@
 // import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 // import { Application } from "@mainsail/kernel";
-// import { Stores, Wallets } from "../../../core-state";
+// import { Stores, Wallets } from "../../../state";
 // import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "../../../core-test-framework";
 // // import { Crypto, Enums, Managers, Transactions, Utils } from "@mainsail/crypto";
 //
