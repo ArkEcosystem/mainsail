@@ -37,7 +37,7 @@
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
-		"@mainsail/core-crypto-time": "workspace:*",
+		"@mainsail/crypto-time": "workspace:*",
 		"@mainsail/core-crypto-transaction": "workspace:*",
 		"@mainsail/core-crypto-transaction-multi-payment": "workspace:*",
 		"@mainsail/core-crypto-transaction-multi-signature-registration": "workspace:*",

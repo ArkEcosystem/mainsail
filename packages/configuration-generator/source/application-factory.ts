@@ -6,7 +6,7 @@ import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
-import { ServiceProvider as CoreCryptoTime } from "@mainsail/core-crypto-time";
+import { ServiceProvider as CoreCryptoTime } from "@mainsail/crypto-time";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/core-crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/core-crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoTransactionValidatorRegistration } from "@mainsail/core-crypto-transaction-validator-registration";

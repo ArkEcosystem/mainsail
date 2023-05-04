@@ -60,8 +60,8 @@ jobs:
               run: cd packages/crypto-signature-ed25519 && pnpm run test
             - name: Test crypto-signature-schnorr
               run: cd packages/crypto-signature-schnorr && pnpm run test
-            - name: Test core-crypto-time
-              run: cd packages/core-crypto-time && pnpm run test
+            - name: Test crypto-time
+              run: cd packages/crypto-time && pnpm run test
             - name: Test core-crypto-transaction
               run: cd packages/core-crypto-transaction && pnpm run test
             - name: Test core-crypto-transaction-multi-payment

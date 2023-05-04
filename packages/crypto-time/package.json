@@ -1,5 +1,5 @@
 {
-	"name": "@mainsail/core-crypto-time",
+	"name": "@mainsail/crypto-time",
 	"version": "0.0.1",
 	"description": "Crypto utilities for the ARK Blockchain",
 	"license": "MIT",
