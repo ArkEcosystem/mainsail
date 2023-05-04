@@ -80,8 +80,8 @@ jobs:
               run: cd packages/crypto-validation && pnpm run test
             - name: Test crypto-wif
               run: cd packages/crypto-wif && pnpm run test
-            - name: Test core-forger
-              run: cd packages/core-forger && pnpm run test
+            - name: Test forger
+              run: cd packages/forger && pnpm run test
             - name: Test core-kernel
               run: cd packages/core-kernel && pnpm run test
             - name: Test core-logger-pino

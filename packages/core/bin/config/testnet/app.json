@@ -91,10 +91,10 @@
 			"package": "@mainsail/core-webhooks"
 		},
 		{
-			"package": "@mainsail/core-forger"
+			"package": "@mainsail/forger"
 		},
 		{
-			"package": "@mainsail/core-forger-tracker"
+			"package": "@mainsail/forger-tracker"
 		}
 	]
 }

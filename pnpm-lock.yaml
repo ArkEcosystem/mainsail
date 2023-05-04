@@ -221,9 +221,6 @@ importers:
       '@mainsail/blockchain':
         specifier: workspace:*
         version: link:../blockchain
-      '@mainsail/core-forger':
-        specifier: workspace:*
-        version: link:../core-forger
       '@mainsail/core-p2p':
         specifier: workspace:*
         version: link:../core-p2p
@@ -233,6 +230,9 @@ importers:
       '@mainsail/core-test-framework':
         specifier: workspace:*
         version: link:../core-test-framework
+      '@mainsail/forger':
+        specifier: workspace:*
+        version: link:../forger
       '@types/hapi__boom':
         specifier: 7.4.1
         version: 7.4.1
@@ -558,12 +558,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/core-forger':
-        specifier: workspace:*
-        version: link:../core-forger
-      '@mainsail/core-forger-tracker':
-        specifier: workspace:*
-        version: link:../core-forger-tracker
       '@mainsail/core-kernel':
         specifier: workspace:*
         version: link:../core-kernel
@@ -660,6 +654,12 @@ importers:
       '@mainsail/fees-static':
         specifier: workspace:*
         version: link:../fees-static
+      '@mainsail/forger':
+        specifier: workspace:*
+        version: link:../forger
+      '@mainsail/forger-tracker':
+        specifier: workspace:*
+        version: link:../forger-tracker
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -720,98 +720,6 @@ importers:
       wif:
         specifier: 2.0.6
         version: 2.0.6
-
-  packages/core-forger:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/core-p2p':
-        specifier: workspace:*
-        version: link:../core-p2p
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      node-forge:
-        specifier: 1.2.1
-        version: 1.2.1
-      wif:
-        specifier: 2.0.6
-        version: 2.0.6
-    devDependencies:
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
-      '@types/node-forge':
-        specifier: 0.10.4
-        version: 0.10.4
-      '@types/wif':
-        specifier: 2.0.2
-        version: 2.0.2
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^12.0.1
-        version: 12.0.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
-
-  packages/core-forger-tracker:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/core-kernel':
-        specifier: workspace:*
-        version: link:../core-kernel
-      '@mainsail/core-p2p':
-        specifier: workspace:*
-        version: link:../core-p2p
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.4.2
-        version: 17.4.2
-      node-forge:
-        specifier: 1.2.1
-        version: 1.2.1
-      wif:
-        specifier: 2.0.6
-        version: 2.0.6
-    devDependencies:
-      '@mainsail/core-state':
-        specifier: workspace:*
-        version: link:../core-state
-      '@types/node-forge':
-        specifier: 0.10.4
-        version: 0.10.4
-      '@types/wif':
-        specifier: 2.0.2
-        version: 2.0.2
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^12.0.1
-        version: 12.0.1
-      uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
 
   packages/core-kernel:
     dependencies:
@@ -2750,6 +2658,98 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+
+  packages/forger:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/core-p2p':
+        specifier: workspace:*
+        version: link:../core-p2p
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      node-forge:
+        specifier: 1.2.1
+        version: 1.2.1
+      wif:
+        specifier: 2.0.6
+        version: 2.0.6
+    devDependencies:
+      '@mainsail/core-state':
+        specifier: workspace:*
+        version: link:../core-state
+      '@types/node-forge':
+        specifier: 0.10.4
+        version: 0.10.4
+      '@types/wif':
+        specifier: 2.0.2
+        version: 2.0.2
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      sinon:
+        specifier: ^12.0.1
+        version: 12.0.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
+
+  packages/forger-tracker:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/core-kernel':
+        specifier: workspace:*
+        version: link:../core-kernel
+      '@mainsail/core-p2p':
+        specifier: workspace:*
+        version: link:../core-p2p
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 17.4.2
+        version: 17.4.2
+      node-forge:
+        specifier: 1.2.1
+        version: 1.2.1
+      wif:
+        specifier: 2.0.6
+        version: 2.0.6
+    devDependencies:
+      '@mainsail/core-state':
+        specifier: workspace:*
+        version: link:../core-state
+      '@types/node-forge':
+        specifier: 0.10.4
+        version: 0.10.4
+      '@types/wif':
+        specifier: 2.0.2
+        version: 2.0.2
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
+      sinon:
+        specifier: ^12.0.1
+        version: 12.0.1
+      uvu:
+        specifier: ^0.5.3
+        version: 0.5.3
 
   packages/utils:
     dependencies:

@@ -35,7 +35,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/blockchain": "workspace:*",
-		"@mainsail/core-forger": "workspace:*",
+		"@mainsail/forger": "workspace:*",
 		"@mainsail/core-p2p": "workspace:*",
 		"@mainsail/core-state": "workspace:*",
 		"@mainsail/core-test-framework": "workspace:*",
