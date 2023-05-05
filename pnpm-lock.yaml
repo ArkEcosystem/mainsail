@@ -73,12 +73,6 @@ importers:
       madge:
         specifier: 4.0.1
         version: 4.0.1
-      moment:
-        specifier: 2.29.1
-        version: 2.29.1
-      moment-timezone:
-        specifier: 0.5.33
-        version: 0.5.33
       nock:
         specifier: 13.1.3
         version: 13.1.3
@@ -2122,6 +2116,9 @@ importers:
       capture-console:
         specifier: 1.0.1
         version: 1.0.1
+      moment-timezone:
+        specifier: 0.5.33
+        version: 0.5.33
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
