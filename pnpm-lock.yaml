@@ -4,9 +4,6 @@ importers:
 
   .:
     devDependencies:
-      '@noble/hashes':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@oclif/dev-cli':
         specifier: 1.26.0
         version: 1.26.0
@@ -4020,6 +4017,7 @@ packages:
 
   /@noble/hashes@1.0.0:
     resolution: {integrity: sha512-DZVbtY62kc3kkBtMHqwCOfXrT/hnoORy5BJ4+HU1IR59X0KWAOqsfzQPcUl/lQLlG7qXbe/fZ3r/emxtAl+sqg==}
+    dev: false
 
   /@noble/secp256k1@1.5.2:
     resolution: {integrity: sha512-5mzA40W2q55VCRuC9XzmkiEnODdY0c5a7qsK2QcOfI5/MuVQyBaWGQyE6YOEF7kDwp+tDVWGsCDVJUME+wsWWw==}
