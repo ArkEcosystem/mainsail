@@ -26,7 +26,6 @@
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
-		"@types/depcheck": "0.9.1",
 		"@types/js-yaml": "3.12.7",
 		"@types/node": "13.9.5",
 		"@types/prettier": "2.3.2",
@@ -40,7 +39,6 @@
 		"create-hash": "1.2.0",
 		"cross-env": "7.0.3",
 		"del-cli": "3.0.1",
-		"depcheck": "1.4.2",
 		"eslint": "^8.3.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.3",
