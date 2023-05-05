@@ -1,4 +1,3 @@
-import nock from "nock";
 import prompts from "prompts";
 
 import { Console, describe } from "../../../test-framework";
@@ -11,7 +10,7 @@ describe<{
 	cli: Console;
 	updater: Updater;
 	config: Config;
-}>("Updater", ({ beforeAll, beforeEach, afterAll, it, stub, spy, assert }) => {
+}>("Updater", ({ beforeAll, beforeEach, afterAll, it, stub, spy, assert, nock }) => {
 	beforeEach((context) => {
 		nock.cleanAll();
 
