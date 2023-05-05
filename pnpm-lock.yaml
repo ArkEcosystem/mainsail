@@ -4,9 +4,6 @@ importers:
 
   .:
     devDependencies:
-      '@types/create-hash':
-        specifier: 1.2.2
-        version: 1.2.2
       '@types/depcheck':
         specifier: 0.9.1
         version: 0.9.1
@@ -5060,12 +5057,6 @@ packages:
     deprecated: This is a stub types definition. ci-info provides its own type definitions, so you do not need this installed.
     dependencies:
       ci-info: 3.8.0
-    dev: true
-
-  /@types/create-hash@1.2.2:
-    resolution: {integrity: sha512-Fg8/kfMJObbETFU/Tn+Y0jieYewryLrbKwLCEIwPyklZZVY2qB+64KFjhplGSw+cseZosfFXctXO+PyIYD8iZQ==}
-    dependencies:
-      '@types/node': 13.9.5
     dev: true
 
   /@types/cron@1.7.3:

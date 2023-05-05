@@ -26,7 +26,6 @@
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
-		"@types/create-hash": "1.2.2",
 		"@types/depcheck": "0.9.1",
 		"@types/js-yaml": "3.12.7",
 		"@types/node": "13.9.5",
