@@ -26,11 +26,8 @@
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
-		"@babel/core": "7.15.5",
-		"@babel/preset-env": "7.15.4",
 		"@noble/hashes": "^1.0.0",
 		"@oclif/dev-cli": "1.26.0",
-		"@types/babel__core": "7.1.16",
 		"@types/create-hash": "1.2.2",
 		"@types/depcheck": "0.9.1",
 		"@types/js-yaml": "3.12.7",
@@ -39,7 +36,6 @@
 		"@types/uuid": "8.3.1",
 		"@typescript-eslint/eslint-plugin": "^5.0",
 		"@typescript-eslint/parser": "^5.0",
-		"babel-loader": "8.2.2",
 		"c8": "~7.10.0",
 		"capture-console": "1.0.1",
 		"chalk": "4.1.2",
