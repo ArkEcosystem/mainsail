@@ -22,9 +22,6 @@ importers:
       c8:
         specifier: ~7.10.0
         version: 7.10.0
-      capture-console:
-        specifier: 1.0.1
-        version: 1.0.1
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -2149,6 +2146,9 @@ importers:
       '@types/semver':
         specifier: 6.2.3
         version: 6.2.3
+      capture-console:
+        specifier: 1.0.1
+        version: 1.0.1
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -2211,6 +2211,9 @@ importers:
       '@types/split2':
         specifier: 2.1.6
         version: 2.1.6
+      capture-console:
+        specifier: 1.0.1
+        version: 1.0.1
       import-fresh:
         specifier: 3.3.0
         version: 3.3.0
