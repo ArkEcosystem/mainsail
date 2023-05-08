@@ -1,5 +1,7 @@
 # Mainsail
 
+![Logo](logo.jpeg)
+
 > **Warning**
 > Mainsail is experimental PoC and should only be used for testing purposes. It is not intended for use in production environments and should be used at your own risk.
 
