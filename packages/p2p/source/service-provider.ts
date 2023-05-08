@@ -1,5 +1,5 @@
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Types, Utils } from "@mainsail/kernel";
+import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
@@ -106,8 +106,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	async #buildServer(): Promise<void> {
 		const server: Server = this.app.get<Server>(Identifiers.P2PServer);
-		const serverConfig = this.config().get<Types.JsonObject>("server");
-		Utils.assert.defined<Types.JsonObject>(serverConfig);
+		const serverConfig = this.config().get<Contracts.Types.JsonObject>("server");
+		Utils.assert.defined<Contracts.Types.JsonObject>(serverConfig);
 
 		await server.initialize("P2P Server", serverConfig);
 	}

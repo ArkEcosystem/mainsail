@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { blue } from "kleur";
-import { PackageJson } from "type-fest";
 
 import { AppHeader } from "../components";
 import { Application } from "../contracts";
@@ -12,7 +12,7 @@ export class CommandHelp {
 	protected readonly app!: Application;
 
 	@inject(Identifiers.Package)
-	protected readonly pkg!: PackageJson;
+	protected readonly pkg!: Contracts.Types.PackageJson;
 
 	public render(command): string {
 		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}

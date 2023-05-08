@@ -1,11 +1,9 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { JsonObject } from "../../../types";
-
 @injectable()
 export class NullValidator implements Contracts.Kernel.Validator {
-	public validate(data: JsonObject, schema: object): void {
+	public validate(data: Contracts.Types.JsonObject, schema: object): void {
 		//
 	}
 
@@ -25,15 +23,15 @@ export class NullValidator implements Contracts.Kernel.Validator {
 		return {};
 	}
 
-	public valid(): JsonObject | undefined {
+	public valid(): Contracts.Types.JsonObject | undefined {
 		return undefined;
 	}
 
-	public invalid(): JsonObject {
+	public invalid(): Contracts.Types.JsonObject {
 		return {};
 	}
 
-	public attributes(): JsonObject {
+	public attributes(): Contracts.Types.JsonObject {
 		return {};
 	}
 }

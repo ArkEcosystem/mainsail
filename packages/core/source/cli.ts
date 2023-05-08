@@ -1,14 +1,21 @@
-import { ApplicationFactory, Commands, Contracts, Identifiers, InputParser, Plugins } from "@mainsail/cli";
+import {
+	ApplicationFactory,
+	Commands,
+	Contracts as CliContracts,
+	Identifiers,
+	InputParser,
+	Plugins,
+} from "@mainsail/cli";
 import { Container, injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
 import { platform } from "os";
 import { join, resolve } from "path";
-import { PackageJson } from "type-fest";
 
 @injectable()
 export class CommandLineInterface {
-	#app!: Contracts.Application;
+	#app!: CliContracts.Application;
 
 	public constructor(private readonly argv: string[]) {}
 
@@ -17,19 +24,19 @@ export class CommandLineInterface {
 		this.#setNodePath();
 
 		// Load the package information. Only needed for updates and installations.
-		const package_: PackageJson = require("../package.json");
+		const package_: Contracts.Types.PackageJson = require("../package.json");
 
 		// Create the application we will work with
 		this.#app = ApplicationFactory.make(new Container(), package_);
 
 		// Check for updates
-		await this.#app.get<Contracts.Updater>(Identifiers.Updater).check();
+		await this.#app.get<CliContracts.Updater>(Identifiers.Updater).check();
 
 		// Parse arguments and flags
 		const { args, flags } = InputParser.parseArgv(this.argv);
 
 		// Discover commands and commands from plugins
-		const commands: Contracts.CommandList = await this.#discoverCommands(dirname, flags);
+		const commands: CliContracts.CommandList = await this.#discoverCommands(dirname, flags);
 
 		// Figure out what command we should run and offer help if necessary
 		let commandSignature: string | undefined = args[0];
@@ -121,15 +128,15 @@ export class CommandLineInterface {
 		return temporaryFlags;
 	}
 
-	async #discoverCommands(dirname: string, flags: any): Promise<Contracts.CommandList> {
+	async #discoverCommands(dirname: string, flags: any): Promise<CliContracts.CommandList> {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
-		const commands: Contracts.CommandList = commandsDiscoverer.within(resolve(dirname, "./commands"));
+		const commands: CliContracts.CommandList = commandsDiscoverer.within(resolve(dirname, "./commands"));
 
 		const temporaryFlags = await this.#detectNetworkAndToken(flags);
 
 		if (temporaryFlags.network) {
 			const plugins = await this.#app
-				.get<Contracts.PluginManager>(Identifiers.PluginManager)
+				.get<CliContracts.PluginManager>(Identifiers.PluginManager)
 				.list(temporaryFlags.token, temporaryFlags.network);
 
 			const commandsFromPlugins = commandsDiscoverer.from(plugins.map((plugin) => plugin.path));

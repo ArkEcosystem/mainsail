@@ -6,7 +6,7 @@ import importFresh from "import-fresh";
 import Joi from "joi";
 import { extname } from "path";
 
-import { JsonObject, KeyValuePair, Primitive } from "../../../types";
+import { KeyValuePair } from "../../../types";
 import { assert } from "../../../utils";
 import { ConfigRepository } from "../repository";
 
@@ -23,7 +23,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
-			const config: Record<string, Primitive> = dotenv.parseFile(this.app.environmentFile());
+			const config: Record<string, Contracts.Types.Primitive> = dotenv.parseFile(this.app.environmentFile());
 
 			for (const [key, value] of Object.entries(config)) {
 				if (process.env[key] === undefined) {
@@ -66,7 +66,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		}
 
 		this.configRepository.set("app.flags", {
-			...this.app.get<JsonObject>(Identifiers.ConfigFlags),
+			...this.app.get<Contracts.Types.JsonObject>(Identifiers.ConfigFlags),
 			...get(this.validationService.valid(), "flags", {}),
 		});
 

@@ -273,9 +273,6 @@ importers:
       tar:
         specifier: 6.1.11
         version: 6.1.11
-      type-fest:
-        specifier: 0.21.3
-        version: 0.21.3
       yargs-parser:
         specifier: 20.2.9
         version: 20.2.9
@@ -597,9 +594,6 @@ importers:
       tmp:
         specifier: 0.2.1
         version: 0.2.1
-      type-fest:
-        specifier: 0.21.3
-        version: 0.21.3
       uvu:
         specifier: ^0.5.3
         version: 0.5.3
@@ -1785,9 +1779,6 @@ importers:
       semver:
         specifier: 6.3.0
         version: 6.3.0
-      type-fest:
-        specifier: 0.21.3
-        version: 0.21.3
     devDependencies:
       '@types/cron':
         specifier: 1.7.3
@@ -2293,8 +2284,8 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0
       type-fest:
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: 0.21.3
+        version: 0.21.3
     devDependencies:
       '@hapi/boom':
         specifier: ^9.1.0
@@ -14855,11 +14846,6 @@ packages:
     resolution: {integrity: sha512-eaBzG6MxNzEn9kiwvtre90cXaNLkmadMWa1zQMs3XORCXNbsH/OewwbxC5ia9dCxIxnTAsSxXJaa/p5y8DlvJg==}
     engines: {node: '>=10'}
     dev: true
-
-  /type-fest@0.17.0:
-    resolution: {integrity: sha512-EFi9HE4hHj85XnVV80uAUMgICQmhxYgiEvtmfpcD6jqn6zYr36HxAU6k+i/DSY28TK7/lYL0s4v/kWmiKdqaoA==}
-    engines: {node: '>=10'}
-    dev: false
 
   /type-fest@0.18.1:
     resolution: {integrity: sha512-OIAYXk8+ISY+qTOwkHtKqzAuxchoMiD9Udx+FSGQDuiRR+PJKJHc2NJAXlbhkGwTt/4/nKZxELY1w3ReWOL8mw==}

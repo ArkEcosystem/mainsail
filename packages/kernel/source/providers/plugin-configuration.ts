@@ -1,10 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { get, has, set, unset } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 
 import { ConfigRepository } from "../services/config";
-import { JsonObject } from "../types";
 
 // @TODO review the implementation
 
@@ -13,9 +12,9 @@ export class PluginConfiguration {
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
-	#items: JsonObject = {};
+	#items: Contracts.Types.JsonObject = {};
 
-	public from(name: string, config: JsonObject): this {
+	public from(name: string, config: Contracts.Types.JsonObject): this {
 		this.#items = config;
 
 		this.#mergeWithGlobal(name);
@@ -35,7 +34,7 @@ export class PluginConfiguration {
 		return this;
 	}
 
-	public merge(values: JsonObject | undefined): this {
+	public merge(values: Contracts.Types.JsonObject | undefined): this {
 		if (values) {
 			this.#items = deepmerge(this.#items, values, {
 				arrayMerge: (destination, source) => source,
@@ -45,7 +44,7 @@ export class PluginConfiguration {
 		return this;
 	}
 
-	public all(): JsonObject {
+	public all(): Contracts.Types.JsonObject {
 		return this.#items;
 	}
 

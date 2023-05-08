@@ -1,7 +1,6 @@
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Types } from "@mainsail/kernel";
 
 import { plugin as hapiNesPlugin } from "../hapi-nes";
 import { AcceptPeerPlugin } from "./plugins/accept-peer";
@@ -32,7 +31,7 @@ export class Server {
 
 	private name!: string;
 
-	public async initialize(name: string, optionsServer: Types.JsonObject): Promise<void> {
+	public async initialize(name: string, optionsServer: Contracts.Types.JsonObject): Promise<void> {
 		this.name = name;
 
 		const address = optionsServer.hostname;

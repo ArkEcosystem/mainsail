@@ -2,7 +2,7 @@ import { badData } from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Types, Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
 
 import * as Schemas from "./schemas";
@@ -28,7 +28,7 @@ export class Server {
 		return this.server.info.uri;
 	}
 
-	public async initialize(name: string, optionsServer: Types.JsonObject): Promise<void> {
+	public async initialize(name: string, optionsServer: Contracts.Types.JsonObject): Promise<void> {
 		this.name = name;
 		this.server = new HapiServer(this.getServerOptions(optionsServer));
 

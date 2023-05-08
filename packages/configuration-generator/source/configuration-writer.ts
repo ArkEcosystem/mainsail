@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Types } from "@mainsail/kernel";
 import { stringifySync } from "envfile";
 import { writeFileSync, writeJSONSync } from "fs-extra";
 import path from "path";
@@ -13,7 +12,7 @@ export class ConfigurationWriter {
 	@inject(Identifiers.ConfigurationPath)
 	private configurationPath: string;
 
-	writeApp(appData: Types.JsonObject): void {
+	writeApp(appData: Contracts.Types.JsonObject): void {
 		writeJSONSync(path.join(this.configurationPath, "app.json"), appData, {
 			spaces: 4,
 		});

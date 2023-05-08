@@ -1,7 +1,7 @@
 import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration-generator";
 import { Container, interfaces } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Application, Providers, Types } from "@mainsail/kernel";
+import { Application, Providers } from "@mainsail/kernel";
 import { readJSONSync, removeSync } from "fs-extra";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -107,7 +107,7 @@ export class Sandbox {
 	}: {
 		name: string;
 		path: string;
-		klass: Types.Class<any>;
+		klass: Contracts.Types.Class<any>;
 	}): Promise<this> {
 		const serviceProvider: Providers.ServiceProvider = this.app.resolve<any>(klass);
 		// serviceProvider.setManifest(this.app.resolve(Providers.PluginManifest).discover(path)); // TODO: Check resolve path

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { Options, Ora } from "ora";
-import { JsonObject } from "type-fest";
 
 import {
 	AppHeader,
@@ -106,7 +106,7 @@ export class ComponentFactory {
 		return this.app.get<NewLine>(Identifiers.NewLine).render(count);
 	}
 
-	public async prompt(options: object): Promise<JsonObject> {
+	public async prompt(options: object): Promise<Contracts.Types.JsonObject> {
 		return this.app.get<Prompt>(Identifiers.Prompt).render(options);
 	}
 

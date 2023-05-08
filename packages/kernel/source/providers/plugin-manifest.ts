@@ -1,11 +1,10 @@
 import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { get, has } from "@mainsail/utils";
-
-import { PackageJson } from "../types";
 
 @injectable()
 export class PluginManifest {
-	#manifest!: PackageJson;
+	#manifest!: Contracts.Types.JsonObject;
 
 	public discover(packageId: string): this {
 		this.#manifest = require(`${packageId}/package.json`);
@@ -21,7 +20,7 @@ export class PluginManifest {
 		return has(this.#manifest, key);
 	}
 
-	public merge(manifest: PackageJson): this {
+	public merge(manifest: Contracts.Types.JsonObject): this {
 		this.#manifest = { ...this.#manifest, ...manifest };
 
 		return this;

@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { minBy } from "@mainsail/utils";
 import Levenshtein from "fast-levenshtein";
 import { blue, red } from "kleur";
-import { JsonObject } from "type-fest";
 
 import { Application } from "../application";
 import { Identifiers } from "../ioc";
@@ -12,7 +12,7 @@ export class SuggestCommand {
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	public async execute(context: JsonObject): Promise<string | undefined> {
+	public async execute(context: Contracts.Types.JsonObject): Promise<string | undefined> {
 		const signature: string = context.signature as string;
 
 		if (!signature) {

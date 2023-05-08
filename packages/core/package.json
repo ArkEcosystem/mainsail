@@ -78,7 +78,6 @@
 		"kleur": "4.1.4",
 		"prompts": "2.4.0",
 		"tmp": "0.2.1",
-		"type-fest": "0.21.3",
 		"uvu": "^0.5.3"
 	},
 	"peerDependencies": {

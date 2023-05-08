@@ -43,7 +43,6 @@
 		"read-last-lines": "1.8.0",
 		"semver": "6.3.0",
 		"tar": "6.1.11",
-		"type-fest": "0.21.3",
 		"yargs-parser": "20.2.9"
 	},
 	"devDependencies": {

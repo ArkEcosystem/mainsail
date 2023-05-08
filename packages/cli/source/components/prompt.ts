@@ -1,10 +1,10 @@
 import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import prompts from "prompts";
-import { JsonObject } from "type-fest";
 
 @injectable()
 export class Prompt {
-	public async render(options: object): Promise<JsonObject> {
+	public async render(options: object): Promise<Contracts.Types.JsonObject> {
 		return prompts(options);
 	}
 }

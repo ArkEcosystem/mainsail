@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Types } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { Database } from "./database";
@@ -17,7 +17,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// Setup Server...
 		this.app.bind(InternalIdentifiers.Server).to(Server).inSingletonScope();
 
-		await this.app.get<Server>(InternalIdentifiers.Server).register(this.config().get<Types.JsonObject>("server")!);
+		await this.app
+			.get<Server>(InternalIdentifiers.Server)
+			.register(this.config().get<Contracts.Types.JsonObject>("server")!);
 
 		// Setup Listeners...
 		this.#startListeners();
