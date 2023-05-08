@@ -25,6 +25,7 @@
 		"@mainsail/utils": "workspace:*",
 		"joi": "17.4.2"
 	},
+	"devDependencies": {},
 	"engines": {
 		"node": ">=16.x"
 	}

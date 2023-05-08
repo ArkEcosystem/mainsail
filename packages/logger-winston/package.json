@@ -24,6 +24,7 @@
 		"joi": "17.4.2",
 		"winston": "^3.6.0"
 	},
+	"devDependencies": {},
 	"engines": {
 		"node": ">=16.x"
 	}

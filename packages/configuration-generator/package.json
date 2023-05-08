@@ -47,6 +47,9 @@
 		"fs-extra": "8.1.0"
 	},
 	"devDependencies": {
+		"@types/env-paths": "2.1.0",
+		"@types/fs-extra": "8.1.0",
+		"@types/tmp": "0.2.1",
 		"tmp": "0.2.1",
 		"uvu": "^0.5.3"
 	},

@@ -30,6 +30,8 @@
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
 		"@types/async": "3.2.7",
+		"@types/delay": "3.1.0",
+		"@types/sinon": "^10.0.14",
 		"delay": "4.4.1",
 		"import-fresh": "3.3.0",
 		"sinon": "^12.0.1",

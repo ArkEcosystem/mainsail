@@ -39,11 +39,17 @@
 		"semver": "6.3.0"
 	},
 	"devDependencies": {
+		"@types/capture-console": "1.0.1",
+		"@types/chalk": "2.2.0",
 		"@types/cron": "1.7.3",
+		"@types/deepmerge": "2.2.0",
+		"@types/env-paths": "2.1.0",
 		"@types/fs-extra": "8.1.2",
+		"@types/glob": "8.1.0",
 		"@types/got": "9.6.12",
 		"@types/log-process-errors": "4.1.0",
 		"@types/semver": "6.2.3",
+		"@types/tmp": "0.2.1",
 		"capture-console": "1.0.1",
 		"moment-timezone": "0.5.33",
 		"tmp": "0.2.1",

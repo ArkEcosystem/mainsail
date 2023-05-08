@@ -46,11 +46,20 @@
 		"yargs-parser": "20.2.9"
 	},
 	"devDependencies": {
+		"@types/boxen": "3.0.1",
+		"@types/env-paths": "2.1.0",
+		"@types/execa": "2.0.0",
 		"@types/fast-levenshtein": "0.0.2",
 		"@types/fs-extra": "8.1.2",
+		"@types/glob": "8.1.0",
 		"@types/is-ci": "2.0.0",
+		"@types/latest-version": "4.0.1",
 		"@types/listr": "0.14.4",
+		"@types/ora": "3.2.0",
+		"@types/prompts": "2.4.0",
 		"@types/semver": "6.2.3",
+		"@types/tar": "6.1.4",
+		"@types/tmp": "0.2.1",
 		"@types/yargs-parser": "20.2.1",
 		"tmp": "0.2.1",
 		"uvu": "^0.5.3"

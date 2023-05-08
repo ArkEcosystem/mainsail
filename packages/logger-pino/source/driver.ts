@@ -80,8 +80,9 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		}
 
 		if (this.#isValidLevel(options.levels.file)) {
-			this.#combinedFileStream = pumpify(
+			this.#combinedFileStream = new pumpify(
 				split(),
+				// @ts-ignore
 				this.#createPrettyTransport(options.levels.file, { colorize: false }),
 				this.#getFileStream(options.fileRotator),
 			);

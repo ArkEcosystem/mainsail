@@ -26,7 +26,14 @@
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
+		"@types/chalk": "^2.2.0",
+		"@types/eslint": "^8.37.0",
+		"@types/eslint-config-prettier": "^6.11.0",
+		"@types/eslint-plugin-prettier": "^3.1.0",
+		"@types/lint-staged": "^13.2.0",
+		"@types/madge": "^5.0.0",
 		"@types/node": "20.1.0",
+		"@types/prettier": "^2.7.2",
 		"@typescript-eslint/eslint-plugin": "^5.0",
 		"@typescript-eslint/parser": "^5.0",
 		"c8": "^7.13.0",

@@ -80,6 +80,14 @@
 		"tmp": "0.2.1",
 		"uvu": "^0.5.3"
 	},
+	"devDependencies": {
+		"@types/boxen": "3.0.1",
+		"@types/env-paths": "2.1.0",
+		"@types/execa": "2.0.0",
+		"@types/fs-extra": "8.1.0",
+		"@types/prompts": "2.4.0",
+		"@types/tmp": "0.2.1"
+	},
 	"peerDependencies": {
 		"pm2": "^4.5.0"
 	},
