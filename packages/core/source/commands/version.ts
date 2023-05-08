@@ -1,4 +1,4 @@
-import { Commands, Container } from "@mainsail/cli";
+import { Commands, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { PackageJson } from "type-fest";
 
@@ -11,6 +11,6 @@ export class Command extends Commands.Command {
 	public requiresNetwork = false;
 
 	public async execute(): Promise<void> {
-		console.log(this.app.get<PackageJson>(Container.Identifiers.Package).version);
+		console.log(this.app.get<PackageJson>(Identifiers.Package).version);
 	}
 }

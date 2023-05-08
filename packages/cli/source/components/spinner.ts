@@ -1,6 +1,5 @@
+import { injectable } from "@mainsail/container";
 import ora, { Options, Ora } from "ora";
-
-import { injectable } from "../ioc";
 
 @injectable()
 export class Spinner {

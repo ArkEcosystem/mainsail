@@ -1,10 +1,11 @@
+import { Container } from "@mainsail/container";
 import { Options as OraOptions, Ora } from "ora";
 import os from "os";
 
 import { describe } from "../../../test-framework";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
-import { Container, Identifiers } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";

@@ -1,10 +1,10 @@
+import { injectable } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { parseFileSync, stringifySync } from "envfile";
 import { existsSync, writeFileSync } from "fs-extra";
 import path from "path";
 
 import { envPaths as environmentPaths, Paths } from "../env-paths";
-import { injectable } from "../ioc";
 
 @injectable()
 export class Environment {

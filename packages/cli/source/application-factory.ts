@@ -1,3 +1,4 @@
+import { Container, interfaces } from "@mainsail/container";
 import { PackageJson } from "type-fest";
 
 import { ActionFactory } from "./action-factory";
@@ -44,7 +45,7 @@ import {
 } from "./components";
 import { envPaths as environmentPaths } from "./env-paths";
 import { Input, InputValidator } from "./input";
-import { Container, Identifiers, interfaces } from "./ioc";
+import { Identifiers } from "./ioc";
 import { Output } from "./output";
 import { Config, Environment, Installer, Logger, PluginManager, ProcessManager, Updater } from "./services";
 import { Process } from "./utils";

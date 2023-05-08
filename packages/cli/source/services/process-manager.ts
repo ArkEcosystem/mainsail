@@ -1,6 +1,7 @@
+import { injectable } from "@mainsail/container";
+
 import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts";
 import { execa, ExecaReturnValue, ExecaSyncReturnValue } from "../execa";
-import { injectable } from "../ioc";
 import { Flags } from "../utils";
 
 @injectable()

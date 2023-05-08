@@ -1,10 +1,10 @@
-import { Commands, Container, Contracts } from "@mainsail/cli";
+import { Commands, Contracts, Identifiers } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Container.Identifiers.PluginManager)
+	@inject(Identifiers.PluginManager)
 	private readonly pluginManager!: Contracts.PluginManager;
 
 	public signature = "plugin:install";

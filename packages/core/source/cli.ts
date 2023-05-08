@@ -1,5 +1,5 @@
-import { ApplicationFactory, Commands, Container, Contracts, InputParser, Plugins } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { ApplicationFactory, Commands, Contracts, Identifiers, InputParser, Plugins } from "@mainsail/cli";
+import { Container, injectable } from "@mainsail/container";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
 import { platform } from "os";
@@ -20,10 +20,10 @@ export class CommandLineInterface {
 		const package_: PackageJson = require("../package.json");
 
 		// Create the application we will work with
-		this.#app = ApplicationFactory.make(new Container.Container(), package_);
+		this.#app = ApplicationFactory.make(new Container(), package_);
 
 		// Check for updates
-		await this.#app.get<Contracts.Updater>(Container.Identifiers.Updater).check();
+		await this.#app.get<Contracts.Updater>(Identifiers.Updater).check();
 
 		// Parse arguments and flags
 		const { args, flags } = InputParser.parseArgv(this.argv);
@@ -129,7 +129,7 @@ export class CommandLineInterface {
 
 		if (temporaryFlags.network) {
 			const plugins = await this.#app
-				.get<Contracts.PluginManager>(Container.Identifiers.PluginManager)
+				.get<Contracts.PluginManager>(Identifiers.PluginManager)
 				.list(temporaryFlags.token, temporaryFlags.network);
 
 			const commandsFromPlugins = commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
@@ -139,7 +139,7 @@ export class CommandLineInterface {
 			}
 		}
 
-		this.#app.bind(Container.Identifiers.Commands).toConstantValue(commands);
+		this.#app.bind(Identifiers.Commands).toConstantValue(commands);
 		return commands;
 	}
 }

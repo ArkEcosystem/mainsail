@@ -1,11 +1,11 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import { Commands, Container, Services } from "@mainsail/cli";
+import { Commands, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Container.Identifiers.Environment)
+	@inject(Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
 	public signature = "env:set";

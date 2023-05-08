@@ -32,13 +32,11 @@
 		"functional-red-black-tree": "1.0.1",
 		"glob": "7.1.7",
 		"import-fresh": "3.3.0",
-		"inversify": "5.1.1",
 		"ipaddr.js": "2.0.1",
 		"joi": "17.4.2",
 		"log-process-errors": "5.1.2",
 		"nanomatch": "1.2.13",
 		"nsfw": "2.1.2",
-		"reflect-metadata": "0.1.13",
 		"semver": "6.3.0",
 		"type-fest": "0.21.3"
 	},

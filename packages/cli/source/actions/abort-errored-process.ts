@@ -1,4 +1,6 @@
-import { Identifiers, inject, injectable } from "../ioc";
+import { inject, injectable } from "@mainsail/container";
+
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 
 @injectable()

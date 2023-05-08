@@ -7,7 +7,7 @@ export * as Components from "./component-factory";
 export * from "./component-factory";
 export * as Contracts from "./contracts";
 export * from "./input";
-export * as Container from "./ioc";
+export * from "./ioc";
 export * from "./output";
 export * as Plugins from "./plugins";
 export * as Services from "./services";

@@ -1,15 +1,18 @@
+import { Container, injectable } from "@mainsail/container";
+
 import { describe } from "../../test-framework";
 import { envPaths as environmentPaths } from "./env-paths";
-import { Application, Container } from "./index";
+import { Application } from "./index";
+import { Identifiers } from "./ioc";
 
-@Container.injectable()
+@injectable()
 class StubClass {}
 
 describe<{
 	app: Application;
 }>("ActionFactory", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
 	});
 
 	it("should bind a value to the IoC container", ({ app }) => {
@@ -56,7 +59,7 @@ describe<{
 	it("should get core paths", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
+		app.bind(Identifiers.ApplicationPaths).toConstantValue(paths);
 
 		assert.equal(app.getCorePath("data"), paths.data);
 		assert.equal(app.getCorePath("config"), paths.config);
@@ -68,7 +71,7 @@ describe<{
 	it("should get console paths with a file", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
+		app.bind(Identifiers.ApplicationPaths).toConstantValue(paths);
 
 		assert.equal(app.getCorePath("data", "file"), `${paths.data}/file`);
 		assert.equal(app.getCorePath("config", "file"), `${paths.config}/file`);
@@ -80,7 +83,7 @@ describe<{
 	it("should get console paths", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);
+		app.bind(Identifiers.ConsolePaths).toConstantValue(paths);
 
 		assert.equal(app.getConsolePath("data"), paths.data);
 		assert.equal(app.getConsolePath("config"), paths.config);
@@ -92,7 +95,7 @@ describe<{
 	it("should get console paths with a file", ({ app }) => {
 		const paths = environmentPaths.get("ark", { suffix: "core" });
 
-		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);
+		app.bind(Identifiers.ConsolePaths).toConstantValue(paths);
 
 		assert.equal(app.getConsolePath("data", "file"), `${paths.data}/file`);
 		assert.equal(app.getConsolePath("config", "file"), `${paths.config}/file`);

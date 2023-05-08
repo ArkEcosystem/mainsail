@@ -1,6 +1,8 @@
+import { Container } from "@mainsail/container";
+
 import { describe } from "../../../test-framework";
 import { ProcessIdentifier } from "../contracts";
-import { Container, Identifiers } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 import { RestartRunningProcess } from "./restart-running-process";

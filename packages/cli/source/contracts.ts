@@ -1,6 +1,5 @@
+import { interfaces } from "@mainsail/container";
 import { AnySchema } from "joi";
-
-import { interfaces } from "./ioc";
 
 export type InputValue = any;
 export type InputValues = Record<string, InputValue>;

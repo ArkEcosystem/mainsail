@@ -1,6 +1,8 @@
+import { inject, injectable } from "@mainsail/container";
+
 import { Application } from "../application";
 import { Spinner } from "../components";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 
 @injectable()

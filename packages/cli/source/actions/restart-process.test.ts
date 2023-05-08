@@ -1,9 +1,10 @@
+import { Container } from "@mainsail/container";
 import { Options as OraOptions, Ora } from "ora";
 
 import { describe } from "../../../test-framework";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
-import { Container, Identifiers } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 

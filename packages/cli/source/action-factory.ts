@@ -1,3 +1,5 @@
+import { inject, injectable } from "@mainsail/container";
+
 import {
 	AbortErroredProcess,
 	AbortMissingProcess,
@@ -10,7 +12,7 @@ import {
 	RestartRunningProcessWithPrompt,
 } from "./actions";
 import { Application, ProcessOptions } from "./contracts";
-import { Identifiers, inject, injectable } from "./ioc";
+import { Identifiers } from "./ioc";
 
 @injectable()
 export class ActionFactory {

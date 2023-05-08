@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 import fs from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -84,7 +84,7 @@ describe<{
 		const spyEnsure = spy(fs, "ensureDirSync");
 		const spyCopy = spy(fs, "copySync");
 
-		stub(cli.app.get(Container.Identifiers.Prompt), "render").returnValue({
+		stub(cli.app.get(Identifiers.Prompt), "render").returnValue({
 			confirm: true,
 			network: "mainnet",
 		});
@@ -102,7 +102,7 @@ describe<{
 		const spyEnsure = spy(fs, "ensureDirSync");
 		const spyCopy = spy(fs, "copySync");
 
-		stub(cli.app.get(Container.Identifiers.Prompt), "render").returnValue({
+		stub(cli.app.get(Identifiers.Prompt), "render").returnValue({
 			confirm: true,
 			network: undefined,
 		});
@@ -123,7 +123,7 @@ describe<{
 		const spyEnsure = spy(fs, "ensureDirSync");
 		const spyCopy = spy(fs, "copySync");
 
-		stub(cli.app.get(Container.Identifiers.Prompt), "render").returnValue({
+		stub(cli.app.get(Identifiers.Prompt), "render").returnValue({
 			confirm: false,
 			network: "mainnet",
 		});
@@ -144,7 +144,7 @@ describe<{
 		const spyEnsure = spy(fs, "ensureDirSync");
 		const spyCopy = spy(fs, "copySync");
 
-		stub(cli.app.get(Container.Identifiers.Prompt), "render").returnValue({
+		stub(cli.app.get(Identifiers.Prompt), "render").returnValue({
 			confirm: true,
 			network: "mainnet",
 		});

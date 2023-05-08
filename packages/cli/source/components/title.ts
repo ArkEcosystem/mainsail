@@ -1,6 +1,7 @@
+import { inject, injectable } from "@mainsail/container";
 import { yellow } from "kleur";
 
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { Logger } from "../services";
 
 @injectable()

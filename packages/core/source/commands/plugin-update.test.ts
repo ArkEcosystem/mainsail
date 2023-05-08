@@ -1,4 +1,4 @@
-import { Container, Services } from "@mainsail/cli";
+import { Identifiers, Services } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 
 import { Command } from "./plugin-update";
@@ -14,7 +14,7 @@ describe<{
 	beforeEach((context) => {
 		context.cli = new Console();
 
-		context.pluginManager = context.cli.app.get(Container.Identifiers.PluginManager);
+		context.pluginManager = context.cli.app.get(Identifiers.PluginManager);
 	});
 
 	it("should throw when package name is not provided", async ({ pluginManager, cli }) => {

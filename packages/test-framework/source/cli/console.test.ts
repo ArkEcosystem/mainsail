@@ -1,4 +1,5 @@
-import { Commands, Container } from "@mainsail/cli";
+import { Commands } from "@mainsail/cli";
+import { injectable } from "@mainsail/container";
 import Joi from "joi";
 
 import { describe } from "../index";
@@ -10,7 +11,7 @@ describe("Console", ({ beforeEach, it, assert, spyFn }) => {
 	let spyOnGetFlagNetwork;
 	let spyOnGetArgument;
 
-	@Container.injectable()
+	@injectable()
 	class Command extends Commands.Command {
 		/**
 		 * The console command signature.
