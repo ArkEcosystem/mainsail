@@ -1,3 +1,3 @@
 import { FlagNames } from "../constants";
 
-export type Flag = typeof FlagNames[number];
+export type Flag = (typeof FlagNames)[number];
