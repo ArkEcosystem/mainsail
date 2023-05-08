@@ -1,4 +1,4 @@
-type Flag = typeof FlagNames[number];
+type Flag = (typeof FlagNames)[number];
 
 export const FlagNames = [
 	// Log

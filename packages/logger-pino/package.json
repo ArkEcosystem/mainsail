@@ -37,6 +37,7 @@
 		"@types/pump": "1.1.1",
 		"@types/readable-stream": "2.3.11",
 		"@types/split2": "2.1.6",
+		"capture-console": "1.0.1",
 		"import-fresh": "3.3.0",
 		"uvu": "^0.5.3"
 	},

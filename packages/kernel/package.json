@@ -49,6 +49,8 @@
 		"@types/got": "9.6.12",
 		"@types/log-process-errors": "4.1.0",
 		"@types/semver": "6.2.3",
+		"capture-console": "1.0.1",
+		"moment-timezone": "0.5.33",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

@@ -1,4 +1,3 @@
-import nock from "nock";
 import prompts from "prompts";
 
 import { Console, describe } from "../../../test-framework";
@@ -11,7 +10,7 @@ describe<{
 	cli: Console;
 	updater: Updater;
 	config: Config;
-}>("Updater", ({ beforeAll, beforeEach, afterAll, it, stub, spy, assert }) => {
+}>("Updater", ({ beforeAll, beforeEach, afterAll, it, stub, spy, assert, nock }) => {
 	beforeEach((context) => {
 		nock.cleanAll();
 
@@ -25,7 +24,7 @@ describe<{
 	afterAll(() => nock.enableNetConnect());
 
 	it("#check - should forget the latest version if it has one from a previous check", async ({ config, updater }) => {
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
 
 		config.set("latestVersion", {});
 
@@ -36,7 +35,7 @@ describe<{
 	});
 
 	it("#check - should return false if the latest version cannot be retrieved", async ({ cli, updater }) => {
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, {});
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, {});
 
 		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
 
@@ -45,7 +44,7 @@ describe<{
 	});
 
 	it("#check - should return false if the latest version is already installed", async ({ updater }) => {
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
 
 		assert.false(await updater.check());
 	});
@@ -54,7 +53,7 @@ describe<{
 		config,
 		updater,
 	}) => {
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, versionNext);
 
 		config.set("lastUpdateCheck", Date.now());
 
@@ -70,7 +69,7 @@ describe<{
 			version: "4.0.0-next.0",
 		};
 
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, response);
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, response);
 
 		config.set("latestVersion", {});
 
@@ -94,7 +93,7 @@ describe<{
 			version: "4.0.0-next.0",
 		};
 
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, response);
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, response);
 
 		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
 			start: () => {},
@@ -125,7 +124,7 @@ describe<{
 			version: "4.0.0-next.0",
 		};
 
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, response);
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, response);
 
 		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
 			start: () => {},
@@ -158,7 +157,7 @@ describe<{
 			version: "4.0.0-next.0",
 		};
 
-		nock(/.*/).get("/@mainsail%2Fcore").reply(200, response);
+		nock.fake(/.*/).get("/@mainsail%2Fcore").reply(200, response);
 
 		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
 			start: () => {},
