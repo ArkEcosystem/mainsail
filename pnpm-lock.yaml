@@ -2138,8 +2138,8 @@ importers:
         specifier: 1.10.7
         version: 1.10.7
       delay:
-        specifier: 4.4.1
-        version: 4.4.1
+        specifier: 5.0.0
+        version: 5.0.0
       ip:
         specifier: 1.1.5
         version: 1.1.5
@@ -2168,9 +2168,6 @@ importers:
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
-      '@types/better-sqlite3':
-        specifier: 5.4.3
-        version: 5.4.3
       '@types/delay':
         specifier: 3.1.0
         version: 3.1.0
@@ -7786,6 +7783,12 @@ packages:
   /delay@4.4.1:
     resolution: {integrity: sha512-aL3AhqtfhOlT/3ai6sWXeqwnw63ATNpnUiN4HL7x9q+My5QtHlO3OIkasmug9LKzpheLdmUKGRKnYXYAS7FQkQ==}
     engines: {node: '>=6'}
+    dev: true
+
+  /delay@5.0.0:
+    resolution: {integrity: sha512-ReEBKkIfe4ya47wlPYf/gu5ib6yUG0/Aez0JQZQz94kiWtRQvZIQbTiehsnwHvLSWJnQdhVeqYue7Id1dKr0qw==}
+    engines: {node: '>=10'}
+    dev: false
 
   /delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
