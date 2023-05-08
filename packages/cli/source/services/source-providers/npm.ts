@@ -67,7 +67,6 @@ export class NPM extends AbstractSource {
 		await extract({
 			cwd: this.tempPath,
 			file,
-			gzip: true,
 		});
 
 		removeSync(file);

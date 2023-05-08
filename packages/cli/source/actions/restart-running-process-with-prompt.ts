@@ -16,13 +16,11 @@ export class RestartRunningProcessWithPrompt {
 
 	public async execute(processName: string): Promise<void> {
 		if (this.processManager.isOnline(processName)) {
-			const { confirm } = await this.app.get<Prompt>(Identifiers.Prompt).render([
-				{
-					message: `Would you like to restart the ${processName} process?`,
-					name: "confirm",
-					type: "confirm",
-				},
-			]);
+			const { confirm } = await this.app.get<Prompt>(Identifiers.Prompt).render({
+				message: `Would you like to restart the ${processName} process?`,
+				name: "confirm",
+				type: "confirm",
+			});
 
 			if (confirm) {
 				this.app.get<RestartProcess>(Identifiers.RestartProcess).execute(processName);

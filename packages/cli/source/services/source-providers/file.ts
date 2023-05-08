@@ -22,7 +22,6 @@ export class File extends AbstractSource {
 			{
 				cwd: this.tempPath,
 				file: value,
-				gzip: true,
 			},
 			["package"],
 		);

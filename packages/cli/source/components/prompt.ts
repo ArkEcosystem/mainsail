@@ -4,7 +4,7 @@ import prompts from "prompts";
 
 @injectable()
 export class Prompt {
-	public async render(options: object): Promise<Contracts.Types.JsonObject> {
+	public async render(options: prompts.PromptObject<string>): Promise<Contracts.Types.JsonObject> {
 		return prompts(options);
 	}
 }
