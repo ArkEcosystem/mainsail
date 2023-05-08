@@ -32,7 +32,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.11.0",
-		"dayjs": "1.10.7",
+		"dayjs": "1.11.7",
 		"delay": "5.0.0",
 		"ip": "1.1.5",
 		"ipaddr.js": "2.0.1",
