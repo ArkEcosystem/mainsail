@@ -2058,9 +2058,6 @@ importers:
       import-fresh:
         specifier: 3.3.0
         version: 3.3.0
-      inversify:
-        specifier: 5.1.1
-        version: 5.1.1
       ipaddr.js:
         specifier: 2.0.1
         version: 2.0.1
