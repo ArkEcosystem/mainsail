@@ -24,5 +24,6 @@
 	},
 	"engines": {
 		"node": ">=16.x"
-	}
+	},
+	"devDependencies": {}
 }

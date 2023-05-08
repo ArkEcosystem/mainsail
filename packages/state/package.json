@@ -28,6 +28,7 @@
 		"lmdb": "2.7.11"
 	},
 	"devDependencies": {
+		"@types/sinon": "^10.0.14",
 		"import-fresh": "3.3.0",
 		"sinon": "^13.0.1",
 		"uvu": "^0.5.3"

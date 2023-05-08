@@ -32,7 +32,9 @@
 	"devDependencies": {
 		"@types/fs-extra": "8.1.2",
 		"@types/hapi__boom": "7.4.1",
+		"@types/hapi__hapi": "21.0.0",
 		"@types/hapi__joi": "17.1.7",
+		"@types/tmp": "0.2.1",
 		"@types/uuid": "8.3.1",
 		"import-fresh": "3.3.0",
 		"tmp": "0.2.1",

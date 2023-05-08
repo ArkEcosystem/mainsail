@@ -31,6 +31,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@types/deepmerge": "2.2.0",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

@@ -24,6 +24,7 @@
 		"lmdb": "2.7.11"
 	},
 	"devDependencies": {
+		"@types/tmp": "0.2.1",
 		"tmp": "0.2.1",
 		"uvu": "0.5.3"
 	},
