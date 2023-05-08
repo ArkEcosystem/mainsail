@@ -32,7 +32,8 @@ export abstract class Route {
 		server.bind(controller);
 		for (const [path, config] of Object.entries(this.getRoutesConfigByPath())) {
 			server.route({
-				config: {
+				method: "POST",
+				options: {
 					handler: config.handler,
 					id: config.id,
 					isInternal: true,
@@ -40,7 +41,6 @@ export abstract class Route {
 						maxBytes: config.maxBytes,
 					},
 				},
-				method: "POST",
 				path,
 			});
 		}
