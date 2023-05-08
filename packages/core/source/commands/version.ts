@@ -1,6 +1,6 @@
 import { Commands, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import { PackageJson } from "type-fest";
+import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -11,6 +11,6 @@ export class Command extends Commands.Command {
 	public requiresNetwork = false;
 
 	public async execute(): Promise<void> {
-		console.log(this.app.get<PackageJson>(Identifiers.Package).version);
+		console.log(this.app.get<Contracts.Types.PackageJson>(Identifiers.Package).version);
 	}
 }
