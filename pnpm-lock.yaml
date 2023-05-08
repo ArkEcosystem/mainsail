@@ -5,8 +5,8 @@ importers:
   .:
     devDependencies:
       '@types/node':
-        specifier: 13.9.5
-        version: 13.9.5
+        specifier: 20.1.0
+        version: 20.1.0
       '@types/uuid':
         specifier: 8.3.1
         version: 8.3.1
@@ -4955,19 +4955,19 @@ packages:
   /@types/bip39@2.4.2:
     resolution: {integrity: sha512-Vo9lqOIRq8uoIzEVrV87ZvcIM0PN9t0K3oYZ/CS61fIYKCBdOIM7mlWzXuRvSXrDtVa1uUO2w1cdfufxTC0bzg==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/bn.js@5.1.1:
     resolution: {integrity: sha512-qNrYbZqMx0uJAfKnKclPh+dTwK33KfLHYqtyODwd5HnXOjnkhc4qgn3BrK6RWyGZm5+sIFE7Q7Vz6QQtJB7w7g==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: false
 
   /@types/buffer-xor@2.0.0:
     resolution: {integrity: sha512-NEJkIKUE/xboduuIAJmdtUvbXgUOfMkjOo6lWsiBVUIWBC5fVWGT+50yEw9W1Xp4ga76khg57pHELXw5Xm3Y+A==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/cacheable-request@6.0.3:
@@ -4975,7 +4975,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.1
       '@types/keyv': 3.1.4
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
       '@types/responselike': 1.0.0
     dev: false
 
@@ -4993,7 +4993,7 @@ packages:
   /@types/cron@1.7.3:
     resolution: {integrity: sha512-iPmUXyIJG1Js+ldPYhOQcYU3kCAQ2FWrSkm1FJPoii2eYSn6wEW6onPukNTT0bfiflexNSRPl6KWmAIqS+36YA==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
       moment: 2.29.1
     dev: true
 
@@ -5004,7 +5004,7 @@ packages:
   /@types/fs-extra@8.1.2:
     resolution: {integrity: sha512-SvSrYXfWSc7R4eqnOzbQF4TZmfpNSM9FrSWLU3EUnWBuyZqNBOrv1B1JA3byUDPUl9z4Ab3jeZG2eDdySlgNMg==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/functional-red-black-tree@1.0.1:
@@ -5015,13 +5015,13 @@ packages:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/got@9.6.12:
     resolution: {integrity: sha512-X4pj/HGHbXVLqTpKjA2ahI4rV/nNBc9mGO2I/0CgAra+F2dKgMXnENv2SRpemScBzBAI4vMelIVYViQxlSE6xA==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
       '@types/tough-cookie': 4.0.2
       form-data: 2.5.1
     dev: true
@@ -5049,7 +5049,7 @@ packages:
   /@types/ip@1.1.0:
     resolution: {integrity: sha512-dwNe8gOoF70VdL6WJBwVHtQmAX4RMd62M+mAB9HQFjG1/qiCLM/meRy95Pd14FYBbEDwCq7jgJs89cHpLBu4HQ==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/is-ci@2.0.0:
@@ -5085,12 +5085,12 @@ packages:
   /@types/keyv@3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
 
   /@types/listr@0.14.4:
     resolution: {integrity: sha512-+MWvidNujBUgJsi4yMVwEQQwaHe6oHedPSy+dwk3akGEeuIbvhWkK+TGsXSwbFup7Y0cCBb+wzzdD+yGKp7sOg==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
       rxjs: 6.6.7
     dev: true
 
@@ -5133,7 +5133,7 @@ packages:
   /@types/node-forge@0.10.4:
     resolution: {integrity: sha512-RpP7JCxlPA32n8FE0kjOpCsCrsX6VjiD0fjOCo4NwIn8IdcicHi4B2e+votWuOpOmwzUjMwRLqVIF95epGd5nA==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/node@10.12.18:
@@ -5144,6 +5144,10 @@ packages:
 
   /@types/node@13.9.5:
     resolution: {integrity: sha512-hkzMMD3xu6BrJpGVLeQ3htQQNAcOrJjX7WFmtK8zWQpz2UJf13LCFF2ALA7c9OVdvc2vQJeDdjfR35M0sBCxvw==}
+    dev: false
+
+  /@types/node@20.1.0:
+    resolution: {integrity: sha512-O+z53uwx64xY7D6roOi4+jApDGFg0qn6WHcxe5QeqjMaTezBO/mxdfFXIVAVVyNWKx84OmPB3L8kbVYOTeN34A==}
 
   /@types/node@8.10.66:
     resolution: {integrity: sha512-tktOkFUA4kXx2hhhrB8bIFb5TbwzS4uOhKEmwiD+NoiL0qtP2OQ9mFldbgD4dV1djrlBYP6eBuQZiWjuHUpqFw==}
@@ -5174,7 +5178,7 @@ packages:
   /@types/pino@6.3.11:
     resolution: {integrity: sha512-S7+fLONqSpHeW9d7TApUqO6VN47KYgOXhCNKwGBVLHObq8HhaAYlVqUNdfnvoXjCMiwE5xcPm/5R2ZUh8bgaXQ==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
       '@types/pino-pretty': 5.0.0
       '@types/pino-std-serializers': 4.0.0
       sonic-boom: 2.8.0
@@ -5183,13 +5187,13 @@ packages:
   /@types/pump@1.1.1:
     resolution: {integrity: sha512-wpRerjHDxFBQ4r8XNv3xHJZeuqrBBoeQ/fhgkooV2F7KsPIYRROb/+f9ODgZfOEyO5/w2ej4YQdpPPXipT8DAA==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/readable-stream@2.3.11:
     resolution: {integrity: sha512-0z+/apYJwKFz/RHp6mOMxz/y7xOvWPYPevuCEyAY3gXsjtaac02E26RvxA+I96rfvmVH/dEMGXNvyJfViR1FSQ==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
       safe-buffer: 5.2.1
     dev: true
 
@@ -5197,7 +5201,7 @@ packages:
     resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==}
     dependencies:
       '@types/caseless': 0.12.2
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
       '@types/tough-cookie': 4.0.2
       form-data: 2.5.1
     dev: false
@@ -5205,7 +5209,7 @@ packages:
   /@types/responselike@1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
 
   /@types/semver@6.2.3:
     resolution: {integrity: sha512-KQf+QAMWKMrtBMsB8/24w53tEsxllMj6TuA80TT/5igJalLI/zm0L3oXRbIAl4Ohfc85gyHX/jhMwsVkmhLU4A==}
@@ -5224,7 +5228,7 @@ packages:
   /@types/split2@2.1.6:
     resolution: {integrity: sha512-ddaFSOMuy2Rp97l6q/LEteQygvTQJuEZ+SRhxFKR0uXGsdbFDqX/QF2xoGcOqLQ8XV91v01SnAv2vpgihNgW/Q==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/tmp@0.2.0:
@@ -5245,7 +5249,7 @@ packages:
   /@types/wif@2.0.2:
     resolution: {integrity: sha512-IiIuBeJzlh4LWJ7kVTrX0nwB60OG0vvGTaWC/SgSbVFw7uYUTF6gEuvDZ1goWkeirekJDD58Y8g7NljQh2fNkA==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 20.1.0
     dev: true
 
   /@types/yargs-parser@20.2.1:
