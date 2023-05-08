@@ -22,6 +22,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"chalk": "4.1.2",
+		"fs-extra": "11.1.1",
 		"joi": "17.4.2",
 		"pino": "6.13.2",
 		"pino-pretty": "4.8.0",
@@ -39,6 +40,7 @@
 		"@types/split2": "2.1.6",
 		"capture-console": "1.0.1",
 		"import-fresh": "3.3.0",
+		"tmp": "0.2.1",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

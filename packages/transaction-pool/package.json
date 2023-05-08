@@ -33,7 +33,6 @@
 		"@types/better-sqlite3": "5.4.3",
 		"@types/fs-extra": "8.1.2",
 		"import-fresh": "3.3.0",
-		"sinon": "^13.0.1",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

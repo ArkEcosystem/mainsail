@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { FeeRegistry } from "@mainsail/fees";
-import { BigNumber } from "packages/utils/distribution";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
