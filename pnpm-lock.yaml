@@ -273,9 +273,6 @@ importers:
       tar:
         specifier: 6.1.11
         version: 6.1.11
-      type-fest:
-        specifier: 0.21.3
-        version: 0.21.3
       yargs-parser:
         specifier: 20.2.9
         version: 20.2.9
