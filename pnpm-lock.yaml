@@ -2114,8 +2114,8 @@ importers:
         specifier: 21.3.2
         version: 21.3.2
       '@hapi/hoek':
-        specifier: 9.2.0
-        version: 9.2.0
+        specifier: 11.0.2
+        version: 11.0.2
       '@hapi/teamwork':
         specifier: 5.1.0
         version: 5.1.0
