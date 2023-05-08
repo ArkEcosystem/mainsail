@@ -288,9 +288,6 @@ importers:
       read-last-lines:
         specifier: 1.8.0
         version: 1.8.0
-      reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
       semver:
         specifier: 6.3.0
         version: 6.3.0
@@ -2073,9 +2070,6 @@ importers:
       nsfw:
         specifier: 2.1.2
         version: 2.1.2
-      reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
       semver:
         specifier: 6.3.0
         version: 6.3.0
