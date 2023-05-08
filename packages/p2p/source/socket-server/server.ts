@@ -94,6 +94,6 @@ export class Server {
 	}
 
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
-		await this.server.inject(options);
+		return this.server.inject(options);
 	}
 }
