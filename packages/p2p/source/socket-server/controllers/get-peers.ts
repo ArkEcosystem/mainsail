@@ -4,14 +4,19 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 import { constants } from "../../constants";
+import { Socket } from "../../hapi-nes/socket";
 import { getPeerIp } from "../../utils/get-peer-ip";
+
+interface Request extends Hapi.Request {
+	socket: Socket;
+}
 
 @injectable()
 export class GetPeersController implements Contracts.P2P.Controller {
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerBroadcast[]> {
+	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerBroadcast[]> {
 		const peerIp = getPeerIp(request.socket);
 
 		return this.peerRepository
