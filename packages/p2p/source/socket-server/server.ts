@@ -31,7 +31,7 @@ export class Server {
 
 	private name!: string;
 
-	public async initialize(name: string, optionsServer: Contracts.Types.JsonObject): Promise<void> {
+	public async initialize(name: string, optionsServer: { hostname: string; port: number }): Promise<void> {
 		this.name = name;
 
 		const address = optionsServer.hostname;
@@ -94,6 +94,6 @@ export class Server {
 	}
 
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
-		await this.server.inject(options);
+		return this.server.inject(options);
 	}
 }
