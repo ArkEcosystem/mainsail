@@ -1,5 +1,3 @@
-import { injectable } from "inversify";
-
 import { ITransaction, ITransactionData } from "../crypto";
 
 export type ProcessorError = {
@@ -15,11 +13,8 @@ export type ProcessorResult = {
 	errors?: { [id: string]: ProcessorError };
 };
 
-@injectable()
-export abstract class ProcessorExtension {
-	public async throwIfCannotBroadcast(transaction: ITransaction): Promise<void> {
-		// override me
-	}
+export interface ProcessorExtension {
+	throwIfCannotBroadcast(transaction: ITransaction): Promise<void>;
 }
 
 export interface Processor {

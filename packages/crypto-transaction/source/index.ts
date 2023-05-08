@@ -1,6 +1,7 @@
 export * from "./builders";
 export * from "./deserializer";
 export * from "./factory";
+export * from "./internal-transaction-type";
 export * from "./registry";
 export * from "./serializer";
 export * from "./service-provider";

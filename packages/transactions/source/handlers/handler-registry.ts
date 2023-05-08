@@ -1,5 +1,6 @@
 import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { InternalTransactionType } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 
 import { TransactionHandlerProvider } from "./handler-provider";
@@ -25,14 +26,14 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 	}
 
 	public getRegisteredHandlerByType(
-		internalType: Contracts.Transactions.InternalTransactionType,
+		internalType: Contracts.Transactions.IInternalTransactionType,
 		version = 1,
 	): TransactionHandler {
 		for (const handler of this.handlers) {
 			const transactionConstructor = handler.getConstructor();
 			Utils.assert.defined<number>(transactionConstructor.type);
 			Utils.assert.defined<number>(transactionConstructor.typeGroup);
-			const handlerInternalType = Contracts.Transactions.InternalTransactionType.from(
+			const handlerInternalType = InternalTransactionType.from(
 				transactionConstructor.type,
 				transactionConstructor.typeGroup,
 			);
@@ -54,7 +55,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 	}
 
 	public async getActivatedHandlerByType(
-		internalType: Contracts.Transactions.InternalTransactionType,
+		internalType: Contracts.Transactions.IInternalTransactionType,
 		version = 1,
 	): Promise<TransactionHandler> {
 		const handler = this.getRegisteredHandlerByType(internalType, version);
@@ -67,10 +68,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 	public async getActivatedHandlerForData(
 		transactionData: Contracts.Crypto.ITransactionData,
 	): Promise<TransactionHandler> {
-		const internalType = Contracts.Transactions.InternalTransactionType.from(
-			transactionData.type,
-			transactionData.typeGroup,
-		);
+		const internalType = InternalTransactionType.from(transactionData.type, transactionData.typeGroup);
 		return this.getActivatedHandlerByType(internalType, transactionData.version);
 	}
 }

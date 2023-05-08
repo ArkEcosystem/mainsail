@@ -1,6 +1,7 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
+import { InternalTransactionType } from "./internal-transaction-type";
 import { Transaction } from "./types";
 import { signedSchema, strictSchema } from "./validation/utils";
 
@@ -15,7 +16,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	readonly #transactionTypes: Map<
-		Contracts.Transactions.InternalTransactionType,
+		Contracts.Transactions.IInternalTransactionType,
 		Map<number, TransactionConstructor>
 	> = new Map();
 
@@ -33,15 +34,17 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.InternalTransactionType =
-			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
+			type,
+			typeGroup,
+		);
 
 		for (const registeredConstructors of this.#transactionTypes.values()) {
 			if (registeredConstructors.size > 0) {
 				const first = [...registeredConstructors.values()][0];
 				if (
 					first.key === constructor.key &&
-					Contracts.Transactions.InternalTransactionType.from(first.type, first.typeGroup) !== internalType
+					InternalTransactionType.from(first.type, first.typeGroup) !== internalType
 				) {
 					throw new Exceptions.TransactionKeyAlreadyRegisteredError(first.key);
 				}
@@ -71,8 +74,10 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.InternalTransactionType =
-			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
+			type,
+			typeGroup,
+		);
 		if (!this.#transactionTypes.has(internalType)) {
 			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
