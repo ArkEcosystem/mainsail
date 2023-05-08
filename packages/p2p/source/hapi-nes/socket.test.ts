@@ -5,7 +5,6 @@ import * as Hoek from "@hapi/hoek";
 import * as Teamwork from "@hapi/teamwork";
 import { Client } from "./client";
 import { plugin } from "./plugin";
-import { Socket } from "./socket";
 import { stringifyNesMessage } from "./utils";
 import { default as Ws } from "ws";
 import delay from "delay";
@@ -52,7 +51,7 @@ describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const server = Hapi.server();
 
 		const onConnection = (socket) => {
-			assert.equal(socket.info.remoteAddress, "127.0.0.1");
+			assert.equal(socket.info.remoteAddress, "::ffff:127.0.0.1");
 			assert.number(socket.info.remotePort);
 
 			team.attend();
