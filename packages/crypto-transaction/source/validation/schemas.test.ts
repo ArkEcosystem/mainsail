@@ -1,12 +1,12 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-schnorr/distribution/schemas";
+import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-schnorr";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
-import { Validator } from "@mainsail/validation/source/validator";
 import { BigNumber } from "@mainsail/utils";
+import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
-import { describe, Sandbox } from "../../../test-framework/distribution";
+import { describe, Sandbox } from "../../../test-framework";
 import { makeKeywords } from "./keywords";
 import { schemas, transactionBaseSchema } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utils";

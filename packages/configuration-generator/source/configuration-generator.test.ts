@@ -4,7 +4,7 @@ import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";
 
-import { describe } from "../../test-framework/distribution";
+import { describe } from "../../test-framework";
 import { makeApplication } from "./application-factory";
 import { ConfigurationGenerator } from "./configuration-generator";
 import { Identifiers as InternalIdentifiers } from "./identifiers";

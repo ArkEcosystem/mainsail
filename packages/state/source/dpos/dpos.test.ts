@@ -1,6 +1,6 @@
 import { Container, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { AssertionException } from "@mainsail/contracts/distribution/exceptions";
+import { Exceptions } from "@mainsail/contracts";
 import { Application, Services, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { spy } from "sinon";
@@ -203,7 +203,7 @@ describe<{
 		// TODO: when we remove Assertion checks, this won't throw
 		// instead it should not.toEqual(round)
 		// assert.not.equal(validators[4].getAttribute("validator.round"), round)
-		assert.rejects(() => validators[4].getAttribute("validator.round"), AssertionException);
+		assert.rejects(() => validators[4].getAttribute("validator.round"), Exceptions.AssertionException);
 		debugLogger.calledWith("Loaded 4 active validators");
 	});
 

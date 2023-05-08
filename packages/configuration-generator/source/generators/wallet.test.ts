@@ -1,4 +1,4 @@
-import { describe } from "../../../test-framework/distribution";
+import { describe } from "../../../test-framework";
 import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
 import { WalletGenerator } from "./wallet";
