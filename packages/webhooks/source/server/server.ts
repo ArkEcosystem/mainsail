@@ -2,7 +2,7 @@ import Boom, { badData } from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Types, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 import { randomBytes } from "crypto";
 
 import { Database } from "../database";
@@ -25,7 +25,7 @@ export class Server {
 
 	#server: HapiServer;
 
-	public async register(optionsServer: Types.JsonObject): Promise<void> {
+	public async register(optionsServer: Contracts.Types.JsonObject): Promise<void> {
 		this.#server = new HapiServer(this.#getServerOptions(optionsServer));
 		this.#server.app.database = this.database;
 
@@ -99,7 +99,7 @@ export class Server {
 		};
 	}
 
-	async #registerPlugins(config: Types.JsonObject): Promise<void> {
+	async #registerPlugins(config: Contracts.Types.JsonObject): Promise<void> {
 		await this.#server.register({
 			options: {
 				whitelist: config.whitelist,
