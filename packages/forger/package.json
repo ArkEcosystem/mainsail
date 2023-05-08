@@ -23,8 +23,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"@mainsail/state": "workspace:*"
+		"@mainsail/state": "workspace:*",
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"sinon": "^12.0.1",
