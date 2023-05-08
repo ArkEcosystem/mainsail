@@ -2284,8 +2284,8 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0
       type-fest:
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: 0.21.3
+        version: 0.21.3
     devDependencies:
       '@hapi/boom':
         specifier: ^9.1.0
@@ -14846,11 +14846,6 @@ packages:
     resolution: {integrity: sha512-eaBzG6MxNzEn9kiwvtre90cXaNLkmadMWa1zQMs3XORCXNbsH/OewwbxC5ia9dCxIxnTAsSxXJaa/p5y8DlvJg==}
     engines: {node: '>=10'}
     dev: true
-
-  /type-fest@0.17.0:
-    resolution: {integrity: sha512-EFi9HE4hHj85XnVV80uAUMgICQmhxYgiEvtmfpcD6jqn6zYr36HxAU6k+i/DSY28TK7/lYL0s4v/kWmiKdqaoA==}
-    engines: {node: '>=10'}
-    dev: false
 
   /type-fest@0.18.1:
     resolution: {integrity: sha512-OIAYXk8+ISY+qTOwkHtKqzAuxchoMiD9Udx+FSGQDuiRR+PJKJHc2NJAXlbhkGwTt/4/nKZxELY1w3ReWOL8mw==}
