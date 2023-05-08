@@ -31,7 +31,7 @@ export class Server {
 
 	private name!: string;
 
-	public async initialize(name: string, optionsServer: Contracts.Types.JsonObject): Promise<void> {
+	public async initialize(name: string, optionsServer: { hostname: string; port: number }): Promise<void> {
 		this.name = name;
 
 		const address = optionsServer.hostname;
