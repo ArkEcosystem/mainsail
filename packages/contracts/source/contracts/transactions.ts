@@ -1,10 +1,4 @@
-import {
-	IMultiSignatureAsset,
-	ITransaction,
-	ITransactionData,
-	TransactionConstructor,
-	TransactionTypeGroup,
-} from "./crypto";
+import { IMultiSignatureAsset, ITransaction, ITransactionData, TransactionConstructor } from "./crypto";
 import { EventDispatcher } from "./kernel";
 import { Wallet } from "./state";
 
@@ -54,11 +48,11 @@ export interface ITransactionHandlerRegistry {
 
 	getRegisteredHandlers(): ITransactionHandler[];
 
-	getRegisteredHandlerByType(internalType: InternalTransactionType, version?: number): ITransactionHandler;
+	getRegisteredHandlerByType(internalType: IInternalTransactionType, version?: number): ITransactionHandler;
 
 	getActivatedHandlers(): Promise<ITransactionHandler[]>;
 
-	getActivatedHandlerByType(internalType: InternalTransactionType, version?: number): Promise<ITransactionHandler>;
+	getActivatedHandlerByType(internalType: IInternalTransactionType, version?: number): Promise<ITransactionHandler>;
 
 	getActivatedHandlerForData(transactionData: ITransactionData): Promise<ITransactionHandler>;
 }
@@ -70,36 +64,14 @@ export interface ITransactionHandlerProvider {
 }
 
 // @TODO: move this out of contracts, it's an implementation
-export class InternalTransactionType {
-	static #types: Map<string, InternalTransactionType> = new Map();
+export interface IInternalTransactionType {
+	// private constructor(public readonly type: number, public readonly typeGroup: number) {}
 
-	private constructor(public readonly type: number, public readonly typeGroup: number) {}
-
-	public static from(type: number, typeGroup?: number): InternalTransactionType {
-		if (typeGroup === undefined) {
-			typeGroup = TransactionTypeGroup.Core;
-		}
-
-		const compositeType = `${typeGroup}-${type}`;
-
-		if (!this.#types.has(compositeType)) {
-			this.#types.set(compositeType, new InternalTransactionType(type, typeGroup));
-		}
-
-		return this.#types.get(compositeType)!;
-	}
-
-	public toString(): string {
-		if (this.typeGroup === TransactionTypeGroup.Core) {
-			return `Core/${this.type}`;
-		}
-
-		return `${this.typeGroup}/${this.type}`;
-	}
+	toString(): string;
 }
 
 export interface ITransactionTypeFactory {
-	initialize(transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>>);
+	initialize(transactionTypes: Map<IInternalTransactionType, Map<number, TransactionConstructor>>);
 
 	create(data: ITransactionData): ITransaction;
 

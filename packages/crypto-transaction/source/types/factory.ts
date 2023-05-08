@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
+import { InternalTransactionType } from "../internal-transaction-type";
 import { Transaction } from "./transaction";
 
 type TransactionConstructor = typeof Transaction;
@@ -10,10 +11,10 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	#transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;
+	#transactionTypes: Map<Contracts.Transactions.IInternalTransactionType, Map<number, TransactionConstructor>>;
 
 	public initialize(
-		transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>,
+		transactionTypes: Map<Contracts.Transactions.IInternalTransactionType, Map<number, TransactionConstructor>>,
 	) {
 		this.#transactionTypes = transactionTypes;
 	}
@@ -33,8 +34,10 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		typeGroup?: number,
 		version?: number,
 	): Contracts.Crypto.TransactionConstructor | undefined {
-		const internalType: Contracts.Transactions.InternalTransactionType =
-			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
+			type,
+			typeGroup,
+		);
 
 		if (!this.#transactionTypes.has(internalType)) {
 			throw new Exceptions.UnkownTransactionError(internalType.toString());

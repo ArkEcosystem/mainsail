@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { InternalTransactionType } from "@mainsail/crypto-transaction";
 import { Services, Utils } from "@mainsail/kernel";
 
 import { TransactionHandlerConstructor } from "./transaction";
@@ -36,7 +37,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 		Utils.assert.defined<number>(transactionConstructor.type);
 		Utils.assert.defined<number>(transactionConstructor.typeGroup);
 
-		const internalType = Contracts.Transactions.InternalTransactionType.from(
+		const internalType = InternalTransactionType.from(
 			transactionConstructor.type,
 			transactionConstructor.typeGroup,
 		);
@@ -64,7 +65,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 
 	#hasOtherHandlerHandling(
 		handlerConstructor: TransactionHandlerConstructor,
-		internalType: Contracts.Transactions.InternalTransactionType,
+		internalType: Contracts.Transactions.IInternalTransactionType,
 		version: number,
 	) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {
@@ -78,7 +79,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 			Utils.assert.defined<number>(otherTransactionConstructor.type);
 			Utils.assert.defined<number>(otherTransactionConstructor.typeGroup);
 
-			const otherInternalType = Contracts.Transactions.InternalTransactionType.from(
+			const otherInternalType = InternalTransactionType.from(
 				otherTransactionConstructor.type,
 				otherTransactionConstructor.typeGroup,
 			);
