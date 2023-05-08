@@ -1,6 +1,8 @@
-import { Commands, Container } from "../../source";
+import { injectable } from "@mainsail/container";
 
-@Container.injectable()
+import { Commands } from "../../source";
+
+@injectable()
 export class CommandWithoutDefinition extends Commands.Command {
 	public signature = "config:cli";
 	public description = "Update the CLI configuration.";

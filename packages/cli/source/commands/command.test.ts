@@ -1,7 +1,8 @@
+import { injectable } from "@mainsail/container";
 import Joi from "joi";
 
 import { Console, describe } from "../../../test-framework";
-import { Identifiers, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { Output } from "../output";
 import { Command } from "./command";
 import { DiscoverConfig } from "./discover-config";
