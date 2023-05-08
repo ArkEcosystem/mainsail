@@ -107,7 +107,7 @@ export class ComponentFactory {
 		return this.app.get<NewLine>(Identifiers.NewLine).render(count);
 	}
 
-	public async prompt(options: PromptObject<string>): Promise<Contracts.Types.JsonObject> {
+	public async prompt(options: PromptObject<string> | PromptObject<string>[]): Promise<Contracts.Types.JsonObject> {
 		return this.app.get<Prompt>(Identifiers.Prompt).render(options);
 	}
 
