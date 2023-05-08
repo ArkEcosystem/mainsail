@@ -1,5 +1,4 @@
 import fs from "fs-extra";
-import nock from "nock";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -11,7 +10,7 @@ describe<{
 	dataPath: string;
 	tempPath: string;
 	source: NPM;
-}>("NPM", ({ beforeEach, afterEach, afterAll, it, assert, spy, stub }) => {
+}>("NPM", ({ beforeEach, afterEach, afterAll, it, assert, spy, stub, nock }) => {
 	beforeEach((context) => {
 		context.dataPath = dirSync().name;
 		context.tempPath = dirSync().name;
@@ -28,7 +27,7 @@ describe<{
 	});
 
 	it("#exists - should return true if the file exists", async ({ source }) => {
-		nock(/.*/)
+		nock.fake(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
@@ -50,7 +49,7 @@ describe<{
 	});
 
 	it("#exists - should return true if the file by version exists", async ({ source }) => {
-		nock(/.*/)
+		nock.fake(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
@@ -72,7 +71,7 @@ describe<{
 	});
 
 	it("#exists - should return false if the file by version doesn't exists", async ({ source }) => {
-		nock(/.*/)
+		nock.fake(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
@@ -98,7 +97,7 @@ describe<{
 	});
 
 	it("#update - should successfully install the plugin", async ({ source, tempPath, dataPath }) => {
-		nock(/.*/)
+		nock.fake(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
 				"dist-tags": {
@@ -116,7 +115,7 @@ describe<{
 				},
 			});
 
-		nock(/.*/)
+		nock.fake(/.*/)
 			.get("/@arkecosystem/utils/-/utils-0.9.1.tgz")
 			.reply(200, fs.readFileSync(resolve(__dirname, "../../../test/files", "utils-0.9.1.tgz")));
 
