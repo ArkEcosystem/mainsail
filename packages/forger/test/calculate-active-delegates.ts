@@ -1,11 +1,11 @@
+import { Identities } from "@mainsail/crypto";
 import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
-import { Identities } from "@mainsail/crypto";
 
 export const calculateActiveDelegates = (): Wallets.Wallet[] => {
 	const activeDelegates = [];
-	for (let i = 0; i < 51; i++) {
-		const address = `Delegate-Wallet-${i}`;
+	for (let index = 0; index < 51; index++) {
+		const address = `Delegate-Wallet-${index}`;
 		const wallet = new Wallets.Wallet(
 			address,
 			new Services.Attributes.AttributeMap(new Services.Attributes.AttributeSet()),

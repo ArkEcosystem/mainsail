@@ -22,7 +22,8 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/fees": "workspace:*",
-		"@mainsail/kernel": "workspace:*"
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*"
 	},
 	"engines": {
 		"node": ">=16.x"
