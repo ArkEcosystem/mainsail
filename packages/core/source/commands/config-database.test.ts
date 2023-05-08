@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -20,7 +20,7 @@ describe<{
 	afterAll(() => setGracefulCleanup());
 
 	it("#Flags - should set the database host", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		await cli.withFlags({ host: "localhost" }).execute(Command);
 
@@ -29,7 +29,7 @@ describe<{
 	});
 
 	it("#Flags - should set the database port", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		await cli.withFlags({ port: "5432" }).execute(Command);
 
@@ -38,7 +38,7 @@ describe<{
 	});
 
 	it("#Flags - should set the database name", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		await cli.withFlags({ database: "ark_mainnet" }).execute(Command);
 
@@ -47,7 +47,7 @@ describe<{
 	});
 
 	it("#Flags - should set the database user", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		await cli.withFlags({ username: "ark" }).execute(Command);
 
@@ -56,7 +56,7 @@ describe<{
 	});
 
 	it("#Flags - should set the database password", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		await cli.withFlags({ password: "password" }).execute(Command);
 
@@ -65,7 +65,7 @@ describe<{
 	});
 
 	it("#Prompts - should set the database host", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		prompts.inject(["dummy", undefined, undefined, undefined, undefined, true]);
 		await cli.execute(Command);
@@ -81,7 +81,7 @@ describe<{
 	});
 
 	it("#Prompts - should set the database port", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		prompts.inject([undefined, 5000, undefined, undefined, undefined, true]);
 		await cli.execute(Command);
@@ -97,7 +97,7 @@ describe<{
 	});
 
 	it("#Prompts - should set the database name", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		prompts.inject([undefined, undefined, "dummy", undefined, undefined, true]);
 		await cli.execute(Command);
@@ -113,7 +113,7 @@ describe<{
 	});
 
 	it("#Prompts - should set the database user", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		prompts.inject([undefined, undefined, undefined, "dummy", undefined, true]);
 		await cli.execute(Command);
@@ -129,7 +129,7 @@ describe<{
 	});
 
 	it("#Prompts - should set the database password", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		prompts.inject([undefined, undefined, undefined, undefined, "dummy", true]);
 		await cli.execute(Command);
@@ -145,7 +145,7 @@ describe<{
 	});
 
 	it("#Prompts - should not update without a confirmation", async ({ cli, envFile }) => {
-		const spyOnUpdateVariables = stub(cli.app.get(Container.Identifiers.Environment), "updateVariables");
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Environment), "updateVariables");
 
 		prompts.inject([undefined, undefined, undefined, undefined, "dummy", false]);
 		await assert.rejects(() => cli.execute(Command), "You'll need to confirm the input to continue.");

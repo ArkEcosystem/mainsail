@@ -1,4 +1,4 @@
-import { Container } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 
 import { Command } from "./help";
@@ -21,7 +21,7 @@ describe<{
 			"grouped:anotherkey": { description: "I should be grouped" },
 		};
 
-		cli.app.bind(Container.Identifiers.Commands).toConstantValue(mockCommands);
+		cli.app.bind(Identifiers.Commands).toConstantValue(mockCommands);
 
 		await cli.execute(Command);
 

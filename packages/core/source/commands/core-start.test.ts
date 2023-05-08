@@ -1,4 +1,4 @@
-import { Container, Services } from "@mainsail/cli";
+import { Identifiers, Services } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 import { writeJSONSync } from "fs-extra";
 import { resolve } from "path";
@@ -16,7 +16,7 @@ describe<{
 		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/delegates.json`, { secrets: ["bip39"] });
 
 		context.cli = new Console();
-		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);
+		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
 	});
 
 	afterAll(() => setGracefulCleanup());

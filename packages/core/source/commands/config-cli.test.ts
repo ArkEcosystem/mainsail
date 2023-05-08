@@ -1,4 +1,4 @@
-import { Container, Contracts } from "@mainsail/cli";
+import { Contracts, Identifiers } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 import execa from "execa";
 
@@ -10,7 +10,7 @@ describe<{
 }>("ConfigCliCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
-		context.config = context.cli.app.get<Contracts.Config>(Container.Identifiers.Config);
+		context.config = context.cli.app.get<Contracts.Config>(Identifiers.Config);
 	});
 
 	it("should change the token", async ({ cli, config }) => {
@@ -25,7 +25,7 @@ describe<{
 
 	it("should not set config token if no token is passed to command", async ({ config }) => {
 		const cli = new Console(false);
-		stub(cli.app.get(Container.Identifiers.Environment), "getPaths");
+		stub(cli.app.get(Identifiers.Environment), "getPaths");
 		const spySetToken = stub(config, "set");
 
 		await assert.resolves(() => cli.execute(Command));
@@ -39,7 +39,7 @@ describe<{
 			stderr: undefined,
 			stdout: '"null"',
 		});
-		const install = stub(cli.app.get(Container.Identifiers.Installer), "install");
+		const install = stub(cli.app.get(Identifiers.Installer), "install");
 
 		await cli.withFlags({ channel: "latest" }).execute(Command);
 
