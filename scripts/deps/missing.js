@@ -22,7 +22,7 @@ for (const pkg of pkgs) {
 				console.log(`[FAIL] ${pkg}`);
 
 				for (const dep of missing) {
-					console.log(`lerna add ${dep} --scope=@arkecosystem/${pkg}`);
+					console.log(`lerna add ${dep} --scope=@mainsail/${pkg}`);
 				}
 			} else {
 				console.log(`[PASS] ${pkg}`);
