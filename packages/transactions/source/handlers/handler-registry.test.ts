@@ -9,6 +9,7 @@ import {
 	TransactionTypeFactory,
 	Utils,
 	Verifier,
+	InternalTransactionType,
 } from "@mainsail/crypto-transaction";
 import { Application, Services } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
@@ -233,37 +234,37 @@ describe<{
 		await assert.resolves(() =>
 			Promise.all([
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
+					InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.Transfer,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
+					InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.ValidatorRegistration,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
+					InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.Vote,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
+					InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.MultiSignature,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
+					InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.MultiPayment,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
+					InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.ValidatorRegistration,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
@@ -386,7 +387,7 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
+		const internalTransactionType = InternalTransactionType.from(
 			TEST_TRANSACTION_TYPE,
 			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
@@ -395,7 +396,7 @@ describe<{
 			TestTransactionHandler,
 		);
 
-		const invalidInternalTransactionType = Contracts.Transactions.InternalTransactionType.from(
+		const invalidInternalTransactionType = InternalTransactionType.from(
 			999,
 			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
@@ -411,7 +412,7 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
+		const internalTransactionType = InternalTransactionType.from(
 			TEST_TRANSACTION_TYPE,
 			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
@@ -420,7 +421,7 @@ describe<{
 			TestTransactionHandler,
 		);
 
-		const invalidInternalTransactionType = Contracts.Transactions.InternalTransactionType.from(
+		const invalidInternalTransactionType = InternalTransactionType.from(
 			999,
 			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
@@ -436,7 +437,7 @@ describe<{
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
-		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
+		const internalTransactionType = InternalTransactionType.from(
 			TEST_DEACTIVATED_TRANSACTION_TYPE,
 			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
