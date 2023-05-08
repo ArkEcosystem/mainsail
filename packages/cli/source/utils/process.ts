@@ -1,3 +1,4 @@
+import { inject, injectable } from "@mainsail/container";
 import { Utils } from "@mainsail/kernel";
 import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -8,7 +9,7 @@ import { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } from ".
 import { Application } from "../application";
 import { Clear, Spinner, Table } from "../components";
 import { ProcessDescription } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 
 @injectable()

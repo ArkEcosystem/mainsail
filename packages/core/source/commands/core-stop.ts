@@ -1,4 +1,4 @@
-import { Commands, Container } from "@mainsail/cli";
+import { Commands, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import Joi from "joi";
 
@@ -15,8 +15,6 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		this.app
-			.get<any>(Container.Identifiers.ProcessFactory)(this.getFlag("token"), "core")
-			.stop(this.getFlag("daemon"));
+		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "core").stop(this.getFlag("daemon"));
 	}
 }

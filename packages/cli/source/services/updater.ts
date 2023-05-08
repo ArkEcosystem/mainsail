@@ -1,3 +1,4 @@
+import { inject, injectable } from "@mainsail/container";
 import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";
 import { lte } from "semver";
@@ -6,7 +7,7 @@ import { PackageJson } from "type-fest";
 import { Application } from "../application";
 import { Confirm, Spinner, Warning } from "../components";
 import { Config, Updater as Contracts_Updater } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { Installer } from "./installer";
 import { ProcessManager } from "./process-manager";
 

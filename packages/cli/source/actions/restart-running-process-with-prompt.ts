@@ -1,6 +1,8 @@
+import { inject, injectable } from "@mainsail/container";
+
 import { Application } from "../application";
 import { Prompt } from "../components";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 

@@ -1,3 +1,4 @@
+import { inject, injectable } from "@mainsail/container";
 import { Options, Ora } from "ora";
 import { JsonObject } from "type-fest";
 
@@ -30,7 +31,7 @@ import {
 	Warning,
 } from "./components";
 import { Application } from "./contracts";
-import { Identifiers, inject, injectable } from "./ioc";
+import { Identifiers } from "./ioc";
 
 @injectable()
 export class ComponentFactory {

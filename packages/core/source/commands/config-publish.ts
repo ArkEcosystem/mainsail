@@ -1,4 +1,4 @@
-import { Commands, Container, Contracts, Services } from "@mainsail/cli";
+import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import Joi from "joi";
@@ -6,7 +6,7 @@ import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Container.Identifiers.Environment)
+	@inject(Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
 	public signature = "config:publish";
@@ -54,7 +54,7 @@ export class Command extends Commands.Command {
 
 	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app
-			.rebind(Container.Identifiers.ApplicationPaths)
+			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(this.environment.getPaths(flags.token, flags.network));
 
 		const configDestination = this.app.getCorePath("config");

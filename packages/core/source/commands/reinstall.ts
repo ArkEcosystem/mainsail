@@ -1,13 +1,13 @@
-import { Commands, Container, Services } from "@mainsail/cli";
+import { Commands, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Container.Identifiers.Installer)
+	@inject(Identifiers.Installer)
 	private readonly installer!: Services.Installer;
 
-	@inject(Container.Identifiers.ProcessManager)
+	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
 	public signature = "reinstall";

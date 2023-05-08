@@ -1,9 +1,9 @@
+import { injectable } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { readJSON } from "fs-extra";
 import path from "path";
 
 import { envPaths as environmentPaths } from "../env-paths";
-import { injectable } from "../ioc";
 
 interface Config {
 	token: string;

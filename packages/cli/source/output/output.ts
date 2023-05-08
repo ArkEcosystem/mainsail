@@ -1,4 +1,4 @@
-import { injectable } from "../ioc";
+import { injectable } from "@mainsail/container";
 
 enum OutputVerbosity {
 	Quiet = 0,

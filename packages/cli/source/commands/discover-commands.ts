@@ -1,7 +1,8 @@
+import { inject, injectable } from "@mainsail/container";
 import { lstatSync, readdirSync } from "fs-extra";
 
 import { Application, CommandList } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 import { Command } from "./command";
 
 @injectable()

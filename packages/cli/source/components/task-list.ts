@@ -1,6 +1,5 @@
+import { injectable } from "@mainsail/container";
 import Listr from "listr";
-
-import { injectable } from "../ioc";
 
 @injectable()
 export class TaskList {

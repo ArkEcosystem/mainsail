@@ -1,6 +1,5 @@
+import { injectable } from "@mainsail/container";
 import Joi from "joi";
-
-import { injectable } from "../ioc";
 
 @injectable()
 export class InputValidator {

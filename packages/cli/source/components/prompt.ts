@@ -1,7 +1,6 @@
+import { injectable } from "@mainsail/container";
 import prompts from "prompts";
 import { JsonObject } from "type-fest";
-
-import { injectable } from "../ioc";
 
 @injectable()
 export class Prompt {

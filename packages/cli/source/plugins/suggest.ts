@@ -1,10 +1,11 @@
+import { inject, injectable } from "@mainsail/container";
 import { minBy } from "@mainsail/utils";
 import Levenshtein from "fast-levenshtein";
 import { blue, red } from "kleur";
 import { JsonObject } from "type-fest";
 
 import { Application } from "../application";
-import { Identifiers, inject, injectable } from "../ioc";
+import { Identifiers } from "../ioc";
 
 @injectable()
 export class SuggestCommand {
