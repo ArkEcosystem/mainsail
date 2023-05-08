@@ -29,7 +29,6 @@
 		"deepmerge": "4.2.2",
 		"env-paths": "2.2.0",
 		"fs-extra": "8.1.0",
-		"functional-red-black-tree": "1.0.1",
 		"glob": "7.1.7",
 		"import-fresh": "3.3.0",
 		"ipaddr.js": "2.0.1",
@@ -43,7 +42,6 @@
 	"devDependencies": {
 		"@types/cron": "1.7.3",
 		"@types/fs-extra": "8.1.2",
-		"@types/functional-red-black-tree": "1.0.1",
 		"@types/got": "9.6.12",
 		"@types/log-process-errors": "4.1.0",
 		"@types/semver": "6.2.3",
