@@ -19,7 +19,6 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"lmdb": "2.7.11"

@@ -21,12 +21,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/p2p": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"joi": "17.4.2",
-		"node-forge": "1.2.1",
-		"wif": "2.0.6"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/state": "workspace:*",

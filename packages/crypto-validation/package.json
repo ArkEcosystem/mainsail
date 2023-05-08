@@ -19,13 +19,11 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.11.0",
-		"ipaddr.js": "2.0.1",
 		"uvu": "^0.5.3"
 	},
 	"devDependencies": {
