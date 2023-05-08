@@ -1,4 +1,4 @@
-import { Application, ApplicationFactory, Commands, Container as CLI, Services, Utils } from "@mainsail/cli";
+import { Application, ApplicationFactory, Commands, Identifiers, Services, Utils } from "@mainsail/cli";
 import { Container } from "@mainsail/container";
 
 export class Console {
@@ -36,10 +36,10 @@ export class Console {
 
 	public async execute(command): Promise<void> {
 		this.app
-			.rebind(CLI.Identifiers.ApplicationPaths)
+			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(
 				this.app
-					.get<Services.Environment>(CLI.Identifiers.Environment)
+					.get<Services.Environment>(Identifiers.Environment)
 					.getPaths(this.flags.token, this.flags.network),
 			);
 
