@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { ensureFileSync, readJsonSync, writeJsonSync } from "fs-extra";
-import { PackageJson } from "type-fest";
 
 import { Application } from "../contracts";
 import { Identifiers } from "../ioc";
@@ -73,7 +73,10 @@ export class Config {
 		}
 
 		if (!this.has("channel")) {
-			this.set("channel", this.#getRegistryChannel(this.app.get<PackageJson>(Identifiers.Package).version));
+			this.set(
+				"channel",
+				this.#getRegistryChannel(this.app.get<Contracts.Types.PackageJson>(Identifiers.Package).version),
+			);
 		}
 
 		if (!this.has("plugins")) {

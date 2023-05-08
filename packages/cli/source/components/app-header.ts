@@ -1,14 +1,14 @@
 import { inject, injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { red, white } from "kleur";
 import os from "os";
-import { PackageJson } from "type-fest";
 
 import { Identifiers } from "../ioc";
 
 @injectable()
 export class AppHeader {
 	@inject(Identifiers.Package)
-	private readonly pkg!: PackageJson;
+	private readonly pkg!: Contracts.Types.PackageJson;
 
 	public render(): string {
 		return `${red().bold(`${this.pkg.description}`)} ${white().bold(

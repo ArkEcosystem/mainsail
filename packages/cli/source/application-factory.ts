@@ -1,5 +1,5 @@
 import { Container, interfaces } from "@mainsail/container";
-import { PackageJson } from "type-fest";
+import { Contracts } from "@mainsail/contracts";
 
 import { ActionFactory } from "./action-factory";
 import {
@@ -51,7 +51,7 @@ import { Config, Environment, Installer, Logger, PluginManager, ProcessManager, 
 import { Process } from "./utils";
 
 export class ApplicationFactory {
-	public static make(container: Container, package_: PackageJson): Application {
+	public static make(container: Container, package_: Contracts.Types.PackageJson): Application {
 		const app: Application = new Application(container);
 
 		// Package

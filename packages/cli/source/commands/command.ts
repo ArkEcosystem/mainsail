@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { PackageJson } from "type-fest";
+import { Contracts } from "@mainsail/contracts";
 
 import { ActionFactory } from "../action-factory";
 import { ComponentFactory } from "../component-factory";
@@ -30,7 +30,7 @@ export abstract class Command {
 	protected readonly config!: Config;
 
 	@inject(Identifiers.Package)
-	protected readonly pkg!: PackageJson;
+	protected readonly pkg!: Contracts.Types.PackageJson;
 
 	@inject(Identifiers.ActionFactory)
 	protected readonly actions!: ActionFactory;

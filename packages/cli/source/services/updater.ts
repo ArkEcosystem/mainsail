@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";
 import { lte } from "semver";
-import { PackageJson } from "type-fest";
 
 import { Application } from "../application";
 import { Confirm, Spinner, Warning } from "../components";
@@ -22,7 +22,7 @@ export class Updater implements Contracts_Updater {
 	private readonly config!: Config;
 
 	@inject(Identifiers.Package)
-	private readonly pkg!: PackageJson;
+	private readonly pkg!: Contracts.Types.PackageJson;
 
 	@inject(Identifiers.Installer)
 	private readonly installer!: Installer;
