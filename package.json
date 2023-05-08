@@ -52,7 +52,7 @@
 		"lint-staged": "^13.2.2",
 		"madge": "^6.0.0",
 		"npm-check-updates": "^16.10.10",
-		"prettier": "2.4.0",
+		"prettier": "^2.8.8",
 		"sort-package-json": "^2.4.1",
 		"tsm": "^2.3.0",
 		"typedoc": "^0.24.7",
