@@ -6,6 +6,13 @@ import { Utils } from "@mainsail/kernel";
 import { constants } from "../../constants";
 import { mapAddr } from "../utils/map-addr";
 
+interface Request extends Hapi.Request {
+	payload: {
+		lastBlockHeight: number;
+		blockLimit: number;
+	};
+}
+
 @injectable()
 export class GetBlocksController implements Contracts.P2P.Controller {
 	@inject(Identifiers.LogService)
@@ -18,11 +25,11 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 	private readonly database: Contracts.Database.IDatabaseService;
 
 	public async handle(
-		request: Hapi.Request,
+		request: Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.Crypto.IBlockData[] | Contracts.Shared.DownloadBlock[]> {
-		const requestBlockHeight: number = +(request.payload as any).lastBlockHeight + 1;
-		const requestBlockLimit: number = +(request.payload as any).blockLimit || 400;
+		const requestBlockHeight: number = request.payload.lastBlockHeight + 1;
+		const requestBlockLimit: number = request.payload.blockLimit || 400;
 
 		const lastHeight: number = this.blockchain.getLastHeight();
 		if (requestBlockHeight > lastHeight) {
