@@ -8,7 +8,7 @@ import { KernelEvent } from "./enums";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
-import { JsonObject, KeyValuePair } from "./types";
+import { KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
 
 export class Application implements Contracts.Kernel.Application {
@@ -27,7 +27,10 @@ export class Application implements Contracts.Kernel.Application {
 			.inSingletonScope();
 	}
 
-	public async bootstrap(options: { flags: JsonObject; plugins?: JsonObject }): Promise<void> {
+	public async bootstrap(options: {
+		flags: Contracts.Types.JsonObject;
+		plugins?: Contracts.Types.JsonObject;
+	}): Promise<void> {
 		this.bind<KeyValuePair>(Identifiers.ConfigFlags).toConstantValue(options.flags);
 		this.bind<KeyValuePair>(Identifiers.ConfigPlugins).toConstantValue(options.plugins || {});
 

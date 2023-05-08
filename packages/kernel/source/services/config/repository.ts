@@ -2,14 +2,14 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { get, has, set, unset } from "@mainsail/utils";
 
-import { JsonObject, KeyValuePair } from "../../types";
+import { KeyValuePair } from "../../types";
 import { assert } from "../../utils";
 
 @injectable()
 export class ConfigRepository implements Contracts.Kernel.Repository {
-	#items: JsonObject = {};
+	#items: Contracts.Types.JsonObject = {};
 
-	public all(): JsonObject {
+	public all(): Contracts.Types.JsonObject {
 		return this.#items;
 	}
 

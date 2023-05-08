@@ -1779,9 +1779,6 @@ importers:
       semver:
         specifier: 6.3.0
         version: 6.3.0
-      type-fest:
-        specifier: 0.21.3
-        version: 0.21.3
     devDependencies:
       '@types/cron':
         specifier: 1.7.3

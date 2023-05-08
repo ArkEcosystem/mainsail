@@ -1,7 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
 
-export type { Class, JsonObject, PackageJson, Primitive } from "type-fest";
-
 export type KeyValuePair<T = any> = Record<string, T>;
 
 export type ActionArguments = Record<string, any>;

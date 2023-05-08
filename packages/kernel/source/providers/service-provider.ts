@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { JsonObject } from "../types";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";
 
@@ -62,7 +61,7 @@ export abstract class ServiceProvider {
 		this.#packageConfiguration = config;
 	}
 
-	public configDefaults(): JsonObject {
+	public configDefaults(): Contracts.Types.JsonObject {
 		return {};
 	}
 

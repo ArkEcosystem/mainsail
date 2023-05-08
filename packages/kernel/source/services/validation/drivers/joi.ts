@@ -1,18 +1,15 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { AnySchema, ValidationErrorItem } from "joi";
-
-import { JsonObject } from "../../../types";
-
 @injectable()
 export class JoiValidator implements Contracts.Kernel.Validator {
-	#data!: JsonObject;
+	#data!: Contracts.Types.JsonObject;
 
-	#resultValue: JsonObject | undefined;
+	#resultValue: Contracts.Types.JsonObject | undefined;
 
 	#resultError: ValidationErrorItem[] | undefined;
 
-	public validate(data: JsonObject, schema: object): void {
+	public validate(data: Contracts.Types.JsonObject, schema: object): void {
 		this.#data = data;
 
 		const { error, value } = (schema as AnySchema).validate(this.#data);
@@ -40,12 +37,12 @@ export class JoiValidator implements Contracts.Kernel.Validator {
 		return this.#groupErrors("message");
 	}
 
-	public valid(): JsonObject | undefined {
+	public valid(): Contracts.Types.JsonObject | undefined {
 		return this.#resultValue;
 	}
 
-	public invalid(): JsonObject {
-		const errors: JsonObject = {};
+	public invalid(): Contracts.Types.JsonObject {
+		const errors: Contracts.Types.JsonObject = {};
 
 		if (!this.#resultError) {
 			return errors;
@@ -60,7 +57,7 @@ export class JoiValidator implements Contracts.Kernel.Validator {
 		return errors;
 	}
 
-	public attributes(): JsonObject {
+	public attributes(): Contracts.Types.JsonObject {
 		return this.#data;
 	}
 

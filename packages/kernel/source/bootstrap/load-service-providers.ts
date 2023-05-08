@@ -6,13 +6,12 @@ import { join } from "path";
 
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";
-import { JsonObject } from "../types";
 import { assert } from "../utils";
 import { Bootstrapper } from "./interfaces";
 
 interface PluginEntry {
 	package: string;
-	options: JsonObject;
+	options: Contracts.Types.JsonObject;
 }
 
 interface Plugin {
@@ -59,7 +58,7 @@ export class LoadServiceProviders implements Bootstrapper {
 
 	#discoverConfiguration(
 		serviceProvider: ServiceProvider,
-		options: JsonObject,
+		options: Contracts.Types.JsonObject,
 		packageId: string,
 	): PluginConfiguration {
 		const serviceProviderName: string | undefined = serviceProvider.name();
