@@ -27,7 +27,6 @@ export class StateStore implements Contracts.State.StateStore {
 	#lastStoredBlockHeight = 1;
 	#blockPing?: Contracts.State.BlockPing;
 	#started = false;
-	#forkedBlock?: Contracts.Crypto.IBlock;
 	#wakeUpTimeout?: NodeJS.Timeout;
 	#noBlockCounter = 0;
 	#p2pUpdateCounter = 0;
@@ -85,18 +84,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setStarted(started: boolean): void {
 		this.#started = started;
-	}
-
-	public getForkedBlock(): Contracts.Crypto.IBlock | undefined {
-		return this.#forkedBlock;
-	}
-
-	public setForkedBlock(block: Contracts.Crypto.IBlock): void {
-		this.#forkedBlock = block;
-	}
-
-	public clearForkedBlock(): void {
-		this.#forkedBlock = undefined;
 	}
 
 	public getNoBlockCounter(): number {

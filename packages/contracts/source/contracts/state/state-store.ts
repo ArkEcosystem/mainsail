@@ -31,12 +31,6 @@ export interface StateStore {
 
 	setStarted(started: boolean): void;
 
-	getForkedBlock(): IBlock | undefined;
-
-	setForkedBlock(block: IBlock): void;
-
-	clearForkedBlock(): void;
-
 	getNoBlockCounter(): number;
 
 	setNoBlockCounter(noBlockCounter: number): void;

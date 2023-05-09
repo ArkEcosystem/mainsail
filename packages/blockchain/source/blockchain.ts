@@ -312,12 +312,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 				return;
 			}
 			this.#lastCheckNetworkHealthTs = nowTs;
-
-			const networkStatus = await this.networkMonitor.checkNetworkHealth();
-
-			if (networkStatus.forked) {
-				this.dispatch("FORK");
-			}
 		}
 	}
 
