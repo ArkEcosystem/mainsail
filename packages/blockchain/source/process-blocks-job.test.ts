@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { rejects } from "assert";
 
 import { describe, Sandbox } from "../../test-framework";
 import { Blocks } from "../test/fixtures";
@@ -236,7 +237,7 @@ describe<{
 		exitSpy.calledOnce();
 	});
 
-	it("should revert block when blockRepository saveBlocks fails", async (context) => {
+	it("should log and throw error when blockRepository saveBlocks fails", async (context) => {
 		const revertBlockHandler = {
 			execute: () => {},
 		};
@@ -251,6 +252,7 @@ describe<{
 		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
 		stub(databaseService, "saveBlocks").rejectedValue(new Error("oops"));
 
+		const logErrorSpy = spy(logService, "error");
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
 		const resetLastDownloadedBlockSpy = spy(blockchainService, "resetLastDownloadedBlock");
 		const restoreCurrentRoundSpy = spy(databaseInteraction, "restoreCurrentRound");
@@ -259,49 +261,14 @@ describe<{
 		spy(stateStore, "setLastBlock");
 
 		context.processBlocksJob.setBlocks([context.currentBlock]);
-		await context.processBlocksJob.handle();
+		await rejects(() => context.processBlocksJob.handle());
 
-		clearQueueSpy.calledOnce();
-		resetLastDownloadedBlockSpy.calledOnce();
-		restoreCurrentRoundSpy.calledOnce();
-		deleteRoundSpy.calledOnce();
+		logErrorSpy.calledOnce();
+		clearQueueSpy.neverCalled();
+		resetLastDownloadedBlockSpy.neverCalled();
+		restoreCurrentRoundSpy.neverCalled();
+		deleteRoundSpy.neverCalled();
 		setLastStoredBlockHeightSpy.neverCalled();
-	});
-
-	it("should stop app when revertBlockHandler return Corrupted", async (context) => {
-		const exitSpy = stub(process, "exit");
-
-		const revertBlockHandler = {
-			execute: () => {},
-		};
-
-		stub(revertBlockHandler, "execute").resolvedValue(BlockProcessorResult.Corrupted);
-		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(context.sandbox.app, "resolve").returnValue(revertBlockHandler);
-		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
-		stub(databaseService, "saveBlocks").rejectedValue(new Error("oops"));
-
-		const clearQueueSpy = spy(blockchainService, "clearQueue");
-		const resetLastDownloadedBlockSpy = spy(blockchainService, "resetLastDownloadedBlock");
-		const restoreCurrentRoundSpy = spy(databaseInteraction, "restoreCurrentRound");
-		const deleteRoundSpy = spy(databaseService, "deleteRound");
-		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
-		spy(stateStore, "setLastBlock");
-
-		context.processBlocksJob.setBlocks([context.currentBlock]);
-		await context.processBlocksJob.handle();
-
-		clearQueueSpy.calledOnce();
-		resetLastDownloadedBlockSpy.calledOnce();
-		restoreCurrentRoundSpy.calledOnce();
-		deleteRoundSpy.calledOnce();
-		setLastStoredBlockHeightSpy.neverCalled();
-
-		exitSpy.calledOnce();
 	});
 
 	it("should broadcast a block if state is newBlock", async (context) => {

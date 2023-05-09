@@ -4,7 +4,6 @@ import { Services, Utils } from "@mainsail/kernel";
 import { DatabaseInteraction } from "@mainsail/state";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
-import { RevertBlockHandler } from "./processor/handlers";
 import { StateMachine } from "./state-machine";
 
 @injectable()
@@ -150,9 +149,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 					}`,
 				);
 
-				await this.#revertBlocks(acceptedBlocks);
-
-				return;
+				throw error;
 			}
 		}
 
@@ -171,38 +168,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			this.blockchain.clearQueue();
 			this.blockchain.resetLastDownloadedBlock();
 		}
-	}
-
-	async #revertBlocks(blocksToRevert: Contracts.Crypto.IBlock[]): Promise<void> {
-		// Rounds are saved while blocks are being processed and may now be out of sync with the last
-		// block that was written into the database.
-
-		const lastHeight: number = blocksToRevert[0].data.height;
-		const deleteRoundsAfter: number = Utils.roundCalculator.calculateRound(lastHeight, this.configuration).round;
-
-		this.logger.info(
-			`Reverting ${Utils.pluralize(
-				"block",
-				blocksToRevert.length,
-				true,
-			)} back to last height: ${lastHeight.toLocaleString()}`,
-		);
-
-		for (const block of blocksToRevert.reverse()) {
-			if (
-				(await this.app.resolve<RevertBlockHandler>(RevertBlockHandler).execute(block)) ===
-				BlockProcessorResult.Corrupted
-			) {
-				await this.#handleCorrupted();
-			}
-		}
-
-		// TODO: Remove, because next rounds are deleted on restore
-		await this.databaseService.deleteRound(deleteRoundsAfter + 1);
-		await this.databaseInteraction.restoreCurrentRound();
-
-		this.blockchain.clearQueue();
-		this.blockchain.resetLastDownloadedBlock();
 	}
 
 	async #handleCorrupted() {
