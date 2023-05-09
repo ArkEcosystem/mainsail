@@ -62,7 +62,7 @@
 		"@types/tmp": "0.2.1",
 		"@types/yargs-parser": "20.2.1",
 		"tmp": "0.2.1",
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=16.x"

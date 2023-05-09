@@ -34,7 +34,7 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@types/lodash.clone": "^4.5.7",
 		"lodash.clone": "^4.5.0",
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=16.x"

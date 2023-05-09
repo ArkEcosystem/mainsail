@@ -34,7 +34,7 @@
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=16.x"

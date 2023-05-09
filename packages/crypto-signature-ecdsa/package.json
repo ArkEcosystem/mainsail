@@ -26,6 +26,6 @@
 		"bcrypto": "5.4.0"
 	},
 	"devDependencies": {
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	}
 }

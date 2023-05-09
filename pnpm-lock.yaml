@@ -223,11 +223,11 @@ importers:
         specifier: 3.3.0
         version: 3.3.0
       sinon:
-        specifier: ^12.0.1
-        version: 12.0.1
+        specifier: ^15.0.4
+        version: 15.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/cli:
     dependencies:
@@ -356,8 +356,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/cli/test/plugins/@namespace/package2: {}
 
@@ -457,8 +457,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/container:
     dependencies:
@@ -668,8 +668,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
     devDependencies:
       '@types/boxen':
         specifier: 3.0.1
@@ -730,8 +730,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-address-bech32:
     dependencies:
@@ -770,8 +770,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-address-bech32m:
     dependencies:
@@ -810,8 +810,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-address-keccak256:
     dependencies:
@@ -850,8 +850,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-address-ss58:
     dependencies:
@@ -893,8 +893,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-block:
     dependencies:
@@ -939,8 +939,8 @@ importers:
         specifier: ^4.5.0
         version: 4.5.0
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-config:
     dependencies:
@@ -995,8 +995,8 @@ importers:
         version: 5.4.0
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-hash-noble:
     dependencies:
@@ -1014,8 +1014,8 @@ importers:
         version: 1.0.0
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-hash-wasm:
     dependencies:
@@ -1033,8 +1033,8 @@ importers:
         version: 4.9.0
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-key-pair-bls12-381:
     dependencies:
@@ -1079,8 +1079,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-key-pair-ecdsa:
     dependencies:
@@ -1119,8 +1119,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-key-pair-ed25519:
     dependencies:
@@ -1165,8 +1165,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-key-pair-schnorr:
     dependencies:
@@ -1205,8 +1205,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-signature-bls12-381:
     dependencies:
@@ -1227,8 +1227,8 @@ importers:
         version: 1.2.0
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-signature-ecdsa:
     dependencies:
@@ -1249,8 +1249,8 @@ importers:
         version: 5.4.0
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-signature-ed25519:
     dependencies:
@@ -1271,8 +1271,8 @@ importers:
         version: 1.6.0
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-signature-schnorr:
     dependencies:
@@ -1293,8 +1293,8 @@ importers:
         version: 5.4.0
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-time:
     dependencies:
@@ -1315,8 +1315,8 @@ importers:
         specifier: workspace:*
         version: link:../crypto-config
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-transaction:
     dependencies:
@@ -1355,8 +1355,8 @@ importers:
         specifier: 2.2.0
         version: 2.2.0
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-transaction-multi-payment:
     dependencies:
@@ -1518,8 +1518,8 @@ importers:
         specifier: workspace:*
         version: link:../validation
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-transaction-validator-resignation:
     dependencies:
@@ -1607,8 +1607,8 @@ importers:
         specifier: workspace:*
         version: link:../validation
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-validation:
     dependencies:
@@ -1628,8 +1628,8 @@ importers:
         specifier: 8.12.0
         version: 8.12.0
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
     devDependencies:
       '@mainsail/validation':
         specifier: workspace:*
@@ -1660,8 +1660,8 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/database:
     dependencies:
@@ -1830,11 +1830,11 @@ importers:
         specifier: ^10.0.14
         version: 10.0.14
       sinon:
-        specifier: ^12.0.1
-        version: 12.0.1
+        specifier: ^15.0.4
+        version: 15.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/forger-tracker:
     dependencies:
@@ -1849,8 +1849,8 @@ importers:
         version: link:../kernel
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/kernel:
     dependencies:
@@ -1952,8 +1952,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/kernel/test/stubs/stub-plugin: {}
 
@@ -2044,8 +2044,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/logger-winston:
     dependencies:
@@ -2248,11 +2248,11 @@ importers:
         specifier: 3.3.0
         version: 3.3.0
       sinon:
-        specifier: ^13.0.1
-        version: 13.0.1
+        specifier: ^15.0.4
+        version: 15.0.4
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/storage-lmdb:
     dependencies:
@@ -2360,8 +2360,8 @@ importers:
         specifier: ^13.2.2
         version: 13.2.2
       sinon:
-        specifier: ^12.0.1
-        version: 12.0.1
+        specifier: ^15.0.4
+        version: 15.0.4
       string-kit:
         specifier: ~0.16.0
         version: 0.16.0
@@ -2369,8 +2369,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
       zod:
         specifier: ~3.11.6
         version: 3.11.6
@@ -2388,8 +2388,8 @@ importers:
         specifier: 4.5.0
         version: 4.5.0
       '@types/sinon':
-        specifier: ^10.0.6
-        version: 10.0.6
+        specifier: ^10.0.14
+        version: 10.0.14
       '@types/tmp':
         specifier: 0.2.1
         version: 0.2.1
@@ -2437,8 +2437,8 @@ importers:
         specifier: 3.3.0
         version: 3.3.0
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/transactions:
     dependencies:
@@ -2459,8 +2459,8 @@ importers:
         version: link:../utils
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/utils:
     dependencies:
@@ -2505,8 +2505,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/validation:
     dependencies:
@@ -2527,8 +2527,8 @@ importers:
         version: 5.1.0(ajv@8.12.0)
     devDependencies:
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/webhooks:
     dependencies:
@@ -2588,8 +2588,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
 packages:
 
@@ -4852,13 +4852,13 @@ packages:
     engines: {node: '>=14.16'}
     dev: true
 
-  /@sinonjs/commons@1.8.6:
-    resolution: {integrity: sha512-Ky+XkAkqPZSm3NLBeUng77EBQl3cmeJhITaGHdYH8kjVB+aun3S4XBRti2zt17mtt0mIUDiNxYeoJm6drVvBJQ==}
+  /@sinonjs/commons@2.0.0:
+    resolution: {integrity: sha512-uLa0j859mMrg2slwQYdO/AkrOfmH+X6LTVmNTS9CqexuE2IvVORIkSpJLqePAbEnKJ77aMmCwr1NUZ57120Xcg==}
     dependencies:
       type-detect: 4.0.8
 
-  /@sinonjs/commons@2.0.0:
-    resolution: {integrity: sha512-uLa0j859mMrg2slwQYdO/AkrOfmH+X6LTVmNTS9CqexuE2IvVORIkSpJLqePAbEnKJ77aMmCwr1NUZ57120Xcg==}
+  /@sinonjs/commons@3.0.0:
+    resolution: {integrity: sha512-jXBtWAF4vmdNmZgD5FoKsVLv3rPgDnLgPbU84LIJ3otV44vJlDRokVng5v8NFJdCf/da9legHcKaRuZs4L7faA==}
     dependencies:
       type-detect: 4.0.8
 
@@ -4867,27 +4867,10 @@ packages:
     dependencies:
       '@sinonjs/commons': 2.0.0
 
-  /@sinonjs/fake-timers@7.1.2:
-    resolution: {integrity: sha512-iQADsW4LBMISqZ6Ci1dupJL9pprqwcVFTcOsEmQOEhW+KLCVn/Y4Jrvg2k19fIHCp+iFprriYPTdRcQR8NbUPg==}
+  /@sinonjs/samsam@8.0.0:
+    resolution: {integrity: sha512-Bp8KUVlLp8ibJZrnvq2foVhP0IVX2CIprMJPK0vqGqgrDa0OHVKeZyBykqskkrdxV6yKBPmGasO8LVjAKR3Gew==}
     dependencies:
-      '@sinonjs/commons': 1.8.6
-    dev: true
-
-  /@sinonjs/fake-timers@8.1.0:
-    resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
-    dependencies:
-      '@sinonjs/commons': 1.8.6
-
-  /@sinonjs/fake-timers@9.1.2:
-    resolution: {integrity: sha512-BPS4ynJW/o92PUR4wgriz2Ud5gpST5vz6GQfMixEDK0Z8ZCUv2M7SkBLykH56T++Xs+8ln9zTGbOvNGIe02/jw==}
-    dependencies:
-      '@sinonjs/commons': 1.8.6
-    dev: true
-
-  /@sinonjs/samsam@6.1.3:
-    resolution: {integrity: sha512-nhOb2dWPeb1sd3IQXL/dVPnKHDOAFfvichtBf4xV00/rU1QbPCQqKMbvIheIjqwVjh7qIgf2AHTHi391yMOMpQ==}
-    dependencies:
-      '@sinonjs/commons': 1.8.6
+      '@sinonjs/commons': 2.0.0
       lodash.get: 4.4.2
       type-detect: 4.0.8
 
@@ -5396,12 +5379,6 @@ packages:
     resolution: {integrity: sha512-mn72up6cjaMyMuaPaa/AwKf6WtsSRysQC7wxFkCm1XcOKXPM1z+5Y4H5wjIVBz4gdAkjvZxVVfjA6ba1nHr5WQ==}
     dependencies:
       '@types/sinonjs__fake-timers': 8.1.2
-    dev: true
-
-  /@types/sinon@10.0.6:
-    resolution: {integrity: sha512-6EF+wzMWvBNeGrfP3Nx60hhx+FfwSg1JJBLAAP/IdIUq0EYkqCYf70VT3PhuhPX9eLD+Dp+lNdpb/ZeHG8Yezg==}
-    dependencies:
-      '@sinonjs/fake-timers': 7.1.2
     dev: true
 
   /@types/sinonjs__fake-timers@8.1.2:
@@ -14755,26 +14732,15 @@ packages:
       is-arrayish: 0.3.2
     dev: false
 
-  /sinon@12.0.1:
-    resolution: {integrity: sha512-iGu29Xhym33ydkAT+aNQFBINakjq69kKO6ByPvTsm3yyIACfyQttRTP03aBP/I8GfhFmLzrnKwNNkr0ORb1udg==}
+  /sinon@15.0.4:
+    resolution: {integrity: sha512-uzmfN6zx3GQaria1kwgWGeKiXSSbShBbue6Dcj0SI8fiCNFbiUDqKl57WFlY5lyhxZVUKmXvzgG2pilRQCBwWg==}
     dependencies:
-      '@sinonjs/commons': 1.8.6
-      '@sinonjs/fake-timers': 8.1.0
-      '@sinonjs/samsam': 6.1.3
+      '@sinonjs/commons': 3.0.0
+      '@sinonjs/fake-timers': 10.0.2
+      '@sinonjs/samsam': 8.0.0
       diff: 5.1.0
       nise: 5.1.4
       supports-color: 7.2.0
-
-  /sinon@13.0.1:
-    resolution: {integrity: sha512-8yx2wIvkBjIq/MGY1D9h1LMraYW+z1X0mb648KZnKSdvLasvDu7maa0dFaNYdTDczFgbjNw2tOmWdTk9saVfwQ==}
-    dependencies:
-      '@sinonjs/commons': 1.8.6
-      '@sinonjs/fake-timers': 9.1.2
-      '@sinonjs/samsam': 6.1.3
-      diff: 5.1.0
-      nise: 5.1.4
-      supports-color: 7.2.0
-    dev: true
 
   /sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
@@ -15953,6 +15919,17 @@ packages:
 
   /uvu@0.5.3:
     resolution: {integrity: sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==}
+    engines: {node: '>=8'}
+    hasBin: true
+    dependencies:
+      dequal: 2.0.3
+      diff: 5.1.0
+      kleur: 4.1.4
+      sade: 1.8.1
+    dev: true
+
+  /uvu@0.5.6:
+    resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
     engines: {node: '>=8'}
     hasBin: true
     dependencies:

@@ -28,7 +28,7 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@types/wif": "^2.0.1",
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=16.x"

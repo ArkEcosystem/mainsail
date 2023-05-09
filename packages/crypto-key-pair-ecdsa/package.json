@@ -32,6 +32,6 @@
 		"@mainsail/validation": "workspace:*",
 		"@types/wif": "^2.0.2",
 		"bip39": "3.0.4",
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	}
 }
