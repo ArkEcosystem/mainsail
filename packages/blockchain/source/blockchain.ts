@@ -267,15 +267,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.dispatch("WAKEUP");
 	}
 
-	// TODO: Remove
-	public forkBlock(block: Contracts.Crypto.IBlock, numberOfBlockToRollback?: number): void {
-		this.stateStore.setForkedBlock(block);
-
-		this.clearAndStopQueue();
-
-		this.dispatch("FORK");
-	}
-
 	public isSynced(block?: Contracts.Crypto.IBlockData): boolean {
 		if (!this.peerRepository.hasPeers()) {
 			return true;
