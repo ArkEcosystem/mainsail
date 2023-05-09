@@ -2,13 +2,28 @@ import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
-import { Factories, Sandbox } from "../../test-framework";
-import { Configuration } from "../../crypto-config";
 import { SinonSpy, spy } from "sinon";
 
-import { walletFactory } from "../source/wallets/wallet-factory";
-import { BuildValidatorRankingAction } from "../source/actions";
+import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
+import { Configuration } from "../../crypto-config";
+import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";
+import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
+import { PublicKeySerializer } from "../../crypto-key-pair-schnorr/source/serializer";
+import { Signature } from "../../crypto-signature-schnorr/source/signature";
+import {
+	Deserializer as TransactionDeserializer,
+	Serializer,
+	TransactionFactory,
+	TransactionRegistry,
+	TransactionTypeFactory,
+	Utils,
+	Verifier,
+} from "../../crypto-transaction";
+import { Factories, Sandbox } from "../../test-framework";
+import { Validator } from "../../validation/source/validator";
 import { StateBuilder } from "../source";
+import { BuildValidatorRankingAction } from "../source/actions";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
 import { DposState } from "../source/dpos";
@@ -20,22 +35,7 @@ import {
 	WalletRepositoryClone,
 	WalletRepositoryCopyOnWrite,
 } from "../source/wallets";
-import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
-import { PublicKeySerializer } from "../../crypto-key-pair-schnorr/source/serializer";
-import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
-import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
-import {
-	Deserializer as TransactionDeserializer,
-	Serializer,
-	TransactionFactory,
-	TransactionRegistry,
-	TransactionTypeFactory,
-	Utils,
-	Verifier,
-} from "../../crypto-transaction";
-import { Validator } from "../../validation/source/validator";
-import { Signature } from "../../crypto-signature-schnorr/source/signature";
-import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";
+import { walletFactory } from "../source/wallets/wallet-factory";
 
 export interface Spies {
 	applySpy: SinonSpy;
@@ -63,7 +63,6 @@ export interface Setup {
 	blockState: BlockState;
 	stateStore: StateStore;
 	dPosState: DposState;
-	dposPreviousRound: Contracts.State.DposPreviousRoundStateProvider;
 	stateBuilder: StateBuilder;
 	transactionValidator: TransactionValidator;
 	spies: Spies;
@@ -91,10 +90,10 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	const sandbox = new Sandbox();
 
 	const logger = {
+		debug: spy(),
 		error: spy(),
 		info: spy(),
 		notice: spy(),
-		debug: spy(),
 		warning: spy(),
 	};
 
@@ -277,21 +276,13 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.inRequestScope()
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
-	sandbox.app
-		.bind<Contracts.State.DposPreviousRoundStateProvider>(Identifiers.DposPreviousRoundStateProvider)
-		.toProvider(dposPreviousRoundStateProvider);
-
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 	const blockFactory = {
-		fromData: () => undefined,
+		fromData: () => {},
 	};
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);
-
-	const dposPreviousRound = sandbox.app.get<Contracts.State.DposPreviousRoundStateProvider>(
-		Identifiers.DposPreviousRoundStateProvider,
-	);
 
 	@injectable()
 	class MockValidatorMutator implements Contracts.State.ValidatorMutator {
@@ -335,18 +326,17 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	return {
 		blockState,
 		dPosState,
-		dposPreviousRound,
 		factory,
 		sandbox,
 		spies: {
 			applySpy,
+			dispatchSpy,
+			dispatchSyncSpy,
 			getBlockRewardsSpy,
 			getRegisteredHandlersSpy,
-			dispatchSpy,
-			logger,
-			dispatchSyncSpy,
-			revertSpy,
 			getSentTransactionSpy,
+			logger,
+			revertSpy,
 		},
 		stateBuilder,
 		stateStore,

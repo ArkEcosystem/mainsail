@@ -144,7 +144,6 @@ describe<{
 			getRoundValidators: () => {},
 			setValidatorsRound: () => {},
 		});
-		container.bind(Identifiers.DposPreviousRoundStateProvider).toConstantValue(() => {});
 		container.bind(Identifiers.TriggerService).toConstantValue({
 			call: () => {},
 		});
