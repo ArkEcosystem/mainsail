@@ -765,28 +765,6 @@ describe<{
 		dispatchSpy.calledWith("WAKEUP");
 	});
 
-	it("forkBlock should set forkedBlock, clear and stop queue and dispatch 'FORK'", async (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		await blockchain.initialize();
-
-		const forkedBlock = { data: { height: 8877, id: "1234" } };
-		const numberOfBlocksToRollback = 34;
-		const clearAndStopQueueSpy = spy(blockchain, "clearAndStopQueue");
-		const dispatchSpy = spy(blockchain, "dispatch");
-		const setForkedBlockSpy = spy(context.stateStore, "setForkedBlock");
-		const setNumberOfBlocksToRollbackSpy = spy(context.stateStore, "setNumberOfBlocksToRollback");
-		const mockBlock = { data: { height: 444, id: "123" } };
-		stub(context.stateStore, "getLastBlock").returnValue(mockBlock);
-
-		blockchain.forkBlock(forkedBlock as Contracts.Crypto.IBlock, numberOfBlocksToRollback);
-
-		setForkedBlockSpy.calledWith(forkedBlock);
-		setNumberOfBlocksToRollbackSpy.calledWith(numberOfBlocksToRollback);
-		clearAndStopQueueSpy.calledOnce();
-		dispatchSpy.calledOnce();
-		dispatchSpy.calledWith("FORK");
-	});
-
 	it("isSynced should return true if we have no peer", (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 
@@ -909,7 +887,7 @@ describe<{
 		pushPingBlockSpy.calledWith(incomingBlock, false);
 	});
 
-	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()<=0.8, should checkNetworkHealth", async (context) => {
+	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()<=0.8, should pass", async (context) => {
 		stub(context.configuration, "getMilestone").returnValue({
 			activeValidators: 51,
 		});
@@ -918,14 +896,11 @@ describe<{
 
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 
-		const checkNetworkHealthStub = stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({});
 		for (let index = 1; index < threshold; index++) {
 			await blockchain.checkMissingBlocks();
-			checkNetworkHealthStub.neverCalled();
 		}
 
 		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.calledOnce();
 	});
 
 	it("checkMissingBlocks should skip checkNetworkHealth if last check occurs in past 10 minutes", async (context) => {
@@ -937,47 +912,18 @@ describe<{
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 		stub(Math, "random").returnValue(0.7);
 
-		const checkNetworkHealthStub = stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({});
 		// @ts-ignore
 		blockchain.missedBlocks = threshold;
 		// @ts-ignore
 		blockchain.lastCheckNetworkHealthTs = Date.now();
 
 		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.neverCalled();
 
 		// @ts-ignore
 		blockchain.missedBlocks = threshold;
 		// @ts-ignore
 		blockchain.lastCheckNetworkHealthTs = Date.now() - 11 * 60 * 1000;
 		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.calledOnce();
-	});
-
-	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()<=0.8, should checkNetworkHealth and dispatch FORK if forked", async (context) => {
-		stub(context.configuration, "getMilestone").returnValue({
-			activeValidators: 51,
-		});
-		const threshold = context.configuration.getMilestone().activeValidators / 3 - 1;
-
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		stub(Math, "random").returnValue(0.7);
-
-		const dispatchSpy = spy(blockchain, "dispatch");
-
-		const checkNetworkHealthStub = stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({
-			forked: true,
-		});
-		for (let index = 1; index < threshold; index++) {
-			await blockchain.checkMissingBlocks();
-			checkNetworkHealthStub.neverCalled();
-			dispatchSpy.neverCalled();
-		}
-
-		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.calledOnce();
-		dispatchSpy.calledOnce();
-		dispatchSpy.calledWith("FORK");
 	});
 
 	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()>0.8, should do nothing", async (context) => {

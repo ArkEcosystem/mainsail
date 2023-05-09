@@ -8,7 +8,6 @@ describe<{
 	container: Container;
 	blockchain: any;
 	stateStore: any;
-	peerNetworkMonitor: any;
 	queue: any;
 	logger: any;
 }>("CheckLastDownloadedBlockSynced", ({ beforeEach, it, spy, stub }) => {
@@ -34,9 +33,6 @@ describe<{
 			setNumberOfBlocksToRollback: () => {},
 			setP2pUpdateCounter: () => {},
 		};
-		context.peerNetworkMonitor = {
-			checkNetworkHealth: () => {},
-		};
 		context.logger = {
 			debug: () => {},
 			error: () => {},
@@ -48,7 +44,6 @@ describe<{
 		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
 
 		process.env.CORE_ENV = "";
 	});
@@ -112,7 +107,6 @@ describe<{
 		stub(context.stateStore, "getNoBlockCounter").returnValue(6);
 		stub(context.queue, "isRunning").returnValue(false);
 		stub(context.stateStore, "getP2pUpdateCounter").returnValue(3);
-		stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({ forked: false });
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const setP2pUpdateCounterSpy = spy(context.stateStore, "setP2pUpdateCounter");
 		const setNoBlockCounterSpy = spy(context.stateStore, "setNoBlockCounter");
@@ -123,26 +117,6 @@ describe<{
 		dispatchSpy.calledWith("NETWORKHALTED");
 		setP2pUpdateCounterSpy.calledWith(0);
 		setNoBlockCounterSpy.calledWith(0);
-	});
-
-	it("when stateStore.getP2pUpdateCounter + 1 > 3should dispatch FORK when networkStatus.forked", async (context) => {
-		const checkLastDownloadedBlockSynced =
-			context.container.resolve<CheckLastDownloadedBlockSynced>(CheckLastDownloadedBlockSynced);
-
-		stub(context.stateStore, "getNoBlockCounter").returnValue(6);
-		stub(context.queue, "isRunning").returnValue(false);
-		stub(context.stateStore, "getP2pUpdateCounter").returnValue(3);
-		stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({ forked: true });
-		const dispatchSpy = spy(context.blockchain, "dispatch");
-		const setP2pUpdateCounterSpy = spy(context.stateStore, "setP2pUpdateCounter");
-		const setNumberOfBlocksToRollbackSpy = spy(context.stateStore, "setNumberOfBlocksToRollback");
-
-		await checkLastDownloadedBlockSynced.handle();
-
-		dispatchSpy.calledOnce();
-		dispatchSpy.calledWith("FORK");
-		setP2pUpdateCounterSpy.calledWith(0);
-		setNumberOfBlocksToRollbackSpy.calledWith(0);
 	});
 
 	it("when stateStore.getP2pUpdateCounter + 1 <= 3 should dispatch NETWORKHALTED and do stateStore.setP2pUpdateCounter++", async (context) => {

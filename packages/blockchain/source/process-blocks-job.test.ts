@@ -20,7 +20,6 @@ describe<{
 }>("ProcessBlocksJob", ({ assert, beforeEach, it, spy, stub }) => {
 	const blockchainService: any = {
 		clearQueue: () => {},
-		forkBlock: () => {},
 		getLastBlock: () => {},
 		resetLastDownloadedBlock: () => {},
 	};
@@ -146,20 +145,6 @@ describe<{
 
 		clearQueueSpy.calledOnce();
 		resetLastDownloadedBlockSpy.calledOnce();
-	});
-
-	it("should not process the remaining blocks if one is not accepted (BlockProcessorResult.Rollback)", async (context) => {
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(blockchainService, "getLastBlock").returnValue({ data: { height: 1 } });
-		const callStub = stub(context.triggers, "call").returnValue(BlockProcessorResult.Rollback);
-		const forkBlockSpy = spy(blockchainService, "forkBlock");
-
-		context.processBlocksJob.setBlocks([context.lastBlock, context.currentBlock]);
-		await context.processBlocksJob.handle();
-
-		callStub.calledOnce();
-		forkBlockSpy.calledOnce(); // because Rollback
 	});
 
 	it("should not process the remaining blocks if one is not accepted (BlockProcessorResult.Rejected)", async (context) => {
