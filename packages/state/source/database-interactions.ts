@@ -19,9 +19,6 @@ export class DatabaseInteraction {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.StateTransactionStore)
-	private readonly stateTransactionStore!: Contracts.State.TransactionStore;
-
 	@inject(Identifiers.TransactionHandlerRegistry)
 	@tagged("state", "blockchain")
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
@@ -123,9 +120,6 @@ export class DatabaseInteraction {
 
 	#configureState(lastBlock: Contracts.Crypto.IBlock): void {
 		this.stateStore.setLastBlock(lastBlock);
-		const { blockTime, block } = this.configuration.getMilestone();
-		const blocksPerDay: number = Math.ceil(86_400 / blockTime);
-		this.stateTransactionStore.resize(blocksPerDay * block.maxTransactions);
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
