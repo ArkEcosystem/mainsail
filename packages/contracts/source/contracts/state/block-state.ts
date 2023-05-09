@@ -4,8 +4,6 @@ import { Wallet } from "./wallets";
 export interface BlockState {
 	applyBlock(block: IBlock): Promise<void>;
 
-	revertBlock(block: IBlock): Promise<void>;
-
 	applyTransaction(transaction: ITransaction): Promise<void>;
 
 	revertTransaction(transaction: ITransaction): Promise<void>;

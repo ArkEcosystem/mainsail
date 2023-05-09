@@ -53,21 +53,6 @@ export class RoundState {
 		await this.#applyRound(block.data.height);
 	}
 
-	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-		if (this.#blocksInCurrentRound.length === 0) {
-			this.#blocksInCurrentRound = await this.#getBlocksForRound();
-		}
-
-		assert(
-			// eslint-disable-next-line unicorn/prefer-at
-			this.#blocksInCurrentRound[this.#blocksInCurrentRound.length - 1]!.data.id === block.data.id,
-			`Last block in blocksInCurrentRound doesn't match block with id ${block.data.id}`,
-		);
-
-		await this.#revertRound(block.data.height);
-		this.#blocksInCurrentRound.pop();
-	}
-
 	// TODO: Check if can restore from state
 	public async restore(): Promise<void> {
 		const block = this.stateStore.getLastBlock();
@@ -172,22 +157,6 @@ export class RoundState {
 			this.#blocksInCurrentRound = [];
 
 			await this.events.dispatch(Enums.RoundEvent.Applied);
-		}
-	}
-
-	async #revertRound(height: number): Promise<void> {
-		const roundInfo = this.#getRound(height);
-		const { round, nextRound } = roundInfo;
-
-		if (nextRound === round + 1) {
-			this.logger.info(`Back to previous round: ${round.toLocaleString()}`);
-
-			await this.#setForgingValidatorsOfRound(
-				roundInfo,
-				// await this.#calcPreviousActiveValidators(roundInfo, this.#blocksInCurrentRound),
-			);
-
-			await this.databaseService.deleteRound(nextRound);
 		}
 	}
 
