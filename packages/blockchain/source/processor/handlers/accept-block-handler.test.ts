@@ -12,7 +12,6 @@ describe<{
 	state: any;
 	transactionPool: any;
 	databaseInteractions: any;
-	revertBlockHandler: any;
 	application: any;
 	block: any;
 }>("AcceptBlockHandler", ({ assert, beforeEach, it, spy, spyFn, stub }) => {
@@ -46,13 +45,9 @@ describe<{
 			getLastBlock: () => {},
 			getTopBlocks: () => {},
 			loadBlocksFromCurrentRound: () => {},
-			revertBlock: () => {},
 			walletRepository: {
 				getNonce: () => {},
 			},
-		};
-		context.revertBlockHandler = {
-			execute: () => {},
 		};
 		context.application = {
 			get: () => {},
@@ -72,7 +67,7 @@ describe<{
 		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
 	});
 
-	it("execute should apply block to database, transaction pool, blockchain and state", async (context) => {
+	it("#execute - should apply block to database, transaction pool, blockchain and state", async (context) => {
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 		stub(context.state, "isStarted").returnValue(true);
@@ -91,7 +86,7 @@ describe<{
 		removeForgedTransactionSpy.calledWith(context.block.transactions[1]);
 	});
 
-	it("execute should clear forkedBlock if incoming block has same height", async (context) => {
+	it("#execute - should clear forkedBlock if incoming block has same height", async (context) => {
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 		stub(context.state, "getForkedBlock").returnValue({ data: { height: context.block.data.height } });
@@ -103,7 +98,7 @@ describe<{
 		clearForkedBlockSpy.calledOnce();
 	});
 
-	it("execute should set state.lastDownloadedBlock if incoming block height is higher", async (context) => {
+	it("#execute - should set state.lastDownloadedBlock if incoming block height is higher", async (context) => {
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 		stub(context.state, "getLastDownloadedBlock").returnValue({ height: context.block.data.height - 1 });
@@ -116,10 +111,7 @@ describe<{
 		setLastDownloadedBlockSpy.calledWith(context.block.data);
 	});
 
-	it("revert should return Rejected when block not accepted and execute throws", async (context) => {
-		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
-			BlockProcessorResult.Reverted,
-		);
+	it("#execute - should return Rejected when block not accepted and execute throws", async (context) => {
 		stub(context.state, "getLastBlock").returnValue({ data: { height: 5543 } }); // Current block was not accpeted
 
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
@@ -131,6 +123,5 @@ describe<{
 
 		assert.is(result, BlockProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
-		revertBlockHandlerExecuteStub.neverCalled();
 	});
 });

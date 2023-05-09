@@ -238,15 +238,9 @@ describe<{
 	});
 
 	it("should log and throw error when blockRepository saveBlocks fails", async (context) => {
-		const revertBlockHandler = {
-			execute: () => {},
-		};
-
-		stub(revertBlockHandler, "execute").resolvedValue(BlockProcessorResult.Reverted);
 		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
 		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(context.sandbox.app, "resolve").returnValue(revertBlockHandler);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);

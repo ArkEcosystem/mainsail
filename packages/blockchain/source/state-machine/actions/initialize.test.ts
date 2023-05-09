@@ -51,7 +51,6 @@ describe<{
 			getTopBlocks: () => {},
 			loadBlocksFromCurrentRound: () => {},
 			restoreCurrentRound: () => {},
-			revertBlock: () => {},
 			walletRepository: {
 				getNonce: () => {},
 			},
