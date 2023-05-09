@@ -58,7 +58,7 @@
 		"@types/lodash.clonedeep": "4.5.0",
 		"@types/sinon": "^10.0.6",
 		"@types/tmp": "0.2.1",
-		"joi": "17.4.2"
+		"joi": "17.9.2"
 	},
 	"engines": {
 		"node": ">=16.x"

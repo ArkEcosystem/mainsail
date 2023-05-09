@@ -24,7 +24,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "17.4.2",
+		"joi": "17.9.2",
 		"xstate": "4.23.4"
 	},
 	"devDependencies": {
