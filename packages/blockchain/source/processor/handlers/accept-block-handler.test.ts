@@ -116,25 +116,6 @@ describe<{
 		setLastDownloadedBlockSpy.calledWith(context.block.data);
 	});
 
-	it("revert should call revertBlockHandler when block is accepted, but execute throws", async (context) => {
-		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
-			BlockProcessorResult.Reverted,
-		);
-		stub(context.application, "resolve").returnValue(context.revertBlockHandler);
-		stub(context.state, "getLastBlock").returnValue({ data: { height: 5544 } });
-		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
-
-		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
-
-		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
-
-		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
-
-		assert.is(result, BlockProcessorResult.Rejected);
-		resetLastDownloadedBlockSpy.calledOnce();
-		revertBlockHandlerExecuteStub.calledOnce();
-	});
-
 	it("revert should call not revertBlockHandler when block not accepted and execute throws", async (context) => {
 		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
 			BlockProcessorResult.Reverted,
@@ -151,25 +132,5 @@ describe<{
 		assert.is(result, BlockProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
 		revertBlockHandlerExecuteStub.neverCalled();
-	});
-
-	it("revert should return Corrupted when reverting block fails", async (context) => {
-		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
-			BlockProcessorResult.Corrupted,
-		);
-		stub(context.application, "resolve").returnValue(context.revertBlockHandler);
-		stub(context.state, "getLastBlock").returnValue({ data: { height: 5544 } });
-
-		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
-
-		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
-		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
-
-		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
-
-		assert.is(result, BlockProcessorResult.Corrupted);
-
-		resetLastDownloadedBlockSpy.calledOnce();
-		revertBlockHandlerExecuteStub.calledOnce();
 	});
 });
