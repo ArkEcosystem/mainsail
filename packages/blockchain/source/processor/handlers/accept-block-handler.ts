@@ -3,7 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { DatabaseInteraction } from "@mainsail/state";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
-import { RevertBlockHandler } from "./revert-block-handler";
 
 @injectable()
 export class AcceptBlockHandler implements BlockHandler {
@@ -60,15 +59,6 @@ export class AcceptBlockHandler implements BlockHandler {
 			this.logger.debug(error.stack);
 
 			this.blockchain.resetLastDownloadedBlock();
-
-			// Revert block if accepted
-			if (this.state.getLastBlock().data.height === block.data.height) {
-				const revertResult = await this.app.resolve<RevertBlockHandler>(RevertBlockHandler).execute(block);
-
-				if (revertResult === BlockProcessorResult.Corrupted) {
-					return revertResult;
-				}
-			}
 
 			return BlockProcessorResult.Rejected;
 		}
