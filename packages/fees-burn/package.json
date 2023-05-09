@@ -23,7 +23,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "17.4.2"
+		"joi": "17.9.2"
 	},
 	"devDependencies": {},
 	"engines": {

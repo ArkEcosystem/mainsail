@@ -152,8 +152,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       nanomatch:
         specifier: 1.2.13
         version: 1.2.13
@@ -198,8 +198,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       xstate:
         specifier: 4.23.4
         version: 4.23.4
@@ -274,8 +274,8 @@ importers:
         specifier: 11.8.2
         version: 11.8.2
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       kleur:
         specifier: 4.0.0
         version: 4.0.0
@@ -653,8 +653,8 @@ importers:
         specifier: 8.1.0
         version: 8.1.0
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       kleur:
         specifier: 4.1.4
         version: 4.1.4
@@ -1763,8 +1763,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
 
   packages/fees-managed:
     dependencies:
@@ -1784,8 +1784,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
 
   packages/fees-static:
     dependencies:
@@ -1894,8 +1894,8 @@ importers:
         specifier: 2.0.1
         version: 2.0.1
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       log-process-errors:
         specifier: 5.1.2
         version: 5.1.2
@@ -1977,8 +1977,8 @@ importers:
         specifier: 11.1.1
         version: 11.1.1
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       pino:
         specifier: 6.13.2
         version: 6.13.2
@@ -2059,8 +2059,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       winston:
         specifier: ^3.6.0
         version: 3.6.0
@@ -2077,8 +2077,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
 
   packages/networking-ntp:
     dependencies:
@@ -2095,8 +2095,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
     devDependencies:
       '@types/hapi__sntp':
         specifier: 3.1.2
@@ -2147,8 +2147,8 @@ importers:
         specifier: 2.0.1
         version: 2.0.1
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       pluralize:
         specifier: 8.0.0
         version: 8.0.0
@@ -2238,8 +2238,8 @@ importers:
         specifier: 4.0.0-rc.14
         version: 4.0.0-rc.14
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       lmdb:
         specifier: 2.7.11
         version: 2.7.11
@@ -2397,8 +2397,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
 
   packages/transaction-pool:
     dependencies:
@@ -2421,8 +2421,8 @@ importers:
         specifier: 8.1.0
         version: 8.1.0
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
     devDependencies:
       '@mainsail/crypto-config':
         specifier: workspace:*
@@ -2557,8 +2557,8 @@ importers:
         specifier: 8.1.0
         version: 8.1.0
       joi:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 17.9.2
+        version: 17.9.2
       lowdb:
         specifier: 1.0.0
         version: 1.0.0
@@ -5125,7 +5125,7 @@ packages:
       '@types/hapi__mimos': 4.1.4
       '@types/hapi__shot': 4.1.2
       '@types/node': 20.1.0
-      joi: 17.4.2
+      joi: 17.9.2
     dev: true
 
   /@types/hapi__hapi@21.0.0:
@@ -10858,8 +10858,8 @@ packages:
     resolution: {integrity: sha512-+kHj8HXArPfpPEKGLZ+kB5ONRTCiGQXo8RQYL0hH8t6pWXUBBK5KkkQmTNOwKK4LEsd0yTsgtjJVm4UBSZea4w==}
     engines: {node: '>= 0.6.0'}
 
-  /joi@17.4.2:
-    resolution: {integrity: sha512-Lm56PP+n0+Z2A2rfRvsfWVDXGEWjXxatPopkQ8qQ5mxCEhwHG+Ettgg5o98FFaxilOxozoa14cFhrE/hOzh/Nw==}
+  /joi@17.9.2:
+    resolution: {integrity: sha512-Itk/r+V4Dx0V3c7RLFdRh12IOjySm2/WGPMubBT92cQvRfYZhPM2W0hZlctjj72iES8jsRCwp7S/cRmWBnJ4nw==}
     dependencies:
       '@hapi/hoek': 9.2.0
       '@hapi/topo': 5.1.0

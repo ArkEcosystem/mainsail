@@ -24,7 +24,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"immutable": "4.0.0-rc.14",
-		"joi": "17.4.2",
+		"joi": "17.9.2",
 		"lmdb": "2.7.11"
 	},
 	"devDependencies": {
