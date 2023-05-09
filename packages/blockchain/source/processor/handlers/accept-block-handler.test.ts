@@ -116,7 +116,7 @@ describe<{
 		setLastDownloadedBlockSpy.calledWith(context.block.data);
 	});
 
-	it("revert should call not revertBlockHandler when block not accepted and execute throws", async (context) => {
+	it("revert should return Rejected when block not accepted and execute throws", async (context) => {
 		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
 			BlockProcessorResult.Reverted,
 		);
