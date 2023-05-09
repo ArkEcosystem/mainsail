@@ -43,6 +43,6 @@ describe<{
 			signatures: ["topic:command1"],
 		});
 
-		spyInfo.calledWith(`Run ${blue("ark help")} for a list of available commands.`);
+		spyInfo.calledWith(`Run ${blue("mainsail help")} for a list of available commands.`);
 	});
 });
