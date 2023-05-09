@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
-import { DatabaseInteraction } from "@mainsail/state";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
 import { StateMachine } from "./state-machine";
@@ -23,9 +22,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.DatabaseInteraction)
-	private readonly databaseInteraction!: DatabaseInteraction;
-
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
@@ -34,9 +30,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
