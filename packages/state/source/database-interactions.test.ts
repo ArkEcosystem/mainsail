@@ -323,27 +323,4 @@ describe<{
 		eventsStub.calledWith(Enums.TransactionEvent.Applied, transaction.data);
 		eventsStub.calledWith(Enums.BlockEvent.Applied, block.data);
 	});
-
-	it("revertBlock - should revert state, and fire events", async (context) => {
-		const eventsStub = spy(context.events, "dispatch");
-		const blockStateStub = spy(context.blockState, "revertBlock");
-		const roundStateStub = spy(context.roundState, "revertBlock");
-
-		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
-
-		const transaction1 = { data: {} };
-		const transaction2 = { data: {} };
-		const block = {
-			data: { height: 100, id: "123" },
-			transactions: [transaction1, transaction2],
-		};
-
-		await databaseInteraction.revertBlock(block as any);
-
-		blockStateStub.calledWith(block);
-		roundStateStub.calledWith(block);
-		eventsStub.calledWith(Enums.TransactionEvent.Reverted, transaction1.data);
-		eventsStub.calledWith(Enums.TransactionEvent.Reverted, transaction2.data);
-		eventsStub.calledWith(Enums.BlockEvent.Reverted, block.data);
-	});
 });
