@@ -32,7 +32,7 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 
 		await cli.execute("distribution");
 
-		assert.true(message.includes(`is not a ark command.`));
+		assert.true(message.includes(`is not a mainsail command.`));
 		assert.equal(process.exitCode, 2);
 	});
 
