@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@hapi/hapi": "20.1.5",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.11.0",
+		"ajv": "8.12.0",
 		"dayjs": "1.10.7",
 		"inversify": "5.1.1",
 		"plur": "^4.0.0",

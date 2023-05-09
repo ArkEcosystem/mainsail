@@ -31,7 +31,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.11.0",
+		"ajv": "8.12.0",
 		"dayjs": "1.10.7",
 		"delay": "4.4.1",
 		"ip": "1.1.5",

@@ -26,7 +26,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"ajv": "8.11.0",
+		"ajv": "8.12.0",
 		"deepmerge": "4.2.2"
 	},
 	"devDependencies": {

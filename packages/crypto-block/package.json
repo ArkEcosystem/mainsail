@@ -26,7 +26,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "1.3.1",
 		"@mainsail/validation": "workspace:*",
-		"ajv": "8.11.0"
+		"ajv": "8.12.0"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-bech32m": "workspace:*",
