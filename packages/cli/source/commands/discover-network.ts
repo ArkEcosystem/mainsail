@@ -13,7 +13,7 @@ export class DiscoverNetwork {
 
 		if (!folders || folders.length === 0) {
 			throw new Error(
-				'We were unable to detect a network configuration. Please run "ark config:publish" and try again.',
+				'We were unable to detect a network configuration. Please run "mainsail config:publish" and try again.',
 			);
 		}
 
