@@ -123,7 +123,6 @@ export const Identifiers = {
 	State: {
 		ValidatorMutator: Symbol.for("State<ValidatorMutator>"),
 	},
-	StateBlockStore: Symbol.for("State<BlockStore>"),
 	StateBuilder: Symbol.for("State<StateBuilder>"),
 	StateMachine: Symbol.for("Blockchain<StateMachine>"),
 	StateStore: Symbol.for("State<StateStore>"),

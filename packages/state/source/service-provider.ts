@@ -11,7 +11,6 @@ import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { RoundState } from "./round-state";
 import { StateBuilder } from "./state-builder";
-import { BlockStore } from "./stores/blocks";
 import { StateStore } from "./stores/state";
 import { TransactionStore } from "./stores/transactions";
 import { TransactionValidator } from "./transaction-validator";
@@ -65,7 +64,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 		this.app.bind(Identifiers.RoundState).to(RoundState).inSingletonScope();
 
-		this.app.bind(Identifiers.StateBlockStore).toConstantValue(new BlockStore(1000));
 		this.app.bind(Identifiers.StateTransactionStore).toConstantValue(new TransactionStore(1000));
 
 		this.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
