@@ -126,12 +126,7 @@ describe<{
 		});
 		container.bind(Identifiers.Database.Service).to(DatabaseService);
 		container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
-		container.bind(Identifiers.StateBlockStore).toConstantValue({
-			resize: () => {},
-		});
-		container.bind(Identifiers.StateTransactionStore).toConstantValue({
-			resize: () => {},
-		});
+
 		container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
 		container.bind(Identifiers.WalletRepository).toConstantValue({
 			createWallet: () => {},
