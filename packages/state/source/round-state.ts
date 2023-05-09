@@ -13,9 +13,6 @@ export class RoundState {
 	@tagged("state", "blockchain")
 	private readonly dposState!: Contracts.State.DposState;
 
-	@inject(Identifiers.DposPreviousRoundStateProvider)
-	private readonly getDposPreviousRoundState!: Contracts.State.DposPreviousRoundStateProvider;
-
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
@@ -187,7 +184,7 @@ export class RoundState {
 
 			await this.#setForgingValidatorsOfRound(
 				roundInfo,
-				await this.#calcPreviousActiveValidators(roundInfo, this.#blocksInCurrentRound),
+				// await this.#calcPreviousActiveValidators(roundInfo, this.#blocksInCurrentRound),
 			);
 
 			await this.databaseService.deleteRound(nextRound);
@@ -287,24 +284,5 @@ export class RoundState {
 		// ! only last part of that function which reshuffles validators is used
 		const result = await this.triggers.call("getActiveValidators", { roundInfo, validators });
 		this.#forgingValidators = (result as Contracts.State.Wallet[]) || [];
-	}
-
-	async #calcPreviousActiveValidators(
-		roundInfo: Contracts.Shared.RoundInfo,
-		blocks: Contracts.Crypto.IBlock[],
-	): Promise<Contracts.State.Wallet[]> {
-		const previousRoundState = await this.getDposPreviousRoundState(blocks, roundInfo);
-
-		// TODO: Move to Dpos
-		for (const previousRoundValidatorWallet of previousRoundState.getActiveValidators()) {
-			// ! name suggest that this is pure function
-			// ! when in fact it is manipulating current wallet repository setting validator ranks
-			const username = previousRoundValidatorWallet.getAttribute("validator.username");
-			const validatorWallet = this.walletRepository.findByUsername(username);
-			validatorWallet.setAttribute("validator.rank", previousRoundValidatorWallet.getAttribute("validator.rank"));
-		}
-
-		// ! return readonly array instead of taking slice
-		return [...previousRoundState.getRoundValidators()];
 	}
 }

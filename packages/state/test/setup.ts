@@ -8,7 +8,7 @@ import { SinonSpy, spy } from "sinon";
 
 import { walletFactory } from "../source/wallets/wallet-factory";
 import { BuildValidatorRankingAction } from "../source/actions";
-import { dposPreviousRoundStateProvider, StateBuilder } from "../source";
+import { StateBuilder } from "../source";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
 import { DposState } from "../source/dpos";
