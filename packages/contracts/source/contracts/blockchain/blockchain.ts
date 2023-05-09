@@ -31,8 +31,6 @@ export interface Blockchain {
 
 	forceWakeup(): void;
 
-	forkBlock(block: IBlock, numberOfBlockToRollback?: number): void;
-
 	isSynced(block?: IBlockData): boolean;
 
 	getLastBlock(): IBlock;

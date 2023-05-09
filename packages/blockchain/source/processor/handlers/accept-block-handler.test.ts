@@ -26,12 +26,9 @@ describe<{
 			resetWakeUp: () => {},
 		};
 		context.state = {
-			clearForkedBlock: () => {},
-			getForkedBlock: () => {},
 			getLastBlock: () => {},
 			getLastDownloadedBlock: () => {},
 			isStarted: () => false,
-			setForkedBlock: () => {},
 			setLastBlock: () => {},
 			setLastDownloadedBlock: () => {},
 		};
@@ -84,18 +81,6 @@ describe<{
 		removeForgedTransactionSpy.calledTimes(2);
 		removeForgedTransactionSpy.calledWith(context.block.transactions[0]);
 		removeForgedTransactionSpy.calledWith(context.block.transactions[1]);
-	});
-
-	it("#execute - should clear forkedBlock if incoming block has same height", async (context) => {
-		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
-
-		stub(context.state, "getForkedBlock").returnValue({ data: { height: context.block.data.height } });
-		const clearForkedBlockSpy = spy(context.state, "clearForkedBlock");
-
-		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
-
-		assert.is(result, BlockProcessorResult.Accepted);
-		clearForkedBlockSpy.calledOnce();
 	});
 
 	it("#execute - should set state.lastDownloadedBlock if incoming block height is higher", async (context) => {

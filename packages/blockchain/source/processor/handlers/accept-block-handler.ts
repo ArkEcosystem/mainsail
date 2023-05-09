@@ -28,13 +28,6 @@ export class AcceptBlockHandler implements BlockHandler {
 		try {
 			await this.databaseInteraction.applyBlock(block);
 
-			// Check if we recovered from a fork
-			const forkedBlock = this.state.getForkedBlock();
-			if (forkedBlock && forkedBlock.data.height === block.data.height) {
-				this.logger.info("Successfully recovered from fork");
-				this.state.clearForkedBlock();
-			}
-
 			for (const transaction of block.transactions) {
 				await this.transactionPool.removeForgedTransaction(transaction);
 			}

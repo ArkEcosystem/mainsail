@@ -7,17 +7,8 @@ export const blockchainMachine: any = Machine({
 		exit: {
 			onEntry: ["exitApp"],
 		},
-		fork: {
-			on: {
-				FAILURE: "exit",
-				STOP: "stopped",
-				SUCCESS: "syncWithNetwork",
-			},
-			onEntry: ["startForkRecovery"],
-		},
 		idle: {
 			on: {
-				FORK: "fork",
 				NEWBLOCK: "newBlock",
 				STOP: "stopped",
 				WAKEUP: "syncWithNetwork",
@@ -35,13 +26,12 @@ export const blockchainMachine: any = Machine({
 		},
 		newBlock: {
 			on: {
-				FORK: "fork",
 				PROCESSFINISHED: "idle",
 				STOP: "stopped",
 			},
 		},
 		/**
-		 * This state should be used for stopping the blockchain on purpose, not as
+		 * This state should be used for stopping the blockchain on surpose, not as
 		 * a result of critical errors. In those cases, using the `exit` state would
 		 * be a better option
 		 */
@@ -52,7 +42,6 @@ export const blockchainMachine: any = Machine({
 		syncWithNetwork: {
 			initial: "syncing",
 			on: {
-				FORK: "fork",
 				STOP: "stopped",
 				SYNCFINISHED: "idle",
 				TEST: "idle",

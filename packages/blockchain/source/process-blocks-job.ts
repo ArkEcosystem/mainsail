@@ -74,7 +74,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		const acceptedBlocks: Contracts.Crypto.IBlock[] = [];
-		let forkBlock: Contracts.Crypto.IBlock | undefined;
 		let lastProcessResult: BlockProcessorResult | undefined;
 		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
@@ -114,11 +113,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 					await this.#handleCorrupted();
 					return;
 				} else {
-					if (lastProcessResult === BlockProcessorResult.Rollback) {
-						forkBlock = blockInstance;
-						this.stateStore.setLastDownloadedBlock(blockInstance.data);
-					}
-
 					break; // if one block is not accepted, the other ones won't be chained anyway
 				}
 			}
@@ -155,8 +149,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.networkMonitor.broadcastBlock(lastProcessedBlock);
 			}
-		} else if (forkBlock) {
-			this.blockchain.forkBlock(forkBlock);
 		} else {
 			this.blockchain.clearQueue();
 			this.blockchain.resetLastDownloadedBlock();

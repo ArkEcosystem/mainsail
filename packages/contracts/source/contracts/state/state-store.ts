@@ -31,12 +31,6 @@ export interface StateStore {
 
 	setStarted(started: boolean): void;
 
-	getForkedBlock(): IBlock | undefined;
-
-	setForkedBlock(block: IBlock): void;
-
-	clearForkedBlock(): void;
-
 	getNoBlockCounter(): number;
 
 	setNoBlockCounter(noBlockCounter: number): void;
@@ -44,10 +38,6 @@ export interface StateStore {
 	getP2pUpdateCounter(): number;
 
 	setP2pUpdateCounter(p2pUpdateCounter: number): void;
-
-	getNumberOfBlocksToRollback(): number;
-
-	setNumberOfBlocksToRollback(numberOfBlocksToRollback: number): void;
 
 	getNetworkStart(): boolean;
 

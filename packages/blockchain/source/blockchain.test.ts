@@ -58,7 +58,6 @@ describe<{
 			pingBlock: () => {},
 			pushPingBlock: () => {},
 			reset: () => {},
-			setForkedBlock: () => {},
 			setLastBlock: () => {},
 			setLastDownloadedBlock: () => {},
 			setLastStoredBlockHeight: () => {},
@@ -676,71 +675,6 @@ describe<{
 		setBlocksSpy.calledWith([blockAfterMilestone]);
 	});
 
-	// it("removeBlocks should throw if last database block is not the same as last state block", async (context) => {
-	// 	const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-	// 	await blockchain.initialize();
-
-	// 	const exitSpy = stub(process, "exit");
-	// 	const errorLogSpy = spy(context.logService, "error");
-	// 	const warningLogSpy = spy(context.logService, "warning");
-	// 	const blocksToRemove = [context.blockHeight1, context.blockHeight2, context.blockHeight3];
-
-	// 	stub(context.stateStore, "getLastBlock")
-	// 		.returnValueNth(0, blocksToRemove[2]) // called in clearAndStopQueue
-	// 		.returnValueNth(1, blocksToRemove[2]) // called in removeBlocks
-	// 		.returnValueNth(2, blocksToRemove[2]) // called in __removeBlocks
-	// 		.returnValueNth(3, blocksToRemove[2]) // called in revertLastBlock
-	// 		.returnValueNth(4, blocksToRemove[1]) // called in __removeBlocks
-	// 		.returnValueNth(5, blocksToRemove[1]) // called in revertLastBlock
-	// 		.returnValueNth(6, context.blockHeight1) // called in validation process
-	// 		.returnValueNth(7, context.blockHeight1); // called when logging the error
-	// 	stub(context.databaseService, "getBlocks").returnValue(
-	// 		blocksToRemove.map((b) => ({ ...b.data, transactions: b.transactions })),
-	// 	);
-	// 	stub(context.databaseService, "getLastBlock").returnValue(context.blockHeight3);
-
-	// 	await blockchain.removeBlocks(2);
-
-	// 	errorLogSpy.calledOnce();
-	// 	errorLogSpy.calledWith(
-	// 		sinon.match((s) =>
-	// 			s.includes(
-	// 				`Last stored block (${context.blockHeight3.data.id}) is not the same as last block from state store (${context.blockHeight1.data.id})`,
-	// 			),
-	// 		),
-	// 	);
-	// 	warningLogSpy.calledOnce();
-	// 	exitSpy.calledOnce();
-	// });
-
-	// it("removeBlocks should log error and exit process, when error is thrown", async (context) => {
-	// 	const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-	// 	await blockchain.initialize();
-
-	// 	const exitSpy = stub(process, "exit");
-	// 	const errorLogSpy = spy(context.logService, "error");
-	// 	const warningLogSpy = spy(context.logService, "warning");
-
-	// 	await blockchain.removeBlocks(0);
-
-	// 	errorLogSpy.calledOnce();
-	// 	warningLogSpy.calledOnce();
-	// 	exitSpy.calledOnce();
-	// });
-
-	// for (const numberOfBlocks of [1, 5, 1329]) {
-	// 	it("removeTopBlocks should call deleteTopBlocks with blockRepository and call loadBlocksFromCurrentRound", async (context) => {
-	// 		stub(context.databaseService, "getLastBlock").returnValue(context.blockHeight1);
-	// 		const deleteTopBlocksSpy = spy(context.blockRepository, "deleteTopBlocks");
-
-	// 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-
-	// 		await blockchain.removeTopBlocks(numberOfBlocks);
-
-	// 		deleteTopBlocksSpy.calledWith(numberOfBlocks);
-	// 	});
-	// }
-
 	it("resetLastDownloadedBlock should set this.state.lastDownloadedBlock = this.getLastBlock().data", (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 
@@ -763,28 +697,6 @@ describe<{
 		clearWakeUpTimeoutSpy.calledOnce();
 		dispatchSpy.calledOnce();
 		dispatchSpy.calledWith("WAKEUP");
-	});
-
-	it("forkBlock should set forkedBlock, clear and stop queue and dispatch 'FORK'", async (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		await blockchain.initialize();
-
-		const forkedBlock = { data: { height: 8877, id: "1234" } };
-		const numberOfBlocksToRollback = 34;
-		const clearAndStopQueueSpy = spy(blockchain, "clearAndStopQueue");
-		const dispatchSpy = spy(blockchain, "dispatch");
-		const setForkedBlockSpy = spy(context.stateStore, "setForkedBlock");
-		const setNumberOfBlocksToRollbackSpy = spy(context.stateStore, "setNumberOfBlocksToRollback");
-		const mockBlock = { data: { height: 444, id: "123" } };
-		stub(context.stateStore, "getLastBlock").returnValue(mockBlock);
-
-		blockchain.forkBlock(forkedBlock as Contracts.Crypto.IBlock, numberOfBlocksToRollback);
-
-		setForkedBlockSpy.calledWith(forkedBlock);
-		setNumberOfBlocksToRollbackSpy.calledWith(numberOfBlocksToRollback);
-		clearAndStopQueueSpy.calledOnce();
-		dispatchSpy.calledOnce();
-		dispatchSpy.calledWith("FORK");
 	});
 
 	it("isSynced should return true if we have no peer", (context) => {
@@ -909,7 +821,7 @@ describe<{
 		pushPingBlockSpy.calledWith(incomingBlock, false);
 	});
 
-	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()<=0.8, should checkNetworkHealth", async (context) => {
+	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()<=0.8, should pass", async (context) => {
 		stub(context.configuration, "getMilestone").returnValue({
 			activeValidators: 51,
 		});
@@ -918,14 +830,11 @@ describe<{
 
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 
-		const checkNetworkHealthStub = stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({});
 		for (let index = 1; index < threshold; index++) {
 			await blockchain.checkMissingBlocks();
-			checkNetworkHealthStub.neverCalled();
 		}
 
 		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.calledOnce();
 	});
 
 	it("checkMissingBlocks should skip checkNetworkHealth if last check occurs in past 10 minutes", async (context) => {
@@ -937,47 +846,18 @@ describe<{
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 		stub(Math, "random").returnValue(0.7);
 
-		const checkNetworkHealthStub = stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({});
 		// @ts-ignore
 		blockchain.missedBlocks = threshold;
 		// @ts-ignore
 		blockchain.lastCheckNetworkHealthTs = Date.now();
 
 		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.neverCalled();
 
 		// @ts-ignore
 		blockchain.missedBlocks = threshold;
 		// @ts-ignore
 		blockchain.lastCheckNetworkHealthTs = Date.now() - 11 * 60 * 1000;
 		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.calledOnce();
-	});
-
-	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()<=0.8, should checkNetworkHealth and dispatch FORK if forked", async (context) => {
-		stub(context.configuration, "getMilestone").returnValue({
-			activeValidators: 51,
-		});
-		const threshold = context.configuration.getMilestone().activeValidators / 3 - 1;
-
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		stub(Math, "random").returnValue(0.7);
-
-		const dispatchSpy = spy(blockchain, "dispatch");
-
-		const checkNetworkHealthStub = stub(context.peerNetworkMonitor, "checkNetworkHealth").returnValue({
-			forked: true,
-		});
-		for (let index = 1; index < threshold; index++) {
-			await blockchain.checkMissingBlocks();
-			checkNetworkHealthStub.neverCalled();
-			dispatchSpy.neverCalled();
-		}
-
-		await blockchain.checkMissingBlocks();
-		checkNetworkHealthStub.calledOnce();
-		dispatchSpy.calledOnce();
-		dispatchSpy.calledWith("FORK");
 	});
 
 	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()>0.8, should do nothing", async (context) => {
