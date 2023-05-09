@@ -20,7 +20,7 @@ interface CallbackArguments<T> {
 	assert: typeof assert;
 	beforeAll: (callback_: ContextCallback<T>) => void;
 	beforeEach: (callback_: ContextCallback<T>) => void;
-	clock: (config?: number | Date | Partial<sinon.SinonFakeTimersConfig>) => sinon.SinonFakeTimers;
+	clock: (config?: number | Date | { now?: number | Date | undefined }) => sinon.SinonFakeTimers;
 	dataset: unknown;
 	each: (name: string, callback: Callback<any>, datasets: unknown[]) => void;
 	it: Test<T>;
@@ -77,7 +77,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		assert,
 		beforeAll: async (callback_: ContextCallback<T>) => suite.before(runHook(callback_)),
 		beforeEach: async (callback_: ContextCallback<T>) => suite.before.each(runHook(callback_)),
-		clock: (config?: number | Date | Partial<sinon.SinonFakeTimersConfig>) => {
+		clock: (config?: number | Date | { now?: number | Date | undefined }) => {
 			const result: sinon.SinonFakeTimers = sinon.useFakeTimers(config);
 
 			clocks.push(result);
