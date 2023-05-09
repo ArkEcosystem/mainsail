@@ -26,6 +26,6 @@
 		"@noble/bls12-381": "^1.2.0"
 	},
 	"devDependencies": {
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	}
 }

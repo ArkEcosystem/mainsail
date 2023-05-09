@@ -25,6 +25,6 @@
 		"hash-wasm": "^4.9.0"
 	},
 	"devDependencies": {
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	}
 }

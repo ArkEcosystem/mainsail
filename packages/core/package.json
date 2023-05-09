@@ -78,7 +78,7 @@
 		"kleur": "4.1.4",
 		"prompts": "2.4.0",
 		"tmp": "0.2.1",
-		"uvu": "^0.5.3"
+		"uvu": "^0.5.6"
 	},
 	"devDependencies": {
 		"@types/boxen": "3.0.1",
