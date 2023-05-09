@@ -58,7 +58,6 @@ describe<{
 			pingBlock: () => {},
 			pushPingBlock: () => {},
 			reset: () => {},
-			setForkedBlock: () => {},
 			setLastBlock: () => {},
 			setLastDownloadedBlock: () => {},
 			setLastStoredBlockHeight: () => {},

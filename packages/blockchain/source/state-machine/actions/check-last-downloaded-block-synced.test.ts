@@ -100,7 +100,7 @@ describe<{
 		dispatchSpy.calledWith("PAUSED");
 	});
 
-	it("when stateStore.getP2pUpdateCounter + 1 > 3 should dispatch NETWORKHALTED when !networkStatus.forked", async (context) => {
+	it("when stateStore.getP2pUpdateCounter + 1 > 3 should dispatch NETWORKHALTED", async (context) => {
 		const checkLastDownloadedBlockSynced =
 			context.container.resolve<CheckLastDownloadedBlockSynced>(CheckLastDownloadedBlockSynced);
 

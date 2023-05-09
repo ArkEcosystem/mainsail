@@ -91,7 +91,6 @@
 // 			getActiveDelegates: () => {},
 // 		};
 // 		context.stateStore = {
-// 			getForkedBlock: () => {},
 // 			getLastBlock: () => {},
 // 			getLastBlocks: () => {},
 // 			getLastDownloadedBlock: () => {},

@@ -102,10 +102,6 @@ export class UnchainedHandler implements BlockHandler {
 				return UnchainedBlockStatus.DoubleForging;
 			}
 
-			this.logger.info(
-				`Forked block disregarded because it is not allowed to be forged. Caused by validator: ${block.data.generatorPublicKey}`,
-			);
-
 			return UnchainedBlockStatus.GeneratorMismatch;
 		}
 	}
