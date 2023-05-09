@@ -267,14 +267,11 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		this.dispatch("WAKEUP");
 	}
 
+	// TODO: Remove
 	public forkBlock(block: Contracts.Crypto.IBlock, numberOfBlockToRollback?: number): void {
 		this.stateStore.setForkedBlock(block);
 
 		this.clearAndStopQueue();
-
-		if (numberOfBlockToRollback) {
-			this.stateStore.setNumberOfBlocksToRollback(numberOfBlockToRollback);
-		}
 
 		this.dispatch("FORK");
 	}
@@ -328,7 +325,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			const networkStatus = await this.networkMonitor.checkNetworkHealth();
 
 			if (networkStatus.forked) {
-				this.stateStore.setNumberOfBlocksToRollback(networkStatus.blocksToRollback || 0);
 				this.dispatch("FORK");
 			}
 		}

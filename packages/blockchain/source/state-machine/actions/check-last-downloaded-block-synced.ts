@@ -14,9 +14,6 @@ export class CheckLastDownloadedBlockSynced implements Action {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.PeerNetworkMonitor)
-	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
-
 	public async handle(): Promise<void> {
 		let event = "NOTSYNCED";
 		this.logger.debug(`Queued chunks of blocks (process: ${this.blockchain.getQueue().size()})`);
@@ -34,13 +31,6 @@ export class CheckLastDownloadedBlockSynced implements Action {
 
 			if (this.stateStore.getP2pUpdateCounter() + 1 > 3) {
 				this.logger.info("Network keeps missing blocks.");
-
-				const networkStatus = await this.networkMonitor.checkNetworkHealth();
-
-				if (networkStatus.forked) {
-					this.stateStore.setNumberOfBlocksToRollback(networkStatus.blocksToRollback || 0);
-					event = "FORK";
-				}
 
 				this.stateStore.setP2pUpdateCounter(0);
 			} else {
