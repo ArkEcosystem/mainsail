@@ -25,7 +25,6 @@ export enum BlockEvent {
 	Disregarded = "block.disregarded",
 	Forged = "block.forged",
 	Received = "block.received",
-	Reverted = "block.reverted",
 }
 
 export enum ValidatorEvent {

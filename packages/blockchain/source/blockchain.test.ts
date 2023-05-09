@@ -71,7 +71,6 @@ describe<{
 			deleteRound: () => {},
 			getBlocks: () => {},
 			getLastBlock: () => {},
-			revertBlock: () => {},
 		};
 		context.blockRepository = {
 			deleteBlocks: () => {},
@@ -105,7 +104,6 @@ describe<{
 			getLastBlock: () => {},
 			getTopBlocks: () => {},
 			restoreCurrentRound: () => {},
-			revertBlock: () => {},
 		};
 
 		context.configuration = {

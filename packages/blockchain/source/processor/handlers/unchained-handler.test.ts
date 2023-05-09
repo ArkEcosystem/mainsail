@@ -38,7 +38,6 @@ describe<{
 			getLastBlock: () => {},
 			getTopBlocks: () => {},
 			loadBlocksFromCurrentRound: () => {},
-			revertBlock: () => {},
 			walletRepository: {
 				getNonce: () => {},
 			},

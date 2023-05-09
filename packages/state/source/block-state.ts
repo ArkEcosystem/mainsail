@@ -62,32 +62,6 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 	}
 
-	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
-
-		// if (!forgerWallet) {
-		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
-		//     this.app.terminate(msg);
-		// }
-
-		const revertedTransactions: Contracts.Crypto.ITransaction[] = [];
-		try {
-			await this.#revertBlockFromForger(forgerWallet, block.data);
-
-			for (const transaction of [...block.transactions].reverse()) {
-				await this.revertTransaction(transaction);
-				revertedTransactions.push(transaction);
-			}
-		} catch (error) {
-			this.logger.error(error.stack);
-			this.logger.error("Failed to revert all transactions in block - applying previous transactions");
-			for (const transaction of revertedTransactions.reverse()) {
-				await this.applyTransaction(transaction);
-			}
-			throw error;
-		}
-	}
-
 	public async applyTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
@@ -152,12 +126,6 @@ export class BlockState implements Contracts.State.BlockState {
 	async #applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
 		for (const validatorMutator of this.validatorMutators) {
 			await validatorMutator.apply(forgerWallet, blockData);
-		}
-	}
-
-	async #revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
-		for (const validatorMutator of this.validatorMutators) {
-			await validatorMutator.revert(forgerWallet, blockData);
 		}
 	}
 

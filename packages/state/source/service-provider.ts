@@ -1,12 +1,12 @@
-import { interfaces, Selectors } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Selectors } from "@mainsail/container";
+import { Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { BuildValidatorRankingAction, GetActiveValidatorsAction } from "./actions";
 import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
-import { DposPreviousRoundState, DposState } from "./dpos";
+import { DposState } from "./dpos";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { RoundState } from "./round-state";
@@ -18,17 +18,6 @@ import { TransactionValidator } from "./transaction-validator";
 import { WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
 import { registerIndexers } from "./wallets/indexers";
 import { walletFactory } from "./wallets/wallet-factory";
-
-export const dposPreviousRoundStateProvider =
-	(context: interfaces.Context) =>
-	async (
-		blocks: Contracts.Crypto.IBlock[],
-		roundInfo: Contracts.Shared.RoundInfo,
-	): Promise<Contracts.State.DposPreviousRoundState> => {
-		const previousRound = context.container.resolve(DposPreviousRoundState);
-		await previousRound.revert(blocks, roundInfo);
-		return previousRound;
-	};
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -80,10 +69,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.StateTransactionStore).toConstantValue(new TransactionStore(1000));
 
 		this.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
-
-		this.app
-			.bind<Contracts.State.DposPreviousRoundStateProvider>(Identifiers.DposPreviousRoundStateProvider)
-			.toProvider(dposPreviousRoundStateProvider);
 
 		this.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
 

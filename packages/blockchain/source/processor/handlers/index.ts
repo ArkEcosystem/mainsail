@@ -4,6 +4,5 @@ export * from "./exception-handler";
 export * from "./incompatible-transactions-handler";
 export * from "./invalid-generator-handler";
 export * from "./nonce-out-of-order-handler";
-export * from "./revert-block-handler";
 export * from "./unchained-handler";
 export * from "./verification-failed-handler";
