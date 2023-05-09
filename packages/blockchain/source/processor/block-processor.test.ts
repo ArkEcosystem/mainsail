@@ -84,7 +84,6 @@
 // 			getLastBlock: () => {},
 // 			getTopBlocks: () => {},
 // 			restoreCurrentRound: () => {},
-// 			revertBlock: () => {},
 // 			walletRepository: context.walletRepository,
 // 		};
 // 		context.roundState = {
