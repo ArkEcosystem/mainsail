@@ -51,7 +51,7 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 
 			this.blockchain.resetLastDownloadedBlock();
 
-			return Contracts.BlockProcessor.ProcessorResult.Accepted;
+			return Contracts.BlockProcessor.ProcessorResult.Rejected;
 		}
 	}
 }
