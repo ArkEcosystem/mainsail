@@ -2,10 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { DatabaseInteraction } from "@mainsail/state";
 
-import { BlockHandler, BlockProcessorResult } from "../contracts";
-
 @injectable()
-export class AcceptBlockHandler implements BlockHandler {
+export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -24,7 +22,7 @@ export class AcceptBlockHandler implements BlockHandler {
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
 		try {
 			await this.databaseInteraction.applyBlock(block);
 
@@ -46,14 +44,14 @@ export class AcceptBlockHandler implements BlockHandler {
 				this.state.setLastDownloadedBlock(block.data);
 			}
 
-			return BlockProcessorResult.Accepted;
+			return Contracts.BlockProcessor.ProcessorResult.Accepted;
 		} catch (error) {
 			this.logger.warning(`Refused new block ${JSON.stringify(block.data)}`);
 			this.logger.debug(error.stack);
 
 			this.blockchain.resetLastDownloadedBlock();
 
-			return BlockProcessorResult.Rejected;
+			return Contracts.BlockProcessor.ProcessorResult.Accepted;
 		}
 	}
 }

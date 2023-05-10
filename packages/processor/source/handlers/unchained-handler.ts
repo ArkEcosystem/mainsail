@@ -2,8 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
 
-import { BlockHandler, BlockProcessorResult } from "../contracts";
-
 enum UnchainedBlockStatus {
 	NotReadyToAcceptNewHeight,
 	AlreadyInBlockchain,
@@ -14,7 +12,7 @@ enum UnchainedBlockStatus {
 }
 
 @injectable()
-export class UnchainedHandler implements BlockHandler {
+export class UnchainedHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
@@ -36,7 +34,7 @@ export class UnchainedHandler implements BlockHandler {
 		return this;
 	}
 
-	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
 		this.blockchain.resetLastDownloadedBlock();
 
 		this.blockchain.clearQueue();
@@ -55,20 +53,20 @@ export class UnchainedHandler implements BlockHandler {
 				});
 
 				if (validators.some((validator) => validator.getPublicKey() === block.data.generatorPublicKey)) {
-					return BlockProcessorResult.Rollback;
+					return Contracts.BlockProcessor.ProcessorResult.Rollback;
 				}
 
-				return BlockProcessorResult.Rejected;
+				return Contracts.BlockProcessor.ProcessorResult.Rejected;
 			}
 
 			case UnchainedBlockStatus.NotReadyToAcceptNewHeight:
 			case UnchainedBlockStatus.GeneratorMismatch:
 			case UnchainedBlockStatus.InvalidTimestamp: {
-				return BlockProcessorResult.Rejected;
+				return Contracts.BlockProcessor.ProcessorResult.Rejected;
 			}
 
 			default: {
-				return BlockProcessorResult.DiscardedButCanBeBroadcasted;
+				return Contracts.BlockProcessor.ProcessorResult.DiscardedButCanBeBroadcasted;
 			}
 		}
 	}

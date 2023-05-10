@@ -3,7 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { BlockProcessorResult } from "./contracts";
 import {
 	AcceptBlockHandler,
 	AlreadyForgedHandler,
@@ -15,7 +14,7 @@ import {
 } from "./handlers";
 
 @injectable()
-export class BlockProcessor {
+export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -47,7 +46,7 @@ export class BlockProcessor {
 	@inject(Identifiers.Cryptography.Block.Verifier)
 	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
 
-	public async process(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async process(block: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
 		if (!(await this.#verifyBlock(block))) {
 			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
 		}

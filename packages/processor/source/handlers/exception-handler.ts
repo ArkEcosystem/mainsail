@@ -2,11 +2,10 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { BlockHandler, BlockProcessorResult } from "../contracts";
 import { AcceptBlockHandler } from "./accept-block-handler";
 
 @injectable()
-export class ExceptionHandler implements BlockHandler {
+export class ExceptionHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -19,7 +18,7 @@ export class ExceptionHandler implements BlockHandler {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
 		Utils.assert.defined<string>(block.data.id);
 
 		const id: string = block.data.id;
@@ -30,7 +29,7 @@ export class ExceptionHandler implements BlockHandler {
 		if (forgedBlock || block.data.height !== this.blockchain.getLastBlock().data.height + 1) {
 			this.blockchain.resetLastDownloadedBlock();
 
-			return BlockProcessorResult.Rejected;
+			return Contracts.BlockProcessor.ProcessorResult.Rejected;
 		}
 
 		this.logger.warning(`Block ${block.data.height.toLocaleString()} (${id}) forcibly accepted.`);
