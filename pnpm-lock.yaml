@@ -601,6 +601,9 @@ importers:
       '@mainsail/p2p':
         specifier: workspace:*
         version: link:../p2p
+      '@mainsail/processor':
+        specifier: workspace:*
+        version: link:../processor
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
