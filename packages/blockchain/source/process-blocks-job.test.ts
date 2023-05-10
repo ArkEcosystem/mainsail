@@ -5,7 +5,6 @@ import { rejects } from "assert";
 import { describe, Sandbox } from "../../test-framework";
 import { Blocks } from "../test/fixtures";
 import { ProcessBlocksJob } from "./process-blocks-job";
-import { BlockProcessorResult } from "./processor";
 
 describe<{
 	sandbox: Sandbox;
@@ -118,10 +117,10 @@ describe<{
 	it("should process a new chained block", async (context) => {
 		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
 		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(context.triggers, "call").resolvedValue(BlockProcessorResult.Accepted);
+		stub(context.triggers, "call").resolvedValue(Contracts.BlockProcessor.ProcessorResult.Accepted);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock }); // TODO: Use stateStore
-		stub(blockProcessor, "process").returnValue(BlockProcessorResult.Accepted);
-		stub(blockProcessor, "validateGenerator").returnValue(BlockProcessorResult.Accepted);
+		stub(blockProcessor, "process").returnValue(Contracts.BlockProcessor.ProcessorResult.Accepted);
+		stub(blockProcessor, "validateGenerator").returnValue(Contracts.BlockProcessor.ProcessorResult.Accepted);
 		stub(stateStore, "isStarted").returnValue(true);
 
 		const saveBlocksSpy = spy(databaseService, "saveBlocks");
@@ -151,7 +150,7 @@ describe<{
 		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
 		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(blockchainService, "getLastBlock").returnValue({ data: { height: 1 } });
-		const callStub = stub(context.triggers, "call").returnValue(BlockProcessorResult.Rejected);
+		const callStub = stub(context.triggers, "call").returnValue(Contracts.BlockProcessor.ProcessorResult.Rejected);
 		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
 
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
@@ -175,8 +174,8 @@ describe<{
 			.returnValueNth(2, Blocks.block2);
 
 		const callStub = stub(context.triggers, "call")
-			.returnValueNth(0, BlockProcessorResult.Accepted)
-			.returnValueNth(1, BlockProcessorResult.Rejected);
+			.returnValueNth(0, Contracts.BlockProcessor.ProcessorResult.Accepted)
+			.returnValueNth(1, Contracts.BlockProcessor.ProcessorResult.Rejected);
 
 		stub(stateStore, "getLastBlock").returnValue({ data: { height: 1 } });
 		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
@@ -205,7 +204,7 @@ describe<{
 		stub(context.slots, "getSlotNumber").returnValue(1);
 
 		stub(blockchainService, "getLastBlock").returnValue({ data: { height: 1 } });
-		const callStub = stub(context.triggers, "call").returnValue(BlockProcessorResult.Corrupted);
+		const callStub = stub(context.triggers, "call").returnValue(Contracts.BlockProcessor.ProcessorResult.Corrupted);
 		stub(stateStore, "getLastBlock").returnValue({ data: { height: 1 } });
 		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
 
@@ -228,7 +227,7 @@ describe<{
 		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
+		stub(context.triggers, "call").returnValue(Contracts.BlockProcessor.ProcessorResult.Accepted);
 		stub(databaseService, "saveBlocks").rejectedValue(new Error("oops"));
 
 		const logErrorSpy = spy(logService, "error");
@@ -262,7 +261,7 @@ describe<{
 		stub(stateStore, "isStarted").returnValue(true);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
+		stub(context.triggers, "call").returnValue(Contracts.BlockProcessor.ProcessorResult.Accepted);
 
 		const saveBlocksSpy = spy(databaseService, "saveBlocks");
 		const broadcastBlockSpy = spy(peerNetworkMonitor, "broadcastBlock");
@@ -289,7 +288,7 @@ describe<{
 		stub(stateStore, "isStarted").returnValue(true);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(context.triggers, "call").returnValue(BlockProcessorResult.Accepted);
+		stub(context.triggers, "call").returnValue(Contracts.BlockProcessor.ProcessorResult.Accepted);
 
 		const saveBlocksSpy = spy(databaseService, "saveBlocks");
 		const broadcastBlockSpy = spy(peerNetworkMonitor, "broadcastBlock");

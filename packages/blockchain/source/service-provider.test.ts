@@ -30,19 +30,17 @@ describe<{
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
 
-	it("register should bind blockchain, state machine and block processr", async (context) => {
+	it("register should bind blockchain, state machine", async (context) => {
 		const pluginConfiguration = context.app.resolve<Providers.PluginConfiguration>(Providers.PluginConfiguration);
 		context.serviceProvider.setConfig(pluginConfiguration);
 
 		assert.false(context.app.isBound(Identifiers.StateMachine));
 		assert.false(context.app.isBound(Identifiers.BlockchainService));
-		assert.false(context.app.isBound(Identifiers.BlockProcessor));
 
 		await context.serviceProvider.register();
 
 		assert.true(context.app.isBound(Identifiers.StateMachine));
 		assert.true(context.app.isBound(Identifiers.BlockchainService));
-		assert.true(context.app.isBound(Identifiers.BlockProcessor));
 	});
 
 	it("boot should call boot on blockchain service", async (context) => {
