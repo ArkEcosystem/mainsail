@@ -2,8 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Utils } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../../../test-framework";
-import { BlockProcessorResult } from "../contracts";
+import { describe, Sandbox } from "../../../test-framework";
 import { UnchainedHandler } from "./unchained-handler";
 
 describe<{
@@ -92,7 +91,7 @@ describe<{
 
 		const result = await unchainedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rollback);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rollback);
 	});
 
 	it("when it is a double forging case should return Rejected if block generator is not an active delegate", async (context) => {
@@ -122,7 +121,7 @@ describe<{
 
 		const result = await unchainedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 	});
 
 	it("when it is a NotReadyToAcceptNewHeight case should return Rejected when height > lastBlock height +1", async (context) => {
@@ -144,7 +143,7 @@ describe<{
 
 		const result = await unchainedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 	});
 
 	it("when block is already in blockchain (height < last height) should return DiscardedButCanBeBroadcasted", async (context) => {
@@ -164,7 +163,7 @@ describe<{
 
 		const result = await unchainedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.DiscardedButCanBeBroadcasted);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.DiscardedButCanBeBroadcasted);
 	});
 
 	it("when it is a GeneratorMismatch case should return Rejected", async (context) => {
@@ -183,7 +182,7 @@ describe<{
 
 		const result = await unchainedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 	});
 
 	it("when it is a InvalidTimestamp case should return Rejected", async (context) => {
@@ -202,7 +201,7 @@ describe<{
 
 		const result = await unchainedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 	});
 
 	it("when it is a InvalidTimestamp case should return DiscardedButCanBeBroadcasted when does not match above cases", async (context) => {
@@ -214,6 +213,6 @@ describe<{
 		stub(context.blockchain, "getLastBlock").returnValue(lastBlock);
 		const result = await unchainedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.DiscardedButCanBeBroadcasted);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.DiscardedButCanBeBroadcasted);
 	});
 });

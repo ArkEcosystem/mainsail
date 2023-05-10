@@ -1,8 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../../test-framework";
-import { BlockProcessorResult } from "../contracts";
+import { describe } from "../../../test-framework";
 import { AcceptBlockHandler } from "./accept-block-handler";
 
 describe<{
@@ -74,7 +73,7 @@ describe<{
 
 		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
-		assert.is(result, BlockProcessorResult.Accepted);
+		assert.is(result, Contracts.BlockProcessor.ProcessorResult.Accepted);
 		applyBlockSpy.calledOnce();
 		applyBlockSpy.calledWith(context.block);
 		resetWakeUpSpy.calledOnce();
@@ -90,7 +89,7 @@ describe<{
 		const setLastDownloadedBlockSpy = spy(context.state, "setLastDownloadedBlock");
 		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
-		assert.is(result, BlockProcessorResult.Accepted);
+		assert.is(result, Contracts.BlockProcessor.ProcessorResult.Accepted);
 
 		setLastDownloadedBlockSpy.calledOnce();
 		setLastDownloadedBlockSpy.calledWith(context.block.data);
@@ -106,7 +105,7 @@ describe<{
 
 		const result = await acceptBlockHandler.execute(context.block as Contracts.Crypto.IBlock);
 
-		assert.is(result, BlockProcessorResult.Rejected);
+		assert.is(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
 	});
 });

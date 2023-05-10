@@ -1,8 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../../test-framework";
-import { BlockProcessorResult } from "../contracts";
+import { describe } from "../../../test-framework";
 import { AcceptBlockHandler } from "./accept-block-handler";
 import { ExceptionHandler } from "./exception-handler";
 
@@ -48,7 +47,7 @@ describe<{
 
 		const result = await exceptionHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
 	});
 
@@ -60,7 +59,7 @@ describe<{
 
 		const result = await exceptionHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
 	});
 
@@ -69,12 +68,12 @@ describe<{
 
 		stub(context.blockchain, "getLastBlock").returnValue({ data: { height: 4444, id: "122" } });
 		const resolveStub = stub(context.application, "resolve").returnValue({
-			execute: () => BlockProcessorResult.Accepted,
+			execute: () => Contracts.BlockProcessor.ProcessorResult.Accepted,
 		});
 
 		const result = await exceptionHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Accepted);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Accepted);
 		resolveStub.calledOnce();
 		resolveStub.calledWith(AcceptBlockHandler);
 	});

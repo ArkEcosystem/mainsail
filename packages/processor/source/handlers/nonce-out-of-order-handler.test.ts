@@ -1,8 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../../test-framework";
-import { BlockProcessorResult } from "../contracts";
+import { describe } from "../../../test-framework";
 import { NonceOutOfOrderHandler } from "./nonce-out-of-order-handler";
 
 describe<{
@@ -31,7 +30,7 @@ describe<{
 		const block = {};
 		const result = await nonceOutOfOrderHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
 	});
 });
