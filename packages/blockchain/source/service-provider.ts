@@ -1,19 +1,14 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ProcessBlockAction } from "./actions";
 import { Blockchain } from "./blockchain";
-import { BlockProcessor } from "./processor";
 import { StateMachine } from "./state-machine";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.StateMachine).to(StateMachine).inSingletonScope();
 		this.app.bind(Identifiers.BlockchainService).to(Blockchain).inSingletonScope();
-		this.app.bind(Identifiers.BlockProcessor).to(BlockProcessor).inSingletonScope();
-
-		this.#registerActions();
 	}
 
 	public async boot(): Promise<void> {
@@ -38,11 +33,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			// used in core:run & relay:run
 			networkStart: Joi.bool(),
 		}).unknown(true);
-	}
-
-	#registerActions(): void {
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("processBlock", new ProcessBlockAction());
 	}
 }
