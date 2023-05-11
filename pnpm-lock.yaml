@@ -179,6 +179,9 @@ importers:
       '@types/semver':
         specifier: 6.2.3
         version: 6.2.3
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/blockchain:
     dependencies:
@@ -462,6 +465,9 @@ importers:
       reflect-metadata:
         specifier: 0.1.13
         version: 0.1.13
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/contracts:
     dependencies:
@@ -496,6 +502,9 @@ importers:
       '@types/plur':
         specifier: ^3.1.0
         version: 3.1.0
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/core:
     dependencies:
@@ -975,6 +984,9 @@ importers:
       '@types/lodash.set':
         specifier: 4.3.2
         version: 4.3.2
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-hash-bcrypto:
     dependencies:
@@ -1395,8 +1407,8 @@ importers:
         specifier: workspace:*
         version: link:../validation
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-transaction-multi-signature-registration:
     dependencies:
@@ -1435,8 +1447,8 @@ importers:
         specifier: workspace:*
         version: link:../validation
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-transaction-transfer:
     dependencies:
@@ -1475,8 +1487,8 @@ importers:
         specifier: workspace:*
         version: link:../validation
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-transaction-validator-registration:
     dependencies:
@@ -1558,8 +1570,8 @@ importers:
         specifier: workspace:*
         version: link:../validation
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/crypto-transaction-vote:
     dependencies:
@@ -1727,8 +1739,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/fees:
     dependencies:
@@ -1744,6 +1756,10 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/fees-burn:
     dependencies:
@@ -1762,6 +1778,10 @@ importers:
       joi:
         specifier: 17.9.2
         version: 17.9.2
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/fees-managed:
     dependencies:
@@ -1783,6 +1803,10 @@ importers:
       joi:
         specifier: 17.9.2
         version: 17.9.2
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/fees-static:
     dependencies:
@@ -1801,6 +1825,10 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/forger:
     dependencies:
@@ -2061,6 +2089,10 @@ importers:
       winston:
         specifier: ^3.6.0
         version: 3.6.0
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/networking-dns:
     dependencies:
@@ -2076,6 +2108,10 @@ importers:
       joi:
         specifier: 17.9.2
         version: 17.9.2
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/networking-ntp:
     dependencies:
@@ -2098,6 +2134,9 @@ importers:
       '@types/hapi__sntp':
         specifier: 3.1.2
         version: 3.1.2
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/p2p:
     dependencies:
@@ -2196,8 +2235,8 @@ importers:
         specifier: 3.14.5
         version: 3.14.5
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/processor:
     dependencies:
@@ -2295,8 +2334,8 @@ importers:
         specifier: 0.2.1
         version: 0.2.1
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: ^0.5.6
+        version: 0.5.6
 
   packages/test-framework:
     dependencies:
@@ -15933,17 +15972,6 @@ packages:
   /uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
-
-  /uvu@0.5.3:
-    resolution: {integrity: sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==}
-    engines: {node: '>=8'}
-    hasBin: true
-    dependencies:
-      dequal: 2.0.3
-      diff: 5.1.0
-      kleur: 4.1.4
-      sade: 1.8.1
-    dev: true
 
   /uvu@0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
