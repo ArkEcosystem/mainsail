@@ -45,10 +45,10 @@ export class StateBuilder {
 			.getRegisteredHandlers();
 		const steps = registeredHandlers.length + 3;
 
-		for (const { value } of this.blockStorage.getRange({})) {
-			const { data, transactions } = await this.blockFactory.fromBytes(value);
+		try {
+			for (const { value } of this.blockStorage.getRange({})) {
+				const { data, transactions } = await this.blockFactory.fromBytes(value);
 
-			try {
 				this.logger.info(`State Generation - Step 1 of ${steps}: Block Rewards`);
 				await this.#buildBlockRewards(data);
 
@@ -80,9 +80,9 @@ export class StateBuilder {
 				this.#verifyWalletsConsistency();
 
 				await this.events.dispatch(Enums.StateEvent.BuilderFinished);
-			} catch (error) {
-				this.logger.error(error.stack);
 			}
+		} catch (error) {
+			this.logger.error(error.stack);
 		}
 	}
 
