@@ -1,19 +1,17 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { BlockHandler, BlockProcessorResult } from "../contracts";
-
 @injectable()
-export class NonceOutOfOrderHandler implements BlockHandler {
+export class VerificationFailedHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	public async execute(block?: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block?: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
 		this.blockchain.resetLastDownloadedBlock();
 
-		return BlockProcessorResult.Rejected;
+		return Contracts.BlockProcessor.ProcessorResult.Rejected;
 	}
 }

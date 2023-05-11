@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
 
-import { BlockProcessor, BlockProcessorResult } from "./processor";
 import { StateMachine } from "./state-machine";
 
 @injectable()
@@ -74,7 +73,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		const acceptedBlocks: Contracts.Crypto.IBlock[] = [];
-		let lastProcessResult: BlockProcessorResult | undefined;
+		let lastProcessResult: Contracts.BlockProcessor.ProcessorResult | undefined;
 		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
 		const acceptedBlockTimeLookup = (height: number) =>
@@ -102,14 +101,14 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 				lastProcessResult = await this.triggers.call("processBlock", {
 					block: blockInstance,
-					blockProcessor: this.app.get<BlockProcessor>(Identifiers.BlockProcessor),
+					blockProcessor: this.app.get<Contracts.BlockProcessor.Processor>(Identifiers.BlockProcessor),
 				});
 
 				lastProcessedBlock = blockInstance;
 
-				if (lastProcessResult === BlockProcessorResult.Accepted) {
+				if (lastProcessResult === Contracts.BlockProcessor.ProcessorResult.Accepted) {
 					acceptedBlocks.push(blockInstance);
-				} else if (lastProcessResult === BlockProcessorResult.Corrupted) {
+				} else if (lastProcessResult === Contracts.BlockProcessor.ProcessorResult.Corrupted) {
 					await this.#handleCorrupted();
 					return;
 				} else {
@@ -141,8 +140,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		if (
-			(lastProcessResult === BlockProcessorResult.Accepted ||
-				lastProcessResult === BlockProcessorResult.DiscardedButCanBeBroadcasted) &&
+			(lastProcessResult === Contracts.BlockProcessor.ProcessorResult.Accepted ||
+				lastProcessResult === Contracts.BlockProcessor.ProcessorResult.DiscardedButCanBeBroadcasted) &&
 			lastProcessedBlock
 		) {
 			if (this.stateStore.isStarted() && this.stateMachine.getState() === "newBlock") {

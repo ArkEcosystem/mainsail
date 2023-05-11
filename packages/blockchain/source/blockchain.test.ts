@@ -5,8 +5,8 @@ import { BigNumber } from "@mainsail/utils";
 import delay from "delay";
 import sinon from "sinon";
 
+import { ProcessBlockAction } from "../../processor/source/actions/process-block";
 import { describe, Sandbox } from "../../test-framework";
-import { ProcessBlockAction } from "./actions";
 import { Blockchain } from "./blockchain";
 import { ProcessBlocksJob } from "./process-blocks-job";
 

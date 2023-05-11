@@ -30,19 +30,17 @@ describe<{
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
 
-	it("register should bind blockchain, state machine and block processr", async (context) => {
+	it("register should bind blockchain, state machine", async (context) => {
 		const pluginConfiguration = context.app.resolve<Providers.PluginConfiguration>(Providers.PluginConfiguration);
 		context.serviceProvider.setConfig(pluginConfiguration);
 
 		assert.false(context.app.isBound(Identifiers.StateMachine));
 		assert.false(context.app.isBound(Identifiers.BlockchainService));
-		assert.false(context.app.isBound(Identifiers.BlockProcessor));
 
 		await context.serviceProvider.register();
 
 		assert.true(context.app.isBound(Identifiers.StateMachine));
 		assert.true(context.app.isBound(Identifiers.BlockchainService));
-		assert.true(context.app.isBound(Identifiers.BlockProcessor));
 	});
 
 	it("boot should call boot on blockchain service", async (context) => {
@@ -97,7 +95,7 @@ describe<{
 		delete defaults.databaseRollback;
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback" is required');
+		assert.equal(result.error?.message, '"databaseRollback" is required');
 	});
 
 	it("databaseRollback.maxBlockRewind is required && is integer && >= 1", async (context) => {
@@ -105,22 +103,22 @@ describe<{
 		defaults.databaseRollback.maxBlockRewind = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" must be a number');
+		assert.equal(result.error?.message, '"databaseRollback.maxBlockRewind" must be a number');
 
 		defaults.databaseRollback.maxBlockRewind = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" must be an integer');
+		assert.equal(result.error?.message, '"databaseRollback.maxBlockRewind" must be an integer');
 
 		defaults.databaseRollback.maxBlockRewind = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" must be greater than or equal to 1');
+		assert.equal(result.error?.message, '"databaseRollback.maxBlockRewind" must be greater than or equal to 1');
 
 		delete defaults.databaseRollback.maxBlockRewind;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.maxBlockRewind" is required');
+		assert.equal(result.error?.message, '"databaseRollback.maxBlockRewind" is required');
 	});
 
 	it("databaseRollback.steps is required && is integer && >= 1", async (context) => {
@@ -128,22 +126,22 @@ describe<{
 		defaults.databaseRollback.steps = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.steps" must be a number');
+		assert.equal(result.error?.message, '"databaseRollback.steps" must be a number');
 
 		defaults.databaseRollback.steps = 1.12;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.steps" must be an integer');
+		assert.equal(result.error?.message, '"databaseRollback.steps" must be an integer');
 
 		defaults.databaseRollback.steps = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.steps" must be greater than or equal to 1');
+		assert.equal(result.error?.message, '"databaseRollback.steps" must be greater than or equal to 1');
 
 		delete defaults.databaseRollback.steps;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"databaseRollback.steps" is required');
+		assert.equal(result.error?.message, '"databaseRollback.steps" is required');
 	});
 
 	it("networkStart is optional && is boolean", async (context) => {
@@ -151,7 +149,7 @@ describe<{
 		defaults.networkStart = 123;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(result.error.message, '"networkStart" must be a boolean');
+		assert.equal(result.error?.message, '"networkStart" must be a boolean');
 
 		delete defaults.networkStart;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);

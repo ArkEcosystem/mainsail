@@ -1,15 +1,14 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../../test-framework";
-import { BlockProcessorResult } from "../contracts";
-import { InvalidGeneratorHandler } from "./invalid-generator-handler";
+import { describe } from "../../../test-framework";
+import { VerificationFailedHandler } from "./verification-failed-handler";
 
 describe<{
 	container: Container;
 	blockchain: any;
 	application: any;
-}>("InvalidGeneratorHandler", ({ assert, beforeEach, it, spy }) => {
+}>("VerificationFailedHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.blockchain = {
 			resetLastDownloadedBlock: () => {},
@@ -24,14 +23,15 @@ describe<{
 	});
 
 	it("should call blockchain.resetLastDownloadedBlock and return DiscardedButCanBeBroadcasted", async (context) => {
-		const invalidGeneratorHandler = context.container.resolve<InvalidGeneratorHandler>(InvalidGeneratorHandler);
+		const verificationFailedHandler =
+			context.container.resolve<VerificationFailedHandler>(VerificationFailedHandler);
 
 		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
 
 		const block = {};
-		const result = await invalidGeneratorHandler.execute(block as Contracts.Crypto.IBlock);
+		const result = await verificationFailedHandler.execute(block as Contracts.Crypto.IBlock);
 
-		assert.equal(result, BlockProcessorResult.Rejected);
+		assert.equal(result, Contracts.BlockProcessor.ProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
 	});
 });

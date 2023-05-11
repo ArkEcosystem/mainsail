@@ -82,6 +82,9 @@
 			"package": "@mainsail/p2p"
 		},
 		{
+			"package": "@mainsail/processor"
+		},
+		{
 			"package": "@mainsail/blockchain"
 		},
 		{
