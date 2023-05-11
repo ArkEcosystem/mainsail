@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application, Enums, Utils as AppUtils } from "@mainsail/kernel";
+import { Application, Enums } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import lmdb from "lmdb";
 
@@ -43,32 +43,22 @@ export class StateBuilder {
 				"blockchain",
 			)
 			.getRegisteredHandlers();
-		const steps = registeredHandlers.length + 3;
 
 		try {
+			this.logger.info(`State Generation - Bootstrap`);
+
 			for (const { value } of this.blockStorage.getRange({})) {
 				const { data, transactions } = await this.blockFactory.fromBytes(value);
 
-				this.logger.info(`State Generation - Step 1 of ${steps}: Block Rewards`);
 				await this.#buildBlockRewards(data);
-
-				this.logger.info(`State Generation - Step 2 of ${steps}: Fees & Nonces`);
 				await this.#buildSentTransactions(transactions);
 
-				const capitalize = (key: string) => key[0].toUpperCase() + key.slice(1);
-				for (const [index, handler] of registeredHandlers.entries()) {
-					const ctorKey: string | undefined = handler.getConstructor().key;
-					const version = handler.getConstructor().version;
-					AppUtils.assert.defined<string>(ctorKey);
-
-					this.logger.info(
-						`State Generation - Step ${3 + index} of ${steps}: ${capitalize(ctorKey)} v${version}`,
-					);
+				for (const handler of registeredHandlers.values()) {
 					await handler.bootstrap(transactions);
 				}
 			}
 
-			this.logger.info(`State Generation - Step ${steps} of ${steps}: Vote Balances & Validator Ranking`);
+			this.logger.info(`State Generation - Vote Balances & Validator Ranking`);
 			this.dposState.buildVoteBalances();
 			this.dposState.buildValidatorRanking();
 
