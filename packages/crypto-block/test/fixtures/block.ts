@@ -4,7 +4,7 @@ import { BigNumber } from "@mainsail/utils";
 export const blockData: Contracts.Crypto.IBlockData = {
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
-	id: "825fbfbe8191882ed54888ca58414f67c395d535a69cb3d23bed18ed3c016052",
+	id: "e6ece29ff55b818dd22f1c2b2c420b374d8b9ce4a9e602816cab6d08ee754ca7",
 	numberOfTransactions: 0,
 	payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 	payloadLength: 0,
@@ -20,7 +20,7 @@ export const blockData: Contracts.Crypto.IBlockData = {
 export const blockDataJson: Contracts.Crypto.IBlockJson = {
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
-	id: "825fbfbe8191882ed54888ca58414f67c395d535a69cb3d23bed18ed3c016052",
+	id: "e6ece29ff55b818dd22f1c2b2c420b374d8b9ce4a9e602816cab6d08ee754ca7",
 	numberOfTransactions: 0,
 	payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 	payloadLength: 0,
@@ -39,7 +39,7 @@ export const serialized =
 export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
-	id: "977db7c9824d5f4a639cd360bad1cc1d68eb230f1a2f876e0bce8521eeeb96ab",
+	id: "d1c09a297ea886d281377c5240bca65bbbaebabd78556f1cfad6d37e07fa39a8",
 	numberOfTransactions: 2,
 	payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 	payloadLength: 0,
@@ -86,7 +86,7 @@ export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
 export const blockDataWithTransactionsJson: Contracts.Crypto.IBlockJson = {
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
-	id: "977db7c9824d5f4a639cd360bad1cc1d68eb230f1a2f876e0bce8521eeeb96ab",
+	id: "d1c09a297ea886d281377c5240bca65bbbaebabd78556f1cfad6d37e07fa39a8",
 	numberOfTransactions: 2,
 	payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 	payloadLength: 0,
