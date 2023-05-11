@@ -36,7 +36,7 @@
 		"uvu": "^0.5.6"
 	},
 	"engines": {
-		"node": ">=16.x"
+		"node": ">=20.x"
 	},
 	"arkecosystem": {
 		"core": {
