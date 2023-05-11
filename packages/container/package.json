@@ -20,7 +20,8 @@
 	},
 	"dependencies": {
 		"inversify": "5.1.1",
-		"reflect-metadata": "0.1.13"
+		"reflect-metadata": "0.1.13",
+		"uvu": "^0.5.6"
 	},
 	"devDependencies": {},
 	"engines": {

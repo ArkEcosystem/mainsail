@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../test-framework";
 import { decorateInjectable } from "./decorator";
 
 class ThirdPartyClass {}
