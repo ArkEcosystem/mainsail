@@ -60,6 +60,11 @@ const workflow = {
 					name: "Install dependencies",
 					run: "pnpm install",
 				},
+
+				{
+					name: "Build",
+					run: "pnpm run build",
+				},
 			],
 			strategy: {
 				matrix: {

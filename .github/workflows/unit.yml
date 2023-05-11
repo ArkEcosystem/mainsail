@@ -34,6 +34,8 @@ jobs:
                   restore-keys: ${{ runner.os }}-lerna-
             - name: Install dependencies
               run: pnpm install
+            - name: Build
+              run: pnpm run build
             - name: Test api
               run: cd packages/api && pnpm run test
             - name: Test blockchain
