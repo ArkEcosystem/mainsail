@@ -3,7 +3,15 @@
 ![Logo](logo.jpeg)
 
 > **Warning**
-> Mainsail is experimental PoC and should only be used for testing purposes. It is not intended for use in production environments and should be used at your own risk.
+> Mainsail is currently in the developmental phase and should only be used for testing purposes. It is not intended for use in production environments and should be used at your own risk.
+
+Welcome to the home of Mainsail, a highly modular, TypeScript-based, layer 1 blockchain protocol. Mainsail is the next evolution of the 'ARK Core' blockchain protocol and features a new consensus engine that greatly improves the finality, security, and reliability of our blockchain solution.
+
+The Mainsail of a ship is its driving force, guiding it toward its destination with strength and efficiency. It's an apt metaphor for what we envision this upgrade to be: the driving force behind our blockchain, directing our technology toward a brighter future.
+
+## Credits
+
+This project exists thanks to all the people who [contribute](../../contributors).
 
 ## AS-IS Clause
 
@@ -15,4 +23,4 @@ By using Mainsail, you agree to indemnify and hold harmless the author of Mainsa
 
 ## License
 
-[MIT](LICENSE) © [ARK Ecosystem](https://ark.io)
+[GNU General Public License v3.0](LICENSE) © [ARK Ecosystem](https://ark.io)
