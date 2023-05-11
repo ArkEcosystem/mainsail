@@ -12,25 +12,55 @@ const workflow = {
 			"runs-on": "ubuntu-latest",
 			steps: [
 				{
-					uses: "actions/checkout@v2",
+					uses: "actions/checkout@v3",
 					with: {
 						ref: "${{ github.head_ref }}",
 					},
 				},
 				{
+					uses: "actions/setup-node@v3",
+					with: {
+						"node-version": "${{ matrix.node-version }}",
+					},
+				},
+				{
+					name: "Setup pnpm",
 					uses: "pnpm/action-setup@v2",
 					with: {
-						run_install: true,
+						run_install: false,
 						version: "latest",
 					},
 				},
 				{
-					uses: "actions/setup-node@v2",
+					name: "Get pnpm store directory",
+					// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+					id: "pnpm-cache",
+					run: 'echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT',
+					shell: "bash",
+				},
+				{
+					name: "Cache pnpm modules",
+					uses: "actions/cache@v3",
 					with: {
-						cache: "pnpm",
-						"node-version": "${{ matrix.node-version }}",
+						key: "${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}",
+						path: "${{ steps.pnpm-cache.outputs.STORE_PATH }}",
+						"restore-keys": "${{ runner.os }}-pnpm-",
 					},
 				},
+				{
+					name: "Cache lerna",
+					uses: "actions/cache@v3",
+					with: {
+						key: "${{ runner.os }}-lerna",
+						path: "./.cache",
+						"restore-keys": "${{ runner.os }}-lerna-",
+					},
+				},
+				{
+					name: "Install dependencies",
+					run: "pnpm install",
+				},
+
 				{
 					name: "Build",
 					run: "pnpm run build",
@@ -38,7 +68,7 @@ const workflow = {
 			],
 			strategy: {
 				matrix: {
-					"node-version": ["16.x"],
+					"node-version": ["20.x"],
 				},
 			},
 		},

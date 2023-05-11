@@ -37,7 +37,8 @@
 		"@types/hapi__hapi": "21.0.0",
 		"@types/hapi__joi": "17.1.7",
 		"@types/ip": "1.1.0",
-		"@types/semver": "6.2.3"
+		"@types/semver": "6.2.3",
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=16.x"
