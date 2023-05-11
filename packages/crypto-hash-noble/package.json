@@ -26,5 +26,8 @@
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
 	}
 }
