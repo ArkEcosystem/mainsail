@@ -66,21 +66,21 @@ export class StateBuilder {
 					);
 					await handler.bootstrap(transactions);
 				}
-
-				this.logger.info(`State Generation - Step ${steps} of ${steps}: Vote Balances & Validator Ranking`);
-				this.dposState.buildVoteBalances();
-				this.dposState.buildValidatorRanking();
-
-				this.logger.info(
-					`Number of registered validators: ${Object.keys(
-						this.walletRepository.allByUsername(),
-					).length.toLocaleString()}`,
-				);
-
-				this.#verifyWalletsConsistency();
-
-				await this.events.dispatch(Enums.StateEvent.BuilderFinished);
 			}
+
+			this.logger.info(`State Generation - Step ${steps} of ${steps}: Vote Balances & Validator Ranking`);
+			this.dposState.buildVoteBalances();
+			this.dposState.buildValidatorRanking();
+
+			this.logger.info(
+				`Number of registered validators: ${Object.keys(
+					this.walletRepository.allByUsername(),
+				).length.toLocaleString()}`,
+			);
+
+			this.#verifyWalletsConsistency();
+
+			await this.events.dispatch(Enums.StateEvent.BuilderFinished);
 		} catch (error) {
 			this.logger.error(error.stack);
 		}
