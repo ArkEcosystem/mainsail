@@ -204,12 +204,6 @@ importers:
         specifier: 4.23.4
         version: 4.23.4
     devDependencies:
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@types/async':
-        specifier: 3.2.7
-        version: 3.2.7
       '@types/delay':
         specifier: 3.1.0
         version: 3.1.0
@@ -2222,34 +2216,10 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      joi:
-        specifier: 17.9.2
-        version: 17.9.2
-      xstate:
-        specifier: 4.23.4
-        version: 4.23.4
     devDependencies:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@types/async':
-        specifier: 3.2.7
-        version: 3.2.7
-      '@types/delay':
-        specifier: 3.1.0
-        version: 3.1.0
-      '@types/sinon':
-        specifier: ^10.0.14
-        version: 10.0.14
-      delay:
-        specifier: 4.4.1
-        version: 4.4.1
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^15.0.4
-        version: 15.0.4
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -4974,10 +4944,6 @@ packages:
     dependencies:
       '@tufjs/canonical-json': 1.0.0
       minimatch: 9.0.0
-    dev: true
-
-  /@types/async@3.2.7:
-    resolution: {integrity: sha512-a+MBBfOTs3ShFMlbH9qsRVFkjIUunEtxrBT0gxRx1cntjKRg2WApuGmNYzHkwKaIhMi3SMbKktaD/rLObQMwIw==}
     dev: true
 
   /@types/benchmark@1.0.33:

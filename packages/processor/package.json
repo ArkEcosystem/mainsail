@@ -23,18 +23,10 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/state": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"joi": "17.9.2",
-		"xstate": "4.23.4"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
-		"@types/async": "3.2.7",
-		"@types/delay": "3.1.0",
-		"@types/sinon": "^10.0.14",
-		"delay": "4.4.1",
-		"import-fresh": "3.3.0",
-		"sinon": "^15.0.4",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
