@@ -2,8 +2,6 @@ import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export const blockData: Contracts.Crypto.IBlockData = {
-	blockSignature:
-		"6a4030f11e813f4641499e399f688e40979a62b7da4c41f86e4f51cae8ffda83dab7959388f45b9e708d9542ba9fe9935233700afa96c965ee362d6a6a322617",
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
 	id: "825fbfbe8191882ed54888ca58414f67c395d535a69cb3d23bed18ed3c016052",
@@ -20,8 +18,6 @@ export const blockData: Contracts.Crypto.IBlockData = {
 };
 
 export const blockDataJson: Contracts.Crypto.IBlockJson = {
-	blockSignature:
-		"6a4030f11e813f4641499e399f688e40979a62b7da4c41f86e4f51cae8ffda83dab7959388f45b9e708d9542ba9fe9935233700afa96c965ee362d6a6a322617",
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
 	id: "825fbfbe8191882ed54888ca58414f67c395d535a69cb3d23bed18ed3c016052",
@@ -41,9 +37,6 @@ export const serialized =
 	"01000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea96a4030f11e813f4641499e399f688e40979a62b7da4c41f86e4f51cae8ffda83dab7959388f45b9e708d9542ba9fe9935233700afa96c965ee362d6a6a322617";
 
 export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
-	blockSignature:
-		"7f9767f3d4c8e267c8b576bba3232534044ab356ac6ddd5cb7df60885487aef0a0868c3bd6431ac39200e2ab0abedbc855324826cfe03cbfa93db91b3aa37ead",
-
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
 	id: "977db7c9824d5f4a639cd360bad1cc1d68eb230f1a2f876e0bce8521eeeb96ab",
@@ -91,9 +84,6 @@ export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
 };
 
 export const blockDataWithTransactionsJson: Contracts.Crypto.IBlockJson = {
-	blockSignature:
-		"7f9767f3d4c8e267c8b576bba3232534044ab356ac6ddd5cb7df60885487aef0a0868c3bd6431ac39200e2ab0abedbc855324826cfe03cbfa93db91b3aa37ead",
-
 	generatorPublicKey: "e012f0a7cac12a74bdc17d844cbc9f637177b470019c32a53cef94c7a56e2ea9",
 	height: 2,
 	id: "977db7c9824d5f4a639cd360bad1cc1d68eb230f1a2f876e0bce8521eeeb96ab",
