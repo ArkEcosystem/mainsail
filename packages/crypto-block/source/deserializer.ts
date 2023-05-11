@@ -62,9 +62,6 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 				generatorPublicKey: {
 					type: "publicKey",
 				},
-				blockSignature: {
-					type: "signature",
-				},
 			},
 		});
 
