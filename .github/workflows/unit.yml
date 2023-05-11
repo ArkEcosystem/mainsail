@@ -62,6 +62,8 @@ jobs:
               run: cd packages/crypto-address-ss58 && pnpm run test
             - name: Test crypto-block
               run: cd packages/crypto-block && pnpm run test
+            - name: Test crypto-config
+              run: cd packages/crypto-config && pnpm run test
             - name: Test crypto-hash-bcrypto
               run: cd packages/crypto-hash-bcrypto && pnpm run test
             - name: Test crypto-hash-noble

@@ -1,74 +1,89 @@
+import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../test-framework";
-import { devnet, mainnet } from "../networks";
-import { configManager } from ".";
+import { Configuration } from "./configuration";
 
 describe<{
-	config: any;
-}>("Configuration", ({ it, beforeEach, afterEach, assert }) => {
+	configManager: Configuration;
+}>("Configuration", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
-		context.config = configManager.all();
+		context.configManager = new Configuration();
 
-		configManager.setConfig(devnet);
+		context.configManager.setConfig(cryptoJson);
 	});
 
-	afterEach((context) => configManager.setConfig(context.config));
-
-	it("should be instantiated", () => {
+	it("should be instantiated", ({ configManager }) => {
 		assert.object(configManager);
 	});
 
-	it("should be set on runtime", () => {
-		configManager.setConfig(mainnet);
+	it("should be set on runtime", ({ configManager }) => {
+		configManager.setConfig(cryptoJson);
 
-		assert.containKeys(configManager.all(), ["network", "milestones", "exceptions", "genesisBlock"]);
+		assert.containKeys(configManager.all(), ["network", "milestones", "genesisBlock"]);
 	});
 
-	it('key should be "set"', () => {
+	it('key should be "set"', ({ configManager }) => {
 		configManager.set("key", "value");
 
 		assert.equal(configManager.get("key"), "value");
 	});
 
-	it('key should be "get"', () => {
+	it('key should be "get"', ({ configManager }) => {
 		assert.equal(
 			configManager.get("network.nethash"),
-			"2a44f340d76ffc3df204c5f38cd355b7496c9065a1ade2ef92071436bd72e867",
+			"ac4279c60e87b4b788475bd86f2cc461f4ea2b786cb5f25f8c3c0fc292524982",
 		);
 	});
 
-	it("should build milestones", () => {
-		assert.equal(configManager.getMilestones(), devnet.milestones);
+	it("should build milestones", ({ configManager }) => {
+		assert.equal(configManager.getMilestones(), [
+			{
+				activeValidators: 51,
+				address: { bech32m: "ark" },
+				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				blockTime: 8,
+				epoch: "2022-03-18T00:00:00.000Z",
+				height: 1,
+				multiPaymentLimit: 256,
+				reward: "0",
+				satoshi: { decimals: 8, denomination: 100_000_000 },
+				vendorFieldLength: 255,
+			},
+			{
+				activeValidators: 51,
+				address: { bech32m: "ark" },
+				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				blockTime: 8,
+				epoch: "2022-03-18T00:00:00.000Z",
+				height: 75_600,
+				multiPaymentLimit: 256,
+				reward: "200000000",
+				satoshi: { decimals: 8, denomination: 100_000_000 },
+				vendorFieldLength: 255,
+			},
+		]);
 	});
 
-	it('should build milestones without concatenating the "minimumVersions" array', () => {
-		const milestones = devnet.milestones.sort((a, b) => a.height - b.height);
-		configManager.setHeight(milestones[0].height);
-
-		const lastMilestone = milestones.find((milestone) => !!milestone.p2p && !!milestone.p2p.minimumVersions);
-
-		if (lastMilestone && lastMilestone.p2p && configManager.getMilestone().p2p) {
-			assert.equal(configManager.getMilestone().p2p.minimumVersions, lastMilestone.p2p.minimumVersions);
-		}
+	it("should get milestone for height", ({ configManager }) => {
+		assert.equal(configManager.getMilestone(1).reward, cryptoJson.milestones[0].reward);
+		assert.equal(configManager.getMilestone(75_600).reward, cryptoJson.milestones[1].reward);
 	});
 
-	it("should get milestone for height", () => {
-		assert.equal(configManager.getMilestone(21_600), devnet.milestones[2]);
+	it("should get milestone for this.height if height is not provided as parameter", ({ configManager }) => {
+		assert.equal(configManager.getMilestone().reward, cryptoJson.milestones[0].reward);
+
+		configManager.setHeight(75_600);
+
+		assert.equal(configManager.getMilestone().reward, cryptoJson.milestones[1].reward);
 	});
 
-	it("should get milestone for this.height if height is not provided as parameter", () => {
-		configManager.setHeight(21_600);
-
-		assert.equal(configManager.getMilestone(), devnet.milestones[2]);
-	});
-
-	it("should set the height", () => {
+	it("should set the height", ({ configManager }) => {
 		configManager.setHeight(21_600);
 
 		assert.equal(configManager.getHeight(), 21_600);
 	});
 
-	it("should determine if a new milestone is becoming active", () => {
-		for (const milestone of devnet.milestones) {
+	it("should determine if a new milestone is becoming active", ({ configManager }) => {
+		for (const milestone of cryptoJson.milestones) {
 			configManager.setHeight(milestone.height);
 			assert.true(configManager.isNewMilestone());
 		}
@@ -80,26 +95,25 @@ describe<{
 		assert.false(configManager.isNewMilestone(999_999));
 	});
 
-	it("getNextMilestoneByKey - should throw an error if no milestones are set", () => {
-		configManager.setConfig({ ...devnet, milestones: [] });
+	it("getNextMilestoneByKey - should throw an error if no milestones are set", ({ configManager }) => {
+		configManager.setConfig({ ...cryptoJson, milestones: [] });
 		assert.throws(
-			() => configManager.getNextMilestoneWithNewKey(1, "blocktime"),
+			() => configManager.getNextMilestoneWithNewKey(1, "vendorFieldLength"),
 			`Attempted to get next milestone but none were set`,
 		);
 	});
 
-	it("getNextMilestoneByKey - should get the next milestone with a given key", () => {
-		configManager.setConfig(devnet);
+	it("getNextMilestoneByKey - should get the next milestone with a given key", ({ configManager }) => {
+		// configManager.setConfig(devnet);
 		const expected = {
-			data: 255,
+			data: "200000000",
 			found: true,
-			height: 1_750_000,
+			height: 75_600,
 		};
-		assert.equal(configManager.getNextMilestoneWithNewKey(1, "vendorFieldLength"), expected);
+		assert.equal(configManager.getNextMilestoneWithNewKey(1, "reward"), expected);
 	});
 
-	it("getNextMilestoneByKey - should return empty result if no next milestone is found", () => {
-		configManager.setConfig(devnet);
+	it("getNextMilestoneByKey - should return empty result if no next milestone is found", ({ configManager }) => {
 		const expected = {
 			data: null,
 			found: false,
@@ -108,27 +122,27 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(1_750_000, "vendorFieldLength"), expected);
 	});
 
-	it("getNextMilestoneByKey - should get all milestones", () => {
+	it("getNextMilestoneByKey - should get all milestones", ({ configManager }) => {
 		const milestones = [
-			{ blocktime: 8, height: 1 },
-			{ blocktime: 9, height: 3 },
-			{ blocktime: 10, height: 6 },
-			{ blocktime: 8, height: 8 },
+			{ reward: "8", height: 1 },
+			{ reward: "9", height: 3 },
+			{ reward: "10", height: 6 },
+			{ reward: "8", height: 8 },
 		];
-		const config = { ...devnet, milestones };
+		const config = { ...cryptoJson, milestones };
 		configManager.setConfig(config);
 		const secondMilestone = {
-			data: 9,
+			data: "9",
 			found: true,
 			height: 3,
 		};
 		const thirdMilestone = {
-			data: 10,
+			data: "10",
 			found: true,
 			height: 6,
 		};
 		const fourthMilestone = {
-			data: 8,
+			data: "8",
 			found: true,
 			height: 8,
 		};
@@ -137,10 +151,10 @@ describe<{
 			found: false,
 			height: 8,
 		};
-		assert.equal(configManager.getNextMilestoneWithNewKey(1, "blocktime"), secondMilestone);
-		assert.equal(configManager.getNextMilestoneWithNewKey(3, "blocktime"), thirdMilestone);
-		assert.equal(configManager.getNextMilestoneWithNewKey(4, "blocktime"), thirdMilestone);
-		assert.equal(configManager.getNextMilestoneWithNewKey(6, "blocktime"), fourthMilestone);
-		assert.equal(configManager.getNextMilestoneWithNewKey(8, "blocktime"), emptyMilestone);
+		assert.equal(configManager.getNextMilestoneWithNewKey(1, "reward"), secondMilestone);
+		assert.equal(configManager.getNextMilestoneWithNewKey(3, "reward"), thirdMilestone);
+		assert.equal(configManager.getNextMilestoneWithNewKey(4, "reward"), thirdMilestone);
+		assert.equal(configManager.getNextMilestoneWithNewKey(6, "reward"), fourthMilestone);
+		assert.equal(configManager.getNextMilestoneWithNewKey(8, "reward"), emptyMilestone);
 	});
 });
