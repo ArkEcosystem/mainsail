@@ -25,7 +25,9 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*"
 	},
-	"devDependencies": {},
+	"devDependencies": {
+		"uvu": "^0.5.6"
+	},
 	"engines": {
 		"node": ">=16.x"
 	}

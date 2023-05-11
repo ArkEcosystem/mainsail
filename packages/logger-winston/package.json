@@ -24,7 +24,9 @@
 		"joi": "17.9.2",
 		"winston": "^3.6.0"
 	},
-	"devDependencies": {},
+	"devDependencies": {
+		"uvu": "^0.5.6"
+	},
 	"engines": {
 		"node": ">=16.x"
 	}
