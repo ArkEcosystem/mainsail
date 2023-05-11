@@ -27,22 +27,23 @@ const workflow = {
 					name: "Setup pnpm",
 					uses: "pnpm/action-setup@v2",
 					with: {
-						version: "latest",
 						run_install: false,
+						version: "latest",
 					},
 				},
 				{
 					name: "Get pnpm store directory",
+					// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 					id: "pnpm-cache",
-					shell: "bash",
 					run: 'echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT',
+					shell: "bash",
 				},
 				{
 					name: "Cache pnpm modules",
 					uses: "actions/cache@v3",
 					with: {
-						path: "${{ steps.pnpm-cache.outputs.STORE_PATH }}",
 						key: "${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}",
+						path: "${{ steps.pnpm-cache.outputs.STORE_PATH }}",
 						"restore-keys": "${{ runner.os }}-pnpm-",
 					},
 				},
@@ -50,8 +51,8 @@ const workflow = {
 					name: "Cache lerna",
 					uses: "actions/cache@v3",
 					with: {
-						path: "./.cache",
 						key: "${{ runner.os }}-lerna",
+						path: "./.cache",
 						"restore-keys": "${{ runner.os }}-lerna-",
 					},
 				},
