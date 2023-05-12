@@ -1,0 +1,170 @@
+jobs:
+    unit:
+        concurrency:
+            cancel-in-progress: true
+            group: ${{ github.head_ref }}-unit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  run_install: false
+                  version: latest
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+              shell: bash
+            - name: Cache pnpm modules
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+            - name: Cache lerna
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-lerna
+                  path: ./.cache
+                  restore-keys: ${{ runner.os }}-lerna-
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm run build
+            - name: Test api
+              run: cd packages/api && pnpm run test
+            - name: Test blockchain
+              run: cd packages/blockchain && pnpm run test
+            - name: Test cli
+              run: cd packages/cli && pnpm run test
+            - name: Test configuration-generator
+              run: cd packages/configuration-generator && pnpm run test
+            - name: Test container
+              run: cd packages/container && pnpm run test
+            - name: Test contracts
+              run: cd packages/contracts && pnpm run test
+            - name: Test core
+              run: cd packages/core && pnpm run test
+            - name: Test crypto-address-base58
+              run: cd packages/crypto-address-base58 && pnpm run test
+            - name: Test crypto-address-bech32
+              run: cd packages/crypto-address-bech32 && pnpm run test
+            - name: Test crypto-address-bech32m
+              run: cd packages/crypto-address-bech32m && pnpm run test
+            - name: Test crypto-address-keccak256
+              run: cd packages/crypto-address-keccak256 && pnpm run test
+            - name: Test crypto-address-ss58
+              run: cd packages/crypto-address-ss58 && pnpm run test
+            - name: Test crypto-block
+              run: cd packages/crypto-block && pnpm run test
+            - name: Test crypto-config
+              run: cd packages/crypto-config && pnpm run test
+            - name: Test crypto-hash-bcrypto
+              run: cd packages/crypto-hash-bcrypto && pnpm run test
+            - name: Test crypto-hash-noble
+              run: cd packages/crypto-hash-noble && pnpm run test
+            - name: Test crypto-hash-wasm
+              run: cd packages/crypto-hash-wasm && pnpm run test
+            - name: Test crypto-key-pair-bls12-381
+              run: cd packages/crypto-key-pair-bls12-381 && pnpm run test
+            - name: Test crypto-key-pair-ecdsa
+              run: cd packages/crypto-key-pair-ecdsa && pnpm run test
+            - name: Test crypto-key-pair-ed25519
+              run: cd packages/crypto-key-pair-ed25519 && pnpm run test
+            - name: Test crypto-key-pair-schnorr
+              run: cd packages/crypto-key-pair-schnorr && pnpm run test
+            - name: Test crypto-signature-bls12-381
+              run: cd packages/crypto-signature-bls12-381 && pnpm run test
+            - name: Test crypto-signature-ecdsa
+              run: cd packages/crypto-signature-ecdsa && pnpm run test
+            - name: Test crypto-signature-ed25519
+              run: cd packages/crypto-signature-ed25519 && pnpm run test
+            - name: Test crypto-signature-schnorr
+              run: cd packages/crypto-signature-schnorr && pnpm run test
+            - name: Test crypto-time
+              run: cd packages/crypto-time && pnpm run test
+            - name: Test crypto-transaction
+              run: cd packages/crypto-transaction && pnpm run test
+            - name: Test crypto-transaction-multi-payment
+              run: cd packages/crypto-transaction-multi-payment && pnpm run test
+            - name: Test crypto-transaction-multi-signature-registration
+              run: cd packages/crypto-transaction-multi-signature-registration && pnpm run
+                  test
+            - name: Test crypto-transaction-transfer
+              run: cd packages/crypto-transaction-transfer && pnpm run test
+            - name: Test crypto-transaction-validator-registration
+              run: cd packages/crypto-transaction-validator-registration && pnpm run test
+            - name: Test crypto-transaction-validator-resignation
+              run: cd packages/crypto-transaction-validator-resignation && pnpm run test
+            - name: Test crypto-transaction-vote
+              run: cd packages/crypto-transaction-vote && pnpm run test
+            - name: Test crypto-validation
+              run: cd packages/crypto-validation && pnpm run test
+            - name: Test crypto-wif
+              run: cd packages/crypto-wif && pnpm run test
+            - name: Test database
+              run: cd packages/database && pnpm run test
+            - name: Test fees
+              run: cd packages/fees && pnpm run test
+            - name: Test fees-burn
+              run: cd packages/fees-burn && pnpm run test
+            - name: Test fees-managed
+              run: cd packages/fees-managed && pnpm run test
+            - name: Test fees-static
+              run: cd packages/fees-static && pnpm run test
+            - name: Test forger
+              run: cd packages/forger && pnpm run test
+            - name: Test forger-tracker
+              run: cd packages/forger-tracker && pnpm run test
+            - name: Test kernel
+              run: cd packages/kernel && pnpm run test
+            - name: Test logger-pino
+              run: cd packages/logger-pino && pnpm run test
+            - name: Test logger-winston
+              run: cd packages/logger-winston && pnpm run test
+            - name: Test networking-dns
+              run: cd packages/networking-dns && pnpm run test
+            - name: Test networking-ntp
+              run: cd packages/networking-ntp && pnpm run test
+            - name: Test p2p
+              run: cd packages/p2p && pnpm run test
+            - name: Test processor
+              run: cd packages/processor && pnpm run test
+            - name: Test serializer
+              run: cd packages/serializer && pnpm run test
+            - name: Test state
+              run: cd packages/state && pnpm run test
+            - name: Test storage-lmdb
+              run: cd packages/storage-lmdb && pnpm run test
+            - name: Test test-framework
+              run: cd packages/test-framework && pnpm run test
+            - name: Test transaction-pool
+              run: cd packages/transaction-pool && pnpm run test
+            - name: Test transactions
+              run: cd packages/transactions && pnpm run test
+            - name: Test utils
+              run: cd packages/utils && pnpm run test
+            - name: Test validation
+              run: cd packages/validation && pnpm run test
+            - name: Test webhooks
+              run: cd packages/webhooks && pnpm run test
+        strategy:
+            matrix:
+                node-version:
+                    - 20.x
+name: CI
+on:
+    pull_request:
+        types:
+            - ready_for_review
+            - synchronize
+            - opened
+    push:
+        branches:
+            - main
+            - develop

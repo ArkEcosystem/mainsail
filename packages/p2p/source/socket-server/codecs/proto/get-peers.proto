@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package getPeers;
+
+message GetPeersRequest {
+    shared.Headers headers = 1;
+}
+
+message GetPeersResponse {
+    message Peer {
+        string ip = 1;
+        uint32 port = 2;
+    }
+
+    repeated Peer peers = 1;
+}

@@ -1,0 +1,36 @@
+{
+	"name": "@mainsail/crypto-wif",
+	"version": "1.1.1",
+	"description": "Standalone version of identity interactions for the Mainsail Blockchain. Developed for TypeScript.",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"wif": "^2.0.6"
+	},
+	"devDependencies": {
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@types/wif": "^2.0.1",
+		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}

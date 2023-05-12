@@ -1,0 +1,46 @@
+{
+	"name": "@mainsail/blockchain",
+	"version": "0.0.1",
+	"description": "Blockchain Manager for Mainsail",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/state": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"joi": "17.9.2",
+		"xstate": "4.23.4"
+	},
+	"devDependencies": {
+		"@types/delay": "3.1.0",
+		"@types/sinon": "^10.0.14",
+		"delay": "4.4.1",
+		"import-fresh": "3.3.0",
+		"sinon": "^15.0.4",
+		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "blockchain"
+		}
+	}
+}

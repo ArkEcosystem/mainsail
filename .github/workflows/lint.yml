@@ -1,0 +1,61 @@
+name: Linting
+
+on:
+    push:
+        branches:
+            - "main"
+            - "develop"
+    pull_request:
+        types: [ready_for_review, synchronize, opened]
+
+jobs:
+    source:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [20.x]
+
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  token: ${{ secrets.GH_TOKEN }}
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: false
+
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              shell: bash
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v3
+              with:
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Sort
+              run: pnpm run sort
+
+            - name: Lint
+              run: pnpm run lint
+
+            - name: Prettier
+              run: pnpm run prettier
+
+            - uses: stefanzweifel/git-auto-commit-action@v4
+              with:
+                  commit_message: "style: resolve style guide violations"
