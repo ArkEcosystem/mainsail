@@ -42,4 +42,4 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## License
 
-[GNU General Public License v3.0](LICENSE) © [ARK Ecosystem](https://ark.io)
+[GNU General Public License v3.0](LICENSE) © [ARK Ecosystem](http://arkscic.com/)
