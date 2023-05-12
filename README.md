@@ -25,7 +25,7 @@ By using Mainsail, you agree to indemnify and hold harmless the author of Mainsa
 
 Mainsail is an open-source Layer 1 blockchain consensus engine, hereinafter referred to as "the Program". The Program is licensed under the terms of the GNU General Public License version 3 ("GPLv3").
 
-Copyright (C) 2023 ARK Ecosystem <http://arkscic.com/>
+Copyright (C) 2023 [ARK Ecosystem](<http://arkscic.com/>)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
