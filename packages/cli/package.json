@@ -1,0 +1,70 @@
+{
+	"name": "@mainsail/cli",
+	"version": "0.0.1",
+	"description": "Core of the Mainsail Blockchain",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"boxen": "4.2.0",
+		"cli-table3": "0.6.0",
+		"dayjs": "1.10.7",
+		"env-paths": "2.2.0",
+		"envfile": "5.2.0",
+		"execa": "3.4.0",
+		"fast-levenshtein": "2.0.6",
+		"fs-extra": "8.1.0",
+		"glob": "7.1.7",
+		"got": "11.8.2",
+		"joi": "17.9.2",
+		"kleur": "4.0.0",
+		"latest-version": "5.1.0",
+		"listr": "0.14.3",
+		"nodejs-tail": "1.1.1",
+		"ora": "4.1.1",
+		"prompts": "2.4.0",
+		"read-last-lines": "1.8.0",
+		"semver": "6.3.0",
+		"tar": "6.1.11",
+		"yargs-parser": "20.2.9"
+	},
+	"devDependencies": {
+		"@types/boxen": "3.0.1",
+		"@types/env-paths": "2.1.0",
+		"@types/execa": "2.0.0",
+		"@types/fast-levenshtein": "0.0.2",
+		"@types/fs-extra": "8.1.2",
+		"@types/glob": "8.1.0",
+		"@types/is-ci": "2.0.0",
+		"@types/latest-version": "4.0.1",
+		"@types/listr": "0.14.4",
+		"@types/ora": "3.2.0",
+		"@types/prompts": "2.4.0",
+		"@types/semver": "6.2.3",
+		"@types/tar": "6.1.4",
+		"@types/tmp": "0.2.1",
+		"@types/yargs-parser": "20.2.1",
+		"tmp": "0.2.1",
+		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}

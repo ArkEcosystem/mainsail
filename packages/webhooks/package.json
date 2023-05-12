@@ -1,0 +1,46 @@
+{
+	"name": "@mainsail/webhooks",
+	"version": "0.0.1",
+	"description": "Webhooks for Mainsail",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@hapi/boom": "9.0.0",
+		"@hapi/hapi": "20.1.5",
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"fs-extra": "8.1.0",
+		"joi": "17.9.2",
+		"lowdb": "1.0.0",
+		"uuid": "8.3.2"
+	},
+	"devDependencies": {
+		"@types/fs-extra": "8.1.2",
+		"@types/hapi__boom": "7.4.1",
+		"@types/hapi__hapi": "21.0.0",
+		"@types/hapi__joi": "17.1.7",
+		"@types/tmp": "0.2.1",
+		"@types/uuid": "8.3.1",
+		"import-fresh": "3.3.0",
+		"tmp": "0.2.1",
+		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}

@@ -1,0 +1,7 @@
+.coverage
+dist
+distribution
+docs
+LICENSE
+
+packages/p2p/source/socket-server/codecs/proto/protos.*

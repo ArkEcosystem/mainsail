@@ -1,0 +1,55 @@
+[
+	{
+		"height": 1,
+		"reward": 0,
+		"activeDelegates": 51,
+		"blockTime": 8,
+		"block": {
+			"version": 0,
+			"maxTransactions": 50,
+			"maxPayload": 2097152
+		},
+		"epoch": "2017-03-21T13:00:00.000Z",
+		"fees": {
+			"staticFees": {
+				"transfer": 10000000,
+				"delegateRegistration": 2500000000,
+				"vote": 100000000,
+				"multiSignature": 500000000,
+				"multiPayment": 10000000,
+				"delegateResignation": 2500000000
+			}
+		},
+		"ignoreExpiredTransactions": true,
+		"vendorFieldLength": 64,
+		"multiPaymentLimit": 128
+	},
+	{
+		"height": 10800,
+		"blockTime": 9
+	},
+	{
+		"height": 21600,
+		"activeDelegates": 41
+	},
+	{
+		"height": 910000,
+		"blockTime": 11
+	},
+	{
+		"height": 910004,
+		"blockTime": 11
+	},
+	{
+		"height": 920000,
+		"blockTime": 9
+	},
+	{
+		"height": 950000,
+		"blockTime": 12
+	},
+	{
+		"height": 960000,
+		"activeDelegates": 51
+	}
+]
