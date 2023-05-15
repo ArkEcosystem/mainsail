@@ -80,6 +80,4 @@ export interface IBlockSerializer {
 
 export interface IBlockVerifier {
 	verify(block: IBlock): Promise<IBlockVerification>;
-
-	// verifySignature(block: IBlock): Promise<boolean>;
 }

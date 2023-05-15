@@ -16,9 +16,6 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
-	// @inject(Identifiers.Cryptography.Signature)
-	// private readonly signatureFactory: Contracts.Crypto.ISignature;
-
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier: Contracts.Crypto.ITransactionVerifier;
 
@@ -42,12 +39,6 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 					["Invalid block reward:", blockData.reward, "expected:", constants.reward].join(" "),
 				);
 			}
-
-			// const valid = this.verifySignature(block);
-
-			// if (!valid) {
-			// 	result.errors.push("Failed to verify block signature");
-			// }
 
 			if (blockData.version !== constants.block.version) {
 				result.errors.push("Invalid block version");
@@ -144,19 +135,4 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 
 		return result;
 	}
-
-	// public async verifySignature(block: Contracts.Crypto.IBlock): Promise<boolean> {
-	// 	const bytes: Buffer = await this.serializer.serialize(block.data, false);
-	// 	const hash: Buffer = await this.hashFactory.sha256(bytes);
-
-	// 	if (!block.data.blockSignature) {
-	// 		throw new Error();
-	// 	}
-
-	// 	return this.signatureFactory.verify(
-	// 		hash,
-	// 		Buffer.from(block.data.blockSignature, "hex"),
-	// 		Buffer.from(block.data.generatorPublicKey, "hex"),
-	// 	);
-	// }
 }
