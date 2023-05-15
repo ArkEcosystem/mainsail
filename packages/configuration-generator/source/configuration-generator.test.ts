@@ -44,7 +44,6 @@ describe<{
 			match("crypto.json"),
 			match({
 				genesisBlock: {
-					blockSignature: match.string,
 					generatorPublicKey: match.string,
 					height: 1,
 					id: match.string,
@@ -175,7 +174,6 @@ describe<{
 			match("crypto.json"),
 			match({
 				genesisBlock: {
-					blockSignature: match.string,
 					generatorPublicKey: match.string,
 					height: 1,
 					id: match.string,
