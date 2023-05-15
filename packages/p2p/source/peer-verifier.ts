@@ -45,9 +45,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
-	@inject(Identifiers.Cryptography.Block.Verifier)
-	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
-
 	#logPrefix!: string;
 
 	#peer!: Contracts.P2P.Peer;
@@ -120,7 +117,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 				}
 			} else {
 				const claimedBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
-				if (claimedBlock && (await this.blockVerifier.verifySignature(claimedBlock))) {
+				// TODO: Verify block signatures
+				// if (claimedBlock && (await this.blockVerifier.verifySignature(claimedBlock))) {
+				if (claimedBlock) {
 					return true;
 				}
 			}
@@ -417,13 +416,14 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 
-		if (!(await this.blockVerifier.verifySignature(block))) {
-			this.#log(
-				Severity.DEBUG_EXTRA,
-				`failure: peer's block at height ${expectedHeight} does not pass crypto-validation`,
-			);
-			return false;
-		}
+		// TODO verify signatures
+		// if (!(await this.blockVerifier.verifySignature(block))) {
+		// 	this.#log(
+		// 		Severity.DEBUG_EXTRA,
+		// 		`failure: peer's block at height ${expectedHeight} does not pass crypto-validation`,
+		// 	);
+		// 	return false;
+		// }
 
 		const height = block.data.height;
 
