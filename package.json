@@ -10,6 +10,7 @@
 		"build": "lerna run build",
 		"clean": "lerna run clean --parallel",
 		"clean:node_modules": "del packages/*/node_modules && del node_modules",
+		"test:unit": "lerna run test --parallel",
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
 		"deps:missing": "node ./scripts/deps/missing.js",
 		"deps:types": "./node_modules/typesync/bin/typesync",
