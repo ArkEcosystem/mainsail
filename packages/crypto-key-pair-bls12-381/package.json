@@ -24,9 +24,9 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@noble/bls12-381": "^1.2.0",
+		"@noble/curves": "^1.0.0",
 		"@scure/bip39": "^1.0.0",
-		"bls12-381-keygen": "^0.2.1",
+		"bls12-381-keygen": "^0.2.3",
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {

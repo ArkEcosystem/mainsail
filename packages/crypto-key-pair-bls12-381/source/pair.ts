@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { getPublicKey } from "@noble/bls12-381";
+import { bls12_381 } from "@noble/curves/bls12-381";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import WIF from "wif";
@@ -24,7 +24,7 @@ export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
 		return {
 			compressed: decoded.compressed,
 			privateKey: decoded.privateKey.toString("hex"),
-			publicKey: Buffer.from(getPublicKey(decoded.privateKey)).toString("hex"),
+			publicKey: Buffer.from(bls12_381.getPublicKey(decoded.privateKey)).toString("hex"),
 		};
 	}
 
@@ -32,7 +32,7 @@ export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
 		return {
 			compressed: true,
 			privateKey: Buffer.from(privateKey).toString("hex"),
-			publicKey: Buffer.from(getPublicKey(privateKey)).toString("hex"),
+			publicKey: Buffer.from(bls12_381.getPublicKey(privateKey)).toString("hex"),
 		};
 	}
 }

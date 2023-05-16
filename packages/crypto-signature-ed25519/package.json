@@ -23,7 +23,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@noble/ed25519": "^1.6.0"
+		"@noble/curves": "^1.0.0"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

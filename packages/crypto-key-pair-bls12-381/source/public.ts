@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { aggregatePublicKeys } from "@noble/bls12-381";
+import { bls12_381 } from "@noble/curves/bls12-381";
 
 @injectable()
 export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
@@ -16,7 +16,7 @@ export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 	}
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
-		return Buffer.from(aggregatePublicKeys(asset.publicKeys)).toString("hex");
+		return Buffer.from(bls12_381.aggregatePublicKeys(asset.publicKeys)).toString("hex");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
