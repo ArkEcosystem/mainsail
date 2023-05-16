@@ -457,6 +457,22 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/consensus:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/container:
     dependencies:
       inversify:
