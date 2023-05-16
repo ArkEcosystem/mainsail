@@ -23,6 +23,7 @@
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
 		"setup": "pnpm install && pnpm run build",
 		"sort": "sort-package-json \"package.json\" \"packages/*/package.json\"",
+		"test:unit": "lerna run test --parallel",
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
