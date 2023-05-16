@@ -88,6 +88,9 @@
 			"package": "@mainsail/blockchain"
 		},
 		{
+			"package": "@mainsail/consensus"
+		},
+		{
 			"package": "@mainsail/api"
 		},
 		{

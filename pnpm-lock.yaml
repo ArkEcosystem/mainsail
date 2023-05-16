@@ -542,6 +542,9 @@ importers:
       '@mainsail/configuration-generator':
         specifier: workspace:*
         version: link:../configuration-generator
+      '@mainsail/consensus':
+        specifier: workspace:*
+        version: link:../consensus
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
