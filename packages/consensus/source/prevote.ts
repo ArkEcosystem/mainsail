@@ -4,12 +4,20 @@ export class Prevote implements IPrevote {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;
+	#validatorPublicKey: string;
 	#signature: string;
 
-	constructor(height: number, round: number, blockId: string | undefined, signature: string) {
+	constructor(
+		height: number,
+		round: number,
+		blockId: string | undefined,
+		validatorPublicKey: string,
+		signature: string,
+	) {
 		this.#height = height;
 		this.#round = round;
 		this.#blockId = blockId;
+		this.#validatorPublicKey = validatorPublicKey;
 		this.#signature = signature;
 	}
 
@@ -27,6 +35,7 @@ export class Prevote implements IPrevote {
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
+			validatorPublicKey: this.#validatorPublicKey,
 		};
 	}
 }

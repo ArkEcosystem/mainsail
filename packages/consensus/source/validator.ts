@@ -54,11 +54,11 @@ export class Validator {
 	}
 
 	public async prevote(height: number, round: number, blockId: string | undefined): Promise<Prevote> {
-		return new Prevote(height, round, blockId, "signature");
+		return new Prevote(height, round, blockId, this.#keyPair.publicKey, "signature");
 	}
 
 	public async precommit(height: number, round: number, blockId: string | undefined): Promise<Prevote> {
-		return new Prevote(height, round, blockId, "signature");
+		return new Prevote(height, round, blockId, this.#keyPair.publicKey, "signature");
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {

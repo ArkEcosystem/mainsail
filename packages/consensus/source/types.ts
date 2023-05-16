@@ -17,6 +17,7 @@ export interface IPrevoteData {
 	height: number;
 	round: number;
 	blockId?: string;
+	validatorPublicKey: string;
 	signature: string;
 }
 
@@ -29,6 +30,7 @@ export interface IPrecommitData {
 	height: number;
 	round: number;
 	blockId?: string;
+	validatorPublicKey: string;
 	signature: string;
 }
 
