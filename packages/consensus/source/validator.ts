@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 
+import { Prevote } from "./prevote";
 import { Proposal } from "./proposal";
 
 @injectable()
@@ -50,6 +51,14 @@ export class Validator {
 
 	public async propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<Proposal> {
 		return new Proposal(height, round, block, this.#keyPair.publicKey, "signature");
+	}
+
+	public async prevote(height: number, round: number, blockId: string | undefined): Promise<Prevote> {
+		return new Prevote(height, round, blockId, "signature");
+	}
+
+	public async precommit(height: number, round: number, blockId: string | undefined): Promise<Prevote> {
+		return new Prevote(height, round, blockId, "signature");
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
