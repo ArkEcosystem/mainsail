@@ -41,6 +41,8 @@ export interface IPrecommit {
 
 export interface IConsensus {
 	onProposal(proposal: IProposal): Promise<void>;
+	onMajorityPrevote(proposal: IProposal): Promise<void>;
+	onMajorityPrecommit(proposal: IProposal): Promise<void>;
 }
 
 export interface IHandler {

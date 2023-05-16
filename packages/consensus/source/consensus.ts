@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
 import { Proposal } from "./proposal";
-import { IBroadcaster, IConsensus, IHandler } from "./types";
+import { IBroadcaster, IConsensus, IHandler, IProposal } from "./types";
 import { Validator } from "./validator";
 
 enum Step {
@@ -89,7 +89,47 @@ export class Consensus implements IConsensus {
 		}
 	}
 
-	public async onProposal(proposal: Proposal): Promise<void> {
+	public async onProposal(proposal: IProposal): Promise<void> {
+		if (this.#step !== Step.propose) {
+			return;
+		}
+
+		this.logger.info(`Received proposal for ${this.#height}/${this.#round}`);
+
+		this.#step = Step.prevote;
+
+		for (const validator of this.#getRegisteredValidators()) {
+			const prevote = await validator.prevote(this.#height, this.#round, proposal.toData().block.data.id);
+
+			await this.broadcaster.broadcastPrevote(prevote);
+			await this.handler.onPrevote(prevote);
+		}
+	}
+
+	public async onMajorityPrevote(proposal: IProposal): Promise<void> {
+		if (this.#step !== Step.prevote) {
+			return;
+		}
+
+		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round}`);
+
+		this.#step = Step.precommit;
+
+		for (const validator of this.#getRegisteredValidators()) {
+			const precommit = await validator.precommit(this.#height, this.#round, proposal.toData().block.data.id);
+
+			await this.broadcaster.broadcastPrecommit(precommit);
+			await this.handler.onPrecommit(precommit);
+		}
+	}
+
+	public async onMajorityPrecommit(proposal: Proposal): Promise<void> {
+		if (this.#step !== Step.precommit) {
+			return;
+		}
+
+		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round}`);
+
 		const result = await this.processor.process(proposal.toData().block);
 
 		if (result === Contracts.BlockProcessor.ProcessorResult.Accepted) {
@@ -110,5 +150,9 @@ export class Consensus implements IConsensus {
 
 	#getRegisteredProposer(publicKey: string): Validator | undefined {
 		return this.#registeredValidators.get(publicKey);
+	}
+
+	#getRegisteredValidators(): Validator[] {
+		return [...this.#registeredValidators.values()];
 	}
 }
