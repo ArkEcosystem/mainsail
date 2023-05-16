@@ -28,6 +28,9 @@ export class Validator {
 	@inject(Identifiers.Database.Service)
 	private readonly database: Contracts.Database.IDatabaseService;
 
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots: Contracts.Crypto.Slots;
+
 	#keyPair: Contracts.Crypto.IKeyPair;
 
 	public configure(keyPair: Contracts.Crypto.IKeyPair): Validator {
@@ -91,7 +94,7 @@ export class Validator {
 				payloadLength: 32 * transactions.length,
 				previousBlock: previousBlock.data.id,
 				reward: this.cryptoConfiguration.getMilestone().reward,
-				timestamp: 0, // TODO: Fix
+				timestamp: this.slots.getTime(),
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions,
