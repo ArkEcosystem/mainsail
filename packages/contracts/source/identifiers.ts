@@ -18,6 +18,9 @@ export const Identifiers = {
 	ConfigPlugins: Symbol.for("Config<Plugins>"),
 	ConfigRepository: Symbol.for("Repository<Config>"),
 	ConfigService: Symbol.for("Service<Config>"),
+	Consensus: {
+		Service: Symbol.for("Service<Consensus>"),
+	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {
 		Block: {

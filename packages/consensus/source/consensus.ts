@@ -1,0 +1,78 @@
+import { injectable } from "@mainsail/container";
+
+import { Validator } from "./validator";
+
+enum Step {
+	propose = "propose",
+	prevote = "prevote",
+	precommit = "precommit",
+}
+
+@injectable()
+export class Consensus {
+	#height = 0;
+	#round = 0;
+	#step: Step = Step.propose;
+	#lockedValue: undefined;
+	#lockedRound = -1;
+	#validValue: undefined;
+	#validRound = -1;
+
+	#validators: string[] = [];
+	#registeredValidators: Map<string, Validator> = new Map();
+
+	public constructor(validators: string[], registeredValidators: Validator[]) {
+		this.#validators = validators;
+		this.#registeredValidators = new Map(
+			registeredValidators.map((validator) => [validator.getPublicKey(), validator]),
+		);
+	}
+
+	public getState(): Record<string, unknown> {
+		return {
+			height: this.#height,
+			lockedRound: this.#lockedRound,
+			lockedValue: this.#lockedValue,
+			round: this.#round,
+			step: this.#step,
+			validRound: this.#validRound,
+			validValue: this.#validValue,
+		};
+	}
+
+	public async run(): Promise<void> {
+		await this.startRound(this.#round);
+	}
+
+	public async startRound(round: number): Promise<void> {
+		this.#round = round;
+		this.#step = Step.propose;
+
+		const proposerPublicKey = this.#getProposerPublicKey(this.#height, round);
+		const proposer = this.#getRegisteredProposer(proposerPublicKey);
+
+		console.log(`Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
+
+		if (proposer) {
+			const block = await proposer.prepareBlock(this.#height, round);
+
+			const proposal = await proposer.propose(block);
+
+			await this.#broadcastProposal(proposal);
+		} else {
+			console.log(`No registered proposer for ${proposerPublicKey}`);
+		}
+	}
+
+	async #broadcastProposal(proposal: unknown): Promise<void> {
+		console.log(`Broadcasting proposal: ${proposal}`);
+	}
+
+	#getProposerPublicKey(height: number, round: number): string {
+		return this.#validators[0];
+	}
+
+	#getRegisteredProposer(publicKey: string): Validator | undefined {
+		return this.#registeredValidators.get(publicKey);
+	}
+}

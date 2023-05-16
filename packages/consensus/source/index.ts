@@ -2,6 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { secrets } from "../../core/bin/config/testnet/validators.json";
+import { Consensus } from "./consensus";
 import { Validator } from "./validator";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -12,5 +13,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		const keyPairs = await Promise.all(secrets.map(async (menonic) => await keyPairFactory.fromMnemonic(menonic)));
 		const validators = keyPairs.map((keyPair) => new Validator(keyPair));
+
+		this.app.bind(Identifiers.Consensus.Service).toConstantValue(
+			new Consensus(
+				validators.map((validator) => validator.getPublicKey()),
+				validators,
+			),
+		);
 	}
 }
