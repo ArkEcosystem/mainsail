@@ -16,7 +16,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const validators = keyPairs.map((keyPair) => this.app.resolve<Validator>(Validator).configure(keyPair));
 
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(
-			this.app.resolve(Consensus).configure(
+			await this.app.resolve(Consensus).configure(
 				validators.map((validator) => validator.getPublicKey()),
 				validators,
 			),

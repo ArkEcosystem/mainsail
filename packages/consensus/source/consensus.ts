@@ -33,11 +33,14 @@ export class Consensus {
 	#validators: string[] = [];
 	#registeredValidators: Map<string, Validator> = new Map();
 
-	public configure(validators: string[], registeredValidators: Validator[]): Consensus {
+	public async configure(validators: string[], registeredValidators: Validator[]): Promise<Consensus> {
 		this.#validators = validators;
 		this.#registeredValidators = new Map(
 			registeredValidators.map((validator) => [validator.getPublicKey(), validator]),
 		);
+
+		const lastBlock = await this.database.getLastBlock();
+		this.#height = lastBlock.data.height + 1;
 
 		return this;
 	}
