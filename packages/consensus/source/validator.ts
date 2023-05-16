@@ -91,7 +91,7 @@ export class Validator {
 				payloadLength: 32 * transactions.length,
 				previousBlock: previousBlock.data.id,
 				reward: this.cryptoConfiguration.getMilestone().reward,
-				timestamp: Date.now(),
+				timestamp: 0, // TODO: Fix
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions,
