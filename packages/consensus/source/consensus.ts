@@ -1,5 +1,8 @@
-import { injectable } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import delay from "delay";
 
+import { Proposal } from "./proposal";
 import { Validator } from "./validator";
 
 enum Step {
@@ -10,6 +13,12 @@ enum Step {
 
 @injectable()
 export class Consensus {
+	@inject(Identifiers.BlockProcessor)
+	private readonly processor: Contracts.BlockProcessor.Processor;
+
+	@inject(Identifiers.Database.Service)
+	private readonly database: Contracts.Database.IDatabaseService;
+
 	#height = 0;
 	#round = 0;
 	#step: Step = Step.propose;
@@ -66,8 +75,23 @@ export class Consensus {
 		}
 	}
 
-	async #broadcastProposal(proposal: unknown): Promise<void> {
+	public async onProposal(proposal: Proposal): Promise<void> {
+		const result = await this.processor.process(proposal.toData().block);
+
+		if (result === Contracts.BlockProcessor.ProcessorResult.Accepted) {
+			await this.database.saveBlocks([proposal.toData().block]);
+		}
+
+		await delay(8000);
+
+		this.#height++;
+		await this.startRound(0);
+	}
+
+	async #broadcastProposal(proposal: Proposal): Promise<void> {
 		console.log(`Broadcasting proposal: ${proposal}`);
+
+		await this.onProposal(proposal);
 	}
 
 	#getProposerPublicKey(height: number, round: number): string {

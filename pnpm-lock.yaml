@@ -471,6 +471,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      delay:
+        specifier: 5.0.0
+        version: 5.0.0
     devDependencies:
       uvu:
         specifier: ^0.5.6
