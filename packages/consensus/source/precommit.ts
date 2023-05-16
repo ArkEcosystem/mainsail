@@ -1,4 +1,6 @@
-export class Precommit {
+import { IPrecommit } from "./types";
+
+export class Precommit implements IPrecommit {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;

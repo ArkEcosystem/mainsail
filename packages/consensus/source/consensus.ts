@@ -2,9 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
-import { Broadcaster } from "./broadcaster";
-import { Handler } from "./handler";
 import { Proposal } from "./proposal";
+import { IBroadcaster, IConsensus, IHandler } from "./types";
 import { Validator } from "./validator";
 
 enum Step {
@@ -14,7 +13,7 @@ enum Step {
 }
 
 @injectable()
-export class Consensus {
+export class Consensus implements IConsensus {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -25,10 +24,10 @@ export class Consensus {
 	private readonly database: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.Consensus.Handler)
-	private readonly handler: Handler;
+	private readonly handler: IHandler;
 
 	@inject(Identifiers.Consensus.Broadcaster)
-	private readonly broadcaster: Broadcaster;
+	private readonly broadcaster: IBroadcaster;
 
 	#height = 2;
 	#round = 0;

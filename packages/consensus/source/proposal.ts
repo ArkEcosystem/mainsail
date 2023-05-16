@@ -1,6 +1,8 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class Proposal {
+import { IProposal, IProposalData } from "./types";
+
+export class Proposal implements IProposal {
 	#height: number;
 	#round: number;
 	#block: Contracts.Crypto.IBlock;
@@ -30,13 +32,7 @@ export class Proposal {
 		});
 	}
 
-	toData(): {
-		height: number;
-		round: number;
-		block: Contracts.Crypto.IBlock;
-		validatorPublicKey: string;
-		signature: string;
-	} {
+	toData(): IProposalData {
 		return {
 			block: this.#block,
 			height: this.#height,

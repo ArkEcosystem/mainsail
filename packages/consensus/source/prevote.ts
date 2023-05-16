@@ -1,4 +1,6 @@
-export class Prevote {
+import { IPrevote, IPrevoteData } from "./types";
+
+export class Prevote implements IPrevote {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;
@@ -19,7 +21,7 @@ export class Prevote {
 		});
 	}
 
-	toData(): { blockId: string | undefined; height: number; round: number; signature: string } {
+	toData(): IPrevoteData {
 		return {
 			blockId: this.#blockId,
 			height: this.#height,
