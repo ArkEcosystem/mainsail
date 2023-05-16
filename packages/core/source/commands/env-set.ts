@@ -1,6 +1,5 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import { Commands, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable } from "@mainsail/container";
+import { Commands, Services } from "@mainsail/cli";
 import Joi from "joi";
 
 @injectable()

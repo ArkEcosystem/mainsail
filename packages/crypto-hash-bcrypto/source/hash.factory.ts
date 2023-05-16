@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Hash256, RIPEMD160, SHA256 } from "bcrypto";
 

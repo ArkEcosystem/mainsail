@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 import { bls12_381 } from "@noble/curves/bls12-381";

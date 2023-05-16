@@ -1,4 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { KernelEvent } from "../enums";

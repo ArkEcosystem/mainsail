@@ -1,8 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
 import { white } from "kleur";
 
 import { Runtime } from "../exceptions";
-import { Identifiers } from "../ioc";
 import { Logger } from "../services";
 
 @injectable()

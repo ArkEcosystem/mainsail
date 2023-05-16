@@ -1,5 +1,3 @@
-import { injectable } from "@mainsail/container";
-
 import { Resource } from "../types";
 
 @injectable()

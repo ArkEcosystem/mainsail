@@ -1,5 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
-
 import { Application } from "../application";
 import { Spinner } from "../components";
 import { Identifiers } from "../ioc";

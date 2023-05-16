@@ -1,5 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { Resource } from "../types";

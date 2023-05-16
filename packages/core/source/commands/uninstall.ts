@@ -1,5 +1,4 @@
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
 
 @injectable()
 export class Command extends Commands.Command {

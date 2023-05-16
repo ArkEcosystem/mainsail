@@ -1,4 +1,3 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { ActionFactory } from "../action-factory";

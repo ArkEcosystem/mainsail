@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { BigNumber } from "@mainsail/utils";
 
 import { Resource } from "../types";

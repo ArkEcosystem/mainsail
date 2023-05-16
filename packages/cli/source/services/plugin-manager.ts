@@ -1,10 +1,8 @@
-import { inject, injectable } from "@mainsail/container";
 import { existsSync, readJSONSync, removeSync } from "fs-extra";
 import glob from "glob";
 import { join } from "path";
 
 import * as Contracts from "../contracts";
-import { Identifiers } from "../ioc";
 import { Environment } from "./environment";
 import { File, Git, NPM, Source } from "./source-providers";
 

@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { strictEqual } from "assert";
 
 @injectable()

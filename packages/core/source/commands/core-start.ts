@@ -1,5 +1,4 @@
 import { Commands, Contracts, Utils } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
 import Joi from "joi";
 import { resolve } from "path";
 

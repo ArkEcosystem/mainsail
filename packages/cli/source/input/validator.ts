@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import Joi from "joi";
 
 @injectable()

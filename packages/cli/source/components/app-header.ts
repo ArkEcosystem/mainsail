@@ -1,9 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { red, white } from "kleur";
 import os from "os";
-
-import { Identifiers } from "../ioc";
 
 @injectable()
 export class AppHeader {

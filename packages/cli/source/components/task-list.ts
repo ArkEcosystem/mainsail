@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import Listr from "listr";
 
 @injectable()

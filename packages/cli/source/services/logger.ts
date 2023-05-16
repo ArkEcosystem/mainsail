@@ -1,6 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
-
-import { Identifiers } from "../ioc";
 import { Output } from "../output";
 
 @injectable()

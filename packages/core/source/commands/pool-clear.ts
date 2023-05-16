@@ -1,5 +1,4 @@
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
 import { removeSync } from "fs-extra";
 import Joi from "joi";
 

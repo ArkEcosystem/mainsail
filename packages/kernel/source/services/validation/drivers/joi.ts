@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { AnySchema, ValidationErrorItem } from "joi";
 @injectable()

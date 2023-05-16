@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import ora, { Options, Ora } from "ora";
 
 @injectable()

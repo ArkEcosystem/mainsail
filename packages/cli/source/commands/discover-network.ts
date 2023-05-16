@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { existsSync, readdirSync } from "fs-extra";
 import prompts from "prompts";
 

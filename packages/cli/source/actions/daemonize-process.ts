@@ -1,4 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { totalmem } from "os";
 

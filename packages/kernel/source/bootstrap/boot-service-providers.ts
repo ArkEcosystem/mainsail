@@ -1,5 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions } from "@mainsail/contracts";
 
 import { BlockEvent, KernelEvent } from "../enums";
 import { ServiceProviderRepository } from "../providers";

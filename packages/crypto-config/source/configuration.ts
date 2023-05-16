@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { Contracts, Exceptions } from "@mainsail/contracts";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";

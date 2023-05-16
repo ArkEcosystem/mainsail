@@ -1,5 +1,3 @@
-import { injectable } from "@mainsail/container";
-
 enum OutputVerbosity {
 	Quiet = 0,
 	Normal = 1,

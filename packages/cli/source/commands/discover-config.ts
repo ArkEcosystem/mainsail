@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { readJSON } from "fs-extra";
 import path from "path";

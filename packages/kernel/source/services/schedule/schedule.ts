@@ -1,5 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 import { BlockJob } from "./block-job";
 import { CronJob } from "./cron-job";

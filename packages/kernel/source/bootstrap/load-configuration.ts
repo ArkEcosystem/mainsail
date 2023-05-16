@@ -1,4 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { ConfigManager, ConfigRepository } from "../services/config";

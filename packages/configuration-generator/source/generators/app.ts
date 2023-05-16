@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { readJSONSync } from "fs-extra";
 import { resolve } from "path";

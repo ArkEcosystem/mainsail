@@ -1,5 +1,3 @@
-import { injectable } from "@mainsail/container";
-
 @injectable()
 export class Clear {
 	public render(): void {

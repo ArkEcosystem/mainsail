@@ -1,4 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";

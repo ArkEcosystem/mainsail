@@ -1,5 +1,3 @@
-import { injectable } from "@mainsail/container";
-
 import { Wallet } from "../contracts";
 import { Generator } from "./generator";
 

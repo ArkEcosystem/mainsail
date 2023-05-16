@@ -1,5 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { bls12_381 } from "@noble/curves/bls12-381";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";

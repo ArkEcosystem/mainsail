@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { generateMnemonic } from "bip39";
 
 @injectable()

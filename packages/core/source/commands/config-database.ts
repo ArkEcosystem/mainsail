@@ -1,5 +1,4 @@
-import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
-import { inject, injectable } from "@mainsail/container";
+import { Commands, Contracts, Services } from "@mainsail/cli";
 import Joi from "joi";
 
 @injectable()

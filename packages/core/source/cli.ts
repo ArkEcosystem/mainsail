@@ -6,7 +6,7 @@ import {
 	InputParser,
 	Plugins,
 } from "@mainsail/cli";
-import { Container, injectable } from "@mainsail/container";
+import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import { existsSync } from "fs-extra";

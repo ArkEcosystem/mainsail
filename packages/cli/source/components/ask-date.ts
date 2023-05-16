@@ -1,5 +1,3 @@
-import { inject, injectable } from "@mainsail/container";
-
 import { Application } from "../contracts";
 import { Identifiers } from "../ioc";
 import { Prompt } from "./prompt";

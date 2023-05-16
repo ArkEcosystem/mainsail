@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import logProcessErrors from "log-process-errors";
 
 import { Bootstrapper } from "./interfaces";

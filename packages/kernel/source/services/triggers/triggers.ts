@@ -1,4 +1,3 @@
-import { injectable } from "@mainsail/container";
 import { Exceptions } from "@mainsail/contracts";
 
 import { ActionArguments } from "../../types";

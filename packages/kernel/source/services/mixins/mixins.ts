@@ -1,5 +1,3 @@
-import { injectable } from "@mainsail/container";
-
 import { Constructor } from "../../types/container";
 import { assert } from "../../utils";
 
