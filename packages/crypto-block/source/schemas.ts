@@ -17,7 +17,6 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
-			blockSignature: { $ref: "hex" },
 			generatorPublicKey: { $ref: "publicKey" },
 			height: { minimum: 1, type: "integer" },
 			id: { $ref: "blockId" },
@@ -40,7 +39,6 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 			"totalFee",
 			"reward",
 			"generatorPublicKey",
-			"blockSignature",
 		],
 		type: "object",
 	},

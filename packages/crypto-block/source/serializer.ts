@@ -21,7 +21,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			block.data.payloadHash.length / 2 +
 			block.data.generatorPublicKey.length / 2;
 
-		let size = headerSize + block.data.blockSignature.length / 2;
+		let size = headerSize;
 
 		for (const transaction of block.transactions) {
 			size += 4 /* tx length */ + transaction.serialized.length;
@@ -30,7 +30,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		return size;
 	}
 
-	public async serialize(block: Contracts.Crypto.IBlockData, includeSignature = true): Promise<Buffer> {
+	public async serialize(block: Contracts.Crypto.IBlockData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IBlockData>(block, {
 			length: 2_000_000,
 			schema: {
@@ -66,10 +66,6 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 				},
 				generatorPublicKey: {
 					type: "publicKey",
-				},
-				blockSignature: {
-					type: "signature",
-					required: includeSignature,
 				},
 			},
 		});
@@ -111,9 +107,6 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 				},
 				generatorPublicKey: {
 					type: "publicKey",
-				},
-				blockSignature: {
-					type: "signature",
 				},
 				transactions: {
 					type: "transactions",

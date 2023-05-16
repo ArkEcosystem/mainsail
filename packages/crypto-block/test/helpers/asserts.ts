@@ -12,7 +12,6 @@ export const assertBlockData = (assert, data1, data2) => {
 		"payloadLength",
 		"payloadHash",
 		"generatorPublicKey",
-		"blockSignature",
 	];
 	for (const field of blockFields) {
 		assert.equal(data1[field].toString(), data2[field].toString());

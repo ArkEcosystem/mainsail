@@ -6,7 +6,7 @@ import { describe, Factories } from "../../test-framework";
 import { blockData } from "../test/fixtures/block";
 import { sealBlock } from "./block";
 
-describe<{}>("Block", ({ it, assert, beforeAll, afterAll, stub, each }) => {
+describe<{}>("Block", ({ it, assert }) => {
 	it("#sealBlock - should seal block", async () => {
 		const transactionFactory = await Factories.factory("Transfer", crypto);
 

@@ -26,7 +26,7 @@ describe<{
 				data: blockData,
 				transactions: [],
 			}),
-			204,
+			140,
 		);
 	});
 
@@ -43,7 +43,7 @@ describe<{
 					),
 				),
 			}),
-			584,
+			520,
 		);
 	});
 

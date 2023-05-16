@@ -31,7 +31,6 @@ export interface IBlockData {
 	payloadHash: string;
 	generatorPublicKey: string;
 
-	blockSignature?: string;
 	serialized?: string;
 	transactions?: ITransactionData[];
 }
@@ -51,7 +50,6 @@ export interface IBlockJson {
 	payloadHash: string;
 	generatorPublicKey: string;
 
-	blockSignature?: string;
 	serialized?: string;
 	transactions?: ITransactionJson[];
 }
@@ -82,6 +80,4 @@ export interface IBlockSerializer {
 
 export interface IBlockVerifier {
 	verify(block: IBlock): Promise<IBlockVerification>;
-
-	verifySignature(block: IBlock): Promise<boolean>;
 }

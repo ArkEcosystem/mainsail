@@ -16,12 +16,6 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
-	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Contracts.Crypto.IHashFactory;
-
-	@inject(Identifiers.Cryptography.Signature)
-	private readonly signatureFactory: Contracts.Crypto.ISignature;
-
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: Contracts.Crypto.IValidator;
 
@@ -30,11 +24,6 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		keys: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IBlock | undefined> {
 		data.generatorPublicKey = keys.publicKey;
-
-		const payloadHash: Buffer = await this.serializer.serialize(data, false);
-		const hash: Buffer = await this.hashFactory.sha256(payloadHash);
-
-		data.blockSignature = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
 
 		data.id = await this.idFactory.make(data);
 

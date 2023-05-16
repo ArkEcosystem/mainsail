@@ -61,7 +61,6 @@ export class BlockWithTransactionsResource implements Resource {
 				length: blockData.payloadLength,
 			},
 			previous: blockData.previousBlock,
-			signature: blockData.blockSignature,
 			transactions: blockData.numberOfTransactions,
 			version: +blockData.version,
 			// timestamp: AppUtils.formatTimestamp(blockData.timestamp),

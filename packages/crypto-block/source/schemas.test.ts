@@ -103,7 +103,6 @@ describe<{
 			"totalFee",
 			"reward",
 			"generatorPublicKey",
-			"blockSignature",
 		];
 
 		for (const field of requiredFields) {
@@ -113,15 +112,6 @@ describe<{
 
 			assert.defined(validator.validate("blockHeader", blockWithoutField).error);
 		}
-	});
-
-	it("blockHeader - blockSignature should be hex", ({ validator }) => {
-		const block = {
-			...blockOriginal,
-			blockSignature: "GHIJK",
-		};
-
-		assert.true(validator.validate("blockHeader", block).error.includes("blockSignature"));
 	});
 
 	it("blockHeader - generatorPublicKey should be publicKey", ({ validator }) => {
