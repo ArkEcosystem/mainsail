@@ -1,7 +1,9 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
+import { Broadcaster } from "./broadcaster";
 import { Consensus } from "./consensus";
+import { Handler } from "./handler";
 import { Validator } from "./validator";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -14,6 +16,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.config("validators.secrets").map(async (menonic) => await keyPairFactory.fromMnemonic(menonic)),
 		);
 		const validators = keyPairs.map((keyPair) => this.app.resolve<Validator>(Validator).configure(keyPair));
+
+		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Broadcaster).to(Broadcaster).inSingletonScope();
 
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(
 			await this.app.resolve(Consensus).configure(

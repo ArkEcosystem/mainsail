@@ -2,6 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
+import { Broadcaster } from "./broadcaster";
+import { Handler } from "./handler";
 import { Proposal } from "./proposal";
 import { Validator } from "./validator";
 
@@ -21,6 +23,12 @@ export class Consensus {
 
 	@inject(Identifiers.Database.Service)
 	private readonly database: Contracts.Database.IDatabaseService;
+
+	@inject(Identifiers.Consensus.Handler)
+	private readonly handler: Handler;
+
+	@inject(Identifiers.Consensus.Broadcaster)
+	private readonly broadcaster: Broadcaster;
 
 	#height = 2;
 	#round = 0;
@@ -75,7 +83,8 @@ export class Consensus {
 
 			const proposal = await proposer.propose(this.#height, this.#round, block);
 
-			await this.#broadcastProposal(proposal);
+			await this.broadcaster.broadcastProposal(proposal);
+			await this.handler.onProposal(proposal);
 		} else {
 			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
 		}
@@ -94,12 +103,6 @@ export class Consensus {
 
 		this.#height++;
 		await this.startRound(0);
-	}
-
-	async #broadcastProposal(proposal: Proposal): Promise<void> {
-		this.logger.info(`Broadcasting proposal: ${proposal}`);
-
-		await this.onProposal(proposal);
 	}
 
 	#getProposerPublicKey(height: number, round: number): string {
