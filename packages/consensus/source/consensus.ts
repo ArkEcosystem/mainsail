@@ -13,6 +13,9 @@ enum Step {
 
 @injectable()
 export class Consensus {
+	@inject(Identifiers.LogService)
+	private readonly logger: Contracts.Kernel.Logger;
+
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor: Contracts.BlockProcessor.Processor;
 
@@ -62,7 +65,7 @@ export class Consensus {
 		const proposerPublicKey = this.#getProposerPublicKey(this.#height, round);
 		const proposer = this.#getRegisteredProposer(proposerPublicKey);
 
-		console.log(`Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
+		this.logger.info(`Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
 		if (proposer) {
 			const block = await proposer.prepareBlock(this.#height, round);
@@ -71,7 +74,7 @@ export class Consensus {
 
 			await this.#broadcastProposal(proposal);
 		} else {
-			console.log(`No registered proposer for ${proposerPublicKey}`);
+			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
 		}
 	}
 
@@ -80,6 +83,8 @@ export class Consensus {
 
 		if (result === Contracts.BlockProcessor.ProcessorResult.Accepted) {
 			await this.database.saveBlocks([proposal.toData().block]);
+		} else {
+			this.logger.info(`Block ${proposal.toData().block.data.height} rejected`);
 		}
 
 		await delay(8000);
@@ -89,7 +94,7 @@ export class Consensus {
 	}
 
 	async #broadcastProposal(proposal: Proposal): Promise<void> {
-		console.log(`Broadcasting proposal: ${proposal}`);
+		this.logger.info(`Broadcasting proposal: ${proposal}`);
 
 		await this.onProposal(proposal);
 	}
