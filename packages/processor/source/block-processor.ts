@@ -7,7 +7,6 @@ import {
 	AcceptBlockHandler,
 	AlreadyForgedHandler,
 	IncompatibleTransactionsHandler,
-	InvalidGeneratorHandler,
 	NonceOutOfOrderHandler,
 	UnchainedHandler,
 	VerificationFailedHandler,
@@ -59,19 +58,19 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			return this.app.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler).execute();
 		}
 
-		const isValidGenerator: boolean = await this.#validateGenerator(block);
+		// const isValidGenerator: boolean = await this.#validateGenerator(block);
 		const isChained: boolean = await AppUtils.isBlockChained(
 			this.blockchain.getLastBlock().data,
 			block.data,
 			this.slots,
 		);
 		if (!isChained) {
-			return this.app.resolve<UnchainedHandler>(UnchainedHandler).initialize(isValidGenerator).execute(block);
+			return this.app.resolve<UnchainedHandler>(UnchainedHandler).initialize(true).execute(block);
 		}
 
-		if (!isValidGenerator) {
-			return this.app.resolve<InvalidGeneratorHandler>(InvalidGeneratorHandler).execute(block);
-		}
+		// if (!isValidGenerator) {
+		// 	return this.app.resolve<InvalidGeneratorHandler>(InvalidGeneratorHandler).execute(block);
+		// }
 
 		const containsForgedTransactions: boolean = await this.#checkBlockContainsForgedTransactions(block);
 		if (containsForgedTransactions) {
@@ -206,6 +205,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return false;
 	}
 
+	// @ts-ignore
 	async #validateGenerator(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(
 			block.data.height,
