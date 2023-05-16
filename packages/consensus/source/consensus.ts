@@ -22,7 +22,7 @@ export class Consensus {
 	@inject(Identifiers.Database.Service)
 	private readonly database: Contracts.Database.IDatabaseService;
 
-	#height = 0;
+	#height = 2;
 	#round = 0;
 	#step: Step = Step.propose;
 	#lockedValue: undefined;
