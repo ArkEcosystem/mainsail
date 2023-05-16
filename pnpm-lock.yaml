@@ -468,6 +468,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       uvu:
         specifier: ^0.5.6

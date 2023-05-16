@@ -58,7 +58,7 @@ export class Consensus {
 		if (proposer) {
 			const block = await proposer.prepareBlock(this.#height, round);
 
-			const proposal = await proposer.propose(block);
+			const proposal = await proposer.propose(this.#height, this.#round, block);
 
 			await this.#broadcastProposal(proposal);
 		} else {
