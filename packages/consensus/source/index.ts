@@ -4,6 +4,7 @@ import { Providers } from "@mainsail/kernel";
 import { Broadcaster } from "./broadcaster";
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
+import { RoundStateRepository } from "./round-state-repository";
 import { Validator } from "./validator";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -19,6 +20,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Broadcaster).to(Broadcaster).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(
 			await this.app.resolve(Consensus).configure(
