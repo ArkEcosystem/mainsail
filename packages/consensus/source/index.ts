@@ -12,10 +12,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		);
 
 		const keyPairs = await Promise.all(secrets.map(async (menonic) => await keyPairFactory.fromMnemonic(menonic)));
-		const validators = keyPairs.map((keyPair) => new Validator(keyPair));
+		const validators = keyPairs.map((keyPair) => this.app.resolve<Validator>(Validator).configure(keyPair));
 
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(
-			new Consensus(
+			this.app.resolve(Consensus).configure(
 				validators.map((validator) => validator.getPublicKey()),
 				validators,
 			),

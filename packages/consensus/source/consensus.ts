@@ -21,11 +21,13 @@ export class Consensus {
 	#validators: string[] = [];
 	#registeredValidators: Map<string, Validator> = new Map();
 
-	public constructor(validators: string[], registeredValidators: Validator[]) {
+	public configure(validators: string[], registeredValidators: Validator[]): Consensus {
 		this.#validators = validators;
 		this.#registeredValidators = new Map(
 			registeredValidators.map((validator) => [validator.getPublicKey(), validator]),
 		);
+
+		return this;
 	}
 
 	public getState(): Record<string, unknown> {
