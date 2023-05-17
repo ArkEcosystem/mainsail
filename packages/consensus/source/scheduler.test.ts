@@ -7,7 +7,7 @@ describe<{
 	sandbox: Sandbox;
 	scheduler: Scheduler;
 }>("Scheduler", ({ beforeEach, it, assert, spy, clock }) => {
-	const delays = [1000, 2000, 4000];
+	const delays = [1000, 3000, 5000];
 
 	const consensus = {
 		onTimeoutPrecommit: () => {},
@@ -15,10 +15,18 @@ describe<{
 		onTimeoutPropose: () => {},
 	};
 
+	const config = {
+		getMilestone: () => ({
+			stageTimeout: 1000,
+			stageTimeoutIncrease: 2000,
+		}),
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 
 		context.scheduler = context.sandbox.app.resolve(Scheduler);
 	});
@@ -52,7 +60,7 @@ describe<{
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		void scheduler.scheduleTimeoutPropose(1, 3);
+		void scheduler.scheduleTimeoutPropose(1, 2);
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 
@@ -84,7 +92,7 @@ describe<{
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		void scheduler.scheduleTimeoutPrevote(1, 3);
+		void scheduler.scheduleTimeoutPrevote(1, 2);
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 
@@ -116,7 +124,7 @@ describe<{
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		void scheduler.scheduleTimeoutPrecommit(1, 3);
+		void scheduler.scheduleTimeoutPrecommit(1, 2);
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 

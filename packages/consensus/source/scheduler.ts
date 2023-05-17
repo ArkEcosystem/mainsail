@@ -9,6 +9,9 @@ export class Scheduler implements IScheduler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+
 	public async scheduleTimeoutPropose(height: number, round: number): Promise<void> {
 		await this.#wait(round);
 		await this.#getConsensus().onTimeoutPropose(height, round);
@@ -25,8 +28,10 @@ export class Scheduler implements IScheduler {
 	}
 
 	async #wait(round: number) {
-		// TODO: Find a better way to calculate the delay
-		await delay((round + 1) * 1000);
+		await delay(
+			this.cryptoConfiguration.getMilestone().stageTimeout +
+				round * this.cryptoConfiguration.getMilestone().stageTimeoutIncrease,
+		);
 	}
 
 	#getConsensus(): IConsensus {
