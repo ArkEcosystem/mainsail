@@ -22,6 +22,7 @@ export const Identifiers = {
 		Broadcaster: Symbol.for("Broadcaster<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
+		Scheduler: Symbol.for("Scheduler<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
