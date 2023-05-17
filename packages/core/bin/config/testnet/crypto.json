@@ -2637,6 +2637,8 @@
 				"decimals": 8,
 				"denomination": 100000000
 			},
+			"stageTimeout": 2000,
+			"stageTimeoutIncrease": 2000,
 			"vendorFieldLength": 255
 		},
 		{

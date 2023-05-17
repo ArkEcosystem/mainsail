@@ -47,6 +47,8 @@ describe<{
 						decimals: 8,
 						denomination: 1e8,
 					},
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
 					vendorFieldLength: 255,
 				},
 			],

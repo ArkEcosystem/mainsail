@@ -47,6 +47,8 @@ export type Milestone = {
 	reward: string;
 	satoshi: MilestoneSatoshi;
 	vendorFieldLength: number;
+	stageTimeout: number;
+	stageTimeoutIncrease: number;
 };
 
 export type MilestonePartial = Partial<Milestone> & {
