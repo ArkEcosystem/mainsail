@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
 import { Proposal } from "./proposal";
-import { IBroadcaster, IConsensus, IHandler, IProposal } from "./types";
+import { IBroadcaster, IConsensus, IHandler, IProposal, IScheduler } from "./types";
 import { Validator } from "./validator";
 
 enum Step {
@@ -28,6 +28,9 @@ export class Consensus implements IConsensus {
 
 	@inject(Identifiers.Consensus.Broadcaster)
 	private readonly broadcaster: IBroadcaster;
+
+	@inject(Identifiers.Consensus.Scheduler)
+	private readonly scheduler: IScheduler;
 
 	#height = 2;
 	#round = 0;
@@ -86,6 +89,8 @@ export class Consensus implements IConsensus {
 			await this.handler.onProposal(proposal);
 		} else {
 			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
+
+			await this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 		}
 	}
 
@@ -143,6 +148,12 @@ export class Consensus implements IConsensus {
 		this.#height++;
 		await this.startRound(0);
 	}
+
+	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
+
+	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
+
+	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
 
 	#getProposerPublicKey(height: number, round: number): string {
 		return this.#validators[0];

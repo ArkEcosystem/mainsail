@@ -43,6 +43,9 @@ export interface IConsensus {
 	onProposal(proposal: IProposal): Promise<void>;
 	onMajorityPrevote(proposal: IProposal): Promise<void>;
 	onMajorityPrecommit(proposal: IProposal): Promise<void>;
+	onTimeoutPropose(height: number, round: number): Promise<void>;
+	onTimeoutPrevote(height: number, round: number): Promise<void>;
+	onTimeoutPrecommit(height: number, round: number): Promise<void>;
 }
 
 export interface IHandler {
@@ -55,4 +58,10 @@ export interface IBroadcaster {
 	broadcastProposal(proposal: IProposal): Promise<void>;
 	broadcastPrevote(prevote: IPrevote): Promise<void>;
 	broadcastPrecommit(precommit: IPrecommit): Promise<void>;
+}
+
+export interface IScheduler {
+	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
+	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
+	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
 }
