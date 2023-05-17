@@ -56,3 +56,9 @@ export interface IBroadcaster {
 	broadcastPrevote(prevote: IPrevote): Promise<void>;
 	broadcastPrecommit(precommit: IPrecommit): Promise<void>;
 }
+
+export interface IScheduler {
+	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
+	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
+	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
+}
