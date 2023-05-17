@@ -26,6 +26,8 @@ export class MilestonesGenerator {
 					decimals: 8,
 					denomination: 1e8,
 				},
+				stageTimeout: 2000,
+				stageTimeoutIncrease: 2000,
 				vendorFieldLength: options.vendorFieldLength,
 			},
 		];
