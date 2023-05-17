@@ -46,6 +46,8 @@ describe<{
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: { decimals: 8, denomination: 100_000_000 },
+				stageTimeout: 2000,
+				stageTimeoutIncrease: 2000,
 				vendorFieldLength: 255,
 			},
 			{
@@ -58,6 +60,8 @@ describe<{
 				multiPaymentLimit: 256,
 				reward: "200000000",
 				satoshi: { decimals: 8, denomination: 100_000_000 },
+				stageTimeout: 2000,
+				stageTimeoutIncrease: 2000,
 				vendorFieldLength: 255,
 			},
 		]);
