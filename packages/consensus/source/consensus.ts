@@ -144,6 +144,12 @@ export class Consensus implements IConsensus {
 		await this.startRound(0);
 	}
 
+	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
+
+	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
+
+	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
+
 	#getProposerPublicKey(height: number, round: number): string {
 		return this.#validators[0];
 	}
