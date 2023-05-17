@@ -88,16 +88,13 @@
 			"package": "@mainsail/blockchain"
 		},
 		{
+			"package": "@mainsail/consensus"
+		},
+		{
 			"package": "@mainsail/api"
 		},
 		{
 			"package": "@mainsail/webhooks"
-		},
-		{
-			"package": "@mainsail/forger"
-		},
-		{
-			"package": "@mainsail/forger-tracker"
 		}
 	]
 }
