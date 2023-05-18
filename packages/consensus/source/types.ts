@@ -79,3 +79,7 @@ export interface IValidatorRepository {
 	getValidator(publicKey: string): IValidator;
 	getValidators(publicKeys: string[]): IValidator[];
 }
+
+export interface IValidatorSet {
+	getActiveValidators(): Promise<Contracts.State.Wallet[]>;
+}

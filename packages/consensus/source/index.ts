@@ -31,11 +31,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(this.app.resolve(ValidatorRepository).configure(validators));
 
-		this.app
-			.bind(Identifiers.Consensus.Service)
-			.toConstantValue(
-				await this.app.resolve(Consensus).configure(validators.map((validator) => validator.getPublicKey())),
-			);
+		this.app.bind(Identifiers.Consensus.Service).toConstantValue(await this.app.resolve(Consensus).configure());
 	}
 
 	public async boot(): Promise<void> {
