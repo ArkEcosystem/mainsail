@@ -6,9 +6,10 @@ import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 import { Precommit } from "./precommit";
 import { Prevote } from "./prevote";
 import { Proposal } from "./proposal";
+import { IValidator } from "./types";
 
 @injectable()
-export class Validator {
+export class Validator implements IValidator {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
