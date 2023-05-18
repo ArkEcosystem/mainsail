@@ -18,6 +18,8 @@ export class MilestonesGenerator {
 					version: 1,
 				},
 				blockTime: options.blockTime,
+				consensusKeyPair: "bls12-381",
+				consensusSignature: "bls12-381",
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
 				height: 1,
 				multiPaymentLimit: 256,
@@ -29,6 +31,8 @@ export class MilestonesGenerator {
 				stageTimeout: 2000,
 				stageTimeoutIncrease: 2000,
 				vendorFieldLength: options.vendorFieldLength,
+				walletKeyPair: "schnorr",
+				walletSignature: "schnorr",
 			},
 		];
 
