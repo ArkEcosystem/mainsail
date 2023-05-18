@@ -41,6 +41,8 @@ describe<{
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8,
+				consensusKeyPair: "bls12-381",
+				consensusSignature: "bls12-381",
 				epoch: "2022-03-18T00:00:00.000Z",
 				height: 1,
 				multiPaymentLimit: 256,
@@ -49,12 +51,16 @@ describe<{
 				stageTimeout: 2000,
 				stageTimeoutIncrease: 2000,
 				vendorFieldLength: 255,
+				walletKeyPair: "schnorr",
+				walletSignature: "schnorr",
 			},
 			{
 				activeValidators: 51,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8,
+				consensusKeyPair: "bls12-381",
+				consensusSignature: "bls12-381",
 				epoch: "2022-03-18T00:00:00.000Z",
 				height: 75_600,
 				multiPaymentLimit: 256,
@@ -63,6 +69,8 @@ describe<{
 				stageTimeout: 2000,
 				stageTimeoutIncrease: 2000,
 				vendorFieldLength: 255,
+				walletKeyPair: "schnorr",
+				walletSignature: "schnorr",
 			},
 		]);
 	});
@@ -128,10 +136,10 @@ describe<{
 
 	it("getNextMilestoneByKey - should get all milestones", ({ configManager }) => {
 		const milestones = [
-			{ reward: "8", height: 1 },
-			{ reward: "9", height: 3 },
-			{ reward: "10", height: 6 },
-			{ reward: "8", height: 8 },
+			{ height: 1, reward: "8" },
+			{ height: 3, reward: "9" },
+			{ height: 6, reward: "10" },
+			{ height: 8, reward: "8" },
 		];
 		const config = { ...cryptoJson, milestones };
 		configManager.setConfig(config);
