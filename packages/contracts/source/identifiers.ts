@@ -20,6 +20,7 @@ export const Identifiers = {
 	ConfigService: Symbol.for("Service<Config>"),
 	Consensus: {
 		Broadcaster: Symbol.for("Broadcaster<Consensus>"),
+		Factory: Symbol.for("Factory<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
 		MessageFactory: Symbol.for("Factory<Consensus.MessageFactory>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
