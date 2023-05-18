@@ -25,6 +25,7 @@ export const Identifiers = {
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
+		ValidatorSet: Symbol.for("Set<Consensus.Validator>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {

@@ -13,7 +13,7 @@ export class ValidatorSet {
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
-	async getActiveValidators(height: number, round: number): Promise<Contracts.State.Wallet[]> {
+	async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
 		const keyPairs = await Promise.all(
 			this.app
 				.config("validators.secrets")
