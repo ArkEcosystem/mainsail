@@ -9,7 +9,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		// TODO: consider different approach
 		const consensusSignature = config.getMilestone().consensusSignature;
-		if (consensusSignature === "bls") {
+		if (consensusSignature === "bls12-381") {
 			this.app.bind(Identifiers.Consensus.Size.Signature).toConstantValue(96);
 			this.app.bind(Identifiers.Consensus.Signature).to(Signature).inSingletonScope();
 		} else {
