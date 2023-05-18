@@ -7,6 +7,7 @@ import { Handler } from "./handler";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
 import { Validator } from "./validator";
+import { ValidatorRepository } from "./validator-repository";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -23,6 +24,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Broadcaster).to(Broadcaster).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
+		this.app
+			.bind(Identifiers.Consensus.ValidatorRepository)
+			.toConstantValue(await this.app.resolve(ValidatorRepository).configure(validators));
 
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(
 			await this.app.resolve(Consensus).configure(
