@@ -49,6 +49,7 @@ export type Milestone = {
 	vendorFieldLength: number;
 	stageTimeout: number;
 	stageTimeoutIncrease: number;
+	consensusSignature: string;
 };
 
 export type MilestonePartial = Partial<Milestone> & {

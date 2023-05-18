@@ -2639,7 +2639,8 @@
 			},
 			"stageTimeout": 2000,
 			"stageTimeoutIncrease": 2000,
-			"vendorFieldLength": 255
+			"vendorFieldLength": 255,
+			"consensusSignature": "bls"
 		},
 		{
 			"height": 75600,

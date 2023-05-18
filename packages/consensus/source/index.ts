@@ -3,9 +3,11 @@ import { Providers } from "@mainsail/kernel";
 
 import { Broadcaster } from "./broadcaster";
 import { Consensus } from "./consensus";
+import { ConsensusFactory } from "./factory";
 import { Handler } from "./handler";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
+import { Serializer } from "./serializer";
 import { Validator } from "./validator";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -13,6 +15,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const keyPairFactory = this.app.get<Contracts.Crypto.IKeyPairFactory>(
 			Identifiers.Cryptography.Identity.KeyPairFactory,
 		);
+
+		this.app.bind(Identifiers.Consensus.Serializer).to(Serializer).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Factory).to(ConsensusFactory).inSingletonScope();
 
 		const keyPairs = await Promise.all(
 			this.app.config("validators.secrets").map(async (menonic) => await keyPairFactory.fromMnemonic(menonic)),

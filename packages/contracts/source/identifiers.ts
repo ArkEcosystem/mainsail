@@ -20,10 +20,16 @@ export const Identifiers = {
 	ConfigService: Symbol.for("Service<Config>"),
 	Consensus: {
 		Broadcaster: Symbol.for("Broadcaster<Consensus>"),
+		Factory: Symbol.for("Factory<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
+		Serializer: Symbol.for("Serializer<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
+		Signature: Symbol.for("Crypto<Consensus.Signature>"),
+		Size: {
+			Signature: Symbol.for("Crypto<Consensus.Size.Signature>"),
+		},
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {

@@ -65,3 +65,33 @@ export interface IScheduler {
 	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
 }
+
+export type HasSignature = { signature: string };
+export type WithoutSignature<T> = Omit<T, "signature">;
+export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
+export type IMakeProposalData = WithoutSignature<IProposalData>;
+export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
+export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
+
+export interface IConsensusFactory {
+	makeProposal(data: IMakeProposalData, keyPair: Contracts.Crypto.IKeyPair): Promise<IProposal>;
+	makePrevote(data: IMakePrevoteData, keyPair: Contracts.Crypto.IKeyPair): Promise<IPrevote>;
+	makePrecommit(data: IMakePrecommitData, keyPair: Contracts.Crypto.IKeyPair): Promise<IPrecommit>;
+}
+
+export interface ISerializeOptions {
+	excludeSignature?: boolean;
+}
+export interface ISerializeProposalOptions extends ISerializeOptions {}
+export interface ISerializePrevoteOptions extends ISerializeOptions {}
+export interface ISerializePrecommitOptions extends ISerializeOptions {}
+
+export type ISerializableProposal = OptionalSignature<IProposalData>;
+export type ISerializablePrevote = OptionalSignature<IPrevoteData>;
+export type ISerializablePrecommit = OptionalSignature<IPrecommitData>;
+
+export interface ISerializer {
+	serializeProposal(proposal: ISerializableProposal, options?: ISerializeProposalOptions): Promise<Buffer>;
+	serializePrevote(prevote: ISerializablePrevote, options?: ISerializePrevoteOptions): Promise<Buffer>;
+	serializePrecommit(precommit: ISerializablePrecommit, options?: ISerializePrecommitOptions): Promise<Buffer>;
+}
