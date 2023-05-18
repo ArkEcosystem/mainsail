@@ -39,6 +39,8 @@ describe<{
 						version: 1,
 					},
 					blockTime: 8,
+					consensusKeyPair: "bls12-381",
+					consensusSignature: "bls12-381",
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
 					height: 1,
 					multiPaymentLimit: 256,
@@ -50,6 +52,8 @@ describe<{
 					stageTimeout: 2000,
 					stageTimeoutIncrease: 2000,
 					vendorFieldLength: 255,
+					walletKeyPair: "schnorr",
+					walletSignature: "schnorr",
 				},
 			],
 		);

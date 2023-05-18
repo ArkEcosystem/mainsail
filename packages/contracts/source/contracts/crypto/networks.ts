@@ -50,6 +50,9 @@ export type Milestone = {
 	stageTimeout: number;
 	stageTimeoutIncrease: number;
 	consensusSignature: string;
+	consensusKeyPair: string;
+	walletSignature: string;
+	walletKeyPair: string;
 };
 
 export type MilestonePartial = Partial<Milestone> & {
