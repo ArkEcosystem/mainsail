@@ -73,7 +73,7 @@ export type IMakeProposalData = WithoutSignature<IProposalData>;
 export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
 export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
 
-export interface IConsensusFactory {
+export interface IMessageFactory {
 	makeProposal(data: IMakeProposalData, keyPair: Contracts.Crypto.IKeyPair): Promise<IProposal>;
 	makePrevote(data: IMakePrevoteData, keyPair: Contracts.Crypto.IKeyPair): Promise<IPrevote>;
 	makePrecommit(data: IMakePrecommitData, keyPair: Contracts.Crypto.IKeyPair): Promise<IPrecommit>;

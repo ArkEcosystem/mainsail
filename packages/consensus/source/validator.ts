@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 
-import { IConsensusFactory, IPrecommit, IPrevote, IProposal } from "./types";
+import { IMessageFactory, IPrecommit, IPrevote, IProposal } from "./types";
 
 @injectable()
 export class Validator {
@@ -31,8 +31,8 @@ export class Validator {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
-	@inject(Identifiers.Consensus.Factory)
-	private readonly consensusFactory: IConsensusFactory;
+	@inject(Identifiers.Consensus.MessageFactory)
+	private readonly messagesFactory: IMessageFactory;
 
 	#keyPair: Contracts.Crypto.IKeyPair;
 
@@ -52,21 +52,21 @@ export class Validator {
 	}
 
 	public async propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<IProposal> {
-		return this.consensusFactory.makeProposal(
+		return this.messagesFactory.makeProposal(
 			{ block, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);
 	}
 
 	public async prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote> {
-		return this.consensusFactory.makePrevote(
+		return this.messagesFactory.makePrevote(
 			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);
 	}
 
 	public async precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit> {
-		return this.consensusFactory.makePrecommit(
+		return this.messagesFactory.makePrecommit(
 			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);

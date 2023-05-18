@@ -5,10 +5,10 @@ import { Precommit } from "./precommit";
 import { Prevote } from "./prevote";
 import { Proposal } from "./proposal";
 import {
-	IConsensusFactory,
 	IMakePrecommitData,
 	IMakePrevoteData,
 	IMakeProposalData,
+	IMessageFactory,
 	IPrecommit,
 	IPrevote,
 	IProposal,
@@ -16,7 +16,7 @@ import {
 } from "./types";
 
 @injectable()
-export class ConsensusFactory implements IConsensusFactory {
+export class MessageFactory implements IMessageFactory {
 	@inject(Identifiers.Consensus.Serializer)
 	private readonly serializer: ISerializer;
 
