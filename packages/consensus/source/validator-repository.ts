@@ -11,7 +11,7 @@ export class ValidatorRepository {
 		return this.#validators.get(publicKey);
 	}
 
-	getValidators(publicKeys: string[]) {
+	getValidators(publicKeys: string[]): Validator[] {
 		return publicKeys.map((publicKey) => this.getValidator(publicKey)).filter((validator) => !!validator);
 	}
 }
