@@ -81,13 +81,11 @@ export class Handler implements IHandler {
 		const consensus = this.#getConsensus();
 
 		if (roundState.hasMajorityPrevotes()) {
-			const majority = await roundState.aggregateMajorityPrevotes();
-			await consensus.onMajorityPrevote(proposal, majority);
+			await consensus.onMajorityPrevote(proposal);
 		}
 
 		if (roundState.hasMajorityPrecommits()) {
-			const majority = await roundState.aggregateMajorityPrecommits();
-			await consensus.onMajorityPrecommit(proposal, majority);
+			await consensus.onMajorityPrecommit(proposal);
 		}
 	}
 

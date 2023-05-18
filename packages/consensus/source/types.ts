@@ -44,8 +44,8 @@ export interface IPrecommit {
 
 export interface IConsensus {
 	onProposal(proposal: IProposal): Promise<void>;
-	onMajorityPrevote(proposal: IPrevote, majority: IValidatorSetMajority): Promise<void>;
-	onMajorityPrecommit(proposal: IPrecommit, majority: IValidatorSetMajority): Promise<void>;
+	onMajorityPrevote(proposal: IPrevote): Promise<void>;
+	onMajorityPrecommit(proposal: IPrecommit): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
