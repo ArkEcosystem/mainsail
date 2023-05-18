@@ -117,10 +117,12 @@ export class Consensus implements IConsensus {
 		}
 	}
 
-	public async onMajorityPrevote(proposal: IProposal): Promise<void> {
+	public async onMajorityPrevote(proposal: IProposal, majority: IValidatorSetMajority): Promise<void> {
 		if (this.#step !== Step.prevote) {
 			return;
 		}
+
+		// TODO: bookkeeping / persist `majority` for successful prevote?
 
 		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round}`);
 
@@ -135,10 +137,12 @@ export class Consensus implements IConsensus {
 		}
 	}
 
-	public async onMajorityPrecommit(proposal: Proposal): Promise<void> {
+	public async onMajorityPrecommit(proposal: Proposal, majority: IValidatorSetMajority): Promise<void> {
 		if (this.#step !== Step.precommit) {
 			return;
 		}
+
+		// TODO: bookkeeping / persist `majority` for successful precommit?
 
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round}`);
 

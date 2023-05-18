@@ -34,6 +34,8 @@ export interface IPublicKeyFactory {
 	fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string>;
 
 	verify(publicKey: string): Promise<boolean>;
+
+	aggregate(publicKeys: Buffer[]): Promise<string>;
 }
 
 export interface IPrivateKeyFactory {
@@ -76,4 +78,6 @@ export interface ISignature {
 	serialize(buffer: ByteBuffer, signature: string): void;
 
 	deserialize(buffer: ByteBuffer): Buffer;
+
+	aggregate(signatures: Buffer[]): Promise<string>;
 }

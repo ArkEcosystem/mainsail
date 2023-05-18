@@ -9,14 +9,33 @@ import { PublicKeySerializer } from "./serializer";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(48);
+		const config = this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration);
 
-		this.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Identity.PrivateKeyFactory).to(PrivateKeyFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Identity.PublicKeySerializer).to(PublicKeySerializer).inSingletonScope();
+		// TODO: consider different approach
+		const consensusSignature = config.getMilestone().consensusSignature;
+		if (consensusSignature === "bls") {
+			this.app.bind(Identifiers.Consensus.Size.PublicKey).toConstantValue(48);
 
-		this.#registerSchemas();
+			this.app.bind(Identifiers.Consensus.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
+			this.app.bind(Identifiers.Consensus.Identity.PrivateKeyFactory).to(PrivateKeyFactory).inSingletonScope();
+			this.app.bind(Identifiers.Consensus.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
+			this.app
+				.bind(Identifiers.Consensus.Identity.PublicKeySerializer)
+				.to(PublicKeySerializer)
+				.inSingletonScope();
+		} else {
+			this.app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(48);
+
+			this.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
+			this.app.bind(Identifiers.Cryptography.Identity.PrivateKeyFactory).to(PrivateKeyFactory).inSingletonScope();
+			this.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
+			this.app
+				.bind(Identifiers.Cryptography.Identity.PublicKeySerializer)
+				.to(PublicKeySerializer)
+				.inSingletonScope();
+
+			this.#registerSchemas();
+		}
 	}
 
 	#registerSchemas(): void {

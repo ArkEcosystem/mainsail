@@ -21,4 +21,8 @@ export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 	public async verify(publicKey: string): Promise<boolean> {
 		throw new Exceptions.NotImplemented(this.constructor.name, "verify");
 	}
+
+	public async aggregate(publicKeys: Buffer[]): Promise<string> {
+		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
+	}
 }

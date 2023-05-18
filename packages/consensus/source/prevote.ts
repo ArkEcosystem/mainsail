@@ -21,6 +21,10 @@ export class Prevote implements IPrevote {
 		this.#signature = signature;
 	}
 
+	get signature(): string {
+		return this.#signature;
+	}
+
 	toString(): string {
 		return JSON.stringify({
 			blockId: this.#blockId,
