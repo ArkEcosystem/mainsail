@@ -12,8 +12,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const config = this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration);
 
 		// TODO: consider different approach
-		const consensusSignature = config.getMilestone().consensusSignature;
-		if (consensusSignature === "bls") {
+		const consensusKeyPair = config.getMilestone().consensusKeyPair;
+		if (consensusKeyPair === "bls12-381") {
 			this.app.bind(Identifiers.Consensus.Size.PublicKey).toConstantValue(48);
 
 			this.app.bind(Identifiers.Consensus.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
