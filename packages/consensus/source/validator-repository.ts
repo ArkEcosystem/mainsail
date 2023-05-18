@@ -1,11 +1,16 @@
+import { injectable } from "@mainsail/container";
+
 import { IValidatorRepository } from "./types";
 import { Validator } from "./validator";
 
+@injectable()
 export class ValidatorRepository implements IValidatorRepository {
 	#validators: Map<string, Validator>;
 
-	async configure(validators: Validator[]) {
+	configure(validators: Validator[]): ValidatorRepository {
 		this.#validators = new Map(validators.map((validator) => [validator.getPublicKey(), validator]));
+
+		return this;
 	}
 
 	getValidator(publicKey): Validator | undefined {

@@ -24,16 +24,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Broadcaster).to(Broadcaster).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
+
 		this.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
-			.toConstantValue(await this.app.resolve(ValidatorRepository).configure(validators));
+			.toConstantValue(this.app.resolve(ValidatorRepository).configure(validators));
 
-		this.app.bind(Identifiers.Consensus.Service).toConstantValue(
-			await this.app.resolve(Consensus).configure(
-				validators.map((validator) => validator.getPublicKey()),
-				validators,
-			),
-		);
+		this.app
+			.bind(Identifiers.Consensus.Service)
+			.toConstantValue(
+				await this.app.resolve(Consensus).configure(validators.map((validator) => validator.getPublicKey())),
+			);
 	}
 
 	public async boot(): Promise<void> {

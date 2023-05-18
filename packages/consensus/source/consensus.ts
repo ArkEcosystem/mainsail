@@ -3,8 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
 import { Proposal } from "./proposal";
-import { IBroadcaster, IConsensus, IHandler, IProposal, IScheduler } from "./types";
-import { Validator } from "./validator";
+import { IBroadcaster, IConsensus, IHandler, IProposal, IScheduler, IValidatorRepository } from "./types";
 
 enum Step {
 	propose = "propose",
@@ -32,6 +31,9 @@ export class Consensus implements IConsensus {
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler: IScheduler;
 
+	@inject(Identifiers.Consensus.ValidatorRepository)
+	private readonly validatorsRepository: IValidatorRepository;
+
 	#height = 2;
 	#round = 0;
 	#step: Step = Step.propose;
@@ -41,13 +43,9 @@ export class Consensus implements IConsensus {
 	#validRound = -1;
 
 	#validators: string[] = [];
-	#registeredValidators: Map<string, Validator> = new Map();
 
-	public async configure(validators: string[], registeredValidators: Validator[]): Promise<Consensus> {
+	public async configure(validators: string[]): Promise<Consensus> {
 		this.#validators = validators;
-		this.#registeredValidators = new Map(
-			registeredValidators.map((validator) => [validator.getPublicKey(), validator]),
-		);
 
 		const lastBlock = await this.database.getLastBlock();
 		this.#height = lastBlock.data.height + 1;
@@ -76,7 +74,7 @@ export class Consensus implements IConsensus {
 		this.#step = Step.propose;
 
 		const proposerPublicKey = this.#getProposerPublicKey(this.#height, round);
-		const proposer = this.#getRegisteredProposer(proposerPublicKey);
+		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
 		this.logger.info(`Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
@@ -103,7 +101,7 @@ export class Consensus implements IConsensus {
 
 		this.#step = Step.prevote;
 
-		for (const validator of this.#getRegisteredValidators()) {
+		for (const validator of this.validatorsRepository.getValidators(this.#validators)) {
 			const prevote = await validator.prevote(this.#height, this.#round, proposal.toData().block.data.id);
 
 			await this.broadcaster.broadcastPrevote(prevote);
@@ -120,7 +118,7 @@ export class Consensus implements IConsensus {
 
 		this.#step = Step.precommit;
 
-		for (const validator of this.#getRegisteredValidators()) {
+		for (const validator of this.validatorsRepository.getValidators(this.#validators)) {
 			const precommit = await validator.precommit(this.#height, this.#round, proposal.toData().block.data.id);
 
 			await this.broadcaster.broadcastPrecommit(precommit);
@@ -157,13 +155,5 @@ export class Consensus implements IConsensus {
 
 	#getProposerPublicKey(height: number, round: number): string {
 		return this.#validators[0];
-	}
-
-	#getRegisteredProposer(publicKey: string): Validator | undefined {
-		return this.#registeredValidators.get(publicKey);
-	}
-
-	#getRegisteredValidators(): Validator[] {
-		return [...this.#registeredValidators.values()];
 	}
 }
