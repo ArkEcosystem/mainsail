@@ -1,6 +1,7 @@
+import { IValidatorRepository } from "./types";
 import { Validator } from "./validator";
 
-export class ValidatorRepository {
+export class ValidatorRepository implements IValidatorRepository {
 	#validators: Map<string, Validator>;
 
 	async configure(validators: Validator[]) {

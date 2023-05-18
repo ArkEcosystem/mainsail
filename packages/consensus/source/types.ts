@@ -74,3 +74,8 @@ export interface IValidator {
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
 	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
 }
+
+export interface IValidatorRepository {
+	getValidator(publicKey: string): IValidator;
+	getValidators(publicKeys: string[]): IValidator[];
+}
