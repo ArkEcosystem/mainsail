@@ -3,14 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
 import { Proposal } from "./proposal";
-import {
-	IBroadcaster,
-	IConsensus,
-	IHandler,
-	IProposal,
-	IScheduler,
-	IValidatorRepository,
-} from "./types";
+import { IBroadcaster, IConsensus, IHandler, IProposal, IScheduler, IValidatorRepository } from "./types";
 
 enum Step {
 	propose = "propose",
@@ -155,14 +148,14 @@ export class Consensus implements IConsensus {
 		await this.startRound(0);
 	}
 
-	public async onTimeoutPropose(height: number, round: number): Promise<void> { }
+	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
 
-	public async onTimeoutPrevote(height: number, round: number): Promise<void> { }
+	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
 
-	public async onTimeoutPrecommit(height: number, round: number): Promise<void> { }
+	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
-		// TODO: 
+		// TODO:
 		const activeValidators = await this.validatorSet.getActiveValidators();
 		return activeValidators[0].getAttribute("consensus.publicKey");
 	}

@@ -18,6 +18,8 @@ export class ValidatorRepository implements IValidatorRepository {
 	}
 
 	getValidators(consensusPublicKeys: string[]): Validator[] {
-		return consensusPublicKeys.map((consensusPublicKey) => this.getValidator(consensusPublicKey)).filter((validator) => !!validator);
+		return consensusPublicKeys
+			.map((consensusPublicKey) => this.getValidator(consensusPublicKey))
+			.filter((validator) => !!validator);
 	}
 }
