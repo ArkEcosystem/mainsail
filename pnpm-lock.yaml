@@ -569,6 +569,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr

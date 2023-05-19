@@ -21,9 +21,15 @@ export const Identifiers = {
 	Consensus: {
 		Broadcaster: Symbol.for("Broadcaster<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
+		MessageFactory: Symbol.for("Factory<Consensus.MessageFactory>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
+		Serializer: Symbol.for("Serializer<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
+		Signature: Symbol.for("Crypto<Consensus.Signature>"),
+		Size: {
+			Signature: Symbol.for("Crypto<Consensus.Size.Signature>"),
+		},
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
 		ValidatorSet: Symbol.for("Set<Consensus.Validator>"),
 	},

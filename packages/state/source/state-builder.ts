@@ -45,7 +45,7 @@ export class StateBuilder {
 			.getRegisteredHandlers();
 
 		try {
-			this.logger.info(`State Generation - Bootstrap`);
+			this.logger.info(`State Generation - Bootstrap - Blocks: ${this.blockStorage.getCount({})}`);
 
 			for (const { value } of this.blockStorage.getRange({})) {
 				const { data, transactions } = await this.blockFactory.fromBytes(value);

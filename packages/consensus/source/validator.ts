@@ -3,10 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 
-import { Precommit } from "./precommit";
-import { Prevote } from "./prevote";
-import { Proposal } from "./proposal";
-import { IValidator } from "./types";
+import { IMessageFactory, IPrecommit, IPrevote, IProposal, IValidator } from "./types";
 
 @injectable()
 export class Validator implements IValidator {
@@ -34,6 +31,9 @@ export class Validator implements IValidator {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
+	@inject(Identifiers.Consensus.MessageFactory)
+	private readonly messagesFactory: IMessageFactory;
+
 	#keyPair: Contracts.Crypto.IKeyPair;
 
 	public configure(keyPair: Contracts.Crypto.IKeyPair): Validator {
@@ -51,16 +51,25 @@ export class Validator implements IValidator {
 		return this.#forge(transactions);
 	}
 
-	public async propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<Proposal> {
-		return new Proposal(height, round, block, this.#keyPair.publicKey, "signature");
+	public async propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<IProposal> {
+		return this.messagesFactory.makeProposal(
+			{ block, height, round, validatorPublicKey: this.#keyPair.publicKey },
+			this.#keyPair,
+		);
 	}
 
-	public async prevote(height: number, round: number, blockId: string | undefined): Promise<Prevote> {
-		return new Prevote(height, round, blockId, this.#keyPair.publicKey, "signature");
+	public async prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote> {
+		return this.messagesFactory.makePrevote(
+			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
+			this.#keyPair,
+		);
 	}
 
-	public async precommit(height: number, round: number, blockId: string | undefined): Promise<Precommit> {
-		return new Precommit(height, round, blockId, this.#keyPair.publicKey, "signature");
+	public async precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit> {
+		return this.messagesFactory.makePrecommit(
+			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
+			this.#keyPair,
+		);
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
