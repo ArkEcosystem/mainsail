@@ -3,10 +3,10 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 
-import { IMessageFactory, IPrecommit, IPrevote, IProposal } from "./types";
+import { IMessageFactory, IPrecommit, IPrevote, IProposal, IValidator } from "./types";
 
 @injectable()
-export class Validator {
+export class Validator implements IValidator {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 

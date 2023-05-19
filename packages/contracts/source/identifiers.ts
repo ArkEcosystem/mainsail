@@ -30,6 +30,8 @@ export const Identifiers = {
 		Size: {
 			Signature: Symbol.for("Crypto<Consensus.Size.Signature>"),
 		},
+		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
+		ValidatorSet: Symbol.for("Set<Consensus.Validator>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {

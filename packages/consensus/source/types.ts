@@ -95,3 +95,21 @@ export interface ISerializer {
 	serializePrevote(prevote: ISerializablePrevote, options?: ISerializePrevoteOptions): Promise<Buffer>;
 	serializePrecommit(precommit: ISerializablePrecommit, options?: ISerializePrecommitOptions): Promise<Buffer>;
 }
+
+export interface IValidator {
+	configure(keyPair: Contracts.Crypto.IKeyPair): IValidator;
+	getPublicKey(): string;
+	prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock>;
+	propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<IProposal>;
+	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
+	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
+}
+
+export interface IValidatorRepository {
+	getValidator(publicKey: string): IValidator;
+	getValidators(publicKeys: string[]): IValidator[];
+}
+
+export interface IValidatorSet {
+	getActiveValidators(): Promise<Contracts.State.Wallet[]>;
+}
