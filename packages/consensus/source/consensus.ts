@@ -41,7 +41,7 @@ export class Consensus implements IConsensus {
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository: IValidatorRepository;
 
-	@inject(Identifiers.Consensus.ValidatorSet)
+	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet: Contracts.Consensus.IValidatorSet;
 
 	#height = 2;

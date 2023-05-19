@@ -1,6 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 
 @injectable()
 export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
@@ -18,13 +17,13 @@ export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
     @inject(Identifiers.Consensus.Identity.KeyPairFactory)
     private readonly consensusKeyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
-    async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
+    #validators: Contracts.State.Wallet[] = [];
+
+    public async configure(): Promise<ValidatorSet> {
         const secrets = this.app
             .config<string[]>("validators.secrets");
 
-        this.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
-
-        return await Promise.all(
+        this.#validators = await Promise.all(
             secrets.map(async (secret) => {
                 const keyPair = await this.walletKeyPairFactory.fromMnemonic(secret);
 
@@ -36,5 +35,11 @@ export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
                 return wallet;
             }),
         );
+
+        return this;
+    }
+
+    public async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
+        return this.#validators;
     }
 }
