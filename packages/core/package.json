@@ -38,6 +38,7 @@
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-bls12-381": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-time": "workspace:*",

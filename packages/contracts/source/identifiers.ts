@@ -27,10 +27,8 @@ export const Identifiers = {
 			PublicKeyFactory: Symbol.for("Crypto<Consensus.Identity.PublicKeyFactory>"),
 			PublicKeySerializer: Symbol.for("Crypto<Consensus.Identity.PublicKeySerializer>"),
 		},
-		MessageFactory: Symbol.for("Factory<Consensus.MessageFactory>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
-		Serializer: Symbol.for("Serializer<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
 		Signature: Symbol.for("Crypto<Consensus.Signature>"),
 		Size: {
@@ -38,7 +36,6 @@ export const Identifiers = {
 			Signature: Symbol.for("Crypto<Consensus.Size.Signature>"),
 		},
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
-		Verifier: Symbol.for("Verifier<Consensus>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {
@@ -59,6 +56,12 @@ export const Identifiers = {
 			PublicKeyFactory: Symbol.for("Crypto<Identity.PublicKeyFactory>"),
 			PublicKeySerializer: Symbol.for("Crypto<Identity.PublicKeySerializer>"),
 			WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
+		},
+		Message: {
+			Factory: Symbol.for("Crypto<Message.Factory>"),
+			Serializer: Symbol.for("Crypto<Message.Serializer>"),
+			Deserializer: Symbol.for("Crypto<Message.Deserializer>"),
+			Verifier: Symbol.for("Crypto<Message.Verifier>"),
 		},
 		Serializer: Symbol.for("Crypto<Serializer>"),
 		Signature: Symbol.for("Crypto<Signature>"),

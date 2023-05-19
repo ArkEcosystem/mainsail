@@ -1,6 +1,6 @@
-import { IPrevote, IPrevoteData } from "./types";
+import { Contracts } from "@mainsail/contracts";
 
-export class Prevote implements IPrevote {
+export class Prevote implements Contracts.Crypto.IPrevote {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;
@@ -33,7 +33,7 @@ export class Prevote implements IPrevote {
 		});
 	}
 
-	toData(): IPrevoteData {
+	toData(): Contracts.Crypto.IPrevoteData {
 		return {
 			blockId: this.#blockId,
 			height: this.#height,

@@ -3,21 +3,14 @@ import { Providers } from "@mainsail/kernel";
 
 import { Broadcaster } from "./broadcaster";
 import { Consensus } from "./consensus";
-import { MessageFactory } from "./factory";
 import { Handler } from "./handler";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
-import { Serializer } from "./serializer";
 import { Validator } from "./validator";
 import { ValidatorRepository } from "./validator-repository";
-import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Consensus.Serializer).to(Serializer).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.MessageFactory).to(MessageFactory).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.Verifier).to(Verifier).inSingletonScope();
-
 		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Broadcaster).to(Broadcaster).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();

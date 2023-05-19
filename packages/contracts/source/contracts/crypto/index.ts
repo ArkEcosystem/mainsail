@@ -4,7 +4,7 @@ export * from "./crypto";
 export * from "./enums";
 export * from "./hash";
 export * from "./identities";
-export * from "./message";
+export * from "./messages";
 export * from "./networks";
 export * from "./time";
 export * from "./transactions";

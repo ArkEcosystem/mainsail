@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { IPrecommit, IPrevote, IProposal, IValidatorSetMajority } from "./types";
+import { IValidatorSetMajority } from "./types";
 
 @injectable()
 export class RoundState {
@@ -14,23 +14,23 @@ export class RoundState {
 	@inject(Identifiers.Consensus.Signature)
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
-	#proposal?: IProposal;
-	#prevotes = new Map<string, IPrevote>();
-	#precommits = new Map<string, IPrecommit>();
+	#proposal?: Contracts.Crypto.IProposal;
+	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
+	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
 
-	public setProposal(proposal: IProposal): void {
+	public setProposal(proposal: Contracts.Crypto.IProposal): void {
 		this.#proposal = proposal;
 	}
 
-	public getProposal(): IProposal | undefined {
+	public getProposal(): Contracts.Crypto.IProposal | undefined {
 		return this.#proposal;
 	}
 
-	public addPrevote(prevote: IPrevote): void {
+	public addPrevote(prevote: Contracts.Crypto.IPrevote): void {
 		this.#prevotes.set(prevote.toData().validatorPublicKey, prevote);
 	}
 
-	public addPrecommit(precommit: IPrecommit): void {
+	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): void {
 		this.#precommits.set(precommit.toData().validatorPublicKey, precommit);
 	}
 

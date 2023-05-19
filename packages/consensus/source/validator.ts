@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 
-import { IMessageFactory, IPrecommit, IPrevote, IProposal, IValidator } from "./types";
+import { IValidator } from "./types";
 
 @injectable()
 export class Validator implements IValidator {
@@ -31,8 +31,8 @@ export class Validator implements IValidator {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
-	@inject(Identifiers.Consensus.MessageFactory)
-	private readonly messagesFactory: IMessageFactory;
+	@inject(Identifiers.Cryptography.Message.Factory)
+	private readonly messagesFactory: Contracts.Crypto.IMessageFactory;
 
 	#keyPair: Contracts.Crypto.IKeyPair;
 
@@ -51,21 +51,21 @@ export class Validator implements IValidator {
 		return this.#forge(transactions);
 	}
 
-	public async propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<IProposal> {
+	public async propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IProposal> {
 		return this.messagesFactory.makeProposal(
 			{ block, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);
 	}
 
-	public async prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote> {
+	public async prevote(height: number, round: number, blockId: string | undefined): Promise<Contracts.Crypto.IPrevote> {
 		return this.messagesFactory.makePrevote(
 			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);
 	}
 
-	public async precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit> {
+	public async precommit(height: number, round: number, blockId: string | undefined): Promise<Contracts.Crypto.IPrecommit> {
 		return this.messagesFactory.makePrecommit(
 			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
