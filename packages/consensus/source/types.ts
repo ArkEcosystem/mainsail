@@ -101,7 +101,7 @@ export interface ISerializer {
 
 export interface IValidator {
 	configure(keyPair: Contracts.Crypto.IKeyPair): IValidator;
-	getPublicKey(): string;
+	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock>;
 	propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<IProposal>;
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
@@ -111,10 +111,6 @@ export interface IValidator {
 export interface IValidatorRepository {
 	getValidator(publicKey: string): IValidator;
 	getValidators(publicKeys: string[]): IValidator[];
-}
-
-export interface IValidatorSet {
-	getActiveValidators(): Promise<Contracts.State.Wallet[]>;
 }
 
 export interface IVerificationResult {

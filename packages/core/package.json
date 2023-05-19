@@ -69,6 +69,7 @@
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@mainsail/validator-set-static": "workspace:*",
 		"@mainsail/webhooks": "workspace:*",
 		"bip39": "3.0.4",
 		"boxen": "4.2.0",

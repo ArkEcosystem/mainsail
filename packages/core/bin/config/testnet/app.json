@@ -94,6 +94,9 @@
 			"package": "@mainsail/blockchain"
 		},
 		{
+			"package": "@mainsail/validator-set-static"
+		},
+		{
 			"package": "@mainsail/consensus"
 		},
 		{

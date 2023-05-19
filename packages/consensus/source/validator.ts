@@ -42,7 +42,7 @@ export class Validator implements IValidator {
 		return this;
 	}
 
-	public getPublicKey(): string {
+	public getConsensusPublicKey(): string {
 		return this.#keyPair.publicKey;
 	}
 
