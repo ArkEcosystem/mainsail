@@ -1,8 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { IProposal, IProposalData } from "./types";
-
-export class Proposal implements IProposal {
+export class Proposal implements Contracts.Crypto.IProposal {
 	#height: number;
 	#round: number;
 	#block: Contracts.Crypto.IBlock;
@@ -36,7 +34,7 @@ export class Proposal implements IProposal {
 		});
 	}
 
-	toData(): IProposalData {
+	toData(): Contracts.Crypto.IProposalData {
 		return {
 			block: this.#block,
 			height: this.#height,

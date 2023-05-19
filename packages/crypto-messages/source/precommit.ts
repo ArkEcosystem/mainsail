@@ -1,6 +1,6 @@
-import { IPrecommit, IPrecommitData } from "./types";
+import { Contracts } from "@mainsail/contracts";
 
-export class Precommit implements IPrecommit {
+export class Precommit implements Contracts.Crypto.IPrecommit {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;
@@ -33,7 +33,7 @@ export class Precommit implements IPrecommit {
 		});
 	}
 
-	toData(): IPrecommitData {
+	toData(): Contracts.Crypto.IPrecommitData {
 		return {
 			blockId: this.#blockId,
 			height: this.#height,

@@ -1,12 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { Precommit } from "./precommit";
-import { Prevote } from "./prevote";
-import { Proposal } from "./proposal";
 import { RoundState } from "./round-state";
 import { RoundStateRepository } from "./round-state-repository";
-import { IConsensus, IHandler, IVerifier } from "./types";
+import { IConsensus, IHandler } from "./types";
 
 @injectable()
 export class Handler implements IHandler {
@@ -19,10 +16,10 @@ export class Handler implements IHandler {
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: RoundStateRepository;
 
-	@inject(Identifiers.Consensus.Verifier)
-	private readonly verifier!: IVerifier;
+	@inject(Identifiers.Cryptography.Message.Verifier)
+	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
 
-	async onProposal(proposal: Proposal): Promise<void> {
+	async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		const data = proposal.toData();
 
 		const { errors } = await this.verifier.verifyProposal(data);
@@ -37,7 +34,7 @@ export class Handler implements IHandler {
 		await this.#getConsensus().onProposal(proposal);
 	}
 
-	async onPrevote(prevote: Prevote): Promise<void> {
+	async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
 		const data = prevote.toData();
 
 		const { errors } = await this.verifier.verifyPrevote(data);
@@ -53,7 +50,7 @@ export class Handler implements IHandler {
 		await this.#handle(roundState);
 	}
 
-	async onPrecommit(precommit: Precommit): Promise<void> {
+	async onPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
 		const data = precommit.toData();
 
 		const { errors } = await this.verifier.verifyPrecommit(data);

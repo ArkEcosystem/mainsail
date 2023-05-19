@@ -572,6 +572,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-messages':
+        specifier: workspace:*
+        version: link:../crypto-messages
       '@mainsail/crypto-signature-bls12-381':
         specifier: workspace:*
         version: link:../crypto-signature-bls12-381
@@ -1250,6 +1253,31 @@ importers:
       bip39:
         specifier: 3.0.4
         version: 3.0.4
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/crypto-messages:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      delay:
+        specifier: 5.0.0
+        version: 5.0.0
+    devDependencies:
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

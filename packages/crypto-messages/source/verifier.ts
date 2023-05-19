@@ -1,17 +1,17 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { IPrecommitData, IPrevoteData, IProposalData, ISerializer, IVerificationResult, IVerifier } from "./types";
-
 @injectable()
-export class Verifier implements IVerifier {
-	@inject(Identifiers.Consensus.Serializer)
-	private readonly serializer: ISerializer;
+export class Verifier implements Contracts.Crypto.IMessageVerifier {
+	@inject(Identifiers.Cryptography.Message.Serializer)
+	private readonly serializer: Contracts.Crypto.IMessageSerializer;
 
 	@inject(Identifiers.Consensus.Signature)
 	private readonly signature: Contracts.Crypto.ISignature;
 
-	public async verifyProposal(proposal: IProposalData): Promise<IVerificationResult> {
+	public async verifyProposal(
+		proposal: Contracts.Crypto.IProposalData,
+	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors = [];
 
 		const bytes = await this.serializer.serializeProposal(proposal, { excludeSignature: false });
@@ -25,7 +25,9 @@ export class Verifier implements IVerifier {
 		};
 	}
 
-	public async verifyPrevote(prevote: IPrevoteData): Promise<IVerificationResult> {
+	public async verifyPrevote(
+		prevote: Contracts.Crypto.IPrevoteData,
+	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors = [];
 
 		const bytes = await this.serializer.serializePrevote(prevote, { excludeSignature: false });
@@ -39,7 +41,9 @@ export class Verifier implements IVerifier {
 		};
 	}
 
-	public async verifyPrecommit(precommit: IPrecommitData): Promise<IVerificationResult> {
+	public async verifyPrecommit(
+		precommit: Contracts.Crypto.IPrecommitData,
+	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors = [];
 
 		const bytes = await this.serializer.serializePrecommit(precommit, { excludeSignature: false });

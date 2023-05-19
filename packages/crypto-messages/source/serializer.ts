@@ -2,26 +2,16 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import {
-	IPrecommitData,
-	IPrevoteData,
-	ISerializableProposal,
-	ISerializePrecommitOptions,
-	ISerializePrevoteOptions,
-	ISerializeProposalOptions,
-	ISerializer,
-} from "./types";
-
 @injectable()
-export class Serializer implements ISerializer {
+export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer: Contracts.Serializer.ISerializer;
 
 	public async serializeProposal(
-		proposal: ISerializableProposal,
-		options: ISerializeProposalOptions = {},
+		proposal: Contracts.Crypto.IMessageSerializableProposal,
+		options: Contracts.Crypto.IMessageSerializeProposalOptions = {},
 	): Promise<Buffer> {
-		return this.serializer.serialize<ISerializableProposal>(proposal, {
+		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(proposal, {
 			length: 2_000_000,
 			// TODO
 			schema: {
@@ -50,10 +40,10 @@ export class Serializer implements ISerializer {
 	}
 
 	public async serializePrecommit(
-		precommit: IPrecommitData,
-		options: ISerializePrecommitOptions = {},
+		precommit: Contracts.Crypto.IPrecommitData,
+		options: Contracts.Crypto.IMessageSerializePrecommitOptions = {},
 	): Promise<Buffer> {
-		return this.serializer.serialize<IPrecommitData>(precommit, {
+		return this.serializer.serialize<Contracts.Crypto.IPrecommitData>(precommit, {
 			length: 2_000_000,
 			// TODO
 			schema: {
@@ -81,8 +71,11 @@ export class Serializer implements ISerializer {
 		});
 	}
 
-	public async serializePrevote(prevote: IPrevoteData, options: ISerializePrevoteOptions = {}): Promise<Buffer> {
-		return this.serializer.serialize<IPrevoteData>(prevote, {
+	public async serializePrevote(
+		prevote: Contracts.Crypto.IPrevoteData,
+		options: Contracts.Crypto.IMessageSerializePrevoteOptions = {},
+	): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
 			length: 2_000_000,
 			// TODO
 			schema: {

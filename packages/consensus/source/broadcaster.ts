@@ -1,13 +1,11 @@
 import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
-import { Precommit } from "./precommit";
-import { Prevote } from "./prevote";
-import { Proposal } from "./proposal";
 import { IBroadcaster } from "./types";
 
 @injectable()
 export class Broadcaster implements IBroadcaster {
-	async broadcastProposal(proposal: Proposal): Promise<void> {}
-	async broadcastPrevote(prevote: Prevote): Promise<void> {}
-	async broadcastPrecommit(precommit: Precommit): Promise<void> {}
+	async broadcastProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {}
+	async broadcastPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {}
+	async broadcastPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {}
 }

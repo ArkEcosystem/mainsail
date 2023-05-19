@@ -2,8 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
-import { Proposal } from "./proposal";
-import { IBroadcaster, IConsensus, IHandler, IProposal, IScheduler, IValidatorRepository } from "./types";
+import { IBroadcaster, IConsensus, IHandler, IScheduler, IValidatorRepository } from "./types";
 
 enum Step {
 	propose = "propose",
@@ -91,7 +90,7 @@ export class Consensus implements IConsensus {
 		}
 	}
 
-	public async onProposal(proposal: IProposal): Promise<void> {
+	public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (this.#step !== Step.propose) {
 			return;
 		}
@@ -109,7 +108,7 @@ export class Consensus implements IConsensus {
 		}
 	}
 
-	public async onMajorityPrevote(proposal: IProposal): Promise<void> {
+	public async onMajorityPrevote(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (this.#step !== Step.prevote) {
 			return;
 		}
@@ -127,19 +126,20 @@ export class Consensus implements IConsensus {
 		}
 	}
 
-	public async onMajorityPrecommit(proposal: Proposal): Promise<void> {
+	public async onMajorityPrecommit(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (this.#step !== Step.precommit) {
 			return;
 		}
 
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round}`);
 
-		const result = await this.processor.process(proposal.toData().block);
+		const block = proposal.toData().block;
+		const result = await this.processor.process(block);
 
 		if (result === Contracts.BlockProcessor.ProcessorResult.Accepted) {
-			await this.database.saveBlocks([proposal.toData().block]);
+			await this.database.saveBlocks([block]);
 		} else {
-			this.logger.info(`Block ${proposal.toData().block.data.height} rejected`);
+			this.logger.info(`Block ${block.data.height} rejected`);
 		}
 
 		await delay(8000);
