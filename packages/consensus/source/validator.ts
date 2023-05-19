@@ -51,21 +51,33 @@ export class Validator implements IValidator {
 		return this.#forge(transactions);
 	}
 
-	public async propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IProposal> {
+	public async propose(
+		height: number,
+		round: number,
+		block: Contracts.Crypto.IBlock,
+	): Promise<Contracts.Crypto.IProposal> {
 		return this.messagesFactory.makeProposal(
 			{ block, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);
 	}
 
-	public async prevote(height: number, round: number, blockId: string | undefined): Promise<Contracts.Crypto.IPrevote> {
+	public async prevote(
+		height: number,
+		round: number,
+		blockId: string | undefined,
+	): Promise<Contracts.Crypto.IPrevote> {
 		return this.messagesFactory.makePrevote(
 			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);
 	}
 
-	public async precommit(height: number, round: number, blockId: string | undefined): Promise<Contracts.Crypto.IPrecommit> {
+	public async precommit(
+		height: number,
+		round: number,
+		blockId: string | undefined,
+	): Promise<Contracts.Crypto.IPrecommit> {
 		return this.messagesFactory.makePrecommit(
 			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,

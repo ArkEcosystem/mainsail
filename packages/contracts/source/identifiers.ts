@@ -58,9 +58,9 @@ export const Identifiers = {
 			WifFactory: Symbol.for("Crypto<Identity.WifFactory>"),
 		},
 		Message: {
+			Deserializer: Symbol.for("Crypto<Message.Deserializer>"),
 			Factory: Symbol.for("Crypto<Message.Factory>"),
 			Serializer: Symbol.for("Crypto<Message.Serializer>"),
-			Deserializer: Symbol.for("Crypto<Message.Deserializer>"),
 			Verifier: Symbol.for("Crypto<Message.Verifier>"),
 		},
 		Serializer: Symbol.for("Crypto<Serializer>"),

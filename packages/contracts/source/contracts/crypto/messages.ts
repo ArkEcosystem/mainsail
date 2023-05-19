@@ -43,7 +43,6 @@ export interface IPrecommit {
 	toData(): IPrecommitData;
 }
 
-
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
@@ -60,18 +59,24 @@ export interface IMessageFactory {
 export interface IMessageSerializeOptions {
 	excludeSignature?: boolean;
 }
-export interface IMessageSerializeProposalOptions extends IMessageSerializeOptions { }
-export interface IMessageSerializePrevoteOptions extends IMessageSerializeOptions { }
-export interface IMessageSerializePrecommitOptions extends IMessageSerializeOptions { }
+export interface IMessageSerializeProposalOptions extends IMessageSerializeOptions {}
+export interface IMessageSerializePrevoteOptions extends IMessageSerializeOptions {}
+export interface IMessageSerializePrecommitOptions extends IMessageSerializeOptions {}
 
 export type IMessageSerializableProposal = OptionalSignature<IProposalData>;
 export type IMessageSerializablePrevote = OptionalSignature<IPrevoteData>;
 export type IMessageSerializablePrecommit = OptionalSignature<IPrecommitData>;
 
 export interface IMessageSerializer {
-	serializeProposal(proposal: IMessageSerializableProposal, options?: IMessageSerializeProposalOptions): Promise<Buffer>;
+	serializeProposal(
+		proposal: IMessageSerializableProposal,
+		options?: IMessageSerializeProposalOptions,
+	): Promise<Buffer>;
 	serializePrevote(prevote: IMessageSerializablePrevote, options?: IMessageSerializePrevoteOptions): Promise<Buffer>;
-	serializePrecommit(precommit: IMessageSerializablePrecommit, options?: IMessageSerializePrecommitOptions): Promise<Buffer>;
+	serializePrecommit(
+		precommit: IMessageSerializablePrecommit,
+		options?: IMessageSerializePrecommitOptions,
+	): Promise<Buffer>;
 }
 
 export interface IMessageDeserializer {
@@ -90,4 +95,3 @@ export interface IMessageVerifier {
 	verifyPrevote(prevote: IPrevoteData): Promise<IMessageVerificationResult>;
 	verifyPrecommit(precommit: IPrecommitData): Promise<IMessageVerificationResult>;
 }
-

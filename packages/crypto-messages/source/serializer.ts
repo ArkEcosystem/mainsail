@@ -27,10 +27,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-						signature: {
-							type: "hash",
-						},
-					}),
+							signature: {
+								type: "hash",
+							},
+					  }),
 
 				// block: {
 				// 	type: "block",
@@ -63,15 +63,18 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-						signature: {
-							type: "hash",
-						},
-					}),
+							signature: {
+								type: "hash",
+							},
+					  }),
 			},
 		});
 	}
 
-	public async serializePrevote(prevote: Contracts.Crypto.IPrevoteData, options: Contracts.Crypto.IMessageSerializePrevoteOptions = {}): Promise<Buffer> {
+	public async serializePrevote(
+		prevote: Contracts.Crypto.IPrevoteData,
+		options: Contracts.Crypto.IMessageSerializePrevoteOptions = {},
+	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
 			length: 2_000_000,
 			// TODO
@@ -92,10 +95,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-						signature: {
-							type: "hash",
-						},
-					}),
+							signature: {
+								type: "hash",
+							},
+					  }),
 			},
 		});
 	}

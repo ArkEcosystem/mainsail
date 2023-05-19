@@ -13,19 +13,28 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	@inject(Identifiers.Consensus.Signature)
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
-	public async makeProposal(data: Contracts.Crypto.IMakeProposalData, keyPair: Contracts.Crypto.IKeyPair): Promise<Contracts.Crypto.IProposal> {
+	public async makeProposal(
+		data: Contracts.Crypto.IMakeProposalData,
+		keyPair: Contracts.Crypto.IKeyPair,
+	): Promise<Contracts.Crypto.IProposal> {
 		const bytes = await this.serializer.serializeProposal(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
 		return new Proposal(data.height, data.round, data.block, data.validatorPublicKey, signature);
 	}
 
-	public async makePrevote(data: Contracts.Crypto.IMakePrevoteData, keyPair: Contracts.Crypto.IKeyPair): Promise<Contracts.Crypto.IPrevote> {
+	public async makePrevote(
+		data: Contracts.Crypto.IMakePrevoteData,
+		keyPair: Contracts.Crypto.IKeyPair,
+	): Promise<Contracts.Crypto.IPrevote> {
 		const bytes = await this.serializer.serializePrevote(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
 		return new Prevote(data.height, data.round, data.blockId, data.validatorPublicKey, signature);
 	}
 
-	public async makePrecommit(data: Contracts.Crypto.IMakePrecommitData, keyPair: Contracts.Crypto.IKeyPair): Promise<Contracts.Crypto.IPrecommit> {
+	public async makePrecommit(
+		data: Contracts.Crypto.IMakePrecommitData,
+		keyPair: Contracts.Crypto.IKeyPair,
+	): Promise<Contracts.Crypto.IPrecommit> {
 		const bytes = await this.serializer.serializePrecommit(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
 		return new Precommit(data.height, data.round, data.blockId, data.validatorPublicKey, signature);

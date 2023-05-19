@@ -8,9 +8,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer: Contracts.Serializer.ISerializer;
 
-	public async deserializeProposal(
-		serialized: Buffer,
-	): Promise<Contracts.Crypto.IProposal> {
+	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const proposal = {} as Contracts.Crypto.IProposal;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -37,9 +35,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		return proposal;
 	}
 
-	public async deserializePrecommit(
-		serialized: Buffer,
-	): Promise<Contracts.Crypto.IPrecommit> {
+	public async deserializePrecommit(serialized: Buffer): Promise<Contracts.Crypto.IPrecommit> {
 		const precommit = {} as Contracts.Crypto.IPrecommit;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -69,9 +65,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		return precommit;
 	}
 
-	public async deserializePrevote(
-		serialized: Buffer,
-	): Promise<Contracts.Crypto.IPrevote> {
+	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.IPrevote> {
 		const prevote = {} as Contracts.Crypto.IPrevote;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -100,5 +94,4 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 
 		return prevote;
 	}
-
 }

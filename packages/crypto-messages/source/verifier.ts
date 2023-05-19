@@ -9,7 +9,9 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	@inject(Identifiers.Consensus.Signature)
 	private readonly signature: Contracts.Crypto.ISignature;
 
-	public async verifyProposal(proposal: Contracts.Crypto.IProposalData): Promise<Contracts.Crypto.IMessageVerificationResult> {
+	public async verifyProposal(
+		proposal: Contracts.Crypto.IProposalData,
+	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors = [];
 
 		const bytes = await this.serializer.serializeProposal(proposal, { excludeSignature: false });
@@ -23,7 +25,9 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		};
 	}
 
-	public async verifyPrevote(prevote: Contracts.Crypto.IPrevoteData): Promise<Contracts.Crypto.IMessageVerificationResult> {
+	public async verifyPrevote(
+		prevote: Contracts.Crypto.IPrevoteData,
+	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors = [];
 
 		const bytes = await this.serializer.serializePrevote(prevote, { excludeSignature: false });
@@ -37,7 +41,9 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		};
 	}
 
-	public async verifyPrecommit(precommit: Contracts.Crypto.IPrecommitData): Promise<Contracts.Crypto.IMessageVerificationResult> {
+	public async verifyPrecommit(
+		precommit: Contracts.Crypto.IPrecommitData,
+	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors = [];
 
 		const bytes = await this.serializer.serializePrecommit(precommit, { excludeSignature: false });
