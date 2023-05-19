@@ -108,7 +108,7 @@ export class Consensus implements IConsensus {
 		}
 	}
 
-	public async onMajorityPrevote(prevote: Contracts.Crypto.IProposal): Promise<void> {
+	public async onMajorityPrevote(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (this.#step !== Step.prevote) {
 			return;
 		}
@@ -119,21 +119,21 @@ export class Consensus implements IConsensus {
 
 		const activeValidators = await this.#getActiveValidators();
 		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			const precommit = await validator.precommit(this.#height, this.#round, prevote.toData().block.data.id);
+			const precommit = await validator.precommit(this.#height, this.#round, proposal.toData().block.data.id);
 
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
 		}
 	}
 
-	public async onMajorityPrecommit(precommit: Contracts.Crypto.IProposal): Promise<void> {
+	public async onMajorityPrecommit(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (this.#step !== Step.precommit) {
 			return;
 		}
 
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round}`);
 
-		const block = precommit.toData().block;
+		const block = proposal.toData().block;
 		const result = await this.processor.process(block);
 
 		if (result === Contracts.BlockProcessor.ProcessorResult.Accepted) {
