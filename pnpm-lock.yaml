@@ -482,6 +482,31 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/consensus-validator-set-static:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      delay:
+        specifier: 5.0.0
+        version: 5.0.0
+    devDependencies:
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/container:
     dependencies:
       inversify:
@@ -548,6 +573,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../consensus
+      '@mainsail/consensus-validator-set-static':
+        specifier: workspace:*
+        version: link:../consensus-validator-set-static
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container

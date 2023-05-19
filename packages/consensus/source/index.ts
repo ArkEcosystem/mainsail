@@ -10,18 +10,23 @@ import { Scheduler } from "./scheduler";
 import { Serializer } from "./serializer";
 import { Validator } from "./validator";
 import { ValidatorRepository } from "./validator-repository";
-import { ValidatorSet } from "./validator-set";
 import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const keyPairFactory = this.app.get<Contracts.Crypto.IKeyPairFactory>(
-			Identifiers.Consensus.Identity.KeyPairFactory,
-		);
-
 		this.app.bind(Identifiers.Consensus.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.MessageFactory).to(MessageFactory).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Verifier).to(Verifier).inSingletonScope();
+
+		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Broadcaster).to(Broadcaster).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
+
+		// TODO: these are validators running on "this" node
+		const keyPairFactory = this.app.get<Contracts.Crypto.IKeyPairFactory>(
+			Identifiers.Consensus.Identity.KeyPairFactory,
+		);
 
 		const keyPairs = await Promise.all(
 			this.app
@@ -29,12 +34,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.map(async (mnemonic: string) => await keyPairFactory.fromMnemonic(mnemonic)),
 		);
 		const validators = keyPairs.map((keyPair) => this.app.resolve<Validator>(Validator).configure(keyPair));
-
-		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.Broadcaster).to(Broadcaster).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.ValidatorSet).to(ValidatorSet).inSingletonScope();
 
 		this.app
 			.bind(Identifiers.Consensus.ValidatorRepository)

@@ -10,7 +10,6 @@ import {
 	IProposal,
 	IScheduler,
 	IValidatorRepository,
-	IValidatorSet,
 } from "./types";
 
 enum Step {
@@ -43,7 +42,7 @@ export class Consensus implements IConsensus {
 	private readonly validatorsRepository: IValidatorRepository;
 
 	@inject(Identifiers.Consensus.ValidatorSet)
-	private readonly validatorSet: IValidatorSet;
+	private readonly validatorSet: Contracts.Consensus.IValidatorSet;
 
 	#height = 2;
 	#round = 0;
@@ -156,22 +155,21 @@ export class Consensus implements IConsensus {
 		await this.startRound(0);
 	}
 
-	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
+	public async onTimeoutPropose(height: number, round: number): Promise<void> { }
 
-	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
+	public async onTimeoutPrevote(height: number, round: number): Promise<void> { }
 
-	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
+	public async onTimeoutPrecommit(height: number, round: number): Promise<void> { }
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
+		// TODO: 
 		const activeValidators = await this.validatorSet.getActiveValidators();
-
-		// TODO: Use consensus public key
-		return activeValidators[0].getPublicKey();
+		return activeValidators[0].getAttribute("consensus.publicKey");
 	}
 
 	async #getActiveValidators(): Promise<string[]> {
 		const activeValidators = await this.validatorSet.getActiveValidators();
 
-		return activeValidators.map((wallet) => wallet.getPublicKey());
+		return activeValidators.map((wallet) => wallet.getAttribute("consensus.publicKey"));
 	}
 }

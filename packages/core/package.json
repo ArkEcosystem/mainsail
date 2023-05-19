@@ -29,6 +29,7 @@
 		"@mainsail/blockchain": "workspace:*",
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",
+		"@mainsail/consensus-validator-set-static": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
