@@ -11,18 +11,22 @@ import { Serializer } from "./serializer";
 import { Validator } from "./validator";
 import { ValidatorRepository } from "./validator-repository";
 import { ValidatorSet } from "./validator-set";
+import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		const keyPairFactory = this.app.get<Contracts.Crypto.IKeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPairFactory,
+			Identifiers.Consensus.Identity.KeyPairFactory,
 		);
 
 		this.app.bind(Identifiers.Consensus.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.MessageFactory).to(MessageFactory).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Verifier).to(Verifier).inSingletonScope();
 
 		const keyPairs = await Promise.all(
-			this.app.config("validators.secrets").map(async (menonic) => await keyPairFactory.fromMnemonic(menonic)),
+			this.app
+				.config("validators.secrets")
+				.map(async (mnemonic: string) => await keyPairFactory.fromMnemonic(mnemonic)),
 		);
 		const validators = keyPairs.map((keyPair) => this.app.resolve<Validator>(Validator).configure(keyPair));
 

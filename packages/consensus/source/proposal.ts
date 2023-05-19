@@ -23,6 +23,10 @@ export class Proposal implements IProposal {
 		this.#signature = signature;
 	}
 
+	get signature(): string {
+		return this.#signature;
+	}
+
 	toString(): string {
 		return JSON.stringify({
 			block: this.#block.data.id,

@@ -9,6 +9,7 @@ export interface IProposalData {
 }
 
 export interface IProposal {
+	signature: string;
 	toString(): string;
 	toData(): IProposalData;
 }
@@ -22,6 +23,7 @@ export interface IPrevoteData {
 }
 
 export interface IPrevote {
+	signature: string;
 	toString(): string;
 	toData(): IPrevoteData;
 }
@@ -35,14 +37,15 @@ export interface IPrecommitData {
 }
 
 export interface IPrecommit {
+	signature: string;
 	toString(): string;
 	toData(): IPrecommitData;
 }
 
 export interface IConsensus {
 	onProposal(proposal: IProposal): Promise<void>;
-	onMajorityPrevote(proposal: IProposal): Promise<void>;
-	onMajorityPrecommit(proposal: IProposal): Promise<void>;
+	onMajorityPrevote(proposal: IPrevote): Promise<void>;
+	onMajorityPrecommit(proposal: IPrecommit): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
@@ -112,4 +115,21 @@ export interface IValidatorRepository {
 
 export interface IValidatorSet {
 	getActiveValidators(): Promise<Contracts.State.Wallet[]>;
+}
+
+export interface IVerificationResult {
+	verified: boolean;
+	errors: string[];
+}
+
+export interface IVerifier {
+	verifyProposal(proposal: IProposalData): Promise<IVerificationResult>;
+	verifyPrevote(prevote: IPrevoteData): Promise<IVerificationResult>;
+	verifyPrecommit(precommit: IPrecommitData): Promise<IVerificationResult>;
+}
+
+export interface IValidatorSetMajority {
+	aggSignature: string;
+	aggPublicKey: string;
+	validatorSet: Set<string>;
 }

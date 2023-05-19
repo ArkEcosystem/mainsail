@@ -1,5 +1,5 @@
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Exceptions } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 import { schnorr } from "bcrypto";
 
@@ -19,5 +19,9 @@ export class Signature implements Contracts.Crypto.ISignature {
 
 	public deserialize(buffer: ByteBuffer): Buffer {
 		return buffer.readBytes(64);
+	}
+
+	public async aggregate(signatures: Buffer[]): Promise<string> {
+		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
 	}
 }
