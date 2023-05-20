@@ -1,12 +1,12 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { describeSkip } from "../../../test-framework";
+import { describe } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from ".";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
 
-describeSkip<{
+describe<{
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
 	walletRepo: WalletRepository;
 }>("Wallet Repository Copy On Write", ({ it, assert, afterEach, beforeAll, spy }) => {
@@ -53,9 +53,9 @@ describeSkip<{
 		const wallet2 = context.walletRepoCopyOnWrite.createWallet("efg");
 		const wallet3 = context.walletRepoCopyOnWrite.createWallet("hij");
 
-		wallet1.setAttribute("delegate.username", "username1");
-		wallet2.setAttribute("delegate.username", "username2");
-		wallet3.setAttribute("delegate.username", "username3");
+		wallet1.setAttribute("validator.username", "username1");
+		wallet2.setAttribute("validator.username", "username2");
+		wallet3.setAttribute("validator.username", "username3");
 
 		const allWallets = [wallet1, wallet2, wallet3];
 		context.walletRepo.index(allWallets);
@@ -65,7 +65,7 @@ describeSkip<{
 		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
 
 		const wallet4 = context.walletRepoCopyOnWrite.createWallet("klm");
-		wallet4.setAttribute("delegate.username", "username4");
+		wallet4.setAttribute("validator.username", "username4");
 
 		context.walletRepo.index(wallet4);
 		allWallets.push(wallet4);
@@ -165,10 +165,10 @@ describeSkip<{
 
 	it("findByUsername - should return a copy", (context) => {
 		const wallet = context.walletRepo.createWallet("abcdef");
-		wallet.setAttribute("delegate", { username: "test" });
+		wallet.setAttribute("validator", { username: "test" });
 		context.walletRepo.index(wallet);
 
-		const temporaryWallet = context.walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("delegate.username"));
+		const temporaryWallet = context.walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("validator.username"));
 		temporaryWallet.setBalance(BigNumber.ONE);
 
 		assert.not.equal(wallet.getBalance(), temporaryWallet.getBalance());
@@ -191,15 +191,15 @@ describeSkip<{
 
 	it("hasByUsername - should be ok", (context) => {
 		const wallet = context.walletRepo.createWallet("abcdef");
-		wallet.setAttribute("delegate", { username: "test" });
+		wallet.setAttribute("validator", { username: "test" });
 		context.walletRepo.index(wallet);
 
-		assert.true(context.walletRepoCopyOnWrite.hasByUsername(wallet.getAttribute("delegate.username")));
+		assert.true(context.walletRepoCopyOnWrite.hasByUsername(wallet.getAttribute("validator.username")));
 	});
 
 	it("hasByIndex - should be ok", (context) => {
 		const wallet = context.walletRepo.createWallet("abc");
-		wallet.setAttribute("delegate", { username: "test" });
+		wallet.setAttribute("validator", { username: "test" });
 		context.walletRepo.index(wallet);
 
 		assert.true(context.walletRepoCopyOnWrite.hasByIndex(Contracts.State.WalletIndexes.Usernames, "test"));
@@ -207,12 +207,12 @@ describeSkip<{
 
 	it("findByIndex - should be ok", (context) => {
 		const wallet = context.walletRepo.createWallet("abc");
-		wallet.setAttribute("delegate", { username: "test" });
+		wallet.setAttribute("validator", { username: "test" });
 		context.walletRepo.index(wallet);
 		const clone = context.walletRepoCopyOnWrite.findByIndex(Contracts.State.WalletIndexes.Usernames, "test");
 
 		assert.not.equal(clone, wallet);
 		assert.equal(clone.getAddress(), wallet.getAddress());
-		assert.equal(clone.getAttribute("delegate.username"), wallet.getAttribute("delegate.username"));
+		assert.equal(clone.getAttribute("validator.username"), wallet.getAttribute("validator.username"));
 	});
 });
