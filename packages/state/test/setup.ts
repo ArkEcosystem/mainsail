@@ -4,6 +4,7 @@ import { Providers, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy, spy } from "sinon";
 
+import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../crypto-config";
 import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";
@@ -99,16 +100,16 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 	sandbox.app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.username");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.voteBalance");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.producedBlocks");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.forgedTotal");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.approval");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.username");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.voteBalance");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.producedBlocks");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.forgedTotal");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.approval");
 	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("vote");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.resigned");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.rank");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("delegate.round");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.resigned");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.rank");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.round");
 
 	registerIndexers(sandbox.app);
 
@@ -312,16 +313,17 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 		// todo: get rid of the need for this, requires an instance based crypto package
 
-		sandbox.app
-			.get<Configuration>(Identifiers.Cryptography.Configuration)
-			.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("crypto"));
+		// sandbox.app
+		// 	.get<Configuration>(Identifiers.Cryptography.Configuration)
+		// 	.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("crypto"));
+		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 	}
 
 	const factory = new Factories.FactoryBuilder();
 
-	Factories.Factories.registerBlockFactory(factory);
-	Factories.Factories.registerTransactionFactory(factory);
-	Factories.Factories.registerWalletFactory(factory);
+	await Factories.Factories.registerBlockFactory(factory);
+	await Factories.Factories.registerTransactionFactory(factory);
+	await Factories.Factories.registerWalletFactory(factory);
 
 	return {
 		blockState,
