@@ -3,7 +3,7 @@ import { Application, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy } from "sinon";
 
-import { describe, describeSkip, getWalletAttributeSet } from "../../../test-framework";
+import { describe, getWalletAttributeSet } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletEvent } from ".";
 
@@ -118,18 +118,18 @@ describe<{
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
-		wallet.setAttribute("delegate", {});
+		wallet.setAttribute("validator", {});
 		wallet.setAttribute("vote", {});
 
-		assert.equal(wallet.getAttributes(), { delegate: {}, vote: {} });
+		assert.equal(wallet.getAttributes(), { validator: {}, vote: {} });
 	});
 
-	it("should return whether wallet is delegate", (context) => {
+	it("should return whether wallet is validator", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.false(wallet.isValidator());
-		wallet.setAttribute("delegate", {});
+		wallet.setAttribute("validator", {});
 		assert.true(wallet.isValidator());
 	});
 
@@ -160,7 +160,7 @@ describe<{
 	});
 });
 
-describeSkip<{
+describe<{
 	app: Application;
 	wallet: Wallet;
 	dispatchSyncSpy: SinonSpy;
@@ -290,12 +290,12 @@ describeSkip<{
 	});
 
 	it("should emit on setAttribute", async (context) => {
-		context.wallet.setAttribute("delegate.username", "dummy");
+		context.wallet.setAttribute("validator.username", "dummy");
 
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				key: "delegate.username",
+				key: "validator.username",
 				publicKey: undefined,
 				value: "dummy",
 				wallet: context.wallet,
@@ -304,13 +304,13 @@ describeSkip<{
 	});
 
 	it("should emit on forgetAttribute", async (context) => {
-		context.wallet.setAttribute("delegate.username", "dummy");
-		context.wallet.forgetAttribute("delegate.username");
+		context.wallet.setAttribute("validator.username", "dummy");
+		context.wallet.forgetAttribute("validator.username");
 
 		assert.true(context.dispatchSyncSpy.calledTwice);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				key: "delegate.username",
+				key: "validator.username",
 				previousValue: "dummy",
 				publicKey: undefined,
 				wallet: context.wallet,
@@ -319,15 +319,15 @@ describeSkip<{
 	});
 
 	it("should clone", async (context) => {
-		context.wallet.setAttribute("delegate.username", "dummy");
+		context.wallet.setAttribute("validator.username", "dummy");
 		const clone = context.wallet.clone();
 
 		assert.equal(clone.getAddress(), "Abcde");
-		assert.equal(clone.getAttribute("delegate.username"), "dummy");
+		assert.equal(clone.getAttribute("validator.username"), "dummy");
 	});
 });
 
-describeSkip<{
+describe<{
 	app: Application;
 	clone: Contracts.State.Wallet;
 	dispatchSyncSpy: SinonSpy;
@@ -360,14 +360,14 @@ describeSkip<{
 	});
 
 	it("should emit on setAttribute", async (context) => {
-		context.clone.setAttribute("delegate.username", "dummy");
+		context.clone.setAttribute("validator.username", "dummy");
 
 		assert.false(context.dispatchSyncSpy.called);
 	});
 
 	it("should emit on forgetAttribute", async (context) => {
-		context.clone.setAttribute("delegate.username", "dummy");
-		context.clone.forgetAttribute("delegate.username");
+		context.clone.setAttribute("validator.username", "dummy");
+		context.clone.forgetAttribute("validator.username");
 
 		assert.false(context.dispatchSyncSpy.called);
 	});
