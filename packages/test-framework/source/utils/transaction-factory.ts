@@ -24,7 +24,6 @@ export class TransactionFactory {
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	@tagged("type", "wallet")
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)

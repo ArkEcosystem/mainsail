@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
@@ -10,7 +10,6 @@ import { TransferTransaction } from "../versions";
 @injectable()
 export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	@tagged("type", "wallet")
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {

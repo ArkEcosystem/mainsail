@@ -6,7 +6,6 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class Validator implements Contracts.Forger.Validator {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	@tagged("type", "wallet")
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Block.Factory)

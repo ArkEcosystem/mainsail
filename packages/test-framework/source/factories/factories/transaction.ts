@@ -82,9 +82,9 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
 				.recipientId(
 					options.recipientId ||
-						(await app
-							.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
-							.fromMnemonic(secrets[0])),
+					(await app
+						.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+						.fromMnemonic(secrets[0])),
 				),
 			options,
 		);
@@ -131,9 +131,9 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 				.resolve(VoteBuilder)
 				.votesAsset([
 					options.publicKey ||
-						(await app
-							.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
-							.fromMnemonic(secrets[1])),
+					(await app
+						.getTagged<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory, "type", "wallet")
+						.fromMnemonic(secrets[1])),
 				]),
 			options,
 		),
@@ -150,9 +150,9 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 				.resolve(VoteBuilder)
 				.unvotesAsset([
 					options.publicKey ||
-						(await app
-							.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
-							.fromMnemonic(secrets[1])),
+					(await app
+						.getTagged<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory, "type", "wallet")
+						.fromMnemonic(secrets[1])),
 				]),
 			options,
 		),
@@ -164,8 +164,8 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 
 export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("MultiSignature", async ({ options }: { options: MultiSignatureOptions }) => {
-		const publicKeyFactory = app.get<Contracts.Crypto.IPublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKeyFactory,
+		const publicKeyFactory = app.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+			Identifiers.Cryptography.Identity.PublicKeyFactory, "type", "wallet"
 		);
 
 		const publicKeys: string[] = options.publicKeys || [

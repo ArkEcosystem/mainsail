@@ -21,7 +21,7 @@ export class BlockState implements Contracts.State.BlockState {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Block.Factory)
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@multiInject(Identifiers.State.ValidatorMutator)

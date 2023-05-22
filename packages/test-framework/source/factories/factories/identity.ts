@@ -16,7 +16,7 @@ export const registerIdentityFactory = async (
 	factory.set("Identity", async ({ options }) => {
 		const passphrase: string = options.passphrase || generateMnemonic();
 		const keys = await app
-			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.getTagged<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory, "type", "wallet")
 			.fromMnemonic(passphrase);
 		return {
 			address: await app

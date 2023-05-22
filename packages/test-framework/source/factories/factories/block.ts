@@ -66,7 +66,7 @@ export const registerBlockFactory = async (
 		return app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 			{
 				generatorPublicKey: await app
-					.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
+					.getTagged<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory, "type", "wallet")
 					.fromMnemonic(passphrase),
 				height: previousBlock.height + 1,
 				numberOfTransactions: transactions.length,
