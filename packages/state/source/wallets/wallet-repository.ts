@@ -1,6 +1,5 @@
 import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 
 import { WalletHolder } from "./wallet-holder";
 import { WalletIndex } from "./wallet-index";
@@ -111,14 +110,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public hasByIndex(indexName: string, key: string): boolean {
 		return this.getIndex(indexName).has(key);
-	}
-
-	public async getNonce(publicKey: string): Promise<BigNumber> {
-		if (this.hasByPublicKey(publicKey)) {
-			return (await this.findByPublicKey(publicKey)).getNonce();
-		}
-
-		return BigNumber.ZERO;
 	}
 
 	public index(wallets: Contracts.State.Wallet | Contracts.State.Wallet[]): void {

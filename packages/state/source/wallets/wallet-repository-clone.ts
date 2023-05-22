@@ -1,6 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 
 import { WalletIndex } from "./wallet-index";
 import { WalletRepository } from "./wallet-repository";
@@ -76,18 +75,6 @@ export class WalletRepositoryClone extends WalletRepository {
 			this.getIndex(indexName).has(key) ||
 			(this.blockchainWalletRepository.getIndex(indexName).has(key) && !this.#getForgetIndex(indexName).has(key))
 		);
-	}
-
-	public async getNonce(publicKey: string): Promise<BigNumber> {
-		if (this.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey)) {
-			return (await this.findByPublicKey(publicKey)).getNonce();
-		}
-
-		if (this.blockchainWalletRepository.hasByPublicKey(publicKey)) {
-			return (await this.blockchainWalletRepository.findByPublicKey(publicKey)).getNonce();
-		}
-
-		return BigNumber.ZERO;
 	}
 
 	public forgetOnIndex(index: string, key: string): void {
