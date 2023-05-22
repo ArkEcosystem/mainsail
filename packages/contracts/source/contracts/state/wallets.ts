@@ -140,8 +140,6 @@ export interface WalletRepository {
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 
 	forgetOnIndex(index: string, key: string): void;
-
-	cloneWallet(origin: WalletRepository, wallet: Wallet): WalletHolder;
 }
 
 export enum SearchScope {
