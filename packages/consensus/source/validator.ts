@@ -35,8 +35,10 @@ export class Validator implements IValidator {
 	private readonly messagesFactory: Contracts.Crypto.IMessageFactory;
 
 	#keyPair: Contracts.Crypto.IKeyPair;
+	#publicKey: string;
 
-	public configure(keyPair: Contracts.Crypto.IKeyPair): Validator {
+	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Validator {
+		this.#publicKey = publicKey;
 		this.#keyPair = keyPair;
 
 		return this;
@@ -119,7 +121,7 @@ export class Validator implements IValidator {
 
 		return this.blockFactory.make(
 			{
-				generatorPublicKey: this.#keyPair.publicKey,
+				generatorPublicKey: this.#publicKey,
 				height: previousBlock.data.height + 1,
 				numberOfTransactions: transactions.length,
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
