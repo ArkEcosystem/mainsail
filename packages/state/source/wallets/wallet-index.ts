@@ -1,15 +1,15 @@
 import { Contracts } from "@mainsail/contracts";
 
 export class WalletIndex implements Contracts.State.WalletIndex {
-	#walletByKey: Map<string, Contracts.State.Wallet>;
-	#keysByWallet: Map<Contracts.State.Wallet, Set<string>>;
+	#walletByKey: Map<string, Contracts.State.WalletHolder>;
+	#keysByWallet: Map<Contracts.State.WalletHolder, Set<string>>;
 
 	public constructor(public readonly indexer: Contracts.State.WalletIndexer, public readonly autoIndex: boolean) {
-		this.#walletByKey = new Map<string, Contracts.State.Wallet>();
-		this.#keysByWallet = new Map<Contracts.State.Wallet, Set<string>>();
+		this.#walletByKey = new Map();
+		this.#keysByWallet = new Map();
 	}
 
-	public entries(): ReadonlyArray<[string, Contracts.State.Wallet]> {
+	public entries(): ReadonlyArray<[string, Contracts.State.WalletHolder]> {
 		return [...this.#walletByKey.entries()];
 	}
 
@@ -17,29 +17,29 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 		return [...this.#walletByKey.keys()];
 	}
 
-	public walletKeys(wallet: Contracts.State.Wallet): string[] {
-		const walletKeys = this.#keysByWallet.get(wallet);
+	public walletKeys(walletHolder: Contracts.State.WalletHolder): string[] {
+		const walletKeys = this.#keysByWallet.get(walletHolder);
 
 		return walletKeys ? [...walletKeys.keys()] : [];
 	}
 
-	public values(): ReadonlyArray<Contracts.State.Wallet> {
+	public values(): ReadonlyArray<Contracts.State.WalletHolder> {
 		return [...this.#walletByKey.values()];
 	}
 
-	public index(wallet: Contracts.State.Wallet): void {
-		this.indexer(this, wallet);
+	public index(walletHolder: Contracts.State.WalletHolder): void {
+		this.indexer(this, walletHolder);
 	}
 
 	public has(key: string): boolean {
 		return this.#walletByKey.has(key);
 	}
 
-	public get(key: string): Contracts.State.Wallet {
+	public get(key: string): Contracts.State.WalletHolder {
 		return this.#walletByKey.get(key);
 	}
 
-	public set(key: string, wallet: Contracts.State.Wallet): void {
+	public set(key: string, walletHolder: Contracts.State.WalletHolder): void {
 		const existingWallet = this.#walletByKey.get(key)!;
 
 		// Remove given key in case where key points to different wallet
@@ -48,16 +48,16 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 			existingKeys.delete(key);
 		}
 
-		this.#walletByKey.set(key, wallet);
+		this.#walletByKey.set(key, walletHolder);
 
-		if (this.#keysByWallet.has(wallet)) {
-			const existingKeys = this.#keysByWallet.get(wallet)!;
+		if (this.#keysByWallet.has(walletHolder)) {
+			const existingKeys = this.#keysByWallet.get(walletHolder)!;
 			existingKeys.add(key);
 		} else {
 			const keys: Set<string> = new Set();
 			keys.add(key);
 
-			this.#keysByWallet.set(wallet, keys);
+			this.#keysByWallet.set(walletHolder, keys);
 		}
 	}
 
@@ -73,7 +73,7 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 		}
 	}
 
-	public forgetWallet(wallet: Contracts.State.Wallet): void {
+	public forgetWallet(wallet: Contracts.State.WalletHolder): void {
 		const keys = this.#keysByWallet.get(wallet)!;
 
 		if (keys) {
@@ -86,7 +86,7 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 	}
 
 	public clear(): void {
-		this.#walletByKey = new Map<string, Contracts.State.Wallet>();
-		this.#keysByWallet = new Map<Contracts.State.Wallet, Set<string>>();
+		this.#walletByKey = new Map();
+		this.#keysByWallet = new Map();
 	}
 }

@@ -7,20 +7,20 @@ import { IBlockData, IMultiSignatureAsset } from "../crypto";
 export interface WalletIndex {
 	readonly indexer: WalletIndexer;
 	readonly autoIndex: boolean;
-	index(wallet: Wallet): void;
+	index(walletHolder: WalletHolder): void;
 	has(key: string): boolean;
-	get(key: string): Wallet | undefined;
-	set(key: string, wallet: Wallet): void;
+	get(key: string): WalletHolder | undefined;
+	set(key: string, walletHolder: WalletHolder): void;
 	forget(key: string): void;
-	forgetWallet(wallet: Wallet): void;
-	entries(): ReadonlyArray<[string, Wallet]>;
-	values(): ReadonlyArray<Wallet>;
+	forgetWallet(walletHolder: WalletHolder): void;
+	entries(): ReadonlyArray<[string, WalletHolder]>;
+	values(): ReadonlyArray<WalletHolder>;
 	keys(): string[];
-	walletKeys(wallet: Wallet): string[];
+	walletKeys(walletHolder: WalletHolder): string[];
 	clear(): void;
 }
 
-export type WalletIndexer = (index: WalletIndex, wallet: Wallet) => void;
+export type WalletIndexer = (index: WalletIndex, walletHolder: WalletHolder) => void;
 
 export type WalletIndexerIndex = { name: string; indexer: WalletIndexer; autoIndex: boolean };
 
