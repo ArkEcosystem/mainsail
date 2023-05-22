@@ -93,7 +93,7 @@ describe<{
 		assert.equal(context.walletIndex.get(context.wallet.getWallet().getAddress()), context.wallet);
 
 		context.walletIndex.forgetWallet(context.wallet);
-		assert.undefined(context.walletIndex.get(context.wallet.getWallet().getAddress()));
+		assert.false(context.walletIndex.has(context.wallet.getWallet().getAddress()));
 	});
 
 	it("forgetWallet - should not throw if wallet is not indexed", (context) => {

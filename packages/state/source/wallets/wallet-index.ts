@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 export class WalletIndex implements Contracts.State.WalletIndex {
 	#walletByKey: Map<string, Contracts.State.WalletHolder>;
@@ -36,7 +37,10 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 	}
 
 	public get(key: string): Contracts.State.WalletHolder {
-		return this.#walletByKey.get(key);
+		const walletHolder = this.#walletByKey.get(key);
+		Utils.assert.defined(walletHolder);
+
+		return walletHolder;
 	}
 
 	public set(key: string, walletHolder: Contracts.State.WalletHolder): void {
