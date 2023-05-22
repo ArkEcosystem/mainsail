@@ -20,195 +20,195 @@ describe<{
 		context.walletRepo.reset();
 	});
 
-	it("#initialize - should throw if indexers are already registered", (context) => {
-		assert.throws(() => context.walletRepo.initialize(), "The wallet index is already registered: addresses");
+	it("#initialize - should throw if indexers are already registered", ({ walletRepo }) => {
+		assert.throws(() => walletRepo.initialize(), "The wallet index is already registered: addresses");
 	});
 
-	it("#createWallet - should create a wallet", (context) => {
-		const wallet = context.walletRepo.createWallet("abcd");
+	it("#createWallet - should create a wallet", ({ walletRepo }) => {
+		const wallet = walletRepo.createWallet("abcd");
 
 		assert.equal(wallet.getAddress(), "abcd");
 		assert.instance(wallet, Wallet);
 	});
 
-	it("#getIndex && #getIndexNames - should be able to look up indexers", (context) => {
+	it("#getIndex && #getIndexNames - should be able to look up indexers", ({ walletRepo }) => {
 		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
 
-		assert.equal(context.walletRepo.getIndexNames(), expected);
-		assert.equal(context.walletRepo.getIndex("addresses").indexer, addressesIndexer);
-		assert.equal(context.walletRepo.getIndex("publicKeys").indexer, publicKeysIndexer);
-		assert.equal(context.walletRepo.getIndex("usernames").indexer, usernamesIndexer);
-		assert.equal(context.walletRepo.getIndex("resignations").indexer, resignationsIndexer);
-		assert.throws(() => context.walletRepo.getIndex("iDontExist"));
+		assert.equal(walletRepo.getIndexNames(), expected);
+		assert.equal(walletRepo.getIndex("addresses").indexer, addressesIndexer);
+		assert.equal(walletRepo.getIndex("publicKeys").indexer, publicKeysIndexer);
+		assert.equal(walletRepo.getIndex("usernames").indexer, usernamesIndexer);
+		assert.equal(walletRepo.getIndex("resignations").indexer, resignationsIndexer);
+		assert.throws(() => walletRepo.getIndex("iDontExist"));
 	});
 
-	it("indexing should keep indexers in sync", async (context) => {
+	it("indexing should keep indexers in sync", async ({ walletRepo }) => {
 		const address = "ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp";
-		const wallet = context.walletRepo.createWallet(address);
+		const wallet = walletRepo.createWallet(address);
 		const walletHolder = new WalletHolder(wallet);
 		const publicKey = "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
 		wallet.setPublicKey(publicKey);
 
-		assert.not.equal(context.walletRepo.findByAddress(address), wallet); // Creates new instance
+		assert.not.equal(walletRepo.findByAddress(address), wallet); // Creates new instance
 
-		context.walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
+		walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
 
-		const byPublicKey = await context.walletRepo.findByPublicKey(publicKey);
+		const byPublicKey = await walletRepo.findByPublicKey(publicKey);
 		assert.defined(byPublicKey.getPublicKey());
 		assert.equal(byPublicKey, wallet);
 
-		assert.undefined(context.walletRepo.findByAddress(address).getPublicKey());
-		assert.not.equal(context.walletRepo.findByAddress(address), wallet);
+		assert.undefined(walletRepo.findByAddress(address).getPublicKey());
+		assert.not.equal(walletRepo.findByAddress(address), wallet);
 
-		const newWallet = context.walletRepo.findByAddress(address);
+		const newWallet = walletRepo.findByAddress(address);
 		newWallet.setPublicKey(publicKey);
-		context.walletRepo.index(newWallet);
+		walletRepo.index(newWallet);
 
-		assert.equal(context.walletRepo.findByAddress(address).getPublicKey(), publicKey);
-		assert.equal(context.walletRepo.findByAddress(address), wallet);
+		assert.equal(walletRepo.findByAddress(address).getPublicKey(), publicKey);
+		assert.equal(walletRepo.findByAddress(address), wallet);
 	});
 
-	it("should get and set wallets by address", (context) => {
+	it("should get and set wallets by address", ({ walletRepo }) => {
 		const address = "abcd";
-		const wallet = context.walletRepo.createWallet(address);
+		const wallet = walletRepo.createWallet(address);
 
-		assert.false(context.walletRepo.has(address));
+		assert.false(walletRepo.has(address));
 
-		assert.equal(context.walletRepo.findByAddress(address), wallet);
-		assert.true(context.walletRepo.has(address));
+		assert.equal(walletRepo.findByAddress(address), wallet);
+		assert.true(walletRepo.has(address));
 
-		assert.equal(context.walletRepo.findByIndex("addresses", address), wallet);
+		assert.equal(walletRepo.findByIndex("addresses", address), wallet);
 		const nonExistingAddress = "abcde";
-		assert.true(context.walletRepo.has(address));
-		assert.false(context.walletRepo.has(nonExistingAddress));
-		assert.true(context.walletRepo.hasByAddress(address));
-		assert.false(context.walletRepo.hasByAddress(nonExistingAddress));
-		assert.true(context.walletRepo.hasByIndex("addresses", address));
-		assert.false(context.walletRepo.hasByIndex("addresses", nonExistingAddress));
-		assert.equal(context.walletRepo.allByAddress(), [wallet]);
-		assert.equal(context.walletRepo.allByIndex("addresses"), [wallet]);
+		assert.true(walletRepo.has(address));
+		assert.false(walletRepo.has(nonExistingAddress));
+		assert.true(walletRepo.hasByAddress(address));
+		assert.false(walletRepo.hasByAddress(nonExistingAddress));
+		assert.true(walletRepo.hasByIndex("addresses", address));
+		assert.false(walletRepo.hasByIndex("addresses", nonExistingAddress));
+		assert.equal(walletRepo.allByAddress(), [wallet]);
+		assert.equal(walletRepo.allByIndex("addresses"), [wallet]);
 	});
 
-	it("should create a wallet if one is not found during address lookup", (context) => {
-		assert.not.throws(() => context.walletRepo.findByAddress("hello"));
-		assert.instance(context.walletRepo.findByAddress("iDontExist"), Wallet);
-		assert.true(context.walletRepo.has("hello"));
-		assert.true(context.walletRepo.hasByAddress("iDontExist"));
+	it("should create a wallet if one is not found during address lookup", ({ walletRepo }) => {
+		assert.not.throws(() => walletRepo.findByAddress("hello"));
+		assert.instance(walletRepo.findByAddress("iDontExist"), Wallet);
+		assert.true(walletRepo.has("hello"));
+		assert.true(walletRepo.hasByAddress("iDontExist"));
 
 		const errorMessage = "Wallet iAlsoDontExist doesn't exist in index addresses";
-		assert.throws(() => context.walletRepo.findByIndex("addresses", "iAlsoDontExist"), errorMessage);
+		assert.throws(() => walletRepo.findByIndex("addresses", "iAlsoDontExist"), errorMessage);
 	});
 
-	it("should get and set wallets by public key", async (context) => {
-		const wallet = context.walletRepo.createWallet("abcde");
+	it("should get and set wallets by public key", async ({ walletRepo }) => {
+		const wallet = walletRepo.createWallet("abcde");
 		const walletHolder = new WalletHolder(wallet);
 		const publicKey = "02337416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
-		context.walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
-		assert.equal(await context.walletRepo.findByPublicKey(publicKey), wallet);
-		assert.equal(context.walletRepo.findByIndex("publicKeys", publicKey), wallet);
+		walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
+		assert.equal(await walletRepo.findByPublicKey(publicKey), wallet);
+		assert.equal(walletRepo.findByIndex("publicKeys", publicKey), wallet);
 
 		const nonExistingPublicKey = "98727416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
 
-		assert.true(context.walletRepo.has(publicKey));
-		assert.false(context.walletRepo.has(nonExistingPublicKey));
-		assert.true(context.walletRepo.hasByPublicKey(publicKey));
-		assert.false(context.walletRepo.hasByPublicKey(nonExistingPublicKey));
-		assert.true(context.walletRepo.hasByIndex("publicKeys", publicKey));
-		assert.false(context.walletRepo.hasByIndex("publicKeys", nonExistingPublicKey));
-		assert.equal(context.walletRepo.allByPublicKey(), [wallet]);
-		assert.equal(context.walletRepo.allByIndex("publicKeys"), [wallet]);
+		assert.true(walletRepo.has(publicKey));
+		assert.false(walletRepo.has(nonExistingPublicKey));
+		assert.true(walletRepo.hasByPublicKey(publicKey));
+		assert.false(walletRepo.hasByPublicKey(nonExistingPublicKey));
+		assert.true(walletRepo.hasByIndex("publicKeys", publicKey));
+		assert.false(walletRepo.hasByIndex("publicKeys", nonExistingPublicKey));
+		assert.equal(walletRepo.allByPublicKey(), [wallet]);
+		assert.equal(walletRepo.allByIndex("publicKeys"), [wallet]);
 	});
 
-	it("should create a wallet if one is not found during public key lookup", async (context) => {
+	it("should create a wallet if one is not found during public key lookup", async ({ walletRepo }) => {
 		const firstNotYetExistingPublicKey = "0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3";
-		assert.not.throws(() => context.walletRepo.findByPublicKey(firstNotYetExistingPublicKey));
-		assert.instance(await context.walletRepo.findByPublicKey(firstNotYetExistingPublicKey), Wallet);
+		assert.not.throws(() => walletRepo.findByPublicKey(firstNotYetExistingPublicKey));
+		assert.instance(await walletRepo.findByPublicKey(firstNotYetExistingPublicKey), Wallet);
 
 		const secondNotYetExistingPublicKey = "03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a";
-		assert.throws(() => context.walletRepo.findByIndex("publicKeys", secondNotYetExistingPublicKey));
+		assert.throws(() => walletRepo.findByIndex("publicKeys", secondNotYetExistingPublicKey));
 	});
 
-	it("should get and set wallets by username", (context) => {
+	it("should get and set wallets by username", ({ walletRepo }) => {
 		const username = "testUsername";
-		const wallet = context.walletRepo.createWallet("abcdef");
+		const wallet = walletRepo.createWallet("abcdef");
 		const walletHolder = new WalletHolder(wallet);
 
-		context.walletRepo.getIndex("usernames").set(username, walletHolder);
-		assert.equal(context.walletRepo.findByUsername(username), wallet);
-		assert.equal(context.walletRepo.findByIndex("usernames", username), wallet);
+		walletRepo.getIndex("usernames").set(username, walletHolder);
+		assert.equal(walletRepo.findByUsername(username), wallet);
+		assert.equal(walletRepo.findByIndex("usernames", username), wallet);
 
 		const nonExistingUsername = "iDontExistAgain";
-		assert.true(context.walletRepo.has(username));
-		assert.false(context.walletRepo.has(nonExistingUsername));
-		assert.true(context.walletRepo.hasByUsername(username));
-		assert.false(context.walletRepo.hasByUsername(nonExistingUsername));
-		assert.true(context.walletRepo.hasByIndex("usernames", username));
-		assert.false(context.walletRepo.hasByIndex("usernames", nonExistingUsername));
-		assert.equal(context.walletRepo.allByUsername(), [wallet]);
-		assert.equal(context.walletRepo.allByIndex("usernames"), [wallet]);
+		assert.true(walletRepo.has(username));
+		assert.false(walletRepo.has(nonExistingUsername));
+		assert.true(walletRepo.hasByUsername(username));
+		assert.false(walletRepo.hasByUsername(nonExistingUsername));
+		assert.true(walletRepo.hasByIndex("usernames", username));
+		assert.false(walletRepo.hasByIndex("usernames", nonExistingUsername));
+		assert.equal(walletRepo.allByUsername(), [wallet]);
+		assert.equal(walletRepo.allByIndex("usernames"), [wallet]);
 	});
 
-	it("should be able to index forgotten wallets", (context) => {
-		const wallet1 = context.walletRepo.createWallet("wallet1");
-		context.walletRepo.index(wallet1);
-		assert.true(context.walletRepo.has("wallet1"));
-		context.walletRepo.index(wallet1);
-		assert.true(context.walletRepo.has("wallet1"));
+	it("should be able to index forgotten wallets", ({ walletRepo }) => {
+		const wallet1 = walletRepo.createWallet("wallet1");
+		walletRepo.index(wallet1);
+		assert.true(walletRepo.has("wallet1"));
+		walletRepo.index(wallet1);
+		assert.true(walletRepo.has("wallet1"));
 	});
 
-	it("should do nothing if forgotten wallet does not exist", (context) => {
-		const wallet1 = context.walletRepo.createWallet("wallet1");
-		context.walletRepo.index(wallet1);
+	it("should do nothing if forgotten wallet does not exist", ({ walletRepo }) => {
+		const wallet1 = walletRepo.createWallet("wallet1");
+		walletRepo.index(wallet1);
 		// @ts-ignore
 		wallet1.publicKey = undefined;
-		assert.false(context.walletRepo.has("wallet2"));
+		assert.false(walletRepo.has("wallet2"));
 	});
 
-	it("should get the nonce of a wallet", async (context) => {
-		const wallet1 = context.walletRepo.findByAddress("wallet1");
+	it("#getNonce - should get the nonce of a wallet", async ({ walletRepo }) => {
+		const wallet1 = walletRepo.findByAddress("wallet1");
 		wallet1.setNonce(BigNumber.make(100));
 		wallet1.setPublicKey("02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34");
-		context.walletRepo.index(wallet1);
+		walletRepo.index(wallet1);
 
-		assert.equal(await context.walletRepo.getNonce(wallet1.getPublicKey()!), BigNumber.make(100));
+		assert.equal(await walletRepo.getNonce(wallet1.getPublicKey()!), BigNumber.make(100));
 	});
 
-	it("should return 0 nonce if there is no wallet", async (context) => {
+	it("#getNonce - should return 0 nonce if there is no wallet", async ({ walletRepo }) => {
 		const publicKey = "03c075494ad044ab8c0b2dc7ccd19f649db844a4e558e539d3ac2610c4b90a5139";
-		assert.equal(await context.walletRepo.getNonce(publicKey), BigNumber.ZERO);
+		assert.equal(await walletRepo.getNonce(publicKey), BigNumber.ZERO);
 	});
 
-	it("should throw when looking up a username which doesn't exist", (context) => {
+	it("should throw when looking up a username which doesn't exist", ({ walletRepo }) => {
 		assert.throws(
-			() => context.walletRepo.findByUsername("iDontExist"),
+			() => walletRepo.findByUsername("iDontExist"),
 			"Wallet iDontExist doesn't exist in index usernames",
 		);
 
 		assert.throws(
-			() => context.walletRepo.findByIndex("usernames", "iDontExist"),
+			() => walletRepo.findByIndex("usernames", "iDontExist"),
 			"Wallet iDontExist doesn't exist in index usernames",
 		);
 	});
 
-	it("allByIndex - should return values on index", (context) => {
-		const wallet = context.walletRepo.findByAddress("address");
+	it("#allByIndex - should return values on index", ({ walletRepo }) => {
+		const wallet = walletRepo.findByAddress("address");
 
-		assert.equal(context.walletRepo.allByIndex("addresses"), [wallet]);
+		assert.equal(walletRepo.allByIndex("addresses"), [wallet]);
 	});
 
-	it("setOnIndex - should set wallet on index", (context) => {
-		const wallet = context.walletRepo.findByAddress("address");
-		context.walletRepo.setOnIndex("addresses", "address2", wallet);
+	it("#setOnIndex - should set wallet on index", ({ walletRepo }) => {
+		const wallet = walletRepo.findByAddress("address");
+		walletRepo.setOnIndex("addresses", "address2", wallet);
 
-		assert.equal(context.walletRepo.allByIndex("addresses"), [wallet, wallet]);
+		assert.equal(walletRepo.allByIndex("addresses"), [wallet, wallet]);
 	});
 
-	it("forgetOnIndex - should forget wallet on index", (context) => {
-		const wallet = context.walletRepo.findByAddress("address");
-		assert.equal(context.walletRepo.allByIndex("addresses"), [wallet]);
+	it("#forgetOnIndex - should forget wallet on index", ({ walletRepo }) => {
+		const wallet = walletRepo.findByAddress("address");
+		assert.equal(walletRepo.allByIndex("addresses"), [wallet]);
 
-		context.walletRepo.forgetOnIndex("addresses", "address");
+		walletRepo.forgetOnIndex("addresses", "address");
 
-		assert.equal(context.walletRepo.allByIndex("addresses"), []);
+		assert.equal(walletRepo.allByIndex("addresses"), []);
 	});
 });
