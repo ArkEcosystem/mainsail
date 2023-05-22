@@ -131,8 +131,6 @@ export interface WalletRepository {
 
 	findByIndexes(indexes: string[], key: string): Wallet;
 
-	getNonce(publicKey: string): Promise<BigNumber>;
-
 	index(wallet: Wallet): void;
 
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
