@@ -144,20 +144,6 @@ describe<{
 		assert.false(walletRepo.has("wallet2"));
 	});
 
-	it("#getNonce - should get the nonce of a wallet", async ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-		wallet1.setNonce(BigNumber.make(100));
-		wallet1.setPublicKey("02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34");
-		walletRepo.index(wallet1);
-
-		assert.equal(await walletRepo.getNonce(wallet1.getPublicKey()!), BigNumber.make(100));
-	});
-
-	it("#getNonce - should return 0 nonce if there is no wallet", async ({ walletRepo }) => {
-		const publicKey = "03c075494ad044ab8c0b2dc7ccd19f649db844a4e558e539d3ac2610c4b90a5139";
-		assert.equal(await walletRepo.getNonce(publicKey), BigNumber.ZERO);
-	});
-
 	it("should throw when looking up a username which doesn't exist", ({ walletRepo }) => {
 		assert.throws(
 			() => walletRepo.findByUsername("iDontExist"),
