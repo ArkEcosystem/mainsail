@@ -30,10 +30,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		}
 	}
 
-	public createWallet(address: string): Contracts.State.Wallet {
-		return this.createWalletFactory(address);
-	}
-
 	public getIndex(name: string): Contracts.State.WalletIndex {
 		if (!this.indexes[name]) {
 			throw new Exceptions.WalletIndexNotFoundError(name);
@@ -178,7 +174,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	protected findHolderByAddress(address: string): Contracts.State.WalletHolder {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 		if (address && !index.has(address)) {
-			index.set(address, new WalletHolder(this.createWallet(address)));
+			index.set(address, new WalletHolder(this.createWalletFactory(address)));
 		}
 		const walletHolder: Contracts.State.WalletHolder | undefined = index.get(address);
 		AppUtils.assert.defined(walletHolder);

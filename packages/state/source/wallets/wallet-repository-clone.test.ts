@@ -114,8 +114,8 @@ describe<{
 		});
 	});
 
-	it("createWallet - should create wallet by address", async (context) => {
-		const wallet = context.walletRepositoryClone.createWallet("address");
+	it("#findByAddress - should create wallet by address", async (context) => {
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getAddress(), "address");
@@ -225,21 +225,15 @@ describe<{
 	});
 
 	it("findByAddress - should return existing wallet", (context) => {
-		const spyOnCreateWallet = spy(context.walletRepositoryClone, "createWallet");
-
 		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getAddress(), "address");
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
-		spyOnCreateWallet.calledOnce();
-
-		spyOnCreateWallet.reset();
 
 		const existingWallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.equal(wallet, existingWallet);
-		spyOnCreateWallet.neverCalled();
 		assert.false(context.walletRepositoryBlockchain.hasByAddress("address"));
 	});
 
@@ -280,8 +274,6 @@ describe<{
 	});
 
 	it("findByPublicKey - should return existing wallet", async (context) => {
-		const spyOnCreateWallet = spy(context.walletRepositoryClone, "createWallet");
-
 		const wallet = await context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
 		assert.instance(wallet, Wallet);
@@ -289,13 +281,9 @@ describe<{
 		assert.true(
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey),
 		);
-		spyOnCreateWallet.calledOnce();
-
-		spyOnCreateWallet.reset();
 		const existingWallet = await context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
 		assert.equal(wallet, existingWallet);
-		spyOnCreateWallet.neverCalled();
 		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
 	});
 
@@ -382,8 +370,6 @@ describe<{
 	});
 
 	it("findByIndex - should return existing wallet", async (context) => {
-		const spyOnCreateWallet = spy(context.walletRepositoryClone, "createWallet");
-
 		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", context.username);
 		context.walletRepositoryClone.index(wallet);
@@ -394,16 +380,12 @@ describe<{
 		assert.true(
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has(context.username),
 		);
-		spyOnCreateWallet.calledOnce();
-
-		spyOnCreateWallet.reset();
 		const existingWallet = context.walletRepositoryClone.findByIndex(
 			Contracts.State.WalletIndexes.Usernames,
 			context.username,
 		);
 
 		assert.equal(wallet, existingWallet);
-		spyOnCreateWallet.neverCalled();
 		assert.false(
 			context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, context.username),
 		);

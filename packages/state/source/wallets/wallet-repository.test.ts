@@ -24,8 +24,8 @@ describe<{
 		assert.throws(() => walletRepo.initialize(), "The wallet index is already registered: addresses");
 	});
 
-	it("#createWallet - should create a wallet", ({ walletRepo }) => {
-		const wallet = walletRepo.createWallet("abcd");
+	it("#findByAddress - should create a wallet", ({ walletRepo }) => {
+		const wallet = walletRepo.findByAddress("abcd");
 
 		assert.equal(wallet.getAddress(), "abcd");
 		assert.instance(wallet, Wallet);
@@ -42,37 +42,9 @@ describe<{
 		assert.throws(() => walletRepo.getIndex("iDontExist"));
 	});
 
-	it("indexing should keep indexers in sync", async ({ walletRepo }) => {
-		const address = "ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp";
-		const wallet = walletRepo.createWallet(address);
-		const walletHolder = new WalletHolder(wallet);
-		const publicKey = "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
-		wallet.setPublicKey(publicKey);
-
-		assert.not.equal(walletRepo.findByAddress(address), wallet); // Creates new instance
-
-		walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
-
-		const byPublicKey = await walletRepo.findByPublicKey(publicKey);
-		assert.defined(byPublicKey.getPublicKey());
-		assert.equal(byPublicKey, wallet);
-
-		assert.undefined(walletRepo.findByAddress(address).getPublicKey());
-		assert.not.equal(walletRepo.findByAddress(address), wallet);
-
-		const newWallet = walletRepo.findByAddress(address);
-		newWallet.setPublicKey(publicKey);
-		walletRepo.index(newWallet);
-
-		assert.equal(walletRepo.findByAddress(address).getPublicKey(), publicKey);
-		assert.equal(walletRepo.findByAddress(address), wallet);
-	});
-
 	it("should get and set wallets by address", ({ walletRepo }) => {
 		const address = "abcd";
-		const wallet = walletRepo.createWallet(address);
-
-		assert.false(walletRepo.has(address));
+		const wallet = walletRepo.findByAddress(address);
 
 		assert.equal(walletRepo.findByAddress(address), wallet);
 		assert.true(walletRepo.has(address));
@@ -100,7 +72,7 @@ describe<{
 	});
 
 	it("should get and set wallets by public key", async ({ walletRepo }) => {
-		const wallet = walletRepo.createWallet("abcde");
+		const wallet = walletRepo.findByAddress("abcde");
 		const walletHolder = new WalletHolder(wallet);
 		const publicKey = "02337416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
 		walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
@@ -130,7 +102,7 @@ describe<{
 
 	it("should get and set wallets by username", ({ walletRepo }) => {
 		const username = "testUsername";
-		const wallet = walletRepo.createWallet("abcdef");
+		const wallet = walletRepo.findByAddress("abcdef");
 		const walletHolder = new WalletHolder(wallet);
 
 		walletRepo.getIndex("usernames").set(username, walletHolder);
@@ -149,7 +121,7 @@ describe<{
 	});
 
 	it("should be able to index forgotten wallets", ({ walletRepo }) => {
-		const wallet1 = walletRepo.createWallet("wallet1");
+		const wallet1 = walletRepo.findByAddress("wallet1");
 		walletRepo.index(wallet1);
 		assert.true(walletRepo.has("wallet1"));
 		walletRepo.index(wallet1);
@@ -157,7 +129,7 @@ describe<{
 	});
 
 	it("should do nothing if forgotten wallet does not exist", ({ walletRepo }) => {
-		const wallet1 = walletRepo.createWallet("wallet1");
+		const wallet1 = walletRepo.findByAddress("wallet1");
 		walletRepo.index(wallet1);
 		// @ts-ignore
 		wallet1.publicKey = undefined;

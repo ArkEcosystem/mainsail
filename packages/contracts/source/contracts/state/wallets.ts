@@ -103,9 +103,6 @@ export interface WalletValidatorAttributes {
 export type WalletMultiSignatureAttributes = IMultiSignatureAsset & { legacy?: boolean };
 
 export interface WalletRepository {
-	// TODO: use an inversify factory for wallets instead?
-	createWallet(address: string): Wallet;
-
 	reset(): void;
 
 	getIndex(name: string): WalletIndex;

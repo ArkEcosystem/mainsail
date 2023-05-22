@@ -22,10 +22,6 @@ export class WalletRepositoryClone extends WalletRepository {
 		}
 	}
 
-	public createWallet(address: string): Contracts.State.Wallet {
-		return super.createWallet(address);
-	}
-
 	public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
 		return this.allByIndex(Contracts.State.WalletIndexes.Addresses);
 	}
