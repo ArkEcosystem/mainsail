@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
-import { IBroadcaster, IConsensus, IHandler, IScheduler, IValidatorRepository } from "./types";
+import { IBroadcaster, IHandler, IScheduler, IValidatorRepository } from "./types";
 
 enum Step {
 	propose = "propose",
@@ -11,7 +11,7 @@ enum Step {
 }
 
 @injectable()
-export class Consensus implements IConsensus {
+export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -34,7 +34,7 @@ export class Consensus implements IConsensus {
 	private readonly validatorsRepository: IValidatorRepository;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet: Contracts.Consensus.IValidatorSet;
+	private readonly validatorSet: Contracts.ValidatorSet.IValidatorSet;
 
 	#height = 2;
 	#round = 0;
