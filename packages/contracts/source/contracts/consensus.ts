@@ -1,7 +1,6 @@
 import { IPrecommit, IPrevote, IProposal } from "./crypto";
 
 export interface IConsensusService {
-	configure(): Promise<void>;
 	run(): Promise<void>;
 	onProposal(proposal: IProposal): Promise<void>;
 	onMajorityPrevote(proposal: IPrevote): Promise<void>;
