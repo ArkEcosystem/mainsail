@@ -114,3 +114,6 @@ tags
 
 # Lerna
 .cache
+
+# Unit test artifacts
+:memory:
