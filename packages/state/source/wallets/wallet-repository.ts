@@ -59,13 +59,13 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
-		return this.findHolderByAddress(address).getWallet();
+		return this.findOrCreate(address).getWallet();
 	}
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		const index = this.getIndex(Contracts.State.WalletIndexes.PublicKeys);
 		if (publicKey && !index.has(publicKey)) {
-			const walletHolder = this.findHolderByAddress(await this.addressFactory.fromPublicKey(publicKey));
+			const walletHolder = this.findOrCreate(await this.addressFactory.fromPublicKey(publicKey));
 			walletHolder.getWallet().setPublicKey(publicKey);
 			index.set(publicKey, walletHolder);
 		}
@@ -132,7 +132,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	}
 
 	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {
-		const walletHolder = this.findHolderByAddress(wallet.getAddress());
+		const walletHolder = this.findHolder(wallet);
 
 		this.getIndex(index).set(key, walletHolder);
 	}
@@ -148,7 +148,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	}
 
 	public cloneWallet(origin: WalletRepository, wallet: Contracts.State.Wallet): Contracts.State.WalletHolder {
-		const walletHolder = origin.findHolderByAddress(wallet.getAddress());
+		const walletHolder = origin.findHolder(wallet);
 		const walletHolderClone = new WalletHolder(wallet.clone());
 
 		for (const indexName of origin.getIndexNames()) {
@@ -163,7 +163,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return walletHolderClone;
 	}
 
-	protected findHolderByAddress(address: string): Contracts.State.WalletHolder {
+	protected findOrCreate(address: string): Contracts.State.WalletHolder {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 		if (address && !index.has(address)) {
 			index.set(address, new WalletHolder(this.createWalletFactory(address)));
@@ -171,8 +171,20 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return index.get(address);
 	}
 
+	protected findHolder(wallet: Contracts.State.Wallet): Contracts.State.WalletHolder {
+		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
+
+		const walletHolder = index.get(wallet.getAddress());
+
+		if (walletHolder.getWallet() !== wallet) {
+			throw new Error("Wallet missmatch");
+		}
+
+		return walletHolder;
+	}
+
 	protected indexWallet(wallet: Contracts.State.Wallet): void {
-		const walletHolder = this.findHolderByAddress(wallet.getAddress());
+		const walletHolder = this.findHolder(wallet);
 
 		for (const index of Object.values(this.indexes).filter((index) => index.autoIndex)) {
 			index.forgetWallet(walletHolder);

@@ -39,7 +39,7 @@ export class WalletRepositoryClone extends WalletRepository {
 			return this.cloneWallet(this.blockchainWalletRepository, walletToClone).getWallet();
 		}
 
-		return this.findHolderByAddress(address).getWallet();
+		return this.findOrCreate(address).getWallet();
 	}
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
@@ -96,7 +96,7 @@ export class WalletRepositoryClone extends WalletRepository {
 
 			this.getIndex(index).forget(key);
 
-			this.#getForgetIndex(index).set(key, this.findHolderByAddress(wallet.getAddress()));
+			this.#getForgetIndex(index).set(key, this.findHolder(wallet));
 		}
 	}
 
@@ -109,7 +109,7 @@ export class WalletRepositoryClone extends WalletRepository {
 
 	protected indexWallet(wallet: Contracts.State.Wallet): void {
 		const indexKeys = {};
-		const walletHolder = this.findHolderByAddress(wallet.getAddress());
+		const walletHolder = this.findHolder(wallet);
 
 		for (const indexName of this.getIndexNames()) {
 			indexKeys[indexName] = this.getIndex(indexName).walletKeys(walletHolder);
