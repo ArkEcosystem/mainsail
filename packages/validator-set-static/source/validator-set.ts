@@ -10,13 +10,13 @@ export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
 	@tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "wallet")
-	private readonly walletKeyPairFactory!: Contracts.Crypto.IKeyPairFactory;
+	private readonly walletPublicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "consensus")
-	private readonly consensusKeyPairFactory!: Contracts.Crypto.IPublicKeyFactory;
+	private readonly consensusPublicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	#validators: Contracts.State.Wallet[] = [];
 
@@ -25,12 +25,11 @@ export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
 
 		this.#validators = await Promise.all(
 			secrets.map(async (secret) => {
-				const keyPair = await this.walletKeyPairFactory.fromMnemonic(secret);
-
-				const wallet = await this.walletRepository.findByPublicKey(keyPair.publicKey);
+				const walletPublicKey = await this.walletPublicKeyFactory.fromMnemonic(secret);
+				const wallet = await this.walletRepository.findByPublicKey(walletPublicKey);
 
 				// TODO: shouldn't be an attribute
-				wallet.setAttribute("consensus.publicKey", await this.consensusKeyPairFactory.fromMnemonic(secret));
+				wallet.setAttribute("consensus.publicKey", await this.consensusPublicKeyFactory.fromMnemonic(secret));
 
 				return wallet;
 			}),
