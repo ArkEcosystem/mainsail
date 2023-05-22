@@ -1,14 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
 
-export interface IConsensus {
-	onProposal(proposal: Contracts.Crypto.IProposal): Promise<void>;
-	onMajorityPrevote(proposal: Contracts.Crypto.IPrevote): Promise<void>;
-	onMajorityPrecommit(proposal: Contracts.Crypto.IPrecommit): Promise<void>;
-	onTimeoutPropose(height: number, round: number): Promise<void>;
-	onTimeoutPrevote(height: number, round: number): Promise<void>;
-	onTimeoutPrecommit(height: number, round: number): Promise<void>;
-}
-
 export interface IHandler {
 	onProposal(proposal: Contracts.Crypto.IProposal): Promise<void>;
 	onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void>;

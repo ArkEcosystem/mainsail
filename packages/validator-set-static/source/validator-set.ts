@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
+export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 

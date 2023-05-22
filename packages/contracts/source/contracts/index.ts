@@ -15,3 +15,4 @@ export * as State from "./state";
 export * as TransactionPool from "./transaction-pool";
 export * as Transactions from "./transactions";
 export * as Types from "./types";
+export * as ValidatorSet from "./validator-set";

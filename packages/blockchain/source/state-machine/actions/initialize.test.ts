@@ -18,6 +18,7 @@ describe<{
 	peerNetworkMonitor: any;
 	stateBuilder: any;
 	configuration: any;
+	consensus: any;
 }>("Initialize", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
@@ -66,6 +67,11 @@ describe<{
 			get: () => {},
 		};
 
+		context.consensus = {
+			configure: () => {},
+			run: () => {},
+		};
+
 		const appGet = {
 			[Identifiers.PeerNetworkMonitor]: context.peerNetworkMonitor,
 			[Identifiers.StateBuilder]: context.stateBuilder,
@@ -82,9 +88,10 @@ describe<{
 		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
 		context.container.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
+		context.container.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
 	});
 
-	it("when stateStore.getRestoredDatabaseIntegrity should initialize state, database, transaction pool and peer network monitor", async (context) => {
+	it("when stateStore.getRestoredDatabaseIntegrity should initialize state, database, transaction pool, consensus and peer network monitor", async (context) => {
 		const initialize = context.container.resolve<Initialize>(Initialize);
 
 		const lastBlock = {
@@ -102,6 +109,7 @@ describe<{
 		const readdTransactionsSpy = spy(context.transactionPool, "readdTransactions");
 		const bootSpy = spy(context.peerNetworkMonitor, "boot");
 		const runSpy = spy(context.stateBuilder, "run");
+		const consenususRunSpy = spy(context.consensus, "run");
 
 		process.env.NODE_ENV = "";
 
@@ -111,6 +119,7 @@ describe<{
 		restoreCurrentRoundSpy.calledOnce();
 		readdTransactionsSpy.calledOnce();
 		bootSpy.calledOnce();
+		consenususRunSpy.calledOnce();
 		runSpy.calledOnce();
 		dispatchSpy.calledOnce();
 		dispatchSpy.calledWith("STARTED");
@@ -150,11 +159,13 @@ describe<{
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		stub(context.databaseService, "verifyBlockchain").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
+		const consenususRunSpy = spy(context.consensus, "run");
 
 		process.env.NODE_ENV = "";
 		await initialize.handle();
 
 		dispatchSpy.calledOnce();
+		consenususRunSpy.calledOnce();
 		dispatchSpy.calledWith("STARTED");
 	});
 
@@ -198,11 +209,13 @@ describe<{
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const deleteRoundSpy = spy(context.databaseService, "deleteRound");
+		const consenususRunSpy = spy(context.consensus, "run");
 
 		process.env.NODE_ENV = "";
 		await initialize.handle();
 
 		deleteRoundSpy.calledWith(1);
+		consenususRunSpy.calledOnce();
 		dispatchSpy.calledOnce();
 		dispatchSpy.calledWith("STARTED");
 	});
@@ -221,11 +234,13 @@ describe<{
 		stub(context.stateStore, "getNetworkStart").returnValue(true);
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
+		const consenususRunSpy = spy(context.consensus, "run");
 
 		process.env.NODE_ENV = "";
 		await initialize.handle();
 
 		dispatchSpy.calledOnce();
+		consenususRunSpy.calledOnce();
 		dispatchSpy.calledWith("STARTED");
 	});
 
@@ -248,6 +263,7 @@ describe<{
 		const readdTransactionsSpy = spy(context.transactionPool, "readdTransactions");
 		const bootSpy = spy(context.peerNetworkMonitor, "boot");
 		const runSpy = spy(context.stateBuilder, "run");
+		const consenususRunSpy = spy(context.consensus, "run");
 
 		process.env[Constants.Flags.CORE_ENV] = "test";
 		await initialize.handle();
@@ -257,6 +273,7 @@ describe<{
 		readdTransactionsSpy.neverCalled();
 		bootSpy.calledOnce();
 		runSpy.calledOnce();
+		consenususRunSpy.calledOnce();
 		dispatchSpy.calledOnce();
 		dispatchSpy.calledWith("STARTED");
 	});
