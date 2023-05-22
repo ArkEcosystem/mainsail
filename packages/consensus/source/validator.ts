@@ -35,8 +35,10 @@ export class Validator implements IValidator {
 	private readonly messagesFactory: Contracts.Crypto.IMessageFactory;
 
 	#keyPair: Contracts.Crypto.IKeyPair;
+	#publicKey: string;
 
-	public configure(keyPair: Contracts.Crypto.IKeyPair): Validator {
+	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Validator {
+		this.#publicKey = publicKey;
 		this.#keyPair = keyPair;
 
 		return this;
@@ -117,22 +119,19 @@ export class Validator implements IValidator {
 
 		const previousBlock = await this.database.getLastBlock();
 
-		return this.blockFactory.make(
-			{
-				generatorPublicKey: this.#keyPair.publicKey,
-				height: previousBlock.data.height + 1,
-				numberOfTransactions: transactions.length,
-				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
-				payloadLength: 32 * transactions.length,
-				previousBlock: previousBlock.data.id,
-				reward: this.cryptoConfiguration.getMilestone().reward,
-				timestamp: this.slots.getTime(),
-				totalAmount: totals.amount,
-				totalFee: totals.fee,
-				transactions,
-				version: 1,
-			},
-			this.#keyPair,
-		);
+		return this.blockFactory.make({
+			generatorPublicKey: this.#publicKey,
+			height: previousBlock.data.height + 1,
+			numberOfTransactions: transactions.length,
+			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
+			payloadLength: 32 * transactions.length,
+			previousBlock: previousBlock.data.id,
+			reward: this.cryptoConfiguration.getMilestone().reward,
+			timestamp: this.slots.getTime(),
+			totalAmount: totals.amount,
+			totalFee: totals.fee,
+			transactions,
+			version: 1,
+		});
 	}
 }

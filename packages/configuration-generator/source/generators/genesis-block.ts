@@ -170,27 +170,24 @@ export class GenesisBlockGenerator extends Generator {
 
 		return {
 			...(
-				await this.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make(
-					{
-						generatorPublicKey: keys.publicKey,
-						height: 1,
-						numberOfTransactions: transactions.length,
-						payloadHash: (
-							await this.app
-								.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
-								.sha256(payloadBuffers)
-						).toString("hex"),
-						payloadLength: 32 * transactions.length,
-						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-						reward: "0",
-						timestamp: dayjs(options.epoch).unix(),
-						totalAmount: totals.amount.toString(),
-						totalFee: totals.fee.toString(),
-						transactions,
-						version: 1,
-					},
-					keys,
-				)
+				await this.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
+					generatorPublicKey: keys.publicKey,
+					height: 1,
+					numberOfTransactions: transactions.length,
+					payloadHash: (
+						await this.app
+							.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+							.sha256(payloadBuffers)
+					).toString("hex"),
+					payloadLength: 32 * transactions.length,
+					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+					reward: "0",
+					timestamp: dayjs(options.epoch).unix(),
+					totalAmount: totals.amount.toString(),
+					totalFee: totals.fee.toString(),
+					transactions,
+					version: 1,
+				})
 			).data,
 			transactions,
 		};

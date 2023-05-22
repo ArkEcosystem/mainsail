@@ -1,14 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
 
-export interface IConsensus {
-	onProposal(proposal: Contracts.Crypto.IProposal): Promise<void>;
-	onMajorityPrevote(proposal: Contracts.Crypto.IPrevote): Promise<void>;
-	onMajorityPrecommit(proposal: Contracts.Crypto.IPrecommit): Promise<void>;
-	onTimeoutPropose(height: number, round: number): Promise<void>;
-	onTimeoutPrevote(height: number, round: number): Promise<void>;
-	onTimeoutPrecommit(height: number, round: number): Promise<void>;
-}
-
 export interface IHandler {
 	onProposal(proposal: Contracts.Crypto.IProposal): Promise<void>;
 	onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void>;
@@ -28,7 +19,7 @@ export interface IScheduler {
 }
 
 export interface IValidator {
-	configure(keyPair: Contracts.Crypto.IKeyPair): IValidator;
+	configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): IValidator;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock>;
 	propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IProposal>;

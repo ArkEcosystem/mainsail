@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
-import { IConsensus, IScheduler } from "./types";
+import { IScheduler } from "./types";
 
 @injectable()
 export class Scheduler implements IScheduler {
@@ -34,7 +34,7 @@ export class Scheduler implements IScheduler {
 		);
 	}
 
-	#getConsensus(): IConsensus {
-		return this.app.get<IConsensus>(Identifiers.Consensus.Service);
+	#getConsensus(): Contracts.Consensus.IConsensusService {
+		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 	}
 }

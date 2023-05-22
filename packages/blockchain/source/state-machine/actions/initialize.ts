@@ -16,6 +16,9 @@ export class Initialize implements Action {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
+	@inject(Identifiers.Consensus.Service)
+	private readonly consensus: Contracts.Consensus.IConsensusService;
+
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
@@ -76,6 +79,7 @@ export class Initialize implements Action {
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 				await this.databaseInteraction.restoreCurrentRound();
 				await this.transactionPool.readdTransactions();
+				await this.consensus.run();
 				await this.networkMonitor.boot();
 
 				return this.blockchain.dispatch("STARTED");
@@ -86,6 +90,7 @@ export class Initialize implements Action {
 
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 				await this.databaseInteraction.restoreCurrentRound();
+				await this.consensus.run();
 				await this.networkMonitor.boot();
 
 				return this.blockchain.dispatch("STARTED");
@@ -102,6 +107,8 @@ export class Initialize implements Action {
 
 			await this.databaseInteraction.restoreCurrentRound();
 			await this.transactionPool.readdTransactions();
+
+			await this.consensus.run();
 
 			await this.networkMonitor.boot();
 

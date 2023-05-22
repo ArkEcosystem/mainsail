@@ -54,22 +54,19 @@ export class Validator implements Contracts.Forger.Validator {
 			payloadBuffers.push(Buffer.from(transaction.id, "hex"));
 		}
 
-		return this.blockFactory.make(
-			{
-				generatorPublicKey: this.keys.publicKey,
-				height: options.previousBlock.height + 1,
-				numberOfTransactions: transactions.length,
-				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
-				payloadLength: 32 * transactions.length,
-				previousBlock: options.previousBlock.id,
-				reward: options.reward,
-				timestamp: options.timestamp,
-				totalAmount: totals.amount,
-				totalFee: totals.fee,
-				transactions,
-				version: 1,
-			},
-			this.keys,
-		);
+		return this.blockFactory.make({
+			generatorPublicKey: this.keys.publicKey,
+			height: options.previousBlock.height + 1,
+			numberOfTransactions: transactions.length,
+			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
+			payloadLength: 32 * transactions.length,
+			previousBlock: options.previousBlock.id,
+			reward: options.reward,
+			timestamp: options.timestamp,
+			totalAmount: totals.amount,
+			totalFee: totals.fee,
+			transactions,
+			version: 1,
+		});
 	}
 }
