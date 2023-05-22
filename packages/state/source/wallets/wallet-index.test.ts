@@ -1,9 +1,9 @@
-import { describeSkip, Factories } from "../../../test-framework";
+import { describe, Factories } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallets } from "..";
 import { WalletIndex } from ".";
 
-describeSkip<{
+describe<{
 	factory: Factories.FactoryBuilder;
 	wallet: Wallets.Wallet;
 	walletIndex: WalletIndex;
@@ -14,8 +14,8 @@ describeSkip<{
 		context.factory = environment.factory;
 	});
 
-	beforeEach((context) => {
-		context.wallet = context.factory.get("Wallet").make<Wallets.Wallet>();
+	beforeEach(async (context) => {
+		context.wallet = await context.factory.get("Wallet").make<Wallets.Wallet>();
 
 		context.walletIndex = new WalletIndex((index, wallet) => {
 			index.set(wallet.getAddress(), wallet);

@@ -54,9 +54,8 @@ export class WalletRepositoryClone extends WalletRepository {
 			wallet = this.cloneWallet(this.blockchainWalletRepository, walletToClone);
 		} else {
 			wallet = this.createWallet(address);
+			super.index(wallet);
 		}
-
-		super.index(wallet);
 
 		return wallet;
 	}

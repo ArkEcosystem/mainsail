@@ -1,19 +1,16 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { describeSkip } from "../../../test-framework";
+import { describe } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository } from ".";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
 
-describeSkip<{
+describe<{
 	walletRepo: WalletRepository;
 }>("Wallet Repository", ({ it, assert, afterEach, beforeAll }) => {
 	beforeAll(async (context) => {
 		const environment = await setUp();
-
-		// TODO: why does this have to be rebound here?
-		environment.sandbox.app.rebind(Identifiers.WalletRepository).to(WalletRepository);
 
 		context.walletRepo = environment.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 	});
@@ -98,11 +95,11 @@ describeSkip<{
 		assert.throws(() => context.walletRepo.findByIndex("addresses", "iAlsoDontExist"), errorMessage);
 	});
 
-	it("should get and set wallets by public key", (context) => {
+	it("should get and set wallets by public key", async (context) => {
 		const wallet = context.walletRepo.createWallet("abcde");
 		const publicKey = "02337416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
 		context.walletRepo.getIndex("publicKeys").set(publicKey, wallet);
-		assert.equal(context.walletRepo.findByPublicKey(publicKey), wallet);
+		assert.equal(await context.walletRepo.findByPublicKey(publicKey), wallet);
 		assert.equal(context.walletRepo.findByIndex("publicKeys", publicKey), wallet);
 
 		const nonExistingPublicKey = "98727416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
@@ -117,10 +114,10 @@ describeSkip<{
 		assert.equal(context.walletRepo.allByIndex("publicKeys"), [wallet]);
 	});
 
-	it("should create a wallet if one is not found during public key lookup", (context) => {
+	it("should create a wallet if one is not found during public key lookup", async (context) => {
 		const firstNotYetExistingPublicKey = "0235d486fea0193cbe77e955ab175b8f6eb9eaf784de689beffbd649989f5d6be3";
 		assert.not.throws(() => context.walletRepo.findByPublicKey(firstNotYetExistingPublicKey));
-		assert.instance(context.walletRepo.findByPublicKey(firstNotYetExistingPublicKey), Wallet);
+		assert.instance(await context.walletRepo.findByPublicKey(firstNotYetExistingPublicKey), Wallet);
 
 		const secondNotYetExistingPublicKey = "03a46f2547d20b47003c1c376788db5a54d67264df2ae914f70bf453b6a1fa1b3a";
 		assert.throws(() => context.walletRepo.findByIndex("publicKeys", secondNotYetExistingPublicKey));
@@ -194,18 +191,18 @@ describeSkip<{
 		}
 	});
 
-	it("should get the nonce of a wallet", (context) => {
+	it("should get the nonce of a wallet", async (context) => {
 		const wallet1 = context.walletRepo.createWallet("wallet1");
 		wallet1.setNonce(BigNumber.make(100));
 		wallet1.setPublicKey("02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34");
 		context.walletRepo.index(wallet1);
 
-		assert.equal(context.walletRepo.getNonce(wallet1.getPublicKey()!), BigNumber.make(100));
+		assert.equal(await context.walletRepo.getNonce(wallet1.getPublicKey()!), BigNumber.make(100));
 	});
 
-	it("should return 0 nonce if there is no wallet", (context) => {
+	it("should return 0 nonce if there is no wallet", async (context) => {
 		const publicKey = "03c075494ad044ab8c0b2dc7ccd19f649db844a4e558e539d3ac2610c4b90a5139";
-		assert.equal(context.walletRepo.getNonce(publicKey), BigNumber.ZERO);
+		assert.equal(await context.walletRepo.getNonce(publicKey), BigNumber.ZERO);
 	});
 
 	it("should throw when looking up a username which doesn't exist", (context) => {

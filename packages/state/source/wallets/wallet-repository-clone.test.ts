@@ -115,7 +115,7 @@ describe<{
 	});
 
 	it("createWallet - should create wallet by address", async (context) => {
-		const wallet = await context.walletRepositoryClone.createWallet("address");
+		const wallet = context.walletRepositoryClone.createWallet("address");
 
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getAddress(), "address");
@@ -135,13 +135,13 @@ describe<{
 	});
 
 	it("index - should index single wallet if there are no changes in indexes", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		context.walletRepositoryClone.index(wallet);
 	});
 
 	it("index - should index single wallet if wallet change results in set on index", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 
 		assert.false(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("genesis_1"));
@@ -152,7 +152,7 @@ describe<{
 	});
 
 	it("index - should index single wallet if wallet change results in forget on index", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryClone.index(wallet);
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("genesis_1"));
@@ -161,11 +161,6 @@ describe<{
 		context.walletRepositoryClone.index(wallet);
 
 		assert.false(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("genesis_1"));
-
-		// assert.true(
-		// 	@ts-ignore .forgetIndexes is now private: .#forgetIndexes
-		// 	context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].has("genesis_1"),
-		// );
 	});
 
 	it("index - should index wallet array", (context) => {
@@ -184,48 +179,39 @@ describe<{
 		context.walletRepositoryClone.forgetOnIndex(Contracts.State.WalletIndexes.Usernames, "key");
 
 		assert.false(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
-		// @ts-ignore .forgetIndexes is now private: .#forgetIndexes
-		// assert.true(context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].has("key"));
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
 	});
 
 	it("forgetOnIndex - should set key on forget index if key exists on wallet repository clone", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).set("key", wallet);
 		assert.true(context.walletRepositoryClone.hasByIndex(Contracts.State.WalletIndexes.Usernames, "key"));
 
 		context.walletRepositoryClone.forgetOnIndex(Contracts.State.WalletIndexes.Usernames, "key");
 
 		assert.false(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
-		// @ts-ignore .forgetIndexes is now private: .#forgetIndexes
-		// assert.true(context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].has("key"));
 		assert.false(context.walletRepositoryClone.hasByIndex(Contracts.State.WalletIndexes.Usernames, "key"));
 	});
 
-	it("forgetOnIndex - should skip setting key if does not exist", (context) => {
-		context.walletRepositoryClone.forgetOnIndex(Contracts.State.WalletIndexes.Usernames, "key");
-
-		// @ts-ignore .forgetIndexes is now private: .#forgetIndexes
-		// assert.false(context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].has("key"));
-	});
-
-	it.skip("findByAddress - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", async (context) => {
+	it("findByAddress - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", async (context) => {
 		const blockchainWallet = context.walletRepositoryBlockchain.findByAddress("address");
 		assert.true(context.walletRepositoryBlockchain.hasByAddress("address"));
-		context.walletRepositoryBlockchain
-			.getIndex(Contracts.State.WalletIndexes.Usernames)
-			.set("key", blockchainWallet);
+		blockchainWallet.setAttribute("validator.username", "username");
+		context.walletRepositoryBlockchain.index(blockchainWallet);
 
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		assert.true(
+			context.walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.Usernames).has("username"),
+		);
+
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.not.equal(wallet, blockchainWallet);
-		assert.equal(wallet, blockchainWallet);
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("username"));
 	});
 
 	it("findByAddress - should create and index new wallet if does not exist in blockchain wallet repository", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getAddress(), "address");
@@ -233,10 +219,10 @@ describe<{
 		assert.false(context.walletRepositoryBlockchain.hasByAddress("address"));
 	});
 
-	it("findByAddress - should return existing wallet", async (context) => {
+	it("findByAddress - should return existing wallet", (context) => {
 		const spyOnCreateWallet = spy(context.walletRepositoryClone, "createWallet");
 
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getAddress(), "address");
@@ -252,12 +238,10 @@ describe<{
 		assert.false(context.walletRepositoryBlockchain.hasByAddress("address"));
 	});
 
-	it.skip("findByPublicKey - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", async (context) => {
+	it("findByPublicKey - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", async (context) => {
 		const blockchainWallet = await context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
-		assert.true(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
-		context.walletRepositoryBlockchain
-			.getIndex(Contracts.State.WalletIndexes.Usernames)
-			.set("key", blockchainWallet);
+		blockchainWallet.setAttribute("validator.username", "username");
+		context.walletRepositoryBlockchain.index(blockchainWallet);
 
 		const wallet = await context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
@@ -269,9 +253,8 @@ describe<{
 		assert.true(
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()),
 		);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("username"));
 
-		assert.not.equal(wallet, blockchainWallet);
 		assert.equal(wallet, blockchainWallet);
 	});
 
@@ -317,7 +300,7 @@ describe<{
 		context.walletRepositoryBlockchain.index(blockchainWallet);
 		assert.true(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
 
-		const wallet = await context.walletRepositoryClone.findByUsername("genesis_1");
+		const wallet = context.walletRepositoryClone.findByUsername("genesis_1");
 
 		assert.not.equal(wallet, blockchainWallet);
 		blockchainWallet.setPublicKey();
@@ -327,7 +310,7 @@ describe<{
 	});
 
 	it("findByUsername - should return existing wallet", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryClone.index(wallet);
 
@@ -354,7 +337,7 @@ describe<{
 	});
 
 	it("findByIndexes - should return wallet from wallet repository clone", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.equal(context.walletRepositoryClone.findByIndexes(["addresses"], "address"), wallet);
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
@@ -377,7 +360,7 @@ describe<{
 			context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, context.username),
 		);
 
-		const wallet = await context.walletRepositoryClone.findByIndex(
+		const wallet = context.walletRepositoryClone.findByIndex(
 			Contracts.State.WalletIndexes.Usernames,
 			context.username,
 		);
@@ -399,7 +382,7 @@ describe<{
 	it("findByIndex - should return existing wallet", async (context) => {
 		const spyOnCreateWallet = spy(context.walletRepositoryClone, "createWallet");
 
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", context.username);
 		context.walletRepositoryClone.index(wallet);
 
@@ -497,7 +480,7 @@ describe<{
 	});
 
 	it("hasByUsername - should return true if wallet exist in clone wallet repository", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryClone.index(wallet);
 
@@ -511,7 +494,7 @@ describe<{
 	});
 
 	it("hasByIndex - should return true if wallet exist in blockchain wallet repository", async (context) => {
-		const wallet = await context.walletRepositoryBlockchain.findByAddress("address");
+		const wallet = context.walletRepositoryBlockchain.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryBlockchain.index(wallet);
 
@@ -522,7 +505,7 @@ describe<{
 	});
 
 	it("hasByIndex - should return true if wallet exist in clone wallet repository", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryClone.index(wallet);
 
@@ -538,7 +521,7 @@ describe<{
 	});
 
 	it("hasByIndex - should return false if index is forgotten", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryClone.index(wallet);
 
@@ -551,7 +534,7 @@ describe<{
 	});
 
 	it("hasByIndex - should return false if index is forgotten bu forgetOnIndex method", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryClone.index(wallet);
 
@@ -582,10 +565,6 @@ describe<{
 		assert.true(
 			context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, "genesis_1"),
 		);
-		// assert.true(
-		// 	// @ts-ignore .forgetIndexes is now private: .#forgetIndexes
-		// 	context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].has("genesis_1"),
-		// );
 		assert.false(context.walletRepositoryClone.hasByIndex(Contracts.State.WalletIndexes.Usernames, "genesis_1"));
 	});
 
@@ -594,7 +573,7 @@ describe<{
 		blockchainWallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryBlockchain.index(blockchainWallet);
 
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 
 		assert.true(context.walletRepositoryClone.hasByIndex(Contracts.State.WalletIndexes.Usernames, "genesis_1"));
 
@@ -692,7 +671,7 @@ describe<{
 	});
 
 	it("allByUsername - should skip wallets when key is removed from index", async (context) => {
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.setAttribute("validator.username", "genesis_1");
 		context.walletRepositoryClone.index(wallet);
 
@@ -711,7 +690,7 @@ describe<{
 
 		assert.equal(context.walletRepositoryClone.allByUsername().length, 1);
 
-		const wallet = await context.walletRepositoryClone.findByAddress("address");
+		const wallet = context.walletRepositoryClone.findByAddress("address");
 		wallet.forgetAttribute("validator");
 		context.walletRepositoryClone.index(wallet);
 
@@ -748,11 +727,6 @@ describe<{
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).values().length,
 			1,
 		);
-		// assert.equal(
-		// 	// @ts-ignore .forgetIndexes is now private: .#forgetIndexes
-		// 	context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].values().length,
-		// 	1,
-		// );
 
 		context.walletRepositoryClone.reset();
 
@@ -760,17 +734,5 @@ describe<{
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).values().length,
 			0,
 		);
-		// assert.equal(
-		// 	// 	@ts-ignore .forgetIndexes is now private: .#forgetIndexes
-		// 	context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].values().length,
-		// 	0,
-		// );
-	});
-
-	it.skip("getForgetIndex - should throw error if index is not found", (context) => {
-		assert.throws(() => {
-			// @ts-ignore
-			context.walletRepositoryClone.getForgetIndex("undefined");
-		});
 	});
 });
