@@ -1,6 +1,7 @@
-import { Wallet, WalletRepository } from "../source/wallets";
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
+
+import { Wallet, WalletRepository } from "../source/wallets";
 
 export const buildValidatorAndVoteWallets = async (
 	addressFactory: Contracts.Crypto.IAddressFactory,
@@ -28,18 +29,18 @@ export const buildValidatorAndVoteWallets = async (
 		throw new Error(`Number of Test Delegates (${numberDelegates}) should not exceed ${delegateKeys.length}`);
 	}
 
-	for (let i = 0; i < numberDelegates; i++) {
-		const delegateKey = delegateKeys[i];
-		const delegate = walletRepo.createWallet(await addressFactory.fromPublicKey(delegateKey));
-		delegate.setPublicKey(delegateKey);
-		delegate.setAttribute("validator.username", `validator${i}`);
+	for (let index = 0; index < numberDelegates; index++) {
+		const delegateKey = delegateKeys[index];
+		const delegate = await walletRepo.findByPublicKey(await addressFactory.fromPublicKey(delegateKey));
+		// delegate.setPublicKey(delegateKey);
+		delegate.setAttribute("validator.username", `validator${index}`);
 		delegate.setAttribute("validator.voteBalance", BigNumber.ZERO);
 
 		// @ts-ignore
 		delegate.events = undefined;
 
-		const voter = walletRepo.createWallet(await addressFactory.fromPublicKey(voterKeys[i]));
-		const totalBalance = BigNumber.make(i + 1)
+		const voter = await walletRepo.findByPublicKey(voterKeys[index]);
+		const totalBalance = BigNumber.make(index + 1)
 			.times(1000)
 			.times(BigNumber.SATOSHI);
 		voter.setBalance(totalBalance);

@@ -11,7 +11,7 @@ import { WalletRepository } from "./wallet-repository";
 export class WalletRepositoryCopyOnWrite extends WalletRepository {
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
-	private readonly blockchainWalletRepository!: Contracts.State.WalletRepository;
+	private readonly blockchainWalletRepository!: WalletRepository;
 
 	public findByAddress(address: string): Contracts.State.Wallet {
 		if (address && !this.hasByAddress(address)) {

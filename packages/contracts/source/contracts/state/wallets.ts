@@ -7,20 +7,20 @@ import { IBlockData, IMultiSignatureAsset } from "../crypto";
 export interface WalletIndex {
 	readonly indexer: WalletIndexer;
 	readonly autoIndex: boolean;
-	index(wallet: Wallet): void;
+	index(walletHolder: WalletHolder): void;
 	has(key: string): boolean;
-	get(key: string): Wallet | undefined;
-	set(key: string, wallet: Wallet): void;
+	get(key: string): WalletHolder | undefined;
+	set(key: string, walletHolder: WalletHolder): void;
 	forget(key: string): void;
-	forgetWallet(wallet: Wallet): void;
-	entries(): ReadonlyArray<[string, Wallet]>;
-	values(): ReadonlyArray<Wallet>;
+	forgetWallet(walletHolder: WalletHolder): void;
+	entries(): ReadonlyArray<[string, WalletHolder]>;
+	values(): ReadonlyArray<WalletHolder>;
 	keys(): string[];
-	walletKeys(wallet: Wallet): string[];
+	walletKeys(walletHolder: WalletHolder): string[];
 	clear(): void;
 }
 
-export type WalletIndexer = (index: WalletIndex, wallet: Wallet) => void;
+export type WalletIndexer = (index: WalletIndex, walletHolder: WalletHolder) => void;
 
 export type WalletIndexerIndex = { name: string; indexer: WalletIndexer; autoIndex: boolean };
 
@@ -84,6 +84,11 @@ export interface Wallet {
 	clone(): Wallet;
 }
 
+export interface WalletHolder {
+	getWallet(): Wallet;
+	setWallet(wallet: Wallet): void;
+}
+
 export type WalletFactory = (address: string) => Wallet;
 
 export interface WalletValidatorAttributes {
@@ -98,9 +103,6 @@ export interface WalletValidatorAttributes {
 export type WalletMultiSignatureAttributes = IMultiSignatureAsset & { legacy?: boolean };
 
 export interface WalletRepository {
-	// TODO: use an inversify factory for wallets instead?
-	createWallet(address: string): Wallet;
-
 	reset(): void;
 
 	getIndex(name: string): WalletIndex;
@@ -143,7 +145,7 @@ export interface WalletRepository {
 
 	hasByUsername(username: string): boolean;
 
-	cloneWallet(origin: WalletRepository, wallet: Wallet): Wallet;
+	cloneWallet(origin: WalletRepository, wallet: Wallet): WalletHolder;
 }
 
 export enum SearchScope {
