@@ -79,6 +79,8 @@ export class Initialize implements Action {
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 				await this.databaseInteraction.restoreCurrentRound();
 				await this.transactionPool.readdTransactions();
+				await this.consensus.configure();
+				await this.consensus.run();
 				await this.networkMonitor.boot();
 
 				return this.blockchain.dispatch("STARTED");
@@ -89,6 +91,8 @@ export class Initialize implements Action {
 
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 				await this.databaseInteraction.restoreCurrentRound();
+				await this.consensus.configure();
+				await this.consensus.run();
 				await this.networkMonitor.boot();
 
 				return this.blockchain.dispatch("STARTED");
@@ -107,7 +111,7 @@ export class Initialize implements Action {
 			await this.transactionPool.readdTransactions();
 
 			await this.consensus.configure();
-			void this.consensus.run();
+			await this.consensus.run();
 
 			await this.networkMonitor.boot();
 
