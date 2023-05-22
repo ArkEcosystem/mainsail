@@ -42,21 +42,15 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	}
 
 	public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(Contracts.State.WalletIndexes.Addresses)
-			.values()
-			.map((walletHolder) => walletHolder.getWallet());
+		return this.allByIndex(Contracts.State.WalletIndexes.Addresses);
 	}
 
 	public allByPublicKey(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(Contracts.State.WalletIndexes.PublicKeys)
-			.values()
-			.map((walletHolder) => walletHolder.getWallet());
+		return this.allByIndex(Contracts.State.WalletIndexes.PublicKeys);
 	}
 
 	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(Contracts.State.WalletIndexes.Usernames)
-			.values()
-			.map((walletHolder) => walletHolder.getWallet());
+		return this.allByIndex(Contracts.State.WalletIndexes.Usernames);
 	}
 
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {

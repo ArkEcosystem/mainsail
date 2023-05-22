@@ -22,18 +22,6 @@ export class WalletRepositoryClone extends WalletRepository {
 		}
 	}
 
-	public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.allByIndex(Contracts.State.WalletIndexes.Addresses);
-	}
-
-	public allByPublicKey(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.allByIndex(Contracts.State.WalletIndexes.PublicKeys);
-	}
-
-	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.allByIndex(Contracts.State.WalletIndexes.Usernames);
-	}
-
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
 		this.#cloneAllByIndex(indexName);
 		return this.getIndex(indexName)
@@ -81,18 +69,6 @@ export class WalletRepositoryClone extends WalletRepository {
 		}
 
 		return false;
-	}
-
-	public hasByAddress(address: string): boolean {
-		return this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address);
-	}
-
-	public hasByPublicKey(publicKey: string): boolean {
-		return this.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
-	}
-
-	public hasByUsername(username: string): boolean {
-		return this.hasByIndex(Contracts.State.WalletIndexes.Usernames, username);
 	}
 
 	public hasByIndex(indexName: string, key: string): boolean {
