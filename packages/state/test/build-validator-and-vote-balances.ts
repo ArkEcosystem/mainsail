@@ -39,7 +39,7 @@ export const buildValidatorAndVoteWallets = async (
 		// @ts-ignore
 		delegate.events = undefined;
 
-		const voter = walletRepo.createWallet(await addressFactory.fromPublicKey(voterKeys[index]));
+		const voter = await walletRepo.findByPublicKey(voterKeys[index]);
 		const totalBalance = BigNumber.make(index + 1)
 			.times(1000)
 			.times(BigNumber.SATOSHI);

@@ -32,9 +32,6 @@ export class RoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
-
 	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
@@ -89,8 +86,7 @@ export class RoundState {
 
 			for (const [index, { balance, publicKey }] of validatorsRound.entries()) {
 				// ! find wallet by public key and clone it
-				const wallet = this.walletRepository.createWallet(await this.addressFactory.fromPublicKey(publicKey));
-				wallet.setPublicKey(publicKey);
+				const wallet = await this.walletRepository.findByPublicKey(publicKey);
 
 				const validator = {
 					round: roundInfo.round,
