@@ -22,10 +22,7 @@
 			"package": "@mainsail/crypto-key-pair-schnorr"
 		},
 		{
-			"package": "@mainsail/crypto-signature-bls12-381"
-		},
-		{
-			"package": "@mainsail/crypto-key-pair-bls12-381"
+			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
 			"package": "@mainsail/crypto-address-bech32m"

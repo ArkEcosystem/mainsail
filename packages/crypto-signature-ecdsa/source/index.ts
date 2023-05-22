@@ -1,4 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
+import { Selectors } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
 
@@ -15,8 +16,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			buffer.reset();
 
 			return Number.parseInt(lengthHex, 16) + 2;
-		});
+		})
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 
-		this.app.bind(Identifiers.Cryptography.Signature).to(Signature).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Signature).to(Signature).inSingletonScope()
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 	}
 }

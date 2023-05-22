@@ -1,0 +1,44 @@
+{
+	"name": "@mainsail/crypto-consensus-bls12-381",
+	"version": "0.0.1",
+	"description": "Consensus crypto for the Mainsail Blockchain",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@hapi/hapi": "20.1.5",
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
+		"@mainsail/crypto-signature-bls12-381": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"ajv": "8.12.0",
+		"dayjs": "1.10.7",
+		"inversify": "5.1.1",
+		"plur": "^4.0.0",
+		"reflect-metadata": "0.1.13",
+		"type-fest": "0.21.3"
+	},
+	"devDependencies": {
+		"@types/hapi__hapi": "21.0.0",
+		"@types/plur": "^3.1.0",
+		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}

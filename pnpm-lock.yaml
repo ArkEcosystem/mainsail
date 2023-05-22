@@ -563,21 +563,18 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
-      '@mainsail/crypto-signature-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-signature-bls12-381
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
@@ -1024,6 +1021,58 @@ importers:
       '@types/lodash.set':
         specifier: 4.3.2
         version: 4.3.2
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/crypto-consensus-bls12-381:
+    dependencies:
+      '@hapi/hapi':
+        specifier: 20.1.5
+        version: 20.1.5
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
+      '@mainsail/crypto-signature-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-signature-bls12-381
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      ajv:
+        specifier: 8.12.0
+        version: 8.12.0
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
+      inversify:
+        specifier: 5.1.1
+        version: 5.1.1
+      plur:
+        specifier: ^4.0.0
+        version: 4.0.0
+      reflect-metadata:
+        specifier: 0.1.13
+        version: 0.1.13
+      type-fest:
+        specifier: 0.21.3
+        version: 0.21.3
+    devDependencies:
+      '@types/hapi__hapi':
+        specifier: 21.0.0
+        version: 21.0.0
+      '@types/plur':
+        specifier: ^3.1.0
+        version: 3.1.0
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

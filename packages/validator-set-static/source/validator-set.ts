@@ -11,11 +11,12 @@ export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@tagged("type", "wallet")
 	private readonly walletKeyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
-	// TODO: use PublicKeyFactory when possible
-	@inject(Identifiers.Consensus.Identity.KeyPairFactory)
-	private readonly consensusKeyPairFactory!: Contracts.Crypto.IKeyPairFactory;
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "consensus")
+	private readonly consensusKeyPairFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	#validators: Contracts.State.Wallet[] = [];
 
@@ -31,7 +32,7 @@ export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
 				// TODO: shouldn't be an attribute
 				wallet.setAttribute(
 					"consensus.publicKey",
-					(await this.consensusKeyPairFactory.fromMnemonic(secret)).publicKey,
+					(await this.consensusKeyPairFactory.fromMnemonic(secret)),
 				);
 
 				return wallet;

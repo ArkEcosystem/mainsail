@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
@@ -12,9 +12,11 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 	private readonly poolQuery: Contracts.TransactionPool.Query;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@tagged("type", "wallet")
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "wallet")
 	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {

@@ -1,10 +1,11 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
+	@tagged("type", "wallet")
 	private readonly serializer: Contracts.Serializer.ISerializer;
 
 	public size(block: Contracts.Crypto.IBlock): number {

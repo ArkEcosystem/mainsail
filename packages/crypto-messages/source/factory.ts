@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Precommit } from "./precommit";
@@ -10,7 +10,8 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer: Contracts.Crypto.IMessageSerializer;
 
-	@inject(Identifiers.Consensus.Signature)
+	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "consensus")
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	public async makeProposal(

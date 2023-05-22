@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
+import { inject, injectable, multiInject, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -15,6 +15,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@tagged("type", "wallet")
 	protected readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};

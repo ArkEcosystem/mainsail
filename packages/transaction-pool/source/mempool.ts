@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 
@@ -11,6 +11,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@tagged("type", "wallet")
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();

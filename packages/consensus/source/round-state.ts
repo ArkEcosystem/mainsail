@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { IValidatorSetMajority } from "./types";
@@ -8,10 +8,12 @@ export class RoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Consensus.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "consensus")
 	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
-	@inject(Identifiers.Consensus.Signature)
+	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "consensus")
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	#proposal?: Contracts.Crypto.IProposal;

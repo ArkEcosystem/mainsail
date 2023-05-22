@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
@@ -6,7 +6,8 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer: Contracts.Crypto.IMessageSerializer;
 
-	@inject(Identifiers.Consensus.Signature)
+	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "consensus")
 	private readonly signature: Contracts.Crypto.ISignature;
 
 	public async verifyProposal(

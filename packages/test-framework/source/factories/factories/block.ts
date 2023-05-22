@@ -85,7 +85,7 @@ export const registerBlockFactory = async (
 				version: 1,
 			},
 			await app
-				.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+				.getTagged<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory, "type", "wallet")
 				.fromMnemonic(passphrase),
 		);
 	});
