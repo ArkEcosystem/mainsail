@@ -92,10 +92,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		throw new Error(`Wallet ${key} doesn't exist in indexes ${indexes.join(", ")}`);
 	}
 
-	public has(key: string): boolean {
-		return Object.values(this.indexes).some((index) => index.has(key));
-	}
-
 	public hasByAddress(address: string): boolean {
 		return this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address);
 	}

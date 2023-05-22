@@ -60,16 +60,6 @@ export class WalletRepositoryClone extends WalletRepository {
 		return this.cloneWallet(this.blockchainWalletRepository, walletToClone).getWallet();
 	}
 
-	public has(key: string): boolean {
-		for (const indexName of this.getIndexNames()) {
-			if (this.hasByIndex(indexName, key)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public hasByIndex(indexName: string, key: string): boolean {
 		return (
 			this.getIndex(indexName).has(key) ||
