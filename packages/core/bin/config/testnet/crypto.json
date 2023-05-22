@@ -2639,11 +2639,7 @@
 			},
 			"stageTimeout": 2000,
 			"stageTimeoutIncrease": 2000,
-			"vendorFieldLength": 255,
-			"walletKeyPair": "schnorr",
-			"walletSignature": "schnorr",
-			"consensusKeyPair": "bls12-381",
-			"consensusSignature": "bls12-381"
+			"vendorFieldLength": 255
 		},
 		{
 			"height": 75600,
