@@ -66,7 +66,11 @@ export const registerBlockFactory = async (
 		return app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 			{
 				generatorPublicKey: await app
-					.getTagged<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory, "type", "wallet")
+					.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+						Identifiers.Cryptography.Identity.PublicKeyFactory,
+						"type",
+						"wallet",
+					)
 					.fromMnemonic(passphrase),
 				height: previousBlock.height + 1,
 				numberOfTransactions: transactions.length,
@@ -85,7 +89,11 @@ export const registerBlockFactory = async (
 				version: 1,
 			},
 			await app
-				.getTagged<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory, "type", "wallet")
+				.getTagged<Contracts.Crypto.IKeyPairFactory>(
+					Identifiers.Cryptography.Identity.KeyPairFactory,
+					"type",
+					"wallet",
+				)
 				.fromMnemonic(passphrase),
 		);
 	});

@@ -20,7 +20,11 @@ export class Generator {
 		}
 
 		const keys: Contracts.Crypto.IKeyPair = await this.app
-			.getTagged<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory, "type", "wallet")
+			.getTagged<Contracts.Crypto.IKeyPairFactory>(
+				Identifiers.Cryptography.Identity.KeyPairFactory,
+				"type",
+				"wallet",
+			)
 			.fromMnemonic(mnemonic);
 
 		return {

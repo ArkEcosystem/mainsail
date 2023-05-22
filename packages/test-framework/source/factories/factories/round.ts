@@ -23,7 +23,11 @@ export const registerRoundFactory = async (
 				passphrases.map(
 					async (passphrase: string) =>
 						await app
-							.getTagged<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory, "type", "wallet")
+							.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+								Identifiers.Cryptography.Identity.PublicKeyFactory,
+								"type",
+								"wallet",
+							)
 							.fromMnemonic(passphrase),
 				),
 			));

@@ -18,7 +18,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		// TODO: these are validators running on "this" node
 		const keyPairFactory = this.app.getTagged<Contracts.Crypto.IKeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPairFactory, "type", "consensus"
+			Identifiers.Cryptography.Identity.KeyPairFactory,
+			"type",
+			"consensus",
 		);
 
 		const keyPairs = await Promise.all(

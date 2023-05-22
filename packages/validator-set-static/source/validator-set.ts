@@ -30,10 +30,7 @@ export class ValidatorSet implements Contracts.Consensus.IValidatorSet {
 				const wallet = await this.walletRepository.findByPublicKey(keyPair.publicKey);
 
 				// TODO: shouldn't be an attribute
-				wallet.setAttribute(
-					"consensus.publicKey",
-					(await this.consensusKeyPairFactory.fromMnemonic(secret)),
-				);
+				wallet.setAttribute("consensus.publicKey", await this.consensusKeyPairFactory.fromMnemonic(secret));
 
 				return wallet;
 			}),

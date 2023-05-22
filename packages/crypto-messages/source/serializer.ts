@@ -28,10 +28,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-						signature: {
-							type: "hash",
-						},
-					}),
+							signature: {
+								type: "hash",
+							},
+					  }),
 
 				// block: {
 				// 	type: "block",
@@ -64,10 +64,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-						signature: {
-							type: "hash",
-						},
-					}),
+							signature: {
+								type: "hash",
+							},
+					  }),
 			},
 		});
 	}
@@ -96,10 +96,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-						signature: {
-							type: "hash",
-						},
-					}),
+							signature: {
+								type: "hash",
+							},
+					  }),
 			},
 		});
 	}

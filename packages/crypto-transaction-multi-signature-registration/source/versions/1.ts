@@ -65,7 +65,9 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
 		const buff: ByteBuffer = ByteBuffer.fromSize(
-			2 + publicKeys.length * this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet"),
+			2 +
+				publicKeys.length *
+					this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet"),
 		);
 
 		buff.writeUint8(min);
