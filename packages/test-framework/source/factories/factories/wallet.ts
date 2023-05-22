@@ -27,7 +27,11 @@ export const registerWalletFactory = async (
 		);
 		wallet.setPublicKey(
 			await app
-				.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
+				.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+					Identifiers.Cryptography.Identity.PublicKeyFactory,
+					"type",
+					"wallet",
+				)
 				.fromMnemonic(passphrase),
 		);
 		return wallet;

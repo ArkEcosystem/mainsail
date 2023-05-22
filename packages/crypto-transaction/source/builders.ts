@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
@@ -16,6 +16,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	protected readonly factory: TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@tagged("type", "wallet")
 	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Signer)

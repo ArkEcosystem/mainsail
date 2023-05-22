@@ -1,3 +1,4 @@
+import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -9,12 +10,31 @@ import { PublicKeySerializer } from "./serializer";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(32);
+		this.app
+			.bind(Identifiers.Cryptography.Size.PublicKey)
+			.toConstantValue(32)
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 
-		this.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Identity.PrivateKeyFactory).to(PrivateKeyFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Identity.PublicKeySerializer).to(PublicKeySerializer).inSingletonScope();
+		this.app
+			.bind(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.to(KeyPairFactory)
+			.inSingletonScope()
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
+		this.app
+			.bind(Identifiers.Cryptography.Identity.PrivateKeyFactory)
+			.to(PrivateKeyFactory)
+			.inSingletonScope()
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
+		this.app
+			.bind(Identifiers.Cryptography.Identity.PublicKeyFactory)
+			.to(PublicKeyFactory)
+			.inSingletonScope()
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
+		this.app
+			.bind(Identifiers.Cryptography.Identity.PublicKeySerializer)
+			.to(PublicKeySerializer)
+			.inSingletonScope()
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 
 		this.#registerSchemas();
 	}

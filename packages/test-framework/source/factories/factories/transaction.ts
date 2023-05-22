@@ -132,7 +132,11 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 				.votesAsset([
 					options.publicKey ||
 						(await app
-							.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
+							.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+								Identifiers.Cryptography.Identity.PublicKeyFactory,
+								"type",
+								"wallet",
+							)
 							.fromMnemonic(secrets[1])),
 				]),
 			options,
@@ -151,7 +155,11 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 				.unvotesAsset([
 					options.publicKey ||
 						(await app
-							.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
+							.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+								Identifiers.Cryptography.Identity.PublicKeyFactory,
+								"type",
+								"wallet",
+							)
 							.fromMnemonic(secrets[1])),
 				]),
 			options,
@@ -164,8 +172,10 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 
 export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("MultiSignature", async ({ options }: { options: MultiSignatureOptions }) => {
-		const publicKeyFactory = app.get<Contracts.Crypto.IPublicKeyFactory>(
+		const publicKeyFactory = app.getTagged<Contracts.Crypto.IPublicKeyFactory>(
 			Identifiers.Cryptography.Identity.PublicKeyFactory,
+			"type",
+			"wallet",
 		);
 
 		const publicKeys: string[] = options.publicKeys || [

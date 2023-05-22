@@ -17,8 +17,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
 
 		// TODO: these are validators running on "this" node
-		const keyPairFactory = this.app.get<Contracts.Crypto.IKeyPairFactory>(
-			Identifiers.Consensus.Identity.KeyPairFactory,
+		const keyPairFactory = this.app.getTagged<Contracts.Crypto.IKeyPairFactory>(
+			Identifiers.Cryptography.Identity.KeyPairFactory,
+			"type",
+			"consensus",
 		);
 
 		const keyPairs = await Promise.all(

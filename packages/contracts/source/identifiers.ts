@@ -21,20 +21,9 @@ export const Identifiers = {
 	Consensus: {
 		Broadcaster: Symbol.for("Broadcaster<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
-		Identity: {
-			KeyPairFactory: Symbol.for("Crypto<Consensus.Identity.KeyPairFactory>"),
-			PrivateKeyFactory: Symbol.for("Crypto<Consensus.Identity.PrivateKeyFactory>"),
-			PublicKeyFactory: Symbol.for("Crypto<Consensus.Identity.PublicKeyFactory>"),
-			PublicKeySerializer: Symbol.for("Crypto<Consensus.Identity.PublicKeySerializer>"),
-		},
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
-		Signature: Symbol.for("Crypto<Consensus.Signature>"),
-		Size: {
-			PublicKey: Symbol.for("Crypto<Consensus.Size.PublicKey>"),
-			Signature: Symbol.for("Crypto<Consensus.Size.Signature>"),
-		},
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),

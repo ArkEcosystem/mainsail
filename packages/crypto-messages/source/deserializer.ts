@@ -1,11 +1,12 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
+	@tagged("type", "consensus")
 	private readonly serializer: Contracts.Serializer.ISerializer;
 
 	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.IProposal> {

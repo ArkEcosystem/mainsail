@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
@@ -13,9 +13,11 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	@tagged("type", "wallet")
 	private readonly publicKeySerializer: Contracts.Crypto.IPublicKeySerializer;
 
 	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "wallet")
 	private readonly signatureSerializer: Contracts.Crypto.ISignature;
 
 	public async deserialize(serialized: string | Buffer): Promise<Contracts.Crypto.ITransaction> {

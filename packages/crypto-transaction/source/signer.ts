@@ -1,10 +1,11 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { numberToHex } from "@mainsail/utils";
 
 @injectable()
 export class Signer {
 	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "wallet")
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)

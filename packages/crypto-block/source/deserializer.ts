@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer } from "@mainsail/utils";
@@ -15,6 +15,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 	private readonly transactionFactory: TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Serializer)
+	@tagged("type", "wallet")
 	private readonly serializer: Contracts.Serializer.ISerializer;
 
 	public async deserialize(

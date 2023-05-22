@@ -47,7 +47,7 @@ export class VoteTransaction extends Transaction {
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
-		const publicKeySize = this.app.get<number>(Identifiers.Cryptography.Size.PublicKey);
+		const publicKeySize = this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet");
 		const buff: ByteBuffer = ByteBuffer.fromSize(
 			1 + 1 + publicKeySize * data.asset.votes.length + publicKeySize * data.asset.unvotes.length,
 		);
@@ -66,7 +66,7 @@ export class VoteTransaction extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 		data.asset = { unvotes: [], votes: [] };
-		const publicKeySize = this.app.get<number>(Identifiers.Cryptography.Size.PublicKey);
+		const publicKeySize = this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet");
 
 		const votelength: number = buf.readUint8();
 		for (let index = 0; index < votelength; index++) {

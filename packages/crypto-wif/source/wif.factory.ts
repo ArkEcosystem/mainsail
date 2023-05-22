@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import wif from "wif";
 
@@ -8,6 +8,7 @@ export class WIFFactory implements Contracts.Crypto.IWIFFactory {
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@tagged("type", "wallet")
 	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {

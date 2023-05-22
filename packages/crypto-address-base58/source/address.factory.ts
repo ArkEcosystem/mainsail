@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { RIPEMD160, SHA256 } from "bcrypto";
 import { base58 } from "bstring";
@@ -9,9 +9,11 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@tagged("type", "wallet")
 	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "wallet")
 	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {

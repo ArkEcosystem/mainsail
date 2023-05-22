@@ -1,4 +1,4 @@
-import { inject } from "@mainsail/container";
+import { inject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -27,6 +27,7 @@ export class TransactionFactory {
 	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "wallet")
 	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	protected builder: any;

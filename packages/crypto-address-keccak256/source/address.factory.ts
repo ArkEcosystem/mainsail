@@ -1,10 +1,11 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ethers } from "ethers";
 
 @injectable()
 export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@tagged("type", "wallet")
 	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
