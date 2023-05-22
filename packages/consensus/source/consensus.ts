@@ -44,11 +44,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#validValue: undefined;
 	#validRound = -1;
 
-	public async configure(): Promise<Consensus> {
+	public async configure(): Promise<void> {
 		const lastBlock = await this.database.getLastBlock();
 		this.#height = lastBlock.data.height + 1;
-
-		return this;
 	}
 
 	public getState(): Record<string, unknown> {
