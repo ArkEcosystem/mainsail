@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class WalletHolder {
+export class WalletHolder implements Contracts.State.WalletHolder {
 	#wallet: Contracts.State.Wallet;
 
 	public constructor(wallet: Contracts.State.Wallet) {

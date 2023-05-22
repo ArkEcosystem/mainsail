@@ -84,6 +84,11 @@ export interface Wallet {
 	clone(): Wallet;
 }
 
+export interface WalletHolder {
+	getWallet(): Wallet;
+	setWallet(wallet: Wallet): void;
+}
+
 export type WalletFactory = (address: string) => Wallet;
 
 export interface WalletValidatorAttributes {
