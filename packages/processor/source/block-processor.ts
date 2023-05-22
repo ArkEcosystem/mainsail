@@ -54,7 +54,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			return this.app.resolve<IncompatibleTransactionsHandler>(IncompatibleTransactionsHandler).execute();
 		}
 
-		if (this.#blockContainsOutOfOrderNonce(block)) {
+		if (await this.#blockContainsOutOfOrderNonce(block)) {
 			return this.app.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler).execute();
 		}
 
@@ -167,7 +167,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return false;
 	}
 
-	#blockContainsOutOfOrderNonce(block: Contracts.Crypto.IBlock): boolean {
+	async #blockContainsOutOfOrderNonce(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		const nonceBySender = {};
 
 		for (const transaction of block.transactions) {
@@ -182,7 +182,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			const sender: string = data.senderPublicKey;
 
 			if (nonceBySender[sender] === undefined) {
-				nonceBySender[sender] = this.walletRepository.getNonce(sender);
+				const wallet = await this.walletRepository.findByPublicKey(sender);
+				nonceBySender[sender] = wallet.getNonce();
 			}
 
 			AppUtils.assert.defined<string>(data.nonce);

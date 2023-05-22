@@ -1,7 +1,6 @@
 import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../crypto-config";
@@ -397,25 +396,6 @@ describe<{
 		}, "Wallet genesis_1 doesn't exist in index usernames");
 	});
 
-	it("has - should return true if key exist in blockchain wallet repository", (context) => {
-		context.walletRepositoryBlockchain.findByAddress("address");
-
-		assert.true(context.walletRepositoryBlockchain.has("address"));
-		assert.true(context.walletRepositoryClone.has("address"));
-	});
-
-	it("has - should return true if key exist in clone wallet repository", (context) => {
-		context.walletRepositoryClone.findByAddress("address");
-
-		assert.false(context.walletRepositoryBlockchain.has("address"));
-		assert.true(context.walletRepositoryClone.has("address"));
-	});
-
-	it("has - should return false if key does not exist in clone wallet repository", (context) => {
-		assert.false(context.walletRepositoryBlockchain.has("address"));
-		assert.false(context.walletRepositoryClone.has("address"));
-	});
-
 	it("hasByAddress - should return true if wallet exist in blockchain wallet repository", (context) => {
 		context.walletRepositoryBlockchain.findByAddress("address");
 
@@ -571,43 +551,6 @@ describe<{
 		context.walletRepositoryClone.index(wallet);
 
 		assert.true(context.walletRepositoryClone.hasByIndex(Contracts.State.WalletIndexes.Usernames, "genesis_1"));
-	});
-
-	it("getNonce - should return 0 if wallet does not exists", async (context) => {
-		assert.equal(await context.walletRepositoryClone.getNonce(context.publicKey), BigNumber.ZERO);
-	});
-
-	it("getNonce - should return nonce if wallet exists only in blockchain wallet repository", async (context) => {
-		const wallet = await context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
-		wallet.setNonce(BigNumber.make("10"));
-
-		assert.equal(await context.walletRepositoryClone.getNonce(context.publicKey), BigNumber.make("10"));
-		assert.true(
-			context.walletRepositoryBlockchain
-				.getIndex(Contracts.State.WalletIndexes.PublicKeys)
-				.has(context.publicKey),
-		);
-		assert.false(
-			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey),
-		);
-	});
-
-	it("getNonce - should return nonce if wallet exists on copy wallet repository", async (context) => {
-		const blockchainWallet = await context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
-		blockchainWallet.setNonce(BigNumber.make("10"));
-
-		const wallet = await context.walletRepositoryClone.findByPublicKey(context.publicKey);
-		wallet.setNonce(BigNumber.make("20"));
-
-		assert.equal(await context.walletRepositoryClone.getNonce(context.publicKey), BigNumber.make("20"));
-		assert.true(
-			context.walletRepositoryBlockchain
-				.getIndex(Contracts.State.WalletIndexes.PublicKeys)
-				.has(context.publicKey),
-		);
-		assert.true(
-			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey),
-		);
 	});
 
 	it("allByAddress - should return all wallets from clone and blockchain wallet repository by address", (context) => {

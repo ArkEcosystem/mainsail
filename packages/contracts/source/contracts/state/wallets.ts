@@ -105,8 +105,6 @@ export type WalletMultiSignatureAttributes = IMultiSignatureAsset & { legacy?: b
 export interface WalletRepository {
 	reset(): void;
 
-	getIndex(name: string): WalletIndex;
-
 	allByAddress(): ReadonlyArray<Wallet>;
 
 	allByPublicKey(): ReadonlyArray<Wallet>;
@@ -117,12 +115,6 @@ export interface WalletRepository {
 
 	findByAddress(address: string): Wallet;
 
-	has(key: string): boolean;
-
-	hasByIndex(indexName: string, key: string): boolean;
-
-	getIndexNames(): string[];
-
 	findByPublicKey(publicKey: string): Promise<Wallet>;
 
 	findByUsername(username: string): Wallet;
@@ -131,21 +123,23 @@ export interface WalletRepository {
 
 	findByIndexes(indexes: string[], key: string): Wallet;
 
-	getNonce(publicKey: string): Promise<BigNumber>;
-
-	index(wallet: Wallet): void;
-
-	setOnIndex(index: string, key: string, wallet: Wallet): void;
-
-	forgetOnIndex(index: string, key: string): void;
-
 	hasByAddress(address: string): boolean;
 
 	hasByPublicKey(publicKey: string): boolean;
 
 	hasByUsername(username: string): boolean;
 
-	cloneWallet(origin: WalletRepository, wallet: Wallet): WalletHolder;
+	hasByIndex(indexName: string, key: string): boolean;
+
+	getIndex(name: string): WalletIndex;
+
+	getIndexNames(): string[];
+
+	index(wallet: Wallet): void;
+
+	setOnIndex(index: string, key: string, wallet: Wallet): void;
+
+	forgetOnIndex(index: string, key: string): void;
 }
 
 export enum SearchScope {

@@ -1,6 +1,5 @@
 import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 
 import { WalletHolder } from "./wallet-holder";
 import { WalletIndex } from "./wallet-index";
@@ -93,10 +92,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		throw new Error(`Wallet ${key} doesn't exist in indexes ${indexes.join(", ")}`);
 	}
 
-	public has(key: string): boolean {
-		return Object.values(this.indexes).some((index) => index.has(key));
-	}
-
 	public hasByAddress(address: string): boolean {
 		return this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address);
 	}
@@ -111,14 +106,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public hasByIndex(indexName: string, key: string): boolean {
 		return this.getIndex(indexName).has(key);
-	}
-
-	public async getNonce(publicKey: string): Promise<BigNumber> {
-		if (this.hasByPublicKey(publicKey)) {
-			return (await this.findByPublicKey(publicKey)).getNonce();
-		}
-
-		return BigNumber.ZERO;
 	}
 
 	public index(wallets: Contracts.State.Wallet | Contracts.State.Wallet[]): void {
@@ -147,7 +134,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		}
 	}
 
-	public cloneWallet(origin: WalletRepository, wallet: Contracts.State.Wallet): Contracts.State.WalletHolder {
+	protected cloneWallet(origin: WalletRepository, wallet: Contracts.State.Wallet): Contracts.State.WalletHolder {
 		const walletHolder = origin.findHolder(wallet);
 		const walletHolderClone = new WalletHolder(wallet.clone());
 

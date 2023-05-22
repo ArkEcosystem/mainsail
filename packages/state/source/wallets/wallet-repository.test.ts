@@ -1,5 +1,4 @@
 import { Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 
 import { describe } from "../../../test-framework";
 import { setUp } from "../../test/setup";
@@ -47,12 +46,10 @@ describe<{
 		const wallet = walletRepo.findByAddress(address);
 
 		assert.equal(walletRepo.findByAddress(address), wallet);
-		assert.true(walletRepo.has(address));
+		assert.true(walletRepo.hasByAddress(address));
 
 		assert.equal(walletRepo.findByIndex("addresses", address), wallet);
 		const nonExistingAddress = "abcde";
-		assert.true(walletRepo.has(address));
-		assert.false(walletRepo.has(nonExistingAddress));
 		assert.true(walletRepo.hasByAddress(address));
 		assert.false(walletRepo.hasByAddress(nonExistingAddress));
 		assert.true(walletRepo.hasByIndex("addresses", address));
@@ -63,8 +60,8 @@ describe<{
 
 	it("should create a wallet if one is not found during address lookup", ({ walletRepo }) => {
 		assert.not.throws(() => walletRepo.findByAddress("hello"));
+		assert.true(walletRepo.hasByAddress("hello"));
 		assert.instance(walletRepo.findByAddress("iDontExist"), Wallet);
-		assert.true(walletRepo.has("hello"));
 		assert.true(walletRepo.hasByAddress("iDontExist"));
 
 		const errorMessage = "Wallet iAlsoDontExist doesn't exist in index addresses";
@@ -81,8 +78,6 @@ describe<{
 
 		const nonExistingPublicKey = "98727416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
 
-		assert.true(walletRepo.has(publicKey));
-		assert.false(walletRepo.has(nonExistingPublicKey));
 		assert.true(walletRepo.hasByPublicKey(publicKey));
 		assert.false(walletRepo.hasByPublicKey(nonExistingPublicKey));
 		assert.true(walletRepo.hasByIndex("publicKeys", publicKey));
@@ -110,8 +105,6 @@ describe<{
 		assert.equal(walletRepo.findByIndex("usernames", username), wallet);
 
 		const nonExistingUsername = "iDontExistAgain";
-		assert.true(walletRepo.has(username));
-		assert.false(walletRepo.has(nonExistingUsername));
 		assert.true(walletRepo.hasByUsername(username));
 		assert.false(walletRepo.hasByUsername(nonExistingUsername));
 		assert.true(walletRepo.hasByIndex("usernames", username));
@@ -123,9 +116,9 @@ describe<{
 	it("should be able to index forgotten wallets", ({ walletRepo }) => {
 		const wallet1 = walletRepo.findByAddress("wallet1");
 		walletRepo.index(wallet1);
-		assert.true(walletRepo.has("wallet1"));
+		assert.true(walletRepo.hasByAddress("wallet1"));
 		walletRepo.index(wallet1);
-		assert.true(walletRepo.has("wallet1"));
+		assert.true(walletRepo.hasByAddress("wallet1"));
 	});
 
 	it("should throw if indexing differnet wallet with same address", ({ walletRepo }) => {
@@ -141,21 +134,7 @@ describe<{
 		walletRepo.index(wallet1);
 		// @ts-ignore
 		wallet1.publicKey = undefined;
-		assert.false(walletRepo.has("wallet2"));
-	});
-
-	it("#getNonce - should get the nonce of a wallet", async ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-		wallet1.setNonce(BigNumber.make(100));
-		wallet1.setPublicKey("02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34");
-		walletRepo.index(wallet1);
-
-		assert.equal(await walletRepo.getNonce(wallet1.getPublicKey()!), BigNumber.make(100));
-	});
-
-	it("#getNonce - should return 0 nonce if there is no wallet", async ({ walletRepo }) => {
-		const publicKey = "03c075494ad044ab8c0b2dc7ccd19f649db844a4e558e539d3ac2610c4b90a5139";
-		assert.equal(await walletRepo.getNonce(publicKey), BigNumber.ZERO);
+		assert.false(walletRepo.hasByAddress("wallet2"));
 	});
 
 	it("should throw when looking up a username which doesn't exist", ({ walletRepo }) => {
