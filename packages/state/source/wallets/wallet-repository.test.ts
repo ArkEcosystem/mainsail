@@ -128,6 +128,14 @@ describe<{
 		assert.true(walletRepo.has("wallet1"));
 	});
 
+	it("should throw if indexing differnet wallet with same address", ({ walletRepo }) => {
+		const wallet1 = walletRepo.findByAddress("wallet1");
+
+		const wallet2 = wallet1.clone();
+
+		assert.throws(() => walletRepo.index(wallet2), "Wallet missmatch");
+	});
+
 	it("should do nothing if forgotten wallet does not exist", ({ walletRepo }) => {
 		const wallet1 = walletRepo.findByAddress("wallet1");
 		walletRepo.index(wallet1);
