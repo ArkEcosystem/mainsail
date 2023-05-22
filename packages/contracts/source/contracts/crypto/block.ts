@@ -1,6 +1,5 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { IKeyPair } from "./identities";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
 export interface IBlockVerification {
@@ -59,7 +58,7 @@ export interface IBlockDeserializer {
 }
 
 export interface IBlockFactory {
-	make(data: any, keys: IKeyPair): Promise<IBlock | undefined>;
+	make(data: any): Promise<IBlock | undefined>;
 
 	fromHex(hex: string): Promise<IBlock>;
 

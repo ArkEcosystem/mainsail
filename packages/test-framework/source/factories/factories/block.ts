@@ -63,38 +63,29 @@ export const registerBlockFactory = async (
 
 		const passphrase = options.passphrase || secrets[0];
 
-		return app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make(
-			{
-				generatorPublicKey: await app
-					.getTagged<Contracts.Crypto.IPublicKeyFactory>(
-						Identifiers.Cryptography.Identity.PublicKeyFactory,
-						"type",
-						"wallet",
-					)
-					.fromMnemonic(passphrase),
-				height: previousBlock.height + 1,
-				numberOfTransactions: transactions.length,
-				payloadHash: (
-					await app
-						.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
-						.sha256(payloadBuffers)
-				).toString("hex"),
-				payloadLength: 32 * transactions.length,
-				previousBlock: previousBlock.id,
-				reward: options.reward || reward,
-				timestamp: options.timestamp || dayjs().unix(),
-				totalAmount: totals.amount,
-				totalFee: totals.fee,
-				transactions,
-				version: 1,
-			},
-			await app
-				.getTagged<Contracts.Crypto.IKeyPairFactory>(
-					Identifiers.Cryptography.Identity.KeyPairFactory,
+		return app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
+			generatorPublicKey: await app
+				.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+					Identifiers.Cryptography.Identity.PublicKeyFactory,
 					"type",
 					"wallet",
 				)
 				.fromMnemonic(passphrase),
-		);
+			height: previousBlock.height + 1,
+			numberOfTransactions: transactions.length,
+			payloadHash: (
+				await app
+					.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+					.sha256(payloadBuffers)
+			).toString("hex"),
+			payloadLength: 32 * transactions.length,
+			previousBlock: previousBlock.id,
+			reward: options.reward || reward,
+			timestamp: options.timestamp || dayjs().unix(),
+			totalAmount: totals.amount,
+			totalFee: totals.fee,
+			transactions,
+			version: 1,
+		});
 	});
 };

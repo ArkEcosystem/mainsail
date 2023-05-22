@@ -19,12 +19,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: Contracts.Crypto.IValidator;
 
-	public async make(
-		data: Contracts.Crypto.IBlockData,
-		keys: Contracts.Crypto.IKeyPair,
-	): Promise<Contracts.Crypto.IBlock | undefined> {
-		data.generatorPublicKey = keys.publicKey;
-
+	public async make(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock | undefined> {
 		data.id = await this.idFactory.make(data);
 
 		return this.fromData(data);
@@ -109,6 +104,9 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			}
 
 			if (fatal) {
+				console.log("Block data:", data);
+				console.trace();
+
 				throw new Exceptions.BlockSchemaError(
 					data.height,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +

@@ -19,7 +19,7 @@ export interface IScheduler {
 }
 
 export interface IValidator {
-	configure(keyPair: Contracts.Crypto.IKeyPair): IValidator;
+	configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): IValidator;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock>;
 	propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IProposal>;

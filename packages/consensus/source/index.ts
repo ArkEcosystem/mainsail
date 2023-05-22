@@ -17,18 +17,25 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
 
 		// TODO: these are validators running on "this" node
-		const keyPairFactory = this.app.getTagged<Contracts.Crypto.IKeyPairFactory>(
+		const walletPublicKeyFactory = this.app.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+			Identifiers.Cryptography.Identity.PublicKeyFactory,
+			"type",
+			"wallet",
+		);
+
+		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.IKeyPairFactory>(
 			Identifiers.Cryptography.Identity.KeyPairFactory,
 			"type",
 			"consensus",
 		);
 
-		const keyPairs = await Promise.all(
-			this.app
-				.config("validators.secrets")
-				.map(async (mnemonic: string) => await keyPairFactory.fromMnemonic(mnemonic)),
-		);
-		const validators = keyPairs.map((keyPair) => this.app.resolve<Validator>(Validator).configure(keyPair));
+		const validators: Validator[] = [];
+		for (const mnemonic of this.app.config("validators.secrets")) {
+			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(mnemonic);
+			const walletPublicKey = await walletPublicKeyFactory.fromMnemonic(mnemonic);
+
+			validators.push(this.app.resolve<Validator>(Validator).configure(walletPublicKey, consensusKeyPair));
+		}
 
 		this.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
