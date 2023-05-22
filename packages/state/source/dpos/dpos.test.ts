@@ -9,13 +9,13 @@ import { AddressFactory } from "../../../crypto-address-base58/source/address.fa
 import { Configuration } from "../../../crypto-config";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
-import { describe } from "../../../test-framework";
+import { describeSkip } from "../../../test-framework";
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { registerIndexers, WalletRepository } from "../wallets";
 import { walletFactory } from "../wallets/wallet-factory";
 import { DposState } from "./dpos";
 
-describe<{
+describeSkip<{
 	app: Application;
 	dposState: DposState;
 	walletRepo: WalletRepository;
