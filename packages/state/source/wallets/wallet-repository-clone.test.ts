@@ -396,25 +396,6 @@ describe<{
 		}, "Wallet genesis_1 doesn't exist in index usernames");
 	});
 
-	it("has - should return true if key exist in blockchain wallet repository", (context) => {
-		context.walletRepositoryBlockchain.findByAddress("address");
-
-		assert.true(context.walletRepositoryBlockchain.has("address"));
-		assert.true(context.walletRepositoryClone.has("address"));
-	});
-
-	it("has - should return true if key exist in clone wallet repository", (context) => {
-		context.walletRepositoryClone.findByAddress("address");
-
-		assert.false(context.walletRepositoryBlockchain.has("address"));
-		assert.true(context.walletRepositoryClone.has("address"));
-	});
-
-	it("has - should return false if key does not exist in clone wallet repository", (context) => {
-		assert.false(context.walletRepositoryBlockchain.has("address"));
-		assert.false(context.walletRepositoryClone.has("address"));
-	});
-
 	it("hasByAddress - should return true if wallet exist in blockchain wallet repository", (context) => {
 		context.walletRepositoryBlockchain.findByAddress("address");
 
