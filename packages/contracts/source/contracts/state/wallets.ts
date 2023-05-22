@@ -148,7 +148,7 @@ export interface WalletRepository {
 
 	hasByUsername(username: string): boolean;
 
-	cloneWallet(origin: WalletRepository, wallet: Wallet): Wallet;
+	cloneWallet(origin: WalletRepository, wallet: Wallet): WalletHolder;
 }
 
 export enum SearchScope {

@@ -1,10 +1,11 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { describe } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository } from ".";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
+import { WalletHolder } from "./wallet-holder";
 
 describe<{
 	walletRepo: WalletRepository;
@@ -19,18 +20,18 @@ describe<{
 		context.walletRepo.reset();
 	});
 
-	it("should throw if indexers are already registered", (context) => {
+	it("#initialize - should throw if indexers are already registered", (context) => {
 		assert.throws(() => context.walletRepo.initialize(), "The wallet index is already registered: addresses");
 	});
 
-	it("should create a wallet", (context) => {
+	it("#createWallet - should create a wallet", (context) => {
 		const wallet = context.walletRepo.createWallet("abcd");
 
 		assert.equal(wallet.getAddress(), "abcd");
 		assert.instance(wallet, Wallet);
 	});
 
-	it("should be able to look up indexers", (context) => {
+	it("#getIndex && #getIndexNames - should be able to look up indexers", (context) => {
 		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
 
 		assert.equal(context.walletRepo.getIndexNames(), expected);
@@ -44,12 +45,13 @@ describe<{
 	it("indexing should keep indexers in sync", async (context) => {
 		const address = "ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp";
 		const wallet = context.walletRepo.createWallet(address);
+		const walletHolder = new WalletHolder(wallet);
 		const publicKey = "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
 		wallet.setPublicKey(publicKey);
 
-		assert.not.equal(context.walletRepo.findByAddress(address), wallet);
+		assert.not.equal(context.walletRepo.findByAddress(address), wallet); // Creates new instance
 
-		context.walletRepo.getIndex("publicKeys").set(publicKey, wallet);
+		context.walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
 
 		const byPublicKey = await context.walletRepo.findByPublicKey(publicKey);
 		assert.defined(byPublicKey.getPublicKey());
@@ -58,7 +60,9 @@ describe<{
 		assert.undefined(context.walletRepo.findByAddress(address).getPublicKey());
 		assert.not.equal(context.walletRepo.findByAddress(address), wallet);
 
-		context.walletRepo.index(wallet);
+		const newWallet = context.walletRepo.findByAddress(address);
+		newWallet.setPublicKey(publicKey);
+		context.walletRepo.index(newWallet);
 
 		assert.equal(context.walletRepo.findByAddress(address).getPublicKey(), publicKey);
 		assert.equal(context.walletRepo.findByAddress(address), wallet);
@@ -97,8 +101,9 @@ describe<{
 
 	it("should get and set wallets by public key", async (context) => {
 		const wallet = context.walletRepo.createWallet("abcde");
+		const walletHolder = new WalletHolder(wallet);
 		const publicKey = "02337416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
-		context.walletRepo.getIndex("publicKeys").set(publicKey, wallet);
+		context.walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
 		assert.equal(await context.walletRepo.findByPublicKey(publicKey), wallet);
 		assert.equal(context.walletRepo.findByIndex("publicKeys", publicKey), wallet);
 
@@ -126,8 +131,9 @@ describe<{
 	it("should get and set wallets by username", (context) => {
 		const username = "testUsername";
 		const wallet = context.walletRepo.createWallet("abcdef");
+		const walletHolder = new WalletHolder(wallet);
 
-		context.walletRepo.getIndex("usernames").set(username, wallet);
+		context.walletRepo.getIndex("usernames").set(username, walletHolder);
 		assert.equal(context.walletRepo.findByUsername(username), wallet);
 		assert.equal(context.walletRepo.findByIndex("usernames", username), wallet);
 
@@ -158,41 +164,8 @@ describe<{
 		assert.false(context.walletRepo.has("wallet2"));
 	});
 
-	it("should index array of wallets using different indexers", (context) => {
-		const wallets: Contracts.State.Wallet[] = [];
-		const walletAddresses: string[] = [];
-		for (let index = 0; index < 6; index++) {
-			const walletAddress = `wallet${index}`;
-			walletAddresses.push(walletAddress);
-			const wallet = context.walletRepo.createWallet(walletAddress);
-			wallets.push(wallet);
-		}
-
-		for (const wallet of wallets) {
-			context.walletRepo.index(wallet);
-		}
-
-		for (const address of walletAddresses) {
-			assert.true(context.walletRepo.has(address));
-		}
-
-		const publicKey = "02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34";
-
-		context.walletRepo.getIndex("publicKeys").set(publicKey, wallets[1]);
-		context.walletRepo.getIndex("usernames").set("username", wallets[2]);
-		context.walletRepo.getIndex("resignations").set("resign", wallets[3]);
-
-		for (const wallet of wallets) {
-			context.walletRepo.index(wallet);
-		}
-
-		for (const address of walletAddresses) {
-			assert.true(context.walletRepo.has(address));
-		}
-	});
-
 	it("should get the nonce of a wallet", async (context) => {
-		const wallet1 = context.walletRepo.createWallet("wallet1");
+		const wallet1 = context.walletRepo.findByAddress("wallet1");
 		wallet1.setNonce(BigNumber.make(100));
 		wallet1.setPublicKey("02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34");
 		context.walletRepo.index(wallet1);

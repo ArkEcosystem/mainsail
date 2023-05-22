@@ -3,6 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
+import { WalletHolder } from "./wallet-holder";
 import { WalletIndex } from "./wallet-index";
 
 // @TODO review the implementation
@@ -45,41 +46,53 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	}
 
 	public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(Contracts.State.WalletIndexes.Addresses).values();
+		return this.getIndex(Contracts.State.WalletIndexes.Addresses)
+			.values()
+			.map((walletHolder) => walletHolder.getWallet());
 	}
 
 	public allByPublicKey(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(Contracts.State.WalletIndexes.PublicKeys).values();
+		return this.getIndex(Contracts.State.WalletIndexes.PublicKeys)
+			.values()
+			.map((walletHolder) => walletHolder.getWallet());
 	}
 
 	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(Contracts.State.WalletIndexes.Usernames).values();
+		return this.getIndex(Contracts.State.WalletIndexes.Usernames)
+			.values()
+			.map((walletHolder) => walletHolder.getWallet());
 	}
 
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(indexName).values();
+		return this.getIndex(indexName)
+			.values()
+			.map((walletHolder) => walletHolder.getWallet());
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
+		return this.findByAddressInternal(address).getWallet();
+	}
+
+	protected findByAddressInternal(address: string): Contracts.State.WalletHolder {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 		if (address && !index.has(address)) {
-			index.set(address, this.createWallet(address));
+			index.set(address, new WalletHolder(this.createWallet(address)));
 		}
-		const wallet: Contracts.State.Wallet | undefined = index.get(address);
-		AppUtils.assert.defined<Contracts.State.Wallet>(wallet);
-		return wallet;
+		const walletHolder: Contracts.State.WalletHolder | undefined = index.get(address);
+		AppUtils.assert.defined(walletHolder);
+		return walletHolder;
 	}
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		const index = this.getIndex(Contracts.State.WalletIndexes.PublicKeys);
 		if (publicKey && !index.has(publicKey)) {
-			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
-			wallet.setPublicKey(publicKey);
-			index.set(publicKey, wallet);
+			const walletHolder = this.findByAddressInternal(await this.addressFactory.fromPublicKey(publicKey));
+			walletHolder.getWallet().setPublicKey(publicKey);
+			index.set(publicKey, walletHolder);
 		}
-		const wallet: Contracts.State.Wallet | undefined = index.get(publicKey);
-		AppUtils.assert.defined<Contracts.State.Wallet>(wallet);
-		return wallet;
+		const wallet: Contracts.State.WalletHolder | undefined = index.get(publicKey);
+		AppUtils.assert.defined(wallet);
+		return wallet.getWallet();
 	}
 
 	public findByUsername(username: string): Contracts.State.Wallet {
@@ -90,7 +103,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		if (!this.hasByIndex(index, key)) {
 			throw new Error(`Wallet ${key} doesn't exist in index ${index}`);
 		}
-		return this.getIndex(index).get(key)!;
+		return this.getIndex(index).get(key)!.getWallet();
 	}
 
 	public findByIndexes(indexes: string[], key: string): Contracts.State.Wallet {
@@ -141,7 +154,9 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	}
 
 	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {
-		this.getIndex(index).set(key, wallet);
+		const walletHolder = this.findByAddressInternal(wallet.getAddress());
+
+		this.getIndex(index).set(key, walletHolder);
 	}
 
 	public forgetOnIndex(index: string, key: string): void {
@@ -157,25 +172,28 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	public cloneWallet(
 		origin: Contracts.State.WalletRepository,
 		wallet: Contracts.State.Wallet,
-	): Contracts.State.Wallet {
-		const walletClone = wallet.clone();
+	): Contracts.State.WalletHolder {
+		const walletHolder = this.findByAddressInternal(wallet.getAddress());
+		const walletHolderClone = new WalletHolder(wallet.clone());
 
 		for (const indexName of origin.getIndexNames()) {
-			const walletKeys = origin.getIndex(indexName).walletKeys(wallet);
+			const walletKeys = origin.getIndex(indexName).walletKeys(walletHolder);
 
 			const index = this.getIndex(indexName);
 			for (const key of walletKeys) {
-				index.set(key, walletClone);
+				index.set(key, walletHolderClone);
 			}
 		}
 
-		return walletClone;
+		return walletHolderClone;
 	}
 
 	protected indexWallet(wallet: Contracts.State.Wallet): void {
+		const walletHolder = this.findByAddressInternal(wallet.getAddress());
+
 		for (const index of Object.values(this.indexes).filter((index) => index.autoIndex)) {
-			index.forgetWallet(wallet);
-			index.index(wallet);
+			index.forgetWallet(walletHolder);
+			index.index(walletHolder);
 		}
 	}
 }
