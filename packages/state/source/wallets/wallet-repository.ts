@@ -1,6 +1,5 @@
 import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { WalletHolder } from "./wallet-holder";
@@ -70,8 +69,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 			walletHolder.getWallet().setPublicKey(publicKey);
 			index.set(publicKey, walletHolder);
 		}
-		const wallet: Contracts.State.WalletHolder | undefined = index.get(publicKey);
-		AppUtils.assert.defined(wallet);
+		const wallet = index.get(publicKey);
 		return wallet.getWallet();
 	}
 
@@ -170,9 +168,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		if (address && !index.has(address)) {
 			index.set(address, new WalletHolder(this.createWalletFactory(address)));
 		}
-		const walletHolder: Contracts.State.WalletHolder | undefined = index.get(address);
-		AppUtils.assert.defined(walletHolder);
-		return walletHolder;
+		return index.get(address);
 	}
 
 	protected indexWallet(wallet: Contracts.State.Wallet): void {
