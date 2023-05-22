@@ -105,8 +105,6 @@ export type WalletMultiSignatureAttributes = IMultiSignatureAsset & { legacy?: b
 export interface WalletRepository {
 	reset(): void;
 
-	has(key: string): boolean;
-
 	allByAddress(): ReadonlyArray<Wallet>;
 
 	allByPublicKey(): ReadonlyArray<Wallet>;
