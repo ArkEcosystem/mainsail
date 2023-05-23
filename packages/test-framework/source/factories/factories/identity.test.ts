@@ -1,19 +1,8 @@
-import { Contracts } from "@mainsail/contracts";
-
 import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../index";
 import { FactoryBuilder } from "../factory-builder";
+import { Identity } from "../types";
 import { registerIdentityFactory } from "./identity";
-
-interface Identity {
-	keys: Contracts.Crypto.IKeyPair;
-	publicKey: string;
-	privateKey: string;
-	address: string;
-	wif: string;
-	passphrase: string;
-	secondPassphrase?: string;
-}
 
 describe<{
 	factoryBuilder: FactoryBuilder;
@@ -25,7 +14,7 @@ describe<{
 	});
 
 	it("should make an identity with a single passphrase", async ({ factoryBuilder }) => {
-		const entity: Identity = await factoryBuilder.get("Identity").make<Identity>();
+		const entity = await factoryBuilder.get("Identity").make<Identity>();
 
 		assert.object(entity.keys);
 		assert.string(entity.keys.publicKey);

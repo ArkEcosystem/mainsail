@@ -13,7 +13,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		options: Contracts.Crypto.IMessageSerializeProposalOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(proposal, {
-			length: 2_000_000,
+			length: 4 + 4 + 48 + (options.excludeSignature ? 0 : 96),
 			// TODO
 			schema: {
 				height: {
@@ -28,10 +28,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "hash",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 
 				// block: {
 				// 	type: "block",
@@ -45,7 +45,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		options: Contracts.Crypto.IMessageSerializePrecommitOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrecommitData>(precommit, {
-			length: 2_000_000,
+			length: 4 + 4 + 48 + 48 + (options.excludeSignature ? 0 : 96),
 			// TODO
 			schema: {
 				height: {
@@ -58,16 +58,16 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					type: "publicKey",
 				},
 				blockId: {
-					type: "hash",
+					type: "publicKey",
 					required: false,
 				},
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "hash",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}
@@ -77,7 +77,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		options: Contracts.Crypto.IMessageSerializePrevoteOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
-			length: 2_000_000,
+			length: 4 + 4 + 48 + 48 + (options.excludeSignature ? 0 : 96),
 			// TODO
 			schema: {
 				height: {
@@ -90,16 +90,16 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					type: "publicKey",
 				},
 				blockId: {
-					type: "hash",
+					type: "publicKey",
 					required: false,
 				},
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "hash",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}
