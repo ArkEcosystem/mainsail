@@ -31,8 +31,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		return size;
 	}
 
-	public async serialize(block: Contracts.Crypto.IBlockData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IBlockData>(block, {
+	public async serialize(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
 			length: 2_000_000,
 			schema: {
 				version: {
@@ -72,8 +72,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		});
 	}
 
-	public async serializeWithTransactions(block: Contracts.Crypto.IBlockData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IBlockData>(block, {
+	public async serializeWithTransactions(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
 			length: 2_000_000,
 			schema: {
 				version: {
@@ -111,7 +111,6 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 				},
 				transactions: {
 					type: "transactions",
-					required: false, // @TODO: this should always have a default value but doesn't right now
 				},
 			},
 		});

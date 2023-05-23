@@ -69,12 +69,14 @@ export interface IBlockFactory {
 	fromData(data: IBlockData): Promise<IBlock | undefined>;
 }
 
+export type IBlockDataSerializable = Omit<IBlockData, "id">;
+
 export interface IBlockSerializer {
 	size(block: IBlock): number;
 
-	serialize(block: IBlockData): Promise<Buffer>;
+	serialize(block: IBlockDataSerializable): Promise<Buffer>;
 
-	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
+	serializeWithTransactions(block: IBlockDataSerializable): Promise<Buffer>;
 }
 
 export interface IBlockVerifier {
