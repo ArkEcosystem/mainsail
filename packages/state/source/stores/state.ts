@@ -199,11 +199,7 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.#lastBlocks
 			.valueSeq()
 			.reverse()
-			.map((b) => {
-				Utils.assert.defined<string>(b.data.id);
-
-				return b.data.id;
-			})
+			.map((b) => b.data.id)
 			.toArray();
 	}
 

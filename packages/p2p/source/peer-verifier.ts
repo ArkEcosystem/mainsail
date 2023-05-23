@@ -231,8 +231,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			const probesHeightById = {};
 
 			for (const b of ourBlocks) {
-				Utils.assert.defined<string>(b.data.id);
-
 				probesIdByHeight[b.data.height] = b.data.id;
 				probesHeightById[b.data.id] = b.data.height;
 			}
