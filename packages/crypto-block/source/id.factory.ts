@@ -9,7 +9,7 @@ export class IDFactory {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
-	public async make(data: Contracts.Crypto.IBlockData): Promise<string> {
+	public async make(data: Contracts.Crypto.IBlockDataSerializable): Promise<string> {
 		return (await this.hashFactory.sha256(await this.serializer.serialize(data))).toString("hex");
 	}
 }

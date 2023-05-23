@@ -158,22 +158,6 @@ describe<{
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.TransactionStorage).getKeysCount(), 2);
 	});
 
-	it("#saveBlocks - should fail to save block without id", async ({ databaseService }) => {
-		await assert.rejects(
-			() =>
-				databaseService.saveBlocks([
-					{
-						// @ts-ignore
-						data: {
-							height: 1,
-							id: undefined,
-						},
-					},
-				]),
-			"Failed to store block 1 because it has no ID.",
-		);
-	});
-
 	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {
 		assert.undefined(await databaseService.getBlock("undefined"));
 	});

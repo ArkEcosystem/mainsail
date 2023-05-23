@@ -199,11 +199,7 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.#lastBlocks
 			.valueSeq()
 			.reverse()
-			.map((b) => {
-				Utils.assert.defined<string>(b.data.id);
-
-				return b.data.id;
-			})
+			.map((b) => b.data.id)
 			.toArray();
 	}
 
@@ -227,11 +223,7 @@ export class StateStore implements Contracts.State.StateStore {
 		}
 
 		return this.getLastBlocksData(true)
-			.filter((block) => {
-				Utils.assert.defined<string>(block.id);
-
-				return idsHash[block.id];
-			})
+			.filter((block) => idsHash[block.id])
 			.toArray() as Contracts.Crypto.IBlockData[];
 	}
 

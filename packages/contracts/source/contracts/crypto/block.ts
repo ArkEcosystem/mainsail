@@ -16,7 +16,7 @@ export interface IBlock {
 }
 
 export interface IBlockData {
-	id?: string;
+	id: string;
 
 	timestamp: number;
 	version: number;
@@ -31,11 +31,11 @@ export interface IBlockData {
 	generatorPublicKey: string;
 
 	serialized?: string;
-	transactions?: ITransactionData[];
+	transactions: ITransactionData[];
 }
 
 export interface IBlockJson {
-	id?: string;
+	id: string;
 
 	timestamp: number;
 	version: number;
@@ -50,7 +50,7 @@ export interface IBlockJson {
 	generatorPublicKey: string;
 
 	serialized?: string;
-	transactions?: ITransactionJson[];
+	transactions: ITransactionJson[];
 }
 
 export interface IBlockDeserializer {
@@ -69,12 +69,14 @@ export interface IBlockFactory {
 	fromData(data: IBlockData): Promise<IBlock | undefined>;
 }
 
+export type IBlockDataSerializable = Omit<IBlockData, "id">;
+
 export interface IBlockSerializer {
 	size(block: IBlock): number;
 
-	serialize(block: IBlockData, includeSignature?: boolean): Promise<Buffer>;
+	serialize(block: IBlockDataSerializable): Promise<Buffer>;
 
-	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
+	serializeWithTransactions(block: IBlockDataSerializable): Promise<Buffer>;
 }
 
 export interface IBlockVerifier {
