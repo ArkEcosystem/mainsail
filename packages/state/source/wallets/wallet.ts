@@ -5,15 +5,20 @@ import { BigNumber } from "@mainsail/utils";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected publicKey: string | undefined;
-	protected balance: BigNumber = BigNumber.ZERO;
-	protected nonce: BigNumber = BigNumber.ZERO;
+	protected publicKey: string | undefined = undefined;
+	protected balance = BigNumber.ZERO;
+	protected nonce = BigNumber.ZERO;
+	#changed = false;
 
 	public constructor(
 		protected readonly address: string,
 		protected readonly attributes: Services.Attributes.AttributeMap,
 		protected readonly events?: Contracts.Kernel.EventDispatcher,
 	) {}
+
+	public isChanged(): boolean {
+		return this.#changed;
+	}
 
 	public getAddress(): string {
 		return this.address;
@@ -27,6 +32,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const previousValue = this.publicKey;
 
 		this.publicKey = publicKey;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: "publicKey",
@@ -45,6 +51,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const previousValue = this.balance;
 
 		this.balance = balance;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: "balance",
@@ -63,6 +70,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const previousValue = this.nonce;
 
 		this.nonce = nonce;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: "nonce",
@@ -113,6 +121,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public setAttribute<T = any>(key: string, value: T): boolean {
 		const wasSet = this.attributes.set<T>(key, value);
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: key,
@@ -128,6 +137,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const na = Symbol();
 		const previousValue = this.attributes.get(key, na);
 		const wasSet = this.attributes.forget(key);
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key,
@@ -155,7 +165,7 @@ export class Wallet implements Contracts.State.Wallet {
 		return this.hasAttribute("multiSignature");
 	}
 
-	public clone(): Contracts.State.Wallet {
+	public clone(): Wallet {
 		const cloned = new Wallet(this.address, this.attributes.clone());
 		cloned.publicKey = this.publicKey;
 		cloned.balance = this.balance;

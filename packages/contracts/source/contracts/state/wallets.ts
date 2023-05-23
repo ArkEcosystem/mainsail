@@ -55,6 +55,8 @@ export interface Wallet {
 
 	setNonce(nonce: BigNumber): void;
 
+	isChanged(): boolean;
+
 	increaseBalance(balance: BigNumber): Wallet;
 
 	decreaseBalance(balance: BigNumber): Wallet;
@@ -87,6 +89,8 @@ export interface Wallet {
 export interface WalletHolder {
 	getWallet(): Wallet;
 	setWallet(wallet: Wallet): void;
+	getOriginal(): WalletHolder | undefined;
+	clone(): WalletHolder;
 }
 
 export type WalletFactory = (address: string) => Wallet;

@@ -209,7 +209,7 @@ describe<{
 
 		const wallet = context.walletRepositoryClone.findByAddress("address");
 
-		assert.not.equal(wallet, blockchainWallet);
+		assert.equal(wallet, blockchainWallet);
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("username"));
 	});
@@ -294,8 +294,6 @@ describe<{
 
 		const wallet = context.walletRepositoryClone.findByUsername("genesis_1");
 
-		assert.not.equal(wallet, blockchainWallet);
-		blockchainWallet.setPublicKey();
 		assert.equal(wallet, blockchainWallet);
 		assert.equal(wallet.getAttribute("validator.username"), "genesis_1");
 		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
@@ -320,11 +318,10 @@ describe<{
 		const blockchainWallet = context.walletRepositoryBlockchain.findByAddress("address");
 
 		assert.equal(context.walletRepositoryBlockchain.findByIndexes(["addresses"], "address"), blockchainWallet);
-		assert.not.equal(context.walletRepositoryClone.findByIndexes(["addresses"], "address"), blockchainWallet);
+		assert.false(context.walletRepositoryClone.findByIndexes(["addresses"], "address") === blockchainWallet);
 
-		blockchainWallet.setPublicKey();
-
-		assert.equal(context.walletRepositoryClone.findByIndexes(["addresses"], "address"), blockchainWallet);
+		const wallet = context.walletRepositoryClone.findByIndexes(["addresses"], "address");
+		assert.equal(wallet, blockchainWallet);
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
 	});
 
@@ -661,5 +658,111 @@ describe<{
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).values().length,
 			0,
 		);
+	});
+
+	it("commitChanges - should commit wallet changes to the blockchain wallet repository", async (context) => {
+		context.walletRepositoryBlockchain.findByAddress("address");
+		const walletClone = context.walletRepositoryClone.findByAddress("address");
+
+		walletClone.setAttribute("validator.username", "genesis_1");
+
+		assert.false(context.walletRepositoryBlockchain.findByAddress("address").hasAttribute("validator.username"));
+		assert.true(context.walletRepositoryClone.findByAddress("address").hasAttribute("validator.username"));
+
+		context.walletRepositoryClone.commitChanges();
+
+		assert.true(context.walletRepositoryBlockchain.findByAddress("address").hasAttribute("validator.username"));
+		assert.true(context.walletRepositoryClone.findByAddress("address").hasAttribute("validator.username"));
+		assert.true(context.walletRepositoryBlockchain.findByAddress("address") === walletClone);
+	});
+
+	it("commitChanges - should create new wallets in the blockchain wallet repository", async (context) => {
+		const walletClone = context.walletRepositoryClone.findByAddress("address");
+
+		assert.false(context.walletRepositoryBlockchain.hasByAddress("address"));
+		assert.true(context.walletRepositoryClone.hasByAddress("address"));
+
+		context.walletRepositoryClone.commitChanges();
+
+		assert.true(context.walletRepositoryBlockchain.hasByAddress("address"));
+		assert.true(context.walletRepositoryClone.hasByAddress("address"));
+		assert.true(context.walletRepositoryBlockchain.findByAddress("address") === walletClone);
+	});
+
+	it("commitChanges - should sync index changes for existing wallet", async (context) => {
+		context.walletRepositoryBlockchain.findByAddress("address");
+		const walletClone = context.walletRepositoryClone.findByAddress("address");
+
+		walletClone.setAttribute("validator.username", "genesis_1");
+		context.walletRepositoryClone.index(walletClone);
+
+		assert.false(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
+
+		context.walletRepositoryClone.commitChanges();
+
+		assert.true(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryBlockchain.findByAddress("address") === walletClone);
+	});
+
+	it("commitChanges - should sync index changes for new wallet", async (context) => {
+		const walletClone = context.walletRepositoryClone.findByAddress("address");
+
+		walletClone.setAttribute("validator.username", "genesis_1");
+		context.walletRepositoryClone.index(walletClone);
+
+		assert.false(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
+
+		context.walletRepositoryClone.commitChanges();
+
+		assert.true(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryBlockchain.findByAddress("address") === walletClone);
+	});
+
+	it("commitChanges - should sync index changes for existing wallet when index value is removed", async (context) => {
+		const walletBlockchain = context.walletRepositoryBlockchain.findByAddress("address");
+		walletBlockchain.setAttribute("validator.username", "genesis_1");
+		context.walletRepositoryBlockchain.index(walletBlockchain);
+
+		const walletClone = context.walletRepositoryClone.findByAddress("address");
+
+		assert.true(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
+
+		walletClone.forgetAttribute("validator");
+		context.walletRepositoryClone.index(walletClone);
+
+		assert.true(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.false(context.walletRepositoryClone.hasByUsername("genesis_1"));
+
+		context.walletRepositoryClone.commitChanges();
+
+		assert.false(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.false(context.walletRepositoryClone.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryBlockchain.findByAddress("address") === walletClone);
+	});
+
+	it("commitChanges - should sync index changes for existing wallet when index value is set and removed only on clone", async (context) => {
+		const walletClone = context.walletRepositoryClone.findByAddress("address");
+		walletClone.setAttribute("validator.username", "genesis_1");
+		context.walletRepositoryClone.index(walletClone);
+
+		assert.false(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
+
+		walletClone.forgetAttribute("validator");
+		context.walletRepositoryClone.index(walletClone);
+
+		assert.false(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.false(context.walletRepositoryClone.hasByUsername("genesis_1"));
+
+		context.walletRepositoryClone.commitChanges();
+
+		assert.false(context.walletRepositoryBlockchain.hasByUsername("genesis_1"));
+		assert.false(context.walletRepositoryClone.hasByUsername("genesis_1"));
+		assert.true(context.walletRepositoryBlockchain.findByAddress("address") === walletClone);
 	});
 });
