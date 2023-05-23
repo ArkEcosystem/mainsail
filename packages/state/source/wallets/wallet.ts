@@ -137,10 +137,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const na = Symbol();
 		const previousValue = this.attributes.get(key, na);
 		const wasSet = this.attributes.forget(key);
-
-		if (wasSet) {
-			this.changed = true;
-		}
+		this.changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key,
@@ -168,7 +165,7 @@ export class Wallet implements Contracts.State.Wallet {
 		return this.hasAttribute("multiSignature");
 	}
 
-	public clone(): Contracts.State.Wallet {
+	public clone(): Wallet {
 		const cloned = new Wallet(this.address, this.attributes.clone());
 		cloned.publicKey = this.publicKey;
 		cloned.balance = this.balance;

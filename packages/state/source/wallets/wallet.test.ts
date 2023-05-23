@@ -26,19 +26,23 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.undefined(wallet.getPublicKey());
+		assert.false(wallet.isChanged());
 
 		wallet.setPublicKey("publicKey");
 		assert.equal(wallet.getPublicKey(), "publicKey");
+		assert.true(wallet.isChanged());
 	});
 
-	it.only("should set and get balance", (context) => {
+	it("should set and get balance", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
+		assert.false(wallet.isChanged());
 
 		wallet.setBalance(BigNumber.ONE);
 		assert.equal(wallet.getBalance(), BigNumber.ONE);
+		assert.true(wallet.isChanged());
 	});
 
 	it("should set and get nonce", (context) => {
@@ -46,9 +50,11 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
+		assert.false(wallet.isChanged());
 
 		wallet.setNonce(BigNumber.ONE);
 		assert.equal(wallet.getNonce(), BigNumber.ONE);
+		assert.true(wallet.isChanged());
 	});
 
 	it("should increase balance", (context) => {
@@ -56,9 +62,11 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
+		assert.false(wallet.isChanged());
 
 		assert.equal(wallet.increaseBalance(BigNumber.ONE), wallet);
 		assert.equal(wallet.getBalance(), BigNumber.ONE);
+		assert.true(wallet.isChanged());
 	});
 
 	it("should decrease balance", (context) => {
@@ -66,8 +74,11 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
+		assert.false(wallet.isChanged());
+
 		assert.equal(wallet.decreaseBalance(BigNumber.ONE), wallet);
 		assert.equal(wallet.getBalance(), BigNumber.make("-1"));
+		assert.true(wallet.isChanged());
 	});
 
 	it("should increase nonce", (context) => {
@@ -75,10 +86,12 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
+		assert.false(wallet.isChanged());
 
 		wallet.increaseNonce();
 
 		assert.equal(wallet.getNonce(), BigNumber.ONE);
+		assert.true(wallet.isChanged());
 	});
 
 	it("should decrease nonce", (context) => {
@@ -86,9 +99,11 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
+		assert.false(wallet.isChanged());
 
 		wallet.decreaseNonce();
 		assert.equal(wallet.getNonce(), BigNumber.make("-1"));
+		assert.true(wallet.isChanged());
 	});
 
 	it("should get, set and forget custom attributes", (context) => {
@@ -99,8 +114,11 @@ describe<{
 		const address = "Abcde";
 		const wallet = new Wallet(address, custromAttributeMap);
 		const testAttribute = { test: true };
+
+		assert.false(wallet.isChanged());
 		wallet.setAttribute("customAttribute", testAttribute);
 
+		assert.true(wallet.isChanged());
 		assert.true(wallet.hasAttribute("customAttribute"));
 		assert.equal(wallet.getAttribute("customAttribute"), testAttribute);
 
@@ -114,13 +132,47 @@ describe<{
 		assert.throws(() => wallet.getAttribute("customAttribute"));
 	});
 
+	it("should set is changed when forget known attributes", (context) => {
+		const customAttributeSet = getWalletAttributeSet();
+		customAttributeSet.set("customAttribute");
+		const custromAttributeMap = new Services.Attributes.AttributeMap(customAttributeSet);
+
+		const address = "Abcde";
+		const wallet = new Wallet(address, custromAttributeMap);
+		const testAttribute = { test: true };
+
+		wallet.setAttribute("customAttribute", testAttribute);
+
+		const clone = wallet.clone();
+		assert.false(clone.isChanged());
+
+		clone.forgetAttribute("customAttribute");
+		assert.true(clone.isChanged());
+	});
+
+	it("should set is changed when forget unknown attributes", (context) => {
+		const customAttributeSet = getWalletAttributeSet();
+		customAttributeSet.set("customAttribute");
+		const custromAttributeMap = new Services.Attributes.AttributeMap(customAttributeSet);
+
+		const address = "Abcde";
+		const wallet = new Wallet(address, custromAttributeMap);
+
+		assert.false(wallet.isChanged());
+
+		wallet.forgetAttribute("customAttribute");
+		assert.true(wallet.isChanged());
+	});
+
 	it("should get all attributes", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
 
+		assert.false(wallet.isChanged());
 		wallet.setAttribute("validator", {});
 		wallet.setAttribute("vote", {});
 
+		assert.true(wallet.isChanged());
 		assert.equal(wallet.getAttributes(), { validator: {}, vote: {} });
 	});
 
@@ -154,9 +206,16 @@ describe<{
 	it("should be cloneable", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
-		wallet.setPublicKey("test");
+		wallet.setPublicKey();
+		assert.true(wallet.isChanged());
 
-		assert.equal(wallet.clone(), wallet);
+		const clone = wallet.clone();
+
+		assert.false(clone.isChanged());
+		clone.setPublicKey();
+		assert.true(clone.isChanged());
+
+		assert.equal(clone, wallet);
 	});
 });
 
