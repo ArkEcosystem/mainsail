@@ -296,6 +296,7 @@ describe<{
 
 		assert.not.equal(wallet, blockchainWallet);
 		blockchainWallet.setPublicKey();
+		wallet.setPublicKey();
 		assert.equal(wallet, blockchainWallet);
 		assert.equal(wallet.getAttribute("validator.username"), "genesis_1");
 		assert.true(context.walletRepositoryClone.hasByUsername("genesis_1"));
@@ -324,7 +325,10 @@ describe<{
 
 		blockchainWallet.setPublicKey();
 
-		assert.equal(context.walletRepositoryClone.findByIndexes(["addresses"], "address"), blockchainWallet);
+		const wallet = context.walletRepositoryClone.findByIndexes(["addresses"], "address");
+		wallet.setPublicKey();
+
+		assert.equal(wallet, blockchainWallet);
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
 	});
 
