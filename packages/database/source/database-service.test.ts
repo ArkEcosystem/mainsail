@@ -84,7 +84,7 @@ describe<{
 		context.sandbox.app.useDataPath(dirSync().name);
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
-			info: () => {},
+			info: () => { },
 		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
@@ -156,22 +156,6 @@ describe<{
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage).getKeysCount(), 1);
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.TransactionStorage).getKeysCount(), 2);
-	});
-
-	it("#saveBlocks - should fail to save block without id", async ({ databaseService }) => {
-		await assert.rejects(
-			() =>
-				databaseService.saveBlocks([
-					{
-						// @ts-ignore
-						data: {
-							height: 1,
-							id: undefined,
-						},
-					},
-				]),
-			"Failed to store block 1 because it has no ID.",
-		);
 	});
 
 	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {

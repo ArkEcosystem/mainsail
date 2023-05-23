@@ -101,16 +101,10 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 	public async saveBlocks(blocks: Contracts.Crypto.IBlock[]): Promise<void> {
 		for (const block of blocks) {
-			const blockID: string | undefined = block.data.id;
+			if (!this.blockStorage.doesExist(block.data.id)) {
+				await this.blockStorage.put(block.data.id, Buffer.from(block.serialized, "hex"));
 
-			if (!blockID) {
-				throw new Error(`Failed to store block ${block.data.height} because it has no ID.`);
-			}
-
-			if (!this.blockStorage.doesExist(blockID)) {
-				await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
-
-				await this.blockStorageById.put(block.data.height, blockID);
+				await this.blockStorageById.put(block.data.height, block.data.id);
 
 				for (const transaction of block.transactions) {
 					await this.transactionStorage.put(transaction.data.id, transaction.serialized);

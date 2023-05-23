@@ -227,11 +227,7 @@ export class StateStore implements Contracts.State.StateStore {
 		}
 
 		return this.getLastBlocksData(true)
-			.filter((block) => {
-				Utils.assert.defined<string>(block.id);
-
-				return idsHash[block.id];
-			})
+			.filter((block) => idsHash[block.id])
 			.toArray() as Contracts.Crypto.IBlockData[];
 	}
 
