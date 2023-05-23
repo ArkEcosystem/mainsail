@@ -55,6 +55,8 @@ export interface Wallet {
 
 	setNonce(nonce: BigNumber): void;
 
+	isChanged(): boolean;
+
 	increaseBalance(balance: BigNumber): Wallet;
 
 	decreaseBalance(balance: BigNumber): Wallet;
