@@ -84,6 +84,40 @@ export class WalletRepositoryClone extends WalletRepository {
 		}
 	}
 
+	public commitChanges(): void {
+		// Replace clones with originals
+		const changedHolders = this.getIndex(Contracts.State.WalletIndexes.Addresses)
+			.values()
+			.filter((walletHolder) => walletHolder.getWallet().isChanged() || walletHolder.getOriginal() !== undefined);
+
+		for (const holder of changedHolders) {
+			const original = holder.getOriginal();
+			if (original) {
+				original.setWallet(holder.getWallet());
+			}
+		}
+
+		// Update indexes
+		for (const indexName of this.getIndexNames()) {
+			const localIndex = this.getIndex(indexName);
+			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
+
+			for (const [key, holder] of localIndex.entries()) {
+				originalIndex.set(key, holder.getOriginal() ?? holder);
+			}
+		}
+
+		// Remove from forget indexes
+		for (const indexName of this.getIndexNames()) {
+			const forgetIndex = this.#getForgetIndex(indexName);
+			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
+
+			for (const [key] of forgetIndex.entries()) {
+				originalIndex.forget(key);
+			}
+		}
+	}
+
 	protected indexWallet(wallet: Contracts.State.Wallet): void {
 		const indexKeys = {};
 		const walletHolder = this.findHolder(wallet);
