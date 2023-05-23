@@ -5,10 +5,10 @@ import { BigNumber } from "@mainsail/utils";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected publicKey: string | undefined;
+	protected publicKey: string | undefined = undefined;
 	protected balance = BigNumber.ZERO;
 	protected nonce = BigNumber.ZERO;
-	protected changed = false;
+	#changed = false;
 
 	public constructor(
 		protected readonly address: string,
@@ -17,7 +17,7 @@ export class Wallet implements Contracts.State.Wallet {
 	) {}
 
 	public isChanged(): boolean {
-		return this.changed;
+		return this.#changed;
 	}
 
 	public getAddress(): string {
@@ -32,7 +32,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const previousValue = this.publicKey;
 
 		this.publicKey = publicKey;
-		this.changed = true;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: "publicKey",
@@ -51,7 +51,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const previousValue = this.balance;
 
 		this.balance = balance;
-		this.changed = true;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: "balance",
@@ -70,7 +70,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const previousValue = this.nonce;
 
 		this.nonce = nonce;
-		this.changed = true;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: "nonce",
@@ -121,7 +121,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public setAttribute<T = any>(key: string, value: T): boolean {
 		const wasSet = this.attributes.set<T>(key, value);
-		this.changed = true;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: key,
@@ -137,7 +137,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const na = Symbol();
 		const previousValue = this.attributes.get(key, na);
 		const wasSet = this.attributes.forget(key);
-		this.changed = true;
+		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key,

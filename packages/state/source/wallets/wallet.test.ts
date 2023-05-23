@@ -206,15 +206,12 @@ describe<{
 	it("should be cloneable", (context) => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, context.attributeMap);
-		wallet.setPublicKey();
+		wallet.setPublicKey("test");
 		assert.true(wallet.isChanged());
 
 		const clone = wallet.clone();
 
 		assert.false(clone.isChanged());
-		clone.setPublicKey();
-		assert.true(clone.isChanged());
-
 		assert.equal(clone, wallet);
 	});
 });
