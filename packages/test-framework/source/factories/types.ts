@@ -1,3 +1,5 @@
+import { Contracts } from "@mainsail/contracts";
+
 export type FactoryFunctionOptions = Record<string, any>;
 
 export type FactoryFunction = ({ entity, options }: { entity?: any; options: FactoryFunctionOptions }) => Promise<any>;
@@ -41,3 +43,13 @@ export type MultiPaymentOptions = TransactionOptions & {
 		recipientId: string;
 	}[];
 };
+
+export interface Identity {
+	keys: Contracts.Crypto.IKeyPair;
+	publicKey: string;
+	privateKey: string;
+	address: string;
+	wif: string;
+	passphrase: string;
+	secondPassphrase?: string;
+}

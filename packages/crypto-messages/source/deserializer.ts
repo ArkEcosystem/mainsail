@@ -15,7 +15,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.IProposal>(buffer, proposal, {
-			length: 2_000_000,
+			length: 4 + 4 + 48 + 96,
 			// TODO
 			schema: {
 				height: {
@@ -28,7 +28,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "publicKey",
 				},
 				signature: {
-					type: "hash",
+					type: "signature",
 				},
 			},
 		});
@@ -58,7 +58,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "hash",
 				},
 				signature: {
-					type: "hash",
+					type: "signature",
 				},
 			},
 		});
@@ -88,7 +88,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "hash",
 				},
 				signature: {
-					type: "hash",
+					type: "signature",
 				},
 			},
 		});
