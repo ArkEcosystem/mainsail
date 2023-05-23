@@ -76,7 +76,11 @@ export interface Application {
 
 	isBound<T>(serviceIdentifier: Container.ServiceIdentifier<T>): boolean;
 
-	isBoundTagged<T>(serviceIdentifier: Container.ServiceIdentifier<T>, key: string | number | symbol, value: any): boolean;
+	isBoundTagged<T>(
+		serviceIdentifier: Container.ServiceIdentifier<T>,
+		key: string | number | symbol,
+		value: any,
+	): boolean;
 
 	resolve<T>(constructorFunction: Container.Newable<T>): T;
 }
