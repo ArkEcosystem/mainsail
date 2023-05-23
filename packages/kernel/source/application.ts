@@ -231,6 +231,14 @@ export class Application implements Contracts.Kernel.Application {
 		return this.container.isBound(serviceIdentifier);
 	}
 
+	public isBoundTagged<T>(
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+		key: string | number | symbol,
+		value: any,
+	): boolean {
+		return this.container.isBoundTagged(serviceIdentifier, key, value);
+	}
+
 	public resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T {
 		return this.container.resolve(constructorFunction);
 	}
