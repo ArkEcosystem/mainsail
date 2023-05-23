@@ -499,6 +499,21 @@ describe<{
 		assert.false(context.app.isBound("key"));
 	});
 
+	it("should return if bound tagged", (context) => {
+		assert.false(context.app.isBoundTagged("key", "a", "b"));
+		assert.false(context.app.isBoundTagged("key", "a", "c"));
+
+		context.app.bind("key").toConstantValue("value").whenTargetTagged("a", "b");
+
+		assert.true(context.app.isBoundTagged("key", "a", "b"));
+		assert.false(context.app.isBoundTagged("key", "a", "c"));
+
+		context.app.unbind("key");
+
+		assert.false(context.app.isBoundTagged("key", "a", "b"));
+		assert.false(context.app.isBoundTagged("key", "a", "c"));
+	});
+
 	it("should get a value from the IoC container", (context) => {
 		context.app.bind("key").toConstantValue("value");
 
