@@ -5,7 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 
 // @TODO revisit the implementation, container usage and arguments after database rework
 @injectable()
-export abstract class TransactionHandler {
+export abstract class TransactionHandler implements Contracts.Transactions.ITransactionHandler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -196,7 +196,10 @@ export abstract class TransactionHandler {
 
 	public abstract isActivated(): Promise<boolean>;
 
-	public abstract bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void>;
+	public abstract bootstrap(
+		walletRepository: Contracts.State.WalletRepository,
+		transactions: Contracts.Crypto.ITransaction[],
+	): Promise<void>;
 
 	public abstract applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,

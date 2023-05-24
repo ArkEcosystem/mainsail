@@ -1,21 +1,25 @@
 import { IMultiSignatureAsset, ITransaction, ITransactionData, TransactionConstructor } from "./crypto";
 import { EventDispatcher } from "./kernel";
-import { Wallet } from "./state";
+import { Wallet, WalletRepository } from "./state";
 
 export type TransactionHandlerConstructor = new () => ITransactionHandler;
 
 export interface ITransactionHandler {
-	verify(transaction: ITransaction): Promise<boolean>;
+	verify(walletRepository: WalletRepository, transaction: ITransaction): Promise<boolean>;
 
-	throwIfCannotBeApplied(transaction: ITransaction, sender: Wallet): Promise<void>;
+	throwIfCannotBeApplied(
+		walletRepository: WalletRepository,
+		transaction: ITransaction,
+		sender: Wallet,
+	): Promise<void>;
 
-	apply(transaction: ITransaction): Promise<void>;
+	apply(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
-	revert(transaction: ITransaction): Promise<void>;
+	revert(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
-	applyToSender(transaction: ITransaction): Promise<void>;
+	applyToSender(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
-	revertForSender(transaction: ITransaction): Promise<void>;
+	revertForSender(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
 	emitEvents(transaction: ITransaction, emitter: EventDispatcher): void;
 
@@ -36,11 +40,11 @@ export interface ITransactionHandler {
 
 	isActivated(): Promise<boolean>;
 
-	bootstrap(transactions: ITransaction[]): Promise<void>;
+	bootstrap(walletRepository: WalletRepository, transactions: ITransaction[]): Promise<void>;
 
-	applyToRecipient(transaction: ITransaction): Promise<void>;
+	applyToRecipient(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
-	revertForRecipient(transaction: ITransaction): Promise<void>;
+	revertForRecipient(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 }
 
 export interface ITransactionHandlerRegistry {
