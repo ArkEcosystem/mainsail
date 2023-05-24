@@ -8,9 +8,11 @@ export interface IBlockVerification {
 	containsMultiSignatures: boolean;
 }
 
+export type IBlockHeader = Exclude<IBlockData, "transactions">;
+
 export interface IBlock {
 	data: IBlockData;
-	header: Exclude<IBlockData, "transactions">;
+	header: IBlockHeader;
 	serialized: string;
 	transactions: ITransaction[];
 }
@@ -54,19 +56,20 @@ export interface IBlockJson {
 }
 
 export interface IBlockDeserializer {
-	deserialize(serialized: Buffer, headerOnly?: boolean): Promise<{ data: IBlockData; transactions: ITransaction[] }>;
+	deserialize(serialized: Buffer): Promise<{ data: IBlockData; transactions: ITransaction[] }>;
+	deserializeHeader(serialized: Buffer): Promise<IBlockHeader>;
 }
 
 export interface IBlockFactory {
-	make(data: any): Promise<IBlock | undefined>;
+	make(data: any): Promise<IBlock>;
 
 	fromHex(hex: string): Promise<IBlock>;
 
 	fromBytes(buff: Buffer): Promise<IBlock>;
 
-	fromJson(json: IBlockJson): Promise<IBlock | undefined>;
+	fromJson(json: IBlockJson): Promise<IBlock>;
 
-	fromData(data: IBlockData): Promise<IBlock | undefined>;
+	fromData(data: IBlockData): Promise<IBlock>;
 }
 
 export type IBlockDataSerializable = Omit<IBlockData, "id">;

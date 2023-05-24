@@ -20,61 +20,39 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 
 	public async deserialize(
 		serialized: Buffer,
-		headerOnly = false,
 	): Promise<{ data: Contracts.Crypto.IBlockData; transactions: Contracts.Crypto.ITransaction[] }> {
-		const block = {} as Contracts.Crypto.IBlockData;
-		let transactions: Contracts.Crypto.ITransaction[] = [];
-
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		await this.serializer.deserialize<Contracts.Crypto.IBlockData>(buffer, block, {
-			length: 512,
-			schema: {
-				version: {
-					type: "uint32",
-				},
-				timestamp: {
-					type: "uint32",
-				},
-				height: {
-					type: "uint32",
-				},
-				previousBlock: {
-					type: "hash",
-				},
-				numberOfTransactions: {
-					type: "uint32",
-				},
-				totalAmount: {
-					type: "bigint",
-				},
-				totalFee: {
-					type: "bigint",
-				},
-				reward: {
-					type: "bigint",
-				},
-				payloadLength: {
-					type: "uint32",
-				},
-				payloadHash: {
-					type: "hash",
-				},
-				generatorPublicKey: {
-					type: "publicKey",
-				},
-			},
-		});
+		const header = await this.#deserializeBufferHeader(buffer);
 
-		headerOnly = headerOnly || buffer.getRemainderLength() === 0;
+		const block = header as Contracts.Crypto.IBlockData;
+		let transactions: Contracts.Crypto.ITransaction[] = [];
 
-		if (!headerOnly) {
+		if (buffer.getRemainderLength() > 0) {
 			transactions = await this.#deserializeTransactions(block, buffer);
 		}
 
 		block.id = await this.idFactory.make(block);
 
 		return { data: block, transactions };
+	}
+
+	public async deserializeHeader(serialized: Buffer): Promise<Contracts.Crypto.IBlockHeader> {
+		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
+
+		const header = await this.#deserializeBufferHeader(buffer);
+
+		header.id = await this.idFactory.make(header);
+
+		return header;
+	}
+
+	async #deserializeBufferHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.IBlockHeader> {
+		const block = {} as Contracts.Crypto.IBlockHeader;
+
+		await this.serializer.deserialize<Contracts.Crypto.IBlockData>(buffer, block, this.#blockHeaderSchema);
+
+		return block;
 	}
 
 	async #deserializeTransactions(
@@ -107,4 +85,43 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 
 		return transactions;
 	}
+
+	#blockHeaderSchema: Contracts.Serializer.DeserializationConfiguration = {
+		length: 512,
+		schema: {
+			version: {
+				type: "uint32",
+			},
+			timestamp: {
+				type: "uint32",
+			},
+			height: {
+				type: "uint32",
+			},
+			previousBlock: {
+				type: "hash",
+			},
+			numberOfTransactions: {
+				type: "uint32",
+			},
+			totalAmount: {
+				type: "bigint",
+			},
+			totalFee: {
+				type: "bigint",
+			},
+			reward: {
+				type: "bigint",
+			},
+			payloadLength: {
+				type: "uint32",
+			},
+			payloadHash: {
+				type: "hash",
+			},
+			generatorPublicKey: {
+				type: "publicKey",
+			},
+		},
+	};
 }
