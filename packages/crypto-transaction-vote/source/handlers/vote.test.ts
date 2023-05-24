@@ -110,7 +110,9 @@ describe<{
 
 		const transactions = [getTransaction(["validatorPublicKey"], [])];
 
-		await assert.resolves(() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]));
+		await assert.resolves(() =>
+			handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
+		);
 
 		spyHasAttribute.calledOnce();
 		spyHasAttribute.calledWith("vote");
@@ -126,7 +128,7 @@ describe<{
 		const transactions = [getTransaction(["validatorPublicKey"], [])];
 
 		await assert.rejects(
-			() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]),
+			() => handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
 			Exceptions.AlreadyVotedError,
 		);
 
@@ -145,7 +147,9 @@ describe<{
 
 		const transactions = [getTransaction([], ["validatorPublicKey"])];
 
-		await assert.resolves(() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]));
+		await assert.resolves(() =>
+			handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
+		);
 
 		spyHasAttribute.calledOnce();
 		spyHasAttribute.calledWith("vote");
@@ -165,7 +169,7 @@ describe<{
 		const transactions = [getTransaction([], ["validatorPublicKey"])];
 
 		await assert.rejects(
-			() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]),
+			() => handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
 			Exceptions.NoVoteError,
 		);
 
@@ -185,7 +189,7 @@ describe<{
 		const transactions = [getTransaction([], ["validatorPublicKey"])];
 
 		await assert.rejects(
-			() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]),
+			() => handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
 			Exceptions.UnvoteMismatchError,
 		);
 
@@ -198,11 +202,14 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw if transaction contains 0 votes and unvotes", async ({ handler }) => {
+	it("#bootstrap -  shoudl throw if transaction contains 0 votes and unvotes", async ({
+		handler,
+		walletRepository,
+	}) => {
 		const transactions = [getTransaction([], [])];
 
 		await assert.rejects(
-			() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]),
+			() => handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
 			Exceptions.EmptyVoteError,
 		);
 
@@ -210,11 +217,11 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw on max votes exceeded", async ({ handler }) => {
+	it("#bootstrap -  shoudl throw on max votes exceeded", async ({ handler, walletRepository }) => {
 		const transactions = [getTransaction(["validatorPublicKey", "secondValidatorPublicKey"], [])];
 
 		await assert.rejects(
-			() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]),
+			() => handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
 			Exceptions.MaxVotesExceeededError,
 		);
 
@@ -222,11 +229,11 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw on max unotes exceeded", async ({ handler }) => {
+	it("#bootstrap -  shoudl throw on max unotes exceeded", async ({ handler, walletRepository }) => {
 		const transactions = [getTransaction([], ["validatorPublicKey", "secondValidatorPublicKey"])];
 
 		await assert.rejects(
-			() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]),
+			() => handler.bootstrap(walletRepository, transactions as Contracts.Crypto.ITransaction[]),
 			Exceptions.MaxUnvotesExceeededError,
 		);
 
@@ -243,6 +250,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
+				walletRepository,
 				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -263,6 +271,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -284,6 +293,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -304,6 +314,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -325,6 +336,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
+				walletRepository,
 				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -349,6 +361,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
+				walletRepository,
 				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -368,6 +381,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -387,6 +401,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -408,6 +423,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -429,6 +445,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
+				walletRepository,
 				getTransaction(["secondValidatorPublicKey"], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -446,6 +463,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction([], []) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -461,6 +479,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction(
 						["ValidatorPublicKey", "secondValidatorPublicKey"],
 						[],
@@ -479,6 +498,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
+					walletRepository,
 					getTransaction(
 						[],
 						["ValidatorPublicKey", "secondValidatorPublicKey"],
@@ -541,22 +561,26 @@ describe<{
 		});
 	});
 
-	it("throwIfCannotEnterPool - should pass", async ({ handler, poolQuery }) => {
+	it("throwIfCannotEnterPool - should pass", async ({ handler, poolQuery, walletRepository }) => {
 		const spyHas = stub(poolQuery, "has").returnValue(false);
 
 		await assert.resolves(() =>
-			handler.throwIfCannotEnterPool(getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction),
+			handler.throwIfCannotEnterPool(
+				walletRepository,
+				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+			),
 		);
 
 		spyHas.calledOnce();
 	});
 
-	it("throwIfCannotEnterPool - should throw", async ({ handler, poolQuery }) => {
+	it("throwIfCannotEnterPool - should throw", async ({ handler, poolQuery, walletRepository }) => {
 		const spyHas = stub(poolQuery, "has").returnValue(true);
 
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotEnterPool(
+					walletRepository,
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
 				),
 			Exceptions.PoolError,
@@ -570,7 +594,10 @@ describe<{
 		const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
 
 		await assert.resolves(() =>
-			handler.applyToSender(getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction),
+			handler.applyToSender(
+				walletRepository,
+				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+			),
 		);
 
 		spySuper.calledOnce();
@@ -583,7 +610,10 @@ describe<{
 		const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
 
 		await assert.resolves(() =>
-			handler.applyToSender(getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+			handler.applyToSender(
+				walletRepository,
+				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+			),
 		);
 
 		spySuper.calledOnce();
@@ -597,6 +627,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.applyToSender(
+				walletRepository,
 				getTransaction(["validatorPublicKey"], ["secondValidatorPublicKey"]) as Contracts.Crypto.ITransaction,
 			),
 		);
@@ -612,7 +643,10 @@ describe<{
 		const spySuper = stub(Handlers.TransactionHandler.prototype, "revertForSender");
 
 		await assert.resolves(() =>
-			handler.revertForSender(getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction),
+			handler.revertForSender(
+				walletRepository,
+				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+			),
 		);
 
 		spySuper.calledOnce();
@@ -625,7 +659,10 @@ describe<{
 		const spySuper = stub(Handlers.TransactionHandler.prototype, "revertForSender");
 
 		await assert.resolves(() =>
-			handler.revertForSender(getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+			handler.revertForSender(
+				walletRepository,
+				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+			),
 		);
 
 		spySuper.calledOnce();
@@ -642,6 +679,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.revertForSender(
+				walletRepository,
 				getTransaction(["validatorPublicKey"], ["secondValidatorPublicKey"]) as Contracts.Crypto.ITransaction,
 			),
 		);
@@ -652,15 +690,21 @@ describe<{
 		spySetAttribute.calledWith("vote", "secondValidatorPublicKey");
 	});
 
-	it("applyToRecipient - should pass", async ({ handler }) => {
+	it("applyToRecipient - should pass", async ({ handler, walletRepository }) => {
 		await assert.resolves(() =>
-			handler.applyToRecipient(getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction),
+			handler.applyToRecipient(
+				walletRepository,
+				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+			),
 		);
 	});
 
-	it("revertForRecipient - should pass", async ({ handler }) => {
+	it("revertForRecipient - should pass", async ({ handler, walletRepository }) => {
 		await assert.resolves(() =>
-			handler.revertForRecipient(getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction),
+			handler.revertForRecipient(
+				walletRepository,
+				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+			),
 		);
 	});
 });
