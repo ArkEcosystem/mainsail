@@ -6,6 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly walletRepository: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.PluginConfiguration)
