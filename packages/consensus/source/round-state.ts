@@ -8,6 +8,10 @@ export class RoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "clone")
+	private readonly walletRepository!: Contracts.State.WalletRepository;
+
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "consensus")
 	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
@@ -19,6 +23,10 @@ export class RoundState {
 	#proposal?: Contracts.Crypto.IProposal;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
+
+	public getWalletRepository(): Contracts.State.WalletRepository {
+		return this.walletRepository;
+	}
 
 	public setProposal(proposal: Contracts.Crypto.IProposal): void {
 		this.#proposal = proposal;
