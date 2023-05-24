@@ -57,7 +57,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
 
 		return sealBlock({
-			...(await this.deserializer.deserialize(serialized, false)),
+			...(await this.deserializer.deserialize(serialized)),
 			serialized: serialized.toString("hex"),
 		});
 	}

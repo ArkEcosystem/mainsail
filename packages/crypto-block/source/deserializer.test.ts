@@ -38,9 +38,16 @@ describe<{
 		}
 	});
 
-	it("#deserialize - should correctly deserialize a block header with transactions", async ({ deserializer }) => {
-		const deserialized = (await deserializer.deserialize(Buffer.from(serializedWithTransactions, "hex"), true))
-			.data;
+	it("#deserializeHeader - should correctly deserialize without transactions", async ({ deserializer }) => {
+		const deserialized = (await deserializer.deserializeHeader(Buffer.from(serialized, "hex")));
+
+		assertBlockData(assert, deserialized, blockData);
+
+		assert.undefined(deserialized.transactions);
+	});
+
+	it("#deserializeHeader - should correctly deserialize with transactions", async ({ deserializer }) => {
+		const deserialized = (await deserializer.deserializeHeader(Buffer.from(serializedWithTransactions, "hex")));
 
 		assertBlockData(assert, deserialized, blockDataWithTransactions);
 
