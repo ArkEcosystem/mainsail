@@ -1,8 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import clone from "lodash.clone";
 
-import crypto from "../../core/bin/config/testnet/crypto.json";
-import { describe, Factories, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import {
 	blockData,
 	blockDataJson,
@@ -17,16 +16,6 @@ import { BlockFactory } from "./factory";
 import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
 
-interface Identity {
-	keys: Contracts.Crypto.IKeyPair;
-	publicKey: string;
-	privateKey: string;
-	address: string;
-	wif: string;
-	passphrase: string;
-	secondPassphrase?: string;
-}
-
 describe<{
 	expectBlock: ({ data }: { data: Contracts.Crypto.IBlockData }) => void;
 	sandbox: Sandbox;
@@ -36,8 +25,8 @@ describe<{
 	const blockDataOriginal = clone(blockData);
 	// Recalculated id
 	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
-	let blockDataClone;
-	let blockDataWithTransactionsClone;
+	let blockDataClone: Contracts.Crypto.IBlockData;
+	let blockDataWithTransactionsClone: Contracts.Crypto.IBlockData;
 
 	beforeEach(async (context) => {
 		blockDataClone = clone(blockDataOriginal);
@@ -54,11 +43,7 @@ describe<{
 	});
 
 	it("#make - should make a block", async ({ factory, sandbox }) => {
-		// @ts-ignore
-		const identityFactory = await Factories.factory("Identity", crypto);
-		const identity = await identityFactory.withOptions({ passphrase: "passphrase" }).make<Identity>();
-
-		const block = await factory.make(blockData, identity.keys);
+		const block = await factory.make(blockData);
 
 		assertBlockData(assert, block.data, blockData);
 		assertBlockData(assert, block.header, blockData);
@@ -67,11 +52,7 @@ describe<{
 	});
 
 	it("#make - should make a block with transactions", async ({ factory }) => {
-		// @ts-ignore
-		const identityFactory = await Factories.factory("Identity", crypto);
-		const identity = await identityFactory.withOptions({ passphrase: "passphrase" }).make<Identity>();
-
-		const block = await factory.make(blockDataWithTransactions, identity.keys);
+		const block = await factory.make(blockDataWithTransactions);
 
 		assertBlockData(assert, block.data, blockDataWithTransactions);
 		assertBlockData(assert, block.header, blockDataWithTransactions);
@@ -103,8 +84,7 @@ describe<{
 		assertBlockData(assert, block.header, blockDataWithTransactionsClone);
 		assert.equal(block.serialized, serializedWithTransactions);
 
-		// TODO: Check why transactions are not included
-		// assert.length(block.transactions, blockDataWithTransactionsClone.transaction.length);
+		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
 	});
 
 	it("#fromBytes - should create a block instance from a buffer", async ({ factory }) => {
@@ -123,8 +103,7 @@ describe<{
 		assertBlockData(assert, block.header, blockDataWithTransactionsClone);
 		assert.equal(block.serialized, serializedWithTransactions);
 
-		// TODO: Check why transactions are not included
-		// assert.length(block.transactions, blockDataWithTransactionsClone.transaction.length);
+		assert.length(block.transactions, blockDataWithTransactionsClone.transactions.length);
 	});
 
 	it("#fromData - should create a block instance from an object", async (context) => {
@@ -163,9 +142,13 @@ describe<{
 	});
 
 	it("#fromData - should throw on invalid input data - required block property is missing", async ({ factory }) => {
-		delete blockDataClone.generatorPublicKey;
+		const partialBlock = {
+			...blockDataClone,
+			generatorPublicKey: undefined,
+		} as unknown as Contracts.Crypto.IBlockData;
+
 		await assert.rejects(
-			() => factory.fromData(blockDataClone),
+			() => factory.fromData(partialBlock),
 			" Invalid data: must have required property 'generatorPublicKey': undefined",
 		);
 	});
