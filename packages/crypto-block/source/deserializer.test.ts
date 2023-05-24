@@ -39,7 +39,7 @@ describe<{
 	});
 
 	it("#deserializeHeader - should correctly deserialize without transactions", async ({ deserializer }) => {
-		const deserialized = (await deserializer.deserializeHeader(Buffer.from(serialized, "hex")));
+		const deserialized = await deserializer.deserializeHeader(Buffer.from(serialized, "hex"));
 
 		assertBlockData(assert, deserialized, blockData);
 
@@ -47,7 +47,7 @@ describe<{
 	});
 
 	it("#deserializeHeader - should correctly deserialize with transactions", async ({ deserializer }) => {
-		const deserialized = (await deserializer.deserializeHeader(Buffer.from(serializedWithTransactions, "hex")));
+		const deserialized = await deserializer.deserializeHeader(Buffer.from(serializedWithTransactions, "hex"));
 
 		assertBlockData(assert, deserialized, blockDataWithTransactions);
 
