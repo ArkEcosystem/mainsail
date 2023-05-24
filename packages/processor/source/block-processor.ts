@@ -92,7 +92,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 						"blockchain",
 					);
 					const handler = await registry.getActivatedHandlerForData(transaction.data);
-					await handler.verify(transaction);
+					await handler.verify(this.walletRepository, transaction);
 				}
 
 				// @TODO: check if we can remove this duplicate verification

@@ -24,15 +24,16 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		return ValidatorResignationTransaction;
 	}
 
-	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+	public async bootstrap(
+		walletRepository: Contracts.State.WalletRepository,
+		transactions: Contracts.Crypto.ITransaction[],
+	): Promise<void> {
 		for (const transaction of this.allTransactions(transactions)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				transaction.senderPublicKey,
-			);
+			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
 			wallet.setAttribute("validator.resigned", true);
-			this.walletRepository.index(wallet);
+			walletRepository.index(wallet);
 		}
 	}
 	public async isActivated(): Promise<boolean> {
@@ -40,6 +41,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public async throwIfCannotBeApplied(
+		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
@@ -52,7 +54,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		}
 
 		const requiredValidatorsCount: number = this.configuration.getMilestone().activeValidators;
-		const currentValidatorsCount: number = this.walletRepository
+		const currentValidatorsCount: number = walletRepository
 			.allByUsername()
 			.filter((w) => w.hasAttribute("validator.resigned") === false).length;
 
@@ -60,7 +62,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			throw new Exceptions.NotEnoughValidatorsError();
 		}
 
-		return super.throwIfCannotBeApplied(transaction, wallet);
+		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
@@ -68,7 +70,10 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		emitter.dispatch(AppEnums.ValidatorEvent.Resigned, transaction.data);
 	}
 
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = await this.poolQuery
@@ -77,7 +82,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			.has();
 
 		if (hasSender) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
 			throw new Exceptions.PoolError(
@@ -87,36 +92,44 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		}
 	}
 
-	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await super.applyToSender(transaction);
+	public async applyToSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await super.applyToSender(walletRepository, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const senderWallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		senderWallet.setAttribute("validator.resigned", true);
 
-		this.walletRepository.index(senderWallet);
+		walletRepository.index(senderWallet);
 	}
 
-	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await super.revertForSender(transaction);
+	public async revertForSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await super.revertForSender(walletRepository, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const senderWallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		senderWallet.forgetAttribute("validator.resigned");
 
-		this.walletRepository.index(senderWallet);
+		walletRepository.index(senderWallet);
 	}
 
 	public async applyToRecipient(
+		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}
 
 	public async revertForRecipient(
+		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}

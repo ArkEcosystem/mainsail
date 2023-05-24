@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
@@ -13,14 +13,12 @@ export class DatabaseInteraction {
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.BlockState)
-	@tagged("state", "blockchain")
 	private readonly blockState!: Contracts.State.BlockState;
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	@tagged("state", "blockchain")
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@inject(Identifiers.EventDispatcherService)

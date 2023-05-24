@@ -9,8 +9,11 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	@tagged("state", "copy-on-write")
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "copy-on-write")
+	private walletRepository!: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
@@ -46,14 +49,28 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		const handler: Contracts.Transactions.ITransactionHandler =
 			await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		if (await this.triggers.call("verifyTransaction", { handler, transaction })) {
+		if (
+			await this.triggers.call("verifyTransaction", {
+				handler,
+				transaction,
+				walletRepository: this.walletRepository,
+			})
+		) {
 			if (this.#corrupt) {
 				throw new Exceptions.RetryTransactionError(transaction);
 			}
 
 			try {
-				await this.triggers.call("throwIfCannotEnterPool", { handler, transaction });
-				await this.triggers.call("applyTransaction", { handler, transaction });
+				await this.triggers.call("throwIfCannotEnterPool", {
+					handler,
+					transaction,
+					walletRepository: this.walletRepository,
+				});
+				await this.triggers.call("applyTransaction", {
+					handler,
+					transaction,
+					walletRepository: this.walletRepository,
+				});
 			} catch (error) {
 				throw new Exceptions.TransactionFailedToApplyError(transaction, error);
 			}
@@ -67,7 +84,11 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			const handler: Contracts.Transactions.ITransactionHandler =
 				await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-			await this.triggers.call("revertTransaction", { handler, transaction });
+			await this.triggers.call("revertTransaction", {
+				handler,
+				transaction,
+				walletRepository: this.walletRepository,
+			});
 		} catch (error) {
 			this.#corrupt = true;
 			throw error;

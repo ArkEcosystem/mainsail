@@ -18,6 +18,7 @@ describe<{
 	transaction: Contracts.Crypto.ITransaction;
 	config: Configuration;
 	slots: Slots;
+	walletRepository: any;
 }>("SenderState", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.configuration = {
@@ -39,12 +40,15 @@ describe<{
 			dispatch: () => {},
 		};
 
+		context.walletRepository = {};
+
 		context.container = new Container();
 		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 		context.container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
 		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
 		context.container.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
 		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.emitter);
+		context.container.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container
 			.bind(Identifiers.Cryptography.Time.BlockTimeCalculator)
@@ -165,7 +169,11 @@ describe<{
 		});
 
 		handlerStub.calledWith(context.transaction.data);
-		triggersStub.calledWith("verifyTransaction", { handler, transaction: context.transaction });
+		triggersStub.calledWith("verifyTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
 	});
 
 	it("apply - should throw when state is corrupted", async (context) => {
@@ -198,10 +206,18 @@ describe<{
 		});
 
 		handlerStub.calledNthWith(0, context.transaction.data);
-		triggerStub.calledNthWith(0, "revertTransaction", { handler, transaction: context.transaction });
+		triggerStub.calledNthWith(0, "revertTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
 
 		handlerStub.calledNthWith(1, context.transaction.data);
-		triggerStub.calledNthWith(1, "verifyTransaction", { handler, transaction: context.transaction });
+		triggerStub.calledNthWith(1, "verifyTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
 	});
 
 	it("apply - should throw when transaction fails to apply", async (context) => {
@@ -229,9 +245,21 @@ describe<{
 		});
 
 		handlerStub.calledWith(context.transaction.data);
-		triggerStub.calledNthWith(0, "verifyTransaction", { handler, transaction: context.transaction });
-		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", { handler, transaction: context.transaction });
-		triggerStub.calledNthWith(2, "applyTransaction", { handler, transaction: context.transaction });
+		triggerStub.calledNthWith(0, "verifyTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
+		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
+		triggerStub.calledNthWith(2, "applyTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
 	});
 
 	it("apply - should call handler to apply transaction", async (context) => {
@@ -252,9 +280,21 @@ describe<{
 		await senderState.apply(context.transaction);
 
 		handlerStub.calledWith(context.transaction.data);
-		triggerStub.calledNthWith(0, "verifyTransaction", { handler, transaction: context.transaction });
-		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", { handler, transaction: context.transaction });
-		triggerStub.calledNthWith(2, "applyTransaction", { handler, transaction: context.transaction });
+		triggerStub.calledNthWith(0, "verifyTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
+		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
+		triggerStub.calledNthWith(2, "applyTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
 	});
 
 	it("revert - should call handler to revert transaction", async (context) => {
@@ -267,6 +307,10 @@ describe<{
 		await senderState.revert(context.transaction);
 
 		handlerStub.calledWith(context.transaction.data);
-		triggerStub.calledWith("revertTransaction", { handler, transaction: context.transaction });
+		triggerStub.calledWith("revertTransaction", {
+			handler,
+			transaction: context.transaction,
+			walletRepository: context.walletRepository,
+		});
 	});
 });

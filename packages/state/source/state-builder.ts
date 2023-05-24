@@ -54,7 +54,7 @@ export class StateBuilder {
 				await this.#buildSentTransactions(transactions);
 
 				for (const handler of registeredHandlers.values()) {
-					await handler.bootstrap(transactions);
+					await handler.bootstrap(this.walletRepository, transactions);
 				}
 			}
 

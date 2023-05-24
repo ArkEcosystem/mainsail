@@ -293,7 +293,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.State.ValidatorMutator).to(MockValidatorMutator).inSingletonScope();
 
-	const blockState = sandbox.app.getTagged<BlockState>(Identifiers.BlockState, "state", "blockchain");
+	const blockState = sandbox.app.get<BlockState>(Identifiers.BlockState);
 
 	const dPosState = sandbox.app.getTagged<DposState>(Identifiers.DposState, "state", "blockchain");
 
