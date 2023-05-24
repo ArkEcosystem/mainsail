@@ -49,7 +49,10 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		return true;
 	}
 
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
 

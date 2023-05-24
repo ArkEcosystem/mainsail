@@ -23,7 +23,7 @@ export interface ITransactionHandler {
 
 	emitEvents(transaction: ITransaction, emitter: EventDispatcher): void;
 
-	throwIfCannotEnterPool(transaction: ITransaction): Promise<void>;
+	throwIfCannotEnterPool(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
 	verifySignatures(
 		wallet: Wallet,

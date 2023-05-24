@@ -153,7 +153,10 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
 
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	public async throwIfCannotEnterPool(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {}
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,

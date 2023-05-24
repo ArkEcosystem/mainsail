@@ -70,7 +70,10 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		emitter.dispatch(AppEnums.ValidatorEvent.Resigned, transaction.data);
 	}
 
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = await this.poolQuery
@@ -79,7 +82,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			.has();
 
 		if (hasSender) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
 			throw new Exceptions.PoolError(

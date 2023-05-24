@@ -83,7 +83,10 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		emitter.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
 	}
 
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = await this.poolQuery
