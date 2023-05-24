@@ -19,7 +19,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: Contracts.Crypto.IValidator;
 
-	public async make(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock | undefined> {
+	public async make(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock> {
 		data.id = await this.idFactory.make(data);
 
 		return this.fromData(data);
@@ -33,7 +33,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		return this.#fromSerialized(buff);
 	}
 
-	public async fromJson(json: Contracts.Crypto.IBlockJson): Promise<Contracts.Crypto.IBlock | undefined> {
+	public async fromJson(json: Contracts.Crypto.IBlockJson): Promise<Contracts.Crypto.IBlock> {
 		// @ts-ignore
 		const data: Contracts.Crypto.IBlockData = { ...json };
 		data.totalAmount = BigNumber.make(data.totalAmount);
@@ -51,7 +51,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		return this.fromData(data);
 	}
 
-	public async fromData(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock | undefined> {
+	public async fromData(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock> {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
@@ -78,7 +78,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		});
 	}
 
-	async #applySchema(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockData | undefined> {
+	async #applySchema(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockData> {
 		const result = this.validator.validate("block", data);
 
 		if (!result.error) {

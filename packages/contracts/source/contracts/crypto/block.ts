@@ -58,15 +58,15 @@ export interface IBlockDeserializer {
 }
 
 export interface IBlockFactory {
-	make(data: any): Promise<IBlock | undefined>;
+	make(data: any): Promise<IBlock>;
 
 	fromHex(hex: string): Promise<IBlock>;
 
 	fromBytes(buff: Buffer): Promise<IBlock>;
 
-	fromJson(json: IBlockJson): Promise<IBlock | undefined>;
+	fromJson(json: IBlockJson): Promise<IBlock>;
 
-	fromData(data: IBlockData): Promise<IBlock | undefined>;
+	fromData(data: IBlockData): Promise<IBlock>;
 }
 
 export type IBlockDataSerializable = Omit<IBlockData, "id">;
