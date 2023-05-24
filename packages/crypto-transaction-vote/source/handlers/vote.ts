@@ -24,7 +24,10 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		return VoteTransaction;
 	}
 
-	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+	public async bootstrap(
+		walletRepository: Contracts.State.WalletRepository,
+		transactions: Contracts.Crypto.ITransaction[],
+	): Promise<void> {
 		for (const transaction of this.allTransactions(transactions)) {
 			Utils.assert.defined<string>(transaction.senderPublicKey);
 			Utils.assert.defined<string[]>(transaction.asset?.votes);
@@ -32,7 +35,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 			this.#checkAsset(transaction);
 
-			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+			const wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
 
 			for (const unvote of transaction.asset.unvotes) {
 				const hasVoted: boolean = wallet.hasAttribute("vote");
@@ -63,6 +66,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
+		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
@@ -77,7 +81,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 
 		for (const unvote of transaction.data.asset.unvotes) {
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(unvote);
+			const validatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(unvote);
 
 			if (!walletVote) {
 				throw new Exceptions.NoVoteError();
@@ -93,7 +97,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 
 		for (const vote of transaction.data.asset.votes) {
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
+			const validatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(vote);
 
 			if (walletVote) {
 				throw new Exceptions.AlreadyVotedError();
@@ -108,7 +112,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 			}
 		}
 
-		return super.throwIfCannotBeApplied(transaction, wallet);
+		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
@@ -148,14 +152,15 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await super.applyToSender(transaction);
+	public async applyToSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await super.applyToSender(walletRepository, transaction);
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
@@ -169,14 +174,15 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await super.revertForSender(transaction);
+	public async revertForSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await super.revertForSender(walletRepository, transaction);
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.votes);
 		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.unvotes);
@@ -190,9 +196,15 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	public async applyToRecipient(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {}
 
-	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	public async revertForRecipient(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {}
 
 	#checkAsset(data: Contracts.Crypto.ITransactionData) {
 		if (data.asset.votes.length > 1) {

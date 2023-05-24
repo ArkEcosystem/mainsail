@@ -24,12 +24,15 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		return ValidatorRegistrationTransaction;
 	}
 
-	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+	public async bootstrap(
+		walletRepository: Contracts.State.WalletRepository,
+		transactions: Contracts.Crypto.ITransaction[],
+	): Promise<void> {
 		for (const transaction of this.allTransactions(transactions)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 			AppUtils.assert.defined<string>(transaction.asset?.validator?.username);
 
-			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+			const wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
 
 			wallet.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
 				rank: undefined,
@@ -37,7 +40,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 				voteBalance: BigNumber.ZERO,
 			});
 
-			this.walletRepository.index(wallet);
+			walletRepository.index(wallet);
 		}
 	}
 
@@ -46,6 +49,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public async throwIfCannotBeApplied(
+		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
@@ -53,7 +57,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
 
 		if (sender.hasMultiSignature()) {
 			throw new Exceptions.NotSupportedForMultiSignatureWalletError();
@@ -67,11 +71,11 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			throw new Exceptions.WalletIsAlreadyValidatorError();
 		}
 
-		if (this.walletRepository.hasByUsername(username)) {
+		if (walletRepository.hasByUsername(username)) {
 			throw new Exceptions.WalletUsernameAlreadyRegisteredError(username);
 		}
 
-		return super.throwIfCannotBeApplied(transaction, wallet);
+		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
@@ -110,14 +114,15 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		}
 	}
 
-	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await super.applyToSender(transaction);
+	public async applyToSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await super.applyToSender(walletRepository, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 
@@ -127,24 +132,31 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			voteBalance: BigNumber.ZERO,
 		});
 
-		this.walletRepository.index(sender);
+		walletRepository.index(sender);
 	}
 
-	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await super.revertForSender(transaction);
+	public async revertForSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await super.revertForSender(walletRepository, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		sender.forgetAttribute("validator");
 
-		this.walletRepository.index(sender);
+		walletRepository.index(sender);
 	}
 
-	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	public async applyToRecipient(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {}
 
-	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	public async revertForRecipient(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {}
 }
