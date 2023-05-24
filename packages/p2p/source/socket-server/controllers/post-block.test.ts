@@ -24,7 +24,7 @@ describe<{
 }>("PostBlockController", ({ it, assert, beforeEach, stub, spy }) => {
 	const logger = { info: () => {} };
 	const configuration = { getMilestone: () => ({ block: { maxTransactions: 150 } }) };
-	const deserializer = { deserialize: () => { }, deserializeHeader: () => { } };
+	const deserializer = { deserialize: () => {}, deserializeHeader: () => {} };
 	const blockchain = {
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
