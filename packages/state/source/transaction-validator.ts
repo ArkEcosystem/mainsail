@@ -5,7 +5,6 @@ import { strictEqual } from "assert";
 @injectable()
 export class TransactionValidator implements Contracts.State.TransactionValidator {
 	@inject(Identifiers.TransactionHandlerRegistry)
-	@tagged("state", "clone")
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	// TODO: provide walletRepository

@@ -8,9 +8,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	// TODO: Remove tagged TransactionHandlerRegistry
 	@inject(Identifiers.TransactionHandlerRegistry)
-	@tagged("state", "copy-on-write")
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@inject(Identifiers.WalletRepository)
