@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { IValidatorSetMajority } from "./types";
 
 @injectable()
-export class RoundState {
+export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 

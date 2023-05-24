@@ -1,4 +1,9 @@
 import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
+import { WalletRepository } from "./state";
+
+export interface IRoundState {
+	getWalletRepository(): WalletRepository;
+}
 
 export interface IConsensusService {
 	run(): Promise<void>;
