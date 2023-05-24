@@ -9,9 +9,6 @@ export abstract class TransactionHandler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.WalletRepository)
-	protected readonly walletRepository!: Contracts.State.WalletRepository;
-
 	@inject(Identifiers.LogService)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
@@ -21,10 +18,13 @@ export abstract class TransactionHandler {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier: Contracts.Crypto.ITransactionVerifier;
 
-	public async verify(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
+	public async verify(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const senderWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+		const senderWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 			transaction.data.senderPublicKey,
 		);
 
@@ -36,14 +36,15 @@ export abstract class TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
+		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
-		const senderWallet: Contracts.State.Wallet = this.walletRepository.findByAddress(sender.getAddress());
+		const senderWallet: Contracts.State.Wallet = walletRepository.findByAddress(sender.getAddress());
 
 		AppUtils.assert.defined<string>(sender.getPublicKey());
 
-		if (!this.walletRepository.hasByPublicKey(sender.getPublicKey()!) && senderWallet.getBalance().isZero()) {
+		if (!walletRepository.hasByPublicKey(sender.getPublicKey()!) && senderWallet.getBalance().isZero()) {
 			throw new Exceptions.ColdWalletError();
 		}
 
@@ -68,7 +69,7 @@ export abstract class TransactionHandler {
 			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 			// Ensure the database wallet already has a multi signature, in case we checked a pool wallet.
-			const databaseSender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			const databaseSender: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				transaction.data.senderPublicKey,
 			);
 
@@ -90,26 +91,33 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await this.applyToSender(transaction);
-		await this.applyToRecipient(transaction);
+	public async apply(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await this.applyToSender(walletRepository, transaction);
+		await this.applyToRecipient(walletRepository, transaction);
 	}
 
-	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		await this.revertForSender(transaction);
-		await this.revertForRecipient(transaction);
+	public async revert(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
+		await this.revertForSender(walletRepository, transaction);
+		await this.revertForRecipient(walletRepository, transaction);
 	}
 
-	public async applyToSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async applyToSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		const data: Contracts.Crypto.ITransactionData = transaction.data;
 
-		await this.throwIfCannotBeApplied(transaction, sender);
+		await this.throwIfCannotBeApplied(walletRepository, transaction, sender);
 
 		if (data.version) {
 			this.#verifyTransactionNonceApply(sender, transaction);
@@ -126,12 +134,13 @@ export abstract class TransactionHandler {
 		sender.setBalance(newBalance);
 	}
 
-	public async revertForSender(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async revertForSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		const data: Contracts.Crypto.ITransactionData = transaction.data;
 
@@ -189,9 +198,15 @@ export abstract class TransactionHandler {
 
 	public abstract bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void>;
 
-	public abstract applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void>;
+	public abstract applyToRecipient(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void>;
 
-	public abstract revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void>;
+	public abstract revertForRecipient(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.ITransaction,
+	): Promise<void>;
 }
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
