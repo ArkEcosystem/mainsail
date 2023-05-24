@@ -24,7 +24,7 @@ describe<{
 }>("PostBlockController", ({ it, assert, beforeEach, stub, spy }) => {
 	const logger = { info: () => {} };
 	const configuration = { getMilestone: () => ({ block: { maxTransactions: 150 } }) };
-	const deserializer = { deserialize: () => {} };
+	const deserializer = { deserialize: () => { }, deserializeHeader: () => { } };
 	const blockchain = {
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
@@ -46,7 +46,7 @@ describe<{
 	});
 
 	it("should throw TooManyTransactionsError when numberOfTransactions is too much", async ({ controller }) => {
-		stub(deserializer, "deserialize").resolvedValue({ data: { numberOfTransactions: 151 } });
+		stub(deserializer, "deserializeHeader").resolvedValue({ numberOfTransactions: 151 });
 
 		await assert.rejects(
 			() => controller.handle({ payload: { block: Buffer.from("") } }, {}),
@@ -55,7 +55,9 @@ describe<{
 	});
 
 	it("should return status true if block is pinged", async ({ controller }) => {
-		stub(deserializer, "deserialize").resolvedValue({ data: { numberOfTransactions: 0 }, transactions: [] });
+		const blockHeader = { numberOfTransactions: 0 };
+		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
+		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
 		stub(blockchain, "pingBlock").returnValue(true);
 		stub(blockchain, "getLastHeight").returnValue(100);
 
@@ -66,7 +68,10 @@ describe<{
 	});
 
 	it("should return status false if block is not chained", async ({ controller }) => {
-		stub(deserializer, "deserialize").resolvedValue({ data: { numberOfTransactions: 0 }, transactions: [] });
+		const blockHeader = { numberOfTransactions: 0 };
+		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
+		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
+
 		stub(blockchain, "pingBlock").returnValue(false);
 		stub(blockchain, "getLastHeight").returnValue(100);
 		stub(utilsMock, "isBlockChained").returnValue(false);
@@ -77,11 +82,11 @@ describe<{
 		});
 	});
 
-	it.only("should return status true and call handleIncommingBlock", async ({ controller }) => {
-		stub(deserializer, "deserialize").resolvedValue({
-			data: { height: 101, numberOfTransactions: 0 },
-			transactions: [],
-		});
+	it("should return status true and call handleIncommingBlock", async ({ controller }) => {
+		const blockHeader = { height: 101, numberOfTransactions: 0 };
+
+		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
+		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
 		stub(blockchain, "pingBlock").returnValue(false);
 		stub(blockchain, "getLastHeight").returnValue(100);
 		stub(utilsMock, "isBlockChained").returnValue(true);

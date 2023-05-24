@@ -30,10 +30,10 @@ export class PostBlockController implements Contracts.P2P.Controller {
 	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<{ status: boolean; height: number }> {
 		const blockBuffer: Buffer = request.payload.block;
 
-		const deserializedHeader = await this.deserializer.deserialize(blockBuffer, true);
+		const deserializedHeader = await this.deserializer.deserializeHeader(blockBuffer);
 
-		if (deserializedHeader.data.numberOfTransactions > this.configuration.getMilestone().block.maxTransactions) {
-			throw new Exceptions.TooManyTransactionsError(deserializedHeader.data);
+		if (deserializedHeader.numberOfTransactions > this.configuration.getMilestone().block.maxTransactions) {
+			throw new Exceptions.TooManyTransactionsError(deserializedHeader);
 		}
 
 		const deserialized: {
