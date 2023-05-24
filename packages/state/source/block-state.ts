@@ -63,7 +63,7 @@ export class BlockState implements Contracts.State.BlockState {
 	public async applyTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		await transactionHandler.apply(transaction);
+		await transactionHandler.apply(this.walletRepository, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -98,7 +98,7 @@ export class BlockState implements Contracts.State.BlockState {
 			recipient = this.walletRepository.findByAddress(transaction.data.recipientId);
 		}
 
-		await transactionHandler.revert(transaction);
+		await transactionHandler.revert(this.walletRepository, transaction);
 
 		// @ts-ignore - Revert vote balance updates
 		await this.#revertVoteBalances(sender, recipient, data);

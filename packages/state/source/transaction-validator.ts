@@ -8,6 +8,11 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 	@tagged("state", "clone")
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
+	// TODO: provide walletRepository
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
+	private walletRepository!: Contracts.State.WalletRepository;
+
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
@@ -17,6 +22,6 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 		);
 		strictEqual(transaction.id, deserialized.id);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		await handler.apply(transaction);
+		await handler.apply(this.walletRepository, transaction);
 	}
 }
