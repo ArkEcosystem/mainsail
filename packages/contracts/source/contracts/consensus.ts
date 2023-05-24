@@ -1,4 +1,4 @@
-import { IPrecommit, IPrevote, IProposal } from "./crypto";
+import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 
 export interface IConsensusService {
 	run(): Promise<void>;
@@ -8,4 +8,18 @@ export interface IConsensusService {
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
+}
+
+export interface IValidator {
+	configure(publicKey: string, keyPair: IKeyPair): IValidator;
+	getConsensusPublicKey(): string;
+	prepareBlock(height: number, round: number): Promise<IBlock>;
+	propose(height: number, round: number, block: IBlock): Promise<IProposal>;
+	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
+	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
+}
+
+export interface IValidatorRepository {
+	getValidator(publicKey: string): IValidator;
+	getValidators(publicKeys: string[]): IValidator[];
 }

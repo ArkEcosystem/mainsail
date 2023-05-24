@@ -3,10 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 
-import { IValidator } from "./types";
-
 @injectable()
-export class Validator implements IValidator {
+export class Validator implements Contracts.Consensus.IValidator {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -37,7 +35,7 @@ export class Validator implements IValidator {
 	#keyPair: Contracts.Crypto.IKeyPair;
 	#publicKey: string;
 
-	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Validator {
+	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Consensus.IValidator {
 		this.#publicKey = publicKey;
 		this.#keyPair = keyPair;
 
@@ -49,6 +47,7 @@ export class Validator implements IValidator {
 	}
 
 	public async prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock> {
+		// TODO: use height/round ?
 		const transactions = await this.#getTransactionsForForging();
 		return this.#forge(transactions);
 	}
@@ -95,7 +94,7 @@ export class Validator implements IValidator {
 
 		this.logger.debug(
 			`Received ${pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
+			`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
 		);
 
 		return transactions.map((transaction: Contracts.Crypto.ITransaction) => transaction.data);
