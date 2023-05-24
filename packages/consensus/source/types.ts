@@ -18,20 +18,6 @@ export interface IScheduler {
 	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
 }
 
-export interface IValidator {
-	configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): IValidator;
-	getConsensusPublicKey(): string;
-	prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock>;
-	propose(height: number, round: number, block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IProposal>;
-	prevote(height: number, round: number, blockId: string | undefined): Promise<Contracts.Crypto.IPrevote>;
-	precommit(height: number, round: number, blockId: string | undefined): Promise<Contracts.Crypto.IPrecommit>;
-}
-
-export interface IValidatorRepository {
-	getValidator(publicKey: string): IValidator;
-	getValidators(publicKeys: string[]): IValidator[];
-}
-
 export interface IValidatorSetMajority {
 	aggSignature: string;
 	aggPublicKey: string;

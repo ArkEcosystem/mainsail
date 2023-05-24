@@ -94,6 +94,9 @@
 			"package": "@mainsail/crypto-messages"
 		},
 		{
+			"package": "@mainsail/validator"
+		},
+		{
 			"package": "@mainsail/validator-set-static"
 		},
 		{
