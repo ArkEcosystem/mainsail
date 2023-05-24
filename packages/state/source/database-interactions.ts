@@ -13,7 +13,6 @@ export class DatabaseInteraction {
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.BlockState)
-	@tagged("state", "blockchain")
 	private readonly blockState!: Contracts.State.BlockState;
 
 	@inject(Identifiers.StateStore)

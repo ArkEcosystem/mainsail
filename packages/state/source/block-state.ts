@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject } from "@mainsail/container";
+import { inject, injectable, multiInject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -10,6 +10,7 @@ export class BlockState implements Contracts.State.BlockState {
 	public readonly app: Contracts.Kernel.Application;
 
 	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly walletRepository: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
