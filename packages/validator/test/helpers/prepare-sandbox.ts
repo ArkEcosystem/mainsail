@@ -49,7 +49,9 @@ export const prepareSandbox = async (context) => {
 
 	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
 	context.sandbox.app.bind(Identifiers.TransactionPoolCollator).toConstantValue({
-		getBlockCandidateTransactions: () => { return []; },
+		getBlockCandidateTransactions: () => {
+			return [];
+		},
 	});
 	context.sandbox.app.bind(Identifiers.TransactionPoolService).toConstantValue({});
 	context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({
@@ -58,7 +60,7 @@ export const prepareSandbox = async (context) => {
 				data: {
 					height: 1,
 					id: "0000000000000000000000000000000000000000000000000000000000000000",
-				}
+				},
 			};
 		},
 	});

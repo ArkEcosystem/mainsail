@@ -14,7 +14,11 @@ describe<{
 
 		const validators: Contracts.Consensus.IValidator[] = [];
 		for (const { consensusKeyPair, walletPublicKey } of validatorKeys) {
-			validators.push(context.sandbox.app.resolve<Contracts.Consensus.IValidator>(Validator).configure(walletPublicKey, consensusKeyPair));
+			validators.push(
+				context.sandbox.app
+					.resolve<Contracts.Consensus.IValidator>(Validator)
+					.configure(walletPublicKey, consensusKeyPair),
+			);
 		}
 
 		context.validatorRepository = context.sandbox.app.resolve(ValidatorRepository).configure(validators);
@@ -32,16 +36,15 @@ describe<{
 		assert.empty(validatorRepository.getValidators(["abc"]));
 		assert.length(
 			validatorRepository.getValidators(validatorKeys.map(({ consensusKeyPair: { publicKey } }) => publicKey)),
-			validatorKeys.length
+			validatorKeys.length,
 		);
 		assert.length(
-			validatorRepository.getValidators(
-				[
-					...validatorKeys.map(({ consensusKeyPair: { publicKey } }) => publicKey),
-					"abc", "def",
-				],
-			),
-			validatorKeys.length
+			validatorRepository.getValidators([
+				...validatorKeys.map(({ consensusKeyPair: { publicKey } }) => publicKey),
+				"abc",
+				"def",
+			]),
+			validatorKeys.length,
 		);
 	});
 });

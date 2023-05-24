@@ -12,7 +12,9 @@ describe<{
 		await prepareSandbox(context);
 
 		const { consensusKeyPair, walletPublicKey } = validatorKeys[0];
-		context.validator = context.sandbox.app.resolve<Contracts.Consensus.IValidator>(Validator).configure(walletPublicKey, consensusKeyPair);
+		context.validator = context.sandbox.app
+			.resolve<Contracts.Consensus.IValidator>(Validator)
+			.configure(walletPublicKey, consensusKeyPair);
 	});
 
 	it("#getConsensusPublicKey", async ({ validator }) => {

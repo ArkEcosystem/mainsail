@@ -158,7 +158,7 @@ jobs:
             - name: Test validation
               run: cd packages/validation && pnpm run test
             - name: Test validator
-              run: cd packages/validator && pnpm run test              
+              run: cd packages/validator && pnpm run test
             - name: Test validator-set-static
               run: cd packages/validator-set-static && pnpm run test
             - name: Test webhooks
