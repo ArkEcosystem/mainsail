@@ -1,10 +1,9 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils as AppUtils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 
 import { AcceptBlockHandler } from "./handlers";
-import { IncompatibleTransactionsVerifier, VerifyBlockVerifier } from "./verifiers";
+import { IncompatibleTransactionsVerifier, NonceVerifier, VerifyBlockVerifier } from "./verifiers";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
@@ -19,10 +18,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
-
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository!: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
@@ -45,7 +40,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			return false;
 		}
 
-		if (await this.#blockContainsOutOfOrderNonce(roundState)) {
+		if (!(await this.app.resolve(NonceVerifier).execute(roundState))) {
 			return false;
 		}
 
@@ -107,46 +102,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 				return true;
 			}
-		}
-
-		return false;
-	}
-
-	async #blockContainsOutOfOrderNonce(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().toData().block;
-		const nonceBySender = {};
-
-		for (const transaction of block.transactions) {
-			const data = transaction.data;
-
-			if (data.version && data.version < 2) {
-				break;
-			}
-
-			AppUtils.assert.defined<string>(data.senderPublicKey);
-
-			const sender: string = data.senderPublicKey;
-
-			if (nonceBySender[sender] === undefined) {
-				const wallet = await this.walletRepository.findByPublicKey(sender);
-				nonceBySender[sender] = wallet.getNonce();
-			}
-
-			AppUtils.assert.defined<string>(data.nonce);
-
-			const nonce: BigNumber = BigNumber.make(data.nonce);
-
-			if (!nonceBySender[sender].plus(1).isEqualTo(nonce)) {
-				this.logger.warning(
-					`Block { height: ${block.data.height.toLocaleString()}, id: ${block.data.id} } ` +
-						`not accepted: invalid nonce order for sender ${sender}: ` +
-						`preceding nonce: ${nonceBySender[sender].toFixed(0)}, ` +
-						`transaction ${data.id} has nonce ${nonce.toFixed()}.`,
-				);
-				return true;
-			}
-
-			nonceBySender[sender] = nonce;
 		}
 
 		return false;
