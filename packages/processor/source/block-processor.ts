@@ -38,17 +38,17 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.Cryptography.Block.Verifier)
 	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
 
-	public async process(block: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
+	public async process(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		if (!(await this.#verifyBlock(block))) {
-			return Contracts.BlockProcessor.ProcessorResult.Rejected;
+			return false;
 		}
 
 		if (this.#blockContainsIncompatibleTransactions(block)) {
-			return Contracts.BlockProcessor.ProcessorResult.Rejected;
+			return false;
 		}
 
 		if (await this.#blockContainsOutOfOrderNonce(block)) {
-			return Contracts.BlockProcessor.ProcessorResult.Rejected;
+			return false;
 		}
 
 		// const isValidGenerator: boolean = await this.#validateGenerator(block);
@@ -58,7 +58,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			this.slots,
 		);
 		if (!isChained) {
-			return Contracts.BlockProcessor.ProcessorResult.Rejected;
+			return false;
 		}
 
 		// if (!isValidGenerator) {
@@ -67,7 +67,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		const containsForgedTransactions: boolean = await this.#checkBlockContainsForgedTransactions(block);
 		if (containsForgedTransactions) {
-			return Contracts.BlockProcessor.ProcessorResult.Rejected;
+			return false;
 		}
 
 		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(block);

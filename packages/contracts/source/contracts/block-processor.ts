@@ -1,17 +1,9 @@
 import { IBlock } from "./crypto";
 
-export enum ProcessorResult {
-	Accepted,
-	DiscardedButCanBeBroadcasted,
-	Rejected,
-	Rollback,
-	Corrupted,
-}
-
 export interface Handler {
-	execute(block?: IBlock): Promise<ProcessorResult>;
+	execute(block?: IBlock): Promise<boolean>;
 }
 
 export interface Processor {
-	process(block: IBlock): Promise<ProcessorResult>;
+	process(block: IBlock): Promise<boolean>;
 }

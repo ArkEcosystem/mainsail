@@ -22,7 +22,7 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	public async execute(block: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		try {
 			await this.databaseInteraction.applyBlock(block);
 
@@ -44,14 +44,14 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 				this.state.setLastDownloadedBlock(block.data);
 			}
 
-			return Contracts.BlockProcessor.ProcessorResult.Accepted;
+			return true;
 		} catch (error) {
 			this.logger.warning(`Refused new block ${JSON.stringify(block.data)}`);
 			this.logger.debug(error.stack);
 
 			this.blockchain.resetLastDownloadedBlock();
 
-			return Contracts.BlockProcessor.ProcessorResult.Rejected;
+			return false;
 		}
 	}
 }

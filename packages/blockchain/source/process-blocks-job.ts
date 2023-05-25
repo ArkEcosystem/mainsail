@@ -73,7 +73,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		const acceptedBlocks: Contracts.Crypto.IBlock[] = [];
-		let lastProcessResult: Contracts.BlockProcessor.ProcessorResult | undefined;
+		let lastProcessResult: boolean | undefined;
 		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
 		const acceptedBlockTimeLookup = (height: number) =>
@@ -106,12 +106,14 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 				lastProcessedBlock = blockInstance;
 
-				if (lastProcessResult === Contracts.BlockProcessor.ProcessorResult.Accepted) {
+				if (lastProcessResult === true) {
 					acceptedBlocks.push(blockInstance);
-				} else if (lastProcessResult === Contracts.BlockProcessor.ProcessorResult.Corrupted) {
-					await this.#handleCorrupted();
-					return;
-				} else {
+				}
+				// else if (lastProcessResult === Contracts.BlockProcessor.ProcessorResult.Corrupted) {
+				// 	await this.#handleCorrupted();
+				// 	return;
+				// }
+				else {
 					break; // if one block is not accepted, the other ones won't be chained anyway
 				}
 			}
@@ -139,11 +141,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			}
 		}
 
-		if (
-			(lastProcessResult === Contracts.BlockProcessor.ProcessorResult.Accepted ||
-				lastProcessResult === Contracts.BlockProcessor.ProcessorResult.DiscardedButCanBeBroadcasted) &&
-			lastProcessedBlock
-		) {
+		if (!!lastProcessResult && lastProcessedBlock) {
 			if (this.stateStore.isStarted() && this.stateMachine.getState() === "newBlock") {
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.networkMonitor.broadcastBlock(lastProcessedBlock);
@@ -154,9 +152,9 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 	}
 
-	async #handleCorrupted() {
-		this.logger.error("Shutting down app, because state is corrupted");
-		// eslint-disable-next-line unicorn/no-process-exit
-		process.exit(1);
-	}
+	// async #handleCorrupted() {
+	// 	this.logger.error("Shutting down app, because state is corrupted");
+	// 	// eslint-disable-next-line unicorn/no-process-exit
+	// 	process.exit(1);
+	// }
 }
