@@ -1,9 +1,9 @@
-import { IBlock } from "./crypto";
+import { IRoundState } from "./consensus";
 
 export interface Handler {
-	execute(block?: IBlock): Promise<boolean>;
+	execute(roundState: IRoundState): Promise<boolean>;
 }
 
 export interface Processor {
-	process(block: IBlock): Promise<boolean>;
+	process(roundState: IRoundState): Promise<boolean>;
 }

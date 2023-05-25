@@ -38,23 +38,23 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.Cryptography.Block.Verifier)
 	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
 
-	public async process(block: Contracts.Crypto.IBlock): Promise<boolean> {
-		if (!(await this.#verifyBlock(block))) {
+	public async process(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
+		if (!(await this.#verifyBlock(roundState))) {
 			return false;
 		}
 
-		if (this.#blockContainsIncompatibleTransactions(block)) {
+		if (this.#blockContainsIncompatibleTransactions(roundState)) {
 			return false;
 		}
 
-		if (await this.#blockContainsOutOfOrderNonce(block)) {
+		if (await this.#blockContainsOutOfOrderNonce(roundState)) {
 			return false;
 		}
 
 		// const isValidGenerator: boolean = await this.#validateGenerator(block);
 		const isChained: boolean = await AppUtils.isBlockChained(
 			this.blockchain.getLastBlock().data,
-			block.data,
+			roundState.getProposal().toData().block.data,
 			this.slots,
 		);
 		if (!isChained) {
@@ -65,15 +65,16 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		// 	return this.app.resolve<InvalidGeneratorHandler>(InvalidGeneratorHandler).execute(block);
 		// }
 
-		const containsForgedTransactions: boolean = await this.#checkBlockContainsForgedTransactions(block);
+		const containsForgedTransactions: boolean = await this.#checkBlockContainsForgedTransactions(roundState);
 		if (containsForgedTransactions) {
 			return false;
 		}
 
-		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(block);
+		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(roundState);
 	}
 
-	async #verifyBlock(block: Contracts.Crypto.IBlock): Promise<boolean> {
+	async #verifyBlock(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
+		const block = roundState.getProposal().toData().block;
 		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
 
 		if (verification.containsMultiSignatures) {
@@ -110,7 +111,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return true;
 	}
 
-	async #checkBlockContainsForgedTransactions(block: Contracts.Crypto.IBlock): Promise<boolean> {
+	async #checkBlockContainsForgedTransactions(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
+		const block = roundState.getProposal().toData().block;
 		if (block.transactions.length > 0) {
 			const transactionIds = block.transactions.map((tx) => {
 				AppUtils.assert.defined<string>(tx.id);
@@ -150,7 +152,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return false;
 	}
 
-	#blockContainsIncompatibleTransactions(block: Contracts.Crypto.IBlock): boolean {
+	#blockContainsIncompatibleTransactions(roundState: Contracts.Consensus.IRoundState): boolean {
+		const block = roundState.getProposal().toData().block;
 		for (let index = 1; index < block.transactions.length; index++) {
 			if (block.transactions[index].data.version !== block.transactions[0].data.version) {
 				return true;
@@ -160,7 +163,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return false;
 	}
 
-	async #blockContainsOutOfOrderNonce(block: Contracts.Crypto.IBlock): Promise<boolean> {
+	async #blockContainsOutOfOrderNonce(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
+		const block = roundState.getProposal().toData().block;
 		const nonceBySender = {};
 
 		for (const transaction of block.transactions) {

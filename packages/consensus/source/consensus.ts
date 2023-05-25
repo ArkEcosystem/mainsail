@@ -97,7 +97,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.logger.info(`Received proposal for ${this.#height}/${this.#round}`);
 
-		const result = await this.processor.process(proposal.toData().block);
+		const result = await this.processor.process(roundState);
 		roundState.setProcessorResult(result);
 
 		this.#step = Step.prevote;
