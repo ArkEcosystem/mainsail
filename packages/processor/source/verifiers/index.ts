@@ -1,1 +1,1 @@
-export * from "./verify-block";
+export * from "./verify-block-verifier";
