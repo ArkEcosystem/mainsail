@@ -3,9 +3,7 @@ import { ProcessBlockAction } from "./process-block";
 
 describe("ProcessBlockAction", ({ assert, it, stub, match }) => {
 	it("should execute", async () => {
-		const block = {
-			id: "dummy_block_id",
-		};
+		const roundState = {};
 
 		const blockProcessor = {
 			process: () => {},
@@ -15,9 +13,9 @@ describe("ProcessBlockAction", ({ assert, it, stub, match }) => {
 
 		const action = new ProcessBlockAction();
 
-		await action.execute({ block, blockProcessor });
+		await action.execute({ roundState, blockProcessor });
 
 		spyOnProcess.calledOnce();
-		spyOnProcess.calledWith(block);
+		spyOnProcess.calledWith(roundState);
 	});
 });
