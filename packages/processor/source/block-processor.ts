@@ -3,14 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import {
-	AcceptBlockHandler,
-	AlreadyForgedHandler,
-	IncompatibleTransactionsHandler,
-	NonceOutOfOrderHandler,
-	UnchainedHandler,
-	VerificationFailedHandler,
-} from "./handlers";
+import { AcceptBlockHandler } from "./handlers";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
@@ -47,15 +40,15 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 	public async process(block: Contracts.Crypto.IBlock): Promise<Contracts.BlockProcessor.ProcessorResult> {
 		if (!(await this.#verifyBlock(block))) {
-			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
+			return Contracts.BlockProcessor.ProcessorResult.Rejected;
 		}
 
 		if (this.#blockContainsIncompatibleTransactions(block)) {
-			return this.app.resolve<IncompatibleTransactionsHandler>(IncompatibleTransactionsHandler).execute();
+			return Contracts.BlockProcessor.ProcessorResult.Rejected;
 		}
 
 		if (await this.#blockContainsOutOfOrderNonce(block)) {
-			return this.app.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler).execute();
+			return Contracts.BlockProcessor.ProcessorResult.Rejected;
 		}
 
 		// const isValidGenerator: boolean = await this.#validateGenerator(block);
@@ -65,7 +58,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			this.slots,
 		);
 		if (!isChained) {
-			return this.app.resolve<UnchainedHandler>(UnchainedHandler).initialize(true).execute(block);
+			return Contracts.BlockProcessor.ProcessorResult.Rejected;
 		}
 
 		// if (!isValidGenerator) {
@@ -74,7 +67,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		const containsForgedTransactions: boolean = await this.#checkBlockContainsForgedTransactions(block);
 		if (containsForgedTransactions) {
-			return this.app.resolve<AlreadyForgedHandler>(AlreadyForgedHandler).execute(block);
+			return Contracts.BlockProcessor.ProcessorResult.Rejected;
 		}
 
 		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(block);
