@@ -1,12 +1,8 @@
-import { IBlock, IBlockData, ITransaction, ITransactionData } from "../crypto";
+import { IBlock, IBlockData, ITransactionData } from "../crypto";
 import { Wallet, WalletRepository } from "./wallets";
 
 export interface BlockState {
 	applyBlock(block: IBlock): Promise<void>;
-
-	applyTransaction(transaction: ITransaction): Promise<void>;
-
-	revertTransaction(transaction: ITransaction): Promise<void>;
 }
 
 export interface VoteBalanceMutator {

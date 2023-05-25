@@ -41,7 +41,7 @@ export class BlockState implements Contracts.State.BlockState {
 		const appliedTransactions: Contracts.Crypto.ITransaction[] = [];
 		try {
 			for (const transaction of block.transactions) {
-				await this.applyTransaction(transaction);
+				await this.#applyTransaction(transaction);
 				appliedTransactions.push(transaction);
 			}
 			await this.#applyBlockToForger(forgerWallet, block.data);
@@ -51,7 +51,7 @@ export class BlockState implements Contracts.State.BlockState {
 			this.logger.error(error.stack);
 			this.logger.error("Failed to apply all transactions in block - reverting previous transactions");
 			for (const transaction of appliedTransactions.reverse()) {
-				await this.revertTransaction(transaction);
+				await this.#revertTransaction(transaction);
 			}
 
 			this.state.setLastBlock(previousBlock);
@@ -60,7 +60,7 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 	}
 
-	public async applyTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	async #applyTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		await transactionHandler.apply(this.walletRepository, transaction);
@@ -82,7 +82,7 @@ export class BlockState implements Contracts.State.BlockState {
 		await this.#applyVoteBalances(sender, recipient, transaction.data);
 	}
 
-	public async revertTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	async #revertTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const { data } = transaction;
 
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
