@@ -4,7 +4,7 @@ import { Services, Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { AcceptBlockHandler } from "./handlers";
-import { VerifyBlockHandler } from "./verifiers";
+import { VerifyBlockVerifier } from "./verifiers";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
@@ -37,7 +37,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	private readonly slots: Contracts.Crypto.Slots;
 
 	public async process(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		if (!(await this.app.resolve(VerifyBlockHandler).execute(roundState))) {
+		if (!(await this.app.resolve(VerifyBlockVerifier).execute(roundState))) {
 			return false;
 		}
 

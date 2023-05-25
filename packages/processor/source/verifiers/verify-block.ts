@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class VerifyBlockHandler implements Contracts.BlockProcessor.Handler {
+export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
