@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils as AppUtils } from "@mainsail/kernel";
 
 import { AcceptBlockHandler } from "./handlers";
-import { IncompatibleTransactionsVerifier, NonceVerifier, VerifyBlockVerifier } from "./verifiers";
+import { ChainedVerifier, IncompatibleTransactionsVerifier, NonceVerifier, VerifyBlockVerifier } from "./verifiers";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
@@ -12,9 +12,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
@@ -27,9 +24,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
-
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
 
 	public async process(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
 		if (!(await this.app.resolve(VerifyBlockVerifier).execute(roundState))) {
@@ -44,13 +38,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			return false;
 		}
 
-		// const isValidGenerator: boolean = await this.#validateGenerator(block);
-		const isChained: boolean = await AppUtils.isBlockChained(
-			this.blockchain.getLastBlock().data,
-			roundState.getProposal().toData().block.data,
-			this.slots,
-		);
-		if (!isChained) {
+		if (!(await this.app.resolve(ChainedVerifier).execute(roundState))) {
 			return false;
 		}
 
