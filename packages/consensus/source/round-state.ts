@@ -21,6 +21,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	#proposal?: Contracts.Crypto.IProposal;
+	#processorResult?: Contracts.BlockProcessor.ProcessorResult;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
 
@@ -34,6 +35,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	public getProposal(): Contracts.Crypto.IProposal | undefined {
 		return this.#proposal;
+	}
+
+	public setProcessorResult(processorResult: Contracts.BlockProcessor.ProcessorResult): void {
+		this.#processorResult = processorResult;
+	}
+
+	public getProcessorResult(): Contracts.BlockProcessor.ProcessorResult | undefined {
+		return this.#processorResult;
 	}
 
 	public addPrevote(prevote: Contracts.Crypto.IPrevote): void {
