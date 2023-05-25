@@ -4,7 +4,7 @@ import { Services, Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { AcceptBlockHandler } from "./handlers";
-import { VerifyBlockVerifier } from "./verifiers";
+import { IncompatibleTransactionsVerifier, VerifyBlockVerifier } from "./verifiers";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
@@ -41,7 +41,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			return false;
 		}
 
-		if (this.#blockContainsIncompatibleTransactions(roundState)) {
+		if (!(await this.app.resolve(IncompatibleTransactionsVerifier).execute(roundState))) {
 			return false;
 		}
 
@@ -105,17 +105,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 				this.logger.debug(`${JSON.stringify(forgedIds, undefined, 4)}`);
 
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	#blockContainsIncompatibleTransactions(roundState: Contracts.Consensus.IRoundState): boolean {
-		const block = roundState.getProposal().toData().block;
-		for (let index = 1; index < block.transactions.length; index++) {
-			if (block.transactions[index].data.version !== block.transactions[0].data.version) {
 				return true;
 			}
 		}
