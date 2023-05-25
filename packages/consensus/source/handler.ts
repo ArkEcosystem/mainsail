@@ -31,7 +31,7 @@ export class Handler implements IHandler {
 		const roundState = this.roundStateRepo.getRoundState(data.height, data.round);
 		roundState.setProposal(proposal);
 
-		await this.#getConsensus().onProposal(proposal);
+		await this.#getConsensus().onProposal(roundState);
 	}
 
 	async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
@@ -78,11 +78,11 @@ export class Handler implements IHandler {
 		const consensus = this.#getConsensus();
 
 		if (roundState.hasMajorityPrevotes()) {
-			await consensus.onMajorityPrevote(proposal);
+			await consensus.onMajorityPrevote(roundState);
 		}
 
 		if (roundState.hasMajorityPrecommits()) {
-			await consensus.onMajorityPrecommit(proposal);
+			await consensus.onMajorityPrecommit(roundState);
 		}
 	}
 

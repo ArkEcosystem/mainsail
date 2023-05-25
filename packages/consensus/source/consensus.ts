@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { IBroadcaster, IHandler, IScheduler } from "./types";
@@ -86,28 +87,43 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
+	public async onProposal(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		if (this.#step !== Step.propose) {
 			return;
 		}
 
+		const proposal = roundState.getProposal();
+		Utils.assert.defined(proposal);
+
 		this.logger.info(`Received proposal for ${this.#height}/${this.#round}`);
+
+		const result = await this.processor.process(proposal.toData().block);
+		roundState.setProcessorResult(result);
 
 		this.#step = Step.prevote;
 
 		const activeValidators = await this.#getActiveValidators();
 		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			const prevote = await validator.prevote(this.#height, this.#round, proposal.toData().block.data.id);
+			const prevote = await validator.prevote(
+				this.#height,
+				this.#round,
+				result === Contracts.BlockProcessor.ProcessorResult.Accepted
+					? proposal.toData().block.data.id
+					: undefined,
+			);
 
 			await this.broadcaster.broadcastPrevote(prevote);
 			await this.handler.onPrevote(prevote);
 		}
 	}
 
-	public async onMajorityPrevote(proposal: Contracts.Crypto.IProposal): Promise<void> {
+	public async onMajorityPrevote(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		if (this.#step !== Step.prevote) {
 			return;
 		}
+
+		const proposal = roundState.getProposal();
+		Utils.assert.defined(proposal);
 
 		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round}`);
 
@@ -122,17 +138,19 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	public async onMajorityPrecommit(proposal: Contracts.Crypto.IProposal): Promise<void> {
+	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		if (this.#step !== Step.precommit) {
 			return;
 		}
 
+		const proposal = roundState.getProposal();
+		Utils.assert.defined(proposal);
+
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round}`);
 
 		const block = proposal.toData().block;
-		const result = await this.processor.process(block);
 
-		if (result === Contracts.BlockProcessor.ProcessorResult.Accepted) {
+		if (roundState.getProcessorResult() === Contracts.BlockProcessor.ProcessorResult.Accepted) {
 			await this.database.saveBlocks([block]);
 		} else {
 			this.logger.info(`Block ${block.data.height} rejected`);

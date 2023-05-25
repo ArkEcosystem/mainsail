@@ -4,9 +4,13 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { IValidatorSetMajority } from "./types";
 
 @injectable()
-export class RoundState {
+export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "clone")
+	private readonly walletRepository!: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "consensus")
@@ -17,8 +21,13 @@ export class RoundState {
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
 	#proposal?: Contracts.Crypto.IProposal;
+	#processorResult?: Contracts.BlockProcessor.ProcessorResult;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
+
+	public getWalletRepository(): Contracts.State.WalletRepository {
+		return this.walletRepository;
+	}
 
 	public setProposal(proposal: Contracts.Crypto.IProposal): void {
 		this.#proposal = proposal;
@@ -26,6 +35,14 @@ export class RoundState {
 
 	public getProposal(): Contracts.Crypto.IProposal | undefined {
 		return this.#proposal;
+	}
+
+	public setProcessorResult(processorResult: Contracts.BlockProcessor.ProcessorResult): void {
+		this.#processorResult = processorResult;
+	}
+
+	public getProcessorResult(): Contracts.BlockProcessor.ProcessorResult | undefined {
+		return this.#processorResult;
 	}
 
 	public addPrevote(prevote: Contracts.Crypto.IPrevote): void {
