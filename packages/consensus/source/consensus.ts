@@ -97,11 +97,20 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.logger.info(`Received proposal for ${this.#height}/${this.#round}`);
 
+		const result = await this.processor.process(proposal.toData().block);
+		roundState.setProcessorResult(result);
+
 		this.#step = Step.prevote;
 
 		const activeValidators = await this.#getActiveValidators();
 		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			const prevote = await validator.prevote(this.#height, this.#round, proposal.toData().block.data.id);
+			const prevote = await validator.prevote(
+				this.#height,
+				this.#round,
+				result === Contracts.BlockProcessor.ProcessorResult.Accepted
+					? proposal.toData().block.data.id
+					: undefined,
+			);
 
 			await this.broadcaster.broadcastPrevote(prevote);
 			await this.handler.onPrevote(prevote);
@@ -140,9 +149,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round}`);
 
 		const block = proposal.toData().block;
-		const result = await this.processor.process(block);
 
-		if (result === Contracts.BlockProcessor.ProcessorResult.Accepted) {
+		if (roundState.getProcessorResult() === Contracts.BlockProcessor.ProcessorResult.Accepted) {
 			await this.database.saveBlocks([block]);
 		} else {
 			this.logger.info(`Block ${block.data.height} rejected`);
