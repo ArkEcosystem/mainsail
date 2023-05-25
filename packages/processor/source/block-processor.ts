@@ -4,6 +4,7 @@ import { Services, Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { AcceptBlockHandler } from "./handlers";
+import { VerifyBlockHandler } from "./verifiers";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
@@ -35,11 +36,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: Contracts.Crypto.Slots;
 
-	@inject(Identifiers.Cryptography.Block.Verifier)
-	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
-
 	public async process(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		if (!(await this.#verifyBlock(roundState))) {
+		if (!(await this.app.resolve(VerifyBlockHandler).execute(roundState))) {
 			return false;
 		}
 
@@ -71,44 +69,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		}
 
 		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(roundState);
-	}
-
-	async #verifyBlock(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().toData().block;
-		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
-
-		if (verification.containsMultiSignatures) {
-			try {
-				for (const transaction of block.transactions) {
-					const registry = this.app.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
-						Identifiers.TransactionHandlerRegistry,
-						"state",
-						"blockchain",
-					);
-					const handler = await registry.getActivatedHandlerForData(transaction.data);
-					await handler.verify(this.walletRepository, transaction);
-				}
-
-				// @TODO: check if we can remove this duplicate verification
-				verification = await this.blockVerifier.verify(block);
-			} catch (error) {
-				this.logger.warning(`Failed to verify block, because: ${error.message}`);
-			}
-		}
-
-		if (!verification.verified) {
-			this.logger.warning(
-				`Block ${block.data.height.toLocaleString()} (${
-					block.data.id
-				}) disregarded because verification failed`,
-			);
-
-			this.logger.warning(JSON.stringify(verification, undefined, 4));
-
-			return false;
-		}
-
-		return true;
 	}
 
 	async #checkBlockContainsForgedTransactions(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
