@@ -2,7 +2,7 @@ import { IBlock, IBlockData, ITransactionData } from "../crypto";
 import { Wallet, WalletRepository } from "./wallets";
 
 export interface BlockState {
-	applyBlock(block: IBlock): Promise<void>;
+	applyBlock(walletRepository: WalletRepository, block: IBlock): Promise<void>;
 }
 
 export interface VoteBalanceMutator {

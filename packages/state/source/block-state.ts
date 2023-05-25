@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, tagged } from "@mainsail/container";
+import { inject, injectable, multiInject } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -8,10 +8,6 @@ import { BigNumber } from "@mainsail/utils";
 export class BlockState implements Contracts.State.BlockState {
 	@inject(Identifiers.Application)
 	public readonly app: Contracts.Kernel.Application;
-
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly handlerRegistry: Contracts.Transactions.ITransactionHandlerRegistry;
@@ -25,13 +21,20 @@ export class BlockState implements Contracts.State.BlockState {
 	@multiInject(Identifiers.State.ValidatorMutator)
 	private readonly validatorMutators: Contracts.State.ValidatorMutator[];
 
-	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
+	#walletRepository: Contracts.State.WalletRepository;
+
+	public async applyBlock(
+		walletRepository: Contracts.State.WalletRepository,
+		block: Contracts.Crypto.IBlock,
+	): Promise<void> {
+		this.#walletRepository = walletRepository;
+
 		if (block.data.height === 1) {
 			await this.#initGenesisForgerWallet(block.data.generatorPublicKey);
 		}
 
 		const previousBlock = this.state.getLastBlock();
-		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
+		const forgerWallet = await this.#walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
 		if (!forgerWallet) {
 			const message = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
@@ -63,11 +66,11 @@ export class BlockState implements Contracts.State.BlockState {
 	async #applyTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		await transactionHandler.apply(this.walletRepository, transaction);
+		await transactionHandler.apply(this.#walletRepository, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+		const sender: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(
 			transaction.data.senderPublicKey,
 		);
 
@@ -75,7 +78,7 @@ export class BlockState implements Contracts.State.BlockState {
 		if (transaction.data.recipientId) {
 			AppUtils.assert.defined<string>(transaction.data.recipientId);
 
-			recipient = this.walletRepository.findByAddress(transaction.data.recipientId);
+			recipient = this.#walletRepository.findByAddress(transaction.data.recipientId);
 		}
 
 		// @ts-ignore - Apply vote balance updates
@@ -89,16 +92,16 @@ export class BlockState implements Contracts.State.BlockState {
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(data.senderPublicKey);
 
 		let recipient: Contracts.State.Wallet | undefined;
 		if (transaction.data.recipientId) {
 			AppUtils.assert.defined<string>(transaction.data.recipientId);
 
-			recipient = this.walletRepository.findByAddress(transaction.data.recipientId);
+			recipient = this.#walletRepository.findByAddress(transaction.data.recipientId);
 		}
 
-		await transactionHandler.revert(this.walletRepository, transaction);
+		await transactionHandler.revert(this.#walletRepository, transaction);
 
 		// @ts-ignore - Revert vote balance updates
 		await this.#revertVoteBalances(sender, recipient, data);
@@ -123,8 +126,8 @@ export class BlockState implements Contracts.State.BlockState {
 
 	async #applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
 		for (const validatorMutator of this.validatorMutators) {
-			// Use wallet repostiory clone
-			await validatorMutator.apply(this.walletRepository, forgerWallet, blockData);
+			console.log("applyBlockToForger", validatorMutator);
+			await validatorMutator.apply(this.#walletRepository, forgerWallet, blockData);
 		}
 	}
 
@@ -147,7 +150,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 			if (transaction.asset.unvotes.length > 0) {
 				const unvote: string = transaction.asset.unvotes[0];
-				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(unvote);
+				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(unvote);
 
 				// unvote also changes vote balance by fee
 				const voteBalanceChange: BigNumber = senderValidatordAmount
@@ -163,7 +166,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 			if (transaction.asset.votes.length > 0) {
 				const vote: string = transaction.asset.votes[0];
-				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
+				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(vote);
 
 				const voteBalanceChange: BigNumber = senderValidatordAmount.times(revert ? -1 : 1);
 
@@ -176,7 +179,7 @@ export class BlockState implements Contracts.State.BlockState {
 		} else {
 			// Update vote balance of the sender's validator
 			if (sender.hasVoted()) {
-				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(
 					sender.getAttribute("vote"),
 				);
 
@@ -212,10 +215,10 @@ export class BlockState implements Contracts.State.BlockState {
 
 				// go through all payments and update recipients validators vote balance
 				for (const { recipientId, amount } of transaction.asset.payments) {
-					const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByAddress(recipientId);
+					const recipientWallet: Contracts.State.Wallet = this.#walletRepository.findByAddress(recipientId);
 					if (recipientWallet.hasVoted()) {
 						const vote = recipientWallet.getAttribute("vote");
-						const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
+						const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(vote);
 						const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
 						validator.setAttribute(
 							"validator.voteBalance",
@@ -227,7 +230,7 @@ export class BlockState implements Contracts.State.BlockState {
 
 			// Update vote balance of recipient's validator
 			if (recipient && recipient.hasVoted()) {
-				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(
 					recipient.getAttribute("vote"),
 				);
 				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
@@ -241,10 +244,10 @@ export class BlockState implements Contracts.State.BlockState {
 	}
 
 	async #initGenesisForgerWallet(forgerPublicKey: string) {
-		if (this.walletRepository.hasByPublicKey(forgerPublicKey)) {
+		if (this.#walletRepository.hasByPublicKey(forgerPublicKey)) {
 			return;
 		}
 
-		await this.walletRepository.findByPublicKey(forgerPublicKey);
+		await this.#walletRepository.findByPublicKey(forgerPublicKey);
 	}
 }
