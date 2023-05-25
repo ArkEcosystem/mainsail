@@ -1,20 +1,20 @@
-import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class BalanceMutator implements Contracts.State.ValidatorMutator {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository: Contracts.State.WalletRepository;
-
-	public async apply(wallet: Contracts.State.Wallet, block: Contracts.Crypto.IBlockData): Promise<void> {
+	public async apply(
+		walletRepository: Contracts.State.WalletRepository,
+		wallet: Contracts.State.Wallet,
+		block: Contracts.Crypto.IBlockData,
+	): Promise<void> {
 		const amount = block.reward.plus(block.totalFee);
 
 		// ? packages/transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
 		// ? is it guaranteed that validator wallet exists, so validatorWallet.getAttribute("validator.voteBalance") is safe?
 		if (wallet.hasVoted()) {
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			const validatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				wallet.getAttribute<string>("vote"),
 			);
 
@@ -27,11 +27,15 @@ export class BalanceMutator implements Contracts.State.ValidatorMutator {
 		wallet.increaseBalance(amount);
 	}
 
-	public async revert(wallet: Contracts.State.Wallet, block: Contracts.Crypto.IBlockData): Promise<void> {
+	public async revert(
+		walletRepository: Contracts.State.WalletRepository,
+		wallet: Contracts.State.Wallet,
+		block: Contracts.Crypto.IBlockData,
+	): Promise<void> {
 		const amount = block.reward.plus(block.totalFee);
 
 		if (wallet.hasVoted()) {
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			const validatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				wallet.getAttribute<string>("vote"),
 			);
 

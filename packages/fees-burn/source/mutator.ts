@@ -5,19 +5,19 @@ import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository: Contracts.State.WalletRepository;
-
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "fees-managed")
 	private readonly pluginConfiguration: Providers.PluginConfiguration;
 
-	public async apply(wallet: Contracts.State.Wallet, block: Contracts.Crypto.IBlockData): Promise<void> {
+	public async apply(
+		walletRepository: Contracts.State.WalletRepository,
+		wallet: Contracts.State.Wallet,
+		block: Contracts.Crypto.IBlockData,
+	): Promise<void> {
 		const amount: BigNumber = this.#calculate(block);
 
 		if (wallet.hasVoted()) {
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			const validatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				wallet.getAttribute<string>("vote"),
 			);
 
@@ -30,11 +30,15 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 		wallet.decreaseBalance(amount);
 	}
 
-	public async revert(wallet: Contracts.State.Wallet, block: Contracts.Crypto.IBlockData): Promise<void> {
+	public async revert(
+		walletRepository: Contracts.State.WalletRepository,
+		wallet: Contracts.State.Wallet,
+		block: Contracts.Crypto.IBlockData,
+	): Promise<void> {
 		const amount: BigNumber = this.#calculate(block);
 
 		if (wallet.hasVoted()) {
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			const validatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 				wallet.getAttribute<string>("vote"),
 			);
 

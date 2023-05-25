@@ -123,7 +123,8 @@ export class BlockState implements Contracts.State.BlockState {
 
 	async #applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
 		for (const validatorMutator of this.validatorMutators) {
-			await validatorMutator.apply(forgerWallet, blockData);
+			// Use wallet repostiory clone
+			await validatorMutator.apply(this.walletRepository, forgerWallet, blockData);
 		}
 	}
 
