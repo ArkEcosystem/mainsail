@@ -97,7 +97,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.logger.info(`Received proposal for ${this.#height}/${this.#round}`);
 
-		const result = await this.processor.process(proposal.toData().block);
+		const result = await this.processor.process(roundState);
 		roundState.setProcessorResult(result);
 
 		this.#step = Step.prevote;
@@ -107,9 +107,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			const prevote = await validator.prevote(
 				this.#height,
 				this.#round,
-				result === Contracts.BlockProcessor.ProcessorResult.Accepted
-					? proposal.toData().block.data.id
-					: undefined,
+				result ? proposal.toData().block.data.id : undefined,
 			);
 
 			await this.broadcaster.broadcastPrevote(prevote);
@@ -150,7 +148,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const block = proposal.toData().block;
 
-		if (roundState.getProcessorResult() === Contracts.BlockProcessor.ProcessorResult.Accepted) {
+		if (roundState.getProcessorResult()) {
 			await this.database.saveBlocks([block]);
 		} else {
 			this.logger.info(`Block ${block.data.height} rejected`);

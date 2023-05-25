@@ -1,17 +1,9 @@
-import { IBlock } from "./crypto";
-
-export enum ProcessorResult {
-	Accepted,
-	DiscardedButCanBeBroadcasted,
-	Rejected,
-	Rollback,
-	Corrupted,
-}
+import { IRoundState } from "./consensus";
 
 export interface Handler {
-	execute(block?: IBlock): Promise<ProcessorResult>;
+	execute(roundState: IRoundState): Promise<boolean>;
 }
 
 export interface Processor {
-	process(block: IBlock): Promise<ProcessorResult>;
+	process(roundState: IRoundState): Promise<boolean>;
 }

@@ -1,4 +1,3 @@
-import { ProcessorResult } from "./block-processor";
 import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 import { WalletRepository } from "./state";
 
@@ -6,8 +5,8 @@ export interface IRoundState {
 	getWalletRepository(): WalletRepository;
 	getProposal(): IProposal | undefined;
 	setProposal(proposal: IProposal): void;
-	setProcessorResult(processorResult: ProcessorResult): void;
-	getProcessorResult(): ProcessorResult;
+	setProcessorResult(processorResult: boolean): void;
+	getProcessorResult(): boolean;
 }
 
 export interface IConsensusService {
