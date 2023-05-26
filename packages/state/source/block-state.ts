@@ -12,9 +12,6 @@ export class BlockState implements Contracts.State.BlockState {
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly handlerRegistry: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@inject(Identifiers.StateStore)
-	private readonly state: Contracts.State.StateStore;
-
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -29,35 +26,16 @@ export class BlockState implements Contracts.State.BlockState {
 	): Promise<void> {
 		this.#walletRepository = walletRepository;
 
-		if (block.data.height === 1) {
-			await this.#initGenesisForgerWallet(block.data.generatorPublicKey);
-		}
-
-		const previousBlock = this.state.getLastBlock();
 		const forgerWallet = await this.#walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
-		if (!forgerWallet) {
-			const message = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.app.terminate(message);
-		}
-		const appliedTransactions: Contracts.Crypto.ITransaction[] = [];
 		try {
 			for (const transaction of block.transactions) {
 				await this.#applyTransaction(transaction);
-				appliedTransactions.push(transaction);
 			}
 			await this.#applyBlockToForger(forgerWallet, block.data);
-
-			this.state.setLastBlock(block);
 		} catch (error) {
 			this.logger.error(error.stack);
 			this.logger.error("Failed to apply all transactions in block - reverting previous transactions");
-			for (const transaction of appliedTransactions.reverse()) {
-				await this.#revertTransaction(transaction);
-			}
-
-			this.state.setLastBlock(previousBlock);
 
 			throw error;
 		}
@@ -85,28 +63,6 @@ export class BlockState implements Contracts.State.BlockState {
 		await this.#applyVoteBalances(sender, recipient, transaction.data);
 	}
 
-	async #revertTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		const { data } = transaction;
-
-		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-
-		AppUtils.assert.defined<string>(data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(data.senderPublicKey);
-
-		let recipient: Contracts.State.Wallet | undefined;
-		if (transaction.data.recipientId) {
-			AppUtils.assert.defined<string>(transaction.data.recipientId);
-
-			recipient = this.#walletRepository.findByAddress(transaction.data.recipientId);
-		}
-
-		await transactionHandler.revert(this.#walletRepository, transaction);
-
-		// @ts-ignore - Revert vote balance updates
-		await this.#revertVoteBalances(sender, recipient, data);
-	}
-
 	// WALLETS
 	async #applyVoteBalances(
 		sender: Contracts.State.Wallet,
@@ -114,14 +70,6 @@ export class BlockState implements Contracts.State.BlockState {
 		transaction: Contracts.Crypto.ITransactionData,
 	): Promise<void> {
 		return this.#updateVoteBalances(sender, recipient, transaction, false);
-	}
-
-	async #revertVoteBalances(
-		sender: Contracts.State.Wallet,
-		recipient: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.ITransactionData,
-	): Promise<void> {
-		return this.#updateVoteBalances(sender, recipient, transaction, true);
 	}
 
 	async #applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
@@ -240,13 +188,5 @@ export class BlockState implements Contracts.State.BlockState {
 				);
 			}
 		}
-	}
-
-	async #initGenesisForgerWallet(forgerPublicKey: string) {
-		if (this.#walletRepository.hasByPublicKey(forgerPublicKey)) {
-			return;
-		}
-
-		await this.#walletRepository.findByPublicKey(forgerPublicKey);
 	}
 }
