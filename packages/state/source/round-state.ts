@@ -123,11 +123,12 @@ export class RoundState {
 			const validator: Contracts.State.Wallet =
 				this.#forgingValidators[missedSlot % this.#forgingValidators.length];
 
-			this.logger.debug(
-				`Validator ${validator.getAttribute(
-					"validator.username",
-				)} (${validator.getPublicKey()}) just missed a block.`,
-			);
+			// TODO: the missed slots are inaccurate
+			// this.logger.debug(
+			// 	`Validator ${validator.getAttribute(
+			// 		"validator.username",
+			// 	)} (${validator.getPublicKey()}) just missed a block.`,
+			// );
 
 			await this.events.dispatch(Enums.ForgerEvent.Missing, {
 				validator,
