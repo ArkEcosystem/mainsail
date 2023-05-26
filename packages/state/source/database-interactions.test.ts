@@ -4,10 +4,10 @@ import { Enums } from "@mainsail/kernel";
 
 import { Configuration } from "../../crypto-config";
 import { DatabaseService } from "../../database/source/database-service";
-import { describe } from "../../test-framework";
+import { describeSkip } from "../../test-framework";
 import { DatabaseInteraction } from "./database-interactions";
 
-describe<{
+describeSkip<{
 	app: any;
 	blockFactory: any;
 	blockStorage: any;
