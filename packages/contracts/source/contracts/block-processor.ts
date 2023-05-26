@@ -6,4 +6,5 @@ export interface Handler {
 
 export interface Processor {
 	process(roundState: IRoundState): Promise<boolean>;
+	commit(roundState: IRoundState): Promise<void>;
 }

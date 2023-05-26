@@ -161,7 +161,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		);
 
 		if (roundState.getProcessorResult()) {
-			await this.database.saveBlocks([proposalData.block]);
+			await this.processor.commit(roundState);
 		} else {
 			this.logger.info(`Block ${proposalData.block.data.height} rejected`);
 		}

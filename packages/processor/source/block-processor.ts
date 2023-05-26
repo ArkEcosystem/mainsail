@@ -61,6 +61,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		this.state.setLastBlock(block);
 
+		this.logger.info(`Block ${block.data.height.toLocaleString()} committed`);
+
 		for (const transaction of block.transactions) {
 			await this.#emitTransactionEvents(transaction);
 		}
