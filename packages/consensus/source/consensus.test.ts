@@ -2,6 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { Consensus } from "./consensus";
+import { Step } from "./enums";
 
 describe<{
 	sandbox: Sandbox;
@@ -71,5 +72,43 @@ describe<{
 		context.consensus = context.sandbox.app.resolve(Consensus);
 	});
 
-	it("should run", async (context) => {});
+	it("#getHeight - should return initial value", async ({ consensus }) => {
+		assert.equal(consensus.getHeight(), 2);
+	});
+
+	it("#getRound - should return initial value", async ({ consensus }) => {
+		assert.equal(consensus.getRound(), 0);
+	});
+
+	it("#getStep - should return initial value", async ({ consensus }) => {
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#getLockedValue - should return initial value", async ({ consensus }) => {
+		assert.undefined(consensus.getLockedValue());
+	});
+
+	it("#getLockedRound - should return initial value", async ({ consensus }) => {
+		assert.equal(consensus.getLockedRound(), -1);
+	});
+
+	it("#getValidValue - should return initial value", async ({ consensus }) => {
+		assert.undefined(consensus.getValidValue());
+	});
+
+	it("#getValidRound - should return initial value", async ({ consensus }) => {
+		assert.equal(consensus.getValidRound(), -1);
+	});
+
+	it("#getState - should return initial value", async ({ consensus }) => {
+		assert.equal(consensus.getState(), {
+			height: 2,
+			lockedRound: -1,
+			lockedValue: undefined,
+			round: 0,
+			step: Step.propose,
+			validRound: -1,
+			validValue: undefined,
+		});
+	});
 });
