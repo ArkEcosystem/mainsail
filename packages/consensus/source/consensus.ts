@@ -3,8 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import delay from "delay";
 
-import { IScheduler } from "./types";
-
 enum Step {
 	propose = "propose",
 	prevote = "prevote",
@@ -23,7 +21,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly database: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.Consensus.Scheduler)
-	private readonly scheduler: IScheduler;
+	private readonly scheduler: Contracts.Consensus.IScheduler;
 
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository: Contracts.Consensus.IValidatorRepository;

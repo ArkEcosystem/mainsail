@@ -2,10 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
-import { IScheduler } from "./types";
-
 @injectable()
-export class Scheduler implements IScheduler {
+export class Scheduler implements Contracts.Consensus.IScheduler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
