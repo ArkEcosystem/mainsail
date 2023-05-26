@@ -71,7 +71,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposerPublicKey = await this.#getProposerPublicKey(this.#height, round);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
-		this.logger.info(`Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
+		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
 		if (proposer) {
 			const block = await proposer.prepareBlock(this.#height, round);
@@ -95,7 +95,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = roundState.getProposal();
 		Utils.assert.defined(proposal);
 
-		this.logger.info(`Received proposal for ${this.#height}/${this.#round}`);
+		this.logger.info(
+			`Received proposal ${this.#height}/${this.#round} blockId: ${proposal.toData().block.data.id}`,
+		);
 
 		const result = await this.processor.process(roundState);
 		roundState.setProcessorResult(result);
@@ -123,13 +125,19 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = roundState.getProposal();
 		Utils.assert.defined(proposal);
 
-		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round}`);
+		const proposalData = proposal.toData();
+
+		this.logger.info(
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
+				proposalData.validatorPublicKey
+			} blockId: ${proposalData.block.data.id}`,
+		);
 
 		this.#step = Step.precommit;
 
 		const activeValidators = await this.#getActiveValidators();
 		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			const precommit = await validator.precommit(this.#height, this.#round, proposal.toData().block.data.id);
+			const precommit = await validator.precommit(this.#height, this.#round, proposalData.block.data.id);
 
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
@@ -144,14 +152,18 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = roundState.getProposal();
 		Utils.assert.defined(proposal);
 
-		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round}`);
+		const proposalData = proposal.toData();
 
-		const block = proposal.toData().block;
+		this.logger.info(
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+				proposalData.validatorPublicKey
+			} blockId: ${proposalData.block.data.id}`,
+		);
 
 		if (roundState.getProcessorResult()) {
-			await this.database.saveBlocks([block]);
+			await this.database.saveBlocks([proposalData.block]);
 		} else {
-			this.logger.info(`Block ${block.data.height} rejected`);
+			this.logger.info(`Block ${proposalData.block.data.height} rejected`);
 		}
 
 		await delay(8000);
