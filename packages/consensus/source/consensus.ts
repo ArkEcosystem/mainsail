@@ -20,6 +20,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Database.Service)
 	private readonly database: Contracts.Database.IDatabaseService;
 
+	@inject(Identifiers.Consensus.Handler)
+	private readonly handler: Contracts.Consensus.IHandler;
+
+	@inject(Identifiers.Consensus.Broadcaster)
+	private readonly broadcaster: Contracts.Consensus.IBroadcaster;
+
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler: Contracts.Consensus.IScheduler;
 
@@ -71,7 +77,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			const block = await proposer.prepareBlock(this.#height, round);
 
 			// TODO: Add valid round to proposal
-			await proposer.propose(this.#height, this.#round, block);
+			const proposal = await proposer.propose(this.#height, this.#round, block);
+
+			await this.broadcaster.broadcastProposal(proposal);
+			await this.handler.onProposal(proposal);
 		} else {
 			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
 
@@ -99,7 +108,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const activeValidators = await this.#getActiveValidators();
 		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			await validator.prevote(this.#height, this.#round, result ? proposal.toData().block.data.id : undefined);
+			const prevote = await validator.prevote(
+				this.#height,
+				this.#round,
+				result ? proposal.toData().block.data.id : undefined,
+			);
+
+			await this.broadcaster.broadcastPrevote(prevote);
+			await this.handler.onPrevote(prevote);
 		}
 	}
 
@@ -123,7 +139,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const activeValidators = await this.#getActiveValidators();
 		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			await validator.precommit(this.#height, this.#round, proposalData.block.data.id);
+			const precommit = await validator.precommit(this.#height, this.#round, proposalData.block.data.id);
+
+			await this.broadcaster.broadcastPrecommit(precommit);
+			await this.handler.onPrecommit(precommit);
 		}
 	}
 
