@@ -74,8 +74,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
 		if (proposer) {
+			// TODO: Handle locked value
+
 			const block = await proposer.prepareBlock(this.#height, round);
 
+			// TODO: Add valid round to proposal
 			const proposal = await proposer.propose(this.#height, this.#round, block);
 
 			await this.broadcaster.broadcastProposal(proposal);
@@ -87,6 +90,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
+	// TODO: Implement proposal for validRound >= 0.
 	public async onProposal(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		if (this.#step !== Step.propose) {
 			return;
@@ -179,7 +183,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
-		// TODO:
 		const activeValidators = await this.validatorSet.getActiveValidators();
 		return activeValidators[0].getAttribute("consensus.publicKey");
 	}
