@@ -72,15 +72,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
 		if (proposer) {
-			// TODO: Handle locked value
-
-			const block = await proposer.prepareBlock(this.#height, round);
-
-			// TODO: Add valid round to proposal
-			const proposal = await proposer.propose(this.#height, this.#round, block);
-
-			await this.broadcaster.broadcastProposal(proposal);
-			await this.handler.onProposal(proposal);
+			await this.#propose(proposer);
 		} else {
 			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
 
@@ -179,6 +171,17 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
+
+	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
+		// TODO: Handle locked value
+		const block = await proposer.prepareBlock(this.#height, this.#round);
+
+		// TODO: Add valid round to proposal
+		const proposal = await proposer.propose(this.#height, this.#round, block);
+
+		await this.broadcaster.broadcastProposal(proposal);
+		await this.handler.onProposal(proposal);
+	}
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
 		const activeValidators = await this.validatorSet.getActiveValidators();
