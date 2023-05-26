@@ -61,7 +61,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const lastBlock = await this.database.getLastBlock();
 		this.#height = lastBlock.data.height + 1;
 
-		await this.startRound(this.#round);
+		void this.startRound(this.#round);
 	}
 
 	public async startRound(round: number): Promise<void> {
