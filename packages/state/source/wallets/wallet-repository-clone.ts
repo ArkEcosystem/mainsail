@@ -5,7 +5,7 @@ import { WalletIndex } from "./wallet-index";
 import { WalletRepository } from "./wallet-repository";
 
 @injectable()
-export class WalletRepositoryClone extends WalletRepository {
+export class WalletRepositoryClone extends WalletRepository implements Contracts.State.WalletRepositoryClone {
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
 	private readonly blockchainWalletRepository!: WalletRepository;

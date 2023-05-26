@@ -107,8 +107,6 @@ export interface WalletValidatorAttributes {
 export type WalletMultiSignatureAttributes = IMultiSignatureAsset & { legacy?: boolean };
 
 export interface WalletRepository {
-	reset(): void;
-
 	allByAddress(): ReadonlyArray<Wallet>;
 
 	allByPublicKey(): ReadonlyArray<Wallet>;
@@ -144,6 +142,12 @@ export interface WalletRepository {
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 
 	forgetOnIndex(index: string, key: string): void;
+}
+
+export interface WalletRepositoryClone extends WalletRepository {
+	reset(): void;
+
+	commitChanges(): void;
 }
 
 export enum SearchScope {

@@ -51,8 +51,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	}
 
 	public async commit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		// TODO Commit changes
-		roundState.getWalletRepository();
+		roundState.getWalletRepository().commitChanges();
 
 		const block = roundState.getProposal().toData().block;
 

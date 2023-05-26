@@ -10,7 +10,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "clone")
-	private readonly walletRepository!: Contracts.State.WalletRepository;
+	private readonly walletRepository!: Contracts.State.WalletRepositoryClone;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "consensus")
@@ -25,7 +25,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
 
-	public getWalletRepository(): Contracts.State.WalletRepository {
+	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
 		return this.walletRepository;
 	}
 

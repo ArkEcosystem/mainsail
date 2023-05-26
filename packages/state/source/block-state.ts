@@ -21,10 +21,10 @@ export class BlockState implements Contracts.State.BlockState {
 	@multiInject(Identifiers.State.ValidatorMutator)
 	private readonly validatorMutators: Contracts.State.ValidatorMutator[];
 
-	#walletRepository: Contracts.State.WalletRepository;
+	#walletRepository: Contracts.State.WalletRepositoryClone;
 
 	public async applyBlock(
-		walletRepository: Contracts.State.WalletRepository,
+		walletRepository: Contracts.State.WalletRepositoryClone,
 		block: Contracts.Crypto.IBlock,
 	): Promise<void> {
 		this.#walletRepository = walletRepository;
