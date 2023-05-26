@@ -95,7 +95,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = roundState.getProposal();
 		Utils.assert.defined(proposal);
 
-		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${proposal.toData().block.data.id}`);
+		this.logger.info(
+			`Received proposal ${this.#height}/${this.#round} blockId: ${proposal.toData().block.data.id}`,
+		);
 
 		const result = await this.processor.process(roundState);
 		roundState.setProcessorResult(result);
@@ -125,7 +127,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const proposalData = proposal.toData();
 
-		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposalData.validatorPublicKey} blockId: ${proposalData.block.data.id}`);
+		this.logger.info(
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
+				proposalData.validatorPublicKey
+			} blockId: ${proposalData.block.data.id}`,
+		);
 
 		this.#step = Step.precommit;
 
@@ -148,7 +154,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const proposalData = proposal.toData();
 
-		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${proposalData.validatorPublicKey} blockId: ${proposalData.block.data.id}`);
+		this.logger.info(
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+				proposalData.validatorPublicKey
+			} blockId: ${proposalData.block.data.id}`,
+		);
 
 		if (roundState.getProcessorResult()) {
 			await this.database.saveBlocks([proposalData.block]);
@@ -162,11 +172,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.startRound(0);
 	}
 
-	public async onTimeoutPropose(height: number, round: number): Promise<void> { }
+	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
 
-	public async onTimeoutPrevote(height: number, round: number): Promise<void> { }
+	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
 
-	public async onTimeoutPrecommit(height: number, round: number): Promise<void> { }
+	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
 		// TODO:
