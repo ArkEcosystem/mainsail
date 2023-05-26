@@ -3,11 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import delay from "delay";
 
-enum Step {
-	propose = "propose",
-	prevote = "prevote",
-	precommit = "precommit",
-}
+import { Step } from "./enums";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
