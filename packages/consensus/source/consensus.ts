@@ -22,6 +22,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler: Contracts.Consensus.IScheduler;
 
+	// TODO: Rename identifier
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository: Contracts.Consensus.IValidatorRepository;
 
