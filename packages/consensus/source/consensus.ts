@@ -11,14 +11,11 @@ enum Step {
 
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
-	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
-
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor: Contracts.BlockProcessor.Processor;
 
-	@inject(Identifiers.Database.Service)
-	private readonly database: Contracts.Database.IDatabaseService;
+	@inject(Identifiers.StateStore)
+	private readonly state: Contracts.State.StateStore;
 
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler: Contracts.Consensus.IHandler;
@@ -34,6 +31,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet: Contracts.ValidatorSet.IValidatorSet;
+
+	@inject(Identifiers.LogService)
+	private readonly logger: Contracts.Kernel.Logger;
 
 	#height = 2;
 	#round = 0;
@@ -56,7 +56,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async run(): Promise<void> {
-		const lastBlock = await this.database.getLastBlock();
+		const lastBlock = this.state.getLastBlock();
 		this.#height = lastBlock.data.height + 1;
 
 		void this.startRound(this.#round);
