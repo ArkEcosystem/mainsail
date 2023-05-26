@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { DatabaseInteraction } from "@mainsail/state";
 
 @injectable()
 export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
@@ -16,8 +15,8 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@inject(Identifiers.DatabaseInteraction)
-	private readonly databaseInteraction!: DatabaseInteraction;
+	// @inject(Identifiers.DatabaseInteraction)
+	// private readonly databaseInteraction!: DatabaseInteraction;
 
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
@@ -26,7 +25,7 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 		const block = roundState.getProposal().toData().block;
 
 		try {
-			await this.databaseInteraction.applyBlock(block);
+			// await this.databaseInteraction.applyBlock(block);
 
 			for (const transaction of block.transactions) {
 				await this.transactionPool.removeForgedTransaction(transaction);

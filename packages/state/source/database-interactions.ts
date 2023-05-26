@@ -12,14 +12,8 @@ export class DatabaseInteraction {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.BlockState)
-	private readonly blockState!: Contracts.State.BlockState;
-
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
-
-	@inject(Identifiers.TransactionHandlerRegistry)
-	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -55,20 +49,6 @@ export class DatabaseInteraction {
 
 			await this.app.terminate("Failed to initialize database service.", error);
 		}
-	}
-
-	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-		await this.roundState.detectMissedBlocks(block);
-
-		await this.blockState.applyBlock(block);
-		await this.roundState.applyBlock(block);
-
-		for (const transaction of block.transactions) {
-			await this.#emitTransactionEvents(transaction);
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.events.dispatch(Enums.BlockEvent.Applied, block.data);
 	}
 
 	public async restoreCurrentRound(): Promise<void> {
@@ -118,13 +98,5 @@ export class DatabaseInteraction {
 
 	#configureState(lastBlock: Contracts.Crypto.IBlock): void {
 		this.stateStore.setLastBlock(lastBlock);
-	}
-
-	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
-		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		// ! no reason to pass this.emitter
-		handler.emitEvents(transaction, this.events);
 	}
 }
