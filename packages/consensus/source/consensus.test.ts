@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { Consensus } from "./consensus";
@@ -128,7 +128,7 @@ describe<{
 				getAttribute: () => validatorPublicKey,
 			},
 		]);
-		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(undefined);
+		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
 		const spyScheduleTimeoutPropose = spy(scheduler, "scheduleTimeoutPropose");
 
 		await consensus.startRound(0);
@@ -196,4 +196,66 @@ describe<{
 		spyScheduleTimeoutPropose.neverCalled();
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 	});
+
+	it("#onProposal - should return if height doesn't match", async ({ consensus, blockProcessor }) => {
+		const spyBlockProcessorProcess = spy(blockProcessor, "process");
+
+		const block = {
+			data: {
+				height: 3,
+			},
+		};
+
+		const proposal = {
+			toData: () => ({
+				block,
+				height: 3,
+				round: 0,
+			}),
+		};
+
+		const roundState = {
+			getProposal: () => proposal,
+		} as unknown as Contracts.Consensus.IRoundState;
+
+		await consensus.onProposal(roundState);
+
+		spyBlockProcessorProcess.neverCalled();
+	});
+
+	it("#onProposal - should return if round doesn't match", async ({ consensus, blockProcessor }) => {
+		const spyBlockProcessorProcess = spy(blockProcessor, "process");
+
+		const block = {
+			data: {
+				height: 2,
+			},
+		};
+
+		const proposal = {
+			toData: () => ({
+				block,
+				height: 2,
+				round: 1,
+			}),
+		};
+
+		const roundState = {
+			getProposal: () => proposal,
+		} as unknown as Contracts.Consensus.IRoundState;
+
+		await consensus.onProposal(roundState);
+
+		spyBlockProcessorProcess.neverCalled();
+	});
+
+	// TODO:
+	it("#onProposal - should return if proposed lockedValue is not -1", async ({ consensus }) => {});
+	it("#onProposal - should return if step !== 'propose'", async ({ consensus }) => {});
+	it("#onProposal - should return if not from valid proposer", async ({ consensus }) => {});
+
+	it("#onProposal - broadcast prevote block id, if block is valid & not locked", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if block is invalid", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if locked", async ({ consensus }) => {});
 });

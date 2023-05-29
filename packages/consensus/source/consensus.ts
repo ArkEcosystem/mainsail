@@ -116,6 +116,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = roundState.getProposal();
 		Utils.assert.defined(proposal);
 
+		if (proposal.toData().height !== this.#height) {
+			return;
+		}
+
+		if (proposal.toData().round !== this.#round) {
+			return;
+		}
+
 		this.logger.info(
 			`Received proposal ${this.#height}/${this.#round} blockId: ${proposal.toData().block.data.id}`,
 		);
