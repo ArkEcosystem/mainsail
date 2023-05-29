@@ -52,6 +52,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return this.#step;
 	}
 
+	// TODO: Only for testing
+	public setStep(step: Step): void {
+		this.#step = step;
+	}
+
 	public getLockedValue(): unknown {
 		return this.#lockedValue;
 	}
@@ -173,6 +178,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
 		}
+	}
+
+	public async onMajorityPrevoteAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+		if (this.#step !== Step.prevote) {
+			return;
+		}
+
+		// TODO: Check that its called only once
+		void this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
 	}
 
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {

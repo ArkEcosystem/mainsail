@@ -412,5 +412,21 @@ describe<{
 	// TODO: Handle on processor
 	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
 
-	it("#onProposal - broadcast prevote null, if locked", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
+
+	it("#onMajorityPrevoteAny - should schedule timeout prevote", async ({ consensus, scheduler }) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+
+		const prevote = {
+			height: 2,
+			round: 0,
+		};
+
+		consensus.setStep(Step.prevote);
+		await consensus.onMajorityPrevoteAny(prevote);
+
+		spyScheduleTimeout.calledOnce();
+		spyScheduleTimeout.calledWith(2, 0);
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
 });
