@@ -21,6 +21,22 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		this.#signature = signature;
 	}
 
+	get height(): number {
+		return this.#height;
+	}
+
+	get round(): number {
+		return this.#round;
+	}
+
+	get block(): Contracts.Crypto.IBlock {
+		return this.#block;
+	}
+
+	get validatorPublicKey(): string {
+		return this.#validatorPublicKey;
+	}
+
 	get signature(): string {
 		return this.#signature;
 	}

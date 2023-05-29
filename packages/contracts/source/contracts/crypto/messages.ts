@@ -10,6 +10,10 @@ export interface IProposalData {
 }
 
 export interface IProposal {
+	height: number;
+	round: number;
+	block: IBlock;
+	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
 	toData(): IProposalData;
@@ -24,6 +28,10 @@ export interface IPrevoteData {
 }
 
 export interface IPrevote {
+	height: number;
+	round: number;
+	blockId?: string;
+	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
 	toData(): IPrevoteData;
@@ -38,6 +46,10 @@ export interface IPrecommitData {
 }
 
 export interface IPrecommit {
+	height: number;
+	round: number;
+	blockId?: string;
+	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
 	toData(): IPrecommitData;
