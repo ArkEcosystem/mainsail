@@ -176,6 +176,24 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		void this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
 	}
 
+	public async onMajorityPrevoteNull(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+		if (this.#step !== Step.prevote || this.#isInvalidRoundState(roundState)) {
+			return;
+		}
+
+		// ADD: Log info
+
+		this.#step = Step.precommit;
+
+		const activeValidators = await this.#getActiveValidators();
+		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
+			const precommit = await validator.precommit(this.#height, this.#round, undefined);
+
+			await this.broadcaster.broadcastPrecommit(precommit);
+			await this.handler.onPrecommit(precommit);
+		}
+	}
+
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		if (this.#step !== Step.precommit) {
 			return;
@@ -208,7 +226,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
 
-	#isInvalidRoundState(roundState: Contracts.Consensus.RoundState): boolean {
+	#isInvalidRoundState(roundState: Contracts.Consensus.IRoundState): boolean {
 		if (roundState.height !== this.#height) {
 			return true;
 		}
