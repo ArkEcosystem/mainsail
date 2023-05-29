@@ -129,17 +129,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.#step = Step.prevote;
 
-		const activeValidators = await this.#getActiveValidators();
-		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			const prevote = await validator.prevote(
-				this.#height,
-				this.#round,
-				result ? proposal.block.data.id : undefined,
-			);
-
-			await this.broadcaster.broadcastPrevote(prevote);
-			await this.handler.onPrevote(prevote);
-		}
+		await this.#prevote(result ? proposal.block.data.id : undefined);
 	}
 
 	public async onMajorityPrevote(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -158,13 +148,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.#step = Step.precommit;
 
-		const activeValidators = await this.#getActiveValidators();
-		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			const precommit = await validator.precommit(this.#height, this.#round, proposal.block.data.id);
-
-			await this.broadcaster.broadcastPrecommit(precommit);
-			await this.handler.onPrecommit(precommit);
-		}
+		await this.#precommit(proposal.block.data.id);
 	}
 
 	public async onMajorityPrevoteAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -185,13 +169,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.#step = Step.precommit;
 
-		const activeValidators = await this.#getActiveValidators();
-		for (const validator of this.validatorsRepository.getValidators(activeValidators)) {
-			const precommit = await validator.precommit(this.#height, this.#round, undefined);
-
-			await this.broadcaster.broadcastPrecommit(precommit);
-			await this.handler.onPrecommit(precommit);
-		}
+		await this.#precommit(undefined);
 	}
 
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -247,6 +225,24 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		await this.broadcaster.broadcastProposal(proposal);
 		await this.handler.onProposal(proposal);
+	}
+
+	async #prevote(value: string | undefined): Promise<void> {
+		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
+			const precommit = await validator.prevote(this.#height, this.#round, value);
+
+			await this.broadcaster.broadcastPrevote(precommit);
+			await this.handler.onPrevote(precommit);
+		}
+	}
+
+	async #precommit(value: string | undefined): Promise<void> {
+		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
+			const precommit = await validator.precommit(this.#height, this.#round, value);
+
+			await this.broadcaster.broadcastPrecommit(precommit);
+			await this.handler.onPrecommit(precommit);
+		}
 	}
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
