@@ -15,6 +15,9 @@ describe<{
 	validatorsRepository: any;
 	validatorSet: any;
 	logger: any;
+	block: any;
+	proposal: any;
+	roundState: Contracts.Consensus.IRoundState;
 }>("Consensus", ({ it, beforeEach, assert, stub, spy }) => {
 	beforeEach((context) => {
 		context.blockProcessor = {
@@ -56,6 +59,28 @@ describe<{
 		context.logger = {
 			info: () => {},
 		};
+
+		context.block = {
+			data: {
+				height: 2,
+				id: "blockId",
+			},
+		};
+
+		context.proposal = {
+			block: context.block,
+			height: 2,
+			round: 0,
+			validRound: undefined,
+			validatorPublicKey: "validatorPublicKey",
+		};
+
+		context.roundState = {
+			getProposal: () => context.proposal,
+			height: 2,
+			round: 0,
+			setProcessorResult: () => {},
+		} as unknown as Contracts.Consensus.IRoundState;
 
 		context.sandbox = new Sandbox();
 
@@ -150,19 +175,13 @@ describe<{
 		logger,
 		broadcaster,
 		handler,
+		block,
+		proposal,
 	}) => {
 		const validatorPublicKey = "publicKey";
 		const validator = {
 			prepareBlock: () => {},
 			propose: () => {},
-		};
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-		const proposal = {
-			block,
 		};
 
 		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
@@ -199,26 +218,8 @@ describe<{
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	it("#onProposal - should return if step !== propose", async ({ consensus, blockProcessor }) => {
+	it("#onProposal - should return if step !== propose", async ({ consensus, blockProcessor, roundState }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
-
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 0,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
 
 		consensus.setStep(Step.prevote);
 		await consensus.onProposal(roundState);
@@ -227,108 +228,45 @@ describe<{
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
 
-	it("#onProposal - should return if height doesn't match", async ({ consensus, blockProcessor }) => {
+	it("#onProposal - should return if height doesn't match", async ({ consensus, blockProcessor, roundState }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
-		const block = {
-			data: {
-				height: 3,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 3,
-			round: 0,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
-
+		roundState.height = 3;
 		await consensus.onProposal(roundState);
 
 		spyBlockProcessorProcess.neverCalled();
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	it("#onProposal - should return if round doesn't match", async ({ consensus, blockProcessor }) => {
+	it("#onProposal - should return if round doesn't match", async ({ consensus, blockProcessor, roundState }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 1,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
-
+		roundState.round = 2;
 		await consensus.onProposal(roundState);
 
 		spyBlockProcessorProcess.neverCalled();
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	it("#onProposal - should return if proposal is undefined", async ({ consensus, blockProcessor }) => {
+	it("#onProposal - should return if proposal is undefined", async ({ consensus, blockProcessor, roundState }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 1,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => undefined,
-		} as unknown as Contracts.Consensus.IRoundState;
-
+		roundState.getProposal = () => {};
 		await consensus.onProposal(roundState);
 
 		spyBlockProcessorProcess.neverCalled();
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	it("#onProposal - should return if proposed validRound is defined", async ({ consensus, blockProcessor }) => {
+	it("#onProposal - should return if proposed validRound is defined", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+		proposal,
+	}) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 1,
-			validRound: 1,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
-
+		proposal.validRound = 1;
 		await consensus.onProposal(roundState);
 
 		spyBlockProcessorProcess.neverCalled();
@@ -344,27 +282,10 @@ describe<{
 		validatorsRepository,
 		broadcaster,
 		handler,
+		roundState,
+		block,
 	}) => {
 		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
-
-		const block = {
-			data: {
-				height: 2,
-				id: "blockId",
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 0,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-			setProcessorResult: () => {},
-		} as unknown as Contracts.Consensus.IRoundState;
 
 		const prevote = {
 			height: 2,
@@ -392,7 +313,7 @@ describe<{
 		spyValidatorsRepositoryGetValidators.calledOnce();
 
 		spyValidatorPrevote.calledOnce();
-		spyValidatorPrevote.calledWith(2, 0, "blockId");
+		spyValidatorPrevote.calledWith(2, 0, block.data.id);
 
 		spyBroadcastPrevote.calledOnce();
 		spyBroadcastPrevote.calledWith(prevote);
@@ -409,27 +330,9 @@ describe<{
 		validatorsRepository,
 		broadcaster,
 		handler,
+		roundState,
 	}) => {
 		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(false);
-
-		const block = {
-			data: {
-				height: 2,
-				id: "blockId",
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 0,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-			setProcessorResult: () => {},
-		} as unknown as Contracts.Consensus.IRoundState;
 
 		const prevote = {
 			height: 2,
@@ -472,26 +375,8 @@ describe<{
 
 	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
 
-	it("#onMajorityPrevoteAny - should schedule timeout prevote", async ({ consensus, scheduler }) => {
+	it("#onMajorityPrevoteAny - should schedule timeout prevote", async ({ consensus, scheduler, roundState }) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
-
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 0,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
 
 		consensus.setStep(Step.prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
@@ -501,26 +386,8 @@ describe<{
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
 
-	it("#onProposal - should return if step !== prevote", async ({ consensus, scheduler }) => {
+	it("#onProposal - should return if step !== prevote", async ({ consensus, scheduler, roundState }) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
-
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 1,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
 
 		consensus.setStep(Step.propose);
 		await consensus.onMajorityPrevoteAny(roundState);
@@ -529,27 +396,10 @@ describe<{
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler }) => {
+	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler, roundState }) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
 
-		const block = {
-			data: {
-				height: 3,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 3,
-			round: 0,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
-
+		roundState.height = 3;
 		consensus.setStep(Step.prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
 
@@ -557,27 +407,10 @@ describe<{
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
 
-	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler }) => {
+	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler, roundState }) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
 
-		const block = {
-			data: {
-				height: 2,
-			},
-		};
-
-		const proposal = {
-			block,
-			height: 2,
-			round: 1,
-			validRound: undefined,
-		};
-
-		const roundState = {
-			...proposal,
-			getProposal: () => proposal,
-		} as unknown as Contracts.Consensus.IRoundState;
-
+		roundState.round = 1;
 		consensus.setStep(Step.prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
 
