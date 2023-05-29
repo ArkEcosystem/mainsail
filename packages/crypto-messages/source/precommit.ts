@@ -21,6 +21,22 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 		this.#signature = signature;
 	}
 
+	get height(): number {
+		return this.#height;
+	}
+
+	get round(): number {
+		return this.#round;
+	}
+
+	get blockId(): string | undefined {
+		return this.#blockId;
+	}
+
+	get validatorPublicKey(): string {
+		return this.#validatorPublicKey;
+	}
+
 	get signature(): string {
 		return this.#signature;
 	}

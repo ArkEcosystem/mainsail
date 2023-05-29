@@ -19,30 +19,28 @@ export class Handler implements Contracts.Consensus.IHandler {
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
 
 	async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
-		const data = proposal.toData();
-
-		const { errors } = await this.verifier.verifyProposal(data);
+		// TODO: Move verification to p2p handler
+		const { errors } = await this.verifier.verifyProposal(proposal);
 		if (errors.length > 0) {
 			this.logger.warning(`received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
 			return;
 		}
 
-		const roundState = this.roundStateRepo.getRoundState(data.height, data.round);
+		const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 		roundState.setProposal(proposal);
 
 		await this.#getConsensus().onProposal(roundState);
 	}
 
 	async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
-		const data = prevote.toData();
-
-		const { errors } = await this.verifier.verifyPrevote(data);
+		// TODO: Move verification to p2p handler
+		const { errors } = await this.verifier.verifyPrevote(prevote);
 		if (errors.length > 0) {
 			this.logger.warning(`received invalid prevote: ${prevote.toString()} errors: ${JSON.stringify(errors)}`);
 			return;
 		}
 
-		const roundState = this.roundStateRepo.getRoundState(data.height, data.round);
+		const roundState = this.roundStateRepo.getRoundState(prevote.height, prevote.round);
 
 		roundState.addPrevote(prevote);
 
@@ -50,9 +48,8 @@ export class Handler implements Contracts.Consensus.IHandler {
 	}
 
 	async onPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
-		const data = precommit.toData();
-
-		const { errors } = await this.verifier.verifyPrecommit(data);
+		// TODO: Move verification to p2p handler
+		const { errors } = await this.verifier.verifyPrecommit(precommit);
 		if (errors.length > 0) {
 			this.logger.warning(
 				`received invalid precommit: ${precommit.toString()} errors: ${JSON.stringify(errors)}`,
@@ -60,7 +57,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 			return;
 		}
 
-		const roundState = this.roundStateRepo.getRoundState(precommit.toData().height, precommit.toData().round);
+		const roundState = this.roundStateRepo.getRoundState(precommit.height, precommit.round);
 
 		roundState.addPrecommit(precommit);
 

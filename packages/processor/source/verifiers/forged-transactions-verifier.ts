@@ -17,7 +17,7 @@ export class ForgedTransactionsVerifier implements Contracts.BlockProcessor.Hand
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().toData().block;
+		const block = roundState.getProposal().block;
 		if (block.transactions.length > 0) {
 			const transactionIds = block.transactions.map((tx) => {
 				Utils.assert.defined<string>(tx.id);

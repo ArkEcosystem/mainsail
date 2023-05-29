@@ -20,7 +20,7 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	): Promise<Contracts.Crypto.IProposal> {
 		const bytes = await this.serializer.serializeProposal(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Proposal(data.height, data.round, data.block, data.validatorPublicKey, signature);
+		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorPublicKey, signature);
 	}
 
 	public async makePrevote(

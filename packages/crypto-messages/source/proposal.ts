@@ -3,6 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 export class Proposal implements Contracts.Crypto.IProposal {
 	#height: number;
 	#round: number;
+	#validRound?: number;
 	#block: Contracts.Crypto.IBlock;
 	#validatorPublicKey: string;
 	#signature: string;
@@ -11,14 +12,36 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		height: number,
 		round: number,
 		block: Contracts.Crypto.IBlock,
+		validRound: number | undefined,
 		validatorPublicKey: string,
 		signature: string,
 	) {
 		this.#height = height;
 		this.#round = round;
+		this.#validRound = validRound;
 		this.#block = block;
 		this.#validatorPublicKey = validatorPublicKey;
 		this.#signature = signature;
+	}
+
+	get height(): number {
+		return this.#height;
+	}
+
+	get round(): number {
+		return this.#round;
+	}
+
+	get validRound(): number | undefined {
+		return this.#validRound;
+	}
+
+	get block(): Contracts.Crypto.IBlock {
+		return this.#block;
+	}
+
+	get validatorPublicKey(): string {
+		return this.#validatorPublicKey;
 	}
 
 	get signature(): string {
@@ -40,6 +63,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
+			validRound: this.#validRound,
 			validatorPublicKey: this.#validatorPublicKey,
 		};
 	}
