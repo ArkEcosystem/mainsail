@@ -386,7 +386,7 @@ describe<{
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
 
-	it("#onProposal - should return if step !== prevote", async ({ consensus, scheduler, roundState }) => {
+	it("#onMajorityPrevoteAny - should return if step !== prevote", async ({ consensus, scheduler, roundState }) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
 
 		consensus.setStep(Step.propose);
@@ -396,7 +396,11 @@ describe<{
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler, roundState }) => {
+	it("#onMajorityPrevoteAny - should return if height doesn't match", async ({
+		consensus,
+		scheduler,
+		roundState,
+	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
 
 		roundState.height = 3;
@@ -407,7 +411,11 @@ describe<{
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
 
-	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler, roundState }) => {
+	it("#onMajorityPrevoteAny - should return if height doesn't match", async ({
+		consensus,
+		scheduler,
+		roundState,
+	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
 
 		roundState.round = 1;
