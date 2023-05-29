@@ -36,9 +36,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#round = 0;
 	#step: Step = Step.propose;
 	#lockedValue: undefined; // TODO: type
-	#lockedRound = -1;
+	#lockedRound?: number = undefined;
 	#validValue: undefined; // TODO: type
-	#validRound = -1;
+	#validRound?: number = undefined;
 
 	public getHeight(): number {
 		return this.#height;
@@ -56,7 +56,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return this.#lockedValue;
 	}
 
-	public getLockedRound(): number {
+	public getLockedRound(): number | undefined {
 		return this.#lockedRound;
 	}
 
@@ -64,7 +64,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return this.#validValue;
 	}
 
-	public getValidRound(): number {
+	public getValidRound(): number | undefined {
 		return this.#validRound;
 	}
 

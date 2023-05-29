@@ -90,7 +90,7 @@ describe<{
 	});
 
 	it("#getLockedRound - should return initial value", async ({ consensus }) => {
-		assert.equal(consensus.getLockedRound(), -1);
+		assert.undefined(consensus.getLockedRound());
 	});
 
 	it("#getValidValue - should return initial value", async ({ consensus }) => {
@@ -98,17 +98,17 @@ describe<{
 	});
 
 	it("#getValidRound - should return initial value", async ({ consensus }) => {
-		assert.equal(consensus.getValidRound(), -1);
+		assert.undefined(consensus.getValidRound());
 	});
 
 	it("#getState - should return initial value", async ({ consensus }) => {
 		assert.equal(consensus.getState(), {
 			height: 2,
-			lockedRound: -1,
+			lockedRound: undefined,
 			lockedValue: undefined,
 			round: 0,
 			step: Step.propose,
-			validRound: -1,
+			validRound: undefined,
 			validValue: undefined,
 		});
 	});
@@ -207,11 +207,9 @@ describe<{
 		};
 
 		const proposal = {
-			toData: () => ({
-				block,
-				height: 3,
-				round: 0,
-			}),
+			block,
+			height: 3,
+			round: 0,
 		};
 
 		const roundState = {
@@ -233,11 +231,9 @@ describe<{
 		};
 
 		const proposal = {
-			toData: () => ({
-				block,
-				height: 2,
-				round: 1,
-			}),
+			block,
+			height: 2,
+			round: 1,
 		};
 
 		const roundState = {
