@@ -475,16 +475,113 @@ describe<{
 	it("#onMajorityPrevoteAny - should schedule timeout prevote", async ({ consensus, scheduler }) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
 
-		const prevote = {
-			height: 2,
-			round: 0,
+		const block = {
+			data: {
+				height: 2,
+			},
 		};
 
+		const proposal = {
+			block,
+			height: 2,
+			round: 0,
+			validRound: undefined,
+		};
+
+		const roundState = {
+			...proposal,
+			getProposal: () => proposal,
+		} as unknown as Contracts.Consensus.IRoundState;
+
 		consensus.setStep(Step.prevote);
-		await consensus.onMajorityPrevoteAny(prevote);
+		await consensus.onMajorityPrevoteAny(roundState);
 
 		spyScheduleTimeout.calledOnce();
 		spyScheduleTimeout.calledWith(2, 0);
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onProposal - should return if step !== prevote", async ({ consensus, scheduler }) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+
+		const block = {
+			data: {
+				height: 2,
+			},
+		};
+
+		const proposal = {
+			block,
+			height: 2,
+			round: 1,
+			validRound: undefined,
+		};
+
+		const roundState = {
+			...proposal,
+			getProposal: () => proposal,
+		} as unknown as Contracts.Consensus.IRoundState;
+
+		consensus.setStep(Step.propose);
+		await consensus.onMajorityPrevoteAny(roundState);
+
+		spyScheduleTimeout.neverCalled();
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler }) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+
+		const block = {
+			data: {
+				height: 3,
+			},
+		};
+
+		const proposal = {
+			block,
+			height: 3,
+			round: 0,
+			validRound: undefined,
+		};
+
+		const roundState = {
+			...proposal,
+			getProposal: () => proposal,
+		} as unknown as Contracts.Consensus.IRoundState;
+
+		consensus.setStep(Step.prevote);
+		await consensus.onMajorityPrevoteAny(roundState);
+
+		spyScheduleTimeout.neverCalled();
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onProposal - should return if height doesn't match", async ({ consensus, scheduler }) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+
+		const block = {
+			data: {
+				height: 2,
+			},
+		};
+
+		const proposal = {
+			block,
+			height: 2,
+			round: 1,
+			validRound: undefined,
+		};
+
+		const roundState = {
+			...proposal,
+			getProposal: () => proposal,
+		} as unknown as Contracts.Consensus.IRoundState;
+
+		consensus.setStep(Step.prevote);
+		await consensus.onMajorityPrevoteAny(roundState);
+
+		spyScheduleTimeout.neverCalled();
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
 });
