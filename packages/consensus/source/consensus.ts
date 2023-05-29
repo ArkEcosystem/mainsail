@@ -124,6 +124,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
+		if (proposal.validRound) {
+			return;
+		}
+
+		// TODO: Check proposer
+
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${proposal.block.data.id}`);
 
 		const result = await this.processor.process(roundState);
