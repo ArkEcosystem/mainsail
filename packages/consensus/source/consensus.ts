@@ -76,7 +76,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		if (proposer) {
 			const block = await proposer.prepareBlock(this.#height, round);
 
-			const proposal = await proposer.propose(this.#height, this.#round, this.#validRound, block);
+			const proposal = await proposer.propose(this.#height, this.#round, block, this.#validRound);
 
 			await this.broadcaster.broadcastProposal(proposal);
 			await this.handler.onProposal(proposal);
