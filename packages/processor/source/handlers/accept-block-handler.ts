@@ -22,7 +22,7 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().toData().block;
+		const block = roundState.getProposal().block;
 
 		try {
 			// await this.databaseInteraction.applyBlock(block);

@@ -10,9 +10,13 @@ export interface IProposalData {
 }
 
 export interface IProposal {
+	height: number;
+	round: number;
+	block: IBlock;
+	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
-	toData(): IProposalData;
+	// toData(): IProposalData;
 }
 
 export interface IPrevoteData {
@@ -24,9 +28,13 @@ export interface IPrevoteData {
 }
 
 export interface IPrevote {
+	height: number;
+	round: number;
+	blockId?: string;
+	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
-	toData(): IPrevoteData;
+	// toData(): IPrevoteData;
 }
 
 export interface IPrecommitData {
@@ -38,9 +46,13 @@ export interface IPrecommitData {
 }
 
 export interface IPrecommit {
+	height: number;
+	round: number;
+	blockId?: string;
+	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
-	toData(): IPrecommitData;
+	// toData(): IPrecommitData;
 }
 
 export type HasSignature = { signature: string };

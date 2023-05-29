@@ -16,7 +16,7 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().toData().block;
+		const block = roundState.getProposal().block;
 		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
 
 		if (verification.containsMultiSignatures) {
