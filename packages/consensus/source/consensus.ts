@@ -114,22 +114,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	// TODO: Implement proposal for validRound >= 0.
 	public async onProposal(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		if (this.#step !== Step.propose) {
-			return;
-		}
-
 		const proposal = roundState.getProposal();
-		Utils.assert.defined(proposal);
 
-		if (roundState.height !== this.#height) {
-			return;
-		}
-
-		if (roundState.round !== this.#round) {
-			return;
-		}
-
-		if (proposal.validRound) {
+		if (this.#step !== Step.propose || this.#isInvalidRoundState(roundState) || !proposal || proposal.validRound) {
 			return;
 		}
 
@@ -181,7 +168,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onMajorityPrevoteAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		if (this.#step !== Step.prevote) {
+		if (this.#step !== Step.prevote || this.#isInvalidRoundState(roundState)) {
 			return;
 		}
 
@@ -220,6 +207,18 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
+
+	#isInvalidRoundState(roundState: Contracts.Consensus.RoundState): boolean {
+		if (roundState.height !== this.#height) {
+			return true;
+		}
+
+		if (roundState.round !== this.#round) {
+			return true;
+		}
+
+		return false;
+	}
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
 		// TODO: Handle locked value

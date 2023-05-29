@@ -199,6 +199,34 @@ describe<{
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
+	it("#onProposal - should return if step !== propose", async ({ consensus, blockProcessor }) => {
+		const spyBlockProcessorProcess = spy(blockProcessor, "process");
+
+		const block = {
+			data: {
+				height: 2,
+			},
+		};
+
+		const proposal = {
+			block,
+			height: 2,
+			round: 0,
+			validRound: undefined,
+		};
+
+		const roundState = {
+			...proposal,
+			getProposal: () => proposal,
+		} as unknown as Contracts.Consensus.IRoundState;
+
+		consensus.setStep(Step.prevote);
+		await consensus.onProposal(roundState);
+
+		spyBlockProcessorProcess.neverCalled();
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
 	it("#onProposal - should return if height doesn't match", async ({ consensus, blockProcessor }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
@@ -253,6 +281,33 @@ describe<{
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
+	it("#onProposal - should return if proposal is undefined", async ({ consensus, blockProcessor }) => {
+		const spyBlockProcessorProcess = spy(blockProcessor, "process");
+
+		const block = {
+			data: {
+				height: 2,
+			},
+		};
+
+		const proposal = {
+			block,
+			height: 2,
+			round: 1,
+			validRound: undefined,
+		};
+
+		const roundState = {
+			...proposal,
+			getProposal: () => undefined,
+		} as unknown as Contracts.Consensus.IRoundState;
+
+		await consensus.onProposal(roundState);
+
+		spyBlockProcessorProcess.neverCalled();
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
 	it("#onProposal - should return if proposed validRound is defined", async ({ consensus, blockProcessor }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
@@ -280,8 +335,6 @@ describe<{
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	// TODO:
-	it("#onProposal - should return if step !== 'propose'", async ({ consensus }) => {});
 	it("#onProposal - should return if not from valid proposer", async ({ consensus }) => {});
 
 	it("#onProposal - broadcast prevote block id, if block is valid & not locked", async ({
