@@ -55,10 +55,11 @@ export class Validator implements Contracts.Consensus.IValidator {
 	public async propose(
 		height: number,
 		round: number,
+		validRound: number,
 		block: Contracts.Crypto.IBlock,
 	): Promise<Contracts.Crypto.IProposal> {
 		return this.messagesFactory.makeProposal(
-			{ block, height, round, validatorPublicKey: this.#keyPair.publicKey },
+			{ block, height, round, validRound, validatorPublicKey: this.#keyPair.publicKey },
 			this.#keyPair,
 		);
 	}
