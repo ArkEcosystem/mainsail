@@ -17,7 +17,7 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().toData().block;
+		const block = roundState.getProposal().block;
 
 		const roundInfo: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(
 			block.data.height,

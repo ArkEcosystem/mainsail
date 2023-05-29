@@ -40,7 +40,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 				return false;
 			}
 
-			await this.blockState.applyBlock(roundState.getWalletRepository(), roundState.getProposal().toData().block);
+			await this.blockState.applyBlock(roundState.getWalletRepository(), roundState.getProposal().block);
 
 			return true;
 		} catch (error) {
@@ -53,7 +53,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	public async commit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		roundState.getWalletRepository().commitChanges();
 
-		const block = roundState.getProposal().toData().block;
+		const block = roundState.getProposal().block;
 
 		// TODO: Save commitBlock
 		await this.databaseService.saveBlocks([block]);

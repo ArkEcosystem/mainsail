@@ -16,7 +16,7 @@ export interface IProposal {
 	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
-	toData(): IProposalData;
+	// toData(): IProposalData;
 }
 
 export interface IPrevoteData {
@@ -34,7 +34,7 @@ export interface IPrevote {
 	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
-	toData(): IPrevoteData;
+	// toData(): IPrevoteData;
 }
 
 export interface IPrecommitData {
@@ -52,7 +52,7 @@ export interface IPrecommit {
 	validatorPublicKey: string;
 	signature: string;
 	toString(): string;
-	toData(): IPrecommitData;
+	// toData(): IPrecommitData;
 }
 
 export type HasSignature = { signature: string };
