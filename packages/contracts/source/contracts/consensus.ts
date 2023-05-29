@@ -2,6 +2,8 @@ import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
 export interface IRoundState {
+	height: number;
+	round: number;
 	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
 	setProposal(proposal: IProposal): void;

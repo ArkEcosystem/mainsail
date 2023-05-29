@@ -20,10 +20,27 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@tagged("type", "consensus")
 	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
+	#height = 0;
+	#round = 0;
 	#proposal?: Contracts.Crypto.IProposal;
 	#processorResult?: boolean;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
+
+	get height(): number {
+		return this.#height;
+	}
+
+	get round(): number {
+		return this.#round;
+	}
+
+	public configure(height: number, round: number): RoundState {
+		this.#height = height;
+		this.#round = round;
+
+		return this;
+	}
 
 	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
 		return this.walletRepository;
