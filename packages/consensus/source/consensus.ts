@@ -121,11 +121,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = roundState.getProposal();
 		Utils.assert.defined(proposal);
 
-		if (proposal.height !== this.#height) {
+		if (roundState.height !== this.#height) {
 			return;
 		}
 
-		if (proposal.round !== this.#round) {
+		if (roundState.round !== this.#round) {
 			return;
 		}
 

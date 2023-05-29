@@ -216,6 +216,7 @@ describe<{
 		};
 
 		const roundState = {
+			...proposal,
 			getProposal: () => proposal,
 		} as unknown as Contracts.Consensus.IRoundState;
 
@@ -242,6 +243,7 @@ describe<{
 		};
 
 		const roundState = {
+			...proposal,
 			getProposal: () => proposal,
 		} as unknown as Contracts.Consensus.IRoundState;
 
@@ -268,6 +270,7 @@ describe<{
 		};
 
 		const roundState = {
+			...proposal,
 			getProposal: () => proposal,
 		} as unknown as Contracts.Consensus.IRoundState;
 
@@ -305,6 +308,7 @@ describe<{
 		};
 
 		const roundState = {
+			...proposal,
 			getProposal: () => proposal,
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
@@ -369,6 +373,7 @@ describe<{
 		};
 
 		const roundState = {
+			...proposal,
 			getProposal: () => proposal,
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
