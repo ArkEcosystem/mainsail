@@ -15,7 +15,7 @@ describe<{
 	validatorsRepository: any;
 	validatorSet: any;
 	logger: any;
-}>("Consensus", ({ it, beforeEach, assert }) => {
+}>("Consensus", ({ it, beforeEach, assert, stub, spy }) => {
 	beforeEach((context) => {
 		context.blockProcessor = {
 			commit: () => {},
@@ -45,6 +45,7 @@ describe<{
 		};
 
 		context.validatorsRepository = {
+			getValidator: () => {},
 			getValidators: () => {},
 		};
 
@@ -110,5 +111,89 @@ describe<{
 			validRound: -1,
 			validValue: undefined,
 		});
+	});
+
+	it("#startRound - should schedule timout if proposer in not local validator", async ({
+		consensus,
+		scheduler,
+		validatorSet,
+		validatorsRepository,
+		logger,
+	}) => {
+		const validatorPublicKey = "publicKey";
+
+		const spyLoggerInfo = spy(logger, "info");
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+			{
+				getAttribute: () => validatorPublicKey,
+			},
+		]);
+		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(undefined);
+		const spyScheduleTimeoutPropose = spy(scheduler, "scheduleTimeoutPropose");
+
+		await consensus.startRound(0);
+
+		spyGetActiveValidators.calledOnce();
+		spyGetValidator.calledOnce();
+		spyGetValidator.calledWith(validatorPublicKey);
+		spyScheduleTimeoutPropose.calledOnce();
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
+		spyLoggerInfo.calledWith(`No registered proposer for ${validatorPublicKey}`);
+	});
+
+	it("#startRound - local validator should propose", async ({
+		consensus,
+		scheduler,
+		validatorSet,
+		validatorsRepository,
+		logger,
+		broadcaster,
+		handler,
+	}) => {
+		const validatorPublicKey = "publicKey";
+		const validator = {
+			prepareBlock: () => {},
+			propose: () => {},
+		};
+		const block = {
+			data: {
+				height: 2,
+			},
+		};
+		const proposal = {
+			block,
+		};
+
+		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+
+		const spyLoggerInfo = spy(logger, "info");
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+			{
+				getAttribute: () => validatorPublicKey,
+			},
+		]);
+		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
+		const spyBroadcastProposal = spy(broadcaster, "broadcastProposal");
+		const spyHandlerOnProposal = spy(handler, "onProposal");
+
+		const spyScheduleTimeoutPropose = spy(scheduler, "scheduleTimeoutPropose");
+
+		await consensus.startRound(0);
+
+		spyGetActiveValidators.calledOnce();
+		spyGetValidator.calledOnce();
+		spyGetValidator.calledWith(validatorPublicKey);
+		spyValidatorPrepareBlock.calledOnce();
+		spyValidatorPrepareBlock.calledWith(2, 0);
+		spyValidatorPropose.calledOnce();
+		spyValidatorPropose.calledWith(2, 0, block);
+		spyBroadcastProposal.calledOnce();
+		spyBroadcastProposal.calledWith(proposal);
+		spyHandlerOnProposal.calledOnce();
+		spyHandlerOnProposal.calledWith(proposal);
+
+		spyScheduleTimeoutPropose.neverCalled();
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 	});
 });

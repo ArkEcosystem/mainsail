@@ -97,10 +97,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
 		if (proposer) {
+			// TODO: Error handling
 			await this.#propose(proposer);
 		} else {
 			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
 
+			// TODO: Can we call this even even proposer is known?
 			await this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 		}
 	}
