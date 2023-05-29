@@ -4,6 +4,7 @@ import { IKeyPair } from "./identities";
 export interface IProposalData {
 	height: number;
 	round: number;
+	validRound?: number;
 	block: IBlock;
 	validatorPublicKey: string;
 	signature: string;
@@ -12,6 +13,7 @@ export interface IProposalData {
 export interface IProposal {
 	height: number;
 	round: number;
+	validRound?: number;
 	block: IBlock;
 	validatorPublicKey: string;
 	signature: string;
