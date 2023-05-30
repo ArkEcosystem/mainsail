@@ -258,7 +258,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#precommit(undefined);
 	}
 
-	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
+	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {
+		if (this.#height !== height || this.#round !== round) {
+			return;
+		}
+
+		setImmediate(() => this.startRound(this.#round + 1));
+	}
 
 	#isInvalidRoundState(roundState: Contracts.Consensus.IRoundState): boolean {
 		if (roundState.height !== this.#height) {

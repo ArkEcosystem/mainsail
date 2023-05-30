@@ -4,7 +4,7 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 import { Consensus } from "./consensus";
 import { Step } from "./enums";
 
-describe<{
+type Context = {
 	sandbox: Sandbox;
 	consensus: Consensus;
 	blockProcessor: any;
@@ -18,7 +18,9 @@ describe<{
 	block: any;
 	proposal: any;
 	roundState: Contracts.Consensus.IRoundState;
-}>("Consensus", ({ it, beforeEach, assert, stub, spy, clock }) => {
+};
+
+describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
 	beforeEach((context) => {
 		context.blockProcessor = {
 			commit: () => {},
@@ -991,5 +993,41 @@ describe<{
 
 		spyBroadcastPrecommit.neverCalled();
 		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	each(
+		"#onTimeoutPrecommit - should start next round",
+		async ({ context: { consensus }, dataset: step }: { context: Context; dataset: Step }) => {
+			const fakeTimers = clock();
+			const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+			consensus.setStep(step);
+			void consensus.onTimeoutPrecommit(2, 0);
+			await fakeTimers.nextAsync();
+
+			spyConsensusStartRound.calledOnce();
+			spyConsensusStartRound.calledWith(1);
+		},
+		[Step.propose, Step.prevote, Step.precommit],
+	);
+
+	it("#onTimeoutPrecommit - should return if height doesn't match", async ({ consensus, broadcaster }) => {
+		const fakeTimers = clock();
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		void consensus.onTimeoutPrecommit(3, 0);
+		await fakeTimers.nextAsync();
+
+		spyConsensusStartRound.neverCalled();
+	});
+
+	it("#onTimeoutPrecommit - should return if round doesn't match", async ({ consensus, broadcaster }) => {
+		const fakeTimers = clock();
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		void consensus.onTimeoutPrecommit(2, 1);
+		await fakeTimers.nextAsync();
+
+		spyConsensusStartRound.neverCalled();
 	});
 });
