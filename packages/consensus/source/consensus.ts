@@ -35,9 +35,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#height = 2;
 	#round = 0;
 	#step: Step = Step.propose;
-	#lockedValue: undefined; // TODO: type
+	#lockedValue?: Contracts.Consensus.IRoundState;
 	#lockedRound?: number = undefined;
-	#validValue: undefined; // TODO: type
+	#validValue?: Contracts.Consensus.IRoundState;
 	#validRound?: number = undefined;
 
 	public getHeight(): number {
@@ -133,22 +133,35 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onMajorityPrevote(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		if (this.#step !== Step.prevote) {
+		const proposal = roundState.getProposal();
+
+		if (
+			this.#step === Step.propose ||
+			this.#isInvalidRoundState(roundState) ||
+			!proposal ||
+			!roundState.getProcessorResult()
+		) {
 			return;
 		}
 
-		const proposal = roundState.getProposal();
-		Utils.assert.defined(proposal);
+		// this.logger.info(
+		// 	`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
+		// 		proposal.validatorPublicKey
+		// 	} blockId: ${proposal.block.data.id}`,
+		// );
 
-		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorPublicKey
-			} blockId: ${proposal.block.data.id}`,
-		);
+		if (this.#step === Step.prevote) {
+			this.#lockedValue = roundState;
+			this.#lockedRound = this.#round;
+			this.#validValue = roundState;
+			this.#validRound = this.#round;
+			this.#step = Step.precommit;
 
-		this.#step = Step.precommit;
-
-		await this.#precommit(proposal.block.data.id);
+			await this.#precommit(proposal.block.data.id);
+		} else {
+			this.#validValue = roundState;
+			this.#validRound = this.#round;
+		}
 	}
 
 	public async onMajorityPrevoteAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
