@@ -185,6 +185,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#precommit(undefined);
 	}
 
+	public async onMajorityPrecommitAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+		// TODO: Execute only once
+		void this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
+	}
+
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		if (this.#step !== Step.precommit) {
 			return;

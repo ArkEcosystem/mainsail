@@ -625,4 +625,16 @@ describe<{
 
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
+
+	it("#onMajorityPrecommitAny - should schedule timeout precommit", async ({ consensus, scheduler, roundState }) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrecommit");
+
+		assert.equal(consensus.getStep(), Step.propose);
+
+		await consensus.onMajorityPrecommitAny(roundState);
+
+		spyScheduleTimeout.calledOnce();
+		spyScheduleTimeout.calledWith(2, 0);
+		assert.equal(consensus.getStep(), Step.propose);
+	});
 });
