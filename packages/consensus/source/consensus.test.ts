@@ -18,7 +18,7 @@ describe<{
 	block: any;
 	proposal: any;
 	roundState: Contracts.Consensus.IRoundState;
-}>("Consensus", ({ it, beforeEach, assert, stub, spy }) => {
+}>("Consensus", ({ it, beforeEach, assert, stub, spy, clock }) => {
 	beforeEach((context) => {
 		context.blockProcessor = {
 			commit: () => {},
@@ -636,5 +636,88 @@ describe<{
 		spyScheduleTimeout.calledOnce();
 		spyScheduleTimeout.calledWith(2, 0);
 		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onMajorityPrecommit - should commit & increase height", async ({ consensus, blockProcessor, roundState }) => {
+		const fakeTimers = clock();
+
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		assert.equal(consensus.getHeight(), 2);
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+
+		spyBlockProcessorCommit.calledOnce();
+		spyBlockProcessorCommit.calledWith(roundState);
+		spyConsensusStartRound.calledOnce();
+		spyConsensusStartRound.calledWith(0);
+		assert.equal(consensus.getHeight(), 3);
+	});
+
+	it("#onMajorityPrecommit - should be called only once", async ({ consensus, blockProcessor, roundState }) => {
+		const fakeTimers = clock();
+
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		assert.equal(consensus.getHeight(), 2);
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+
+		spyBlockProcessorCommit.calledOnce();
+		spyConsensusStartRound.calledOnce();
+		assert.equal(consensus.getHeight(), 3);
+
+		await consensus.onMajorityPrecommit(roundState);
+
+		spyBlockProcessorCommit.calledOnce();
+		spyConsensusStartRound.calledOnce();
+		assert.equal(consensus.getHeight(), 3);
+	});
+
+	it("#onMajorityPrecommit - should return if height doesn't match", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+	}) => {
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		roundState.height = 3;
+		await consensus.onMajorityPrecommit(roundState);
+
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should return if round doesn't match", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+	}) => {
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		roundState.round = 1;
+		await consensus.onMajorityPrecommit(roundState);
+
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should return if proposal is undefined", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+	}) => {
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		roundState.getProposal = () => undefined;
+		await consensus.onMajorityPrecommit(roundState);
+
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
 	});
 });

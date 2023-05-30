@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { Step } from "./enums";
@@ -39,6 +38,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#lockedRound?: number = undefined;
 	#validValue?: Contracts.Consensus.IRoundState;
 	#validRound?: number = undefined;
+
+	#didMajorityPrecommit = false;
 
 	public getHeight(): number {
 		return this.#height;
@@ -191,29 +192,38 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		if (this.#step !== Step.precommit) {
+		const proposal = roundState.getProposal();
+		if (this.#isInvalidRoundState(roundState) || !proposal || this.#didMajorityPrecommit) {
 			return;
 		}
 
-		const proposal = roundState.getProposal();
-		Utils.assert.defined(proposal);
+		this.#didMajorityPrecommit = true;
 
-		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorPublicKey
-			} blockId: ${proposal.block.data.id}`,
-		);
+		// this.logger.info(
+		// 	`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+		// 		proposal.validatorPublicKey
+		// 	} blockId: ${proposal.block.data.id}`,
+		// );
 
-		if (roundState.getProcessorResult()) {
-			await this.processor.commit(roundState);
-		} else {
-			this.logger.info(`Block ${proposal.block.data.height} rejected`);
-		}
+		// if (!roundState.getProcessorResult()) {
+		// 	this.logger.info(
+		// 		`Block ${proposal.block.data.id} on height ${this.#height} received +2/3 precommti but is invalid`,
+		// 	);
+		// }
 
+		await this.processor.commit(roundState);
+
+		// TODO: Caclulate timeout
 		await delay(8000);
 
 		this.#height++;
-		await this.startRound(0);
+		this.#lockedRound = undefined;
+		this.#lockedValue = undefined;
+		this.#validRound = undefined;
+		this.#validValue = undefined;
+		this.#didMajorityPrecommit = false;
+
+		void this.startRound(0);
 	}
 
 	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
