@@ -4,7 +4,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
 import {
-	ChainedVerifier,
 	ForgedTransactionsVerifier,
 	IncompatibleTransactionsVerifier,
 	NonceVerifier,
@@ -86,9 +85,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		// 	return false;
 		// }
 
-		if (!(await this.app.resolve(ChainedVerifier).execute(roundState))) {
-			return false;
-		}
+		// if (!(await this.app.resolve(ChainedVerifier).execute(roundState))) {
+		// 	return false;
+		// }
 
 		if (!(await this.app.resolve(ForgedTransactionsVerifier).execute(roundState))) {
 			return false;
