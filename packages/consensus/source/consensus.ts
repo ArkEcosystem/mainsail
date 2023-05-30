@@ -240,7 +240,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		setImmediate(() => this.startRound(roundState.round));
 	}
 
-	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
+	public async onTimeoutPropose(height: number, round: number): Promise<void> {
+		if (this.#step !== Step.propose || this.#height !== height || this.#round !== round) {
+			return;
+		}
+
+		this.#step = Step.prevote;
+		await this.#prevote(undefined);
+	}
 
 	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
 

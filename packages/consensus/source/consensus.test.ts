@@ -829,4 +829,82 @@ describe<{
 
 		spyConsensusStartRound.neverCalled();
 	});
+
+	it("#onTimeoutPropose - should prevote null", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+	}) => {
+		const prevote = {
+			height: 2,
+			round: 0,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
+		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
+			validator,
+		]);
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+		const spyHandlerOnPrevote = spy(handler, "onPrevote");
+
+		await consensus.onTimeoutPropose(2, 0);
+
+		spyValidatorSetGetActoveValidators.calledOnce();
+		spyValidatorsRepositoryGetValidators.calledOnce();
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(2, 0, undefined);
+
+		spyBroadcastPrevote.calledOnce();
+		spyBroadcastPrevote.calledWith(prevote);
+		spyHandlerOnPrevote.calledOnce();
+		spyHandlerOnPrevote.calledWith(prevote);
+
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onTimeoutPropose - should return if step === prevote", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+
+		consensus.setStep(Step.prevote);
+		await consensus.onTimeoutPropose(2, 0);
+
+		spyBroadcastPrevote.neverCalled();
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onTimeoutPropose - should return if step === precommit", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+
+		consensus.setStep(Step.precommit);
+		await consensus.onTimeoutPropose(2, 0);
+
+		spyBroadcastPrevote.neverCalled();
+		assert.equal(consensus.getStep(), Step.precommit);
+	});
+
+	it("#onTimeoutPropose - should return if height doesn't match", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+
+		await consensus.onTimeoutPropose(3, 0);
+
+		spyBroadcastPrevote.neverCalled();
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onTimeoutPropose - should return if round doesn't match", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+
+		await consensus.onTimeoutPropose(2, 1);
+
+		spyBroadcastPrevote.neverCalled();
+		assert.equal(consensus.getStep(), Step.propose);
+	});
 });
