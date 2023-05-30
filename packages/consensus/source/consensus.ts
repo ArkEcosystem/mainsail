@@ -39,6 +39,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#validValue?: Contracts.Consensus.IRoundState;
 	#validRound?: number = undefined;
 
+	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
 
 	public getHeight(): number {
@@ -137,6 +138,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = roundState.getProposal();
 
 		if (
+			this.#didMajorityPrevote ||
 			this.#step === Step.propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
@@ -145,11 +147,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		// this.logger.info(
-		// 	`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
-		// 		proposal.validatorPublicKey
-		// 	} blockId: ${proposal.block.data.id}`,
-		// );
+		this.logger.info(
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
+				proposal.validatorPublicKey
+			} blockId: ${proposal.block.data.id}`,
+		);
+
+		this.#didMajorityPrevote = true;
 
 		if (this.#step === Step.prevote) {
 			this.#lockedValue = roundState;
@@ -193,17 +197,17 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		const proposal = roundState.getProposal();
-		if (this.#isInvalidRoundState(roundState) || !proposal || this.#didMajorityPrecommit) {
+		if (this.#didMajorityPrecommit || this.#isInvalidRoundState(roundState) || !proposal) {
 			return;
 		}
 
 		this.#didMajorityPrecommit = true;
 
-		// this.logger.info(
-		// 	`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
-		// 		proposal.validatorPublicKey
-		// 	} blockId: ${proposal.block.data.id}`,
-		// );
+		this.logger.info(
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+				proposal.validatorPublicKey
+			} blockId: ${proposal.block.data.id}`,
+		);
 
 		// if (!roundState.getProcessorResult()) {
 		// 	this.logger.info(
@@ -214,16 +218,17 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.processor.commit(roundState);
 
 		// TODO: Caclulate timeout
-		await delay(8000);
+		await delay(80);
 
 		this.#height++;
 		this.#lockedRound = undefined;
 		this.#lockedValue = undefined;
 		this.#validRound = undefined;
 		this.#validValue = undefined;
+		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 
-		void this.startRound(0);
+		setImmediate(() => this.startRound(0));
 	}
 
 	public async onTimeoutPropose(height: number, round: number): Promise<void> {}
