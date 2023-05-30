@@ -797,4 +797,36 @@ describe<{
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
 	});
+
+	it("#onMinorityWithHigherRound - should start new round", async ({ consensus, roundState }) => {
+		const fakeTimers = clock();
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		roundState.round = 1;
+		void consensus.onMinorityWithHigherRound(roundState);
+		await fakeTimers.nextAsync();
+
+		spyConsensusStartRound.calledWith(roundState.round);
+	});
+
+	it("#onMinorityWithHigherRound - should return if height doesn't match", async ({ consensus, roundState }) => {
+		const fakeTimers = clock();
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		roundState.height = 3;
+		void consensus.onMinorityWithHigherRound(roundState);
+		await fakeTimers.nextAsync();
+
+		spyConsensusStartRound.neverCalled();
+	});
+
+	it("#onMinorityWithHigherRound - should return if round is not greater", async ({ consensus, roundState }) => {
+		const fakeTimers = clock();
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		void consensus.onMinorityWithHigherRound(roundState);
+		await fakeTimers.nextAsync();
+
+		spyConsensusStartRound.neverCalled();
+	});
 });
