@@ -97,6 +97,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async startRound(round: number): Promise<void> {
 		this.#round = round;
 		this.#step = Step.propose;
+		this.#didMajorityPrevote = false;
+		this.#didMajorityPrecommit = false;
 
 		const proposerPublicKey = await this.#getProposerPublicKey(this.#height, round);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
@@ -218,6 +220,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.processor.commit(roundState);
 
 		// TODO: Caclulate timeout
+		// TODO: Wait for other approvals if needed
 		await delay(80);
 
 		this.#height++;
@@ -225,8 +228,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#lockedValue = undefined;
 		this.#validRound = undefined;
 		this.#validValue = undefined;
-		this.#didMajorityPrevote = false;
-		this.#didMajorityPrecommit = false;
 
 		setImmediate(() => this.startRound(0));
 	}
