@@ -907,4 +907,89 @@ describe<{
 		spyBroadcastPrevote.neverCalled();
 		assert.equal(consensus.getStep(), Step.propose);
 	});
+
+	it("#onTimeoutPrevote - should precommit null", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+	}) => {
+		const validatorPublicKey = "publicKey";
+		const validator = {
+			precommit: () => {},
+		};
+
+		const precommit = {
+			height: 2,
+			round: 0,
+		};
+
+		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+			{
+				getAttribute: () => validatorPublicKey,
+			},
+		]);
+		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
+		const spyBroadcastPrecommit = spy(broadcaster, "broadcastPrecommit");
+		const spyHandlerOnPrecommit = spy(handler, "onPrecommit");
+
+		consensus.setStep(Step.prevote);
+		await consensus.onTimeoutPrevote(2, 0);
+
+		spyGetActiveValidators.calledOnce();
+		spyGetValidators.calledOnce();
+		spyGetValidators.calledWith([validatorPublicKey]);
+
+		spyValidatorPrecommit.calledOnce();
+		spyValidatorPrecommit.calledWith(2, 0);
+
+		spyBroadcastPrecommit.calledOnce();
+		spyBroadcastPrecommit.calledWith(precommit);
+		spyHandlerOnPrecommit.calledOnce();
+		spyHandlerOnPrecommit.calledWith(precommit);
+
+		assert.equal(consensus.getStep(), Step.precommit);
+	});
+
+	it("#onTimeoutPrevote - should return if step === propose", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrecommit = spy(broadcaster, "broadcastPrecommit");
+
+		consensus.setStep(Step.propose);
+		await consensus.onTimeoutPrevote(2, 0);
+
+		spyBroadcastPrecommit.neverCalled();
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onTimeoutPrevote - should return if step === precommit", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrecommit = spy(broadcaster, "broadcastPrecommit");
+
+		consensus.setStep(Step.precommit);
+		await consensus.onTimeoutPrevote(2, 0);
+
+		spyBroadcastPrecommit.neverCalled();
+		assert.equal(consensus.getStep(), Step.precommit);
+	});
+
+	it("#onTimeoutPrevote - should return if height doesn't match", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrecommit = spy(broadcaster, "broadcastPrecommit");
+
+		consensus.setStep(Step.prevote);
+		await consensus.onTimeoutPrevote(3, 0);
+
+		spyBroadcastPrecommit.neverCalled();
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onTimeoutPrevote - should return if round doesn't match", async ({ consensus, broadcaster }) => {
+		const spyBroadcastPrecommit = spy(broadcaster, "broadcastPrecommit");
+
+		consensus.setStep(Step.prevote);
+		await consensus.onTimeoutPrevote(2, 1);
+
+		spyBroadcastPrecommit.neverCalled();
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
 });

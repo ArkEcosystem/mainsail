@@ -249,7 +249,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#prevote(undefined);
 	}
 
-	public async onTimeoutPrevote(height: number, round: number): Promise<void> {}
+	public async onTimeoutPrevote(height: number, round: number): Promise<void> {
+		if (this.#step !== Step.prevote || this.#height !== height || this.#round !== round) {
+			return;
+		}
+
+		this.#step = Step.precommit;
+		await this.#precommit(undefined);
+	}
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {}
 
