@@ -170,7 +170,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			}
 		}
 
-		await this.#prevote(undefined);
+		await this.#prevote();
 	}
 
 	public async onMajorityPrevote(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -225,7 +225,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.#step = Step.precommit;
 
-		await this.#precommit(undefined);
+		await this.#precommit();
 	}
 
 	public async onMajorityPrecommitAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -281,7 +281,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.#step = Step.prevote;
-		await this.#prevote(undefined);
+		await this.#prevote();
 	}
 
 	public async onTimeoutPrevote(height: number, round: number): Promise<void> {
@@ -290,7 +290,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.#step = Step.precommit;
-		await this.#precommit(undefined);
+		await this.#precommit();
 	}
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {
@@ -327,7 +327,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.handler.onProposal(proposal);
 	}
 
-	async #prevote(value: string | undefined): Promise<void> {
+	async #prevote(value?: string): Promise<void> {
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
 			const precommit = await validator.prevote(this.#height, this.#round, value);
 
@@ -336,7 +336,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	async #precommit(value: string | undefined): Promise<void> {
+	async #precommit(value?: string): Promise<void> {
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
