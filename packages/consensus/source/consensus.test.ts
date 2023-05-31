@@ -377,6 +377,195 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
 
+	it("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
+		consensus,
+		blockProcessor,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+		roundState,
+		block,
+		proposal,
+	}) => {
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
+
+		const prevote = {
+			height: 2,
+			round: 0,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
+		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
+			validator,
+		]);
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+		const spyHandlerOnPrevote = spy(handler, "onPrevote");
+
+		proposal.validRound = 0;
+		roundState.round = 1;
+		consensus.setRound(1);
+		await consensus.onProposalLocked(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+
+		spyValidatorSetGetActoveValidators.calledOnce();
+		spyValidatorsRepositoryGetValidators.calledOnce();
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(2, 1, block.data.id);
+
+		spyBroadcastPrevote.calledOnce();
+		spyBroadcastPrevote.calledWith(prevote);
+		spyHandlerOnPrevote.calledOnce();
+		spyHandlerOnPrevote.calledWith(prevote);
+
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onProposalLocked - broadcast prevote block id, if block is valid and valid round is higher or equal than lockedRound ", async () => {});
+
+	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is undefined", async ({
+		consensus,
+		blockProcessor,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+		roundState,
+		proposal,
+	}) => {
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(false);
+
+		const prevote = {
+			height: 2,
+			round: 0,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
+		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
+			validator,
+		]);
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+		const spyHandlerOnPrevote = spy(handler, "onPrevote");
+
+		proposal.validRound = 0;
+		roundState.round = 1;
+		consensus.setRound(1);
+		await consensus.onProposalLocked(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+
+		spyValidatorSetGetActoveValidators.calledOnce();
+		spyValidatorsRepositoryGetValidators.calledOnce();
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(2, 1, undefined);
+
+		spyBroadcastPrevote.calledOnce();
+		spyBroadcastPrevote.calledWith(prevote);
+		spyHandlerOnPrevote.calledOnce();
+		spyHandlerOnPrevote.calledWith(prevote);
+
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async () => {});
+
+	it("#onProposalLocked - should return if step === prevote", async ({ consensus, roundState, proposal }) => {
+		proposal.validRound = 0;
+		roundState.round = 1;
+		consensus.setRound(1);
+		consensus.setStep(Step.prevote);
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onProposalLocked - should return if step === precommit", async ({ consensus, roundState, proposal }) => {
+		proposal.validRound = 0;
+		roundState.round = 1;
+		consensus.setRound(1);
+		consensus.setStep(Step.precommit);
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.precommit);
+	});
+
+	it("#onProposalLocked - should return if height doesn't match", async ({ consensus, roundState, proposal }) => {
+		proposal.validRound = 0;
+		roundState.round = 1;
+		consensus.setRound(1);
+		roundState.height = 3;
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onProposalLocked - should return if round doesn't match", async ({ consensus, roundState, proposal }) => {
+		proposal.validRound = 0;
+		roundState.round = 1;
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onProposalLocked - should return if proposal is undefined", async ({ consensus, roundState, proposal }) => {
+		proposal.validRound = 0;
+		roundState.round = 1;
+		consensus.setRound(1);
+		roundState.getProposal = () => undefined;
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onProposalLocked - should return if validRound is undefined", async ({ consensus, roundState, proposal }) => {
+		roundState.round = 1;
+		consensus.setRound(1);
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onProposalLocked - should return if validRound is higher than round", async ({
+		consensus,
+		roundState,
+		proposal,
+	}) => {
+		proposal.validRound = 2;
+		roundState.round = 1;
+		consensus.setRound(1);
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
+	it("#onProposalLocked - should return if validRound is equal to round", async ({
+		consensus,
+		roundState,
+		proposal,
+	}) => {
+		proposal.validRound = 1;
+		roundState.round = 1;
+		consensus.setRound(1);
+		await consensus.onProposalLocked(roundState);
+
+		assert.equal(consensus.getStep(), Step.propose);
+	});
+
 	it("#onMajorityPrevote - should set locked values, valid values and precommit, when step === prevote", async ({
 		consensus,
 		roundState,
