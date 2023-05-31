@@ -3,10 +3,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { RoundState } from "./round-state";
 import { RoundStateRepository } from "./round-state-repository";
-import { IHandler } from "./types";
 
 @injectable()
-export class Handler implements IHandler {
+export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
