@@ -105,6 +105,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 
+		this.scheduler.clear();
+
 		const proposerPublicKey = await this.#getProposerPublicKey(this.#height, round);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 

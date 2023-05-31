@@ -47,6 +47,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			scheduleTimeoutPrecommit: () => {},
 			scheduleTimeoutPrevote: () => {},
 			scheduleTimeoutPropose: () => {},
+			clear: () => {},
 		};
 
 		context.validatorsRepository = {
@@ -156,6 +157,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			},
 		]);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
+		const spySchedulerClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutPropose = spy(scheduler, "scheduleTimeoutPropose");
 
 		await consensus.startRound(0);
@@ -163,6 +165,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetActiveValidators.calledOnce();
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(validatorPublicKey);
+		spySchedulerClear.calledOnce();
 		spyScheduleTimeoutPropose.calledOnce();
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 		spyLoggerInfo.calledWith(`No registered proposer for ${validatorPublicKey}`);
@@ -199,6 +202,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyBroadcastProposal = spy(broadcaster, "broadcastProposal");
 		const spyHandlerOnProposal = spy(handler, "onProposal");
 
+		const spySchedulerClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutPropose = spy(scheduler, "scheduleTimeoutPropose");
 
 		await consensus.startRound(0);
@@ -214,7 +218,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBroadcastProposal.calledWith(proposal);
 		spyHandlerOnProposal.calledOnce();
 		spyHandlerOnProposal.calledWith(proposal);
-
+		spySchedulerClear.calledOnce();
 		spyScheduleTimeoutPropose.neverCalled();
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 		assert.equal(consensus.getStep(), Step.propose);
