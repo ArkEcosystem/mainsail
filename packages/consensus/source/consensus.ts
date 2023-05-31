@@ -236,17 +236,17 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.#didMajorityPrecommit = true;
 
+		if (!roundState.getProcessorResult()) {
+			this.logger.info(
+				`Block ${proposal.block.data.id} on height ${this.#height} received +2/3 precommti but is invalid`,
+			);
+			return;
+		}
 		this.logger.info(
 			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
 				proposal.validatorPublicKey
 			} blockId: ${proposal.block.data.id}`,
 		);
-
-		// if (!roundState.getProcessorResult()) {
-		// 	this.logger.info(
-		// 		`Block ${proposal.block.data.id} on height ${this.#height} received +2/3 precommti but is invalid`,
-		// 	);
-		// }
 
 		await this.processor.commit(roundState);
 

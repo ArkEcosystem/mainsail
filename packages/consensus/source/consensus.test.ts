@@ -910,11 +910,20 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Step.propose);
 	});
 
-	it("#onMajorityPrecommit - should commit & increase height", async ({ consensus, blockProcessor, roundState }) => {
+	it("#onMajorityPrecommit - should commit & increase height", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+		logger,
+		proposal,
+	}) => {
 		const fakeTimers = clock();
 
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		roundState.getProcessorResult = () => true;
 
 		assert.equal(consensus.getHeight(), 2);
 		void consensus.onMajorityPrecommit(roundState);
@@ -925,7 +934,38 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.calledWith(roundState);
 		spyConsensusStartRound.calledOnce();
 		spyConsensusStartRound.calledWith(0);
+		spyLoggerInfo.calledWith(
+			`Received +2/3 precommits for ${2}/${0} proposer: ${proposal.validatorPublicKey} blockId: ${
+				proposal.block.data.id
+			}`,
+		);
 		assert.equal(consensus.getHeight(), 3);
+	});
+
+	it("#onMajorityPrecommit - should log and do nothing if result is invalid", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+		logger,
+		block,
+	}) => {
+		const fakeTimers = clock();
+
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		roundState.getProcessorResult = () => false;
+
+		assert.equal(consensus.getHeight(), 2);
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+		await fakeTimers.nextAsync();
+
+		spyBlockProcessorCommit.neverCalled();
+		spyConsensusStartRound.neverCalled();
+		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${2} received +2/3 precommti but is invalid`);
+		assert.equal(consensus.getHeight(), 2);
 	});
 
 	it("#onMajorityPrecommit - should be called only once", async ({ consensus, blockProcessor, roundState }) => {
@@ -933,6 +973,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		roundState.getProcessorResult = () => true;
 
 		assert.equal(consensus.getHeight(), 2);
 		void consensus.onMajorityPrecommit(roundState);
@@ -958,6 +1000,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 
+		roundState.getProcessorResult = () => true;
+
 		roundState.height = 3;
 		await consensus.onMajorityPrecommit(roundState);
 
@@ -973,6 +1017,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 
+		roundState.getProcessorResult = () => true;
+
 		roundState.round = 1;
 		await consensus.onMajorityPrecommit(roundState);
 
@@ -987,6 +1033,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+
+		roundState.getProcessorResult = () => true;
 
 		roundState.getProposal = () => undefined;
 		await consensus.onMajorityPrecommit(roundState);
