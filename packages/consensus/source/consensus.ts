@@ -155,6 +155,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
+		this.logger.info(
+			`Received proposal ${this.#height}/${this.#round} with locked blockId: ${proposal.block.data.id}`,
+		);
+
 		this.#step = Step.prevote;
 		if (!this.#lockedRound || this.#lockedRound <= proposal.validRound) {
 			const result = await this.processor.process(roundState);

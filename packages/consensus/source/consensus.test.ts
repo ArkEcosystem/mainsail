@@ -292,106 +292,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		handler,
 		roundState,
 		block,
-	}) => {
-		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
-
-		const prevote = {
-			height: 2,
-			round: 0,
-		};
-
-		const validator = {
-			prevote: () => {},
-		};
-		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
-
-		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
-		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
-			validator,
-		]);
-		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
-		const spyHandlerOnPrevote = spy(handler, "onPrevote");
-
-		await consensus.onProposal(roundState);
-
-		spyBlockProcessorProcess.calledOnce();
-		spyBlockProcessorProcess.calledWith(roundState);
-
-		spyValidatorSetGetActoveValidators.calledOnce();
-		spyValidatorsRepositoryGetValidators.calledOnce();
-
-		spyValidatorPrevote.calledOnce();
-		spyValidatorPrevote.calledWith(2, 0, block.data.id);
-
-		spyBroadcastPrevote.calledOnce();
-		spyBroadcastPrevote.calledWith(prevote);
-		spyHandlerOnPrevote.calledOnce();
-		spyHandlerOnPrevote.calledWith(prevote);
-
-		assert.equal(consensus.getStep(), Step.prevote);
-	});
-
-	it("#onProposal - broadcast prevote undefined, if block is invalid", async ({
-		consensus,
-		blockProcessor,
-		validatorSet,
-		validatorsRepository,
-		broadcaster,
-		handler,
-		roundState,
-	}) => {
-		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(false);
-
-		const prevote = {
-			height: 2,
-			round: 0,
-		};
-
-		const validator = {
-			prevote: () => {},
-		};
-		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
-
-		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
-		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
-			validator,
-		]);
-		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
-		const spyHandlerOnPrevote = spy(handler, "onPrevote");
-
-		await consensus.onProposal(roundState);
-
-		spyBlockProcessorProcess.calledOnce();
-		spyBlockProcessorProcess.calledWith(roundState);
-
-		spyValidatorSetGetActoveValidators.calledOnce();
-		spyValidatorsRepositoryGetValidators.calledOnce();
-
-		spyValidatorPrevote.calledOnce();
-		spyValidatorPrevote.calledWith(2, 0);
-
-		spyBroadcastPrevote.calledOnce();
-		spyBroadcastPrevote.calledWith(prevote);
-		spyHandlerOnPrevote.calledOnce();
-		spyHandlerOnPrevote.calledWith(prevote);
-
-		assert.equal(consensus.getStep(), Step.prevote);
-	});
-
-	// TODO: Handle on processor
-	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
-
-	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
-
-	it("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
-		consensus,
-		blockProcessor,
-		validatorSet,
-		validatorsRepository,
-		broadcaster,
-		handler,
-		roundState,
-		block,
+		logger,
 		proposal,
 	}) => {
 		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
@@ -412,6 +313,115 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		]);
 		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
 		const spyHandlerOnPrevote = spy(handler, "onPrevote");
+		const spyLoggerInfo = spy(logger, "info");
+
+		await consensus.onProposal(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+
+		spyValidatorSetGetActoveValidators.calledOnce();
+		spyValidatorsRepositoryGetValidators.calledOnce();
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(2, 0, block.data.id);
+
+		spyBroadcastPrevote.calledOnce();
+		spyBroadcastPrevote.calledWith(prevote);
+		spyHandlerOnPrevote.calledOnce();
+		spyHandlerOnPrevote.calledWith(prevote);
+		spyLoggerInfo.calledWith(`Received proposal ${2}/${0} blockId: ${proposal.block.data.id}`);
+
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	it("#onProposal - broadcast prevote undefined, if block is invalid", async ({
+		consensus,
+		blockProcessor,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+		roundState,
+		logger,
+		proposal,
+	}) => {
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(false);
+
+		const prevote = {
+			height: 2,
+			round: 0,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
+		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
+			validator,
+		]);
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+		const spyHandlerOnPrevote = spy(handler, "onPrevote");
+		const spyLoggerInfo = spy(logger, "info");
+
+		await consensus.onProposal(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+
+		spyValidatorSetGetActoveValidators.calledOnce();
+		spyValidatorsRepositoryGetValidators.calledOnce();
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(2, 0);
+
+		spyBroadcastPrevote.calledOnce();
+		spyBroadcastPrevote.calledWith(prevote);
+		spyHandlerOnPrevote.calledOnce();
+		spyHandlerOnPrevote.calledWith(prevote);
+		spyLoggerInfo.calledWith(`Received proposal ${2}/${0} blockId: ${proposal.block.data.id}`);
+
+		assert.equal(consensus.getStep(), Step.prevote);
+	});
+
+	// TODO: Handle on processor
+	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
+
+	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
+
+	it("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
+		consensus,
+		blockProcessor,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+		roundState,
+		block,
+		proposal,
+		logger,
+	}) => {
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
+
+		const prevote = {
+			height: 2,
+			round: 0,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
+		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
+			validator,
+		]);
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+		const spyHandlerOnPrevote = spy(handler, "onPrevote");
+		const spyLoggerInfo = spy(logger, "info");
 
 		proposal.validRound = 0;
 		roundState.round = 1;
@@ -431,6 +441,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBroadcastPrevote.calledWith(prevote);
 		spyHandlerOnPrevote.calledOnce();
 		spyHandlerOnPrevote.calledWith(prevote);
+		spyLoggerInfo.calledWith(`Received proposal ${2}/${1} with locked blockId: ${proposal.block.data.id}`);
 
 		assert.equal(consensus.getStep(), Step.prevote);
 	});
@@ -580,6 +591,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		broadcaster,
 		handler,
 		block,
+		logger,
+		proposal,
 	}) => {
 		const validatorPublicKey = "publicKey";
 		const validator = {
@@ -600,6 +613,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
 		const spyBroadcastPrecommit = spy(broadcaster, "broadcastPrecommit");
 		const spyHandlerOnPrecommit = spy(handler, "onPrecommit");
+		const spyLoggerInfo = spy(logger, "info");
 
 		roundState.getProcessorResult = () => true;
 
@@ -620,6 +634,11 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBroadcastPrecommit.calledWith(precommit);
 		spyHandlerOnPrecommit.calledOnce();
 		spyHandlerOnPrecommit.calledWith(precommit);
+		spyLoggerInfo.calledWith(
+			`Received +2/3 prevotes for ${2}/${0} proposer: ${proposal.validatorPublicKey} blockId: ${
+				proposal.block.data.id
+			}`,
+		);
 
 		assert.equal(consensus.getLockedRound(), 0);
 		assert.equal(consensus.getLockedValue(), roundState);
