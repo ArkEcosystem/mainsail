@@ -209,7 +209,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		// TODO: Check that its called only once
 		void this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
 	}
 
@@ -226,7 +225,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onMajorityPrecommitAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		// TODO: Execute only once
 		void this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
 	}
 
