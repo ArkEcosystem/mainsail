@@ -34,9 +34,6 @@ export interface IBroadcaster {
 }
 
 export interface IScheduler {
-	isTimeoutProposeSet(): boolean;
-	isTimeoutPrevoteSet(): boolean;
-	isTimeoutPrecommitSet(): boolean;
 	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;

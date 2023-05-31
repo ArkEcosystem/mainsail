@@ -13,19 +13,11 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
 
-	public isTimeoutProposeSet(): boolean {
-		return !!this.#timeoutPropose;
-	}
-
-	public isTimeoutPrevoteSet(): boolean {
-		return !!this.#timeoutPrevote;
-	}
-
-	public isTimeoutPrecommitSet(): boolean {
-		return !!this.#timeoutPrecommit;
-	}
-
 	public async scheduleTimeoutPropose(height: number, round: number): Promise<void> {
+		if (this.#timeoutPropose) {
+			return;
+		}
+
 		this.#timeoutPropose = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPropose(height, round);
 			this.#timeoutPropose = undefined;
@@ -33,6 +25,10 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	}
 
 	public async scheduleTimeoutPrevote(height: number, round: number): Promise<void> {
+		if (this.#timeoutPrevote) {
+			return;
+		}
+
 		this.#timeoutPrevote = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPrevote(height, round);
 			this.#timeoutPrevote = undefined;
@@ -40,6 +36,10 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	}
 
 	public async scheduleTimeoutPrecommit(height: number, round: number): Promise<void> {
+		if (this.#timeoutPrecommit) {
+			return;
+		}
+
 		this.#timeoutPrecommit = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPrecommit(height, round);
 			this.#timeoutPrecommit = undefined;

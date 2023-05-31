@@ -40,10 +40,19 @@ describe<{
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
 
 		void scheduler.scheduleTimeoutPropose(1, 2);
-		assert.true(scheduler.isTimeoutProposeSet());
-
 		await fakeTimers.nextAsync();
-		assert.false(scheduler.isTimeoutProposeSet());
+
+		spyOnTimeoutPropose.calledOnce();
+	});
+
+	it("#scheduleTimeoutPropose - should call onTimeoutPropose only once", async ({ scheduler }) => {
+		const fakeTimers = clock();
+		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
+
+		void scheduler.scheduleTimeoutPropose(1, 2);
+		void scheduler.scheduleTimeoutPropose(1, 2);
+		await fakeTimers.nextAsync();
+		await fakeTimers.nextAsync();
 
 		spyOnTimeoutPropose.calledOnce();
 	});
@@ -70,15 +79,24 @@ describe<{
 		assert.equal(timerValues, delays);
 	});
 
-	it("#scheduleTimeoutPrevote - should call onTimeoutPrevote ", async ({ scheduler }) => {
+	it("#scheduleTimeoutPrevote - should call onTimeoutPrevote", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
 
 		void scheduler.scheduleTimeoutPrevote(1, 2);
-		assert.true(scheduler.isTimeoutPrevoteSet());
-
 		await fakeTimers.nextAsync();
-		assert.false(scheduler.isTimeoutPrevoteSet());
+
+		spyOnTimeoutPropose.calledOnce();
+	});
+
+	it("#scheduleTimeoutPrevote - should call onTimeoutPrevote only once", async ({ scheduler }) => {
+		const fakeTimers = clock();
+		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
+
+		void scheduler.scheduleTimeoutPrevote(1, 2);
+		void scheduler.scheduleTimeoutPrevote(1, 2);
+		await fakeTimers.nextAsync();
+		await fakeTimers.nextAsync();
 
 		spyOnTimeoutPropose.calledOnce();
 	});
@@ -110,10 +128,19 @@ describe<{
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
 
 		void scheduler.scheduleTimeoutPrecommit(1, 2);
-		assert.true(scheduler.isTimeoutPrecommitSet());
-
 		await fakeTimers.nextAsync();
-		assert.false(scheduler.isTimeoutPrecommitSet());
+
+		spyOnTimeoutPropose.calledOnce();
+	});
+
+	it("#scheduleTimeoutPrecommit - should call onTimeoutPrecommit only once", async ({ scheduler }) => {
+		const fakeTimers = clock();
+		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
+
+		void scheduler.scheduleTimeoutPrecommit(1, 2);
+		void scheduler.scheduleTimeoutPrecommit(1, 2);
+		await fakeTimers.nextAsync();
+		await fakeTimers.nextAsync();
 
 		spyOnTimeoutPropose.calledOnce();
 	});
@@ -145,11 +172,8 @@ describe<{
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
 
 		void scheduler.scheduleTimeoutPropose(1, 2);
-		assert.true(scheduler.isTimeoutProposeSet());
 		scheduler.clear();
-
 		await fakeTimers.nextAsync();
-		assert.false(scheduler.isTimeoutProposeSet());
 
 		spyOnTimeoutPropose.neverCalled();
 	});
@@ -159,11 +183,9 @@ describe<{
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
 
 		void scheduler.scheduleTimeoutPrevote(1, 2);
-		assert.true(scheduler.isTimeoutPrevoteSet());
 		scheduler.clear();
 
 		await fakeTimers.nextAsync();
-		assert.false(scheduler.isTimeoutPrevoteSet());
 
 		spyOnTimeoutPropose.neverCalled();
 	});
@@ -173,11 +195,8 @@ describe<{
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
 
 		void scheduler.scheduleTimeoutPrecommit(1, 2);
-		assert.true(scheduler.isTimeoutPrecommitSet());
 		scheduler.clear();
-
 		await fakeTimers.nextAsync();
-		assert.false(scheduler.isTimeoutPrecommitSet());
 
 		spyOnTimeoutPropose.neverCalled();
 	});
