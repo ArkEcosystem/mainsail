@@ -310,10 +310,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
-		// TODO: Handle locked value
-		const block = await proposer.prepareBlock(this.#height, this.#round);
+		let block: Contracts.Crypto.IBlock;
+		if (this.#validValue && this.#validValue.getProposal()) {
+			block = this.#validValue.getProposal().block;
+		} else {
+			block = await proposer.prepareBlock(this.#height, this.#round);
+		}
 
-		// TODO: Add valid round to proposal
 		const proposal = await proposer.propose(this.#height, this.#round, block, this.#validRound);
 
 		await this.broadcaster.broadcastProposal(proposal);

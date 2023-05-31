@@ -140,7 +140,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		});
 	});
 
-	it("#startRound - should schedule timout if proposer in not local validator", async ({
+	it("#startRound - should schedule timout if proposer is not local validator", async ({
 		consensus,
 		scheduler,
 		validatorSet,
@@ -219,6 +219,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 		assert.equal(consensus.getStep(), Step.propose);
 	});
+
+	it("#startRound - local validator should locked value", async () => {});
 
 	it("#onProposal - should return if step !== propose", async ({ consensus, blockProcessor, roundState }) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
