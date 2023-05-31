@@ -75,7 +75,7 @@ export class Config {
 		if (!this.has("channel")) {
 			this.set(
 				"channel",
-				this.#getRegistryChannel(this.app.get<Contracts.Types.PackageJson>(Identifiers.Package).version),
+				this.#getRegistryChannel(this.app.get<Contracts.Types.PackageJson>(Identifiers.Package).version ?? ""),
 			);
 		}
 

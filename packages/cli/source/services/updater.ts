@@ -115,11 +115,11 @@ export class Updater implements Contracts_Updater {
 	}
 
 	get #packageName(): string {
-		return this.pkg.name;
+		return this.pkg.name ?? "";
 	}
 
 	get #packageVersion(): string {
-		return this.pkg.version;
+		return this.pkg.version ?? "";
 	}
 
 	get #packageChannel(): string {

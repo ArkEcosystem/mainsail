@@ -7,7 +7,7 @@ import assert from "assert";
 @injectable()
 export class RoundState {
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.DposState)
 	@tagged("state", "blockchain")
@@ -30,16 +30,16 @@ export class RoundState {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	#blocksInCurrentRound: Contracts.Crypto.IBlock[] = [];
 	#forgingValidators: Contracts.State.Wallet[] = [];

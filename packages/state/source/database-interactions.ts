@@ -10,7 +10,7 @@ export class DatabaseInteraction {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
@@ -25,10 +25,10 @@ export class DatabaseInteraction {
 	private readonly roundState!: RoundState;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	public async initialize(): Promise<void> {
 		try {

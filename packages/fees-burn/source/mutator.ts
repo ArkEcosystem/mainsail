@@ -1,13 +1,13 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "fees-managed")
-	private readonly pluginConfiguration: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	public async apply(
 		walletRepository: Contracts.State.WalletRepository,
@@ -52,7 +52,8 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 	}
 
 	#calculate(block: Contracts.Crypto.IBlockData): BigNumber {
-		const burnPercentage: number = this.pluginConfiguration.get("percentage");
+		const burnPercentage = this.pluginConfiguration.get<number>("percentage");
+		Utils.assert.defined(burnPercentage);
 
 		let fee: BigNumber = block.totalFee;
 

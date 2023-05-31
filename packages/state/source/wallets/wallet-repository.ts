@@ -14,7 +14,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	protected readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	protected readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};
 
@@ -68,7 +68,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 			walletHolder.getWallet().setPublicKey(publicKey);
 			index.set(publicKey, walletHolder);
 		}
-		const wallet = index.get(publicKey);
+		const wallet = index.get(publicKey)!;
 		return wallet.getWallet();
 	}
 
@@ -155,13 +155,17 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		if (address && !index.has(address)) {
 			index.set(address, new WalletHolder(this.createWalletFactory(address)));
 		}
-		return index.get(address);
+		return index.get(address)!;
 	}
 
 	protected findHolder(wallet: Contracts.State.Wallet): Contracts.State.WalletHolder {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 
 		const walletHolder = index.get(wallet.getAddress());
+
+		if (!walletHolder) {
+			throw new Error("Wallet holder not found");
+		}
 
 		if (walletHolder.getWallet() !== wallet) {
 			throw new Error("Wallet missmatch");

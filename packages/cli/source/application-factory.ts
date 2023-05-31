@@ -1,5 +1,6 @@
 import { Container, interfaces } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 import { ActionFactory } from "./action-factory";
 import {
@@ -58,6 +59,7 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Package).toConstantValue(package_);
 
 		// Paths
+		Utils.assert.defined<string>(package_.name);
 		app.bind(Identifiers.ConsolePaths).toConstantValue(environmentPaths.get(package_.name));
 
 		// Factories

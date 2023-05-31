@@ -7,18 +7,18 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class BlockState implements Contracts.State.BlockState {
 	@inject(Identifiers.Application)
-	public readonly app: Contracts.Kernel.Application;
+	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private readonly handlerRegistry: Contracts.Transactions.ITransactionHandlerRegistry;
+	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@multiInject(Identifiers.State.ValidatorMutator)
-	private readonly validatorMutators: Contracts.State.ValidatorMutator[];
+	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
 
-	#walletRepository: Contracts.State.WalletRepositoryClone;
+	#walletRepository!: Contracts.State.WalletRepositoryClone;
 
 	public async applyBlock(
 		walletRepository: Contracts.State.WalletRepositoryClone,
@@ -89,6 +89,7 @@ export class BlockState implements Contracts.State.BlockState {
 			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
 		) {
 			AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.asset?.votes);
+			AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.asset?.unvotes);
 
 			const senderValidatordAmount = sender
 				.getBalance()

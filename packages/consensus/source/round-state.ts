@@ -6,7 +6,7 @@ import { IValidatorSetMajority } from "./types";
 @injectable()
 export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "clone")
@@ -14,11 +14,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "consensus")
-	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
-	private readonly signatureFactory: Contracts.Crypto.ISignature;
+	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
 	#proposal?: Contracts.Crypto.IProposal;
 	#processorResult?: boolean;
@@ -41,8 +41,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		this.#processorResult = processorResult;
 	}
 
-	public getProcessorResult(): boolean | undefined {
-		return this.#processorResult;
+	public getProcessorResult(): boolean {
+		return !!this.#processorResult;
 	}
 
 	public addPrevote(prevote: Contracts.Crypto.IPrevote): void {
@@ -74,8 +74,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	async #aggregateValidatorSetMajority(majority: Map<string, { signature: string }>): Promise<IValidatorSetMajority> {
-		const publicKeys = [];
-		const signatures = [];
+		const publicKeys: Buffer[] = [];
+		const signatures: Buffer[] = [];
 
 		for (const [key, { signature }] of majority) {
 			publicKeys.push(Buffer.from(key, "hex"));
