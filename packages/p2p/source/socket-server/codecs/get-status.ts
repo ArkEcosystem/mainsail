@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
-import { Utils } from "packages/kernel/distribution";
 
 import { getStatus as proto } from "./proto/protos";
 

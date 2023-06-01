@@ -1,8 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
+import { Utils } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
-import { Utils } from "packages/kernel/distribution";
 
 @injectable()
 export class MultiSignatureRegistrationTransaction extends Transaction {
