@@ -14,14 +14,14 @@ export class RoundStateRepository {
 		const key = `${height}-${round}`;
 
 		if (!this.#roundStates.has(key)) {
-			this.#roundStates.set(key, this.#createRoundState());
+			this.#roundStates.set(key, this.#createRoundState(height, round));
 		}
 
 		return this.#roundStates.get(key);
 	}
 
 	// TODO: Bind to factory
-	#createRoundState(): RoundState {
-		return this.app.resolve(RoundState);
+	#createRoundState(height: number, round: number): RoundState {
+		return this.app.resolve(RoundState).configure(height, round);
 	}
 }
