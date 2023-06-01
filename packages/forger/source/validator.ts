@@ -6,25 +6,25 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class Validator implements Contracts.Forger.Validator {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	@tagged("type", "wallet")
-	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
-	#mnemonic: string;
+	#mnemonic!: string;
 
-	public keys: Contracts.Crypto.IKeyPair | undefined;
+	public keys!: Contracts.Crypto.IKeyPair;
 
-	public publicKey: string;
+	public publicKey!: string;
 
-	public address: string;
+	public address!: string;
 
 	public async configure(mnemonic: string): Promise<Validator> {
 		this.#mnemonic = mnemonic;

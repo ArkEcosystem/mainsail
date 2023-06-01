@@ -4,13 +4,13 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class Utils implements Contracts.Crypto.ITransactionUtils {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
-	private readonly serializer: Contracts.Crypto.ITransactionSerializer;
+	private readonly serializer!: Contracts.Crypto.ITransactionSerializer;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async toBytes(data: Contracts.Crypto.ITransactionData): Promise<Buffer> {
 		return this.serializer.serialize(this.transactionTypeFactory.create(data));

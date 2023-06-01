@@ -33,7 +33,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
 	readonly #lock: AppUtils.Lock = new AppUtils.Lock();
 

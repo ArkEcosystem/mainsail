@@ -13,7 +13,7 @@ export class NodeController extends Controller {
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const lastBlock = this.blockchain.getLastBlock();
@@ -44,7 +44,7 @@ export class NodeController extends Controller {
 	}
 
 	public async configurationNode(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const network = this.configuration.all().network;
+		const network = this.configuration.all()!.network;
 
 		return {
 			data: {

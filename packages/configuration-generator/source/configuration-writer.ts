@@ -10,7 +10,7 @@ import { Identifiers } from "./identifiers";
 @injectable()
 export class ConfigurationWriter {
 	@inject(Identifiers.ConfigurationPath)
-	private configurationPath: string;
+	private configurationPath!: string;
 
 	writeApp(appData: Contracts.Types.JsonObject): void {
 		writeJSONSync(path.join(this.configurationPath, "app.json"), appData, {

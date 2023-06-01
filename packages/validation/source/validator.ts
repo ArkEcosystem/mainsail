@@ -32,7 +32,7 @@ export class Validator implements Contracts.Crypto.IValidator {
 				value: data,
 			};
 		} catch (error) {
-			return { error: error.stack, errors: [], value: undefined };
+			return { error: error.stack, errors: [], value: data };
 		}
 	}
 

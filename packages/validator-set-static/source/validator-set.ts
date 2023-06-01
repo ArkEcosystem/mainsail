@@ -21,7 +21,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	#validators: Contracts.State.Wallet[] = [];
 
 	public async configure(): Promise<ValidatorSet> {
-		const secrets = this.app.config<string[]>("validators.secrets");
+		const secrets = this.app.config<string[]>("validators.secrets") ?? [];
 
 		this.#validators = await Promise.all(
 			secrets.map(async (secret) => {

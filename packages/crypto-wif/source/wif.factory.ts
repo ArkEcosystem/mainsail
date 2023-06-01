@@ -5,11 +5,11 @@ import wif from "wif";
 @injectable()
 export class WIFFactory implements Contracts.Crypto.IWIFFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	@tagged("type", "wallet")
-	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		const { compressed, privateKey }: Contracts.Crypto.IKeyPair = await this.keyPairFactory.fromMnemonic(mnemonic);

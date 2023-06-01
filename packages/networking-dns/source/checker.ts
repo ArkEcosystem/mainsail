@@ -16,7 +16,7 @@ export class Checker {
 	public async execute(): Promise<void> {
 		const lookupService = util.promisify(dns.lookupService);
 
-		for (const host of Utils.shuffle(this.configuration.get<string[]>("hosts"))) {
+		for (const host of Utils.shuffle(this.configuration.getRequired<string[]>("hosts"))) {
 			try {
 				await lookupService(host, 53);
 

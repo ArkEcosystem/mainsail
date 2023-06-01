@@ -67,12 +67,12 @@ export class PeersController extends Controller {
 					break;
 				}
 				default: {
-					results = results.sort((a, b) => a.latency - b.latency);
+					results = results.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
 					break;
 				}
 			}
 		} else {
-			results = results.sort((a, b) => a.latency - b.latency);
+			results = results.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
 		}
 
 		results = results.slice(offset, offset + limit);

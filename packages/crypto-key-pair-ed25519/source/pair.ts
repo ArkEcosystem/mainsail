@@ -8,7 +8,7 @@ import WIF from "wif";
 @injectable()
 export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async fromMnemonic(mnemonic: string): Promise<Contracts.Crypto.IKeyPair> {
 		return this.#fromPrivateKey(sha256(mnemonicToSeedSync(mnemonic)));

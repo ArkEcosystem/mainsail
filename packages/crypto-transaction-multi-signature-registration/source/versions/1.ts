@@ -2,15 +2,16 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
 import { ByteBuffer } from "@mainsail/utils";
+import { Utils } from "packages/kernel/distribution";
 
 @injectable()
 export class MultiSignatureRegistrationTransaction extends Transaction {
 	@inject(Identifiers.Application)
-	public readonly app: Contracts.Kernel.Application;
+	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
 	@tagged("type", "wallet")
-	private readonly publicKeySerializer: Contracts.Crypto.IPublicKeySerializer;
+	private readonly publicKeySerializer!: Contracts.Crypto.IPublicKeySerializer;
 
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.MultiSignature;
@@ -63,6 +64,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
+		Utils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
 		const { min, publicKeys } = data.asset.multiSignature;
 		const buff: ByteBuffer = ByteBuffer.fromSize(
 			2 +

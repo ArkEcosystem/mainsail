@@ -6,19 +6,19 @@ import { DatabaseInteraction } from "@mainsail/state";
 @injectable()
 export class GetCurrentRoundAction extends Services.Triggers.Action {
 	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.BlockchainService)
-	private readonly blockchain: Contracts.Blockchain.Blockchain;
+	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.DatabaseInteraction)
-	private readonly databaseInteraction: DatabaseInteraction;
+	private readonly databaseInteraction!: DatabaseInteraction;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	public async execute(): Promise<Contracts.P2P.CurrentRound> {
 		const lastBlock = this.blockchain.getLastBlock();

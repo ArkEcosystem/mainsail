@@ -7,7 +7,7 @@ import { Utils } from "../utils";
 @injectable()
 export class ForgeNewBlockAction extends Services.Triggers.Action {
 	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
@@ -19,26 +19,29 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Contracts.Crypto.IBlockSerializer;
+	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
+	private readonly deserializer!: Contracts.Crypto.IBlockDeserializer;
 
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {
 		const validator: Contracts.Forger.Validator = arguments_.validator;
 		const round: Contracts.P2P.CurrentRound = arguments_.round;
 		const networkState: Contracts.P2P.NetworkState = arguments_.networkState;
 
-		this.configuration.setHeight(networkState.getNodeHeight());
+		const height = networkState.getNodeHeight();
+		if (height) {
+			this.configuration.setHeight(height);
+		}
 
 		const transactions: Contracts.Crypto.ITransactionData[] = await this.#getTransactionsForForging();
 
@@ -55,7 +58,8 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 		AppUtils.assert.defined<string>(validator.publicKey);
 
 		const minimumMs = 2000;
-		const timeLeftInMs: number = Utils.getRemainingSlotTime(round, this.configuration);
+		const timeLeftInMs = Utils.getRemainingSlotTime(round, this.configuration);
+		AppUtils.assert.defined<number>(timeLeftInMs);
 		const prettyName = `${this.app.get<object>(Identifiers.Forger.Usernames)[validator.publicKey]} (${
 			validator.publicKey
 		})`;

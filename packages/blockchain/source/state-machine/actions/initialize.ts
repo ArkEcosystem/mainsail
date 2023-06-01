@@ -17,7 +17,7 @@ export class Initialize implements Action {
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Consensus.Service)
-	private readonly consensus: Contracts.Consensus.IConsensusService;
+	private readonly consensus!: Contracts.Consensus.IConsensusService;
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
@@ -26,7 +26,7 @@ export class Initialize implements Action {
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
@@ -35,7 +35,7 @@ export class Initialize implements Action {
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async handle(): Promise<void> {
 		try {

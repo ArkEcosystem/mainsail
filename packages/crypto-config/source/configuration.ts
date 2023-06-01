@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Contracts, Exceptions } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import deepmerge from "deepmerge";
 import clone from "lodash.clone";
 import get from "lodash.get";
@@ -38,6 +39,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			};
 		}
 
+		Utils.assert.defined<Contracts.Crypto.NetworkConfig>(this.#config);
 		set(this.#config, key, value);
 
 		try {

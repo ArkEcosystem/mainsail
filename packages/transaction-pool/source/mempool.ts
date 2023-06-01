@@ -11,7 +11,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 

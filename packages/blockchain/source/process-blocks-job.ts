@@ -19,7 +19,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
@@ -31,10 +31,10 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
 	private readonly blockTimeLookup: any;

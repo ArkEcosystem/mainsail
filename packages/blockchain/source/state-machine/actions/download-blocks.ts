@@ -22,7 +22,7 @@ export class DownloadBlocks implements Action {
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	public async handle(): Promise<void> {
 		const lastDownloadedBlock: Contracts.Crypto.IBlockData =

@@ -50,6 +50,6 @@ export interface IValidator {
 }
 
 export interface IValidatorRepository {
-	getValidator(publicKey: string): IValidator;
+	getValidator(publicKey: string): IValidator | undefined;
 	getValidators(publicKeys: string[]): IValidator[];
 }

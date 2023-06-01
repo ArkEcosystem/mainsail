@@ -1,5 +1,6 @@
 import { Contracts, Exceptions } from "@mainsail/contracts";
 
+import { assert } from "./assert";
 import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 
 export const isNewRound = (height: number, configuration: Contracts.Crypto.IConfiguration): boolean => {
@@ -54,6 +55,7 @@ export const calculateRound = (
 
 		result.round += spanHeight / activeValidators;
 		result.roundHeight = nextMilestone.height;
+		assert.defined<number>(nextMilestone.data);
 		result.maxValidators = nextMilestone.data;
 
 		activeValidators = nextMilestone.data;

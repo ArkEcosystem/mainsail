@@ -4,16 +4,16 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer: Contracts.Crypto.IMessageSerializer;
+	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
 
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
-	private readonly signature: Contracts.Crypto.ISignature;
+	private readonly signature!: Contracts.Crypto.ISignature;
 
 	public async verifyProposal(
 		proposal: Contracts.Crypto.IProposalData,
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
-		const errors = [];
+		const errors: string[] = [];
 
 		const bytes = await this.serializer.serializeProposal(proposal, { excludeSignature: false });
 		if (!this.#verifySignature(proposal.signature, proposal.validatorPublicKey, bytes)) {
@@ -29,7 +29,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	public async verifyPrevote(
 		prevote: Contracts.Crypto.IPrevoteData,
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
-		const errors = [];
+		const errors: string[] = [];
 
 		const bytes = await this.serializer.serializePrevote(prevote, { excludeSignature: false });
 		if (!this.#verifySignature(prevote.signature, prevote.validatorPublicKey, bytes)) {
@@ -45,7 +45,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	public async verifyPrecommit(
 		precommit: Contracts.Crypto.IPrecommitData,
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
-		const errors = [];
+		const errors: string[] = [];
 
 		const bytes = await this.serializer.serializePrecommit(precommit, { excludeSignature: false });
 		if (!this.#verifySignature(precommit.signature, precommit.validatorPublicKey, bytes)) {

@@ -11,13 +11,15 @@ export class ForgedTransactionsVerifier implements Contracts.BlockProcessor.Hand
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().block;
+		const block = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+
 		if (block.transactions.length > 0) {
 			const transactionIds = block.transactions.map((tx) => {
 				Utils.assert.defined<string>(tx.id);

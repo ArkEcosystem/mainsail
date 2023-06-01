@@ -1,6 +1,6 @@
 import { inject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { Utils as AppUtils, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { MultiPaymentBuilder } from "../../../crypto-transaction-multi-payment";
@@ -21,14 +21,14 @@ interface IPassphrasePair {
 // @TODO replace this by the use of real factories
 export class TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "wallet")
-	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	protected builder: any;
 	protected app: Contracts.Kernel.Application;
@@ -254,6 +254,7 @@ export class TransactionFactory {
 	}
 
 	async #sign<T>(quantity: number, method: string): Promise<T[]> {
+		Utils.assert.defined<Contracts.Crypto.NetworkConfig>(this.#networkConfig);
 		this.configuration.setConfig(this.#networkConfig);
 
 		if (!this.#senderPublicKey) {

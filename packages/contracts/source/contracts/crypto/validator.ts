@@ -1,7 +1,7 @@
 import Ajv, { AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 
 export interface ISchemaValidationResult<T = any> {
-	value: T | undefined;
+	value: T;
 	error: any;
 	errors?: ErrorObject[] | undefined;
 }

@@ -118,7 +118,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		}
 
 		const previousBlock = await this.database.getLastBlock();
-		Utils.assert.defined(previousBlock);
+		Utils.assert.defined<Contracts.Crypto.IBlock>(previousBlock);
 
 		return this.blockFactory.make({
 			generatorPublicKey: this.#publicKey,

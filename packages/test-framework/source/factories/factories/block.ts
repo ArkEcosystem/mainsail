@@ -28,7 +28,7 @@ export const registerBlockFactory = async (
 		const transactions = options.transactions || [];
 		if (options.transactionsCount) {
 			const signer = new Signer(
-				app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).all(),
+				app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).all()!,
 				options.nonce,
 			);
 

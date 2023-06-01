@@ -15,7 +15,7 @@ export class VoteBuilder extends TransactionBuilder<VoteBuilder> {
 		this.data.typeGroup = VoteTransaction.typeGroup;
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
-		this.data.senderPublicKey = undefined;
+		this.data.senderPublicKey = "";
 		this.data.asset = { unvotes: [], votes: [] };
 
 		this.signWithSenderAsRecipient = true;

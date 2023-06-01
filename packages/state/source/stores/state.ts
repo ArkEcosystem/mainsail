@@ -308,6 +308,8 @@ export class StateStore implements Contracts.State.StateStore {
 		blocks: Seq<number, Contracts.Crypto.IBlock>,
 		headersOnly?: boolean,
 	): Seq<number, Contracts.Crypto.IBlockData> {
+		// TODO: Add type support for headers only
+		// @ts-ignore
 		return blocks.map((block) => ({
 			...block.data,
 			transactions: headersOnly ? undefined : block.transactions.map((tx) => tx.data),

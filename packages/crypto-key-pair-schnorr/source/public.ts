@@ -6,7 +6,7 @@ import { schnorr } from "bcrypto";
 @injectable()
 export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
-	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;

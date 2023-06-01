@@ -53,7 +53,7 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 
 	#calculate(block: Contracts.Crypto.IBlockData): BigNumber {
 		const burnPercentage = this.pluginConfiguration.get<number>("percentage");
-		Utils.assert.defined(burnPercentage);
+		Utils.assert.defined<number>(burnPercentage);
 
 		let fee: BigNumber = block.totalFee;
 

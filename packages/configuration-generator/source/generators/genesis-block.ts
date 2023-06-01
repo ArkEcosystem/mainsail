@@ -73,7 +73,7 @@ export class GenesisBlockGenerator extends Generator {
 	async #createTransferTransactions(sender: Wallet, recipients: Wallet[], totalPremine: string, pubKeyHash: number) {
 		const amount: string = BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
 
-		const result = [];
+		const result: any[] = [];
 
 		for (const [index, recipient] of recipients.entries()) {
 			result.push(await this.#createTransferTransaction(sender, recipient, amount, pubKeyHash, index + 1));
@@ -83,7 +83,7 @@ export class GenesisBlockGenerator extends Generator {
 	}
 
 	async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number) {
-		const result = [];
+		const result: any[] = [];
 
 		for (const [index, sender] of senders.entries()) {
 			result[index] = await this.#formatGenesisTransaction(
@@ -105,7 +105,7 @@ export class GenesisBlockGenerator extends Generator {
 	}
 
 	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number) {
-		const result = [];
+		const result: any[] = [];
 
 		for (const [index, sender] of senders.entries()) {
 			result[index] = await this.#formatGenesisTransaction(

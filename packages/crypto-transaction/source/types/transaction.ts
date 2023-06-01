@@ -5,18 +5,18 @@ import { ByteBuffer } from "@mainsail/utils";
 @injectable()
 export abstract class Transaction implements Contracts.Crypto.ITransaction {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	protected readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	protected readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public static type: number | undefined = undefined;
 	public static typeGroup: number | undefined = undefined;
 	public static version = 1;
 	public static key: string | undefined = undefined;
 
-	public data: Contracts.Crypto.ITransactionData;
-	public serialized: Buffer;
+	public data!: Contracts.Crypto.ITransactionData;
+	public serialized!: Buffer;
 
 	public get id(): string | undefined {
 		return this.data.id;

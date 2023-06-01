@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 // TODO: Move enums to contracts
-import { Enums } from "@mainsail/kernel";
+import { Enums, Utils } from "@mainsail/kernel";
 
 import {
 	ForgedTransactionsVerifier,
@@ -16,13 +16,13 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.StateStore)
-	private readonly state: Contracts.State.StateStore;
+	private readonly state!: Contracts.State.StateStore;
 
 	@inject(Identifiers.BlockState)
 	private readonly blockState!: Contracts.State.BlockState;
 
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
@@ -39,7 +39,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 				return false;
 			}
 
-			await this.blockState.applyBlock(roundState.getWalletRepository(), roundState.getProposal().block);
+			const block = roundState.getProposal()?.block;
+			Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+			await this.blockState.applyBlock(roundState.getWalletRepository(), block);
 
 			return true;
 		} catch (error) {
@@ -52,7 +54,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	public async commit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		roundState.getWalletRepository().commitChanges();
 
-		const block = roundState.getProposal().block;
+		const block = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 
 		// TODO: Save commitBlock
 		await this.databaseService.saveBlocks([block]);

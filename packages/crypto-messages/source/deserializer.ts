@@ -7,7 +7,7 @@ import { ByteBuffer } from "@mainsail/utils";
 export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	@tagged("type", "consensus")
-	private readonly serializer: Contracts.Serializer.ISerializer;
+	private readonly serializer!: Contracts.Serializer.ISerializer;
 
 	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const proposal = {} as Contracts.Crypto.IProposal;

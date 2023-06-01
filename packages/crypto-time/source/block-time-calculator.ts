@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class BlockTimeCalculator {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public isNewBlockTime(height: number): boolean {
 		if (height === 1) {

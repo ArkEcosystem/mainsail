@@ -22,7 +22,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async getBlockCandidateTransactions(): Promise<Contracts.Crypto.ITransaction[]> {
 		const height: number = this.blockchain.getLastBlock().data.height;

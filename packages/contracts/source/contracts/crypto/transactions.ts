@@ -107,6 +107,11 @@ export interface IMultiSignatureAsset {
 	publicKeys: string[];
 }
 
+export interface IVoteAsset {
+	votes: string[];
+	unvotes: string[];
+}
+
 export interface ISerializeOptions {
 	excludeSignature?: boolean;
 	excludeMultiSignature?: boolean;

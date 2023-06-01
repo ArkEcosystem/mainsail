@@ -7,29 +7,29 @@ import { Step } from "./enums";
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.BlockProcessor)
-	private readonly processor: Contracts.BlockProcessor.Processor;
+	private readonly processor!: Contracts.BlockProcessor.Processor;
 
 	@inject(Identifiers.StateStore)
-	private readonly state: Contracts.State.StateStore;
+	private readonly state!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Consensus.Handler)
-	private readonly handler: Contracts.Consensus.IHandler;
+	private readonly handler!: Contracts.Consensus.IHandler;
 
 	@inject(Identifiers.Consensus.Broadcaster)
-	private readonly broadcaster: Contracts.Consensus.IBroadcaster;
+	private readonly broadcaster!: Contracts.Consensus.IBroadcaster;
 
 	@inject(Identifiers.Consensus.Scheduler)
-	private readonly scheduler: Contracts.Consensus.IScheduler;
+	private readonly scheduler!: Contracts.Consensus.IScheduler;
 
 	// TODO: Rename identifier
 	@inject(Identifiers.Consensus.ValidatorRepository)
-	private readonly validatorsRepository: Contracts.Consensus.IValidatorRepository;
+	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	#height = 2;
 	#round = 0;
@@ -315,8 +315,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
 		let block: Contracts.Crypto.IBlock;
-		if (this.#validValue && this.#validValue.getProposal()) {
-			block = this.#validValue.getProposal().block;
+		const existingProposal = this.#validValue?.getProposal();
+		if (this.#validValue && existingProposal) {
+			block = existingProposal.block;
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
 		}
