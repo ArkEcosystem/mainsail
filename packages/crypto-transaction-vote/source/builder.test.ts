@@ -30,7 +30,7 @@ describe<{
 			amount: BigNumber.ZERO,
 			asset: { unvotes: [], votes: [] },
 			recipientId: undefined,
-			senderPublicKey: undefined,
+			senderPublicKey: "",
 			type: VoteTransaction.type,
 			typeGroup: VoteTransaction.typeGroup,
 		};
