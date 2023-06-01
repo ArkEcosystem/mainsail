@@ -1,8 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../test-framework";
 import importFresh from "import-fresh";
 
+import { describe, Sandbox } from "../../test-framework";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { ServiceProvider } from "./service-provider";
@@ -370,7 +370,7 @@ describe<{
 
 		assert.equal(result.error?.message, '"server.port" must be greater than or equal to 1');
 
-		defaults.server.port = 65536;
+		defaults.server.port = 65_536;
 		result = serviceProvider.configSchema().validate(defaults);
 
 		assert.equal(result.error?.message, '"server.port" must be less than or equal to 65535');

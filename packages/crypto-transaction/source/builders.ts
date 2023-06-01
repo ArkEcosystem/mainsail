@@ -7,28 +7,28 @@ import { TransactionFactory } from "./factory";
 @injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	protected readonly factory: TransactionFactory;
+	protected readonly factory!: TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	@tagged("type", "wallet")
-	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Signer)
-	protected readonly signer: Contracts.Crypto.ITransactionSigner;
+	protected readonly signer!: Contracts.Crypto.ITransactionSigner;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	protected readonly utils: Contracts.Crypto.ITransactionUtils;
+	protected readonly utils!: Contracts.Crypto.ITransactionUtils;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier: Contracts.Crypto.ITransactionVerifier;
+	protected readonly verifier!: Contracts.Crypto.ITransactionVerifier;
 
-	public data: Contracts.Crypto.ITransactionData;
+	public data!: Contracts.Crypto.ITransactionData;
 
 	protected signWithSenderAsRecipient = false;
 

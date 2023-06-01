@@ -38,7 +38,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			{
 				managed: BigNumber.make("500"),
 				static: BigNumber.make("10000000"),
-			}[this.app.get<string>(Identifiers.Fee.Type)],
+			}[this.app.get<string>(Identifiers.Fee.Type)]!,
 		);
 	}
 

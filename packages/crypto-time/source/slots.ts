@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 import { BlockTimeCalculator } from "./block-time-calculator";
@@ -8,13 +9,13 @@ import { BlockTimeLookup } from "./block-time-lookup";
 @injectable()
 export class Slots implements Contracts.Crypto.Slots {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
-	private readonly calculator: BlockTimeCalculator;
+	private readonly calculator!: BlockTimeCalculator;
 
 	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
-	private readonly blockTimeLookup: BlockTimeLookup;
+	private readonly blockTimeLookup!: BlockTimeLookup;
 
 	#transientBlockTimeLookup: Contracts.Crypto.GetBlockTimeStampLookup | undefined;
 
@@ -77,6 +78,7 @@ export class Slots implements Contracts.Crypto.Slots {
 			lastSpanEndTime = (await this.#getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
+			Utils.assert.defined<number>(nextMilestone.data);
 			blockTime = nextMilestone.data;
 			previousMilestoneHeight = nextMilestone.height;
 			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blockTime");
@@ -135,6 +137,7 @@ export class Slots implements Contracts.Crypto.Slots {
 			lastSpanEndTime = (await this.#getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
+			Utils.assert.defined<number>(nextMilestone.data);
 			blockTime = nextMilestone.data;
 			milestoneHeight = nextMilestone.height;
 			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blockTime");
@@ -148,11 +151,7 @@ export class Slots implements Contracts.Crypto.Slots {
 			return height;
 		}
 
-		if (this.configuration.getHeight()) {
-			return this.configuration.getHeight();
-		}
-
-		return 1;
+		return this.configuration.getHeight() ?? 1;
 	}
 
 	async #getBlockTimeLookup(height: number): Promise<number> {

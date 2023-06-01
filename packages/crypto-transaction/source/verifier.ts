@@ -5,16 +5,16 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "wallet")
-	private readonly signatureFactory: Contracts.Crypto.ISignature;
+	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.IValidator;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils: Contracts.Crypto.ITransactionUtils;
+	private readonly utils!: Contracts.Crypto.ITransactionUtils;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async verifySignatures(
 		transaction: Contracts.Crypto.ITransactionData,

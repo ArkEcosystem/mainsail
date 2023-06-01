@@ -210,6 +210,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	): Promise<void> {}
 
 	#checkAsset(data: Contracts.Crypto.ITransactionData) {
+		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
 		if (data.asset.votes.length > 1) {
 			throw new Exceptions.MaxVotesExceeededError();
 		}

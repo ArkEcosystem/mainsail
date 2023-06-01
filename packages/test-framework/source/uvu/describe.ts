@@ -93,6 +93,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		only: suite.only,
 		schema,
 		skip: suite.skip,
+		// @ts-ignore
 		spy: (owner: object, method: string) => {
 			const result: Spy = new Spy(sinon.spy(owner, method as never));
 

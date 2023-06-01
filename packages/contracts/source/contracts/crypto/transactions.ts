@@ -37,14 +37,14 @@ export interface ITransactionAsset {
 }
 
 export interface ITransactionData {
-	version?: number;
+	version: number;
 	network?: number;
 
-	typeGroup?: number;
+	typeGroup: number;
 	type: number;
 	timestamp: number;
-	nonce?: BigNumber;
-	senderPublicKey: string | undefined;
+	nonce: BigNumber;
+	senderPublicKey: string;
 
 	fee: BigNumber;
 	amount: BigNumber;
@@ -105,6 +105,11 @@ export interface IMultiSignatureLegacyAsset {
 export interface IMultiSignatureAsset {
 	min: number;
 	publicKeys: string[];
+}
+
+export interface IVoteAsset {
+	votes: string[];
+	unvotes: string[];
 }
 
 export interface ISerializeOptions {

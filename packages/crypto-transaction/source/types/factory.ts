@@ -11,7 +11,7 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	#transactionTypes: Map<Contracts.Transactions.IInternalTransactionType, Map<number, TransactionConstructor>>;
+	#transactionTypes!: Map<Contracts.Transactions.IInternalTransactionType, Map<number, TransactionConstructor>>;
 
 	public initialize(
 		transactionTypes: Map<Contracts.Transactions.IInternalTransactionType, Map<number, TransactionConstructor>>,

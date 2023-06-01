@@ -8,13 +8,13 @@ import { TransactionHandlerConstructor } from "./transaction";
 @injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
 	@inject(Identifiers.WalletAttributes)
-	private readonly attributeSet: Services.Attributes.AttributeSet;
+	private readonly attributeSet!: Services.Attributes.AttributeSet;
 
 	@inject(Identifiers.TransactionHandlerConstructors)
-	private readonly handlerConstructors: TransactionHandlerConstructor[];
+	private readonly handlerConstructors!: TransactionHandlerConstructor[];
 
 	@inject(Identifiers.Cryptography.Transaction.Registry)
-	private readonly transactionRegistry: Contracts.Crypto.ITransactionRegistry;
+	private readonly transactionRegistry!: Contracts.Crypto.ITransactionRegistry;
 
 	#registered = false;
 

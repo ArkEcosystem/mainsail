@@ -35,7 +35,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
@@ -279,6 +279,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			.get<Contracts.State.StateStore>(Identifiers.StateStore)
 			.getLastBlock();
 
+		// @ts-ignore
 		const verificationResults: Contracts.P2P.PeerVerificationResult[] = this.repository
 			.getPeers()
 			.filter((peer) => peer.verificationResult)

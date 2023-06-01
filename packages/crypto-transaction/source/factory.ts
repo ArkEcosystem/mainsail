@@ -5,22 +5,22 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.ITransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Deserializer)
-	private readonly deserializer: Contracts.Crypto.ITransactionDeserializer;
+	private readonly deserializer!: Contracts.Crypto.ITransactionDeserializer;
 
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
-	private readonly serializer: Contracts.Crypto.ITransactionSerializer;
+	private readonly serializer!: Contracts.Crypto.ITransactionSerializer;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils: Contracts.Crypto.ITransactionUtils;
+	private readonly utils!: Contracts.Crypto.ITransactionUtils;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	private readonly verifier: Contracts.Crypto.ITransactionVerifier;
+	private readonly verifier!: Contracts.Crypto.ITransactionVerifier;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async fromHex(hex: string): Promise<Contracts.Crypto.ITransaction> {
 		return this.#fromSerialized(hex);

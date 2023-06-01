@@ -10,7 +10,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: RoundStateRepository;

@@ -7,17 +7,17 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Fee.Registry)
-	private readonly feeRegistry: FeeRegistry;
+	private readonly feeRegistry!: FeeRegistry;
 
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "fees-managed")
-	private readonly pluginConfiguration: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		await this.#throwIfCannot("pool", transaction);
@@ -46,7 +46,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 
 	#calculateMinFee(transaction: Contracts.Crypto.ITransaction): BigNumber {
 		const addonBytes = this.feeRegistry.get(transaction.key, transaction.data.version) || BigNumber.ZERO;
-		const satoshiPerByte: number = this.pluginConfiguration.get("satoshiPerByte");
+		const satoshiPerByte: number = this.pluginConfiguration.getOptional("satoshiPerByte", 0);
 
 		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
 

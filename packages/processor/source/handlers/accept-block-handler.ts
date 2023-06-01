@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
@@ -22,7 +23,8 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().block;
+		const block = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 
 		try {
 			// await this.databaseInteraction.applyBlock(block);

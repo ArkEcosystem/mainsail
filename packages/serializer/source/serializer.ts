@@ -5,22 +5,22 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 @injectable()
 export class Serializer implements Contracts.Serializer.ISerializer {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
-	private readonly addressSerializer: Contracts.Crypto.IAddressSerializer;
+	private readonly addressSerializer!: Contracts.Crypto.IAddressSerializer;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
-	private readonly publicKeySerializer: Contracts.Crypto.IPublicKeySerializer;
+	private readonly publicKeySerializer!: Contracts.Crypto.IPublicKeySerializer;
 
 	@inject(Identifiers.Cryptography.Signature)
-	private readonly signatureSerializer: Contracts.Crypto.ISignature;
+	private readonly signatureSerializer!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly transactionUtils: any;
 
 	@inject(Identifiers.Cryptography.Size.HASH256)
-	private readonly hashSize: number;
+	private readonly hashSize!: number;
 
 	public async serialize<T>(
 		data: T,

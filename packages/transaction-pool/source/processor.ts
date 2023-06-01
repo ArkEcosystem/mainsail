@@ -19,10 +19,10 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Deserializer)
-	private readonly deserializer: Contracts.Crypto.ITransactionDeserializer;
+	private readonly deserializer!: Contracts.Crypto.ITransactionDeserializer;
 
 	public async process(
 		data: Contracts.Crypto.ITransactionData[] | Buffer[],

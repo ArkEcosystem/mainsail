@@ -13,7 +13,7 @@ export class PluginManifest {
 	}
 
 	public get<T>(key: string, defaultValue?: T): T {
-		return get(this.#manifest, key, defaultValue);
+		return get(this.#manifest, key, defaultValue)!;
 	}
 
 	public has(key: string): boolean {

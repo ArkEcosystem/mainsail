@@ -6,7 +6,7 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 @injectable()
 export class TransferTransaction extends Transaction {
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
-	private readonly addressSerializer: Contracts.Crypto.IAddressSerializer;
+	private readonly addressSerializer!: Contracts.Crypto.IAddressSerializer;
 
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.Transfer;

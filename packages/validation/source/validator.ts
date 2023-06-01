@@ -5,7 +5,7 @@ import keywords from "ajv-keywords";
 
 @injectable()
 export class Validator implements Contracts.Crypto.IValidator {
-	#ajv: Ajv;
+	#ajv!: Ajv;
 
 	@postConstruct()
 	public postConstruct(): void {
@@ -32,7 +32,7 @@ export class Validator implements Contracts.Crypto.IValidator {
 				value: data,
 			};
 		} catch (error) {
-			return { error: error.stack, errors: [], value: undefined };
+			return { error: error.stack, errors: [], value: data };
 		}
 	}
 

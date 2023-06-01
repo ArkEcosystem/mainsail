@@ -15,7 +15,7 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		this.data.typeGroup = ValidatorRegistrationTransaction.typeGroup;
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
-		this.data.senderPublicKey = undefined;
+		this.data.senderPublicKey = "";
 		this.data.asset = { validator: {} } as Contracts.Crypto.ITransactionAsset;
 	}
 

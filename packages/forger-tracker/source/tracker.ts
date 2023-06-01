@@ -5,20 +5,20 @@ import { Services, Utils } from "@mainsail/kernel";
 @injectable()
 export class ValidatorTracker {
 	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.BlockchainService)
-	private readonly blockchainService: Contracts.Blockchain.Blockchain;
+	private readonly blockchainService!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
-	private readonly walletRepository: Contracts.State.WalletRepository;
+	private readonly walletRepository!: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeCalculator: any;
@@ -74,7 +74,7 @@ export class ValidatorTracker {
 		}
 
 		// Determine Next Forger Usernames...
-		const nextForgersUsernames = [];
+		const nextForgersUsernames: string[] = [];
 
 		for (let index = 0; index < nextForgers.slice(0, 5).length; index++) {
 			nextForgersUsernames[index] = await this.#getUsername(nextForgers[index]);

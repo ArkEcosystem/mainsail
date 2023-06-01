@@ -8,7 +8,7 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
@@ -17,16 +17,18 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().block;
+		const block = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 
 		const roundInfo: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(
 			block.data.height,
 			this.configuration,
 		);
 
-		const validators: Contracts.State.Wallet[] = await this.triggers.call("getActiveValidators", {
+		const validators = await this.triggers.call<Contracts.State.Wallet[]>("getActiveValidators", {
 			roundInfo,
 		});
+		Utils.assert.defined<Contracts.State.Wallet[]>(validators);
 
 		const forgingInfo: Contracts.Shared.ForgingInfo = await Utils.forgingInfoCalculator.calculateForgingInfo(
 			block.data.timestamp,

@@ -128,9 +128,8 @@ describe<{
 	it("apply - should throw when transaction expired", async (context) => {
 		const senderState = context.container.resolve(SenderState);
 
-		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
+		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
 		stub(context.slots, "getTime").returnValue(13_600);
-		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(true);
 		stub(context.expirationService, "getExpirationHeight").returnValueOnce(10);
 		const eventSpy = spy(context.emitter, "dispatch");
@@ -152,9 +151,8 @@ describe<{
 		const senderState = context.container.resolve(SenderState);
 		const handler = {};
 
-		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
+		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
 		stub(context.slots, "getTime").returnValue(13_600);
-		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
 		const triggersStub = stub(context.triggers, "call").resolvedValue(false); // verifyTransaction
@@ -180,9 +178,8 @@ describe<{
 		const senderState = context.container.resolve(SenderState);
 		const handler = {};
 
-		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
+		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
 		stub(context.slots, "getTime").returnValue(13_600);
-		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData");
 		const triggerStub = stub(context.triggers, "call");
@@ -224,9 +221,8 @@ describe<{
 		const senderState = context.container.resolve(SenderState);
 		const handler = {};
 
-		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
+		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
 		stub(context.slots, "getTime").returnValue(13_600);
-		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 
@@ -266,9 +262,8 @@ describe<{
 		const senderState = context.container.resolve(SenderState);
 		const handler = {};
 
-		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
+		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
 		stub(context.slots, "getTime").returnValue(13_600);
-		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 

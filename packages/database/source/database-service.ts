@@ -1,30 +1,31 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber, sortBy, sortByDesc } from "@mainsail/utils";
 import { Database } from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Database.BlockStorage)
-	private readonly blockStorage: Database;
+	private readonly blockStorage!: Database;
 
 	@inject(Identifiers.Database.BlockHeightStorage)
-	private readonly blockStorageById: Database;
+	private readonly blockStorageById!: Database;
 
 	@inject(Identifiers.Database.TransactionStorage)
-	private readonly transactionStorage: Database;
+	private readonly transactionStorage!: Database;
 
 	@inject(Identifiers.Database.RoundStorage)
-	private readonly roundStorage: Database;
+	private readonly roundStorage!: Database;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
 	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
 		const bytes = this.blockStorage.get(id);
@@ -107,6 +108,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 				await this.blockStorageById.put(block.data.height, block.data.id);
 
 				for (const transaction of block.transactions) {
+					Utils.assert.defined<string>(transaction.data.id);
 					await this.transactionStorage.put(transaction.data.id, transaction.serialized);
 				}
 			}

@@ -112,7 +112,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			if (claimedHeight < this.#ourHeight()) {
 				const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight, this.configuration);
 				const validators = await this.#getValidatorsByRound(roundInfo);
-				if (this.#verifyPeerBlock(blockHeader, claimedHeight, validators)) {
+				if (await this.#verifyPeerBlock(blockHeader, claimedHeight, validators)) {
 					return true;
 				}
 			} else {

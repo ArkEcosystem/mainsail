@@ -6,15 +6,15 @@ import { base58 } from "bstring";
 @injectable()
 export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	@tagged("type", "wallet")
-	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "wallet")
-	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);

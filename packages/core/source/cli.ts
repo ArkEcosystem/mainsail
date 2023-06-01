@@ -52,6 +52,7 @@ export class CommandLineInterface {
 
 		if (!commandInstance) {
 			commandSignature = await this.#app.resolve(Plugins.SuggestCommand).execute({
+				// @ts-ignore
 				bin: Object.keys(package_.bin)[0],
 				signature: commandSignature,
 				signatures: Object.keys(commands),

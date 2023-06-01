@@ -22,7 +22,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Database.Service)
-	private readonly database: Contracts.Database.IDatabaseService;
+	private readonly database!: Contracts.Database.IDatabaseService;
 
 	public async handle(
 		request: Request,

@@ -251,7 +251,7 @@ export class Command extends Commands.Command {
 				continue;
 			}
 
-			if (["confirm", "date"].includes(flag.promptType)) {
+			if (["confirm", "date"].includes(flag.promptType ?? "")) {
 				continue;
 			}
 

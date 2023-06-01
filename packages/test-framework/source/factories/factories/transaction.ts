@@ -94,7 +94,9 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 		.get("Transfer")
 		.state("vendorField", ({ entity, options }) => entity.vendorField(options.vendorField || "Hello World"));
 
+	// @ts-ignore
 	factory.get("Transfer").state("sign", sign);
+	// @ts-ignore
 	factory.get("Transfer").state("multiSign", multiSign);
 };
 
@@ -111,6 +113,7 @@ export const registerValidatorRegistrationFactory = (
 		),
 	);
 
+	// @ts-ignore
 	factory.get("ValidatorRegistration").state("sign", sign);
 };
 
@@ -121,6 +124,7 @@ export const registerValidatorResignationFactory = (
 	factory.set("ValidatorResignation", async ({ options }: { options: ValidatorResignationOptions }) =>
 		applyModifiers(app.resolve(ValidatorResignationBuilder), options),
 	);
+	// @ts-ignore
 	factory.get("ValidatorResignation").state("sign", sign);
 };
 
@@ -143,7 +147,9 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 		),
 	);
 
+	// @ts-ignore
 	factory.get("Vote").state("sign", sign);
+	// @ts-ignore
 	factory.get("Vote").state("multiSign", multiSign);
 };
 
@@ -166,7 +172,9 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 		),
 	);
 
+	// @ts-ignore
 	factory.get("Unvote").state("sign", sign);
+	// @ts-ignore
 	factory.get("Unvote").state("multiSign", multiSign);
 };
 
@@ -196,7 +204,9 @@ export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.K
 		);
 	});
 
+	// @ts-ignore
 	factory.get("MultiSignature").state("sign", sign);
+	// @ts-ignore
 	factory.get("MultiSignature").state("multiSign", multiSign);
 };
 
@@ -228,7 +238,9 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contra
 		return builder;
 	});
 
+	// @ts-ignore
 	factory.get("MultiPayment").state("sign", sign);
+	// @ts-ignore
 	factory.get("MultiPayment").state("multiSign", multiSign);
 };
 

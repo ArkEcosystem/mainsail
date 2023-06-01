@@ -9,14 +9,14 @@ import { IDFactory } from "./id.factory";
 @injectable()
 export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 	@inject(Identifiers.Cryptography.Block.IDFactory)
-	private readonly idFactory: IDFactory;
+	private readonly idFactory!: IDFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: TransactionFactory;
+	private readonly transactionFactory!: TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Serializer)
 	@tagged("type", "wallet")
-	private readonly serializer: Contracts.Serializer.ISerializer;
+	private readonly serializer!: Contracts.Serializer.ISerializer;
 
 	public async deserialize(
 		serialized: Buffer,

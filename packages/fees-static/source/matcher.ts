@@ -6,13 +6,13 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Fee.Registry)
-	private readonly feeRegistry: FeeRegistry;
+	private readonly feeRegistry!: FeeRegistry;
 
 	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		this.#throwIfCannot("pool", transaction);

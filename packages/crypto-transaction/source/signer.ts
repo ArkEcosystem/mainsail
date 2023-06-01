@@ -6,10 +6,10 @@ import { numberToHex } from "@mainsail/utils";
 export class Signer {
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "wallet")
-	private readonly signatureFactory: Contracts.Crypto.ISignature;
+	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils: Contracts.Crypto.ITransactionUtils;
+	private readonly utils!: Contracts.Crypto.ITransactionUtils;
 
 	public async sign(
 		transaction: Contracts.Crypto.ITransactionData,

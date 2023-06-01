@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
+import { Utils } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
@@ -47,6 +48,7 @@ export class VoteTransaction extends Transaction {
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
+		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
 		const publicKeySize = this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet");
 		const buff: ByteBuffer = ByteBuffer.fromSize(
 			1 + 1 + publicKeySize * data.asset.votes.length + publicKeySize * data.asset.unvotes.length,
@@ -65,21 +67,23 @@ export class VoteTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		data.asset = { unvotes: [], votes: [] };
+		const asset: Contracts.Crypto.IVoteAsset = { unvotes: [], votes: [] };
 		const publicKeySize = this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet");
 
 		const votelength: number = buf.readUint8();
 		for (let index = 0; index < votelength; index++) {
-			const vote: string = buf.readBytes(publicKeySize).toString("hex");
+			const vote = buf.readBytes(publicKeySize).toString("hex");
 
-			data.asset.votes.push(vote);
+			asset.votes.push(vote);
 		}
 
 		const unvotelength: number = buf.readUint8();
 		for (let index = 0; index < unvotelength; index++) {
-			const unvote: string = buf.readBytes(publicKeySize).toString("hex");
+			const unvote = buf.readBytes(publicKeySize).toString("hex");
 
-			data.asset.unvotes.push(unvote);
+			asset.unvotes.push(unvote);
 		}
+
+		data.asset = asset;
 	}
 }

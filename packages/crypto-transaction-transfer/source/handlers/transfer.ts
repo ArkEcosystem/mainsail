@@ -10,7 +10,7 @@ import { TransferTransaction } from "../versions";
 @injectable()
 export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -29,6 +29,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		transactions: Contracts.Crypto.ITransaction[],
 	): Promise<void> {
 		for (const transaction of this.allTransactions(transactions)) {
+			Utils.assert.defined<string>(transaction.recipientId);
 			walletRepository.findByAddress(transaction.recipientId).increaseBalance(BigNumber.make(transaction.amount));
 		}
 	}

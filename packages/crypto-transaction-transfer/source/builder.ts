@@ -15,7 +15,7 @@ export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 		this.data.typeGroup = TransferTransaction.typeGroup;
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
-		this.data.senderPublicKey = undefined;
+		this.data.senderPublicKey = "";
 		this.data.expiration = 0;
 	}
 

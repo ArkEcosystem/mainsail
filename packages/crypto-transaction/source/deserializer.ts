@@ -7,18 +7,18 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 @injectable()
 export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
 	@tagged("type", "wallet")
-	private readonly publicKeySerializer: Contracts.Crypto.IPublicKeySerializer;
+	private readonly publicKeySerializer!: Contracts.Crypto.IPublicKeySerializer;
 
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "wallet")
-	private readonly signatureSerializer: Contracts.Crypto.ISignature;
+	private readonly signatureSerializer!: Contracts.Crypto.ISignature;
 
 	public async deserialize(serialized: string | Buffer): Promise<Contracts.Crypto.ITransaction> {
 		const data = {} as Contracts.Crypto.ITransactionData;

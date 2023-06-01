@@ -6,7 +6,7 @@ import winston from "winston";
 
 @injectable()
 export class Logger implements Contracts.Kernel.Logger {
-	#logger: winston.Logger;
+	#logger!: winston.Logger;
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#logger = winston.createLogger({

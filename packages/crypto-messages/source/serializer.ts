@@ -6,7 +6,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	@tagged("type", "consensus")
-	private readonly serializer: Contracts.Serializer.ISerializer;
+	private readonly serializer!: Contracts.Serializer.ISerializer;
 
 	public async serializeProposal(
 		proposal: Contracts.Crypto.IMessageSerializableProposal,
@@ -14,6 +14,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(proposal, {
 			length: 4 + 4 + 48 + (options.excludeSignature ? 0 : 96),
+			skip: 0,
 			// TODO
 			schema: {
 				height: {
@@ -46,6 +47,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrecommitData>(precommit, {
 			length: 4 + 4 + 48 + 48 + (options.excludeSignature ? 0 : 96),
+			skip: 0,
 			// TODO
 			schema: {
 				height: {
@@ -78,6 +80,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
 			length: 4 + 4 + 48 + 48 + (options.excludeSignature ? 0 : 96),
+			skip: 0,
 			// TODO
 			schema: {
 				height: {

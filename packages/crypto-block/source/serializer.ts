@@ -6,7 +6,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	@tagged("type", "wallet")
-	private readonly serializer: Contracts.Serializer.ISerializer;
+	private readonly serializer!: Contracts.Serializer.ISerializer;
 
 	public size(block: Contracts.Crypto.IBlock): number {
 		const headerSize =
@@ -34,6 +34,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	public async serialize(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
 			length: 2_000_000,
+			skip: 0,
 			schema: {
 				version: {
 					type: "uint32",
@@ -75,6 +76,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	public async serializeWithTransactions(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
 			length: 2_000_000,
+			skip: 0,
 			schema: {
 				version: {
 					type: "uint32",

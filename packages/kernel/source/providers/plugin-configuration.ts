@@ -61,7 +61,7 @@ export class PluginConfiguration {
 			throw new Error(`Missing required ${key} configuration value`);
 		}
 
-		return get(this.#items, key);
+		return get(this.#items, key)!;
 	}
 
 	public getOptional<T>(key: string, defaultValue: T): T {
@@ -69,7 +69,7 @@ export class PluginConfiguration {
 			return defaultValue;
 		}
 
-		return get(this.#items, key);
+		return get(this.#items, key)!;
 	}
 
 	public set<T>(key: string, value: T): boolean {

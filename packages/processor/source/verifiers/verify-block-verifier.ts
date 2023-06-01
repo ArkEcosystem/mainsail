@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
@@ -7,16 +8,18 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Block.Verifier)
-	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
+	private readonly blockVerifier!: Contracts.Crypto.IBlockVerifier;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private readonly handlerRegistry: Contracts.Transactions.ITransactionHandlerRegistry;
+	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal().block;
+		const block = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+
 		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
 
 		if (verification.containsMultiSignatures) {

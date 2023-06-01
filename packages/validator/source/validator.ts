@@ -6,7 +6,7 @@ import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
 @injectable()
 export class Validator implements Contracts.Consensus.IValidator {
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.TransactionPoolCollator)
 	private readonly collator!: Contracts.TransactionPool.Collator;
@@ -15,25 +15,25 @@ export class Validator implements Contracts.Consensus.IValidator {
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Database.Service)
-	private readonly database: Contracts.Database.IDatabaseService;
+	private readonly database!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messagesFactory: Contracts.Crypto.IMessageFactory;
+	private readonly messagesFactory!: Contracts.Crypto.IMessageFactory;
 
-	#keyPair: Contracts.Crypto.IKeyPair;
-	#publicKey: string;
+	#keyPair!: Contracts.Crypto.IKeyPair;
+	#publicKey!: string;
 
 	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Consensus.IValidator {
 		this.#publicKey = publicKey;
@@ -118,6 +118,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		}
 
 		const previousBlock = await this.database.getLastBlock();
+		Utils.assert.defined<Contracts.Crypto.IBlock>(previousBlock);
 
 		return this.blockFactory.make({
 			generatorPublicKey: this.#publicKey,

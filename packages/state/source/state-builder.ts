@@ -25,10 +25,10 @@ export class StateBuilder {
 	private logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Database.BlockStorage)
-	private readonly blockStorage: lmdb.Database;
+	private readonly blockStorage!: lmdb.Database;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;

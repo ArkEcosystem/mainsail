@@ -1,5 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { assert } from "./assert";
+
 const findIndex = async (
 	height: number,
 	slotNumber: number,
@@ -23,6 +25,7 @@ const findIndex = async (
 
 		const lastSpanEndTime = blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1);
 		lastSpanSlotNumber = (await slots.getSlotInfo(lastSpanEndTime, nextMilestone.height - 1)).slotNumber + 1;
+		assert.defined<number>(nextMilestone.data);
 		activeValidators = nextMilestone.data;
 
 		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");

@@ -9,10 +9,10 @@ import { MnemonicGenerator } from "./mnemonic";
 @injectable()
 export class Generator {
 	@inject(InternalIdentifiers.Application)
-	protected app: Application;
+	protected app!: Application;
 
 	@inject(InternalIdentifiers.Generator.Mnemonic)
-	private mnemonicGenerator: MnemonicGenerator;
+	private mnemonicGenerator!: MnemonicGenerator;
 
 	protected async createWallet(mnemonic?: string): Promise<Wallet> {
 		if (!mnemonic) {

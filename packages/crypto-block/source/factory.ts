@@ -8,16 +8,16 @@ import { IDFactory } from "./id.factory";
 @injectable()
 export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Contracts.Crypto.IBlockSerializer;
+	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
+	private readonly deserializer!: Contracts.Crypto.IBlockDeserializer;
 
 	@inject(Identifiers.Cryptography.Block.IDFactory)
-	private readonly idFactory: IDFactory;
+	private readonly idFactory!: IDFactory;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.IValidator;
 
 	public async make(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock> {
 		data.id = await this.idFactory.make(data);
@@ -85,7 +85,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			return result.value;
 		}
 
-		for (const error of result.errors) {
+		for (const error of result.errors ?? []) {
 			let fatal = false;
 
 			const match = error.instancePath.match(/\.transactions\[(\d+)]/);

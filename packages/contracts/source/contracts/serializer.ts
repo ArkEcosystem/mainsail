@@ -17,8 +17,8 @@ export interface SerializationSchema {
 
 export interface SerializationConfiguration {
 	schema: Record<string, SerializationSchema>;
-	length?: number;
-	skip?: number;
+	length: number;
+	skip: number;
 }
 
 export interface DeserializationSchema {

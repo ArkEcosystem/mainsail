@@ -10,10 +10,10 @@ export type TransactionConstructor = typeof Transaction;
 @injectable()
 export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistry {
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.IValidator;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
 
 	readonly #transactionTypes: Map<
 		Contracts.Transactions.IInternalTransactionType,
@@ -44,8 +44,12 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 				const first = [...registeredConstructors.values()][0];
 				if (
 					first.key === constructor.key &&
+					// TODO: Check type
+					// @ts-ignore
 					InternalTransactionType.from(first.type, first.typeGroup) !== internalType
 				) {
+					// TODO: Check type
+					// @ts-ignore
 					throw new Exceptions.TransactionKeyAlreadyRegisteredError(first.key);
 				}
 

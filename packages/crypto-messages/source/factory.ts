@@ -8,11 +8,11 @@ import { Proposal } from "./proposal";
 @injectable()
 export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer: Contracts.Crypto.IMessageSerializer;
+	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
 
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
-	private readonly signatureFactory: Contracts.Crypto.ISignature;
+	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
 	public async makeProposal(
 		data: Contracts.Crypto.IMakeProposalData,

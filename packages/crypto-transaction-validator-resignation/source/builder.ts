@@ -14,7 +14,7 @@ export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorRes
 		this.data.type = ValidatorResignationTransaction.type;
 		this.data.typeGroup = ValidatorResignationTransaction.typeGroup;
 		this.data.amount = BigNumber.ZERO;
-		this.data.senderPublicKey = undefined;
+		this.data.senderPublicKey = "";
 	}
 
 	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {

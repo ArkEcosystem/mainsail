@@ -12,7 +12,7 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 	private walletRepository!: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
 	public async validate(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const deserialized: Contracts.Crypto.ITransaction = await this.transactionFactory.fromBytes(

@@ -25,37 +25,37 @@ type Task = {
 @injectable()
 export class ConfigurationGenerator {
 	@inject(InternalIdentifiers.Application)
-	private app: Application;
+	private app!: Application;
 
 	@inject(InternalIdentifiers.ConfigurationPath)
-	private configurationPath: string;
+	private configurationPath!: string;
 
 	@inject(InternalIdentifiers.ConfigurationWriter)
-	private configurationWriter: ConfigurationWriter;
+	private configurationWriter!: ConfigurationWriter;
 
 	@inject(InternalIdentifiers.Generator.App)
-	private appGenerator: AppGenerator;
+	private appGenerator!: AppGenerator;
 
 	@inject(InternalIdentifiers.Generator.Environment)
-	private environmentGenerator: EnvironmentGenerator;
+	private environmentGenerator!: EnvironmentGenerator;
 
 	@inject(InternalIdentifiers.Generator.GenesisBlock)
-	private genesisBlockGenerator: GenesisBlockGenerator;
+	private genesisBlockGenerator!: GenesisBlockGenerator;
 
 	@inject(InternalIdentifiers.Generator.Milestones)
-	private milestonesGenerator: MilestonesGenerator;
+	private milestonesGenerator!: MilestonesGenerator;
 
 	@inject(InternalIdentifiers.Generator.Mnemonic)
-	private mnemonicGenerator: MnemonicGenerator;
+	private mnemonicGenerator!: MnemonicGenerator;
 
 	@inject(InternalIdentifiers.Generator.Network)
-	private networkGenerator: NetworkGenerator;
+	private networkGenerator!: NetworkGenerator;
 
 	@inject(InternalIdentifiers.Generator.Peers)
-	private peersGenerator: PeersGenerator;
+	private peersGenerator!: PeersGenerator;
 
 	@inject(InternalIdentifiers.Generator.Wallet)
-	private walletGenerator: WalletGenerator;
+	private walletGenerator!: WalletGenerator;
 
 	public async generate(
 		options: Contracts.NetworkGenerator.Options,
@@ -73,7 +73,6 @@ export class ConfigurationGenerator {
 			force: false,
 			maxBlockPayload: 2_097_152,
 			maxTxPerBlock: 150,
-			network: "testnet",
 			overwriteConfig: false,
 			peers: ["127.0.0.1"],
 			premine: "12500000000000000",

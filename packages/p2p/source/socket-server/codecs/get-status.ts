@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { getStatus as proto } from "./proto/protos";
@@ -12,6 +13,11 @@ export const getStatus = {
 	response: {
 		deserialize: (payload: Buffer): Contracts.P2P.PeerPingResponse => {
 			const decoded = proto.GetStatusResponse.decode(payload);
+
+			Utils.assert.defined<string>(decoded.state?.header?.totalAmount);
+			Utils.assert.defined<string>(decoded.state?.header?.totalFee);
+			Utils.assert.defined<string>(decoded.state?.header?.reward);
+
 			const totalAmount = new BigNumber(decoded.state.header.totalAmount);
 			const totalFee = new BigNumber(decoded.state.header.totalFee);
 			const reward = new BigNumber(decoded.state.header.reward);

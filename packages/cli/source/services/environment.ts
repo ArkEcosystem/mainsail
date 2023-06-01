@@ -18,14 +18,14 @@ export class Environment {
 		if (process.env[Constants.Flags.CORE_PATH_CONFIG]) {
 			paths = {
 				...paths,
-				config: path.resolve(process.env[Constants.Flags.CORE_PATH_CONFIG]),
+				config: path.resolve(process.env[Constants.Flags.CORE_PATH_CONFIG]!),
 			};
 		}
 
 		if (process.env[Constants.Flags.CORE_PATH_DATA]) {
 			paths = {
 				...paths,
-				data: path.resolve(process.env[Constants.Flags.CORE_PATH_DATA]),
+				data: path.resolve(process.env[Constants.Flags.CORE_PATH_DATA]!),
 			};
 		}
 

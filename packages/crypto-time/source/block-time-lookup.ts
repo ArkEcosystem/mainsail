@@ -4,10 +4,10 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class BlockTimeLookup {
 	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async getBlockTimeLookup(height: number): Promise<number> {
 		const findBlockTimestampByHeight = async (height: number): Promise<number> =>

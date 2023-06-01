@@ -5,19 +5,19 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class Verifier implements Contracts.Crypto.IBlockVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Contracts.Crypto.IBlockSerializer;
+	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	private readonly transactionVerifier: Contracts.Crypto.ITransactionVerifier;
+	private readonly transactionVerifier!: Contracts.Crypto.ITransactionVerifier;
 
 	public async verify(block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IBlockVerification> {
 		const blockData: Contracts.Crypto.IBlockData = block.data;

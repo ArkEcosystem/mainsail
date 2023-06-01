@@ -6,7 +6,7 @@ import WIF from "wif";
 @injectable()
 export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async fromMnemonic(mnemonic: string, compressed = true): Promise<Contracts.Crypto.IKeyPair> {
 		return this.fromPrivateKey(SHA256.digest(Buffer.from(mnemonic, "utf8")), compressed);

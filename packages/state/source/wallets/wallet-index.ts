@@ -38,7 +38,7 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 
 	public get(key: string): Contracts.State.WalletHolder {
 		const walletHolder = this.#walletByKey.get(key);
-		Utils.assert.defined(walletHolder);
+		Utils.assert.defined<Contracts.State.WalletHolder>(walletHolder);
 
 		return walletHolder;
 	}

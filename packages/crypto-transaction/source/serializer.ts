@@ -5,10 +5,10 @@ import { ByteBuffer } from "@mainsail/utils";
 @injectable()
 export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async getBytes(
 		transaction: Contracts.Crypto.ITransactionData,

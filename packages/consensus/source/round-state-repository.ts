@@ -6,7 +6,7 @@ import { RoundState } from "./round-state";
 @injectable()
 export class RoundStateRepository {
 	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	#roundStates = new Map<string, RoundState>();
 
@@ -17,7 +17,7 @@ export class RoundStateRepository {
 			this.#roundStates.set(key, this.#createRoundState(height, round));
 		}
 
-		return this.#roundStates.get(key);
+		return this.#roundStates.get(key)!;
 	}
 
 	// TODO: Bind to factory

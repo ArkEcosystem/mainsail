@@ -32,7 +32,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new Exceptions.TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
 
-		const currentNetwork: number = this.configuration.get<number>("network.pubKeyHash");
+		const currentNetwork: number = this.configuration.getRequired<number>("network.pubKeyHash");
 		if (transaction.data.network && transaction.data.network !== currentNetwork) {
 			throw new Exceptions.TransactionFromWrongNetworkError(transaction, currentNetwork);
 		}

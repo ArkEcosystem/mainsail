@@ -35,10 +35,10 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: Contracts.Crypto.Slots;
+	private readonly slots!: Contracts.Crypto.Slots;
 
 	#queue!: Contracts.Kernel.Queue;
 

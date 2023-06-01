@@ -9,14 +9,14 @@ import { MultiSignatureRegistrationTransaction } from "../versions";
 @injectable()
 export class MultiSignatureRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPoolQuery)
-	private readonly poolQuery: Contracts.TransactionPool.Query;
+	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "wallet")
-	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -118,6 +118,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			.whereKind(transaction)
 			.wherePredicate(
 				async (t) =>
+					!!t.data.asset?.multiSignature &&
 					(await this.addressFactory.fromMultiSignatureAsset(t.data.asset.multiSignature)) === address,
 			)
 			.has();

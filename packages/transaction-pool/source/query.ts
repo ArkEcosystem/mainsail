@@ -17,7 +17,7 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	}
 
 	public async all(): Promise<Contracts.Crypto.ITransaction[]> {
-		const transactions = [];
+		const transactions: Contracts.Crypto.ITransaction[] = [];
 
 		for (const transaction of this.transactions) {
 			if (await this.#satisfiesPredicates(transaction)) {

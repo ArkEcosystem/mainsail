@@ -8,7 +8,7 @@ import { Utils } from "./utils";
 @injectable()
 export class ForgerService {
 	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
@@ -17,13 +17,13 @@ export class ForgerService {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
-	private readonly logger: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly peerNetworkMonitor!: Contracts.P2P.NetworkMonitor;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	#validators: Contracts.Forger.Validator[] = [];
 
@@ -50,7 +50,7 @@ export class ForgerService {
 
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.#round);
 
-			timeout = Math.max(0, Utils.getRemainingSlotTime(this.#round, this.configuration));
+			timeout = Math.max(0, Utils.getRemainingSlotTime(this.#round, this.configuration) ?? 0);
 		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {
@@ -98,7 +98,7 @@ export class ForgerService {
 					this.blockchain.forceWakeup();
 				}
 
-				return this.#checkLater(Utils.getRemainingSlotTime(this.#round, this.configuration));
+				return this.#checkLater(Utils.getRemainingSlotTime(this.#round, this.configuration) ?? 1000);
 			}
 
 			const networkState: Contracts.P2P.NetworkState = await this.peerNetworkMonitor.getNetworkState();
@@ -123,7 +123,7 @@ export class ForgerService {
 
 			this.#logAppReady = true;
 
-			return this.#checkLater(Utils.getRemainingSlotTime(this.#round, this.configuration));
+			return this.#checkLater(Utils.getRemainingSlotTime(this.#round, this.configuration) ?? 1000);
 		} catch (error) {
 			if (
 				error instanceof Exceptions.HostNoResponseError ||
@@ -162,6 +162,8 @@ export class ForgerService {
 		this.#round = await this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.call("getCurrentRound");
+
+		AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.#round);
 
 		this.#usernames = this.#round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);

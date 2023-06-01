@@ -38,10 +38,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private readonly createQueue!: Types.QueueFactory;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Contracts.Crypto.IBlockSerializer;
+	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;

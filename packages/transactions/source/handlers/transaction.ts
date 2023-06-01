@@ -13,10 +13,10 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 	protected readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier: Contracts.Crypto.ITransactionVerifier;
+	protected readonly verifier!: Contracts.Crypto.ITransactionVerifier;
 
 	public async verify(
 		walletRepository: Contracts.State.WalletRepository,
