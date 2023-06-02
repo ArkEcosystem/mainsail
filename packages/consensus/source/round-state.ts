@@ -46,7 +46,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.walletRepository;
 	}
 
-	public setProposal(proposal: Contracts.Crypto.IProposal): void {
+	public addProposal(proposal: Contracts.Crypto.IProposal): void {
 		this.#proposal = proposal;
 	}
 

@@ -27,7 +27,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		}
 
 		const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
-		roundState.setProposal(proposal);
+		roundState.addProposal(proposal);
 
 		await this.#getConsensus().onProposal(roundState);
 	}
