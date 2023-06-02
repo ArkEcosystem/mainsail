@@ -46,8 +46,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.walletRepository;
 	}
 
-	public addProposal(proposal: Contracts.Crypto.IProposal): void {
+	public addProposal(proposal: Contracts.Crypto.IProposal): boolean {
 		this.#proposal = proposal;
+
+		return true;
 	}
 
 	public getProposal(): Contracts.Crypto.IProposal | undefined {
@@ -62,12 +64,16 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return !!this.#processorResult;
 	}
 
-	public addPrevote(prevote: Contracts.Crypto.IPrevote): void {
+	public addPrevote(prevote: Contracts.Crypto.IPrevote): boolean {
 		this.#prevotes.set(prevote.validatorPublicKey, prevote);
+
+		return true;
 	}
 
-	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): void {
+	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): boolean {
 		this.#precommits.set(precommit.validatorPublicKey, precommit);
+
+		return true;
 	}
 
 	public hasMajorityPrevotes(): boolean {

@@ -6,7 +6,7 @@ export interface IRoundState {
 	round: number;
 	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
-	addProposal(proposal: IProposal): void;
+	addProposal(proposal: IProposal): boolean;
 	setProcessorResult(processorResult: boolean): void;
 	getProcessorResult(): boolean;
 }
