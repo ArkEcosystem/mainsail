@@ -10,18 +10,18 @@ export class RoundStateRepository {
 
 	#roundStates = new Map<string, RoundState>();
 
-	getRoundState(height, round): RoundState {
+	async getRoundState(height, round): Promise<RoundState> {
 		const key = `${height}-${round}`;
 
 		if (!this.#roundStates.has(key)) {
-			this.#roundStates.set(key, this.#createRoundState(height, round));
+			this.#roundStates.set(key, await this.#createRoundState(height, round));
 		}
 
 		return this.#roundStates.get(key)!;
 	}
 
 	// TODO: Bind to factory
-	#createRoundState(height: number, round: number): RoundState {
+	#createRoundState(height: number, round: number): Promise<RoundState> {
 		return this.app.resolve(RoundState).configure(height, round);
 	}
 }

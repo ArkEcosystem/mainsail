@@ -20,12 +20,16 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@tagged("type", "consensus")
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+
 	#height = 0;
 	#round = 0;
 	#proposal?: Contracts.Crypto.IProposal;
 	#processorResult?: boolean;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
+	#validators = new Map<string, Contracts.State.Wallet>();
 
 	get height(): number {
 		return this.#height;
@@ -35,9 +39,15 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#round;
 	}
 
-	public configure(height: number, round: number): RoundState {
+	public async configure(height: number, round: number): Promise<RoundState> {
 		this.#height = height;
 		this.#round = round;
+
+		const validators = await this.validatorSet.getActiveValidators();
+		for (const validator of validators) {
+			const consensuPublicKey = validator.getAttribute<string>("consensus.publicKey");
+			this.#validators.set(consensuPublicKey, validator);
+		}
 
 		return this;
 	}
