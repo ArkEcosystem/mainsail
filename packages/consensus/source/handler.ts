@@ -23,7 +23,6 @@ export class Handler implements Contracts.Consensus.IHandler {
 			return;
 		}
 
-		// TODO: Move verification to p2p handler
 		const { errors } = await this.verifier.verifyProposal(proposal);
 		if (errors.length > 0) {
 			this.logger.warning(`received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
@@ -33,7 +32,9 @@ export class Handler implements Contracts.Consensus.IHandler {
 		const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 		roundState.addProposal(proposal);
 
-		await this.#getConsensus().onProposal(roundState);
+		if (roundState.addProposal(proposal)) {
+			await this.#handle(roundState);
+		}
 	}
 
 	async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
@@ -41,7 +42,6 @@ export class Handler implements Contracts.Consensus.IHandler {
 			return;
 		}
 
-		// TODO: Move verification to p2p handler
 		const { errors } = await this.verifier.verifyPrevote(prevote);
 		if (errors.length > 0) {
 			this.logger.warning(`received invalid prevote: ${prevote.toString()} errors: ${JSON.stringify(errors)}`);
@@ -50,9 +50,9 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 		const roundState = await this.roundStateRepo.getRoundState(prevote.height, prevote.round);
 
-		roundState.addPrevote(prevote);
-
-		await this.#handle(roundState);
+		if (roundState.addPrevote(prevote)) {
+			await this.#handle(roundState);
+		}
 	}
 
 	async onPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
@@ -60,7 +60,6 @@ export class Handler implements Contracts.Consensus.IHandler {
 			return;
 		}
 
-		// TODO: Move verification to p2p handler
 		const { errors } = await this.verifier.verifyPrecommit(precommit);
 		if (errors.length > 0) {
 			this.logger.warning(
@@ -71,9 +70,9 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 		const roundState = await this.roundStateRepo.getRoundState(precommit.height, precommit.round);
 
-		roundState.addPrecommit(precommit);
-
-		await this.#handle(roundState);
+		if (roundState.addPrecommit(precommit)) {
+			await this.#handle(roundState);
+		}
 	}
 
 	#isValidHeightAndRound(message: { height: number; round: number }): boolean {
