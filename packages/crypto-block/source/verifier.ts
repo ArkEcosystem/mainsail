@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
@@ -21,7 +21,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 
 	public async verify(block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IBlockVerification> {
 		const blockData: Contracts.Crypto.IBlockData = block.data;
-		const result: Contracts.Crypto.IBlockVerification = {
+		const result: Utils.Mutable<Contracts.Crypto.IBlockVerification> = {
 			containsMultiSignatures: false,
 			errors: [],
 			verified: false,
