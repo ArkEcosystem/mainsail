@@ -1,7 +1,7 @@
+import { aggregateSignatures, PublicKey, SecretKey, Signature as Sig, verify } from "@chainsafe/blst";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
-import { aggregateSignatures, verify, PublicKey, SecretKey, Signature as Sig } from "@chainsafe/blst";
 
 @injectable()
 export class Signature implements Contracts.Crypto.ISignature {
@@ -22,6 +22,6 @@ export class Signature implements Contracts.Crypto.ISignature {
 	}
 
 	public async aggregate(signatures: Buffer[]): Promise<string> {
-		return Buffer.from(aggregateSignatures(signatures.map(s => Sig.fromBytes(s))).toBytes()).toString("hex");
+		return Buffer.from(aggregateSignatures(signatures.map((s) => Sig.fromBytes(s))).toBytes()).toString("hex");
 	}
 }
