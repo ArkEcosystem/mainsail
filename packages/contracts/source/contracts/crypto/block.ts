@@ -32,7 +32,6 @@ export interface IBlockData {
 	payloadHash: string;
 	generatorPublicKey: string;
 
-	serialized?: string;
 	transactions: ITransactionData[];
 }
 
