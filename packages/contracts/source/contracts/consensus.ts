@@ -2,8 +2,10 @@ import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
 export interface IRoundState {
-	height: number;
-	round: number;
+	readonly height: number;
+	readonly round: number;
+	readonly validators: string[];
+	readonly proposer: string;
 	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
 	addProposal(proposal: IProposal): boolean;
