@@ -33,8 +33,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#height = 2;
-	#round = 0;
 	#roundState!: Contracts.Consensus.IRoundState;
 	#step: Step = Step.propose;
 	#lockedValue?: Contracts.Consensus.IRoundState;
@@ -46,16 +44,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#didMajorityPrecommit = false;
 
 	public getHeight(): number {
-		return this.#height;
+		return this.#roundState.height;
 	}
 
 	public getRound(): number {
-		return this.#round;
-	}
-
-	// TODO: Only for testing
-	public setRound(round: number): void {
-		this.#round = round;
+		return this.#roundState.round;
 	}
 
 	public getStep(): Step {
@@ -85,10 +78,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	public getState(): Record<string, unknown> {
 		return {
-			height: this.#height,
+			height: this.#roundState.height,
 			lockedRound: this.#lockedRound,
 			lockedValue: this.#lockedValue,
-			round: this.#round,
+			round: this.#roundState.round,
 			step: this.#step,
 			validRound: this.#validRound,
 			validValue: this.#validValue,
@@ -97,25 +90,21 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	public async run(): Promise<void> {
 		const lastBlock = this.state.getLastBlock();
-		this.#height = lastBlock.data.height + 1;
 
-		void this.startRound(this.#round);
+		void this.startRound(lastBlock.data.height + 1, 0);
 	}
 
-	public async startRound(round: number): Promise<void> {
-		this.#round = round;
+	public async startRound(height: number, round: number): Promise<void> {
 		this.#step = Step.propose;
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 		this.scheduler.clear();
 
-		this.#roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
+		this.#roundState = await this.roundStateRepository.getRoundState(height, round);
 
 		const proposer = this.validatorsRepository.getValidator(this.#roundState.proposer);
 
-		this.logger.info(
-			`>> Starting new round: ${this.#height}/${this.#round} with proposer ${this.#roundState.proposer}`,
-		);
+		this.logger.info(`>> Starting new round: ${height}/${round} with proposer ${this.#roundState.proposer}`);
 
 		if (proposer) {
 			// TODO: Error handling
@@ -124,7 +113,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.logger.info(`No registered proposer for ${this.#roundState.proposer}`);
 
 			// TODO: Can we call this even even proposer is known?
-			await this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
+			await this.scheduler.scheduleTimeoutPropose(height, round);
 		}
 	}
 
@@ -137,7 +126,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		// TODO: Check proposer
-		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${proposal.block.data.id}`);
+		this.logger.info(
+			`Received proposal ${this.#roundState.height}/${this.#roundState.round} blockId: ${proposal.block.data.id}`,
+		);
 
 		const result = await this.processor.process(roundState);
 		roundState.setProcessorResult(result);
@@ -155,13 +146,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
 			proposal.validRound === undefined ||
-			proposal.validRound >= this.#round
+			proposal.validRound >= this.#roundState.round
 		) {
 			return;
 		}
 
 		this.logger.info(
-			`Received proposal ${this.#height}/${this.#round} with locked blockId: ${proposal.block.data.id}`,
+			`Received proposal ${this.#roundState.height}/${this.#roundState.round} with locked blockId: ${
+				proposal.block.data.id
+			}`,
 		);
 
 		this.#step = Step.prevote;
@@ -192,7 +185,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
+			`Received +2/3 prevotes for ${this.#roundState.height}/${this.#roundState.round} proposer: ${
 				proposal.validatorPublicKey
 			} blockId: ${proposal.block.data.id}`,
 		);
@@ -201,15 +194,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (this.#step === Step.prevote) {
 			this.#lockedValue = roundState;
-			this.#lockedRound = this.#round;
+			this.#lockedRound = this.#roundState.round;
 			this.#validValue = roundState;
-			this.#validRound = this.#round;
+			this.#validRound = this.#roundState.round;
 			this.#step = Step.precommit;
 
 			await this.#precommit(proposal.block.data.id);
 		} else {
 			this.#validValue = roundState;
-			this.#validRound = this.#round;
+			this.#validRound = this.#roundState.round;
 		}
 	}
 
@@ -218,7 +211,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		void this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
+		void this.scheduler.scheduleTimeoutPrevote(this.#roundState.height, this.#roundState.round);
 	}
 
 	public async onMajorityPrevoteNull(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -234,7 +227,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onMajorityPrecommitAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		void this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
+		void this.scheduler.scheduleTimeoutPrecommit(this.#roundState.height, this.#roundState.round);
 	}
 
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -247,12 +240,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (!roundState.getProcessorResult()) {
 			this.logger.info(
-				`Block ${proposal.block.data.id} on height ${this.#height} received +2/3 precommti but is invalid`,
+				`Block ${proposal.block.data.id} on height ${
+					this.#roundState.height
+				} received +2/3 precommti but is invalid`,
 			);
 			return;
 		}
 		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+			`Received +2/3 precommits for ${this.#roundState.height}/${this.#roundState.round} proposer: ${
 				proposal.validatorPublicKey
 			} blockId: ${proposal.block.data.id}`,
 		);
@@ -263,25 +258,24 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		// TODO: Wait for other approvals if needed
 		await delay(80);
 
-		this.#height++;
 		this.#lockedRound = undefined;
 		this.#lockedValue = undefined;
 		this.#validRound = undefined;
 		this.#validValue = undefined;
 
-		setImmediate(() => this.startRound(0));
+		setImmediate(() => this.startRound(this.#roundState.height + 1, 0));
 	}
 
 	async onMinorityWithHigherRound(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		if (roundState.height !== this.#height || roundState.round <= this.#round) {
+		if (roundState.height !== this.#roundState.height || roundState.round <= this.#roundState.round) {
 			return;
 		}
 
-		setImmediate(() => this.startRound(roundState.round));
+		setImmediate(() => this.startRound(this.#roundState.height, roundState.round));
 	}
 
 	public async onTimeoutPropose(height: number, round: number): Promise<void> {
-		if (this.#step !== Step.propose || this.#height !== height || this.#round !== round) {
+		if (this.#step !== Step.propose || this.#roundState.height !== height || this.#roundState.round !== round) {
 			return;
 		}
 
@@ -290,7 +284,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onTimeoutPrevote(height: number, round: number): Promise<void> {
-		if (this.#step !== Step.prevote || this.#height !== height || this.#round !== round) {
+		if (this.#step !== Step.prevote || this.#roundState.height !== height || this.#roundState.round !== round) {
 			return;
 		}
 
@@ -299,19 +293,19 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {
-		if (this.#height !== height || this.#round !== round) {
+		if (this.#roundState.height !== height || this.#roundState.round !== round) {
 			return;
 		}
 
-		setImmediate(() => this.startRound(this.#round + 1));
+		setImmediate(() => this.startRound(this.#roundState.height, this.#roundState.round + 1));
 	}
 
 	#isInvalidRoundState(roundState: Contracts.Consensus.IRoundState): boolean {
-		if (roundState.height !== this.#height) {
+		if (roundState.height !== this.#roundState.height) {
 			return true;
 		}
 
-		if (roundState.round !== this.#round) {
+		if (roundState.round !== this.#roundState.round) {
 			return true;
 		}
 
@@ -324,10 +318,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		if (this.#validValue && existingProposal) {
 			block = existingProposal.block;
 		} else {
-			block = await proposer.prepareBlock(this.#height, this.#round);
+			block = await proposer.prepareBlock(this.#roundState.height, this.#roundState.round);
 		}
 
-		const proposal = await proposer.propose(this.#height, this.#round, block, this.#validRound);
+		const proposal = await proposer.propose(
+			this.#roundState.height,
+			this.#roundState.round,
+			block,
+			this.#validRound,
+		);
 
 		await this.broadcaster.broadcastProposal(proposal);
 		await this.handler.onProposal(proposal);
@@ -335,7 +334,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #prevote(value?: string): Promise<void> {
 		for (const validator of this.validatorsRepository.getValidators(this.#roundState.validators)) {
-			const precommit = await validator.prevote(this.#height, this.#round, value);
+			const precommit = await validator.prevote(this.#roundState.height, this.#roundState.round, value);
 
 			await this.broadcaster.broadcastPrevote(precommit);
 			await this.handler.onPrevote(precommit);
@@ -344,7 +343,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #precommit(value?: string): Promise<void> {
 		for (const validator of this.validatorsRepository.getValidators(this.#roundState.validators)) {
-			const precommit = await validator.precommit(this.#height, this.#round, value);
+			const precommit = await validator.precommit(this.#roundState.height, this.#roundState.round, value);
 
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
