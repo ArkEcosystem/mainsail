@@ -30,8 +30,6 @@ export class Handler implements Contracts.Consensus.IHandler {
 		}
 
 		const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round);
-		roundState.addProposal(proposal);
-
 		if (roundState.addProposal(proposal)) {
 			await this.#handle(roundState);
 		}
@@ -87,6 +85,8 @@ export class Handler implements Contracts.Consensus.IHandler {
 		}
 
 		const consensus = this.#getConsensus();
+
+		await consensus.onProposal(roundState);
 
 		if (roundState.hasMajorityPrevotes()) {
 			await consensus.onMajorityPrevote(roundState);
