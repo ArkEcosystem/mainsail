@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { Consensus } from "./consensus";
 import { RoundState } from "./round-state";
 import { RoundStateRepository } from "./round-state-repository";
 
@@ -109,7 +108,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		}
 	}
 
-	#getConsensus(): Consensus {
-		return this.app.get<Consensus>(Identifiers.Consensus.Service);
+	#getConsensus(): Contracts.Consensus.IConsensusService {
+		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 	}
 }
