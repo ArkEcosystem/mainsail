@@ -19,6 +19,10 @@ export class Handler implements Contracts.Consensus.IHandler {
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
 
 	async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
+		if (!this.#isValidHeightAndRound(proposal)) {
+			return;
+		}
+
 		// TODO: Move verification to p2p handler
 		const { errors } = await this.verifier.verifyProposal(proposal);
 		if (errors.length > 0) {
@@ -33,6 +37,10 @@ export class Handler implements Contracts.Consensus.IHandler {
 	}
 
 	async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
+		if (!this.#isValidHeightAndRound(prevote)) {
+			return;
+		}
+
 		// TODO: Move verification to p2p handler
 		const { errors } = await this.verifier.verifyPrevote(prevote);
 		if (errors.length > 0) {
@@ -48,6 +56,10 @@ export class Handler implements Contracts.Consensus.IHandler {
 	}
 
 	async onPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
+		if (!this.#isValidHeightAndRound(precommit)) {
+			return;
+		}
+
 		// TODO: Move verification to p2p handler
 		const { errors } = await this.verifier.verifyPrecommit(precommit);
 		if (errors.length > 0) {
@@ -62,6 +74,10 @@ export class Handler implements Contracts.Consensus.IHandler {
 		roundState.addPrecommit(precommit);
 
 		await this.#handle(roundState);
+	}
+
+	#isValidHeightAndRound(message: { height: number; round: number }): boolean {
+		return message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound();
 	}
 
 	async #handle(roundState: RoundState): Promise<void> {

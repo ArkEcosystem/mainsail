@@ -15,6 +15,8 @@ export interface IRoundState {
 
 export interface IConsensusService {
 	run(): Promise<void>;
+	getHeight(): number;
+	getRound(): number;
 	onProposal(roudnState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;
 	onMajorityPrecommit(roundState: IRoundState): Promise<void>;
