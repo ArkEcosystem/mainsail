@@ -233,7 +233,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		void this.scheduler.scheduleTimeoutPrecommit(this.#roundState.height, this.#roundState.round);
+		void this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
 	}
 
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
