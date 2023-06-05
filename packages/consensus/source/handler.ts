@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { RoundState } from "./round-state";
 import { RoundStateRepository } from "./round-state-repository";
 
 @injectable()
@@ -77,7 +76,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		return message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound();
 	}
 
-	async #handle(roundState: RoundState): Promise<void> {
+	async #handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		const consensus = this.#getConsensus();
 
 		await consensus.onProposal(roundState);

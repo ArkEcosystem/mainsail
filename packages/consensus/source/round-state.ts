@@ -1,8 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { IValidatorSetMajority } from "./types";
-
 @injectable()
 export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Configuration)
@@ -189,15 +187,17 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#precommitsCount.get(blockId) ?? 0;
 	}
 
-	public async aggregateMajorityPrevotes(): Promise<IValidatorSetMajority> {
+	public async aggregateMajorityPrevotes(): Promise<Contracts.Consensus.IValidatorSetMajority> {
 		return this.#aggregateValidatorSetMajority(this.#prevotes);
 	}
 
-	public async aggregateMajorityPrecommits(): Promise<IValidatorSetMajority> {
+	public async aggregateMajorityPrecommits(): Promise<Contracts.Consensus.IValidatorSetMajority> {
 		return this.#aggregateValidatorSetMajority(this.#precommits);
 	}
 
-	async #aggregateValidatorSetMajority(majority: Map<string, { signature: string }>): Promise<IValidatorSetMajority> {
+	async #aggregateValidatorSetMajority(
+		majority: Map<string, { signature: string }>,
+	): Promise<Contracts.Consensus.IValidatorSetMajority> {
 		const publicKeys: Buffer[] = [];
 		const signatures: Buffer[] = [];
 

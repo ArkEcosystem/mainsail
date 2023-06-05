@@ -1,6 +1,13 @@
 import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
+// TODO: Move to crypto
+export interface IValidatorSetMajority {
+	aggSignature: string;
+	aggPublicKey: string;
+	validatorSet: Set<Buffer>;
+}
+
 export interface IRoundState {
 	readonly height: number;
 	readonly round: number;
@@ -11,6 +18,16 @@ export interface IRoundState {
 	addProposal(proposal: IProposal): boolean;
 	setProcessorResult(processorResult: boolean): void;
 	getProcessorResult(): boolean;
+	addPrevote(prevote: IPrevote): boolean;
+	addPrecommit(precommit: IPrecommit): boolean;
+	hasMajorityPrevotes(): boolean;
+	hasMajorityPrevotesAny(): boolean;
+	hasMajorityPrevotesNull(): boolean;
+	hasMajorityPrecommits(): boolean;
+	hasMajorityPrecommitsAny(): boolean;
+	hasMinorityPrevotesOrPrecommits(): boolean;
+	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
+	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
 }
 
 export interface IConsensusService {
