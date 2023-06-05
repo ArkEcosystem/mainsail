@@ -126,14 +126,30 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public hasMajorityPrevotes(): boolean {
-		return this.#isMajority(this.#prevotes.size);
+		if (!this.#proposal) {
+			return false;
+		}
+
+		return this.#isMajority(this.#getPrevoteCount(this.#proposal.block.data.id));
 	}
 
 	public hasMajorityPrevotesAny(): boolean {
 		return this.#isMajority(this.#prevotes.size);
 	}
 
+	public hasMajorityPrevotesNull(): boolean {
+		return this.#isMajority(this.#getPrevoteCount());
+	}
+
 	public hasMajorityPrecommits(): boolean {
+		if (!this.#proposal) {
+			return false;
+		}
+
+		return this.#isMajority(this.#getPrecommitCount(this.#proposal.block.data.id));
+	}
+
+	public hasMajorityPrecommitsAny(): boolean {
 		return this.#isMajority(this.#precommits.size);
 	}
 
@@ -157,19 +173,19 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return size >= this.configuration.getMilestone().activeValidators / 3 + 1;
 	}
 
-	#increasePrevoteCount(blockId: string | undefined): void {
+	#increasePrevoteCount(blockId?: string): void {
 		this.#prevotesCount.set(blockId, this.#getPrevoteCount(blockId) + 1);
 	}
 
-	#getPrevoteCount(blockId: string | undefined): number {
+	#getPrevoteCount(blockId?: string): number {
 		return this.#prevotesCount.get(blockId) ?? 0;
 	}
 
-	#increasePrecommitCount(blockId: string | undefined): void {
+	#increasePrecommitCount(blockId?: string): void {
 		this.#precommitsCount.set(blockId, this.#getPrecommitCount(blockId) + 1);
 	}
 
-	#getPrecommitCount(blockId: string | undefined): number {
+	#getPrecommitCount(blockId?: string): number {
 		return this.#precommitsCount.get(blockId) ?? 0;
 	}
 
