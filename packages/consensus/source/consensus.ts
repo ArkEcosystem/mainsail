@@ -3,7 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import delay from "delay";
 
 import { Step } from "./enums";
-import { RoundStateRepository } from "./round-state-repository";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
@@ -26,16 +25,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
 
-	// TODO: Add interface
-	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepository!: RoundStateRepository;
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#height = 2;
 	#round = 0;
-	#roundState!: Contracts.Consensus.IRoundState;
 	#step: Step = Step.propose;
 	#lockedValue?: Contracts.Consensus.IRoundState;
 	#lockedRound?: number = undefined;
@@ -107,21 +104,19 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#step = Step.propose;
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
+
 		this.scheduler.clear();
 
-		this.#roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
+		const proposerPublicKey = await this.#getProposerPublicKey(this.#height, round);
+		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
-		const proposer = this.validatorsRepository.getValidator(this.#roundState.proposer);
-
-		this.logger.info(
-			`>> Starting new round: ${this.#height}/${this.#round} with proposer ${this.#roundState.proposer}`,
-		);
+		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
 		if (proposer) {
 			// TODO: Error handling
 			await this.#propose(proposer);
 		} else {
-			this.logger.info(`No registered proposer for ${this.#roundState.proposer}`);
+			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
 
 			// TODO: Can we call this even even proposer is known?
 			await this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
@@ -339,7 +334,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #prevote(value?: string): Promise<void> {
-		for (const validator of this.validatorsRepository.getValidators(this.#roundState.validators)) {
+		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
 			const precommit = await validator.prevote(this.#height, this.#round, value);
 
 			await this.broadcaster.broadcastPrevote(precommit);
@@ -348,11 +343,22 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #precommit(value?: string): Promise<void> {
-		for (const validator of this.validatorsRepository.getValidators(this.#roundState.validators)) {
+		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
 		}
+	}
+
+	async #getProposerPublicKey(height: number, round: number): Promise<string> {
+		const activeValidators = await this.validatorSet.getActiveValidators();
+		return activeValidators[0].getAttribute("consensus.publicKey");
+	}
+
+	async #getActiveValidators(): Promise<string[]> {
+		const activeValidators = await this.validatorSet.getActiveValidators();
+
+		return activeValidators.map((wallet) => wallet.getAttribute("consensus.publicKey"));
 	}
 }
