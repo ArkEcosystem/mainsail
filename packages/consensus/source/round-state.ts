@@ -28,7 +28,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#proposal?: Contracts.Crypto.IProposal;
 	#processorResult?: boolean;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
+	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
+	#precommitsCount = new Map<string | undefined, number>();
 	#validators = new Map<string, Contracts.State.Wallet>();
 	#proposer!: string;
 
@@ -105,6 +107,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		}
 
 		this.#prevotes.set(prevote.validatorPublicKey, prevote);
+		this.#increasePrevoteCount(prevote.blockId);
 		return true;
 	}
 
@@ -118,6 +121,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		}
 
 		this.#precommits.set(precommit.validatorPublicKey, precommit);
+		this.#increasePrecommitCount(precommit.blockId);
 		return true;
 	}
 
@@ -151,6 +155,22 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	#isMinority(size: number): boolean {
 		return size >= this.configuration.getMilestone().activeValidators / 3 + 1;
+	}
+
+	#increasePrevoteCount(blockId: string | undefined): void {
+		this.#prevotesCount.set(blockId, this.#getPrevoteCount(blockId) + 1);
+	}
+
+	#getPrevoteCount(blockId: string | undefined): number {
+		return this.#prevotesCount.get(blockId) ?? 0;
+	}
+
+	#increasePrecommitCount(blockId: string | undefined): void {
+		this.#precommitsCount.set(blockId, this.#getPrecommitCount(blockId) + 1);
+	}
+
+	#getPrecommitCount(blockId: string | undefined): number {
+		return this.#precommitsCount.get(blockId) ?? 0;
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<IValidatorSetMajority> {
