@@ -227,11 +227,16 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onMajorityPrecommitAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+		if (this.#isInvalidRoundState(roundState)) {
+			return;
+		}
+
 		void this.scheduler.scheduleTimeoutPrecommit(this.#roundState.height, this.#roundState.round);
 	}
 
 	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		const proposal = roundState.getProposal();
+		// TODO: Round can be any
 		if (this.#didMajorityPrecommit || this.#isInvalidRoundState(roundState) || !proposal) {
 			return;
 		}

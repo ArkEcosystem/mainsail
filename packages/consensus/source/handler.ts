@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { Consensus } from "./consensus";
 import { RoundState } from "./round-state";
 import { RoundStateRepository } from "./round-state-repository";
 
@@ -78,26 +79,37 @@ export class Handler implements Contracts.Consensus.IHandler {
 	}
 
 	async #handle(roundState: RoundState): Promise<void> {
-		const proposal = roundState.getProposal();
-
-		if (!proposal) {
-			return;
-		}
-
 		const consensus = this.#getConsensus();
 
 		await consensus.onProposal(roundState);
+		await consensus.onProposalLocked(roundState);
 
 		if (roundState.hasMajorityPrevotes()) {
 			await consensus.onMajorityPrevote(roundState);
 		}
 
+		if (roundState.hasMajorityPrevotesAny()) {
+			await consensus.onMajorityPrevoteAny(roundState);
+		}
+
+		if (roundState.hasMajorityPrevotesNull()) {
+			await consensus.onMajorityPrevoteNull(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommitsAny()) {
+			await consensus.onMajorityPrecommitAny(roundState);
+		}
+
 		if (roundState.hasMajorityPrecommits()) {
 			await consensus.onMajorityPrecommit(roundState);
 		}
+
+		if (roundState.hasMinorityPrevotesOrPrecommits()) {
+			await consensus.onMinorityWithHigherRound(roundState);
+		}
 	}
 
-	#getConsensus(): Contracts.Consensus.IConsensusService {
-		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
+	#getConsensus(): Consensus {
+		return this.app.get<Consensus>(Identifiers.Consensus.Service);
 	}
 }
