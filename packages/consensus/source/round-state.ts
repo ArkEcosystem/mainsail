@@ -90,14 +90,22 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public addPrevote(prevote: Contracts.Crypto.IPrevote): boolean {
-		this.#prevotes.set(prevote.validatorPublicKey, prevote);
+		if (this.#prevotes.has(prevote.validatorPublicKey)) {
+			// TODO: Handle evidence
 
+			return false;
+		}
+
+		this.#prevotes.set(prevote.validatorPublicKey, prevote);
 		return true;
 	}
 
 	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): boolean {
-		this.#precommits.set(precommit.validatorPublicKey, precommit);
+		if (this.#precommits.has(precommit.validatorPublicKey)) {
+			return false;
+		}
 
+		this.#precommits.set(precommit.validatorPublicKey, precommit);
 		return true;
 	}
 
