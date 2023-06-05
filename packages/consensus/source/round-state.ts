@@ -67,6 +67,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public addProposal(proposal: Contracts.Crypto.IProposal): boolean {
+		if (this.#proposer !== proposal.validatorPublicKey) {
+			return false;
+		}
+
 		if (this.#proposal) {
 			// TODO: Handle evidence
 			return false;
@@ -90,6 +94,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public addPrevote(prevote: Contracts.Crypto.IPrevote): boolean {
+		if (!this.#validators.has(prevote.validatorPublicKey)) {
+			return false;
+		}
+
 		if (this.#prevotes.has(prevote.validatorPublicKey)) {
 			// TODO: Handle evidence
 
@@ -101,6 +109,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): boolean {
+		if (!this.#validators.has(precommit.validatorPublicKey)) {
+			return false;
+		}
+
 		if (this.#precommits.has(precommit.validatorPublicKey)) {
 			return false;
 		}
@@ -113,12 +125,32 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#isMajority(this.#prevotes.size);
 	}
 
+	public hasMajorityPrevotesAny(): boolean {
+		return this.#isMajority(this.#prevotes.size);
+	}
+
 	public hasMajorityPrecommits(): boolean {
 		return this.#isMajority(this.#precommits.size);
 	}
 
+	public hasMinorityPrevotesOrPrecommits(): boolean {
+		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
+	}
+
+	#hasMinorityPrevotes(): boolean {
+		return this.#isMinority(this.#prevotes.size);
+	}
+
+	#hasMinorityPrecommits(): boolean {
+		return this.#isMinority(this.#precommits.size);
+	}
+
 	#isMajority(size: number): boolean {
 		return size >= (this.configuration.getMilestone().activeValidators / 3) * 2 + 1;
+	}
+
+	#isMinority(size: number): boolean {
+		return size >= this.configuration.getMilestone().activeValidators / 3 + 1;
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<IValidatorSetMajority> {
