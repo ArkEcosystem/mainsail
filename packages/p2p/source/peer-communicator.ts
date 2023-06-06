@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -48,8 +48,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	#outgoingRateLimiter!: RateLimiter;
 
-	#postTransactionsQueueByIp: Map<string, Contracts.Kernel.Queue> = new Map();
-
 	@postConstruct()
 	public initialize(): void {
 		this.#outgoingRateLimiter = buildRateLimiter({
@@ -61,10 +59,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			// White listing anybody here means we would not throttle ourselves when sending
 			// them requests, ie we could spam them.
 			whitelist: [],
-		});
-
-		this.events.listen(Enums.PeerEvent.Disconnect, {
-			handle: ({ data }) => this.#postTransactionsQueueByIp.delete(data.peer.ip),
 		});
 	}
 
