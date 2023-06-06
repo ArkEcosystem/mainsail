@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
+import dayjs from "dayjs";
 
 @injectable()
 export class Validator implements Contracts.Consensus.IValidator {
@@ -25,9 +26,6 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.IDatabaseService;
-
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.IMessageFactory;
@@ -128,7 +126,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 			payloadLength: 32 * transactions.length,
 			previousBlock: previousBlock.data.id,
 			reward: this.cryptoConfiguration.getMilestone().reward,
-			timestamp: this.slots.getTime(),
+			timestamp: dayjs().unix(),
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
 			transactions,
