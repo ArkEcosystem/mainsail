@@ -62,9 +62,9 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
 
-		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.#blocks[0], this.slots)) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.#blocks[0])) {
 			this.logger.warning(
-				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.#blocks[0], this.slots),
+				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.#blocks[0]),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
 			this.blockchain.clearQueue();
