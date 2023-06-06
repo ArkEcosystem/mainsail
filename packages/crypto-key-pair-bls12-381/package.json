@@ -19,12 +19,12 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
+		"@chainsafe/blst": "^0.2.8",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@noble/bls12-381": "^1.2.0",
 		"@scure/bip39": "^1.0.0",
 		"bls12-381-keygen": "^0.2.1",
 		"wif": "^2.0.6"
