@@ -81,7 +81,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerFactories(): void {
 		this.app
 			.bind(Identifiers.PeerFactory)
-			.toFactory<Peer>(() => (ip: string) => new Peer(ip, Number(this.config().get<number>("server.port"))!));
+			.toFactory<Peer>(
+				() => (ip: string) =>
+					this.app.resolve(Peer).init(ip, Number(this.config().getRequired<number>("server.port"))),
+			);
 	}
 
 	#registerServices(): void {

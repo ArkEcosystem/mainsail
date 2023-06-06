@@ -4,7 +4,6 @@ import { Enums, Providers, Services, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";
-import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 
 const defaultDownloadChunkSize = 400;
@@ -24,6 +23,9 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
+
+	@inject(Identifiers.PeerFactory)
+	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
 	@inject(Identifiers.PeerChunkCache)
 	private readonly chunkCache!: Contracts.P2P.ChunkCache;
@@ -198,13 +200,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 					Object.fromEntries(
 						Utils.shuffle(peers)
 							.slice(0, maxPeersPerPeer)
-							.map(
-								// @ts-ignore - rework this so TS stops throwing errors
-								(current: Contracts.P2P.PeerBroadcast) => [
-									current.ip,
-									new Peer(current.ip, current.port),
-								],
-							),
+							.map((current: Contracts.P2P.PeerBroadcast) => [current.ip, this.peerFactory(current.ip)]),
 					),
 				)
 				.reduce(
@@ -583,7 +579,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		const peers: Contracts.P2P.Peer[] = peerList.map((peer) => {
-			const peerInstance = new Peer(peer.ip, peer.port);
+			const peerInstance = this.peerFactory(peer.ip);
 			peerInstance.version = this.app.version();
 			return peerInstance;
 		});
