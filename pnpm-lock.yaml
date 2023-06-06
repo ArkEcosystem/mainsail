@@ -624,9 +624,6 @@ importers:
       '@mainsail/forger':
         specifier: workspace:*
         version: link:../forger
-      '@mainsail/forger-tracker':
-        specifier: workspace:*
-        version: link:../forger-tracker
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1978,22 +1975,6 @@ importers:
       sinon:
         specifier: ^15.0.4
         version: 15.0.4
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/forger-tracker:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-    devDependencies:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
