@@ -40,7 +40,6 @@
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
-		"@mainsail/crypto-time": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
 		"@mainsail/crypto-transaction-multi-signature-registration": "workspace:*",
