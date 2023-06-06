@@ -115,6 +115,7 @@ export const Identifiers = {
 	PeerChunkCache: Symbol.for("Peer<ChunkCache>"),
 	PeerCommunicator: Symbol.for("Peer<Communicator>"),
 	PeerConnector: Symbol.for("Peer<Connector>"),
+	PeerDisposer: Symbol.for("Peer<Disposer>"),
 	PeerEventListener: Symbol.for("Peer<EventListener>"),
 	PeerFactory: Symbol.for("Factory<Peer>"),
 	PeerNetworkMonitor: Symbol.for("Peer<NetworkMonitor>"),
