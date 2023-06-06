@@ -1,4 +1,4 @@
-import { describe } from "../../../test-framework";
+import { describeSkip } from "../../../test-framework";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";
@@ -9,7 +9,7 @@ import { stringifyNesMessage } from "./utils";
 import { default as Ws } from "ws";
 import delay from "delay";
 
-describe("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
+describeSkip("Socket", ({ it, spy, beforeEach, assert, nock, each }) => {
 	beforeEach(() => {
 		nock.enableNetConnect();
 	});

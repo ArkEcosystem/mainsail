@@ -8,20 +8,20 @@ export class RoundStateRepository {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	#roundStates = new Map<string, RoundState>();
+	#roundStates = new Map<string, Contracts.Consensus.IRoundState>();
 
-	getRoundState(height, round): RoundState {
+	async getRoundState(height, round): Promise<Contracts.Consensus.IRoundState> {
 		const key = `${height}-${round}`;
 
 		if (!this.#roundStates.has(key)) {
-			this.#roundStates.set(key, this.#createRoundState(height, round));
+			this.#roundStates.set(key, await this.#createRoundState(height, round));
 		}
 
 		return this.#roundStates.get(key)!;
 	}
 
 	// TODO: Bind to factory
-	#createRoundState(height: number, round: number): RoundState {
+	#createRoundState(height: number, round: number): Promise<Contracts.Consensus.IRoundState> {
 		return this.app.resolve(RoundState).configure(height, round);
 	}
 }

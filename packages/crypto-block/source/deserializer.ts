@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer } from "@mainsail/utils";
 
@@ -23,9 +23,8 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 	): Promise<{ data: Contracts.Crypto.IBlockData; transactions: Contracts.Crypto.ITransaction[] }> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		const header = await this.#deserializeBufferHeader(buffer);
+		const block: Utils.Mutable<Contracts.Crypto.IBlockData> = await this.#deserializeBufferHeader(buffer);
 
-		const block = header as Contracts.Crypto.IBlockData;
 		let transactions: Contracts.Crypto.ITransaction[] = [];
 
 		if (buffer.getRemainderLength() > 0) {
@@ -40,7 +39,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 	public async deserializeHeader(serialized: Buffer): Promise<Contracts.Crypto.IBlockHeader> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		const header = await this.#deserializeBufferHeader(buffer);
+		const header: Utils.Mutable<Contracts.Crypto.IBlockData> = await this.#deserializeBufferHeader(buffer);
 
 		header.id = await this.idFactory.make(header);
 

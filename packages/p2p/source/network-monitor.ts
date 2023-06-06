@@ -1,10 +1,9 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Services, Utils } from "@mainsail/kernel";
+import { Providers, Services, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";
-import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 
 const defaultDownloadChunkSize = 400;
@@ -25,11 +24,14 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
+	@inject(Identifiers.PeerFactory)
+	private readonly peerFactory!: Contracts.P2P.PeerFactory;
+
+	@inject(Identifiers.PeerProcessor)
+	private readonly processor!: Contracts.P2P.PeerProcessor;
+
 	@inject(Identifiers.PeerChunkCache)
 	private readonly chunkCache!: Contracts.P2P.ChunkCache;
-
-	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -151,10 +153,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						peerErrors[error] = peerErrors[error] || [];
 						peerErrors[error].push(peer);
 
-						await this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
-
-						// eslint-disable-next-line @typescript-eslint/no-floating-promises
-						this.events.dispatch(Enums.PeerEvent.Removed, peer);
+						await this.processor.dispose(peer);
 					}
 				}),
 			).then(resolvesFirst);
@@ -198,13 +197,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 					Object.fromEntries(
 						Utils.shuffle(peers)
 							.slice(0, maxPeersPerPeer)
-							.map(
-								// @ts-ignore - rework this so TS stops throwing errors
-								(current: Contracts.P2P.PeerBroadcast) => [
-									current.ip,
-									new Peer(current.ip, current.port),
-								],
-							),
+							.map((current: Contracts.P2P.PeerBroadcast) => [current.ip, this.peerFactory(current.ip)]),
 					),
 				)
 				.reduce(
@@ -583,7 +576,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		const peers: Contracts.P2P.Peer[] = peerList.map((peer) => {
-			const peerInstance = new Peer(peer.ip, peer.port);
+			const peerInstance = this.peerFactory(peer.ip);
 			peerInstance.version = this.app.version();
 			return peerInstance;
 		});

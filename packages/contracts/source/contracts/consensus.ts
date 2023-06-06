@@ -1,21 +1,47 @@
 import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
+// TODO: Move to crypto
+export interface IValidatorSetMajority {
+	aggSignature: string;
+	aggPublicKey: string;
+	validatorSet: Set<Buffer>;
+}
+
 export interface IRoundState {
-	height: number;
-	round: number;
+	readonly height: number;
+	readonly round: number;
+	readonly validators: string[];
+	readonly proposer: string;
 	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
-	setProposal(proposal: IProposal): void;
+	addProposal(proposal: IProposal): boolean;
 	setProcessorResult(processorResult: boolean): void;
 	getProcessorResult(): boolean;
+	addPrevote(prevote: IPrevote): boolean;
+	addPrecommit(precommit: IPrecommit): boolean;
+	hasMajorityPrevotes(): boolean;
+	hasMajorityPrevotesAny(): boolean;
+	hasMajorityPrevotesNull(): boolean;
+	hasMajorityPrecommits(): boolean;
+	hasMajorityPrecommitsAny(): boolean;
+	hasMinorityPrevotesOrPrecommits(): boolean;
+	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
+	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
 }
 
 export interface IConsensusService {
 	run(): Promise<void>;
-	onProposal(roudnState: IRoundState): Promise<void>;
+	getHeight(): number;
+	getRound(): number;
+	onProposal(roundState: IRoundState): Promise<void>;
+	onProposalLocked(roudnState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;
+	onMajorityPrevoteAny(roundState: IRoundState): Promise<void>;
+	onMajorityPrevoteNull(roundState: IRoundState): Promise<void>;
+	onMajorityPrecommitAny(roundState: IRoundState): Promise<void>;
 	onMajorityPrecommit(roundState: IRoundState): Promise<void>;
+	onMinorityWithHigherRound(roundState: IRoundState): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;

@@ -1,5 +1,6 @@
-import { describe, Sandbox } from "../../test-framework";
+import { Identifiers } from "@mainsail/contracts";
 
+import { describe, Sandbox } from "../../test-framework";
 import { Peer } from "./peer";
 import { PeerRepository } from "./peer-repository";
 
@@ -10,14 +11,16 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
+		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+
 		context.peerRepostiory = context.sandbox.app.resolve(PeerRepository);
 	});
 
-	it("#getPeers - should return all the peers in an array", ({ peerRepostiory }) => {
+	it("#getPeers - should return all the peers in an array", ({ peerRepostiory, sandbox }) => {
 		const peers = [
-			new Peer("176.165.66.55", 4000),
-			new Peer("176.165.44.33", 4000),
-			new Peer("2001:3984:3989::104", 4000),
+			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		];
 
 		for (const peer of peers) {
@@ -31,12 +34,12 @@ describe<{
 		assert.false(peerRepostiory.hasPeers());
 	});
 
-	it("#hasPeers - should return true if there is more than zero peer", ({ peerRepostiory }) => {
+	it("#hasPeers - should return true if there is more than zero peer", ({ peerRepostiory, sandbox }) => {
 		const peers = [
-			new Peer("176.165.66.55", 4000),
-			new Peer("176.165.44.33", 4000),
-			new Peer("176.165.22.11", 4000),
-			new Peer("2001:3984:3989::104", 4000),
+			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			sandbox.app.resolve(Peer).init("176.165.22.11", 4000),
+			sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		];
 
 		assert.false(peerRepostiory.hasPeers());
@@ -47,11 +50,11 @@ describe<{
 		}
 	});
 
-	it("#getPeer - should return the peer by its ip", ({ peerRepostiory }) => {
+	it("#getPeer - should return the peer by its ip", ({ peerRepostiory, sandbox }) => {
 		const peersByIp = {
-			"176.165.44.33": new Peer("176.165.44.33", 4000),
-			"176.165.66.55": new Peer("176.165.66.55", 4000),
-			"2001:3984:3989::104": new Peer("2001:3984:3989::104", 4000),
+			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 
 		for (const peerIp of Object.values(peersByIp)) {
@@ -63,11 +66,11 @@ describe<{
 		}
 	});
 
-	it("#getPeer - should throw when no peer exists for the ip", ({ peerRepostiory }) => {
+	it("#getPeer - should throw when no peer exists for the ip", ({ peerRepostiory, sandbox }) => {
 		const peersByIp = {
-			"176.165.44.33": new Peer("176.165.44.33", 4000),
-			"176.165.66.55": new Peer("176.165.66.55", 4000),
-			"2001:3984:3989::104": new Peer("2001:3984:3989::104", 4000),
+			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 
 		for (const peerIp of Object.values(peersByIp)) {
@@ -77,11 +80,11 @@ describe<{
 		assert.throws(() => peerRepostiory.getPeer("127.0.0.1"));
 	});
 
-	it("#setPeer - should set the peer by its ip", ({ peerRepostiory }) => {
+	it("#setPeer - should set the peer by its ip", ({ peerRepostiory, sandbox }) => {
 		const peersByIp = {
-			"176.165.44.33": new Peer("176.165.44.33", 4000),
-			"176.165.66.55": new Peer("176.165.66.55", 4000),
-			"2001:3984:3989::104": new Peer("2001:3984:3989::104", 4000),
+			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 
 		for (const peer of Object.values(peersByIp)) {
@@ -93,8 +96,8 @@ describe<{
 		}
 	});
 
-	it("#forgetPeer - should forget the peer", ({ peerRepostiory }) => {
-		const peer = new Peer("176.165.66.55", 4000);
+	it("#forgetPeer - should forget the peer", ({ peerRepostiory, sandbox }) => {
+		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
 		peerRepostiory.setPeer(peer);
 
@@ -107,8 +110,8 @@ describe<{
 		assert.throws(() => peerRepostiory.getPeer(peer.ip));
 	});
 
-	it("#hasPeer - should return true if the peer exists", ({ peerRepostiory }) => {
-		const peer = new Peer("176.165.66.55", 4000);
+	it("#hasPeer - should return true if the peer exists", ({ peerRepostiory, sandbox }) => {
+		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
 		peerRepostiory.setPeer(peer);
 
@@ -119,8 +122,11 @@ describe<{
 		assert.false(peerRepostiory.hasPeer("176.165.66.55"));
 	});
 
-	it("#getPendingPeers - should return the pending peers", ({ peerRepostiory }) => {
-		const peers = [new Peer("176.165.66.55", 4000), new Peer("176.165.44.33", 4000)];
+	it("#getPendingPeers - should return the pending peers", ({ peerRepostiory, sandbox }) => {
+		const peers = [
+			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+		];
 
 		for (const peer of peers) {
 			peerRepostiory.setPendingPeer(peer);
@@ -133,12 +139,15 @@ describe<{
 		assert.false(peerRepostiory.hasPendingPeers());
 	});
 
-	it("#hasPendingPeers - should return true if there is more than zero pending peer", ({ peerRepostiory }) => {
+	it("#hasPendingPeers - should return true if there is more than zero pending peer", ({
+		peerRepostiory,
+		sandbox,
+	}) => {
 		const peers = [
-			new Peer("176.165.66.55", 4000),
-			new Peer("176.165.44.33", 4000),
-			new Peer("176.165.22.11", 4000),
-			new Peer("2001:3984:3989::104", 4000),
+			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			sandbox.app.resolve(Peer).init("176.165.22.11", 4000),
+			sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		];
 
 		assert.false(peerRepostiory.hasPendingPeers());
@@ -149,11 +158,11 @@ describe<{
 		}
 	});
 
-	it("#getPendingPeer - should return the pending peer by its ip", ({ peerRepostiory }) => {
+	it("#getPendingPeer - should return the pending peer by its ip", ({ peerRepostiory, sandbox }) => {
 		const peersByIp = {
-			"176.165.44.33": new Peer("176.165.44.33", 4000),
-			"176.165.66.55": new Peer("176.165.66.55", 4000),
-			"2001:3984:3989::104": new Peer("2001:3984:3989::104", 4000),
+			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 		for (const peer of Object.values(peersByIp)) {
 			peerRepostiory.setPendingPeer(peer);
@@ -163,11 +172,11 @@ describe<{
 		}
 	});
 
-	it("#getPendingPeer - should throw when no pending peer exists for the ip", ({ peerRepostiory }) => {
+	it("#getPendingPeer - should throw when no pending peer exists for the ip", ({ peerRepostiory, sandbox }) => {
 		const peersByIp = {
-			"176.165.44.33": new Peer("176.165.44.33", 4000),
-			"176.165.66.55": new Peer("176.165.66.55", 4000),
-			"2001:3984:3989::104": new Peer("2001:3984:3989::104", 4000),
+			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 		for (const peer of Object.values(peersByIp)) {
 			peerRepostiory.setPendingPeer(peer);
@@ -176,11 +185,11 @@ describe<{
 		assert.throws(() => peerRepostiory.getPendingPeer("127.0.0.1"));
 	});
 
-	it("#setPendingPeer - should set the pending peer by its ip", ({ peerRepostiory }) => {
+	it("#setPendingPeer - should set the pending peer by its ip", ({ peerRepostiory, sandbox }) => {
 		const peersByIp = {
-			"176.165.44.33": new Peer("176.165.44.33", 4000),
-			"176.165.66.55": new Peer("176.165.66.55", 4000),
-			"2001:3984:3989::104": new Peer("2001:3984:3989::104", 4000),
+			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 		for (const peer of Object.values(peersByIp)) {
 			peerRepostiory.setPendingPeer(peer);
@@ -190,8 +199,8 @@ describe<{
 		}
 	});
 
-	it("#forgetPendingPeer - should forget the pending peer", ({ peerRepostiory }) => {
-		const peer = new Peer("176.165.66.55", 4000);
+	it("#forgetPendingPeer - should forget the pending peer", ({ peerRepostiory, sandbox }) => {
+		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
 		peerRepostiory.setPendingPeer(peer);
 
@@ -204,8 +213,8 @@ describe<{
 		assert.throws(() => peerRepostiory.getPendingPeer(peer.ip));
 	});
 
-	it("#hasPendingPeer - should return true if the pending peer exists", ({ peerRepostiory }) => {
-		const peer = new Peer("176.165.66.55", 4000);
+	it("#hasPendingPeer - should return true if the pending peer exists", ({ peerRepostiory, sandbox }) => {
+		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
 		peerRepostiory.setPendingPeer(peer);
 
@@ -216,12 +225,15 @@ describe<{
 		assert.false(peerRepostiory.hasPendingPeer("176.165.66.55"));
 	});
 
-	it("#getSameSubnetPeers - should get the peers within same subnet of provided ip", ({ peerRepostiory }) => {
+	it("#getSameSubnetPeers - should get the peers within same subnet of provided ip", ({
+		peerRepostiory,
+		sandbox,
+	}) => {
 		const peers = [
-			new Peer("176.165.66.55", 4000),
-			new Peer("176.165.66.33", 4000),
-			new Peer("176.165.22.11", 4000),
-			new Peer("2001:3984:3989::104", 4000),
+			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
+			sandbox.app.resolve(Peer).init("176.165.66.33", 4000),
+			sandbox.app.resolve(Peer).init("176.165.22.11", 4000),
+			sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		];
 
 		for (const peer of peers) {

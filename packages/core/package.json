@@ -53,8 +53,6 @@
 		"@mainsail/database": "workspace:*",
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
-		"@mainsail/forger": "workspace:*",
-		"@mainsail/forger-tracker": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/networking-dns": "workspace:*",

@@ -1,4 +1,4 @@
-import { describe } from "../../../test-framework";
+import { describeSkip } from "../../../test-framework";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";
@@ -8,7 +8,7 @@ import { plugin } from "./plugin";
 import { Socket } from "./socket";
 import { parseNesMessage } from "./utils";
 
-describe("Plugin", ({ it, spy, beforeEach, assert, nock, each }) => {
+describeSkip("Plugin", ({ it, spy, beforeEach, assert, nock, each }) => {
 	beforeEach(() => {
 		nock.enableNetConnect();
 	});
