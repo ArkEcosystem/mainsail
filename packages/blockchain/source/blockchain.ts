@@ -37,9 +37,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
-
 	#queue!: Contracts.Kernel.Queue;
 
 	#stopped!: boolean;
@@ -162,34 +159,18 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	}
 
 	public async handleIncomingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): Promise<void> {
-		const currentSlot: number = await this.slots.getSlotNumber();
-		const receivedSlot: number = await this.slots.getSlotNumber(block.timestamp);
+		// if (fromForger) {
+		// 	const minimumMs = 2000;
+		// 	if (currentSlot !== receivedSlot || timeLeftInMs < minimumMs) {
+		// 		this.logger.info(`Discarded block ${block.height.toLocaleString()} because it was received too late.`);
+		// 		return;
+		// 	}
+		// }
 
-		if (fromForger) {
-			const minimumMs = 2000;
-			const timeLeftInMs: number = await this.slots.getTimeInMsUntilNextSlot();
-
-			// console.log({
-			// 	currentSlot,
-			// 	receivedSlot,
-			// 	timeLeftInMs,
-			// 	// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-			// 	minimumMs,
-			// 	// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-			// 	discardSlot: currentSlot !== receivedSlot,
-			// 	discardTime: timeLeftInMs < minimumMs,
-			// });
-
-			if (currentSlot !== receivedSlot || timeLeftInMs < minimumMs) {
-				this.logger.info(`Discarded block ${block.height.toLocaleString()} because it was received too late.`);
-				return;
-			}
-		}
-
-		if (receivedSlot > currentSlot) {
-			this.logger.info(`Discarded block ${block.height.toLocaleString()} because it takes a future slot.`);
-			return;
-		}
+		// if (receivedSlot > currentSlot) {
+		// 	this.logger.info(`Discarded block ${block.height.toLocaleString()} because it takes a future slot.`);
+		// 	return;
+		// }
 
 		this.pushPingBlock(block, fromForger);
 
@@ -274,7 +255,10 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 		block = block || this.getLastBlock().data;
 
-		return this.slots.getTime() - block.timestamp < 3 * this.configuration.getMilestone(block.height).blockTime;
+		return true;
+
+		// TODO: Fix
+		// return this.slots.getTime() - block.timestamp < 3 * this.configuration.getMilestone(block.height).blockTime;
 	}
 
 	public getLastBlock(): Contracts.Crypto.IBlock {
