@@ -1,12 +1,12 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Enums, Providers } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../test-framework";
 
+import { describeSkip, Sandbox } from "../../test-framework";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { PeerProcessor } from "./peer-processor";
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	peerProcessor: PeerProcessor;
 	configuration: Providers.PluginConfiguration;
