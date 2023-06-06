@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Types, Utils } from "@mainsail/kernel";
+import { Enums, Providers, Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -33,9 +33,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.QueueFactory)
-	private readonly createQueue!: Types.QueueFactory;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
@@ -92,14 +89,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const postTransactionsTimeout = 10_000;
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
-		if (!this.#postTransactionsQueueByIp.get(peer.ip)) {
-			this.#postTransactionsQueueByIp.set(peer.ip, await this.createQueue());
-		}
-
-		const queue = this.#postTransactionsQueueByIp.get(peer.ip)!;
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		const queue = await peer.getTransactionsQueue();
 		queue.resume();
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		queue.push({
 			handle: async () => {
 				await this.emit(peer, Routes.PostTransactions, { transactions }, postTransactionsTimeout);

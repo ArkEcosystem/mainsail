@@ -1,11 +1,15 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Types } from "@mainsail/kernel";
 import dayjs, { Dayjs } from "dayjs";
 
 import { PeerVerificationResult } from "./peer-verifier";
 
 @injectable()
 export class Peer implements Contracts.P2P.Peer {
+	@inject(Identifiers.QueueFactory)
+	private readonly createQueue!: Types.QueueFactory;
+
 	public ip!: string;
 
 	public port!: number;
@@ -30,6 +34,8 @@ export class Peer implements Contracts.P2P.Peer {
 	};
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
+
+	#transactionsQueue!: Contracts.Kernel.Queue;
 
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;
@@ -59,5 +65,13 @@ export class Peer implements Contracts.P2P.Peer {
 			ip: this.ip,
 			port: this.port,
 		};
+	}
+
+	public async getTransactionsQueue(): Promise<Contracts.Kernel.Queue> {
+		if (!this.#transactionsQueue) {
+			this.#transactionsQueue = await this.createQueue();
+		}
+
+		return this.#transactionsQueue;
 	}
 }
