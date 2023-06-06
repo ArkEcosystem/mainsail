@@ -36,9 +36,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
-
 	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
 	#coldStart = false;
@@ -255,7 +252,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async getNetworkState(): Promise<Contracts.P2P.NetworkState> {
 		await this.cleansePeers({ fast: true, forcePing: true });
 
-		return await NetworkState.analyze(this, this.repository, this.slots);
+		return await NetworkState.analyze(this, this.repository);
 	}
 
 	public async refreshPeersAfterFork(): Promise<void> {

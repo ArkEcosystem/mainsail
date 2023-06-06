@@ -14,8 +14,6 @@ class QuorumDetails {
 
 	public peersForked = 0;
 
-	public peersDifferentSlot = 0;
-
 	public peersForgingNotAllowed = 0;
 
 	public getQuorum() {
@@ -42,7 +40,6 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	public static async analyze(
 		monitor: Contracts.P2P.NetworkMonitor,
 		repository: Contracts.P2P.PeerRepository,
-		slots: Contracts.Crypto.Slots,
 	): Promise<Contracts.P2P.NetworkState> {
 		// @ts-ignore - app exists but isn't on the interface for now
 		const lastBlock: Contracts.Crypto.IBlock = monitor.app.get<any>(Identifiers.BlockchainService).getLastBlock();
@@ -65,7 +62,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			return new NetworkState(NetworkStateStatus.BelowMinimumPeers, lastBlock);
 		}
 
-		return this.#analyzeNetwork(lastBlock, peers, slots);
+		return this.#analyzeNetwork(lastBlock, peers);
 	}
 
 	public static parse(data: any): Contracts.P2P.NetworkState {
@@ -81,12 +78,11 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		return networkState;
 	}
 
-	static #analyzeNetwork(lastBlock, peers: Contracts.P2P.Peer[], slots): Contracts.P2P.NetworkState {
+	static #analyzeNetwork(lastBlock, peers: Contracts.P2P.Peer[]): Contracts.P2P.NetworkState {
 		const networkState = new NetworkState(NetworkStateStatus.Default, lastBlock);
-		const currentSlot = slots.getSlotNumber();
 
 		for (const peer of peers) {
-			networkState.#update(peer, currentSlot);
+			networkState.#update(peer);
 		}
 
 		return networkState;
@@ -128,7 +124,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		this.#lastBlockId = lastBlock.data.id;
 	}
 
-	#update(peer: Contracts.P2P.Peer, currentSlot: number): void {
+	#update(peer: Contracts.P2P.Peer): void {
 		Utils.assert.defined<number>(peer.state.height);
 		Utils.assert.defined<number>(this.#nodeHeight);
 		if (peer.state.height > this.#nodeHeight) {
@@ -142,11 +138,6 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			} else {
 				this.#quorumDetails.peersQuorum++;
 			}
-		}
-
-		// Just statistics in case something goes wrong.
-		if (peer.state.currentSlot !== currentSlot) {
-			this.#quorumDetails.peersDifferentSlot++;
 		}
 
 		if (!peer.state.forgingAllowed) {
