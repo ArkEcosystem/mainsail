@@ -7,10 +7,10 @@ type BlockChainedDetails = {
 	isChained: boolean;
 };
 
-const getBlockChainedDetails = async (
+const getBlockChainedDetails = (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-): Promise<BlockChainedDetails> => {
+): BlockChainedDetails => {
 	const followsPrevious: boolean = nextBlock.previousBlock === previousBlock.id;
 	const isPlusOne: boolean = nextBlock.height === previousBlock.height + 1;
 
@@ -21,16 +21,16 @@ const getBlockChainedDetails = async (
 	return { followsPrevious, isAfterPrevious, isChained, isPlusOne };
 };
 
-export const isBlockChained = async (
+export const isBlockChained = (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-): Promise<boolean> => (await getBlockChainedDetails(previousBlock, nextBlock)).isChained;
+): boolean => getBlockChainedDetails(previousBlock, nextBlock).isChained;
 
-export const getBlockNotChainedErrorMessage = async (
+export const getBlockNotChainedErrorMessage = (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-): Promise<string> => {
-	const details: BlockChainedDetails = await getBlockChainedDetails(previousBlock, nextBlock);
+): string => {
+	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock);
 
 	if (details.isChained) {
 		throw new Error("Block had no chain error");
