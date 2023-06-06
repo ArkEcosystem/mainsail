@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { sealBlock } from "./block";
@@ -19,7 +19,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
 
-	public async make(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock> {
+	public async make(data: Utils.Mutable<Contracts.Crypto.IBlockData>): Promise<Contracts.Crypto.IBlock> {
 		data.id = await this.idFactory.make(data);
 
 		return this.fromData(data);
@@ -35,7 +35,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 
 	public async fromJson(json: Contracts.Crypto.IBlockJson): Promise<Contracts.Crypto.IBlock> {
 		// @ts-ignore
-		const data: Contracts.Crypto.IBlockData = { ...json };
+		const data: Utils.Mutable<Contracts.Crypto.IBlockData> = { ...json };
 		data.totalAmount = BigNumber.make(data.totalAmount);
 		data.totalFee = BigNumber.make(data.totalFee);
 		data.reward = BigNumber.make(data.reward);
