@@ -2,7 +2,7 @@ import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Utils as KernelUtils } from "@mainsail/kernel";
 
-import { DisconnectInvalidPeers } from "./listeners";
+import { isValidVersion } from "./utils";
 import { isValidPeer } from "./validation";
 
 // @TODO review the implementation
@@ -24,6 +24,9 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -35,7 +38,9 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 	@postConstruct()
 	public initialize(): void {
-		this.events.listen(Enums.CryptoEvent.MilestoneChanged, this.app.resolve(DisconnectInvalidPeers));
+		this.events.listen(Enums.CryptoEvent.MilestoneChanged, {
+			handle: () => this.#disconnectInvalidPeers(),
+		});
 	}
 
 	public isWhitelisted(peer: Contracts.P2P.Peer): boolean {
@@ -113,6 +118,16 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			this.connector.disconnect(newPeer);
 		} finally {
 			this.repository.forgetPendingPeer(peer);
+		}
+	}
+
+	async #disconnectInvalidPeers(): Promise<void> {
+		const peers = this.repository.getPeers();
+
+		for (const peer of peers) {
+			if (!isValidVersion(this.app, peer)) {
+				await this.peerDisposer.dispose(peer);
+			}
 		}
 	}
 }
