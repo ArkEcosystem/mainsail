@@ -31,9 +31,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDiposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 

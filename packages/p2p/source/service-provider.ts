@@ -4,7 +4,6 @@ import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
 import { ChunkCache } from "./chunk-cache";
-import { EventListener } from "./event-listener";
 import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
@@ -32,8 +31,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		this.app.get<EventListener>(Identifiers.PeerEventListener).initialize();
-
 		await this.#buildServer();
 
 		await this.app.get<Server>(Identifiers.P2PServer).boot();
@@ -102,8 +99,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
-
-		this.app.bind(Identifiers.PeerEventListener).to(EventListener).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerTransactionBroadcaster).to(TransactionBroadcaster);
 
