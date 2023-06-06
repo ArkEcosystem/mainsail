@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Services, Utils } from "@mainsail/kernel";
+import { Providers, Services, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";
@@ -27,11 +27,11 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.PeerFactory)
 	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDiposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.PeerChunkCache)
 	private readonly chunkCache!: Contracts.P2P.ChunkCache;
-
-	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -153,10 +153,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						peerErrors[error] = peerErrors[error] || [];
 						peerErrors[error].push(peer);
 
-						await this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
-
-						// eslint-disable-next-line @typescript-eslint/no-floating-promises
-						this.events.dispatch(Enums.PeerEvent.Removed, peer);
+						await this.peerDiposer.dispose(peer);
 					}
 				}),
 			).then(resolvesFirst);

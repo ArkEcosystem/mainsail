@@ -28,6 +28,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDiposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -312,7 +315,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				throw validationError;
 			}
 		} catch (error) {
-			this.handleSocketError(peer, event, error, disconnectOnError);
+			await this.handleSocketError(peer, event, error, disconnectOnError);
 			return;
 		}
 
@@ -334,7 +337,12 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error, disconnect = true): void {
+	private async handleSocketError(
+		peer: Contracts.P2P.Peer,
+		event: string,
+		error: Error,
+		disconnect = true,
+	): Promise<void> {
 		if (!error.name) {
 			return;
 		}
@@ -342,8 +350,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		this.connector.setError(peer, error.name);
 		peer.sequentialErrorCounter++;
 		if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
+			await this.peerDiposer.dispose(peer);
 		}
 
 		switch (error.name) {
@@ -361,8 +368,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				}
 
 				if (disconnect) {
-					// eslint-disable-next-line @typescript-eslint/no-floating-promises
-					this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
+					await this.peerDiposer.dispose(peer);
 				}
 		}
 	}
