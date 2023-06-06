@@ -27,8 +27,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.PeerFactory)
 	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
-	@inject(Identifiers.PeerDisposer)
-	private readonly peerDiposer!: Contracts.P2P.PeerDisposer;
+	@inject(Identifiers.PeerProcessor)
+	private readonly processor!: Contracts.P2P.PeerProcessor;
 
 	@inject(Identifiers.PeerChunkCache)
 	private readonly chunkCache!: Contracts.P2P.ChunkCache;
@@ -153,7 +153,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						peerErrors[error] = peerErrors[error] || [];
 						peerErrors[error].push(peer);
 
-						await this.peerDiposer.dispose(peer);
+						await this.processor.dispose(peer);
 					}
 				}),
 			).then(resolvesFirst);

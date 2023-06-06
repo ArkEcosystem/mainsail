@@ -24,9 +24,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerDisposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
-
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -92,6 +89,14 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		return true;
 	}
 
+	public async dispose(peer: Contracts.P2P.Peer): Promise<void> {
+		this.connector.disconnect(peer);
+		this.repository.forgetPeer(peer);
+		await peer.dispose();
+
+		await this.events.dispatch(Enums.PeerEvent.Removed, peer);
+	}
+
 	async #acceptNewPeer(peer, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
 		if (this.repository.hasPeer(peer.ip)) {
 			return;
@@ -126,7 +131,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		for (const peer of peers) {
 			if (!isValidVersion(this.app, peer)) {
-				await this.peerDisposer.dispose(peer);
+				await this.dispose(peer);
 			}
 		}
 	}

@@ -8,7 +8,6 @@ import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
-import { PeerDiposer } from "./peer-disposer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { Server } from "./socket-server/server";
@@ -93,8 +92,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerCommunicator).to(PeerCommunicator).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
-
-		this.app.bind(Identifiers.PeerDisposer).to(PeerDiposer).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
 

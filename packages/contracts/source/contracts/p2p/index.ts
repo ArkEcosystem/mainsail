@@ -6,7 +6,6 @@ export * from "./network-state";
 export * from "./peer";
 export * from "./peer-communicator";
 export * from "./peer-connector";
-export * from "./peer-disposer";
 export * from "./peer-processor";
 export * from "./peer-repository";
 export * from "./peer-verifier";
