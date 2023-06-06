@@ -3,41 +3,34 @@ import { Contracts } from "@mainsail/contracts";
 type BlockChainedDetails = {
 	followsPrevious: boolean;
 	isPlusOne: boolean;
-	previousSlot: number;
-	nextSlot: number;
-	isAfterPreviousSlot: boolean;
+	isAfterPrevious: boolean;
 	isChained: boolean;
 };
 
 const getBlockChainedDetails = async (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	slots: Contracts.Crypto.Slots,
 ): Promise<BlockChainedDetails> => {
 	const followsPrevious: boolean = nextBlock.previousBlock === previousBlock.id;
 	const isPlusOne: boolean = nextBlock.height === previousBlock.height + 1;
 
-	const previousSlot: number = await slots.getSlotNumber(previousBlock.timestamp);
-	const nextSlot: number = await slots.getSlotNumber(nextBlock.timestamp);
-	const isAfterPreviousSlot: boolean = previousSlot < nextSlot;
+	const isAfterPrevious: boolean = previousBlock.timestamp < nextBlock.timestamp;
 
-	const isChained: boolean = followsPrevious && isPlusOne && isAfterPreviousSlot;
+	const isChained: boolean = followsPrevious && isPlusOne && isAfterPrevious;
 
-	return { followsPrevious, isAfterPreviousSlot, isChained, isPlusOne, nextSlot, previousSlot };
+	return { followsPrevious, isAfterPrevious, isChained, isPlusOne };
 };
 
 export const isBlockChained = async (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	slots: Contracts.Crypto.Slots,
-): Promise<boolean> => (await getBlockChainedDetails(previousBlock, nextBlock, slots)).isChained;
+): Promise<boolean> => (await getBlockChainedDetails(previousBlock, nextBlock)).isChained;
 
 export const getBlockNotChainedErrorMessage = async (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	slots: Contracts.Crypto.Slots,
 ): Promise<string> => {
-	const details: BlockChainedDetails = await getBlockChainedDetails(previousBlock, nextBlock, slots);
+	const details: BlockChainedDetails = await getBlockChainedDetails(previousBlock, nextBlock);
 
 	if (details.isChained) {
 		throw new Error("Block had no chain error");
@@ -54,11 +47,8 @@ export const getBlockNotChainedErrorMessage = async (
 		messageDetail = `previous block id mismatch`;
 	} else if (!details.isPlusOne) {
 		messageDetail = `height is not plus one`;
-	} else if (!details.isAfterPreviousSlot) {
-		messageDetail =
-			`previous slot is not smaller: ` +
-			`${details.previousSlot} (derived from timestamp ${previousBlock.timestamp}) VS ` +
-			`${details.nextSlot} (derived from timestamp ${nextBlock.timestamp})`;
+	} else if (!details.isAfterPrevious) {
+		messageDetail = `previous block is not earlier: ${previousBlock.timestamp} cd ${nextBlock.timestamp} `;
 	}
 
 	return `${messagePrefix}: ${messageDetail}`;
