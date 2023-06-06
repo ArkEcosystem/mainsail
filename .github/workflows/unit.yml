@@ -123,10 +123,6 @@ jobs:
               run: cd packages/fees-managed && pnpm run test
             - name: Test fees-static
               run: cd packages/fees-static && pnpm run test
-            - name: Test forger
-              run: cd packages/forger && pnpm run test
-            - name: Test forger-tracker
-              run: cd packages/forger-tracker && pnpm run test
             - name: Test kernel
               run: cd packages/kernel && pnpm run test
             - name: Test logger-pino
