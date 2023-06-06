@@ -30,13 +30,8 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 		});
 		Utils.assert.defined<Contracts.State.Wallet[]>(validators);
 
-		const forgingInfo: Contracts.Shared.ForgingInfo = await Utils.forgingInfoCalculator.calculateForgingInfo(
-			block.data.timestamp,
-			block.data.height,
-			this.app,
-		);
-
-		const forgingValidator: Contracts.State.Wallet = validators[forgingInfo.currentForger];
+		// TODO: Fix
+		const forgingValidator: Contracts.State.Wallet = validators[0];
 
 		const walletRepository = this.app.getTagged<Contracts.State.WalletRepository>(
 			Identifiers.WalletRepository,
