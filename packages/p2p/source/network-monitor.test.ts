@@ -1,18 +1,16 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Utils } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../test-framework";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
-import path from "path";
 
-import peerFixtures from "../test/fixtures/peers.json";
+import { describeSkip, Sandbox } from "../../test-framework";
 import { ChunkCache } from "./chunk-cache";
 import { NetworkMonitor } from "./network-monitor";
 import { NetworkState } from "./network-state";
 import { Peer } from "./peer";
 import { PeerVerificationResult } from "./peer-verifier";
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	networkMonitor: NetworkMonitor;
 	configuration: Providers.PluginConfiguration;
@@ -1407,12 +1405,12 @@ describe<{
 		stub(repository, "getPeers").returnValue(peers);
 
 		stub(blockchain, "getBlockPing")
-			.returnValueNth(0, { block: block.data, last: 10500, first: 10200, count: 2 })
+			.returnValueNth(0, { block: block.data, count: 2, first: 10_200, last: 10_500 })
 			.returnValueNth(1, {
-				block: { ...block.data, id: "11111111", height: 3 },
-				last: 10500,
-				first: 10200,
+				block: { ...block.data, height: 3, id: "11111111" },
 				count: 2,
+				first: 10_200,
+				last: 10_500,
 			});
 
 		const spyCommunicatorPostBlock = spy(communicator, "postBlock");

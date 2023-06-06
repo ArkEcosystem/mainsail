@@ -42,11 +42,9 @@ describe<{
 	it("#boot - should call the server boot method", async ({ sandbox, serviceProvider }) => {
 		const peerEventListener = { initialize: () => {} };
 
-		const spyPeerEventListenerInitialize = stub(peerEventListener, "initialize");
 		const spyServerInitialize = stub(server, "initialize");
 		const spyServerBoot = stub(server, "boot");
 
-		sandbox.app.bind(Identifiers.PeerEventListener).toConstantValue(peerEventListener);
 		sandbox.app.bind(Identifiers.P2PServer).toConstantValue(server);
 
 		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
@@ -54,7 +52,6 @@ describe<{
 
 		await serviceProvider.boot();
 
-		spyPeerEventListenerInitialize.calledOnce();
 		spyServerInitialize.calledOnce();
 		spyServerBoot.calledOnce();
 	});
@@ -94,6 +91,7 @@ describe<{
 		sandbox,
 		serviceProvider,
 	}) => {
+		sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
 		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
 		serviceProvider.setConfig(config);
 		await serviceProvider.register();

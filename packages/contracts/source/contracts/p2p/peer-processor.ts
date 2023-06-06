@@ -13,4 +13,6 @@ export interface PeerProcessor {
 	validatePeerIp(peer, options?: AcceptNewPeerOptions): boolean;
 
 	isWhitelisted(peer): boolean;
+
+	dispose(peer: Peer): Promise<void>;
 }

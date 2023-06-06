@@ -1,18 +1,22 @@
-import { Contracts } from "@mainsail/contracts";
-import { describe } from "../../test-framework";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
+import { describe, Sandbox } from "../../test-framework";
 import { Peer } from "./peer";
 import { PeerVerificationResult } from "./peer-verifier";
 
 describe<{
+	sandbox: Sandbox;
 	peer: Peer;
 }>("Peer", ({ it, assert, beforeEach, each }) => {
 	const ip = "167.184.53.78";
 	const port = 4000;
 
 	beforeEach((context) => {
-		context.peer = new Peer(ip, port);
+		context.sandbox = new Sandbox();
+		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+
+		context.peer = context.sandbox.app.resolve(Peer).init(ip, port);
 	});
 
 	it("#url - should return http url", ({ peer }) => {
@@ -21,8 +25,8 @@ describe<{
 
 	each(
 		"#url - should return https url when port is multiple of 443",
-		({ dataset }) => {
-			assert.equal(new Peer(ip, dataset).url, `https://${ip}:${dataset}`);
+		({ context, dataset }) => {
+			assert.equal(context.sandbox.app.resolve(Peer).init(ip, dataset).url, `https://${ip}:${dataset}`);
 		},
 		[443, 886],
 	);

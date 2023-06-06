@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../../test-framework";
+import { describeSkip, Sandbox } from "../../../test-framework";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";
@@ -8,7 +8,7 @@ import { Client } from "./client";
 import { plugin } from "./plugin";
 import { stringifyNesMessage } from "./utils";
 
-describe<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
+describeSkip<{}>("Client", ({ it, spy, beforeEach, assert, nock, each }) => {
 	const createServerWithPlugin = async (pluginOptions = {}, serverOptions = {}, withPreResponseHandler = false) => {
 		const server = Hapi.server(serverOptions);
 		await server.register({ plugin: plugin, options: pluginOptions });

@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Types, Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -28,14 +28,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
+	@inject(Identifiers.PeerProcessor)
+	private readonly processor!: Contracts.P2P.PeerProcessor;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.QueueFactory)
-	private readonly createQueue!: Types.QueueFactory;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
@@ -48,8 +45,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	#outgoingRateLimiter!: RateLimiter;
 
-	#postTransactionsQueueByIp: Map<string, Contracts.Kernel.Queue> = new Map();
-
 	@postConstruct()
 	public initialize(): void {
 		this.#outgoingRateLimiter = buildRateLimiter({
@@ -61,10 +56,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			// White listing anybody here means we would not throttle ourselves when sending
 			// them requests, ie we could spam them.
 			whitelist: [],
-		});
-
-		this.events.listen(Enums.PeerEvent.Disconnect, {
-			handle: ({ data }) => this.#postTransactionsQueueByIp.delete(data.peer.ip),
 		});
 	}
 
@@ -92,14 +83,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const postTransactionsTimeout = 10_000;
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
-		if (!this.#postTransactionsQueueByIp.get(peer.ip)) {
-			this.#postTransactionsQueueByIp.set(peer.ip, await this.createQueue());
-		}
-
-		const queue = this.#postTransactionsQueueByIp.get(peer.ip)!;
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		const queue = await peer.getTransactionsQueue();
 		queue.resume();
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		queue.push({
 			handle: async () => {
 				await this.emit(peer, Routes.PostTransactions, { transactions }, postTransactionsTimeout);
@@ -321,7 +306,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				throw validationError;
 			}
 		} catch (error) {
-			this.handleSocketError(peer, event, error, disconnectOnError);
+			await this.handleSocketError(peer, event, error, disconnectOnError);
 			return;
 		}
 
@@ -343,7 +328,12 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error, disconnect = true): void {
+	private async handleSocketError(
+		peer: Contracts.P2P.Peer,
+		event: string,
+		error: Error,
+		disconnect = true,
+	): Promise<void> {
 		if (!error.name) {
 			return;
 		}
@@ -351,8 +341,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		this.connector.setError(peer, error.name);
 		peer.sequentialErrorCounter++;
 		if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
+			await this.processor.dispose(peer);
 		}
 
 		switch (error.name) {
@@ -370,8 +359,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				}
 
 				if (disconnect) {
-					// eslint-disable-next-line @typescript-eslint/no-floating-promises
-					this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
+					await this.processor.dispose(peer);
 				}
 		}
 	}

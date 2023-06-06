@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../../../test-framework";
 
+import { describe, Sandbox } from "../../../../test-framework";
 import { Peer } from "../../peer";
 import { GetPeersController } from "./get-peers";
 
@@ -14,17 +14,18 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(peerRepository);
+		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
 
 		context.controller = context.sandbox.app.resolve(GetPeersController);
 	});
 
-	it("should return the peers except connected peer sorted by latency", async ({ controller }) => {
+	it("should return the peers except connected peer sorted by latency", async ({ controller, sandbox }) => {
 		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("181.177.54.4", 4000),
-			new Peer("182.177.54.4", 4000),
-			new Peer("183.177.54.4", 4000),
-			new Peer("184.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("180.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("181.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("182.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("183.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("184.177.54.4", 4000),
 		];
 		peers[0].latency = 197_634;
 		peers[1].latency = 120_000;
@@ -47,19 +48,19 @@ describe<{
 		);
 	});
 
-	it("should return the peers except forwarded peer sorted by latency", async ({ controller }) => {
+	it("should return the peers except forwarded peer sorted by latency", async ({ controller, sandbox }) => {
 		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("181.177.54.4", 4000),
-			new Peer("182.177.54.4", 4000),
-			new Peer("183.177.54.4", 4000),
-			new Peer("184.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("180.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("181.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("182.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("183.177.54.4", 4000),
+			sandbox.app.resolve(Peer).init("184.177.54.4", 4000),
 		];
-		peers[0].latency = 197634;
-		peers[1].latency = 120000;
-		peers[2].latency = 117634;
-		peers[3].latency = 297600;
-		peers[4].latency = 1197634;
+		peers[0].latency = 197_634;
+		peers[1].latency = 120_000;
+		peers[2].latency = 117_634;
+		peers[3].latency = 297_600;
+		peers[4].latency = 1_197_634;
 		stub(peerRepository, "getPeers").returnValue(peers);
 
 		const request = {

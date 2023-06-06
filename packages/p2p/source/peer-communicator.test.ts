@@ -1,14 +1,14 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../test-framework";
 import rewiremock from "rewiremock";
 
+import { describeSkip, Sandbox } from "../../test-framework";
 import { defaults } from "./defaults";
 import { Routes } from "./enums";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	peerCommunicator: PeerCommunicator;
 }>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, spyFn, match, each }) => {

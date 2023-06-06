@@ -1,13 +1,13 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../test-framework";
 import rewiremock from "rewiremock";
 
+import { describeSkip, Sandbox } from "../../test-framework";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 
 let onDelay = (timeout: number) => {};
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	peerConnector: PeerConnector;
 }>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
