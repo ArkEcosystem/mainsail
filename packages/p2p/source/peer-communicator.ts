@@ -28,9 +28,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@inject(Identifiers.PeerProcessor)
-	private readonly processor!: Contracts.P2P.PeerProcessor;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -338,10 +335,12 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			return;
 		}
 
+		const processor = this.app.get<Contracts.P2P.PeerProcessor>(Identifiers.PeerProcessor);
+
 		this.connector.setError(peer, error.name);
 		peer.sequentialErrorCounter++;
 		if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
-			await this.processor.dispose(peer);
+			await processor.dispose(peer);
 		}
 
 		switch (error.name) {
@@ -359,7 +358,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				}
 
 				if (disconnect) {
-					await this.processor.dispose(peer);
+					await processor.dispose(peer);
 				}
 		}
 	}
