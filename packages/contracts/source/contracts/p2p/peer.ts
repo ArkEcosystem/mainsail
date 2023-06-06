@@ -33,6 +33,7 @@ export interface Peer {
 	toBroadcast(): PeerBroadcast;
 
 	getTransactionsQueue(): Promise<Queue>;
+	dispose(): Promise<void>;
 }
 
 export interface PeerBroadcast {

@@ -74,4 +74,10 @@ export class Peer implements Contracts.P2P.Peer {
 
 		return this.#transactionsQueue;
 	}
+
+	public async dispose(): Promise<void> {
+		if (this.#transactionsQueue) {
+			await this.#transactionsQueue.stop();
+		}
+	}
 }
