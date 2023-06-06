@@ -14,8 +14,6 @@ class QuorumDetails {
 
 	public peersForked = 0;
 
-	public peersForgingNotAllowed = 0;
-
 	public getQuorum() {
 		const quorum = this.peersQuorum / (this.peersQuorum + this.peersNoQuorum);
 
@@ -138,10 +136,6 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			} else {
 				this.#quorumDetails.peersQuorum++;
 			}
-		}
-
-		if (!peer.state.forgingAllowed) {
-			this.#quorumDetails.peersForgingNotAllowed++;
 		}
 	}
 }

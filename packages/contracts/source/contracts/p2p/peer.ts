@@ -43,8 +43,6 @@ export interface PeerBroadcast {
 
 export interface PeerState {
 	height: number | undefined;
-	forgingAllowed: boolean | undefined;
-	currentSlot: number | undefined;
 	header: Record<string, any>; // @@TODO rename, those are block headers but the name is horrible
 }
 

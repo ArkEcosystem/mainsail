@@ -27,8 +27,6 @@ export class Peer implements Contracts.P2P.Peer {
 	public verificationResult: PeerVerificationResult | undefined;
 
 	public state: Contracts.P2P.PeerState = {
-		currentSlot: undefined,
-		forgingAllowed: undefined,
 		header: {},
 		height: undefined,
 	};
