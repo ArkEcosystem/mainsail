@@ -11,7 +11,7 @@ describe<{
 	lastBlock;
 	stateStore;
 	logger;
-	peerNetworkMonitor;
+	blockDownloader;
 	application;
 	queue: any;
 	slots: any;
@@ -43,7 +43,7 @@ describe<{
 			info: () => {},
 			warning: () => {},
 		};
-		context.peerNetworkMonitor = {
+		context.blockDownloader = {
 			downloadBlocksFromHeight: () => {},
 		};
 
@@ -58,7 +58,7 @@ describe<{
 		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
+		context.container.bind(Identifiers.PeerBlockDownloader).toConstantValue(context.blockDownloader);
 	});
 
 	it("should do nothing when blockchain.isStopped", async (context) => {
@@ -75,7 +75,7 @@ describe<{
 	it("should do nothing when stateStore.getLastDownloadedBlock !== lastDownloadedBlock", async (context) => {
 		const downloadBlocks = context.container.resolve<DownloadBlocks>(DownloadBlocks);
 
-		stub(context.peerNetworkMonitor, "downloadBlocksFromHeight").resolvedValue(async () => {
+		stub(context.blockDownloader, "downloadBlocksFromHeight").resolvedValue(async () => {
 			await delay(100);
 			return [];
 		});
@@ -96,7 +96,7 @@ describe<{
 		const downloadBlocks = context.container.resolve<DownloadBlocks>(DownloadBlocks);
 
 		stub(context.queue, "size").returnValue(0);
-		stub(context.peerNetworkMonitor, "downloadBlocksFromHeight").returnValue([]);
+		stub(context.blockDownloader, "downloadBlocksFromHeight").returnValue([]);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const setNoBlockCounterSpy = spy(context.stateStore, "setNoBlockCounter");
 
@@ -112,7 +112,7 @@ describe<{
 
 		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(context.queue, "size").returnValue(0);
-		stub(context.peerNetworkMonitor, "downloadBlocksFromHeight").returnValue([{ height: 11 }]);
+		stub(context.blockDownloader, "downloadBlocksFromHeight").returnValue([{ height: 11 }]);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const setNoBlockCounterSpy = spy(context.stateStore, "setNoBlockCounter");
 
@@ -126,7 +126,7 @@ describe<{
 	it("should enqueueBlocks and dispatch DOWNLOADED when downloadBlocksFromHeight returns chained blocks", async (context) => {
 		const downloadBlocks = context.container.resolve<DownloadBlocks>(DownloadBlocks);
 
-		stub(context.peerNetworkMonitor, "downloadBlocksFromHeight").returnValue([
+		stub(context.blockDownloader, "downloadBlocksFromHeight").returnValue([
 			{
 				height: context.lastBlock.data.height + 1,
 				previousBlock: context.lastBlock.data.id,
@@ -147,7 +147,7 @@ describe<{
 	it("should dispatch NOBLOCK when enqueueBlocks throws exception", async (context) => {
 		const downloadBlocks = context.container.resolve<DownloadBlocks>(DownloadBlocks);
 
-		stub(context.peerNetworkMonitor, "downloadBlocksFromHeight").returnValue([
+		stub(context.blockDownloader, "downloadBlocksFromHeight").returnValue([
 			{
 				height: context.lastBlock.data.height + 1,
 				previousBlock: context.lastBlock.data.id,
