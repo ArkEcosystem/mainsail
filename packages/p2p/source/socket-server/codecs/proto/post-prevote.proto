@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package postPrevote;
+
+message PostPrevoteRequest {
+    bytes prevote = 1;
+    shared.Headers headers = 2;
+}
+
+message PostPrevoteResponse {}
