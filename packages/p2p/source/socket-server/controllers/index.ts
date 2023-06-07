@@ -3,4 +3,5 @@ export * from "./get-common-blocks";
 export * from "./get-peers";
 export * from "./get-status";
 export * from "./post-block";
+export * from "./post-prevote";
 export * from "./post-transactions";
