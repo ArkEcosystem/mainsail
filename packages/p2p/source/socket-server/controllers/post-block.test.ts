@@ -1,8 +1,8 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../../../test-framework";
 import rewiremock from "rewiremock";
 
+import { describe, Sandbox } from "../../../../test-framework";
 import { PostBlockController } from "./post-block";
 
 const utilsMock = {
@@ -40,7 +40,6 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue(deserializer);
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(slots);
 
 		context.controller = context.sandbox.app.resolve(PostBlockControllerProxy);
 	});
@@ -94,7 +93,7 @@ describe<{
 		const spyHandleIncommingBlock = spy(blockchain, "handleIncomingBlock");
 
 		assert.equal(
-			await controller.handle({ payload: { block: Buffer.from("") }, info: { remoteAddress: "127.0.0.1" } }, {}),
+			await controller.handle({ info: { remoteAddress: "127.0.0.1" }, payload: { block: Buffer.from("") } }, {}),
 			{
 				height: 100,
 				status: true,
