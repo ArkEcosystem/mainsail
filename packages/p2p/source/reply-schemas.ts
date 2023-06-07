@@ -193,6 +193,9 @@ export const replySchemas = {
 		},
 		type: "object",
 	},
+	postPrevote: {
+		type: "object",
+	},
 	postTransactions: {
 		type: "array",
 	},
