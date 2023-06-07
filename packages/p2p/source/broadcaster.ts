@@ -94,17 +94,22 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	async broadcastProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {}
 
 	public async broadcastPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
-		const peers = this.#getPeersForBroadcast();
-
 		// TODO: Remove once serialized field is on IPrevote
 		const serialized = await this.messageSerializer.serializePrevote(prevote);
 
-		const promises = peers.map((peer) => this.communicator.postPrevote(peer, serialized));
+		const promises = this.#getPeersForBroadcast().map((peer) => this.communicator.postPrevote(peer, serialized));
 
 		await Promise.all(promises);
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {}
+	async broadcastPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
+		// TODO: Remove once serialized field is on IPrecommit
+		const serialized = await this.messageSerializer.serializePrecommit(precommit);
+
+		const promises = this.#getPeersForBroadcast().map((peer) => this.communicator.postPrecommit(peer, serialized));
+
+		await Promise.all(promises);
+	}
 
 	#getPeersForBroadcast(): Contracts.P2P.Peer[] {
 		const maxPeersBroadcast: number = this.configuration.getRequired<number>("maxPeersBroadcast");
