@@ -93,6 +93,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		});
 	}
 
+	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
+		await this.emit(peer, Routes.PostProposal, { proposal }, 10_000);
+	}
+
 	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
 		await this.emit(peer, Routes.PostPrevote, { prevote }, 10_000);
 	}

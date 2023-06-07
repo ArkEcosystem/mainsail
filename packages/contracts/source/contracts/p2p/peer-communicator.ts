@@ -6,6 +6,7 @@ export interface PeerCommunicator {
 
 	postBlock(peer: Peer, block: IBlock);
 	postTransactions(peer: Peer, transactions: Buffer[]): Promise<any>;
+	postProposal(peer: Peer, proposal: Buffer): Promise<any>;
 	postPrevote(peer: Peer, prevote: Buffer): Promise<any>;
 	postPrecommit(peer: Peer, prevote: Buffer): Promise<any>;
 
