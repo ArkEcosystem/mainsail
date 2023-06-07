@@ -3,6 +3,7 @@ import { getCommonBlocks } from "./get-common-blocks";
 import { getPeers } from "./get-peers";
 import { getStatus } from "./get-status";
 import { postBlock } from "./post-block";
+import { postPrevote } from "./post-prevote";
 
 export const Schemas = {
 	getBlocks,
@@ -10,4 +11,5 @@ export const Schemas = {
 	getPeers,
 	getStatus,
 	postBlock,
+	postPrevote,
 };
