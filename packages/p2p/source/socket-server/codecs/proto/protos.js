@@ -6039,6 +6039,434 @@ $root.postPrevote = (function() {
     return postPrevote;
 })();
 
+$root.postProposal = (function() {
+
+    /**
+     * Namespace postProposal.
+     * @exports postProposal
+     * @namespace
+     */
+    var postProposal = {};
+
+    postProposal.PostProposalRequest = (function() {
+
+        /**
+         * Properties of a PostProposalRequest.
+         * @memberof postProposal
+         * @interface IPostProposalRequest
+         * @property {Uint8Array|null} [proposal] PostProposalRequest proposal
+         * @property {shared.IHeaders|null} [headers] PostProposalRequest headers
+         */
+
+        /**
+         * Constructs a new PostProposalRequest.
+         * @memberof postProposal
+         * @classdesc Represents a PostProposalRequest.
+         * @implements IPostProposalRequest
+         * @constructor
+         * @param {postProposal.IPostProposalRequest=} [properties] Properties to set
+         */
+        function PostProposalRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PostProposalRequest proposal.
+         * @member {Uint8Array} proposal
+         * @memberof postProposal.PostProposalRequest
+         * @instance
+         */
+        PostProposalRequest.prototype.proposal = $util.newBuffer([]);
+
+        /**
+         * PostProposalRequest headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postProposal.PostProposalRequest
+         * @instance
+         */
+        PostProposalRequest.prototype.headers = null;
+
+        /**
+         * Creates a new PostProposalRequest instance using the specified properties.
+         * @function create
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {postProposal.IPostProposalRequest=} [properties] Properties to set
+         * @returns {postProposal.PostProposalRequest} PostProposalRequest instance
+         */
+        PostProposalRequest.create = function create(properties) {
+            return new PostProposalRequest(properties);
+        };
+
+        /**
+         * Encodes the specified PostProposalRequest message. Does not implicitly {@link postProposal.PostProposalRequest.verify|verify} messages.
+         * @function encode
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {postProposal.IPostProposalRequest} message PostProposalRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostProposalRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.proposal);
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostProposalRequest message, length delimited. Does not implicitly {@link postProposal.PostProposalRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {postProposal.IPostProposalRequest} message PostProposalRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostProposalRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostProposalRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postProposal.PostProposalRequest} PostProposalRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostProposalRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postProposal.PostProposalRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.proposal = reader.bytes();
+                        break;
+                    }
+                case 2: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostProposalRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postProposal.PostProposalRequest} PostProposalRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostProposalRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostProposalRequest message.
+         * @function verify
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostProposalRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.proposal != null && message.hasOwnProperty("proposal"))
+                if (!(message.proposal && typeof message.proposal.length === "number" || $util.isString(message.proposal)))
+                    return "proposal: buffer expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a PostProposalRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postProposal.PostProposalRequest} PostProposalRequest
+         */
+        PostProposalRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.postProposal.PostProposalRequest)
+                return object;
+            var message = new $root.postProposal.PostProposalRequest();
+            if (object.proposal != null)
+                if (typeof object.proposal === "string")
+                    $util.base64.decode(object.proposal, message.proposal = $util.newBuffer($util.base64.length(object.proposal)), 0);
+                else if (object.proposal.length >= 0)
+                    message.proposal = object.proposal;
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postProposal.PostProposalRequest.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PostProposalRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {postProposal.PostProposalRequest} message PostProposalRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostProposalRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if (options.bytes === String)
+                    object.proposal = "";
+                else {
+                    object.proposal = [];
+                    if (options.bytes !== Array)
+                        object.proposal = $util.newBuffer(object.proposal);
+                }
+                object.headers = null;
+            }
+            if (message.proposal != null && message.hasOwnProperty("proposal"))
+                object.proposal = options.bytes === String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
+        };
+
+        /**
+         * Converts this PostProposalRequest to JSON.
+         * @function toJSON
+         * @memberof postProposal.PostProposalRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostProposalRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for PostProposalRequest
+         * @function getTypeUrl
+         * @memberof postProposal.PostProposalRequest
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        PostProposalRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/postProposal.PostProposalRequest";
+        };
+
+        return PostProposalRequest;
+    })();
+
+    postProposal.PostProposalResponse = (function() {
+
+        /**
+         * Properties of a PostProposalResponse.
+         * @memberof postProposal
+         * @interface IPostProposalResponse
+         */
+
+        /**
+         * Constructs a new PostProposalResponse.
+         * @memberof postProposal
+         * @classdesc Represents a PostProposalResponse.
+         * @implements IPostProposalResponse
+         * @constructor
+         * @param {postProposal.IPostProposalResponse=} [properties] Properties to set
+         */
+        function PostProposalResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new PostProposalResponse instance using the specified properties.
+         * @function create
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {postProposal.IPostProposalResponse=} [properties] Properties to set
+         * @returns {postProposal.PostProposalResponse} PostProposalResponse instance
+         */
+        PostProposalResponse.create = function create(properties) {
+            return new PostProposalResponse(properties);
+        };
+
+        /**
+         * Encodes the specified PostProposalResponse message. Does not implicitly {@link postProposal.PostProposalResponse.verify|verify} messages.
+         * @function encode
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {postProposal.IPostProposalResponse} message PostProposalResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostProposalResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostProposalResponse message, length delimited. Does not implicitly {@link postProposal.PostProposalResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {postProposal.IPostProposalResponse} message PostProposalResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostProposalResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostProposalResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postProposal.PostProposalResponse} PostProposalResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostProposalResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postProposal.PostProposalResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostProposalResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postProposal.PostProposalResponse} PostProposalResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostProposalResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostProposalResponse message.
+         * @function verify
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostProposalResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a PostProposalResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postProposal.PostProposalResponse} PostProposalResponse
+         */
+        PostProposalResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.postProposal.PostProposalResponse)
+                return object;
+            return new $root.postProposal.PostProposalResponse();
+        };
+
+        /**
+         * Creates a plain object from a PostProposalResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {postProposal.PostProposalResponse} message PostProposalResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostProposalResponse.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this PostProposalResponse to JSON.
+         * @function toJSON
+         * @memberof postProposal.PostProposalResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostProposalResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for PostProposalResponse
+         * @function getTypeUrl
+         * @memberof postProposal.PostProposalResponse
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        PostProposalResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/postProposal.PostProposalResponse";
+        };
+
+        return PostProposalResponse;
+    })();
+
+    return postProposal;
+})();
+
 $root.postTransactions = (function() {
 
     /**
