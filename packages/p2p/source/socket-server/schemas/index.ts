@@ -5,6 +5,7 @@ import { getStatus } from "./get-status";
 import { postBlock } from "./post-block";
 import { postPrecommit } from "./post-precommit";
 import { postPrevote } from "./post-prevote";
+import { postProposal } from "./post-proposal";
 
 export const Schemas = {
 	getBlocks,
@@ -14,4 +15,5 @@ export const Schemas = {
 	postBlock,
 	postPrecommit,
 	postPrevote,
+	postProposal,
 };

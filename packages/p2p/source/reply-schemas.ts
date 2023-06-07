@@ -199,6 +199,9 @@ export const replySchemas = {
 	postPrevote: {
 		type: "object",
 	},
+	postProposal: {
+		type: "object",
+	},
 	postTransactions: {
 		type: "array",
 	},
