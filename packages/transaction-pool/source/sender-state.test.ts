@@ -1,8 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { BlockTimeCalculator } from "@mainsail/crypto-time/source/block-time-calculator";
-import { Slots } from "@mainsail/crypto-time/source/slots";
 import { Enums } from "@mainsail/kernel";
 
 import { describe } from "../../test-framework";
@@ -17,7 +15,6 @@ describe<{
 	container: Container;
 	transaction: Contracts.Crypto.ITransaction;
 	config: Configuration;
-	slots: Slots;
 	walletRepository: any;
 }>("SenderState", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
@@ -50,23 +47,8 @@ describe<{
 		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.emitter);
 		context.container.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container
-			.bind(Identifiers.Cryptography.Time.BlockTimeCalculator)
-			.to(BlockTimeCalculator)
-			.inSingletonScope();
-		context.container.bind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
-			getBlockTimeLookup: (height: number) => {
-				switch (height) {
-					case 1:
-						return 0;
-					default:
-						throw new Error(`Test scenarios should not hit this line`);
-				}
-			},
-		});
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
-		context.slots = context.container.resolve(Slots);
 
 		// @ts-ignore
 		context.transaction = {
@@ -112,7 +94,6 @@ describe<{
 		const senderState = context.container.resolve(SenderState);
 
 		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
-		stub(context.slots, "getTime").returnValue(9999);
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 
 		const promise = senderState.apply(context.transaction);
@@ -129,7 +110,6 @@ describe<{
 		const senderState = context.container.resolve(SenderState);
 
 		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.expirationService, "isExpired").returnValueOnce(true);
 		stub(context.expirationService, "getExpirationHeight").returnValueOnce(10);
 		const eventSpy = spy(context.emitter, "dispatch");
@@ -152,7 +132,6 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
 		const triggersStub = stub(context.triggers, "call").resolvedValue(false); // verifyTransaction
@@ -179,7 +158,6 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData");
 		const triggerStub = stub(context.triggers, "call");
@@ -222,7 +200,6 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 
@@ -263,7 +240,6 @@ describe<{
 		const handler = {};
 
 		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.slots, "getTime").returnValue(13_600);
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 
