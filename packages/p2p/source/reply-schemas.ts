@@ -193,6 +193,9 @@ export const replySchemas = {
 		},
 		type: "object",
 	},
+	postPrecommit: {
+		type: "object",
+	},
 	postPrevote: {
 		type: "object",
 	},
