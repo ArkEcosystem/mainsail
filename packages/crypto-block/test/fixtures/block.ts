@@ -42,7 +42,7 @@ export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
 	id: "d1c09a297ea886d281377c5240bca65bbbaebabd78556f1cfad6d37e07fa39a8",
 	numberOfTransactions: 2,
 	payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-	payloadLength: 0,
+	payloadLength: 186 * 2 + 8,
 	previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 	reward: BigNumber.make(3),
 	timestamp: 0,
