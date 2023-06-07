@@ -63,6 +63,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			peer,
 			Routes.PostBlock,
 			{
+				// TODO: move serialization out
 				block: await this.serializer.serializeWithTransactions({
 					...block.data,
 					transactions: block.transactions.map((tx) => tx.data),
@@ -81,8 +82,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
 		const queue = await peer.getTransactionsQueue();
-		queue.resume();
-		queue.push({
+		void queue.resume();
+		void queue.push({
 			handle: async () => {
 				await this.emit(peer, Routes.PostTransactions, { transactions }, postTransactionsTimeout);
 				await delay(Math.ceil(1000 / postTransactionsRateLimit));
@@ -90,6 +91,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				// optimized here because default throttling would not be effective for postTransactions
 			},
 		});
+	}
+
+	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
+		await this.emit(peer, Routes.PostPrevote, { prevote }, 10_000);
 	}
 
 	// ! do not rely on parameter timeoutMsec as guarantee that ping method will resolve within it !

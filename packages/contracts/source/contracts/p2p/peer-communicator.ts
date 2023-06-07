@@ -8,6 +8,8 @@ export interface PeerCommunicator {
 
 	postTransactions(peer: Peer, transactions: Buffer[]): Promise<any>;
 
+	postPrevote(peer: Peer, prevote: Buffer): Promise<any>;
+
 	ping(peer: Peer, timeoutMsec: number, force?: boolean): Promise<any>;
 
 	pingPorts(peer: Peer): Promise<void>;
