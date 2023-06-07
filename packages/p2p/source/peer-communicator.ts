@@ -97,6 +97,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		await this.emit(peer, Routes.PostPrevote, { prevote }, 10_000);
 	}
 
+	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
+		await this.emit(peer, Routes.PostPrecommit, { precommit }, 10_000);
+	}
+
 	// ! do not rely on parameter timeoutMsec as guarantee that ping method will resolve within it !
 	// ! peerVerifier.checkState can take more time !
 	// TODO refactor ?
