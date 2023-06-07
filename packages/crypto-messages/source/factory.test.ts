@@ -11,7 +11,7 @@ describe<{
 	factory: MessageFactory;
 	verifier: Verifier;
 	identity: Types.Identity;
-}>("Verifier", ({ it, assert, beforeEach }) => {
+}>("Factory", ({ it, assert, beforeEach }) => {
 	const mnemonic =
 		"question measure debris increase false feature journey height fun agent coach office only shell nation skill track upset distance behave easy devote floor shy";
 
@@ -49,7 +49,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"af9601b4797ab6712531dd5787c8c2d26be798899975b4573727caa11eb926e62e3c04a534503997f9c0aa68a21e87700729aa49371e0d2a3e1f909edbc9d49902a929f5213fbe87f8ee802c6e6775d1ab199a07e9d45aa5682f4c76c592d8f7",
+			"837232059fe615393b5827e239ab301ea03fab99668ce7924933073698644359b86b24fba05380cf2c65753b3e6b52230eb5bd07283b72b4e2ca782117840cc47e0665ee42aed76fd43717a29a68d86d4a2406d4ab69f093ab62aa9244f7327f",
 		);
 		assert.true((await verifier.verifyProposal(proposal.toData())).verified);
 	});
@@ -68,7 +68,7 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"b6ea5c04971f3c5ca1b553c8f0f0bce9640f07b71ce4ef1651f5d7eb1ac0c5a08db09ae795d5988876ea92c3b515e627097afaf316583e610fffefdb94262576b5418f0eeaef8d4437d9134b21182b8797ad0a499530b0cd92cd6387ae682b90",
+			"8c32ffc4d5fe8aa9a3b3a5623c1b805a50095bc5b53940abc62d22f84e55fab406ba530b3dc3d8082ed9bec0c660094a010c2320e5a201612b9fbac78b0d2664b3e7bc1e4442734ab8a3fc378567c0d8109ba0192da90c6faaa0e215be842ee0",
 		);
 		assert.true((await verifier.verifyPrecommit(precommit.toData())).verified);
 	});
@@ -87,7 +87,7 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"b6ea5c04971f3c5ca1b553c8f0f0bce9640f07b71ce4ef1651f5d7eb1ac0c5a08db09ae795d5988876ea92c3b515e627097afaf316583e610fffefdb94262576b5418f0eeaef8d4437d9134b21182b8797ad0a499530b0cd92cd6387ae682b90",
+			"8c32ffc4d5fe8aa9a3b3a5623c1b805a50095bc5b53940abc62d22f84e55fab406ba530b3dc3d8082ed9bec0c660094a010c2320e5a201612b9fbac78b0d2664b3e7bc1e4442734ab8a3fc378567c0d8109ba0192da90c6faaa0e215be842ee0",
 		);
 		assert.true((await verifier.verifyPrevote(prevote.toData())).verified);
 	});

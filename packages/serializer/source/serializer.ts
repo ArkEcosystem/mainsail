@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
@@ -65,6 +66,14 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				this.signatureSerializer.serialize(result, data[property]);
 			}
 
+			if (schema.type === "hex") {
+				Utils.assert.string(data[property]["serialized"]);
+
+				const serialized = Buffer.from(data[property]["serialized"], "hex");
+				result.writeUint32(serialized.length);
+				result.writeBytes(serialized);
+			}
+
 			if (schema.type === "transactions") {
 				for (const transaction of data[property].values()) {
 					const serialized: Buffer = await this.transactionUtils.toBytes(transaction);
@@ -110,6 +119,10 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 			if (schema.type === "signature") {
 				target[property] = this.signatureSerializer.deserialize(source).toString("hex");
+			}
+
+			if (schema.type === "hex") {
+				target[property] = source.readBytes(source.readUint32()).toString("hex");
 			}
 
 			if (schema.type === "transactions") {

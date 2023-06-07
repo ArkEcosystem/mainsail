@@ -8,6 +8,7 @@ export type PropertyType =
 	| "hash"
 	| "publicKey"
 	| "signature"
+	| "hex"
 	| "transactions";
 
 export interface SerializationSchema {
