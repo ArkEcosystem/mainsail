@@ -3,6 +3,7 @@ import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
+import { BlockDownloader } from "./block-downloader";
 import { Broadcaster } from "./broadcaster";
 import { ChunkCache } from "./chunk-cache";
 import { NetworkMonitor } from "./network-monitor";
@@ -94,6 +95,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 
