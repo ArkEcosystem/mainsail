@@ -5,6 +5,7 @@ import { getStatus } from "./get-status";
 import { postBlock } from "./post-block";
 import { postPrecommit } from "./post-precommit";
 import { postPrevote } from "./post-prevote";
+import { postProposal } from "./post-proposal";
 import { postTransactions } from "./post-transactions";
 
 export const Codecs = {
@@ -15,5 +16,6 @@ export const Codecs = {
 	postBlock,
 	postPrecommit,
 	postPrevote,
+	postProposal,
 	postTransactions,
 };
