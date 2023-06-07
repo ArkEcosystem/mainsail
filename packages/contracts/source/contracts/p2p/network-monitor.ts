@@ -1,4 +1,4 @@
-import { IBlock, IBlockData } from "../crypto";
+import { IBlockData } from "../crypto";
 import { NetworkState } from "./network-state";
 
 export interface NetworkStatus {
@@ -29,7 +29,6 @@ export interface NetworkMonitor {
 	refreshPeersAfterFork(): Promise<void>;
 	checkNetworkHealth(): Promise<NetworkStatus>;
 	downloadBlocksFromHeight(fromBlockHeight: number, maxParallelDownloads?: number): Promise<IBlockData[]>;
-	broadcastBlock(block: IBlock): Promise<void>;
 	isColdStart(): boolean;
 	completeColdStart(): void;
 }

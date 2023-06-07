@@ -21,8 +21,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.PeerNetworkMonitor)
-	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
+	@inject(Identifiers.PeerBroadcaster)
+	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
 	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
@@ -120,7 +120,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		if (!!lastProcessResult && lastProcessedBlock) {
 			if (this.stateStore.isStarted() && this.stateMachine.getState() === "newBlock") {
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.networkMonitor.broadcastBlock(lastProcessedBlock);
+				this.broadcaster.broadcastBlock(lastProcessedBlock);
 			}
 		} else {
 			this.blockchain.clearQueue();

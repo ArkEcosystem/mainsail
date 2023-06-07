@@ -5,8 +5,8 @@ import { Broadcaster } from "./broadcaster";
 
 describe<{
 	sandbox: Sandbox;
-	transactionBroadcaster: Broadcaster;
-}>("TransactionBroadcaster", ({ it, assert, beforeEach, stub }) => {
+	broadcaster: Broadcaster;
+}>("Broadcaster", ({ it, assert, beforeEach, stub }) => {
 	const logger = { debug: () => {}, warning: () => {} };
 	const configuration = { getRequired: () => {} };
 	const repository = { getPeers: () => {} };
@@ -22,23 +22,21 @@ describe<{
 		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);
 
-		context.transactionBroadcaster = context.sandbox.app.resolve(Broadcaster);
+		context.broadcaster = context.sandbox.app.resolve(Broadcaster);
 	});
 
-	it("#broadcastTransactions - should warn when attempting to broadcast empty array", async ({
-		transactionBroadcaster,
-	}) => {
+	it("#broadcastTransactions - should warn when attempting to broadcast empty array", async ({ broadcaster }) => {
 		const spyLoggerWarning = stub(logger, "warning");
 		const spyCommunicatorPostTransactions = stub(communicator, "postTransactions");
 
-		await transactionBroadcaster.broadcastTransactions([]);
+		await broadcaster.broadcastTransactions([]);
 
 		spyLoggerWarning.calledOnce();
 		spyLoggerWarning.calledWith("Broadcasting 0 transactions");
 		spyCommunicatorPostTransactions.neverCalled();
 	});
 
-	it("#broadcastTransactions - should broadcast transaction to peers", async ({ transactionBroadcaster }) => {
+	it("#broadcastTransactions - should broadcast transaction to peers", async ({ broadcaster }) => {
 		const peers = [{}, {}, {}];
 		const transactions = [{}];
 
@@ -49,7 +47,7 @@ describe<{
 		const spyRepositoryGetPeers = stub(repository, "getPeers").returnValue(peers);
 		const spySerialzierSerialzie = stub(serializer, "serialize").returnValue(Buffer.from(""));
 
-		await transactionBroadcaster.broadcastTransactions(transactions as Contracts.Crypto.ITransaction[]);
+		await broadcaster.broadcastTransactions(transactions as Contracts.Crypto.ITransaction[]);
 
 		spyLoggerWarning.neverCalled();
 		spyLoggerDebug.calledWith("Broadcasting 1 transaction to 3 peers");
