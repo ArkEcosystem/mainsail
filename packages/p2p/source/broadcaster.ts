@@ -5,7 +5,7 @@ import { Providers, Utils } from "@mainsail/kernel";
 import { PeerCommunicator } from "./peer-communicator";
 
 @injectable()
-export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcaster {
+export class Broadcaster implements Contracts.P2P.Broadcaster {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 

@@ -1,5 +1,5 @@
 import { ITransaction } from "../crypto";
 
-export interface TransactionBroadcaster {
+export interface Broadcaster {
 	broadcastTransactions(transactions: ITransaction[]): Promise<void>;
 }

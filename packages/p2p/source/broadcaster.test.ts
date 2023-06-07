@@ -1,11 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../test-framework";
 
-import { TransactionBroadcaster } from "./transaction-broadcaster";
+import { describe, Sandbox } from "../../test-framework";
+import { Broadcaster } from "./broadcaster";
 
 describe<{
 	sandbox: Sandbox;
-	transactionBroadcaster: TransactionBroadcaster;
+	transactionBroadcaster: Broadcaster;
 }>("TransactionBroadcaster", ({ it, assert, beforeEach, stub }) => {
 	const logger = { debug: () => {}, warning: () => {} };
 	const configuration = { getRequired: () => {} };
@@ -22,7 +22,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);
 
-		context.transactionBroadcaster = context.sandbox.app.resolve(TransactionBroadcaster);
+		context.transactionBroadcaster = context.sandbox.app.resolve(Broadcaster);
 	});
 
 	it("#broadcastTransactions - should warn when attempting to broadcast empty array", async ({
