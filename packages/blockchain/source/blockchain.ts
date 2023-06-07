@@ -159,19 +159,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	}
 
 	public async handleIncomingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): Promise<void> {
-		// if (fromForger) {
-		// 	const minimumMs = 2000;
-		// 	if (currentSlot !== receivedSlot || timeLeftInMs < minimumMs) {
-		// 		this.logger.info(`Discarded block ${block.height.toLocaleString()} because it was received too late.`);
-		// 		return;
-		// 	}
-		// }
-
-		// if (receivedSlot > currentSlot) {
-		// 	this.logger.info(`Discarded block ${block.height.toLocaleString()} because it takes a future slot.`);
-		// 	return;
-		// }
-
 		this.pushPingBlock(block, fromForger);
 
 		if (this.stateStore.isStarted()) {
