@@ -2166,6 +2166,204 @@ export namespace postBlock {
     }
 }
 
+/** Namespace postPrecommit. */
+export namespace postPrecommit {
+
+    /** Properties of a PostPrecommitRequest. */
+    interface IPostPrecommitRequest {
+
+        /** PostPrecommitRequest prevote */
+        prevote?: (Uint8Array|null);
+
+        /** PostPrecommitRequest headers */
+        headers?: (shared.IHeaders|null);
+    }
+
+    /** Represents a PostPrecommitRequest. */
+    class PostPrecommitRequest implements IPostPrecommitRequest {
+
+        /**
+         * Constructs a new PostPrecommitRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postPrecommit.IPostPrecommitRequest);
+
+        /** PostPrecommitRequest prevote. */
+        public prevote: Uint8Array;
+
+        /** PostPrecommitRequest headers. */
+        public headers?: (shared.IHeaders|null);
+
+        /**
+         * Creates a new PostPrecommitRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostPrecommitRequest instance
+         */
+        public static create(properties?: postPrecommit.IPostPrecommitRequest): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Encodes the specified PostPrecommitRequest message. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
+         * @param message PostPrecommitRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postPrecommit.IPostPrecommitRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostPrecommitRequest message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
+         * @param message PostPrecommitRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postPrecommit.IPostPrecommitRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostPrecommitRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostPrecommitRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Decodes a PostPrecommitRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostPrecommitRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Verifies a PostPrecommitRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostPrecommitRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostPrecommitRequest
+         */
+        public static fromObject(object: { [k: string]: any }): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Creates a plain object from a PostPrecommitRequest message. Also converts values to other types if specified.
+         * @param message PostPrecommitRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postPrecommit.PostPrecommitRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostPrecommitRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostPrecommitRequest
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a PostPrecommitResponse. */
+    interface IPostPrecommitResponse {
+    }
+
+    /** Represents a PostPrecommitResponse. */
+    class PostPrecommitResponse implements IPostPrecommitResponse {
+
+        /**
+         * Constructs a new PostPrecommitResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postPrecommit.IPostPrecommitResponse);
+
+        /**
+         * Creates a new PostPrecommitResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostPrecommitResponse instance
+         */
+        public static create(properties?: postPrecommit.IPostPrecommitResponse): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Encodes the specified PostPrecommitResponse message. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
+         * @param message PostPrecommitResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postPrecommit.IPostPrecommitResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostPrecommitResponse message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
+         * @param message PostPrecommitResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postPrecommit.IPostPrecommitResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostPrecommitResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostPrecommitResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Decodes a PostPrecommitResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostPrecommitResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Verifies a PostPrecommitResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostPrecommitResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostPrecommitResponse
+         */
+        public static fromObject(object: { [k: string]: any }): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Creates a plain object from a PostPrecommitResponse message. Also converts values to other types if specified.
+         * @param message PostPrecommitResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postPrecommit.PostPrecommitResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostPrecommitResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostPrecommitResponse
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
 /** Namespace postPrevote. */
 export namespace postPrevote {
 

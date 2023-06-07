@@ -5183,6 +5183,434 @@ $root.postBlock = (function() {
     return postBlock;
 })();
 
+$root.postPrecommit = (function() {
+
+    /**
+     * Namespace postPrecommit.
+     * @exports postPrecommit
+     * @namespace
+     */
+    var postPrecommit = {};
+
+    postPrecommit.PostPrecommitRequest = (function() {
+
+        /**
+         * Properties of a PostPrecommitRequest.
+         * @memberof postPrecommit
+         * @interface IPostPrecommitRequest
+         * @property {Uint8Array|null} [prevote] PostPrecommitRequest prevote
+         * @property {shared.IHeaders|null} [headers] PostPrecommitRequest headers
+         */
+
+        /**
+         * Constructs a new PostPrecommitRequest.
+         * @memberof postPrecommit
+         * @classdesc Represents a PostPrecommitRequest.
+         * @implements IPostPrecommitRequest
+         * @constructor
+         * @param {postPrecommit.IPostPrecommitRequest=} [properties] Properties to set
+         */
+        function PostPrecommitRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PostPrecommitRequest prevote.
+         * @member {Uint8Array} prevote
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @instance
+         */
+        PostPrecommitRequest.prototype.prevote = $util.newBuffer([]);
+
+        /**
+         * PostPrecommitRequest headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @instance
+         */
+        PostPrecommitRequest.prototype.headers = null;
+
+        /**
+         * Creates a new PostPrecommitRequest instance using the specified properties.
+         * @function create
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {postPrecommit.IPostPrecommitRequest=} [properties] Properties to set
+         * @returns {postPrecommit.PostPrecommitRequest} PostPrecommitRequest instance
+         */
+        PostPrecommitRequest.create = function create(properties) {
+            return new PostPrecommitRequest(properties);
+        };
+
+        /**
+         * Encodes the specified PostPrecommitRequest message. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
+         * @function encode
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {postPrecommit.IPostPrecommitRequest} message PostPrecommitRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostPrecommitRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.prevote != null && Object.hasOwnProperty.call(message, "prevote"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.prevote);
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostPrecommitRequest message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {postPrecommit.IPostPrecommitRequest} message PostPrecommitRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostPrecommitRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostPrecommitRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postPrecommit.PostPrecommitRequest} PostPrecommitRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostPrecommitRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postPrecommit.PostPrecommitRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.prevote = reader.bytes();
+                        break;
+                    }
+                case 2: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostPrecommitRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postPrecommit.PostPrecommitRequest} PostPrecommitRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostPrecommitRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostPrecommitRequest message.
+         * @function verify
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostPrecommitRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.prevote != null && message.hasOwnProperty("prevote"))
+                if (!(message.prevote && typeof message.prevote.length === "number" || $util.isString(message.prevote)))
+                    return "prevote: buffer expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a PostPrecommitRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postPrecommit.PostPrecommitRequest} PostPrecommitRequest
+         */
+        PostPrecommitRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.postPrecommit.PostPrecommitRequest)
+                return object;
+            var message = new $root.postPrecommit.PostPrecommitRequest();
+            if (object.prevote != null)
+                if (typeof object.prevote === "string")
+                    $util.base64.decode(object.prevote, message.prevote = $util.newBuffer($util.base64.length(object.prevote)), 0);
+                else if (object.prevote.length >= 0)
+                    message.prevote = object.prevote;
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postPrecommit.PostPrecommitRequest.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PostPrecommitRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {postPrecommit.PostPrecommitRequest} message PostPrecommitRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostPrecommitRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if (options.bytes === String)
+                    object.prevote = "";
+                else {
+                    object.prevote = [];
+                    if (options.bytes !== Array)
+                        object.prevote = $util.newBuffer(object.prevote);
+                }
+                object.headers = null;
+            }
+            if (message.prevote != null && message.hasOwnProperty("prevote"))
+                object.prevote = options.bytes === String ? $util.base64.encode(message.prevote, 0, message.prevote.length) : options.bytes === Array ? Array.prototype.slice.call(message.prevote) : message.prevote;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
+        };
+
+        /**
+         * Converts this PostPrecommitRequest to JSON.
+         * @function toJSON
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostPrecommitRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for PostPrecommitRequest
+         * @function getTypeUrl
+         * @memberof postPrecommit.PostPrecommitRequest
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        PostPrecommitRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/postPrecommit.PostPrecommitRequest";
+        };
+
+        return PostPrecommitRequest;
+    })();
+
+    postPrecommit.PostPrecommitResponse = (function() {
+
+        /**
+         * Properties of a PostPrecommitResponse.
+         * @memberof postPrecommit
+         * @interface IPostPrecommitResponse
+         */
+
+        /**
+         * Constructs a new PostPrecommitResponse.
+         * @memberof postPrecommit
+         * @classdesc Represents a PostPrecommitResponse.
+         * @implements IPostPrecommitResponse
+         * @constructor
+         * @param {postPrecommit.IPostPrecommitResponse=} [properties] Properties to set
+         */
+        function PostPrecommitResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new PostPrecommitResponse instance using the specified properties.
+         * @function create
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {postPrecommit.IPostPrecommitResponse=} [properties] Properties to set
+         * @returns {postPrecommit.PostPrecommitResponse} PostPrecommitResponse instance
+         */
+        PostPrecommitResponse.create = function create(properties) {
+            return new PostPrecommitResponse(properties);
+        };
+
+        /**
+         * Encodes the specified PostPrecommitResponse message. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
+         * @function encode
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {postPrecommit.IPostPrecommitResponse} message PostPrecommitResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostPrecommitResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PostPrecommitResponse message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {postPrecommit.IPostPrecommitResponse} message PostPrecommitResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PostPrecommitResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PostPrecommitResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {postPrecommit.PostPrecommitResponse} PostPrecommitResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostPrecommitResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postPrecommit.PostPrecommitResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PostPrecommitResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {postPrecommit.PostPrecommitResponse} PostPrecommitResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PostPrecommitResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PostPrecommitResponse message.
+         * @function verify
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PostPrecommitResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a PostPrecommitResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {postPrecommit.PostPrecommitResponse} PostPrecommitResponse
+         */
+        PostPrecommitResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.postPrecommit.PostPrecommitResponse)
+                return object;
+            return new $root.postPrecommit.PostPrecommitResponse();
+        };
+
+        /**
+         * Creates a plain object from a PostPrecommitResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {postPrecommit.PostPrecommitResponse} message PostPrecommitResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PostPrecommitResponse.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this PostPrecommitResponse to JSON.
+         * @function toJSON
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PostPrecommitResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for PostPrecommitResponse
+         * @function getTypeUrl
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        PostPrecommitResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/postPrecommit.PostPrecommitResponse";
+        };
+
+        return PostPrecommitResponse;
+    })();
+
+    return postPrecommit;
+})();
+
 $root.postPrevote = (function() {
 
     /**
