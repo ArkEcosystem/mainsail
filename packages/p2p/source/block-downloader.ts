@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-const defaultDownloadChunkSize = 400;
+import { constants } from "./constants";
 
 @injectable()
 export class BlockDownloader implements Contracts.P2P.BlockDownloader {
@@ -21,7 +21,7 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#downloadChunkSize = defaultDownloadChunkSize;
+	#downloadChunkSize = constants.MAX_DOWNLOAD_BLOCKS;
 	#maxParallelDownloads = 10;
 
 	public async downloadBlocksFromHeight(fromBlockHeight: number): Promise<Contracts.Crypto.IBlockData[]> {
@@ -177,7 +177,7 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 
 		// if we did not manage to download any block, reduce chunk size for next time
 		this.#downloadChunkSize =
-			downloadedBlocks.length === 0 ? Math.ceil(this.#downloadChunkSize / 10) : defaultDownloadChunkSize;
+			downloadedBlocks.length === 0 ? Math.ceil(this.#downloadChunkSize / 10) : constants.MAX_DOWNLOAD_BLOCKS;
 
 		return downloadedBlocks;
 	}
