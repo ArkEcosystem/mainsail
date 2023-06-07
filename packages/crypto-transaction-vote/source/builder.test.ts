@@ -18,7 +18,6 @@ describe<{
 		sandbox.app.bind(Identifiers.Cryptography.Transaction.Signer).toConstantValue({});
 		sandbox.app.bind(Identifiers.Cryptography.Transaction.Utils).toConstantValue({});
 		sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});
-		sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
 
 		contex.builder = sandbox.app.resolve(VoteBuilder);
 	});
