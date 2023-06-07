@@ -1,6 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
+import { Mutable } from "../../utils";
 
 export interface IBlockVerification {
 	readonly verified: boolean;
@@ -54,13 +55,10 @@ export interface IBlockJson {
 	readonly transactions: ITransactionJson[];
 }
 
-export interface IBlockDeserializer {
-	deserialize(serialized: Buffer): Promise<{ data: IBlockData; transactions: ITransaction[] }>;
-	deserializeHeader(serialized: Buffer): Promise<IBlockHeader>;
-}
+export type IBlockDataSerializable = Omit<IBlockData, "id">;
 
 export interface IBlockFactory {
-	make(data: any): Promise<IBlock>;
+	make(data: Mutable<IBlockDataSerializable>): Promise<IBlock>;
 
 	fromHex(hex: string): Promise<IBlock>;
 
@@ -71,14 +69,23 @@ export interface IBlockFactory {
 	fromData(data: IBlockData): Promise<IBlock>;
 }
 
-export type IBlockDataSerializable = Omit<IBlockData, "id">;
-
 export interface IBlockSerializer {
-	size(block: IBlock): number;
+	headerSize(): number;
+	totalSize(block: IBlockDataSerializable): number;
 
-	serialize(block: IBlockDataSerializable): Promise<Buffer>;
+	serializeHeader(block: IBlockDataSerializable): Promise<Buffer>;
 
 	serializeWithTransactions(block: IBlockDataSerializable): Promise<Buffer>;
+}
+
+export interface IBlockWithTransactions {
+	data: IBlockData;
+	transactions: ITransaction[];
+}
+
+export interface IBlockDeserializer {
+	deserializeHeader(serialized: Buffer): Promise<IBlockHeader>;
+	deserializeWithTransactions(serialized: Buffer): Promise<IBlockWithTransactions>;
 }
 
 export interface IBlockVerifier {

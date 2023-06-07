@@ -51,7 +51,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				result.errors.push("Invalid block timestamp");
 			}
 
-			const size: number = this.serializer.size(block);
+			const size: number = this.serializer.totalSize(blockData);
 			if (size > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
@@ -87,6 +87,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;
+			let totalPayloadLength = 0;
 
 			const payloadBuffers: Buffer[] = [];
 			for (const transaction of block.transactions) {
@@ -112,6 +113,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 
 				totalAmount = totalAmount.plus(transaction.data.amount);
 				totalFee = totalFee.plus(transaction.data.fee);
+				totalPayloadLength += transaction.serialized.length;
 
 				payloadBuffers.push(bytes);
 			}
@@ -122,6 +124,10 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 
 			if (!totalFee.isEqualTo(blockData.totalFee)) {
 				result.errors.push("Invalid total fee");
+			}
+
+			if (totalPayloadLength !== blockData.payloadLength) {
+				result.errors.push("Invalid payload length");
 			}
 
 			if ((await this.hashFactory.sha256(payloadBuffers)).toString("hex") !== blockData.payloadHash) {
