@@ -48,7 +48,7 @@ export const getBlockNotChainedErrorMessage = (
 	} else if (!details.isPlusOne) {
 		messageDetail = `height is not plus one`;
 	} else if (!details.isAfterPrevious) {
-		messageDetail = `previous block is not earlier: ${previousBlock.timestamp} cd ${nextBlock.timestamp} `;
+		messageDetail = `previous timestamp is after current timestamp: ${previousBlock.timestamp} VS ${nextBlock.timestamp}`;
 	}
 
 	return `${messagePrefix}: ${messageDetail}`;
