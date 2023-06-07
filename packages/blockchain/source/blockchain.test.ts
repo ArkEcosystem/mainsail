@@ -21,6 +21,7 @@ describe<{
 	stateMachine: any;
 	eventDispatcherService: any;
 	peerNetworkMonitor: any;
+	peerBroadcaster: any;
 	peerRepository: any;
 	blockProcessor: any;
 	databaseInteractions: any;
@@ -86,9 +87,11 @@ describe<{
 			listen: () => {},
 		};
 		context.peerNetworkMonitor = {
-			broadcastBlock: () => {},
 			checkNetworkHealth: () => {},
 			cleansePeers: () => {},
+		};
+		context.peerBroadcaster = {
+			broadcastBlock: () => {},
 		};
 		context.peerRepository = {
 			hasPeers: () => {},
@@ -183,6 +186,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.StateMachine).toConstantValue(context.stateMachine);
 		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcherService);
 		context.sandbox.app.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
+		context.sandbox.app.bind(Identifiers.PeerBroadcaster).toConstantValue(context.peerBroadcaster);
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(context.peerRepository);
 		context.sandbox.app.bind(Identifiers.BlockchainService).to(Blockchain).inSingletonScope();
 		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(context.blockProcessor);

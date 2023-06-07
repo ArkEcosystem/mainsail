@@ -3,6 +3,7 @@ import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
+import { Broadcaster } from "./broadcaster";
 import { ChunkCache } from "./chunk-cache";
 import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
@@ -11,7 +12,6 @@ import { PeerConnector } from "./peer-connector";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { Server } from "./socket-server/server";
-import { TransactionBroadcaster } from "./transaction-broadcaster";
 import { makeFormats } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -97,7 +97,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerTransactionBroadcaster).to(TransactionBroadcaster);
+		this.app.bind(Identifiers.PeerBroadcaster).to(Broadcaster);
 
 		this.app.bind<Server>(Identifiers.P2PServer).to(Server).inSingletonScope();
 	}

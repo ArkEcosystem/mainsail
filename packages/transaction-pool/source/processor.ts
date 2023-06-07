@@ -11,9 +11,9 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	@inject(Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.PeerTransactionBroadcaster)
+	@inject(Identifiers.PeerBroadcaster)
 	@optional()
-	private readonly transactionBroadcaster!: Contracts.P2P.TransactionBroadcaster | undefined;
+	private readonly broadcaster!: Contracts.P2P.Broadcaster | undefined;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -73,8 +73,8 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				}
 			}
 		} finally {
-			if (this.transactionBroadcaster && broadcastTransactions.length > 0) {
-				this.transactionBroadcaster
+			if (this.broadcaster && broadcastTransactions.length > 0) {
+				this.broadcaster
 					.broadcastTransactions(broadcastTransactions)
 					.catch((error) => this.logger.error(error.stack));
 			}
