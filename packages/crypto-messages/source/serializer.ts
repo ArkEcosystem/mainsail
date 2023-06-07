@@ -12,6 +12,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@tagged("type", "consensus")
 	private readonly validatorPublicKeySize!: number;
 
+	@inject(Identifiers.Cryptography.Size.Signature)
+	@tagged("type", "consensus")
+	private readonly signatureSize!: number;
+
 	@inject(Identifiers.Cryptography.Size.SHA256)
 	private readonly hashSize!: number;
 
@@ -24,30 +28,30 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // height
 				4 + // round
 				this.validatorPublicKeySize + // validator
-				(options.excludeSignature ? 0 : 96) + // signature 
-				4 + proposal.block.serialized.length / 2, // serialized block
+				4 + proposal.block.serialized.length / 2 + // serialized block
+				(options.excludeSignature ? 0 : this.signatureSize), // signature 
 			skip: 0,
 			// TODO
 			schema: {
 				height: {
 					type: "uint32",
+					required: true,
 				},
 				round: {
 					type: "uint32",
+					required: true,
 				},
 				validatorPublicKey: {
 					type: "publicKey",
+					required: true,
 				},
-				...(options.excludeSignature
-					? {}
-					: {
-						signature: {
-							type: "signature",
-						},
-					}),
-
+				signature: {
+					type: "signature",
+					required: options.excludeSignature ? false : true
+				},
 				block: {
 					type: "hex",
+					required: true,
 				},
 			},
 		});
@@ -62,31 +66,31 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // height
 				4 + // round
 				this.validatorPublicKeySize + // validator
-				this.hashSize + // hash
-				(options.excludeSignature ? 0 : 96), // signature 
+				this.hashSize + // blockId
+				(options.excludeSignature ? 0 : this.signatureSize), // signature 
 			skip: 0,
 			// TODO
 			schema: {
 				height: {
 					type: "uint32",
+					required: true,
 				},
 				round: {
 					type: "uint32",
+					required: true,
 				},
 				validatorPublicKey: {
 					type: "publicKey",
+					required: true,
+				},
+				signature: {
+					type: "signature",
+					required: options.excludeSignature ? false : true
 				},
 				blockId: {
-					type: "hash",
+					type: "blockId",
 					required: false,
 				},
-				...(options.excludeSignature
-					? {}
-					: {
-						signature: {
-							type: "signature",
-						},
-					}),
 			},
 		});
 	}
@@ -100,31 +104,31 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // height
 				4 + // round
 				this.validatorPublicKeySize + // validator
-				this.hashSize + // hash
-				(options.excludeSignature ? 0 : 96), // signature 
+				this.hashSize + // blockId
+				(options.excludeSignature ? 0 : this.signatureSize), // signature 
 			skip: 0,
 			// TODO
 			schema: {
 				height: {
 					type: "uint32",
+					required: true,
 				},
 				round: {
 					type: "uint32",
+					required: true,
 				},
 				validatorPublicKey: {
 					type: "publicKey",
+					required: true,
+				},
+				signature: {
+					type: "signature",
+					required: options.excludeSignature ? false : true
 				},
 				blockId: {
-					type: "hash",
+					type: "blockId",
 					required: false,
 				},
-				...(options.excludeSignature
-					? {}
-					: {
-						signature: {
-							type: "signature",
-						},
-					}),
 			},
 		});
 	}
