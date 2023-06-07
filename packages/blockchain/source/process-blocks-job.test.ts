@@ -46,7 +46,7 @@ describe<{
 		loadBlocksFromCurrentRound: () => {},
 		restoreCurrentRound: () => {},
 	};
-	const peerNetworkMonitor: any = {
+	const broadcaster: any = {
 		broadcastBlock: () => {},
 	};
 	const logService: any = {
@@ -76,7 +76,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(databaseService);
 		context.sandbox.app.bind(Identifiers.DatabaseInteraction).toConstantValue(databaseInteraction);
-		context.sandbox.app.bind(Identifiers.PeerNetworkMonitor).toConstantValue(peerNetworkMonitor);
+		context.sandbox.app.bind(Identifiers.PeerBroadcaster).toConstantValue(broadcaster);
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logService);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(context.blockFactory);
@@ -220,7 +220,7 @@ describe<{
 		stub(context.triggers, "call").returnValue(true);
 
 		const saveBlocksSpy = spy(databaseService, "saveBlocks");
-		const broadcastBlockSpy = spy(peerNetworkMonitor, "broadcastBlock");
+		const broadcastBlockSpy = spy(broadcaster, "broadcastBlock");
 		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
 
 		context.processBlocksJob.setBlocks([block]);
@@ -245,7 +245,7 @@ describe<{
 		stub(context.triggers, "call").returnValue(true);
 
 		const saveBlocksSpy = spy(databaseService, "saveBlocks");
-		const broadcastBlockSpy = spy(peerNetworkMonitor, "broadcastBlock");
+		const broadcastBlockSpy = spy(broadcaster, "broadcastBlock");
 		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
 
 		context.processBlocksJob.setBlocks([block]);
