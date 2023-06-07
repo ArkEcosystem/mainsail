@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
+import { Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 import { join } from "path";
 
@@ -25,7 +26,7 @@ export const registerBlockFactory = async (
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone(previousBlock.height);
 
-		const transactions = options.transactions || [];
+		const transactions: Contracts.Crypto.ITransaction[] = options.transactions || [];
 		if (options.transactionsCount) {
 			const signer = new Signer(
 				app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).all()!,
@@ -53,13 +54,20 @@ export const registerBlockFactory = async (
 			fee: BigNumber.ZERO,
 		};
 		const payloadBuffers: Buffer[] = [];
+		const transactionData: Contracts.Crypto.ITransactionData[] = [];
+		let payloadLength = transactions.length * 4;
 
-		for (const transaction of transactions) {
-			totals.amount = totals.amount.plus(transaction.amount);
-			totals.fee = totals.fee.plus(transaction.fee);
+		for (const { data, serialized } of transactions) {
+			Utils.assert.defined<string>(data.id);
 
-			payloadBuffers.push(Buffer.from(transaction.id, "hex"));
+			totals.amount = totals.amount.plus(data.amount);
+			totals.fee = totals.fee.plus(data.fee);
+
+			payloadBuffers.push(Buffer.from(data.id, "hex"));
+			transactionData.push(data);
+			payloadLength += serialized.length;
 		}
+
 
 		const passphrase = options.passphrase || secrets[0];
 
@@ -78,13 +86,13 @@ export const registerBlockFactory = async (
 					.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
 					.sha256(payloadBuffers)
 			).toString("hex"),
-			payloadLength: 32 * transactions.length,
+			payloadLength,
 			previousBlock: previousBlock.id,
 			reward: options.reward || reward,
 			timestamp: options.timestamp || dayjs().unix(),
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
-			transactions,
+			transactions: transactionData,
 			version: 1,
 		});
 	});

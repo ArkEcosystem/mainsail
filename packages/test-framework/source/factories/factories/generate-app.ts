@@ -6,6 +6,7 @@ import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../../crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoConsensus } from "../../../../crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoTransaction, TransactionRegistry } from "../../../../crypto-transaction";
 import { MultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment";
 import { MultiSignatureRegistrationTransaction } from "../../../../crypto-transaction-multi-signature-registration";
@@ -35,6 +36,7 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 	await sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
 	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();
+	await sandbox.app.resolve(CoreCryptoConsensus).register();
 	await sandbox.app.resolve(CoreCryptoTransaction).register();
 	await sandbox.app.resolve(CoreCryptoBlock).register();
 	await sandbox.app.resolve(CoreSerializer).register();
