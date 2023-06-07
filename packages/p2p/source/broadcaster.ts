@@ -91,7 +91,14 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(peers.map((peer) => this.communicator.postBlock(peer, block)));
 	}
 
-	async broadcastProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {}
+	async broadcastProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
+		// TODO: Remove once serialized field is on IProposal
+		const serialized = await this.messageSerializer.serializePrevote(proposal);
+
+		const promises = this.#getPeersForBroadcast().map((peer) => this.communicator.postProposal(peer, serialized));
+
+		await Promise.all(promises);
+	}
 
 	public async broadcastPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
 		// TODO: Remove once serialized field is on IPrevote
