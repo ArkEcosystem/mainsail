@@ -18,14 +18,14 @@ export class DownloadBlocks implements Action {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.PeerNetworkMonitor)
-	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
+	@inject(Identifiers.PeerBlockDownloader)
+	private readonly blockDownloader!: Contracts.P2P.BlockDownloader;
 
 	public async handle(): Promise<void> {
 		const lastDownloadedBlock: Contracts.Crypto.IBlockData =
 			this.stateStore.getLastDownloadedBlock() || this.stateStore.getLastBlock().data;
 
-		const blocks: Contracts.Crypto.IBlockData[] = await this.networkMonitor.downloadBlocksFromHeight(
+		const blocks: Contracts.Crypto.IBlockData[] = await this.blockDownloader.downloadBlocksFromHeight(
 			lastDownloadedBlock.height,
 		);
 
