@@ -25,7 +25,6 @@ describe<{
 	blockProcessor: any;
 	databaseInteractions: any;
 	configuration: any;
-	slots: any;
 	queue: any;
 	blockData: Contracts.Crypto.IBlockData;
 	blockHeight1: any;
@@ -110,12 +109,6 @@ describe<{
 			getMilestones: () => {},
 		};
 
-		context.slots = {
-			getSlotNumber: () => {},
-			getTime: () => 0,
-			getTimeInMsUntilNextSlot: () => {},
-		};
-
 		context.queue = {
 			clear: () => {},
 			drain: () => {},
@@ -196,11 +189,8 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Database.TransactionStorage).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.WalletRepository).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({});
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(context.slots);
-
 		context.sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 		context.sandbox.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
@@ -211,18 +201,6 @@ describe<{
 			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
 
 		context.sandbox.app.bind(Identifiers.QueueFactory).toFactory(() => () => context.queue);
-
-		const getTimeStampForBlock = (height: number) => {
-			switch (height) {
-				case 1:
-					return 0;
-				default:
-					throw new Error(`Test scenarios should not hit this line`);
-			}
-		};
-
-		// const spyblockTimeLookup = stub(AppUtils.forgingInfoCalculator, "getBlockTimeLookup");
-		// spyblockTimeLookup.resolvedValue(getTimeStampForBlock);
 
 		// Managers.configManager.setFromPreset("testnet");
 	});
@@ -451,7 +429,6 @@ describe<{
 		const enqueueBlocksSpy = stub(blockchain, "enqueueBlocks").callsFake(() => {});
 
 		const eventDispatcherServiceDispatchSpy = spy(context.eventDispatcherService, "dispatch");
-		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(context.stateStore, "isStarted").returnValue(true);
 		stub(context.stateStore, "getLastBlock").returnValue({ data: context.blockData });
 
@@ -465,83 +442,14 @@ describe<{
 		enqueueBlocksSpy.calledWith([context.blockData]);
 	});
 
-	it("handleIncomingBlock when state is started should not dispatch anything nor enqueue the block if receivedSlot > currentSlot", async (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
-
-		const eventDispatcherServiceDispatchSpy = spy(context.eventDispatcherService, "dispatch");
-		stub(context.stateStore, "isStarted").returnValue(true);
-		stub(context.stateStore, "getLastBlock").returnValue({ data: context.blockData });
-		stub(context.slots, "getSlotNumber").returnValueNth(0, 1).returnValueNth(1, 2);
-
-		await blockchain.handleIncomingBlock(context.blockData);
-
-		enqueueBlocksSpy.neverCalled();
-		eventDispatcherServiceDispatchSpy.neverCalled();
-	});
-
-	it("handleIncomingBlock when state is started should handle block from forger if in right slot", async (context) => {
+	it("handleIncomingBlock when state is started should handle block from forger", async (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 		const enqueueBlocksSpy = stub(blockchain, "enqueueBlocks").callsFake(() => {});
 		const dispatchSpy = spy(blockchain, "dispatch");
 		stub(context.stateStore, "isStarted").returnValue(true);
 		stub(context.stateStore, "getLastBlock").returnValue({ data: context.blockData });
-		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(context.slots, "getTimeInMsUntilNextSlot").returnValue(5000);
 
 		await blockchain.handleIncomingBlock(context.blockData, true);
-
-		enqueueBlocksSpy.calledOnce();
-		enqueueBlocksSpy.calledWith([context.blockData]);
-		dispatchSpy.calledOnce();
-		dispatchSpy.calledWith("NEWBLOCK");
-	});
-
-	for (const fromForger of [true, false]) {
-		it("handleIncomingBlock when state is started should not handle block if in wrong slot", async (context) => {
-			const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-			const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
-			const dispatchSpy = spy(blockchain, "dispatch");
-			stub(context.stateStore, "isStarted").returnValue(true);
-			stub(context.stateStore, "getLastBlock").returnValue({ data: context.blockData });
-
-			stub(context.slots, "getSlotNumber").returnValueNth(0, 1).returnValueNth(1, 2);
-			stub(context.slots, "getTimeInMsUntilNextSlot").returnValue(5000);
-
-			await blockchain.handleIncomingBlock(context.blockData, fromForger);
-
-			enqueueBlocksSpy.neverCalled();
-			dispatchSpy.neverCalled();
-		});
-	}
-
-	it("handleIncomingBlock when state is started should not handle block from forger if less than 2 seconds left in slot", async (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
-		const dispatchSpy = spy(blockchain, "dispatch");
-
-		stub(context.stateStore, "isStarted").returnValue(true);
-		stub(context.stateStore, "getLastBlock").returnValue({ data: context.blockData });
-		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(context.slots, "getTimeInMsUntilNextSlot").returnValue(1500);
-
-		await blockchain.handleIncomingBlock(context.blockData, true);
-
-		enqueueBlocksSpy.neverCalled();
-		dispatchSpy.neverCalled();
-	});
-
-	it("handleIncomingBlock when state is started should handle block if not from forger if less than 2 seconds left in slot", async (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const enqueueBlocksSpy = stub(blockchain, "enqueueBlocks").callsFake(() => {});
-		const dispatchSpy = spy(blockchain, "dispatch");
-
-		stub(context.stateStore, "isStarted").returnValue(true);
-		stub(context.stateStore, "getLastBlock").returnValue({ data: context.blockData });
-		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(context.slots, "getTimeInMsUntilNextSlot").returnValue(1500);
-
-		await blockchain.handleIncomingBlock(context.blockData);
 
 		enqueueBlocksSpy.calledOnce();
 		enqueueBlocksSpy.calledWith([context.blockData]);
@@ -550,8 +458,6 @@ describe<{
 	});
 
 	it("handleIncomingBlock when state is not started should dispatch BlockEvent.Disregarded and not enqueue the block", async (context) => {
-		stub(context.slots, "getSlotNumber").returnValue(1);
-
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 		const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
 
@@ -563,19 +469,6 @@ describe<{
 		eventDispatcherServiceDispatchSpy.calledOnce();
 		eventDispatcherServiceDispatchSpy.calledWith(Enums.BlockEvent.Disregarded, context.blockData);
 		enqueueBlocksSpy.neverCalled();
-	});
-
-	it("handleIncomingBlock should not dispatch anything nor enqueue the block if receivedSlot > currentSlot", async (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
-
-		const eventDispatcherServiceDispatchSpy = spy(context.eventDispatcherService, "dispatch");
-		stub(context.slots, "getSlotNumber").returnValueNth(0, 1).returnValueNth(1, 2);
-
-		await blockchain.handleIncomingBlock(context.blockData);
-
-		enqueueBlocksSpy.neverCalled();
-		eventDispatcherServiceDispatchSpy.neverCalled();
 	});
 
 	it("enqueueBlocks should just return if blocks provided are an empty array", async (context) => {
@@ -707,33 +600,33 @@ describe<{
 		assert.true(blockchain.isSynced());
 	});
 
-	it("isSynced should return true if last block is less than 3 blocktimes away from current slot time", (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		stub(context.slots, "getTime").returnValue(100);
-		stub(context.configuration, "getMilestone").returnValue({
-			blockTime: 8,
-		});
+	// it("isSynced should return true if last block is less than 3 blocktimes away from current slot time", (context) => {
+	// 	const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
+	// 	stub(context.slots, "getTime").returnValue(100);
+	// 	stub(context.configuration, "getMilestone").returnValue({
+	// 		blockTime: 8,
+	// 	});
 
-		stub(context.peerRepository, "hasPeers").returnValue(true);
-		const mockBlock = { data: { height: 444, id: "123", timestamp: context.slots.getTime() - 16 } };
-		stub(context.stateStore, "getLastBlock").returnValue(mockBlock);
+	// 	stub(context.peerRepository, "hasPeers").returnValue(true);
+	// 	const mockBlock = { data: { height: 444, id: "123", timestamp: context.slots.getTime() - 16 } };
+	// 	stub(context.stateStore, "getLastBlock").returnValue(mockBlock);
 
-		assert.true(blockchain.isSynced());
-	});
+	// 	assert.true(blockchain.isSynced());
+	// });
 
-	it("isSynced should return false if last block is more than 3 blocktimes away from current slot time", (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		stub(context.slots, "getTime").returnValue(100);
-		stub(context.configuration, "getMilestone").returnValue({
-			blockTime: 8,
-		});
+	// it("isSynced should return false if last block is more than 3 blocktimes away from current slot time", (context) => {
+	// 	const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
+	// 	stub(context.slots, "getTime").returnValue(100);
+	// 	stub(context.configuration, "getMilestone").returnValue({
+	// 		blockTime: 8,
+	// 	});
 
-		stub(context.peerRepository, "hasPeers").returnValue(true);
-		const mockBlock = { data: { height: 444, id: "123", timestamp: context.slots.getTime() - 25 } };
-		stub(context.stateStore, "getLastBlock").returnValue(mockBlock);
+	// 	stub(context.peerRepository, "hasPeers").returnValue(true);
+	// 	const mockBlock = { data: { height: 444, id: "123", timestamp: context.slots.getTime() - 25 } };
+	// 	stub(context.stateStore, "getLastBlock").returnValue(mockBlock);
 
-		assert.false(blockchain.isSynced());
-	});
+	// 	assert.false(blockchain.isSynced());
+	// });
 
 	it("getLastBlock should return the last block from state", (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);

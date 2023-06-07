@@ -390,9 +390,6 @@ importers:
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-time':
-        specifier: workspace:*
-        version: link:../crypto-time
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -582,9 +579,6 @@ importers:
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-time':
-        specifier: workspace:*
-        version: link:../crypto-time
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1416,28 +1410,6 @@ importers:
         specifier: 5.4.0
         version: 5.4.0
     devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-time:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      dayjs:
-        specifier: 1.10.7
-        version: 1.10.7
-    devDependencies:
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -2557,9 +2529,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-time':
-        specifier: workspace:*
-        version: link:../crypto-time
       '@types/better-sqlite3':
         specifier: 5.4.3
         version: 5.4.3
@@ -2591,6 +2560,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      dayjs:
+        specifier: 1.11.8
+        version: 1.11.8
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -2677,6 +2649,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
       delay:
         specifier: 5.0.0
         version: 5.0.0
@@ -7767,6 +7742,10 @@ packages:
   /dayjs@1.11.7:
     resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==}
     dev: false
+
+  /dayjs@1.11.8:
+    resolution: {integrity: sha512-LcgxzFoWMEPO7ggRv1Y2N31hUf2R0Vj7fuy/m+Bg1K8rr+KAs1AEy4y9jd5DXe8pbHgX+srkHNS7TH6Q6ZhYeQ==}
+    dev: true
 
   /dayjs@1.8.36:
     resolution: {integrity: sha512-3VmRXEtw7RZKAf+4Tv1Ym9AGeo8r8+CjDi26x+7SYQil1UqtqdaokhzoEJohqlzt0m5kacJSDhJQkG/LWhpRBw==}

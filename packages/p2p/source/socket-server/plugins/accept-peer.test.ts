@@ -1,8 +1,8 @@
+import { Server } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../../../test-framework";
-import { Server } from "@hapi/hapi";
 
+import { describe, Sandbox } from "../../../../test-framework";
 import { defaults as transactionPoolDefaults } from "../../../../transaction-pool/source/defaults";
 import { defaults } from "../../defaults";
 import { AcceptPeerPlugin } from "./accept-peer";
@@ -30,7 +30,6 @@ describe<{
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});

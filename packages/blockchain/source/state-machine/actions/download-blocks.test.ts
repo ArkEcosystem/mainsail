@@ -59,7 +59,6 @@ describe<{
 		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
-		context.container.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(context.slots);
 	});
 
 	it("should do nothing when blockchain.isStopped", async (context) => {

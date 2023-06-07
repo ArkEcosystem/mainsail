@@ -62,11 +62,6 @@ export const Identifiers = {
 			SHA256: Symbol.for("Crypto<Size.SHA256>"),
 			Signature: Symbol.for("Crypto<Size.Signature>"),
 		},
-		Time: {
-			BlockTimeCalculator: Symbol.for("Crypto<Time.BlockTimeCalculator>"),
-			BlockTimeLookup: Symbol.for("Crypto<Time.BlockTimeLookup>"),
-			Slots: Symbol.for("Crypto<Time.Slots>"),
-		},
 		Transaction: {
 			Deserializer: Symbol.for("Crypto<Transaction.Deserializer>"),
 			Factory: Symbol.for("Crypto<Transaction.Factory>"),

@@ -2,6 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import {
 	extendSchema,
+	InternalTransactionType,
 	Serializer,
 	Transaction,
 	transactionBaseSchema,
@@ -9,7 +10,6 @@ import {
 	TransactionTypeFactory,
 	Utils,
 	Verifier,
-	InternalTransactionType,
 } from "@mainsail/crypto-transaction";
 import { Application, Services } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
@@ -20,9 +20,6 @@ import { HashFactory } from "../../../crypto-hash-bcrypto/source/hash.factory";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
 import { Signature } from "../../../crypto-signature-schnorr/source/signature";
-import { BlockTimeCalculator } from "../../../crypto-time/source/block-time-calculator";
-import { BlockTimeLookup } from "../../../crypto-time/source/block-time-lookup";
-import { Slots } from "../../../crypto-time/source/slots";
 import { MultiPaymentTransactionHandler } from "../../../crypto-transaction-multi-payment/source/handlers";
 import { MultiSignatureRegistrationTransactionHandler } from "../../../crypto-transaction-multi-signature-registration/source/handlers";
 import { TransferTransactionHandler } from "../../../crypto-transaction-transfer/source/handlers";
@@ -35,6 +32,7 @@ import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
+import dayjs from "dayjs";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;
@@ -216,9 +214,6 @@ describe<{
 			ServiceProvider.getTransactionHandlerConstructorsBinding(),
 		);
 
-		app.bind(Identifiers.Cryptography.Time.Slots).to(Slots).inSingletonScope();
-		app.bind(Identifiers.Cryptography.Time.BlockTimeCalculator).to(BlockTimeCalculator).inSingletonScope();
-		app.bind(Identifiers.Cryptography.Time.BlockTimeLookup).to(BlockTimeLookup).inSingletonScope();
 		app.bind(Identifiers.Database.Service).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
@@ -318,7 +313,6 @@ describe<{
 		const keys = await context.app
 			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
 			.fromMnemonic("secret");
-		const slots = await context.app.get<Contracts.Crypto.Slots>(Identifiers.Cryptography.Time.Slots);
 
 		const data: Contracts.Crypto.ITransactionData = {
 			amount: BigNumber.make("200000000"),
@@ -329,7 +323,7 @@ describe<{
 			nonce: BigNumber.ONE,
 			recipientId: "APyFYXxXtUrvZFnEuwLopfst94GMY5Zkeq",
 			senderPublicKey: keys.publicKey,
-			timestamp: slots.getTime(),
+			timestamp: dayjs().unix(),
 			type: TEST_TRANSACTION_TYPE,
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 1,

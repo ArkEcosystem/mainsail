@@ -1,8 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { BlockTimeCalculator } from "@mainsail/crypto-time/source/block-time-calculator";
-import { Slots } from "@mainsail/crypto-time/source/slots";
 
 import { describe } from "../../test-framework";
 import { ExpirationService } from ".";
@@ -13,7 +11,6 @@ describe<{
 	stateStore: any;
 	container: Container;
 	config: Configuration;
-	slots: Slots;
 }>("ExpirationService", ({ it, assert, stub, beforeAll }) => {
 	beforeAll((context) => {
 		context.configuration = { getRequired: () => {} };
@@ -25,24 +22,8 @@ describe<{
 		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.bind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
-			getBlockTimeLookup: (height: number) => {
-				switch (height) {
-					case 1:
-						return 0;
-					default:
-						throw new Error(`Test scenarios should not hit this line`);
-				}
-			},
-		});
-
-		context.container
-			.bind(Identifiers.Cryptography.Time.BlockTimeCalculator)
-			.to(BlockTimeCalculator)
-			.inSingletonScope();
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
-		context.slots = context.container.resolve(Slots);
 	});
 
 	it("canExpire - should return false when checking v2 transaction with 0 expiration", (context) => {

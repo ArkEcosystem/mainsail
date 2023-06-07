@@ -27,7 +27,6 @@
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
-		"@mainsail/crypto-time": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-transfer": "workspace:*",
 		"@mainsail/crypto-transaction-validator-registration": "workspace:*",

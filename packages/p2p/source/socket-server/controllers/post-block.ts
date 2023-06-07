@@ -24,9 +24,6 @@ export class PostBlockController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer!: Contracts.Crypto.IBlockDeserializer;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
-
 	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<{ status: boolean; height: number }> {
 		const blockBuffer: Buffer = request.payload.block;
 
@@ -52,7 +49,7 @@ export class PostBlockController implements Contracts.P2P.Controller {
 
 		const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
 
-		if (!Utils.isBlockChained(lastDownloadedBlock, block, this.slots)) {
+		if (!Utils.isBlockChained(lastDownloadedBlock, block)) {
 			return { height: this.blockchain.getLastHeight(), status: false };
 		}
 

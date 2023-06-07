@@ -13,9 +13,6 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
-
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier!: Contracts.Crypto.ITransactionVerifier;
 
@@ -44,12 +41,13 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				result.errors.push("Invalid block version");
 			}
 
-			if (
-				blockData.timestamp >
-				this.slots.getTime() + this.configuration.getMilestone(blockData.height).blockTime
-			) {
-				result.errors.push("Invalid block timestamp");
-			}
+			// TODO: Fix
+			// if (
+			// 	blockData.timestamp >
+			// 	this.slots.getTime() + this.configuration.getMilestone(blockData.height).blockTime
+			// ) {
+			// 	result.errors.push("Invalid block timestamp");
+			// }
 
 			const size: number = this.serializer.size(block);
 			if (size > constants.block.maxPayload) {

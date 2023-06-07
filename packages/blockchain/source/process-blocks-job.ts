@@ -33,12 +33,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
-
-	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
-	private readonly blockTimeLookup: any;
-
 	#blocks: Contracts.Crypto.IBlockData[] = [];
 
 	public getBlocks(): Contracts.Crypto.IBlockData[] {
@@ -62,9 +56,9 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
 
-		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.#blocks[0], this.slots)) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.#blocks[0])) {
 			this.logger.warning(
-				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.#blocks[0], this.slots),
+				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.#blocks[0]),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
 			this.blockchain.clearQueue();
@@ -76,26 +70,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		let lastProcessResult: boolean | undefined;
 		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
-		const acceptedBlockTimeLookup = (height: number) =>
-			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ??
-			this.blockTimeLookup.getBlockTimeLookup(height);
-
 		try {
 			for (const block of this.#blocks) {
-				const currentSlot: number = await this.slots
-					.withBlockTimeLookup(acceptedBlockTimeLookup)
-					.getSlotNumber();
-				const blockSlot: number = await this.slots
-					.withBlockTimeLookup(acceptedBlockTimeLookup)
-					.getSlotNumber(block.timestamp);
-
-				if (blockSlot > currentSlot) {
-					this.logger.error(
-						`Discarded block ${block.height.toLocaleString()} because it takes a future slot.`,
-					);
-					break;
-				}
-
 				const blockInstance = await this.blockFactory.fromData(block);
 				Utils.assert.defined<Contracts.Crypto.IBlock>(blockInstance);
 

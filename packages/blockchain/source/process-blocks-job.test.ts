@@ -11,7 +11,6 @@ describe<{
 	processBlocksJob: ProcessBlocksJob;
 	configuration: any;
 	blockFactory: any;
-	slots: any;
 	triggers: any;
 
 	lastBlock: Contracts.Crypto.IBlockData;
@@ -64,10 +63,6 @@ describe<{
 				data: blockData,
 			}),
 		};
-		context.slots = {
-			getSlotNumber: async () => {},
-			withBlockTimeLookup: () => {},
-		};
 
 		context.triggers = {
 			call: () => {},
@@ -85,8 +80,6 @@ describe<{
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logService);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(context.blockFactory);
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(context.slots);
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({});
 
 		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
 		// context.sandbox.app
@@ -115,8 +108,6 @@ describe<{
 	});
 
 	it("should process a new chained block", async (context) => {
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(context.triggers, "call").resolvedValue(true);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock }); // TODO: Use stateStore
 		stub(blockProcessor, "process").returnValue(true);
@@ -147,11 +138,8 @@ describe<{
 	});
 
 	it("should not process the remaining blocks if one is not accepted", async (context) => {
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
-		stub(blockchainService, "getLastBlock").returnValue({ data: { height: 1 } });
-		const callStub = stub(context.triggers, "call").returnValue(false);
-		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
+		stub(blockchainService, "getLastBlock").returnValue(Blocks.block1);
+		const callStub = stub(context.triggers, "call").resolvedValue(false);
 
 		const clearQueueSpy = spy(blockchainService, "clearQueue");
 		spy(databaseInteraction, "loadBlocksFromCurrentRound");
@@ -166,17 +154,14 @@ describe<{
 	});
 
 	it("should not process the remaining blocks if second is not accepted", async (context) => {
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(blockchainService, "getLastBlock")
-			.returnValueNth(0, { data: { height: 1 } })
-			.returnValueNth(1, { data: { height: 1 } })
+			.returnValueNth(0, Blocks.block1)
+			.returnValueNth(1, Blocks.block1)
 			.returnValueNth(2, Blocks.block2);
 
 		const callStub = stub(context.triggers, "call").returnValueNth(0, true).returnValueNth(1, false);
 
 		stub(stateStore, "getLastBlock").returnValue({ data: { height: 1 } });
-		stub(databaseService, "getLastBlock").returnValue({ data: { height: 1 } });
 
 		spy(stateStore, "setLastBlock");
 		spy(databaseInteraction, "loadBlocksFromCurrentRound");
@@ -198,8 +183,6 @@ describe<{
 
 	it("should log and throw error when blockRepository saveBlocks fails", async (context) => {
 		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(context.triggers, "call").returnValue(true);
@@ -231,8 +214,6 @@ describe<{
 			...context.currentBlock,
 		};
 
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(stateStore, "isStarted").returnValue(true);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
@@ -258,8 +239,6 @@ describe<{
 			...context.currentBlock,
 		};
 
-		stub(context.slots, "withBlockTimeLookup").returnValue(context.slots);
-		stub(context.slots, "getSlotNumber").returnValue(1);
 		stub(stateStore, "isStarted").returnValue(true);
 		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
 		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
