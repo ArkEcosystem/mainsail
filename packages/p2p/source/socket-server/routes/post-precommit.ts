@@ -1,25 +1,25 @@
 import { constants } from "../../constants";
 import { Routes } from "../../enums";
 import { Codecs } from "../codecs";
-import { PostPrevoteController } from "../controllers";
+import { PostPrecommitController } from "../controllers";
 import { Schemas } from "../schemas";
 import { Route, RouteConfig } from "./route";
 
-export class PostPrevoteRoute extends Route {
+export class PostPrecommitRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
 		const controller = this.getController();
 		return {
-			"/postPrevote": {
-				codec: Codecs.postPrevote,
+			"/postPrecommit": {
+				codec: Codecs.postPrecommit,
 				handler: controller.handle,
-				id: Routes.PostPrevote,
+				id: Routes.PostPrecommit,
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
-				validation: Schemas.postPrevote,
+				validation: Schemas.postPrecommit,
 			},
 		};
 	}
 
-	protected getController(): PostPrevoteController {
-		return this.app.resolve(PostPrevoteController);
+	protected getController(): PostPrecommitController {
+		return this.app.resolve(PostPrecommitController);
 	}
 }
