@@ -14,7 +14,7 @@ export const blockData: Contracts.Crypto.IBlockData = {
 	payloadHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
 	generatorPublicKey: '2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d',
 	transactions: [],
-	id: '78bcf47371468cc6f143c3641b8766076626e09d86fed3fb99df616aa9e7bbe4'
+	id: 'ac8685bea920bbf07145ce1c7f3caddb40259836e95b4e44dc55539e31525237'
 }
 
 export const blockDataJson: Contracts.Crypto.IBlockJson = {
@@ -30,14 +30,14 @@ export const blockDataJson: Contracts.Crypto.IBlockJson = {
 	payloadHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
 	generatorPublicKey: '2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d',
 	transactions: [],
-	id: '78bcf47371468cc6f143c3641b8766076626e09d86fed3fb99df616aa9e7bbe4'
+	id: 'ac8685bea920bbf07145ce1c7f3caddb40259836e95b4e44dc55539e31525237'
 }
 
 export const serialized =
 	"010000008c4981640200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b8552a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d00000000000000000000000000000000";
 
 export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
-	id: 'f2ea5ce72842be8381c8bec199b8166ddda9a4a68ef1a46df4dc8c7fe5d3d73f',
+	id: 'de6fbaaf4535dee0e243d455793a0f869a5af59de7989271d45583df5f710e8a',
 	version: 1,
 	timestamp: 1686194628,
 	height: 2,
@@ -87,7 +87,7 @@ export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
 
 
 export const blockDataWithTransactionsJson: Contracts.Crypto.IBlockJson = {
-	id: 'f2ea5ce72842be8381c8bec199b8166ddda9a4a68ef1a46df4dc8c7fe5d3d73f',
+	id: 'de6fbaaf4535dee0e243d455793a0f869a5af59de7989271d45583df5f710e8a',
 	version: 1,
 	timestamp: 1686194628,
 	height: 2,

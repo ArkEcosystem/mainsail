@@ -179,7 +179,7 @@ describe<{
 		assert.undefined(
 			context.validator.validate("test", {
 				fee: 0,
-				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
+				id: "da74c78b522ea015b2ae552d7f2fec76dfda0477b5d349ea17b633b8d417c037",
 			}).error,
 		);
 	});
@@ -229,7 +229,7 @@ describe<{
 		assert.defined(
 			context.validator.validate("test", {
 				fee: 0,
-				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
+				id: "da74c78b522ea015b2ae552d7f2fec76dfda0477b5d349ea17b633b8d417c037",
 			}).error,
 		);
 	});

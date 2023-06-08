@@ -33,7 +33,7 @@ export const registerBlockFactory = async (
 				options.nonce,
 			);
 
-			const genesisAddresses = previousBlock.transactions
+			const genesisAddresses = (previousBlock.transactions ?? [])
 				.map((transaction) => transaction.recipientId)
 				.filter((address: string) => !!address);
 

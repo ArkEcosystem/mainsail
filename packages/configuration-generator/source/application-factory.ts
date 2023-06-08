@@ -58,7 +58,7 @@ export const makeApplication = async (configurationPath?: string) => {
 
 	// @ts-ignore
 	app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
-		milestones: [{ address: { bech32m: "ark" }, height: 0 }],
+		milestones: [{ address: { bech32m: "ark" }, height: 0, blockTime: 8 }],
 	});
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);

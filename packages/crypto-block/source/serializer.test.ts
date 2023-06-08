@@ -21,16 +21,16 @@ describe<{
 
 	it("#size - should return size", ({ serializer }) => {
 		assert.equal(serializer.headerSize(),
-			156,
+			140,
 		);
 
-		assert.equal(serializer.totalSize(blockData), 156);
+		assert.equal(serializer.totalSize(blockData), 140);
 	});
 
 	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
 		assert.equal(
 			serializer.totalSize(blockDataWithTransactions),
-			536,
+			520,
 		);
 	});
 
