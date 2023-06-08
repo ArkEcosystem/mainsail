@@ -6,7 +6,7 @@ describe<{
 	sandbox: Sandbox;
 }>("Proposal", ({ it, assert }) => {
 	const block = {
-		header: { ...blockData, transactions: undefined },
+		header: { ...blockData, transactions: [] },
 		serialized: "",
 		transactions: [],
 		data: blockData,
@@ -54,7 +54,7 @@ describe<{
 	it("#toString", async () => {
 		assert.equal(
 			proposal.toString(),
-			`{"block":"e6ece29ff55b818dd22f1c2b2c420b374d8b9ce4a9e602816cab6d08ee754ca7","height":1,"round":1,"validatorPublicKey":"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb"}`,
+			`{"block":"de6fbaaf4535dee0e243d455793a0f869a5af59de7989271d45583df5f710e8a","height":1,"round":1,"validatorPublicKey":"95af988701a6fb60e09da41d2ca1a9e0b49e43501bda4255b3ca01073f490c34102b6bbcafde6333185e9980745d72cb"}`,
 		);
 	});
 

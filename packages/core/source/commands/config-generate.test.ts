@@ -26,7 +26,7 @@ describe<{
 
 		await cli
 			.withFlags({
-				blockTime: "9",
+				blockTime: "9000",
 				distribute: "true",
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
@@ -59,7 +59,7 @@ describe<{
 					id: match.string,
 					numberOfTransactions: 153,
 					payloadHash: match.string,
-					payloadLength: 4896,
+					payloadLength: 24828,
 					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					timestamp: match.number,
@@ -73,7 +73,7 @@ describe<{
 						activeValidators: 51,
 						address: match.object,
 						block: match.object,
-						blockTime: 9,
+						blockTime: 9000,
 						epoch: match.string,
 						height: 1,
 						multiPaymentLimit: 256,
@@ -107,7 +107,7 @@ describe<{
 			() =>
 				cli
 					.withFlags({
-						blockTime: "9",
+						blockTime: "9000",
 						distribute: "true",
 						explorer: "myex.io",
 						maxBlockPayload: "123444",
@@ -135,7 +135,7 @@ describe<{
 			() =>
 				cli
 					.withFlags({
-						blocktime: "9",
+						blocktime: "9000",
 						delegates: "47",
 						distribute: "true",
 						explorer: "myex.io",
@@ -295,7 +295,7 @@ describe<{
 
 		await cli
 			.withFlags({
-				blockTime: "9",
+				blockTime: "9000",
 				coreAPIPort: 3003,
 				coreMonitorPort: 3005,
 				coreP2PPort: 3002,
@@ -348,7 +348,7 @@ describe<{
 					id: match.string,
 					numberOfTransactions: 141,
 					payloadHash: match.string,
-					payloadLength: 4512,
+					payloadLength: 22880,
 					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					timestamp: match.number,
@@ -362,7 +362,7 @@ describe<{
 						activeValidators: 47,
 						address: match.object,
 						block: match.object,
-						blockTime: 9,
+						blockTime: 9000,
 						epoch: match.string,
 						height: 1,
 						multiPaymentLimit: 256,
@@ -416,7 +416,7 @@ describe<{
 
 		await cli
 			.withFlags({
-				blockTime: "9",
+				blockTime: "9000",
 				distribute: "true",
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
@@ -448,7 +448,7 @@ describe<{
 
 		await cli
 			.withFlags({
-				blockTime: "9",
+				blockTime: "9000",
 				configPath: "/path/to/config",
 				distribute: "true",
 				explorer: "myex.io",
@@ -480,7 +480,7 @@ describe<{
 
 		await cli
 			.withFlags({
-				blockTime: "9",
+				blockTime: "9000",
 				distribute: "true",
 				explorer: "myex.io",
 				maxBlockPayload: "123444",

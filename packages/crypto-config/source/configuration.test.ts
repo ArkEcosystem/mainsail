@@ -30,7 +30,7 @@ describe<{
 	it('key should be "get"', ({ configManager }) => {
 		assert.equal(
 			configManager.get("network.nethash"),
-			"ac4279c60e87b4b788475bd86f2cc461f4ea2b786cb5f25f8c3c0fc292524982",
+			"d2c644ce6ff30ba698342c65af8d4b3657186dc1880cba1900ae6cdd603c2f79",
 		);
 	});
 
@@ -40,8 +40,8 @@ describe<{
 				activeValidators: 51,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
-				blockTime: 8,
-				epoch: "2022-03-18T00:00:00.000Z",
+				blockTime: 8000,
+				epoch: "2023-06-08T00:00:00.000Z",
 				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
@@ -54,8 +54,8 @@ describe<{
 				activeValidators: 51,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
-				blockTime: 8,
-				epoch: "2022-03-18T00:00:00.000Z",
+				blockTime: 8000,
+				epoch: "2023-06-08T00:00:00.000Z",
 				height: 75_600,
 				multiPaymentLimit: 256,
 				reward: "200000000",

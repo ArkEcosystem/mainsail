@@ -381,6 +381,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
@@ -472,6 +475,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
       delay:
         specifier: 5.0.0
         version: 5.0.0
@@ -479,6 +485,9 @@ importers:
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
+      rewiremock:
+        specifier: 3.14.5
+        version: 3.14.5
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -1786,6 +1795,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto

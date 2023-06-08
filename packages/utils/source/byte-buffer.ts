@@ -61,7 +61,15 @@ export class ByteBuffer {
 
 	public writeBytes(value: Buffer): void {
 		if (value.length > this.getRemainderLength()) {
-			throw new Error("Write over buffer boundary.");
+			throw new Error(
+				"Write over buffer boundary. (length: " +
+					value.length +
+					", remaining: " +
+					this.getRemainderLength() +
+					", diff: " +
+					(value.length - this.getRemainderLength()) +
+					")",
+			);
 		}
 
 		this.#offset += value.copy(this.#buffer, this.#offset);
@@ -69,7 +77,15 @@ export class ByteBuffer {
 
 	public readBytes(length: number): Buffer {
 		if (length > this.getRemainderLength()) {
-			throw new Error("Read over buffer boundary.");
+			throw new Error(
+				"Read over buffer boundary. (length: " +
+					length +
+					", remaining: " +
+					this.getRemainderLength() +
+					", diff: " +
+					(length - this.getRemainderLength()) +
+					")",
+			);
 		}
 
 		const value = this.#buffer.slice(this.#offset, this.#offset + length);

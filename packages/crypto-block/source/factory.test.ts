@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import clone from "lodash.clone";
 
 import { describe, Sandbox } from "../../test-framework";
@@ -25,8 +25,8 @@ describe<{
 	const blockDataOriginal = clone(blockData);
 	// Recalculated id
 	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
-	let blockDataClone: Contracts.Crypto.IBlockData;
-	let blockDataWithTransactionsClone: Contracts.Crypto.IBlockData;
+	let blockDataClone: Utils.Mutable<Contracts.Crypto.IBlockData>;
+	let blockDataWithTransactionsClone: Utils.Mutable<Contracts.Crypto.IBlockData>;
 
 	beforeEach(async (context) => {
 		blockDataClone = clone(blockDataOriginal);

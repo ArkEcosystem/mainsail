@@ -1,12 +1,23 @@
 import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import rewiremock from "rewiremock";
 
 import { Scheduler } from "./scheduler";
 
 describe<{
 	sandbox: Sandbox;
 	scheduler: Scheduler;
-}>("Scheduler", ({ beforeEach, it, assert, spy, clock }) => {
+}>("Scheduler", ({ beforeEach, it, assert, spy, spyFn, clock, stub }) => {
+	let onDelay = (timeout: number) => {};
+	let currentTimestamp = 0;
+
+	const { Scheduler: SchedulerProxy } = rewiremock.proxy<{ Scheduler: Scheduler }>("./scheduler", {
+		dayjs: () => ({ unix: () => currentTimestamp }),
+		delay: async (timeout: number) => {
+			onDelay(timeout);
+		},
+	});
+
 	const delays = [1000, 3000, 5000];
 
 	const consensus = {
@@ -17,9 +28,14 @@ describe<{
 
 	const config = {
 		getMilestone: () => ({
+			blockTime: 8000,
 			stageTimeout: 1000,
 			stageTimeoutIncrease: 2000,
 		}),
+	};
+
+	const stateStore = {
+		getLastBlock: () => {},
 	};
 
 	beforeEach((context) => {
@@ -27,12 +43,33 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
+		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
-		context.scheduler = context.sandbox.app.resolve(Scheduler);
+		context.scheduler = context.sandbox.app.resolve(SchedulerProxy);
 	});
 
 	it("should be instantiated", async ({ scheduler }) => {
-		assert.instance(scheduler, Scheduler);
+		assert.instance(scheduler, SchedulerProxy);
+	});
+
+	it("#delayProposal - should delay proposal for blockTime - difference", async ({ scheduler }) => {
+		const spyDelay = spyFn();
+		onDelay = (timeout) => {
+			spyDelay.call(timeout);
+		};
+		const spyOnGetLatBlock = stub(stateStore, "getLastBlock").returnValue({
+			data: {
+				timestamp: 0,
+			},
+		});
+
+		currentTimestamp = 2000;
+		const promise = scheduler.delayProposal();
+
+		await promise;
+		spyOnGetLatBlock.calledOnce();
+		spyDelay.calledOnce();
+		spyDelay.calledWith(8000 - currentTimestamp);
 	});
 
 	it("#scheduleTimeoutPropose - should call onTimeoutPropose ", async ({ scheduler }) => {
