@@ -4,7 +4,6 @@ import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
 import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { BigNumber } from "@mainsail/utils";
-import dayjs from "dayjs";
 
 import { Wallet } from "../contracts";
 import { Generator } from "./generator";
@@ -188,7 +187,9 @@ export class GenesisBlockGenerator extends Generator {
 					payloadLength,
 					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
-					timestamp: dayjs(options.epoch).unix(),
+					timestamp: await this.app
+						.get<Contracts.Crypto.Slots>(Identifiers.Cryptography.Time.Slots)
+						.getSlotTime(0, 1),
 					totalAmount: totals.amount,
 					totalFee: totals.fee,
 					transactions: transactionData,
