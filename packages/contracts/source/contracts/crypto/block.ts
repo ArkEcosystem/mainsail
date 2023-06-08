@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 import { Mutable } from "../../utils";
+import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
 export interface IBlockVerification {
 	readonly verified: boolean;

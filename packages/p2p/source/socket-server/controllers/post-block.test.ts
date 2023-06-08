@@ -7,7 +7,7 @@ import { PostBlockController } from "./post-block";
 
 const utilsMock = {
 	...Utils,
-	isBlockChained: () => { },
+	isBlockChained: () => {},
 };
 
 const { PostBlockController: PostBlockControllerProxy } = rewiremock.proxy<{
@@ -22,14 +22,14 @@ describe<{
 	sandbox: Sandbox;
 	controller: PostBlockController;
 }>("PostBlockController", ({ it, assert, beforeEach, stub, spy }) => {
-	const logger = { info: () => { } };
+	const logger = { info: () => {} };
 	const configuration = { getMilestone: () => ({ block: { maxTransactions: 150 } }) };
-	const deserializer = { deserializeWithTransactions: () => { }, deserializeHeader: () => { } };
+	const deserializer = { deserializeWithTransactions: () => {}, deserializeHeader: () => {} };
 	const blockchain = {
-		getLastDownloadedBlock: () => { },
-		getLastHeight: () => { },
-		handleIncomingBlock: () => { },
-		pingBlock: () => { },
+		getLastDownloadedBlock: () => {},
+		getLastHeight: () => {},
+		handleIncomingBlock: () => {},
+		pingBlock: () => {},
 	};
 	const slots = {};
 

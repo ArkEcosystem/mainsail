@@ -31,9 +31,7 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		return header;
 	}
 
-	public async deserializeWithTransactions(
-		serialized: Buffer,
-	): Promise<Contracts.Crypto.IBlockWithTransactions> {
+	public async deserializeWithTransactions(serialized: Buffer): Promise<Contracts.Crypto.IBlockWithTransactions> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		const block: Utils.Mutable<Contracts.Crypto.IBlockData> = await this.#deserializeBufferHeader(buffer);

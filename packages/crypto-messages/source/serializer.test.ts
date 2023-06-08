@@ -33,7 +33,10 @@ describe<{
 	});
 
 	it("#serializePrecommit - should correctly serialize without block", async ({ serializer }) => {
-		assert.equal(await serializer.serializePrecommit(precommitDataNoBlock), Buffer.from(serializedPrecommitNoBlock, "hex"));
+		assert.equal(
+			await serializer.serializePrecommit(precommitDataNoBlock),
+			Buffer.from(serializedPrecommitNoBlock, "hex"),
+		);
 	});
 
 	it("#serializePrevote - should correctly serialize", async ({ serializer }) => {
@@ -41,6 +44,9 @@ describe<{
 	});
 
 	it("#serializePrevote - should correctly serialize without block", async ({ serializer }) => {
-		assert.equal(await serializer.serializePrevote(prevoteDataNoBlock), Buffer.from(serializedPrevoteNoBlock, "hex"));
+		assert.equal(
+			await serializer.serializePrevote(prevoteDataNoBlock),
+			Buffer.from(serializedPrevoteNoBlock, "hex"),
+		);
 	});
 });

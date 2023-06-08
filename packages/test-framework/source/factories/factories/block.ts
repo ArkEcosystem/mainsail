@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 import { Utils } from "@mainsail/kernel";
+import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { join } from "path";
 
@@ -67,7 +67,6 @@ export const registerBlockFactory = async (
 			transactionData.push(data);
 			payloadLength += serialized.length;
 		}
-
 
 		const passphrase = options.passphrase || secrets[0];
 

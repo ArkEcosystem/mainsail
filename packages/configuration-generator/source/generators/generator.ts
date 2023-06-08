@@ -29,9 +29,10 @@ export class Generator {
 
 		return {
 			address: await this.app
-				.getTagged<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory,
+				.getTagged<Contracts.Crypto.IAddressFactory>(
+					Identifiers.Cryptography.Identity.AddressFactory,
 					"type",
-					"wallet"
+					"wallet",
 				)
 				.fromPublicKey(keys.publicKey),
 			keys,

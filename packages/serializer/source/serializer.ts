@@ -64,7 +64,6 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-
 				if (value === undefined) {
 					const nullBlockId = "0000000000000000000000000000000000000000000000000000000000000000";
 					result.writeBytes(Buffer.from(nullBlockId, "hex"));

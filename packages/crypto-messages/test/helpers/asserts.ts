@@ -22,7 +22,6 @@ export const assertPrevote = (assert, data1, data2) => {
 const assertPrecommitOrPrevote = (assert, data1, data2) => {
 	const fields = ["height", "round", "blockId", "validatorPublicKey", "signature"];
 	for (const field of fields) {
-
 		let v1 = data1[field];
 		let v2 = data2[field];
 		if (field === "blockId") {
@@ -32,4 +31,4 @@ const assertPrecommitOrPrevote = (assert, data1, data2) => {
 
 		assert.equal(v1.toString(), v2.toString());
 	}
-}
+};

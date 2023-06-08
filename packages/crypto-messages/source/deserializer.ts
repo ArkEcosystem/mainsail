@@ -17,7 +17,6 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 	@tagged("type", "consensus")
 	private readonly signatureSize!: number;
 
-
 	@inject(Identifiers.Cryptography.Size.SHA256)
 	private readonly hashSize!: number;
 
@@ -62,7 +61,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				4 + // round
 				this.validatorPublicKeySize + // validator
 				this.hashSize + // blockId
-				this.signatureSize, // signature 
+				this.signatureSize, // signature
 			schema: {
 				height: {
 					type: "uint32",
@@ -96,7 +95,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				4 + // round
 				this.validatorPublicKeySize + // validator
 				this.hashSize + // blockId
-				this.signatureSize, // signature 
+				this.signatureSize, // signature
 			schema: {
 				height: {
 					type: "uint32",

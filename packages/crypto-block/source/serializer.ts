@@ -16,7 +16,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	private readonly generatorPublicKeyByteLength!: number;
 
 	public headerSize(): number {
-		return 4 + // version
+		return (
+			4 + // version
 			4 + // timestamp
 			4 + // height
 			this.hashByteLength + // previousBlock
@@ -26,7 +27,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			8 + // reward
 			4 + // payloadLength
 			this.hashByteLength + // payloadHash
-			this.generatorPublicKeyByteLength;
+			this.generatorPublicKeyByteLength
+		);
 	}
 
 	public totalSize(block: Contracts.Crypto.IBlockDataSerializable): number {

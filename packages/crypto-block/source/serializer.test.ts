@@ -20,18 +20,13 @@ describe<{
 	});
 
 	it("#size - should return size", ({ serializer }) => {
-		assert.equal(serializer.headerSize(),
-			140,
-		);
+		assert.equal(serializer.headerSize(), 140);
 
 		assert.equal(serializer.totalSize(blockData), 140);
 	});
 
 	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
-		assert.equal(
-			serializer.totalSize(blockDataWithTransactions),
-			520,
-		);
+		assert.equal(serializer.totalSize(blockDataWithTransactions), 520);
 	});
 
 	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {

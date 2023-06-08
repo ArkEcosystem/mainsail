@@ -64,8 +64,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	}
 
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.IBlock> {
-		const deserialized =
-			await this.deserializer.deserializeWithTransactions(serialized);
+		const deserialized = await this.deserializer.deserializeWithTransactions(serialized);
 
 		const validated: Contracts.Crypto.IBlockData | undefined = await this.#applySchema(deserialized.data);
 
@@ -111,7 +110,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 				throw new Exceptions.BlockSchemaError(
 					data.height,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-					`${error.message}: ${JSON.stringify(error.data)}`,
+						`${error.message}: ${JSON.stringify(error.data)}`,
 				);
 			}
 		}

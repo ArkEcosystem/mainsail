@@ -54,7 +54,13 @@ export class GenesisBlockGenerator extends Generator {
 		return this.#createGenesisBlock(premineWallet.keys, transactions, options);
 	}
 
-	async #createTransferTransaction(sender: Wallet, recipient: Wallet, amount: string, pubKeyHash: number, nonce = 1): Promise<Contracts.Crypto.ITransaction> {
+	async #createTransferTransaction(
+		sender: Wallet,
+		recipient: Wallet,
+		amount: string,
+		pubKeyHash: number,
+		nonce = 1,
+	): Promise<Contracts.Crypto.ITransaction> {
 		return this.#formatGenesisTransaction(
 			await (
 				await this.app
@@ -70,7 +76,12 @@ export class GenesisBlockGenerator extends Generator {
 		);
 	}
 
-	async #createTransferTransactions(sender: Wallet, recipients: Wallet[], totalPremine: string, pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
+	async #createTransferTransactions(
+		sender: Wallet,
+		recipients: Wallet[],
+		totalPremine: string,
+		pubKeyHash: number,
+	): Promise<Contracts.Crypto.ITransaction[]> {
 		const amount: string = BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
 
 		const result: Contracts.Crypto.ITransaction[] = [];
@@ -126,7 +137,10 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
-	async #formatGenesisTransaction(transaction: Contracts.Crypto.ITransaction, wallet: Wallet): Promise<Contracts.Crypto.ITransaction> {
+	async #formatGenesisTransaction(
+		transaction: Contracts.Crypto.ITransaction,
+		wallet: Wallet,
+	): Promise<Contracts.Crypto.ITransaction> {
 		Object.assign(transaction.data, {
 			fee: BigNumber.ZERO,
 			timestamp: 0,

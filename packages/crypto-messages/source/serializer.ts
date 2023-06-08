@@ -28,8 +28,9 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // height
 				4 + // round
 				this.validatorPublicKeySize + // validator
-				4 + proposal.block.serialized.length / 2 + // serialized block
-				(options.excludeSignature ? 0 : this.signatureSize), // signature 
+				4 +
+				proposal.block.serialized.length / 2 + // serialized block
+				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
 			// TODO
 			schema: {
@@ -47,7 +48,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				},
 				signature: {
 					type: "signature",
-					required: options.excludeSignature ? false : true
+					required: !options.excludeSignature,
 				},
 				block: {
 					type: "hex",
@@ -67,7 +68,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // round
 				this.validatorPublicKeySize + // validator
 				this.hashSize + // blockId
-				(options.excludeSignature ? 0 : this.signatureSize), // signature 
+				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
 			// TODO
 			schema: {
@@ -85,7 +86,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				},
 				signature: {
 					type: "signature",
-					required: options.excludeSignature ? false : true
+					required: !options.excludeSignature,
 				},
 				blockId: {
 					type: "blockId",
@@ -105,7 +106,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // round
 				this.validatorPublicKeySize + // validator
 				this.hashSize + // blockId
-				(options.excludeSignature ? 0 : this.signatureSize), // signature 
+				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
 			// TODO
 			schema: {
@@ -123,7 +124,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				},
 				signature: {
 					type: "signature",
-					required: options.excludeSignature ? false : true
+					required: !options.excludeSignature,
 				},
 				blockId: {
 					type: "blockId",
