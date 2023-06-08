@@ -7,13 +7,15 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-has
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../../crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoConsensus } from "../../../../crypto-consensus-bls12-381";
-import { ServiceProvider as CoreCryptoTransaction, TransactionRegistry } from "../../../../crypto-transaction";
-import { MultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment";
-import { MultiSignatureRegistrationTransaction } from "../../../../crypto-transaction-multi-signature-registration";
-import { TransferTransaction } from "../../../../crypto-transaction-transfer";
-import { ValidatorRegistrationTransaction } from "../../../../crypto-transaction-validator-registration";
-import { ValidatorResignationTransaction } from "../../../../crypto-transaction-validator-resignation";
-import { VoteTransaction } from "../../../../crypto-transaction-vote";
+import { ServiceProvider as CoreCryptoTransaction } from "../../../../crypto-transaction";
+import { ServiceProvider as CoreMultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment";
+import { ServiceProvider as CoreMultiSignatureRegistrationTransaction } from "../../../../crypto-transaction-multi-signature-registration";
+import { ServiceProvider as CoreTransferTransaction } from "../../../../crypto-transaction-transfer";
+import { ServiceProvider as CoreValidatorRegistrationTransaction } from "../../../../crypto-transaction-validator-registration";
+import { ServiceProvider as CoreValidatorResignationTransaction } from "../../../../crypto-transaction-validator-resignation";
+import { ServiceProvider as CoreVoteTransaction } from "../../../../crypto-transaction-vote";
+import { ServiceProvider as CoreFees } from "../../../../fees";
+import { ServiceProvider as CoreFeesStatic } from "../../../../fees-static";
 import { ServiceProvider as CoreCryptoValidation } from "../../../../crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "../../../../crypto-wif";
 import { ServiceProvider as CoreSerializer } from "../../../../serializer";
@@ -37,29 +39,18 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
 	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 	await sandbox.app.resolve(CoreCryptoConsensus).register();
+	await sandbox.app.resolve(CoreFees).register();
+	await sandbox.app.resolve(CoreFeesStatic).register();
 	await sandbox.app.resolve(CoreCryptoTransaction).register();
+	await sandbox.app.resolve(CoreTransferTransaction).register();
+	await sandbox.app.resolve(CoreVoteTransaction).register();
+	await sandbox.app.resolve(CoreValidatorRegistrationTransaction).register();
+	await sandbox.app.resolve(CoreValidatorResignationTransaction).register();
+	await sandbox.app.resolve(CoreMultiSignatureRegistrationTransaction).register();
+	await sandbox.app.resolve(CoreMultiPaymentTransaction).register();
 	await sandbox.app.resolve(CoreCryptoBlock).register();
 	await sandbox.app.resolve(CoreSerializer).register();
 	await sandbox.app.resolve(CoreCryptoWif).register();
-
-	sandbox.app
-		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-		.registerTransactionType(TransferTransaction);
-	sandbox.app
-		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-		.registerTransactionType(ValidatorRegistrationTransaction);
-	sandbox.app
-		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-		.registerTransactionType(ValidatorResignationTransaction);
-	sandbox.app
-		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-		.registerTransactionType(VoteTransaction);
-	sandbox.app
-		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-		.registerTransactionType(MultiSignatureRegistrationTransaction);
-	sandbox.app
-		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-		.registerTransactionType(MultiPaymentTransaction);
 
 	return sandbox.app;
 };

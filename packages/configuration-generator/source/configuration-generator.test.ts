@@ -49,7 +49,7 @@ describe<{
 					id: match.string,
 					numberOfTransactions: 103,
 					payloadHash: match.string,
-					payloadLength: 3296,
+					payloadLength: 15328,
 					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					timestamp: match.number,
@@ -92,7 +92,7 @@ describe<{
 
 	it("should log if logger is provided", async ({ generator, app }) => {
 		const logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		app.bind(InternalIdentifiers.LogService).toConstantValue(logger);
@@ -179,7 +179,7 @@ describe<{
 					id: match.string,
 					numberOfTransactions: 153,
 					payloadHash: match.string,
-					payloadLength: 4896,
+					payloadLength: 24828,
 					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					timestamp: match.number,
