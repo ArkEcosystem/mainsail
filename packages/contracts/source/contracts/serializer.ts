@@ -13,13 +13,14 @@ export type MandatoryPropertyType =
 
 export type OptionalPropertyType = "blockId";
 
-export type SerializationSchema = {
-	type: MandatoryPropertyType;
-} |
-{
-	type: OptionalPropertyType,
-	optional: boolean
-};
+export type SerializationSchema =
+	| {
+			type: MandatoryPropertyType;
+	  }
+	| {
+			type: OptionalPropertyType;
+			optional: boolean;
+	  };
 
 export interface SerializationConfiguration {
 	schema: Record<string, SerializationSchema>;

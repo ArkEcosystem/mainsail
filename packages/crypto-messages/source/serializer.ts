@@ -46,11 +46,13 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				block: {
 					type: "hex",
 				},
-				...(options.excludeSignature ? {} : {
-					signature: {
-						type: "signature",
-					}
-				}),
+				...(options.excludeSignature
+					? {}
+					: {
+							signature: {
+								type: "signature",
+							},
+					  }),
 			},
 		});
 	}
@@ -82,11 +84,13 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					type: "blockId",
 					optional: true,
 				},
-				...(options.excludeSignature ? {} : {
-					signature: {
-						type: "signature",
-					}
-				}),
+				...(options.excludeSignature
+					? {}
+					: {
+							signature: {
+								type: "signature",
+							},
+					  }),
 			},
 		});
 	}
@@ -118,11 +122,13 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					type: "blockId",
 					optional: true,
 				},
-				...(options.excludeSignature ? {} : {
-					signature: {
-						type: "signature",
-					}
-				}),
+				...(options.excludeSignature
+					? {}
+					: {
+							signature: {
+								type: "signature",
+							},
+					  }),
 			},
 		});
 	}
