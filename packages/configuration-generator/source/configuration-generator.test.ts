@@ -63,7 +63,7 @@ describe<{
 						activeValidators: 51,
 						address: match.object,
 						block: match.object,
-						blockTime: 8,
+						blockTime: 8000,
 						epoch: match.string,
 						height: 1,
 						multiPaymentLimit: 256,
