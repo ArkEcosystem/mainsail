@@ -19,7 +19,7 @@ describe<{
 		assert.equal(
 			generator
 				.setInitial({
-					blockTime: 8,
+					blockTime: 8000,
 					epoch: date,
 					maxBlockPayload: 2000,
 					maxTxPerBlock: 100,
@@ -38,7 +38,7 @@ describe<{
 						maxTransactions: 100,
 						version: 1,
 					},
-					blockTime: 8,
+					blockTime: 8000,
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
 					height: 1,
 					multiPaymentLimit: 256,

@@ -608,7 +608,7 @@ describe<{
 	// 	const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 	// 	stub(context.slots, "getTime").returnValue(100);
 	// 	stub(context.configuration, "getMilestone").returnValue({
-	// 		blockTime: 8,
+	// 		blockTime: 8000,
 	// 	});
 
 	// 	stub(context.peerRepository, "hasPeers").returnValue(true);
@@ -622,7 +622,7 @@ describe<{
 	// 	const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 	// 	stub(context.slots, "getTime").returnValue(100);
 	// 	stub(context.configuration, "getMilestone").returnValue({
-	// 		blockTime: 8,
+	// 		blockTime: 8000,
 	// 	});
 
 	// 	stub(context.peerRepository, "hasPeers").returnValue(true);
