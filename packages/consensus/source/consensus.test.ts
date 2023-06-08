@@ -90,7 +90,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(context.blockProcessor);
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.state);
 		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue(context.handler);
-		context.sandbox.app.bind(Identifiers.Consensus.Broadcaster).toConstantValue(context.broadcaster);
+		context.sandbox.app.bind(Identifiers.PeerBroadcaster).toConstantValue(context.broadcaster);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
