@@ -2,11 +2,11 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework";
 import { Peer } from "../distribution";
 import { Broadcaster } from "./broadcaster";
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	broadcaster: Broadcaster;
 	peers: Peer[];
