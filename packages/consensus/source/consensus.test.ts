@@ -44,6 +44,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.scheduler = {
+			delayProposal: () => {},
 			scheduleTimeoutPrecommit: () => {},
 			scheduleTimeoutPrevote: () => {},
 			scheduleTimeoutPropose: () => {},
@@ -151,6 +152,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const validatorPublicKey = "publicKey";
 
 		const spyLoggerInfo = spy(logger, "info");
+		const spyDelayProposal = spy(scheduler, "delayProposal");
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
 			{
 				getAttribute: () => validatorPublicKey,
@@ -162,6 +164,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		await consensus.startRound(0);
 
+		spyDelayProposal.calledOnce();
 		spyGetActiveValidators.calledOnce();
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(validatorPublicKey);
@@ -189,6 +192,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			propose: () => {},
 		};
 
+		const spyDelayProposal = spy(scheduler, "delayProposal");
 		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
 
@@ -207,6 +211,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		await consensus.startRound(0);
 
+		spyDelayProposal.calledOnce();
 		spyGetActiveValidators.calledOnce();
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(validatorPublicKey);
