@@ -37,7 +37,7 @@ describe<{
 
 		stub(blockchain, "getLastBlock").returnValue(lastBlock);
 		const slotInfo = {
-			blockTime: 8,
+			blockTime: 8000,
 			endTime: 99_000,
 			forgingStatus: true,
 			slotNumber: 344,

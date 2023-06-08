@@ -62,7 +62,7 @@ export class ConfigurationGenerator {
 		writeOptions?: Contracts.NetworkGenerator.WriteOptions,
 	): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
-			blockTime: 8,
+			blockTime: 8000,
 			coreDBHost: "localhost",
 			coreDBPort: 5432,
 			coreP2PPort: 4000,

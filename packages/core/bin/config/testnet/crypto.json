@@ -1826,7 +1826,7 @@
 				"maxTransactions": 150,
 				"version": 1
 			},
-			"blockTime": 8,
+			"blockTime": 8000,
 			"epoch": "2023-06-08T00:00:00.000Z",
 			"height": 1,
 			"multiPaymentLimit": 256,

@@ -1,10 +1,15 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import dayjs from "dayjs";
+import delay from "delay";
 
 @injectable()
 export class Scheduler implements Contracts.Consensus.IScheduler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.StateStore)
+	private readonly state!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
@@ -12,6 +17,17 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	#timeoutPropose?: NodeJS.Timeout;
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
+
+	public async delayProposal(): Promise<void> {
+		await delay(
+			Math.max(
+				0,
+				this.state.getLastBlock().data.timestamp -
+					dayjs().unix() +
+					this.cryptoConfiguration.getMilestone().blockTime,
+			),
+		);
+	}
 
 	public async scheduleTimeoutPropose(height: number, round: number): Promise<void> {
 		if (this.#timeoutPropose) {
