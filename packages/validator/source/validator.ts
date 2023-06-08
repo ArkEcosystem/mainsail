@@ -33,10 +33,10 @@ export class Validator implements Contracts.Consensus.IValidator {
 	private readonly messagesFactory!: Contracts.Crypto.IMessageFactory;
 
 	#keyPair!: Contracts.Crypto.IKeyPair;
-	#publicKey!: string;
+	#walletPublicKey!: string;
 
 	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Consensus.IValidator {
-		this.#publicKey = publicKey;
+		this.#walletPublicKey = publicKey;
 		this.#keyPair = keyPair;
 
 		return this;
@@ -125,7 +125,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		Utils.assert.defined<Contracts.Crypto.IBlock>(previousBlock);
 
 		return this.blockFactory.make({
-			generatorPublicKey: this.#publicKey,
+			generatorPublicKey: this.#walletPublicKey,
 			height: previousBlock.data.height + 1,
 			numberOfTransactions: transactions.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),

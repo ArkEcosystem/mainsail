@@ -12,7 +12,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	private readonly hashByteLength!: number;
 
 	@inject(Identifiers.Cryptography.Size.PublicKey)
-	@tagged("type", "consensus")
+	@tagged("type", "wallet")
 	private readonly generatorPublicKeyByteLength!: number;
 
 	public headerSize(): number {
@@ -30,8 +30,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	}
 
 	public totalSize(block: Contracts.Crypto.IBlockDataSerializable): number {
-		// TODO: remove workaround after regenerating genesis block
-		return block.height <= 1 ? 2_000_000 : (this.headerSize() + block.payloadLength);
+		return this.headerSize() + block.payloadLength;
 	}
 
 	public async serializeHeader(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
@@ -138,7 +137,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 				},
 				transactions: {
 					type: "transactions",
-					required: true,
+					required: false,
 				},
 			},
 		});

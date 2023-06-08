@@ -29,7 +29,10 @@ export class Generator {
 
 		return {
 			address: await this.app
-				.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+				.getTagged<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory,
+					"type",
+					"wallet"
+				)
 				.fromPublicKey(keys.publicKey),
 			keys,
 			passphrase: mnemonic,

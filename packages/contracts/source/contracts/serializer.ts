@@ -7,10 +7,9 @@ export type MandatoryPropertyType =
 	| "bigint"
 	| "hash"
 	| "publicKey"
-	| "hex"
-	| "transactions";
+	| "hex";
 
-export type OptionalPropertyType = "blockId" | "signature";
+export type OptionalPropertyType = "blockId" | "signature" | "transactions";
 
 export type SerializationSchema = {
 	type: MandatoryPropertyType;
@@ -18,7 +17,7 @@ export type SerializationSchema = {
 } |
 {
 	type: OptionalPropertyType,
-	required?: boolean
+	required: boolean
 };
 
 export interface SerializationConfiguration {

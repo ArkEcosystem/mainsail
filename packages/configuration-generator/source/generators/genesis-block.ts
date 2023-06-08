@@ -164,11 +164,13 @@ export class GenesisBlockGenerator extends Generator {
 
 		let payloadLength = transactions.length * 4;
 
+		const transactionData: Contracts.Crypto.ITransactionData[] = [];
 		for (const { serialized, data } of sortedTransactions) {
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
 
 			payloadBuffers.push(Buffer.from(data.id!, "hex"));
+			transactionData.push(data);
 			payloadLength += serialized.length;
 		}
 
@@ -189,11 +191,11 @@ export class GenesisBlockGenerator extends Generator {
 					timestamp: dayjs(options.epoch).unix(),
 					totalAmount: totals.amount,
 					totalFee: totals.fee,
-					transactions: transactions.map(tx => tx.data),
+					transactions: transactionData,
 					version: 1,
 				})
 			).data,
-			transactions: transactions.map(tx => tx.data),
+			transactions: transactionData,
 		};
 	}
 }
