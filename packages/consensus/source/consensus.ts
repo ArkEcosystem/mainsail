@@ -107,6 +107,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.scheduler.clear();
 
+		await this.scheduler.delayProposal();
+
 		const proposerPublicKey = await this.#getProposerPublicKey(this.#height, round);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 

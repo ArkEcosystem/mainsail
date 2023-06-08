@@ -60,6 +60,7 @@ export interface IBroadcaster {
 }
 
 export interface IScheduler {
+	delayProposal(): Promise<void>;
 	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
