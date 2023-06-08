@@ -952,7 +952,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getHeight(), 2);
 		void consensus.onMajorityPrecommit(roundState);
 		await fakeTimers.nextAsync();
-		await fakeTimers.nextAsync();
 
 		spyBlockProcessorCommit.calledOnce();
 		spyBlockProcessorCommit.calledWith(roundState);
@@ -984,7 +983,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getHeight(), 2);
 		void consensus.onMajorityPrecommit(roundState);
 		await fakeTimers.nextAsync();
-		await fakeTimers.nextAsync();
 
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
@@ -1002,7 +1000,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		assert.equal(consensus.getHeight(), 2);
 		void consensus.onMajorityPrecommit(roundState);
-		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
 		spyBlockProcessorCommit.calledOnce();

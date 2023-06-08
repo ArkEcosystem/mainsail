@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import delay from "delay";
 
 import { Step } from "./enums";
 
@@ -260,10 +259,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		);
 
 		await this.processor.commit(roundState);
-
-		// TODO: Caclulate timeout
-		// TODO: Wait for other approvals if needed
-		await delay(80);
 
 		this.#height++;
 		this.#lockedRound = undefined;
