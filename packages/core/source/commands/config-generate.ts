@@ -59,7 +59,7 @@ export class Command extends Commands.Command {
 			description: "The network blockTime.",
 			schema: Joi.number(),
 			promptType: "number",
-			default: 8,
+			default: 8000,
 		},
 		{
 			name: "maxTxPerBlock",

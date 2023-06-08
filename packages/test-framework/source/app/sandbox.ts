@@ -16,7 +16,7 @@ export class Sandbox {
 	#path = dirSync().name;
 
 	#configurationOptions: Contracts.NetworkGenerator.Options = {
-		blockTime: 8,
+		blockTime: 8000,
 		configPath: resolve(`${this.#path}/unitnet`),
 		distribute: true,
 		explorer: "http://uexplorer.ark.io",
