@@ -62,11 +62,6 @@ export const Identifiers = {
 			SHA256: Symbol.for("Crypto<Size.SHA256>"),
 			Signature: Symbol.for("Crypto<Size.Signature>"),
 		},
-		Time: {
-			BlockTimeCalculator: Symbol.for("Crypto<Time.BlockTimeCalculator>"),
-			BlockTimeLookup: Symbol.for("Crypto<Time.BlockTimeLookup>"),
-			Slots: Symbol.for("Crypto<Time.Slots>"),
-		},
 		Transaction: {
 			Deserializer: Symbol.for("Crypto<Transaction.Deserializer>"),
 			Factory: Symbol.for("Crypto<Transaction.Factory>"),
@@ -112,6 +107,8 @@ export const Identifiers = {
 		Server: Symbol.for("P2P<Server>"),
 	},
 	P2PServer: Symbol.for("Server<P2P>"),
+	PeerBlockDownloader: Symbol.for("Peer<BlockDownloader>"),
+	PeerBroadcaster: Symbol.for("Peer<Broadcaster>"),
 	PeerChunkCache: Symbol.for("Peer<ChunkCache>"),
 	PeerCommunicator: Symbol.for("Peer<Communicator>"),
 	PeerConnector: Symbol.for("Peer<Connector>"),
@@ -119,7 +116,6 @@ export const Identifiers = {
 	PeerNetworkMonitor: Symbol.for("Peer<NetworkMonitor>"),
 	PeerProcessor: Symbol.for("Peer<Processor>"),
 	PeerRepository: Symbol.for("Peer<Repository>"),
-	PeerTransactionBroadcaster: Symbol.for("Peer<TransactionBroadcaster>"),
 	PipelineFactory: Symbol.for("Factory<Pipeline>"),
 	PipelineService: Symbol.for("Service<Pipeline>"),
 	PluginConfiguration: Symbol.for("PluginConfiguration"),

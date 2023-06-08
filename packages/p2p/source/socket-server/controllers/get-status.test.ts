@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../../../test-framework";
 import rewiremock from "rewiremock";
 
+import { describe, Sandbox } from "../../../../test-framework";
 import { GetStatusController } from "./get-status";
 
 describe<{
@@ -23,7 +23,6 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(slots);
 
 		context.controller = context.sandbox.app.resolve(GetStatusControllerProxy);
 	});
@@ -52,8 +51,6 @@ describe<{
 		assert.equal(status, {
 			config: {},
 			state: {
-				currentSlot: slotInfo.slotNumber,
-				forgingAllowed: slotInfo.forgingStatus,
 				header,
 				height,
 			},

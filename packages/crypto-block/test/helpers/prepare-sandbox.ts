@@ -9,7 +9,6 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../crypto-hash-b
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoConsensus } from "../../../crypto-consensus-bls12-381";
-import { ServiceProvider as CoreCryptoTime } from "../../../crypto-time";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
@@ -29,7 +28,6 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreSerializer).register();
 	await context.sandbox.app.resolve(CoreValidation).register();
 	await context.sandbox.app.resolve(CoreCryptoConfig).register();
-	await context.sandbox.app.resolve(CoreCryptoTime).register();
 	await context.sandbox.app.resolve(CoreCryptoValidation).register();
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 	await context.sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();

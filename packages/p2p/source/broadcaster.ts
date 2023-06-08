@@ -5,7 +5,10 @@ import { Providers, Utils } from "@mainsail/kernel";
 import { PeerCommunicator } from "./peer-communicator";
 
 @injectable()
-export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcaster {
+export class Broadcaster implements Contracts.P2P.Broadcaster {
+	@inject(Identifiers.Application)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -43,5 +46,45 @@ export class TransactionBroadcaster implements Contracts.P2P.TransactionBroadcas
 		const promises = peers.map((p) => this.communicator.postTransactions(p, transactionsBroadcast));
 
 		await Promise.all(promises);
+	}
+
+	public async broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
+		const blockchain = this.app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService);
+
+		let blockPing = blockchain.getBlockPing();
+		let peers: Contracts.P2P.Peer[] = this.repository.getPeers();
+
+		if (blockPing && blockPing.block.id === block.data.id && !blockPing.fromForger) {
+			// wait a bit before broadcasting if a bit early
+			const diff = blockPing.last - blockPing.first;
+			const maxHop = 4;
+			let broadcastQuota: number = (maxHop - blockPing.count) / maxHop;
+
+			if (diff < 500 && broadcastQuota > 0) {
+				await Utils.sleep(500 - diff);
+
+				blockPing = blockchain.getBlockPing()!;
+
+				// got aleady a new block, no broadcast
+				if (blockPing.block.height !== block.data.height) {
+					return;
+				}
+
+				broadcastQuota = (maxHop - blockPing.count) / maxHop;
+			}
+
+			peers = broadcastQuota <= 0 ? [] : Utils.shuffle(peers).slice(0, Math.ceil(broadcastQuota * peers.length));
+			// select a portion of our peers according to quota calculated before
+		}
+
+		this.logger.info(
+			`Broadcasting block ${block.data.height.toLocaleString()} to ${Utils.pluralize(
+				"peer",
+				peers.length,
+				true,
+			)}`,
+		);
+
+		await Promise.all(peers.map((peer) => this.communicator.postBlock(peer, block)));
 	}
 }

@@ -1,13 +1,13 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../../../test-framework";
 import rewiremock from "rewiremock";
 
+import { describe, Sandbox } from "../../../../test-framework";
 import { PostBlockController } from "./post-block";
 
 const utilsMock = {
 	...Utils,
-	isBlockChained: () => {},
+	isBlockChained: () => { },
 };
 
 const { PostBlockController: PostBlockControllerProxy } = rewiremock.proxy<{
@@ -22,14 +22,14 @@ describe<{
 	sandbox: Sandbox;
 	controller: PostBlockController;
 }>("PostBlockController", ({ it, assert, beforeEach, stub, spy }) => {
-	const logger = { info: () => {} };
+	const logger = { info: () => { } };
 	const configuration = { getMilestone: () => ({ block: { maxTransactions: 150 } }) };
-	const deserializer = { deserialize: () => {}, deserializeHeader: () => {} };
+	const deserializer = { deserializeWithTransactions: () => { }, deserializeHeader: () => { } };
 	const blockchain = {
-		getLastDownloadedBlock: () => {},
-		getLastHeight: () => {},
-		handleIncomingBlock: () => {},
-		pingBlock: () => {},
+		getLastDownloadedBlock: () => { },
+		getLastHeight: () => { },
+		handleIncomingBlock: () => { },
+		pingBlock: () => { },
 	};
 	const slots = {};
 
@@ -40,7 +40,6 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue(deserializer);
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
-		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue(slots);
 
 		context.controller = context.sandbox.app.resolve(PostBlockControllerProxy);
 	});
@@ -57,7 +56,7 @@ describe<{
 	it("should return status true if block is pinged", async ({ controller }) => {
 		const blockHeader = { numberOfTransactions: 0 };
 		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
-		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
+		stub(deserializer, "deserializeWithTransactions").resolvedValue({ data: blockHeader, transactions: [] });
 		stub(blockchain, "pingBlock").returnValue(true);
 		stub(blockchain, "getLastHeight").returnValue(100);
 
@@ -70,7 +69,7 @@ describe<{
 	it("should return status false if block is not chained", async ({ controller }) => {
 		const blockHeader = { numberOfTransactions: 0 };
 		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
-		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
+		stub(deserializer, "deserializeWithTransactions").resolvedValue({ data: blockHeader, transactions: [] });
 
 		stub(blockchain, "pingBlock").returnValue(false);
 		stub(blockchain, "getLastHeight").returnValue(100);
@@ -86,7 +85,7 @@ describe<{
 		const blockHeader = { height: 101, numberOfTransactions: 0 };
 
 		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
-		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
+		stub(deserializer, "deserializeWithTransactions").resolvedValue({ data: blockHeader, transactions: [] });
 		stub(blockchain, "pingBlock").returnValue(false);
 		stub(blockchain, "getLastHeight").returnValue(100);
 		stub(utilsMock, "isBlockChained").returnValue(true);
@@ -94,7 +93,7 @@ describe<{
 		const spyHandleIncommingBlock = spy(blockchain, "handleIncomingBlock");
 
 		assert.equal(
-			await controller.handle({ payload: { block: Buffer.from("") }, info: { remoteAddress: "127.0.0.1" } }, {}),
+			await controller.handle({ info: { remoteAddress: "127.0.0.1" }, payload: { block: Buffer.from("") } }, {}),
 			{
 				height: 100,
 				status: true,

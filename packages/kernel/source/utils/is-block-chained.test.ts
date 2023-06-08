@@ -86,7 +86,7 @@ describe("", ({ assert, it, stub }) => {
 		);
 	});
 
-	it("isBlockChained should not chain when same slot", async () => {
+	it("isBlockChained should not chain when same timestamp", async () => {
 		const previousBlock: Partial<Contracts.Crypto.IBlockData> = {
 			height: 1,
 			id: "1",
@@ -98,7 +98,7 @@ describe("", ({ assert, it, stub }) => {
 			height: 2,
 			id: "2",
 			previousBlock: "1",
-			timestamp: 2,
+			timestamp: 1,
 		};
 
 		stub(slots, "getSlotNumber").resolvedValueNth(0, 1).resolvedValueNth(1, 1);
@@ -112,19 +112,19 @@ describe("", ({ assert, it, stub }) => {
 		);
 	});
 
-	it("isBlockChained should not chain when lower slot", async () => {
+	it("isBlockChained should not chain when lower timestamp", async () => {
 		const previousBlock: Partial<Contracts.Crypto.IBlockData> = {
 			height: 1,
 			id: "1",
 			previousBlock: null,
-			timestamp: 1,
+			timestamp: 2,
 		};
 
 		const nextBlock: Partial<Contracts.Crypto.IBlockData> = {
 			height: 2,
 			id: "2",
 			previousBlock: "1",
-			timestamp: 2,
+			timestamp: 1,
 		};
 
 		stub(slots, "getSlotNumber").resolvedValueNth(0, 2).resolvedValueNth(1, 1);
@@ -220,7 +220,7 @@ describe("", ({ assert, it, stub }) => {
 		);
 	});
 
-	it("getBlockNotChainedErrorMessage should not chain when same slot", async () => {
+	it("getBlockNotChainedErrorMessage should not chain when same timestamp", async () => {
 		const previousBlock = {
 			height: 1,
 			id: "1",
@@ -243,11 +243,11 @@ describe("", ({ assert, it, stub }) => {
 				nextBlock as Contracts.Crypto.IBlockData,
 				slots as Contracts.Crypto.Slots,
 			),
-			"Block { height: 2, id: 2, previousBlock: 1 } is not chained to the previous block { height: 1, id: 1 }: previous slot is not smaller: 1 (derived from timestamp 1) VS 1 (derived from timestamp 1)",
+			"Block { height: 2, id: 2, previousBlock: 1 } is not chained to the previous block { height: 1, id: 1 }: previous timestamp is after current timestamp: 1 VS 1",
 		);
 	});
 
-	it("getBlockNotChainedErrorMessage should not chain when lower slot", async () => {
+	it("getBlockNotChainedErrorMessage should not chain when lower timestamp", async () => {
 		const previousBlock = {
 			height: 1,
 			id: "1",
@@ -270,7 +270,7 @@ describe("", ({ assert, it, stub }) => {
 				nextBlock as Contracts.Crypto.IBlockData,
 				slots as Contracts.Crypto.Slots,
 			),
-			"Block { height: 2, id: 2, previousBlock: 1 } is not chained to the previous block { height: 1, id: 1 }: previous slot is not smaller: 2 (derived from timestamp 2) VS 1 (derived from timestamp 1)",
+			"Block { height: 2, id: 2, previousBlock: 1 } is not chained to the previous block { height: 1, id: 1 }: previous timestamp is after current timestamp: 2 VS 1",
 		);
 	});
 });

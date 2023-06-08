@@ -7,7 +7,6 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
-import { ServiceProvider as CoreCryptoTime } from "@mainsail/crypto-time";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoTransactionValidatorRegistration } from "@mainsail/crypto-transaction-validator-registration";
@@ -40,7 +39,6 @@ export const makeApplication = async (configurationPath?: string) => {
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();
 	await app.resolve(CoreCryptoConfig).register();
-	await app.resolve(CoreCryptoTime).register();
 	await app.resolve(CoreCryptoValidation).register();
 	await app.resolve(CoreCryptoHashBcrypto).register();
 	await app.resolve(CoreCryptoSignatureSchnorr).register();

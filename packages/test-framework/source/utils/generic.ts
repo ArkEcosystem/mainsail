@@ -1,29 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import cloneDeep from "lodash.clonedeep";
-
-const defaultblockTimestampLookup = (height: number): number => {
-	if (height === 1) {
-		return 0;
-	}
-
-	throw new Error(`Attempted to lookup block with height ${height}, but no lookup implementation was provided`);
-};
-
-export const snoozeForBlock = async (
-	sleep = 0,
-	height = 1,
-	blockTimestampLookupByHeight = defaultblockTimestampLookup,
-	configuration: Contracts.Crypto.IConfiguration,
-	slots: Contracts.Crypto.Slots,
-): Promise<void> => {
-	const blockTime: number = configuration.getMilestone(height).blockTime * 1000;
-	const remainingTimeInSlot: number = await slots.getTimeInMsUntilNextSlot();
-	const sleepTime: number = sleep * 1000;
-
-	return AppUtils.sleep(blockTime + remainingTimeInSlot + sleepTime);
-};
 
 export const injectMilestone = (
 	index: number,

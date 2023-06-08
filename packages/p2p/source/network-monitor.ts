@@ -6,8 +6,6 @@ import delay from "delay";
 import { NetworkState } from "./network-state";
 import { PeerCommunicator } from "./peer-communicator";
 
-const defaultDownloadChunkSize = 400;
-
 // @TODO review the implementation
 @injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
@@ -30,21 +28,13 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.PeerProcessor)
 	private readonly processor!: Contracts.P2P.PeerProcessor;
 
-	@inject(Identifiers.PeerChunkCache)
-	private readonly chunkCache!: Contracts.P2P.ChunkCache;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
-
 	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
+
 	#coldStart = false;
-
-	#downloadChunkSize: number = defaultDownloadChunkSize;
-
 	#initializing = true;
 
 	@postConstruct()
@@ -255,7 +245,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async getNetworkState(): Promise<Contracts.P2P.NetworkState> {
 		await this.cleansePeers({ fast: true, forcePing: true });
 
-		return await NetworkState.analyze(this, this.repository, this.slots);
+		return await NetworkState.analyze(this, this.repository);
 	}
 
 	public async refreshPeersAfterFork(): Promise<void> {
@@ -320,203 +310,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		return { forked: false };
-	}
-
-	public async downloadBlocksFromHeight(
-		fromBlockHeight: number,
-		maxParallelDownloads = 10,
-	): Promise<Contracts.Crypto.IBlockData[]> {
-		const peersAll: Contracts.P2P.Peer[] = this.repository.getPeers();
-
-		if (peersAll.length === 0) {
-			this.logger.error(`Could not download blocks: we have 0 peers`);
-			return [];
-		}
-
-		const peersNotForked: Contracts.P2P.Peer[] = Utils.shuffle(peersAll.filter((peer) => !peer.isForked()));
-
-		if (peersNotForked.length === 0) {
-			this.logger.error(
-				`Could not download blocks: We have ${peersAll.length} peer(s) but all ` +
-					`of them are on a different chain than us`,
-			);
-			return [];
-		}
-
-		const networkHeight: number = this.getNetworkHeight();
-		let chunksMissingToSync: number;
-
-		if (!networkHeight || networkHeight <= fromBlockHeight) {
-			chunksMissingToSync = 1;
-		} else {
-			chunksMissingToSync = Math.ceil((networkHeight - fromBlockHeight) / this.#downloadChunkSize);
-		}
-		const chunksToDownload: number = Math.min(chunksMissingToSync, peersNotForked.length, maxParallelDownloads);
-
-		// We must return an uninterrupted sequence of blocks, starting from `fromBlockHeight`,
-		// with sequential heights, without gaps.
-
-		const downloadJobs = [];
-		const downloadResults: any = [];
-		let someJobFailed = false;
-		let chunksHumanReadable = "";
-
-		for (let index = 0; index < chunksToDownload; index++) {
-			const height: number = fromBlockHeight + this.#downloadChunkSize * index;
-			const isLastChunk: boolean = index === chunksToDownload - 1;
-			const blocksRange = `[${(height + 1).toLocaleString()}, ${(isLastChunk
-				? ".."
-				: height + this.#downloadChunkSize
-			).toLocaleString()}]`;
-
-			//@ts-ignore
-			downloadJobs.push(async () => {
-				if (this.chunkCache.has(blocksRange)) {
-					downloadResults[index] = this.chunkCache.get(blocksRange);
-					// Remove it from the cache so that it does not get served many times
-					// from the cache. In case of network reorganization or downloading
-					// flawed chunks we want to re-download from another peer.
-					this.chunkCache.remove(blocksRange);
-					return;
-				}
-
-				let blocks!: Contracts.Crypto.IBlockData[];
-				let peer: Contracts.P2P.Peer;
-				let peerPrint!: string;
-
-				// As a first peer to try, pick such a peer that different jobs use different peers.
-				// If that peer fails then pick randomly from the remaining peers that have not
-				// been first-attempt for any job.
-				const peersToTry = [peersNotForked[index], ...Utils.shuffle(peersNotForked.slice(chunksToDownload))];
-				if (peersToTry.length === 1) {
-					// special case where we don't have "backup peers" (that have not been first-attempt for any job)
-					// so add peers that have been first-attempt as backup peers
-					peersToTry.push(...peersNotForked.filter((p) => p.ip !== peersNotForked[index].ip));
-				}
-
-				for (peer of peersToTry) {
-					peerPrint = `${peer.ip}:${peer.port}`;
-					try {
-						blocks = await this.communicator.getPeerBlocks(peer, {
-							blockLimit: this.#downloadChunkSize,
-							fromBlockHeight: height,
-						});
-
-						if (blocks.length > 0 || isLastChunk) {
-							// when `isLastChunk` it can be normal that the peer does not send any block (when none were forged)
-							this.logger.debug(
-								`Downloaded blocks ${blocksRange} (${blocks.length}) ` + `from ${peerPrint}`,
-							);
-							downloadResults[index] = blocks;
-							return;
-						} else {
-							throw new Error("Peer did not return any block");
-						}
-					} catch (error) {
-						this.logger.info(
-							`Failed to download blocks ${blocksRange} from ${peerPrint}: ${error.message}`,
-						);
-					}
-
-					if (someJobFailed) {
-						this.logger.info(
-							`Giving up on trying to download blocks ${blocksRange}: ` + `another download job failed`,
-						);
-					}
-				}
-
-				someJobFailed = true;
-				throw new Error(
-					`Could not download blocks ${blocksRange} from any of ${peersToTry.length} ` +
-						`peer(s). Last attempt returned ${blocks.length} block(s) from peer ${peerPrint}.`,
-				);
-			});
-
-			if (chunksHumanReadable.length > 0) {
-				chunksHumanReadable += ", ";
-			}
-			chunksHumanReadable += blocksRange;
-		}
-
-		this.logger.debug(`Downloading blocks in chunks: ${chunksHumanReadable}`);
-		let firstFailureMessage!: string;
-
-		try {
-			// Convert the array of AsyncFunction to an array of Promise by calling the functions.
-			// @ts-ignore
-			await Promise.all(downloadJobs.map((f) => f()));
-		} catch (error) {
-			firstFailureMessage = error.message;
-		}
-
-		let downloadedBlocks: Contracts.Crypto.IBlockData[] = [];
-
-		let index;
-
-		for (index = 0; index < chunksToDownload; index++) {
-			if (downloadResults[index] === undefined) {
-				this.logger.error(firstFailureMessage);
-				break;
-			}
-			downloadedBlocks = [...downloadedBlocks, ...downloadResults[index]];
-		}
-		// Save any downloaded chunks that are higher than a failed chunk for later reuse.
-		for (index++; index < chunksToDownload; index++) {
-			if (downloadResults[index]) {
-				const height: number = fromBlockHeight + this.#downloadChunkSize * index;
-				const blocksRange = `[${(height + 1).toLocaleString()}, ${(
-					height + this.#downloadChunkSize
-				).toLocaleString()}]`;
-
-				this.chunkCache.set(blocksRange, downloadResults[index]);
-			}
-		}
-
-		// if we did not manage to download any block, reduce chunk size for next time
-		this.#downloadChunkSize =
-			downloadedBlocks.length === 0 ? Math.ceil(this.#downloadChunkSize / 10) : defaultDownloadChunkSize;
-
-		return downloadedBlocks;
-	}
-
-	public async broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-		const blockchain = this.app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService);
-
-		let blockPing = blockchain.getBlockPing();
-		let peers: Contracts.P2P.Peer[] = this.repository.getPeers();
-
-		if (blockPing && blockPing.block.id === block.data.id && !blockPing.fromForger) {
-			// wait a bit before broadcasting if a bit early
-			const diff = blockPing.last - blockPing.first;
-			const maxHop = 4;
-			let broadcastQuota: number = (maxHop - blockPing.count) / maxHop;
-
-			if (diff < 500 && broadcastQuota > 0) {
-				await Utils.sleep(500 - diff);
-
-				blockPing = blockchain.getBlockPing()!;
-
-				// got aleady a new block, no broadcast
-				if (blockPing.block.height !== block.data.height) {
-					return;
-				}
-
-				broadcastQuota = (maxHop - blockPing.count) / maxHop;
-			}
-
-			peers = broadcastQuota <= 0 ? [] : Utils.shuffle(peers).slice(0, Math.ceil(broadcastQuota * peers.length));
-			// select a portion of our peers according to quota calculated before
-		}
-
-		this.logger.info(
-			`Broadcasting block ${block.data.height.toLocaleString()} to ${Utils.pluralize(
-				"peer",
-				peers.length,
-				true,
-			)}`,
-		);
-
-		await Promise.all(peers.map((peer) => this.communicator.postBlock(peer, block)));
 	}
 
 	async #pingPeerPorts(pingAll?: boolean): Promise<void> {

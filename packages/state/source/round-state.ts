@@ -38,9 +38,6 @@ export class RoundState {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
-	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: Contracts.Crypto.Slots;
-
 	#blocksInCurrentRound: Contracts.Crypto.IBlock[] = [];
 	#forgingValidators: Contracts.State.Wallet[] = [];
 
@@ -114,26 +111,26 @@ export class RoundState {
 			return;
 		}
 
-		const lastSlot: number = await this.slots.getSlotNumber(lastBlock.data.timestamp);
-		const currentSlot: number = await this.slots.getSlotNumber(block.data.timestamp);
+		// const lastSlot: number = await this.slots.getSlotNumber(lastBlock.data.timestamp);
+		// const currentSlot: number = await this.slots.getSlotNumber(block.data.timestamp);
 
-		const missedSlots: number = Math.min(currentSlot - lastSlot - 1, this.#forgingValidators.length);
-		for (let index = 0; index < missedSlots; index++) {
-			const missedSlot: number = lastSlot + index + 1;
-			const validator: Contracts.State.Wallet =
-				this.#forgingValidators[missedSlot % this.#forgingValidators.length];
+		// const missedSlots: number = Math.min(currentSlot - lastSlot - 1, this.#forgingValidators.length);
+		// for (let index = 0; index < missedSlots; index++) {
+		// 	const missedSlot: number = lastSlot + index + 1;
+		// 	const validator: Contracts.State.Wallet =
+		// 		this.#forgingValidators[missedSlot % this.#forgingValidators.length];
 
-			// TODO: the missed slots are inaccurate
-			// this.logger.debug(
-			// 	`Validator ${validator.getAttribute(
-			// 		"validator.username",
-			// 	)} (${validator.getPublicKey()}) just missed a block.`,
-			// );
+		// 	// TODO: the missed slots are inaccurate
+		// 	// this.logger.debug(
+		// 	// 	`Validator ${validator.getAttribute(
+		// 	// 		"validator.username",
+		// 	// 	)} (${validator.getPublicKey()}) just missed a block.`,
+		// 	// );
 
-			await this.events.dispatch(Enums.ForgerEvent.Missing, {
-				validator,
-			});
-		}
+		// 	await this.events.dispatch(Enums.ForgerEvent.Missing, {
+		// 		validator,
+		// 	});
+		// }
 	}
 
 	async #applyRound(height: number): Promise<void> {
