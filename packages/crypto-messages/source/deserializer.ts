@@ -15,8 +15,6 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.IProposal>(buffer, proposal, {
-			length: 4 + 4 + 48 + 96,
-			// TODO
 			schema: {
 				height: {
 					type: "uint32",
@@ -26,6 +24,9 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				},
 				validatorPublicKey: {
 					type: "publicKey",
+				},
+				block: {
+					type: "hex",
 				},
 				signature: {
 					type: "signature",
@@ -42,8 +43,6 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.IPrecommit>(buffer, precommit, {
-			length: 2_000_000,
-			// TODO
 			schema: {
 				height: {
 					type: "uint32",
@@ -55,7 +54,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "publicKey",
 				},
 				blockId: {
-					type: "hash",
+					type: "blockId",
 				},
 				signature: {
 					type: "signature",
@@ -72,8 +71,6 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.IPrevote>(buffer, prevote, {
-			length: 2_000_000,
-			// TODO
 			schema: {
 				height: {
 					type: "uint32",
@@ -85,7 +82,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "publicKey",
 				},
 				blockId: {
-					type: "hash",
+					type: "blockId",
 				},
 				signature: {
 					type: "signature",

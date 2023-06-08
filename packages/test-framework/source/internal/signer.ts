@@ -26,7 +26,7 @@ export class Signer {
 		this.#factoryBuilder = new FactoryBuilder();
 	}
 
-	public async makeTransfer(options: TransferOptions): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeTransfer(options: TransferOptions): Promise<Contracts.Crypto.ITransaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -44,10 +44,10 @@ export class Signer {
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.getStruct();
+		return transferBuilder.build();
 	}
 
-	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.ITransaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -59,10 +59,10 @@ export class Signer {
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.getStruct();
+		return await transferBuilder.build();
 	}
 
-	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.ITransaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -74,12 +74,12 @@ export class Signer {
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.getStruct();
+		return transferBuilder.build();
 	}
 
 	public async makeMultiSignatureRegistration(
 		options: MultiSignatureOptions,
-	): Promise<Contracts.Crypto.ITransactionData> {
+	): Promise<Contracts.Crypto.ITransaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -91,10 +91,10 @@ export class Signer {
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.getStruct();
+		return transferBuilder.build();
 	}
 
-	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.ITransaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -106,7 +106,7 @@ export class Signer {
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.getStruct();
+		return transferBuilder.build();
 	}
 
 	#incrementNonce(): void {

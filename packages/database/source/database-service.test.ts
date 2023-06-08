@@ -5,6 +5,7 @@ import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -92,6 +93,7 @@ describe<{
 		await context.sandbox.app.resolve(CoreCryptoValidation).register();
 		await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 		await context.sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
+		await context.sandbox.app.resolve(CoreCryptoConsensus).register();
 		await context.sandbox.app.resolve(CoreCryptoAddressBeach32m).register();
 		await context.sandbox.app.resolve(CoreSerializer).register();
 		await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();

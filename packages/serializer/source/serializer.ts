@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
@@ -33,36 +34,65 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		}
 
 		for (const [property, schema] of Object.entries(configuration.schema)) {
-			if (data[property] === undefined && schema.required === false) {
-				continue;
+			const value = data[property];
+			const isOptional = schema["optional"] ?? false;
+
+			if (!isOptional) {
+				Utils.assert.defined(value);
 			}
 
 			if (schema.type === "uint32") {
-				result.writeUint32(data[property]);
+				result.writeUint32(value);
+				continue;
 			}
 
 			if (schema.type === "uint64") {
-				result.writeUint64(data[property]);
+				result.writeUint64(value);
+				continue;
 			}
 
 			if (schema.type === "bigint") {
-				result.writeUint64(data[property].toString());
+				result.writeUint64(value.toString());
+				continue;
 			}
 
 			if (schema.type === "hash") {
-				result.writeBytes(Buffer.from(data[property], "hex"));
+				result.writeBytes(Buffer.from(value, "hex"));
+				continue;
+			}
+
+			if (schema.type === "blockId") {
+				if (value === undefined) {
+					result.writeBytes(Buffer.alloc(this.hashSize));
+				} else {
+					result.writeBytes(Buffer.from(value, "hex"));
+				}
+
+				continue;
 			}
 
 			if (schema.type === "address") {
-				this.addressSerializer.serialize(result, await this.addressFactory.toBuffer(data[property]));
+				this.addressSerializer.serialize(result, await this.addressFactory.toBuffer(value));
+				continue;
 			}
 
 			if (schema.type === "publicKey") {
 				this.publicKeySerializer.serialize(result, data[property]);
+				continue;
 			}
 
 			if (schema.type === "signature") {
 				this.signatureSerializer.serialize(result, data[property]);
+				continue;
+			}
+
+			if (schema.type === "hex") {
+				Utils.assert.string(data[property]["serialized"]);
+
+				const serialized = Buffer.from(data[property]["serialized"], "hex");
+				result.writeUint32(serialized.length);
+				result.writeBytes(serialized);
+				continue;
 			}
 
 			if (schema.type === "transactions") {
@@ -72,6 +102,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 					result.writeUint32(serialized.length);
 					result.writeBytes(serialized);
 				}
+				continue;
 			}
 		}
 
@@ -86,30 +117,47 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		for (const [property, schema] of Object.entries(configuration.schema)) {
 			if (schema.type === "uint32") {
 				target[property] = source.readUint32();
+				continue;
 			}
 
 			if (schema.type === "uint64") {
 				target[property] = +source.readUint64().toString();
+				continue;
 			}
 
 			if (schema.type === "bigint") {
 				target[property] = BigNumber.make(source.readUint64().toString());
+				continue;
 			}
 
 			if (schema.type === "hash") {
 				target[property] = source.readBytes(schema.size ?? this.hashSize).toString("hex");
+				continue;
+			}
+
+			if (schema.type === "blockId") {
+				target[property] = source.readBytes(schema.size ?? this.hashSize).toString("hex");
+				continue;
 			}
 
 			if (schema.type === "address") {
 				target[property] = await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(source));
+				continue;
 			}
 
 			if (schema.type === "publicKey") {
 				target[property] = this.publicKeySerializer.deserialize(source).toString("hex");
+				continue;
 			}
 
 			if (schema.type === "signature") {
 				target[property] = this.signatureSerializer.deserialize(source).toString("hex");
+				continue;
+			}
+
+			if (schema.type === "hex") {
+				target[property] = source.readBytes(source.readUint32()).toString("hex");
+				continue;
 			}
 
 			if (schema.type === "transactions") {
@@ -118,6 +166,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				for (let index = 0; index < (target as any).numberOfTransactions; index++) {
 					target[property].push(source.readBytes(source.readUint32()));
 				}
+				continue;
 			}
 		}
 

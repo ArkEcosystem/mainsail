@@ -24,7 +24,7 @@ describe<{
 }>("PostBlockController", ({ it, assert, beforeEach, stub, spy }) => {
 	const logger = { info: () => {} };
 	const configuration = { getMilestone: () => ({ block: { maxTransactions: 150 } }) };
-	const deserializer = { deserialize: () => {}, deserializeHeader: () => {} };
+	const deserializer = { deserializeWithTransactions: () => {}, deserializeHeader: () => {} };
 	const blockchain = {
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
@@ -56,7 +56,7 @@ describe<{
 	it("should return status true if block is pinged", async ({ controller }) => {
 		const blockHeader = { numberOfTransactions: 0 };
 		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
-		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
+		stub(deserializer, "deserializeWithTransactions").resolvedValue({ data: blockHeader, transactions: [] });
 		stub(blockchain, "pingBlock").returnValue(true);
 		stub(blockchain, "getLastHeight").returnValue(100);
 
@@ -69,7 +69,7 @@ describe<{
 	it("should return status false if block is not chained", async ({ controller }) => {
 		const blockHeader = { numberOfTransactions: 0 };
 		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
-		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
+		stub(deserializer, "deserializeWithTransactions").resolvedValue({ data: blockHeader, transactions: [] });
 
 		stub(blockchain, "pingBlock").returnValue(false);
 		stub(blockchain, "getLastHeight").returnValue(100);
@@ -85,7 +85,7 @@ describe<{
 		const blockHeader = { height: 101, numberOfTransactions: 0 };
 
 		stub(deserializer, "deserializeHeader").resolvedValue(blockHeader);
-		stub(deserializer, "deserialize").resolvedValue({ data: blockHeader, transactions: [] });
+		stub(deserializer, "deserializeWithTransactions").resolvedValue({ data: blockHeader, transactions: [] });
 		stub(blockchain, "pingBlock").returnValue(false);
 		stub(blockchain, "getLastHeight").returnValue(100);
 		stub(utilsMock, "isBlockChained").returnValue(true);
