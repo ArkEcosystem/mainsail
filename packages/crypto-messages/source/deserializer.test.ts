@@ -1,10 +1,14 @@
 import { describe, Sandbox } from "../../test-framework";
 import {
 	precommitData,
+	precommitDataNoBlock,
 	prevoteData,
+	prevoteDataNoBlock,
 	proposalData,
 	serializedPrecommit,
+	serializedPrecommitNoBlock,
 	serializedPrevote,
+	serializedPrevoteNoBlock,
 	serializedProposal,
 } from "../test/fixtures/proposal";
 import { assertPrecommit, assertPrevote, assertProposal } from "../test/helpers/asserts";
@@ -31,8 +35,18 @@ describe<{
 		assertPrecommit(assert, deserialized, precommitData);
 	});
 
+	it("#deserializePrecommit - should correctly deserialize without block", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializePrecommit(Buffer.from(serializedPrecommitNoBlock, "hex"));
+		assertPrecommit(assert, deserialized, precommitDataNoBlock);
+	});
+
 	it("#deserializePrevote - should correctly deserialize", async ({ deserializer }) => {
 		const deserialized = await deserializer.deserializePrevote(Buffer.from(serializedPrevote, "hex"));
 		assertPrevote(assert, deserialized, prevoteData);
+	});
+
+	it("#deserializePrevote - should correctly deserialize without block", async ({ deserializer }) => {
+		const deserialized = await deserializer.deserializePrevote(Buffer.from(serializedPrevoteNoBlock, "hex"));
+		assertPrevote(assert, deserialized, prevoteDataNoBlock);
 	});
 });

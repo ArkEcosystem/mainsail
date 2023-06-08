@@ -36,7 +36,7 @@ export class PostBlockController implements Contracts.P2P.Controller {
 		const deserialized: {
 			data: Contracts.Crypto.IBlockData;
 			transactions: Contracts.Crypto.ITransaction[];
-		} = await this.deserializer.deserialize(blockBuffer);
+		} = await this.deserializer.deserializeWithTransactions(blockBuffer);
 
 		const block: Contracts.Crypto.IBlockData = {
 			...deserialized.data,

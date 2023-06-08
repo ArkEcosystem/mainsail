@@ -20,37 +20,19 @@ describe<{
 	});
 
 	it("#size - should return size", ({ serializer }) => {
-		assert.equal(
-			// @ts-ignore
-			serializer.size({
-				data: blockData,
-				transactions: [],
-			}),
-			140,
-		);
+		assert.equal(serializer.headerSize(), 140);
+
+		assert.equal(serializer.totalSize(blockData), 140);
 	});
 
 	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
-		assert.equal(
-			// @ts-ignore
-			serializer.size({
-				data: blockDataWithTransactions,
-				transactions: await Promise.all(
-					blockDataWithTransactions.transactions.map(async (tx) =>
-						sandbox.app
-							.get<Contracts.Crypto.ITransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
-							.fromData(tx),
-					),
-				),
-			}),
-			520,
-		);
+		assert.equal(serializer.totalSize(blockDataWithTransactions), 520);
 	});
 
 	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {
-		const serialized = await serializer.serialize(blockData);
+		const serialized = await serializer.serializeWithTransactions(blockData);
 
-		const deserialized = await deserializer.deserialize(serialized);
+		const deserialized = await deserializer.deserializeWithTransactions(serialized);
 
 		assertBlockData(assert, deserialized.data, blockData);
 	});
@@ -60,8 +42,7 @@ describe<{
 		deserializer,
 	}) => {
 		const serialized = await serializer.serializeWithTransactions(blockDataWithTransactions);
-
-		const deserialized = await deserializer.deserialize(serialized);
+		const deserialized = await deserializer.deserializeWithTransactions(serialized);
 
 		assertBlockData(assert, deserialized.data, blockDataWithTransactions);
 

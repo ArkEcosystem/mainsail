@@ -15,7 +15,7 @@ describe<{
 	});
 
 	it("#deserialize - should correctly deserialize a block", async ({ deserializer }) => {
-		const deserialized = (await deserializer.deserialize(Buffer.from(serialized, "hex"))).data;
+		const deserialized = await deserializer.deserializeHeader(Buffer.from(serialized, "hex"));
 
 		assertBlockData(assert, deserialized, blockData);
 
@@ -23,7 +23,9 @@ describe<{
 	});
 
 	it("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
-		const deserialized = (await deserializer.deserialize(Buffer.from(serializedWithTransactions, "hex"))).data;
+		const deserialized = (
+			await deserializer.deserializeWithTransactions(Buffer.from(serializedWithTransactions, "hex"))
+		).data;
 
 		assertBlockData(assert, deserialized, blockDataWithTransactions);
 

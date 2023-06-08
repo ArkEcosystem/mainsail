@@ -31,10 +31,10 @@ export class Validator implements Contracts.Consensus.IValidator {
 	private readonly messagesFactory!: Contracts.Crypto.IMessageFactory;
 
 	#keyPair!: Contracts.Crypto.IKeyPair;
-	#publicKey!: string;
+	#walletPublicKey!: string;
 
 	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Consensus.IValidator {
-		this.#publicKey = publicKey;
+		this.#walletPublicKey = publicKey;
 		this.#keyPair = keyPair;
 
 		return this;
@@ -84,7 +84,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		);
 	}
 
-	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
+	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransaction[]> {
 		const transactions: Contracts.Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
 
 		if (isEmpty(transactions)) {
@@ -96,40 +96,44 @@ export class Validator implements Contracts.Consensus.IValidator {
 				`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
 		);
 
-		return transactions.map((transaction: Contracts.Crypto.ITransaction) => transaction.data);
+		return transactions;
 	}
 
-	async #forge(transactions: Contracts.Crypto.ITransactionData[]): Promise<Contracts.Crypto.IBlock> {
+	async #forge(transactions: Contracts.Crypto.ITransaction[]): Promise<Contracts.Crypto.IBlock> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
 		};
 
 		const payloadBuffers: Buffer[] = [];
-		for (const transaction of transactions) {
-			Utils.assert.defined<string>(transaction.id);
+		const transactionData: Contracts.Crypto.ITransactionData[] = [];
+		let payloadLength = transactions.length * 4;
+		for (const { data, serialized } of transactions) {
+			Utils.assert.defined<string>(data.id);
 
-			totals.amount = totals.amount.plus(transaction.amount);
-			totals.fee = totals.fee.plus(transaction.fee);
+			totals.amount = totals.amount.plus(data.amount);
+			totals.fee = totals.fee.plus(data.fee);
 
-			payloadBuffers.push(Buffer.from(transaction.id, "hex"));
+			payloadBuffers.push(Buffer.from(data.id, "hex"));
+			transactionData.push(data);
+			payloadLength += serialized.length;
 		}
 
 		const previousBlock = await this.database.getLastBlock();
 		Utils.assert.defined<Contracts.Crypto.IBlock>(previousBlock);
 
 		return this.blockFactory.make({
-			generatorPublicKey: this.#publicKey,
+			generatorPublicKey: this.#walletPublicKey,
 			height: previousBlock.data.height + 1,
 			numberOfTransactions: transactions.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
-			payloadLength: 32 * transactions.length,
+			payloadLength,
 			previousBlock: previousBlock.data.id,
-			reward: this.cryptoConfiguration.getMilestone().reward,
+			reward: BigNumber.make(this.cryptoConfiguration.getMilestone().reward),
 			timestamp: dayjs().unix(),
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
-			transactions,
+			transactions: transactionData,
 			version: 1,
 		});
 	}

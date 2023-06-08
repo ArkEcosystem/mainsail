@@ -8,32 +8,36 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	@tagged("type", "wallet")
 	private readonly serializer!: Contracts.Serializer.ISerializer;
 
-	public size(block: Contracts.Crypto.IBlock): number {
-		const headerSize =
+	@inject(Identifiers.Cryptography.Size.SHA256)
+	private readonly hashByteLength!: number;
+
+	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@tagged("type", "wallet")
+	private readonly generatorPublicKeyByteLength!: number;
+
+	public headerSize(): number {
+		return (
 			4 + // version
 			4 + // timestamp
 			4 + // height
-			32 + // previousBlock
+			this.hashByteLength + // previousBlock
 			4 + // numberOfTransactions
 			8 + // totalAmount
 			8 + // totalFee
 			8 + // reward
 			4 + // payloadLength
-			block.data.payloadHash.length / 2 +
-			block.data.generatorPublicKey.length / 2;
-
-		let size = headerSize;
-
-		for (const transaction of block.transactions) {
-			size += 4 /* tx length */ + transaction.serialized.length;
-		}
-
-		return size;
+			this.hashByteLength + // payloadHash
+			this.generatorPublicKeyByteLength
+		);
 	}
 
-	public async serialize(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
+	public totalSize(block: Contracts.Crypto.IBlockDataSerializable): number {
+		return this.headerSize() + block.payloadLength;
+	}
+
+	public async serializeHeader(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
-			length: 2_000_000,
+			length: this.headerSize(),
 			skip: 0,
 			schema: {
 				version: {
@@ -75,7 +79,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 
 	public async serializeWithTransactions(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
-			length: 2_000_000,
+			length: this.totalSize(block),
 			skip: 0,
 			schema: {
 				version: {
