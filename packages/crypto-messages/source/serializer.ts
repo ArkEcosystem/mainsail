@@ -36,24 +36,21 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			schema: {
 				height: {
 					type: "uint32",
-					required: true,
 				},
 				round: {
 					type: "uint32",
-					required: true,
 				},
 				validatorPublicKey: {
 					type: "publicKey",
-					required: true,
-				},
-				signature: {
-					type: "signature",
-					required: !options.excludeSignature,
 				},
 				block: {
 					type: "hex",
-					required: true,
 				},
+				...(options.excludeSignature ? {} : {
+					signature: {
+						type: "signature",
+					}
+				}),
 			},
 		});
 	}
@@ -74,24 +71,22 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			schema: {
 				height: {
 					type: "uint32",
-					required: true,
 				},
 				round: {
 					type: "uint32",
-					required: true,
 				},
 				validatorPublicKey: {
 					type: "publicKey",
-					required: true,
-				},
-				signature: {
-					type: "signature",
-					required: !options.excludeSignature,
 				},
 				blockId: {
 					type: "blockId",
-					required: false,
+					optional: true,
 				},
+				...(options.excludeSignature ? {} : {
+					signature: {
+						type: "signature",
+					}
+				}),
 			},
 		});
 	}
@@ -112,24 +107,22 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			schema: {
 				height: {
 					type: "uint32",
-					required: true,
 				},
 				round: {
 					type: "uint32",
-					required: true,
 				},
 				validatorPublicKey: {
 					type: "publicKey",
-					required: true,
-				},
-				signature: {
-					type: "signature",
-					required: !options.excludeSignature,
 				},
 				blockId: {
 					type: "blockId",
-					required: false,
+					optional: true,
 				},
+				...(options.excludeSignature ? {} : {
+					signature: {
+						type: "signature",
+					}
+				}),
 			},
 		});
 	}

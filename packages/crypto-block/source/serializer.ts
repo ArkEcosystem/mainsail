@@ -42,47 +42,36 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			schema: {
 				version: {
 					type: "uint32",
-					required: true,
 				},
 				timestamp: {
 					type: "uint32",
-					required: true,
 				},
 				height: {
 					type: "uint32",
-					required: true,
 				},
 				previousBlock: {
 					type: "hash",
-					required: true,
 				},
 				numberOfTransactions: {
 					type: "uint32",
-					required: true,
 				},
 				totalAmount: {
 					type: "bigint",
-					required: true,
 				},
 				totalFee: {
 					type: "bigint",
-					required: true,
 				},
 				reward: {
 					type: "bigint",
-					required: true,
 				},
 				payloadLength: {
 					type: "uint32",
-					required: true,
 				},
 				payloadHash: {
 					type: "hash",
-					required: true,
 				},
 				generatorPublicKey: {
 					type: "publicKey",
-					required: true,
 				},
 			},
 		});
@@ -95,51 +84,39 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			schema: {
 				version: {
 					type: "uint32",
-					required: true,
 				},
 				timestamp: {
 					type: "uint32",
-					required: true,
 				},
 				height: {
 					type: "uint32",
-					required: true,
 				},
 				previousBlock: {
 					type: "hash",
-					required: true,
 				},
 				numberOfTransactions: {
 					type: "uint32",
-					required: true,
 				},
 				totalAmount: {
 					type: "bigint",
-					required: true,
 				},
 				totalFee: {
 					type: "bigint",
-					required: true,
 				},
 				reward: {
 					type: "bigint",
-					required: true,
 				},
 				payloadLength: {
 					type: "uint32",
-					required: true,
 				},
 				payloadHash: {
 					type: "hash",
-					required: true,
 				},
 				generatorPublicKey: {
 					type: "publicKey",
-					required: true,
 				},
 				transactions: {
 					type: "transactions",
-					required: false,
 				},
 			},
 		});

@@ -9,25 +9,12 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 	@tagged("type", "consensus")
 	private readonly serializer!: Contracts.Serializer.ISerializer;
 
-	@inject(Identifiers.Cryptography.Size.PublicKey)
-	@tagged("type", "consensus")
-	private readonly validatorPublicKeySize!: number;
-
-	@inject(Identifiers.Cryptography.Size.Signature)
-	@tagged("type", "consensus")
-	private readonly signatureSize!: number;
-
-	@inject(Identifiers.Cryptography.Size.SHA256)
-	private readonly hashSize!: number;
-
 	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const proposal = {} as Contracts.Crypto.IProposal;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.IProposal>(buffer, proposal, {
-			length: 4 + 4 + 48 + 96,
-			// TODO
 			schema: {
 				height: {
 					type: "uint32",
@@ -38,11 +25,11 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				validatorPublicKey: {
 					type: "publicKey",
 				},
-				signature: {
-					type: "signature",
-				},
 				block: {
 					type: "hex",
+				},
+				signature: {
+					type: "signature",
 				},
 			},
 		});
@@ -56,12 +43,6 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.IPrecommit>(buffer, precommit, {
-			length:
-				4 + // height
-				4 + // round
-				this.validatorPublicKeySize + // validator
-				this.hashSize + // blockId
-				this.signatureSize, // signature
 			schema: {
 				height: {
 					type: "uint32",
@@ -72,11 +53,11 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				validatorPublicKey: {
 					type: "publicKey",
 				},
-				signature: {
-					type: "signature",
-				},
 				blockId: {
 					type: "blockId",
+				},
+				signature: {
+					type: "signature",
 				},
 			},
 		});
@@ -90,12 +71,6 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
 		await this.serializer.deserialize<Contracts.Crypto.IPrevote>(buffer, prevote, {
-			length:
-				4 + // height
-				4 + // round
-				this.validatorPublicKeySize + // validator
-				this.hashSize + // blockId
-				this.signatureSize, // signature
 			schema: {
 				height: {
 					type: "uint32",
@@ -106,11 +81,11 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				validatorPublicKey: {
 					type: "publicKey",
 				},
-				signature: {
-					type: "signature",
-				},
 				blockId: {
 					type: "blockId",
+				},
+				signature: {
+					type: "signature",
 				},
 			},
 		});

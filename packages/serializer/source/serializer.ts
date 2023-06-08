@@ -34,12 +34,10 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		}
 
 		for (const [property, schema] of Object.entries(configuration.schema)) {
-			if (data[property] === undefined && schema.required === false) {
-				continue;
-			}
-
 			const value = data[property];
-			if (schema.required) {
+			const isOptional = schema["optional"] ?? false;
+
+			if (!isOptional) {
 				Utils.assert.defined(value);
 			}
 
@@ -65,8 +63,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 			if (schema.type === "blockId") {
 				if (value === undefined) {
-					const nullBlockId = "0000000000000000000000000000000000000000000000000000000000000000";
-					result.writeBytes(Buffer.from(nullBlockId, "hex"));
+					result.writeBytes(Buffer.alloc(this.hashSize));
 				} else {
 					result.writeBytes(Buffer.from(value, "hex"));
 				}
@@ -85,12 +82,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "signature") {
-				if (value === undefined) {
-					// TODO
-				} else {
-					this.signatureSerializer.serialize(result, data[property]);
-				}
-
+				this.signatureSerializer.serialize(result, data[property]);
 				continue;
 			}
 

@@ -31,7 +31,7 @@ describe<{
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity, verifier }) => {
 		const block: Contracts.Crypto.IBlock = {
-			header: { ...blockData, transactions: [] },
+			header: { ...blockData },
 			serialized: serializedBlock,
 			transactions: [],
 			data: blockData,
@@ -50,7 +50,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"b184631bf2f87b85b727981b8c1f19cde1fd4b69fd75617437e8495060b6ad5c997be908d6e11c6255b4aee2d49011c317d087e66b889af205e9ac8799238843bfbd08bb7de6a3ff5ec52602e14fa2440cba094296588c13c09312b727225d6e",
+			"a46860c81f6530994fa6e23d513dec7a377926db8798916aee1f9d05ed29f00e8560e1c5a5e4860f6b6aca2f1fc2f92f142ac71a82696d889365f1e06bb68b78dc2e762b5811f6646abffc1b566d00efb80be1027904379e057e0806091c0622",
 		);
 		assert.true((await verifier.verifyProposal(proposal.toData())).verified);
 	});
