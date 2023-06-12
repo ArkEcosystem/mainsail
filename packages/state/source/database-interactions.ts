@@ -35,7 +35,7 @@ export class DatabaseInteraction {
 			await this.events.dispatch(Enums.StateEvent.Starting);
 
 			const genesisBlockJson = this.configuration.get("genesisBlock");
-			const genesisBlock = await this.blockFactory.fromJson(genesisBlockJson);
+			const genesisBlock = await this.blockFactory.fromCommittedJson(genesisBlockJson);
 
 			this.stateStore.setGenesisBlock(genesisBlock);
 
@@ -93,7 +93,7 @@ export class DatabaseInteraction {
 
 		await this.databaseService.saveBlocks([genesisBlock]);
 
-		return genesisBlock;
+		return genesisBlock.block;
 	}
 
 	#configureState(lastBlock: Contracts.Crypto.IBlock): void {

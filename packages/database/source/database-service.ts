@@ -13,7 +13,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	private readonly blockStorage!: Database;
 
 	@inject(Identifiers.Database.BlockHeightStorage)
-	private readonly blockStorageById!: Database;
+	private readonly blockStorageByHeight!: Database;
 
 	@inject(Identifiers.Database.TransactionStorage)
 	private readonly transactionStorage!: Database;
@@ -31,7 +31,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		const bytes = this.blockStorage.get(id);
 
 		if (bytes) {
-			return this.blockFactory.fromBytes(bytes);
+			return (await this.blockFactory.fromCommittedBytes(bytes)).block;
 		}
 
 		return undefined;
@@ -49,13 +49,13 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 				heights
 					.map((height: number) => {
 						try {
-							return this.blockStorage.get(this.blockStorageById.get(height));
+							return this.blockStorage.get(this.blockStorageByHeight.get(height));
 						} catch {
 							return;
 						}
 					})
 					.filter(Boolean),
-				(block: Buffer) => this.blockFactory.fromBytes(block),
+				async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
 			)
 		).sort((a: Contracts.Crypto.IBlock, b: Contracts.Crypto.IBlock) => a.data.height - b.data.height);
 	}
@@ -72,20 +72,24 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {
-		const ids = await this.#map<string>(heights, (height: number) => this.blockStorageById.get(height));
+		// TODO: this hits the disk twice for each height
+		const ids = await this.#map<string>(heights, (height: number) => this.blockStorageByHeight.get(height));
 
 		return this.#map<Contracts.Crypto.IBlock>(
 			ids.filter((id) => id !== undefined),
-			(id: string) => this.blockFactory.fromBytes(this.blockStorage.get(id)),
+			async (id: string) => (await this.blockFactory.fromCommittedBytes(this.blockStorage.get(id))).block,
 		);
 	}
 
 	public async getLastBlock(): Promise<Contracts.Crypto.IBlock | undefined> {
 		try {
-			return this.blockFactory.fromBytes(
-				this.blockStorage.get(this.blockStorageById.getRange({ limit: 1, reverse: true }).asArray[0].value),
+			const lastCommittedBlock = await this.blockFactory.fromCommittedBytes(
+				this.blockStorage.get(this.blockStorageByHeight.getRange({ limit: 1, reverse: true }).asArray[0].value),
 			);
-		} catch {
+
+			// TODO: return committed block or even have a dedicated storage for it?
+			return lastCommittedBlock.block;
+		} catch (ex) {
 			return undefined;
 		}
 	}
@@ -100,12 +104,14 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return undefined;
 	}
 
-	public async saveBlocks(blocks: Contracts.Crypto.IBlock[]): Promise<void> {
-		for (const block of blocks) {
+	public async saveBlocks(blocks: Contracts.Crypto.ICommittedBlock[]): Promise<void> {
+		for (const { serialized, block } of blocks) {
 			if (!this.blockStorage.doesExist(block.data.id)) {
-				await this.blockStorage.put(block.data.id, Buffer.from(block.serialized, "hex"));
+				// TODO: store commits
 
-				await this.blockStorageById.put(block.data.height, block.data.id);
+				await this.blockStorage.put(block.data.id, Buffer.from(serialized, "hex"));
+
+				await this.blockStorageByHeight.put(block.data.height, block.data.id);
 
 				for (const transaction of block.transactions) {
 					Utils.assert.defined<string>(transaction.data.id);
@@ -120,7 +126,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 		return this.#map(
 			blocks.filter((block) => block !== undefined),
-			async (block: Buffer) => (await this.blockFactory.fromBytes(block)).data,
+			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block.data,
 		);
 	}
 
@@ -255,7 +261,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return result;
 	}
 
-	async #map<T>(data: unknown[], callback: Function): Promise<T[]> {
+	async #map<T>(data: unknown[], callback: (...args: any[]) => Promise<T>): Promise<T[]> {
 		const result: T[] = [];
 
 		for (const [index, datum] of data.entries()) {

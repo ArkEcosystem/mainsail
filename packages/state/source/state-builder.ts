@@ -48,7 +48,7 @@ export class StateBuilder {
 			this.logger.info(`State Generation - Bootstrap - Blocks: ${this.blockStorage.getCount({})}`);
 
 			for (const { value } of this.blockStorage.getRange({})) {
-				const { data, transactions } = await this.blockFactory.fromBytes(value);
+				const { block: { data, transactions } } = await this.blockFactory.fromCommittedBytes(value);
 
 				await this.#buildBlockRewards(data);
 				await this.#buildSentTransactions(transactions);
@@ -94,7 +94,7 @@ export class StateBuilder {
 			this.logger.warning(`Wallet ${wallet.address} has a negative ${type} of '${balance}'`);
 
 		const genesisPublicKeys: Record<string, true> = Object.fromEntries(
-			this.configuration.get("genesisBlock.transactions").map((current) => [current.senderPublicKey, true]),
+			this.configuration.get("genesisBlock.block.transactions").map((current) => [current.senderPublicKey, true]),
 		);
 
 		for (const wallet of this.walletRepository.allByAddress()) {
