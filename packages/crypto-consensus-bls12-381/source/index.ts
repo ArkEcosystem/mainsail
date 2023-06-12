@@ -1,5 +1,5 @@
 import { Selectors } from "@mainsail/container";
-import { Contracts,Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import {
 	KeyPairFactory,
 	PrivateKeyFactory,
@@ -54,7 +54,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
 		for (const schema of Object.values(schemas)) {
-		    this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
 }

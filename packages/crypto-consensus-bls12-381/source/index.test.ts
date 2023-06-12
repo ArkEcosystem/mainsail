@@ -8,8 +8,8 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("Index", ({ beforeEach, it, assert, spy }) => {
 	const validator = {
-		addSchema: () => {}
-	}
+		addSchema: () => {},
+	};
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();

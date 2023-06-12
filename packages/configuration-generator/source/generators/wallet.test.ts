@@ -21,7 +21,8 @@ describe<{
 	});
 
 	it("#generate - should return wallet from mnemonic", async ({ generator }) => {
-		const mnemonic = "sugar clump talent range royal era tomorrow century fame captain tattoo ghost dilemma grace window gallery narrow menu cinnamon area height crime calm edge"
+		const mnemonic =
+			"sugar clump talent range royal era tomorrow century fame captain tattoo ghost dilemma grace window gallery narrow menu cinnamon area height crime calm edge";
 
 		const wallet = await generator.generate(mnemonic);
 

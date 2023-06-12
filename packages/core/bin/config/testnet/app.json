@@ -1,109 +1,109 @@
 {
-    "plugins": [
-        {
-            "package": "@mainsail/validation"
-        },
-        {
-            "package": "@mainsail/crypto-config"
-        },
-        {
-            "package": "@mainsail/crypto-validation"
-        },
-        {
-            "package": "@mainsail/crypto-hash-bcrypto"
-        },
-        {
-            "package": "@mainsail/crypto-signature-schnorr"
-        },
-        {
-            "package": "@mainsail/crypto-key-pair-schnorr"
-        },
-        {
-            "package": "@mainsail/crypto-consensus-bls12-381"
-        },
-        {
-            "package": "@mainsail/crypto-address-bech32m"
-        },
-        {
-            "package": "@mainsail/crypto-wif"
-        },
-        {
-            "package": "@mainsail/serializer"
-        },
-        {
-            "package": "@mainsail/crypto-block"
-        },
-        {
-            "package": "@mainsail/fees"
-        },
-        {
-            "package": "@mainsail/fees-static"
-        },
-        {
-            "package": "@mainsail/crypto-transaction"
-        },
-        {
-            "package": "@mainsail/crypto-transaction-validator-registration"
-        },
-        {
-            "package": "@mainsail/crypto-transaction-validator-resignation"
-        },
-        {
-            "package": "@mainsail/crypto-transaction-multi-payment"
-        },
-        {
-            "package": "@mainsail/crypto-transaction-multi-signature-registration"
-        },
-        {
-            "package": "@mainsail/crypto-transaction-transfer"
-        },
-        {
-            "package": "@mainsail/crypto-transaction-vote"
-        },
-        {
-            "package": "@mainsail/logger-pino"
-        },
-        {
-            "package": "@mainsail/state"
-        },
-        {
-            "package": "@mainsail/storage-lmdb"
-        },
-        {
-            "package": "@mainsail/database"
-        },
-        {
-            "package": "@mainsail/transactions"
-        },
-        {
-            "package": "@mainsail/transaction-pool"
-        },
-        {
-            "package": "@mainsail/p2p"
-        },
-        {
-            "package": "@mainsail/processor"
-        },
-        {
-            "package": "@mainsail/blockchain"
-        },
-        {
-            "package": "@mainsail/crypto-messages"
-        },
-        {
-            "package": "@mainsail/validator"
-        },
-        {
-            "package": "@mainsail/validator-set-static"
-        },
-        {
-            "package": "@mainsail/consensus"
-        },
-        {
-            "package": "@mainsail/api"
-        },
-        {
-            "package": "@mainsail/webhooks"
-        }
-    ]
+	"plugins": [
+		{
+			"package": "@mainsail/validation"
+		},
+		{
+			"package": "@mainsail/crypto-config"
+		},
+		{
+			"package": "@mainsail/crypto-validation"
+		},
+		{
+			"package": "@mainsail/crypto-hash-bcrypto"
+		},
+		{
+			"package": "@mainsail/crypto-signature-schnorr"
+		},
+		{
+			"package": "@mainsail/crypto-key-pair-schnorr"
+		},
+		{
+			"package": "@mainsail/crypto-consensus-bls12-381"
+		},
+		{
+			"package": "@mainsail/crypto-address-bech32m"
+		},
+		{
+			"package": "@mainsail/crypto-wif"
+		},
+		{
+			"package": "@mainsail/serializer"
+		},
+		{
+			"package": "@mainsail/crypto-block"
+		},
+		{
+			"package": "@mainsail/fees"
+		},
+		{
+			"package": "@mainsail/fees-static"
+		},
+		{
+			"package": "@mainsail/crypto-transaction"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-validator-registration"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-validator-resignation"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-multi-payment"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-multi-signature-registration"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-transfer"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-vote"
+		},
+		{
+			"package": "@mainsail/logger-pino"
+		},
+		{
+			"package": "@mainsail/state"
+		},
+		{
+			"package": "@mainsail/storage-lmdb"
+		},
+		{
+			"package": "@mainsail/database"
+		},
+		{
+			"package": "@mainsail/transactions"
+		},
+		{
+			"package": "@mainsail/transaction-pool"
+		},
+		{
+			"package": "@mainsail/p2p"
+		},
+		{
+			"package": "@mainsail/processor"
+		},
+		{
+			"package": "@mainsail/blockchain"
+		},
+		{
+			"package": "@mainsail/crypto-messages"
+		},
+		{
+			"package": "@mainsail/validator"
+		},
+		{
+			"package": "@mainsail/validator-set-static"
+		},
+		{
+			"package": "@mainsail/consensus"
+		},
+		{
+			"package": "@mainsail/api"
+		},
+		{
+			"package": "@mainsail/webhooks"
+		}
+	]
 }

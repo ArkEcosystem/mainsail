@@ -8,7 +8,7 @@ import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
-import {  ServiceProvider as CryptoConsensusServiceProvider } from "../../../crypto-consensus-bls12-381";
+import { ServiceProvider as CryptoConsensusServiceProvider } from "../../../crypto-consensus-bls12-381";
 import { describe, Sandbox } from "../../../test-framework";
 import { schemas } from "../validation/schemas";
 import { ValidatorRegistrationTransaction } from "./1";
@@ -139,7 +139,6 @@ describe<{
 					publicKey: "a".repeat(96),
 					test: "test",
 					username: "username",
-
 				},
 			},
 		};

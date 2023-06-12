@@ -46,7 +46,7 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 		const { data, publicKeySize } = this;
 
 		Utils.assert.defined<Contracts.Crypto.ITransactionData>(data.asset);
-		Utils.assert.defined<{ username: string, publicKey: string }>(data.asset.validator);
+		Utils.assert.defined<{ username: string; publicKey: string }>(data.asset.validator);
 
 		const validatorBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
 		const buff: ByteBuffer = ByteBuffer.fromSize(validatorBytes.length + 1 + publicKeySize);
