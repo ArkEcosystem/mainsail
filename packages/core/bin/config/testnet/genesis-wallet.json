@@ -1,9 +1,10 @@
 {
-	"address": "ark10mk0h5cn98e2ddr4vvggm2pzx9mpj5kjkamhh8xl6d474z87605s6hsywj",
-	"keys": {
-		"compressed": true,
-		"privateKey": "adc3b71ef0702b42c74b786b87c43dc1513094c3046e771c2f7486829493a963",
-		"publicKey": "7eecfbd31329f2a6b47563108da82231761952d2b7777b9cdfd36bea88fed3e9"
-	},
-	"passphrase": "exact torch pluck seed fix flame promote remain survey question two enroll trust budget welcome common exit plastic toilet pizza truck brick blur electric"
+    "address": "ark1tl527ae35jvvlqe0zpcsungyf85nvlzzskl6ww7t5ckwgfcf0eesvnd8ca",
+    "consenusPublicKey": "863506b50c02695ca9f24dcf7abdc5e7ccde89cf442cc6eb07e66d0ffbba36a902f163384a125ea2af69380044a9a2bd",
+    "keys": {
+        "compressed": true,
+        "privateKey": "3933fa980221a9952d7d0d5bd181d8ec8620bb728e55d6a8a959439280fc28b2",
+        "publicKey": "5fe8af7731a498cf832f10710e4d0449e9367c4285bfa73bcba62ce427097e73"
+    },
+    "passphrase": "embody defy clog enact abuse mirror help bird surround canyon dust smoke range boring napkin mango forest flock all chunk accident involve wish broccoli"
 }
