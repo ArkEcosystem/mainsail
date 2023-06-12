@@ -10,5 +10,6 @@ export type Wallet = {
 	address: string;
 	passphrase: string;
 	keys: Contracts.Crypto.IKeyPair;
+	consensusKeys: Contracts.Crypto.IKeyPair;
 	username: string | undefined;
 };

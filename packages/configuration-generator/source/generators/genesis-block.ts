@@ -1,4 +1,4 @@
-import { injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
@@ -11,11 +11,19 @@ import { Generator } from "./generator";
 
 @injectable()
 export class GenesisBlockGenerator extends Generator {
+
+	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "consensus")
+	private readonly signatureFactory!: Contracts.Crypto.ISignature;
+
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<Contracts.Crypto.IBlockData> {
+	): Promise<Contracts.Crypto.ICommittedBlockData> {
 		const premineWallet = await this.createWallet();
 
 		const genesisWallet = await this.createWallet(genesisMnemonic);
@@ -51,7 +59,13 @@ export class GenesisBlockGenerator extends Generator {
 			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
 		);
 
-		return this.#createGenesisBlock(premineWallet.keys, transactions, options);
+		const genesis = await this.#createCommittedGenesisBlock(validators, premineWallet.keys, transactions, options);
+
+		return {
+			block: genesis.block.data,
+			commit: genesis.commit,
+			serialized: genesis.serialized,
+		};
 	}
 
 	async #createTransferTransaction(
@@ -156,11 +170,37 @@ export class GenesisBlockGenerator extends Generator {
 		return transaction;
 	}
 
+	async #createCommittedGenesisBlock(
+		validators: Wallet[],
+		premineKeys: Contracts.Crypto.IKeyPair,
+		transactions: Contracts.Crypto.ITransaction[],
+		options: Contracts.NetworkGenerator.GenesisBlockOptions,
+	): Promise<Contracts.Crypto.ICommittedBlock> {
+		const genesisBlock = await this.#createGenesisBlock(
+			premineKeys, transactions, options
+		);
+
+		const proof = await this.#createCommitProof(validators, genesisBlock.block.data);
+		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
+			block: genesisBlock.block,
+			commit: proof,
+		}
+
+		console.log(commitBlock);
+
+		const serialized = await this.blockSerializer.serializeFull(commitBlock)
+
+		return {
+			...commitBlock,
+			serialized: serialized.toString("hex"),
+		}
+	}
+
 	async #createGenesisBlock(
 		keys: Contracts.Crypto.IKeyPair,
 		transactions: Contracts.Crypto.ITransaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<Contracts.Crypto.IBlockData> {
+	): Promise<{ block: Contracts.Crypto.IBlock, transactions: Contracts.Crypto.ITransactionData[] }> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -189,27 +229,47 @@ export class GenesisBlockGenerator extends Generator {
 		}
 
 		return {
-			...(
-				await this.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
-					generatorPublicKey: keys.publicKey,
-					height: 1,
-					numberOfTransactions: transactions.length,
-					payloadHash: (
-						await this.app
-							.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
-							.sha256(payloadBuffers)
-					).toString("hex"),
-					payloadLength,
-					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-					reward: BigNumber.ZERO,
-					timestamp: dayjs(options.epoch).unix(),
-					totalAmount: totals.amount,
-					totalFee: totals.fee,
-					transactions: transactionData,
-					version: 1,
-				})
-			).data,
+			block: await this.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
+				generatorPublicKey: keys.publicKey,
+				height: 1,
+				numberOfTransactions: transactions.length,
+				payloadHash: (
+					await this.app
+						.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+						.sha256(payloadBuffers)
+				).toString("hex"),
+				payloadLength,
+				previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+				reward: BigNumber.ZERO,
+				timestamp: dayjs(options.epoch).unix(),
+				totalAmount: totals.amount,
+				totalFee: totals.fee,
+				transactions: transactionData,
+				version: 1,
+			}),
 			transactions: transactionData,
+		};
+	}
+
+	async #createCommitProof(
+		validators: Wallet[],
+		genesisBlock: Contracts.Crypto.IBlockData,
+	): Promise<Contracts.Crypto.IBlockCommit> {
+		const signatures: Buffer[] = [];
+		const serialized = await this.blockSerializer.serializeWithTransactions(genesisBlock);
+
+		for (const wallet of validators) {
+			const message = Buffer.concat([Buffer.from(wallet.keys.publicKey, "hex"), serialized]);
+			const signature = await this.signatureFactory.sign(message, Buffer.from(wallet.consensusKeys.privateKey, "hex"));
+			signatures.push(Buffer.from(signature, "hex"));
+		}
+
+		return {
+			height: genesisBlock.height,
+			round: 1,
+			signature: await this.signatureFactory.aggregate(signatures),
+			blockId: genesisBlock.id,
+			validators: validators.map(v => true),
 		};
 	}
 }

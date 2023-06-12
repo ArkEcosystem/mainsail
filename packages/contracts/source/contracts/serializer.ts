@@ -9,18 +9,20 @@ export type MandatoryPropertyType =
 	| "publicKey"
 	| "hex"
 	| "signature"
-	| "transactions";
+	| "transactions"
+	| "consensusSignature"
+	| "validatorSet";
 
 export type OptionalPropertyType = "blockId";
 
 export type SerializationSchema =
 	| {
-			type: MandatoryPropertyType;
-	  }
+		type: MandatoryPropertyType;
+	}
 	| {
-			type: OptionalPropertyType;
-			optional: boolean;
-	  };
+		type: OptionalPropertyType;
+		optional: boolean;
+	};
 
 export interface SerializationConfiguration {
 	schema: Record<string, SerializationSchema>;

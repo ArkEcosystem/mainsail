@@ -102,7 +102,7 @@ export class ConfigurationGenerator {
 			{
 				task: async () => {
 					if (!internalOptions.overwriteConfig && existsSync(this.configurationPath)) {
-						throw new Error(`${this.configurationPath} already exists.`);
+						//	throw new Error(`${this.configurationPath} already exists.`);
 					}
 
 					ensureDirSync(this.configurationPath);
@@ -144,7 +144,7 @@ export class ConfigurationGenerator {
 						internalOptions,
 					);
 
-					const network = this.networkGenerator.generate(genesisBlock.payloadHash, internalOptions);
+					const network = this.networkGenerator.generate(genesisBlock.block.payloadHash, internalOptions);
 
 					this.configurationWriter.writeCrypto(genesisBlock, milestones, network);
 				},

@@ -27,6 +27,14 @@ export class Generator {
 			)
 			.fromMnemonic(mnemonic);
 
+		const consensusKeys: Contracts.Crypto.IKeyPair = await this.app
+			.getTagged<Contracts.Crypto.IKeyPairFactory>(
+				Identifiers.Cryptography.Identity.KeyPairFactory,
+				"type",
+				"consensus",
+			)
+			.fromMnemonic(mnemonic);
+
 		return {
 			address: await this.app
 				.getTagged<Contracts.Crypto.IAddressFactory>(
@@ -36,6 +44,7 @@ export class Generator {
 				)
 				.fromPublicKey(keys.publicKey),
 			keys,
+			consensusKeys,
 			passphrase: mnemonic,
 			username: undefined,
 		};
