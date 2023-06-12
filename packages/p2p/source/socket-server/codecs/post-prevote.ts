@@ -6,7 +6,7 @@ export const postPrevote = {
 			const decoded = proto.PostPrevoteRequest.decode(payload);
 			return {
 				...decoded,
-				block: Buffer.from(decoded.prevote),
+				prevote: Buffer.from(decoded.prevote),
 			};
 		},
 		serialize: (object: proto.IPostPrevoteRequest): Buffer =>

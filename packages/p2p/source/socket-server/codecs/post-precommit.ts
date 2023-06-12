@@ -6,7 +6,7 @@ export const postPrecommit = {
 			const decoded = proto.PostPrecommitRequest.decode(payload);
 			return {
 				...decoded,
-				block: Buffer.from(decoded.prevote),
+				precommit: Buffer.from(decoded.prevote),
 			};
 		},
 		serialize: (object: proto.IPostPrecommitRequest): Buffer =>

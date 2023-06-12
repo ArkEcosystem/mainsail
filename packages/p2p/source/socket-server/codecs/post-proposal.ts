@@ -6,7 +6,7 @@ export const postProposal = {
 			const decoded = proto.PostProposalRequest.decode(payload);
 			return {
 				...decoded,
-				block: Buffer.from(decoded.proposal),
+				proposal: Buffer.from(decoded.proposal),
 			};
 		},
 		serialize: (object: proto.IPostProposalRequest): Buffer =>
