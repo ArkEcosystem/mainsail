@@ -23,7 +23,6 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.ITransactionSerializer;
 
-
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
 
