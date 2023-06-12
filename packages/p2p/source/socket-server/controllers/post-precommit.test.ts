@@ -7,7 +7,7 @@ describe<{
 	sandbox: Sandbox;
 	controller: PostPrecommitController;
 }>("PostProvoteController", ({ it, assert, beforeEach, stub, spy }) => {
-	const deserializer = { deserializePrevote: () => {} };
+	const deserializer = { deserializePrecommit: () => {} };
 	const handler = {
 		onPrecommit: () => {},
 	};
@@ -24,7 +24,7 @@ describe<{
 	it("#handle - should deserialize prevote and call onPrecommit handler", async ({ controller }) => {
 		const prevote = { height: 1 };
 
-		stub(deserializer, "deserializePrevote").resolvedValue(prevote);
+		stub(deserializer, "deserializePrecommit").resolvedValue(prevote);
 		const spyOnPrecommit = spy(handler, "onPrecommit");
 
 		await controller.handle({ payload: { precommit: Buffer.from("") } }, {});

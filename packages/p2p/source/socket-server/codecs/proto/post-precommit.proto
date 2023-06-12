@@ -3,7 +3,7 @@ syntax = "proto3";
 package postPrecommit;
 
 message PostPrecommitRequest {
-    bytes prevote = 1;
+    bytes precommit = 1;
     shared.Headers headers = 2;
 }
 

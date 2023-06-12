@@ -5198,7 +5198,7 @@ $root.postPrecommit = (function() {
          * Properties of a PostPrecommitRequest.
          * @memberof postPrecommit
          * @interface IPostPrecommitRequest
-         * @property {Uint8Array|null} [prevote] PostPrecommitRequest prevote
+         * @property {Uint8Array|null} [precommit] PostPrecommitRequest precommit
          * @property {shared.IHeaders|null} [headers] PostPrecommitRequest headers
          */
 
@@ -5218,12 +5218,12 @@ $root.postPrecommit = (function() {
         }
 
         /**
-         * PostPrecommitRequest prevote.
-         * @member {Uint8Array} prevote
+         * PostPrecommitRequest precommit.
+         * @member {Uint8Array} precommit
          * @memberof postPrecommit.PostPrecommitRequest
          * @instance
          */
-        PostPrecommitRequest.prototype.prevote = $util.newBuffer([]);
+        PostPrecommitRequest.prototype.precommit = $util.newBuffer([]);
 
         /**
          * PostPrecommitRequest headers.
@@ -5257,8 +5257,8 @@ $root.postPrecommit = (function() {
         PostPrecommitRequest.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.prevote != null && Object.hasOwnProperty.call(message, "prevote"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.prevote);
+            if (message.precommit != null && Object.hasOwnProperty.call(message, "precommit"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.precommit);
             if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
@@ -5296,7 +5296,7 @@ $root.postPrecommit = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
-                        message.prevote = reader.bytes();
+                        message.precommit = reader.bytes();
                         break;
                     }
                 case 2: {
@@ -5338,9 +5338,9 @@ $root.postPrecommit = (function() {
         PostPrecommitRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.prevote != null && message.hasOwnProperty("prevote"))
-                if (!(message.prevote && typeof message.prevote.length === "number" || $util.isString(message.prevote)))
-                    return "prevote: buffer expected";
+            if (message.precommit != null && message.hasOwnProperty("precommit"))
+                if (!(message.precommit && typeof message.precommit.length === "number" || $util.isString(message.precommit)))
+                    return "precommit: buffer expected";
             if (message.headers != null && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
@@ -5361,11 +5361,11 @@ $root.postPrecommit = (function() {
             if (object instanceof $root.postPrecommit.PostPrecommitRequest)
                 return object;
             var message = new $root.postPrecommit.PostPrecommitRequest();
-            if (object.prevote != null)
-                if (typeof object.prevote === "string")
-                    $util.base64.decode(object.prevote, message.prevote = $util.newBuffer($util.base64.length(object.prevote)), 0);
-                else if (object.prevote.length >= 0)
-                    message.prevote = object.prevote;
+            if (object.precommit != null)
+                if (typeof object.precommit === "string")
+                    $util.base64.decode(object.precommit, message.precommit = $util.newBuffer($util.base64.length(object.precommit)), 0);
+                else if (object.precommit.length >= 0)
+                    message.precommit = object.precommit;
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
                     throw TypeError(".postPrecommit.PostPrecommitRequest.headers: object expected");
@@ -5389,16 +5389,16 @@ $root.postPrecommit = (function() {
             var object = {};
             if (options.defaults) {
                 if (options.bytes === String)
-                    object.prevote = "";
+                    object.precommit = "";
                 else {
-                    object.prevote = [];
+                    object.precommit = [];
                     if (options.bytes !== Array)
-                        object.prevote = $util.newBuffer(object.prevote);
+                        object.precommit = $util.newBuffer(object.precommit);
                 }
                 object.headers = null;
             }
-            if (message.prevote != null && message.hasOwnProperty("prevote"))
-                object.prevote = options.bytes === String ? $util.base64.encode(message.prevote, 0, message.prevote.length) : options.bytes === Array ? Array.prototype.slice.call(message.prevote) : message.prevote;
+            if (message.precommit != null && message.hasOwnProperty("precommit"))
+                object.precommit = options.bytes === String ? $util.base64.encode(message.precommit, 0, message.precommit.length) : options.bytes === Array ? Array.prototype.slice.call(message.precommit) : message.precommit;
             if (message.headers != null && message.hasOwnProperty("headers"))
                 object.headers = $root.shared.Headers.toObject(message.headers, options);
             return object;

@@ -2172,8 +2172,8 @@ export namespace postPrecommit {
     /** Properties of a PostPrecommitRequest. */
     interface IPostPrecommitRequest {
 
-        /** PostPrecommitRequest prevote */
-        prevote?: (Uint8Array|null);
+        /** PostPrecommitRequest precommit */
+        precommit?: (Uint8Array|null);
 
         /** PostPrecommitRequest headers */
         headers?: (shared.IHeaders|null);
@@ -2188,8 +2188,8 @@ export namespace postPrecommit {
          */
         constructor(properties?: postPrecommit.IPostPrecommitRequest);
 
-        /** PostPrecommitRequest prevote. */
-        public prevote: Uint8Array;
+        /** PostPrecommitRequest precommit. */
+        public precommit: Uint8Array;
 
         /** PostPrecommitRequest headers. */
         public headers?: (shared.IHeaders|null);
