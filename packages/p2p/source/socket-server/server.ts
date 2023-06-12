@@ -15,10 +15,10 @@ import {
 	GetPeersRoute,
 	GetStausRoute,
 	PostBlockRoute,
-	PostTransactionsRoute,
-	PostProposalRoute,
-	PostPrevoteRoute,
 	PostPrecommitRoute,
+	PostPrevoteRoute,
+	PostProposalRoute,
+	PostTransactionsRoute,
 } from "./routes";
 
 // todo: review the implementation
