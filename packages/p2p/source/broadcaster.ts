@@ -23,6 +23,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.ITransactionSerializer;
 
+
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
 
@@ -93,7 +94,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 
 	async broadcastProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		// TODO: Remove once serialized field is on IProposal
-		const serialized = await this.messageSerializer.serializePrevote(proposal);
+		const serialized = await this.messageSerializer.serializeProposal(proposal);
 
 		const promises = this.#getPeersForBroadcast().map((peer) => this.communicator.postProposal(peer, serialized));
 
