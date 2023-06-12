@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { BuildValidatorRankingAction, GetActiveValidatorsAction } from "./actions";
+import { GetActiveValidatorsAction } from "./actions";
 import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
 import { DposState } from "./dpos";
@@ -100,10 +100,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerActions(): void {
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("buildValidatorRanking", new BuildValidatorRankingAction());
-
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("getActiveValidators", new GetActiveValidatorsAction(this.app));
