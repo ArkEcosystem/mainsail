@@ -1,12 +1,10 @@
 import { Selectors } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { BuildValidatorRankingAction, GetActiveValidatorsAction } from "./actions";
 import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
-import { DposState } from "./dpos";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { RoundState } from "./round-state";
@@ -59,7 +57,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
-		this.app.bind(Identifiers.DposState).to(DposState);
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 		this.app.bind(Identifiers.RoundState).to(RoundState).inSingletonScope();
 
@@ -72,8 +69,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.DatabaseInteraction).to(DatabaseInteraction).inSingletonScope();
 
 		this.app.bind(Identifiers.StateBuilder).to(StateBuilder);
-
-		this.#registerActions();
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
 		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
@@ -97,15 +92,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				enabled: Joi.boolean().required(),
 			}).required(),
 		}).unknown(true);
-	}
-
-	#registerActions(): void {
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("buildValidatorRanking", new BuildValidatorRankingAction());
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("getActiveValidators", new GetActiveValidatorsAction(this.app));
 	}
 }

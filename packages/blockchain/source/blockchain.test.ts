@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Services } from "@mainsail/kernel";
-import { Actions } from "@mainsail/state";
 import { BigNumber } from "@mainsail/utils";
 import delay from "delay";
 import sinon from "sinon";
@@ -199,10 +198,6 @@ describe<{
 		context.sandbox.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("processBlock", new ProcessBlockAction());
-
-		context.sandbox.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
 
 		context.sandbox.app.bind(Identifiers.QueueFactory).toFactory(() => () => context.queue);
 

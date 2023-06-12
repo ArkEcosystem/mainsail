@@ -81,8 +81,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
 		const queue = await peer.getTransactionsQueue();
-		queue.resume();
-		queue.push({
+		void queue.resume();
+		void queue.push({
 			handle: async () => {
 				await this.emit(peer, Routes.PostTransactions, { transactions }, postTransactionsTimeout);
 				await delay(Math.ceil(1000 / postTransactionsRateLimit));

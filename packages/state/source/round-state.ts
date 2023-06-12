@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Services, Utils as AppUtils } from "@mainsail/kernel";
+import { Enums, Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import assert from "assert";
 
@@ -9,19 +9,12 @@ export class RoundState {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.DposState)
-	@tagged("state", "blockchain")
-	private readonly dposState!: Contracts.State.DposState;
-
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
-
-	@inject(Identifiers.TriggerService)
-	private readonly triggers!: Services.Triggers.Triggers;
 
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -141,12 +134,12 @@ export class RoundState {
 
 			await this.#detectMissedRound();
 
-			this.dposState.buildValidatorRanking();
-			this.dposState.setValidatorsRound(roundInfo);
+			// this.dposState.buildValidatorRanking();
+			// this.dposState.setValidatorsRound(roundInfo);
 
-			await this.#setForgingValidatorsOfRound(roundInfo, [...this.dposState.getRoundValidators()]);
+			// await this.#setForgingValidatorsOfRound(roundInfo, [...this.dposState.getRoundValidators()]);
 
-			await this.databaseService.saveRound(this.dposState.getRoundValidators());
+			// await this.databaseService.saveRound(this.dposState.getRoundValidators());
 
 			this.#blocksInCurrentRound = [];
 
@@ -245,7 +238,7 @@ export class RoundState {
 	): Promise<void> {
 		// ! it's this.getActiveValidators(roundInfo, validators);
 		// ! only last part of that function which reshuffles validators is used
-		const result = await this.triggers.call("getActiveValidators", { roundInfo, validators });
-		this.#forgingValidators = (result as Contracts.State.Wallet[]) || [];
+		// const result = await this.triggers.call("getActiveValidators", { roundInfo, validators });
+		// this.#forgingValidators = (result as Contracts.State.Wallet[]) || [];
 	}
 }
