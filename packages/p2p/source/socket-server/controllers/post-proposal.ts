@@ -16,9 +16,11 @@ export class PostProposalController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Cryptography.Message.Deserializer)
 	private readonly deserializer!: Contracts.Crypto.IMessageDeserializer;
 
-	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<void> {
+	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<{}> {
 		const proposal = await this.deserializer.deserializeProposal(request.payload.proposal);
 
 		await this.consensusHandler.onProposal(proposal);
+
+		return {};
 	}
 }
