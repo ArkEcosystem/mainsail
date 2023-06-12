@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class RoundState implements Contracts.Consensus.IRoundState {
@@ -17,6 +18,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
+
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -213,6 +217,34 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			aggPublicKey, // TODO: possibly not needed in this context
 			aggSignature,
 			validatorSet: new Set(publicKeys),
+		};
+	}
+
+	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
+		const majority = await this.aggregateMajorityPrecommits();
+
+		const proposal = this.getProposal();
+		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+
+		const { round, block } = proposal;
+
+		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
+			block,
+			commit: {
+				blockId: block.data.id,
+				height: block.data.height,
+				round,
+				signature: majority.aggSignature,
+				// TODO: calcualte validator set matrix
+				validators: [...majority.validatorSet].map(v => true),
+			}
+		};
+
+		const serialized = await this.blockSerializer.serializeFull(commitBlock)
+
+		return {
+			...commitBlock,
+			serialized: serialized.toString("hex"),
 		};
 	}
 }

@@ -1,4 +1,4 @@
-import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
+import { IBlock, ICommittedBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
 // TODO: Move to crypto
@@ -28,6 +28,7 @@ export interface IRoundState {
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
 	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
+	getProposedCommitBlock(): Promise<ICommittedBlock>;
 }
 
 export interface IConsensusService {
