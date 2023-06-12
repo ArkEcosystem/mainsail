@@ -27,6 +27,14 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		return this;
 	}
 
+	public publicKeyAsset(publicKey: string): ValidatorRegistrationBuilder {
+		if (this.data.asset && this.data.asset.validator) {
+			this.data.asset.validator.publicKey = publicKey;
+		}
+
+		return this;
+	}
+
 	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
 		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;

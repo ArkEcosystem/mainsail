@@ -6,13 +6,21 @@ import { ServiceProvider } from "./index";
 describe<{
 	sandbox: Sandbox;
 	serviceProvider: ServiceProvider;
-}>("Index", ({ beforeEach, it, assert }) => {
+}>("Index", ({ beforeEach, it, assert, spy }) => {
+	const validator = {
+		addSchema: () => {},
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
+		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
+
 		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
 	});
 
-	it("#register - should bind tagged", async ({ sandbox, serviceProvider }) => {
+	it("#register - should bind tagged and register schema", async ({ sandbox, serviceProvider }) => {
+		const spyAddSchema = spy(validator, "addSchema");
+
 		await serviceProvider.register();
 
 		[
@@ -24,5 +32,7 @@ describe<{
 			Identifiers.Cryptography.Identity.PublicKeySerializer,
 			Identifiers.Cryptography.Signature,
 		].forEach((identifier) => assert.true(sandbox.app.isBoundTagged(identifier, "type", "consensus")));
+
+		spyAddSchema.calledOnce();
 	});
 });

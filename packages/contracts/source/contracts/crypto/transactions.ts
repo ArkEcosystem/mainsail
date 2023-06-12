@@ -28,6 +28,7 @@ export interface ITransactionAsset {
 	};
 	validator?: {
 		username: string;
+		publicKey: string;
 	};
 	votes?: string[];
 	unvotes?: string[];

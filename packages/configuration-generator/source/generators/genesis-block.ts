@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
 import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -105,6 +106,7 @@ export class GenesisBlockGenerator extends Generator {
 						.fee("2500000000")
 						.nonce("1") // validator registration tx is always the first one from sender
 						.usernameAsset(`genesis_${index + 1}`)
+						.publicKeyAsset(sender.consenusPublicKey)
 						.fee(`${25 * 1e8}`)
 						.sign(sender.passphrase)
 				).build(),
@@ -180,10 +182,12 @@ export class GenesisBlockGenerator extends Generator {
 
 		const transactionData: Contracts.Crypto.ITransactionData[] = [];
 		for (const { serialized, data } of sortedTransactions) {
+			Utils.assert.defined<string>(data.id);
+
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
 
-			payloadBuffers.push(Buffer.from(data.id!, "hex"));
+			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
 			payloadLength += serialized.length;
 		}
