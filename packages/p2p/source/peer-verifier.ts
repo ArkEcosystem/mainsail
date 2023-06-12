@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prefer-at */
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Services, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 import assert from "assert";
 import pluralize from "pluralize";
 import { inspect } from "util";
@@ -26,9 +26,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.DposState)
-	@tagged("state", "blockchain")
-	private readonly dposState!: Contracts.State.DposState;
+	// @inject(Identifiers.DposState)
+	// @tagged("state", "blockchain")
+	// private readonly dposState!: Contracts.State.DposState;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -110,11 +110,11 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 
 			if (claimedHeight < this.#ourHeight()) {
-				const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight, this.configuration);
-				const validators = await this.#getValidatorsByRound(roundInfo);
-				if (await this.#verifyPeerBlock(blockHeader, claimedHeight, validators)) {
-					return true;
-				}
+				// const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight, this.configuration);
+				// const validators = await this.#getValidatorsByRound(roundInfo);
+				// if (await this.#verifyPeerBlock(blockHeader, claimedHeight, validators)) {
+				// 	return true;
+				// }
 			} else {
 				const claimedBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
 				// TODO: Verify block signatures
@@ -305,7 +305,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		// the last block in a round (so that the validators calculations are still the same for
 		// both chains).
 
-		const validators = await this.#getValidatorsByRound(roundInfo);
+		// const validators = await this.#getValidatorsByRound(roundInfo);
 
 		const hisBlocksByHeight = {};
 
@@ -325,39 +325,39 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 			assert(hisBlocksByHeight[height] !== undefined);
 
-			if (!this.#verifyPeerBlock(hisBlocksByHeight[height], height, validators)) {
-				return false;
-			}
+			// if (!this.#verifyPeerBlock(hisBlocksByHeight[height], height, validators)) {
+			// 	return false;
+			// }
 		}
 
 		return true;
 	}
 
-	async #getValidatorsByRound(
-		roundInfo: Contracts.Shared.RoundInfo,
-	): Promise<Record<string, Contracts.State.Wallet>> {
-		let validators: any = await this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.call("getActiveValidators", { roundInfo });
+	// async #getValidatorsByRound(
+	// 	roundInfo: Contracts.Shared.RoundInfo,
+	// ): Promise<Record<string, Contracts.State.Wallet>> {
+	// 	let validators: any = await this.app
+	// 		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+	// 		.call("getActiveValidators", { roundInfo });
 
-		if (validators.length === 0) {
-			// This must be the current round, still not saved into the database (it is saved
-			// only after it has completed). So fetch the list of validators from the wallet
-			// manager.
-			// ! looks like DoS attack vector
-			const dposRound = this.dposState.getRoundInfo();
-			assert.strictEqual(dposRound.round, roundInfo.round);
-			assert.strictEqual(dposRound.maxValidators, roundInfo.maxValidators);
-			validators = [...this.dposState.getRoundValidators()];
-		}
+	// 	if (validators.length === 0) {
+	// 		// This must be the current round, still not saved into the database (it is saved
+	// 		// only after it has completed). So fetch the list of validators from the wallet
+	// 		// manager.
+	// 		// ! looks like DoS attack vector
+	// 		const dposRound = this.dposState.getRoundInfo();
+	// 		assert.strictEqual(dposRound.round, roundInfo.round);
+	// 		assert.strictEqual(dposRound.maxValidators, roundInfo.maxValidators);
+	// 		validators = [...this.dposState.getRoundValidators()];
+	// 	}
 
-		const validatorsByPublicKey: Record<string, Contracts.State.Wallet> = {};
-		for (const validator of validators) {
-			Utils.assert.defined<string>(validator.getPublicKey());
-			validatorsByPublicKey[validator.getPublicKey()!] = validator;
-		}
-		return validatorsByPublicKey;
-	}
+	// 	const validatorsByPublicKey: Record<string, Contracts.State.Wallet> = {};
+	// 	for (const validator of validators) {
+	// 		Utils.assert.defined<string>(validator.getPublicKey());
+	// 		validatorsByPublicKey[validator.getPublicKey()!] = validator;
+	// 	}
+	// 	return validatorsByPublicKey;
+	// }
 
 	async #fetchBlocksFromHeight({
 		height,
@@ -405,6 +405,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return true;
 	}
 
+	// @ts-ignore
 	async #verifyPeerBlock(
 		blockData: Contracts.Crypto.IBlockData,
 		expectedHeight: number,
