@@ -16,6 +16,9 @@ import {
 	GetStausRoute,
 	PostBlockRoute,
 	PostTransactionsRoute,
+	PostProposalRoute,
+	PostPrevoteRoute,
+	PostPrecommitRoute,
 } from "./routes";
 
 // todo: review the implementation
@@ -52,6 +55,9 @@ export class Server {
 		this.app.resolve(GetStausRoute).register(this.server);
 		this.app.resolve(PostBlockRoute).register(this.server);
 		this.app.resolve(PostTransactionsRoute).register(this.server);
+		this.app.resolve(PostProposalRoute).register(this.server);
+		this.app.resolve(PostPrevoteRoute).register(this.server);
+		this.app.resolve(PostPrecommitRoute).register(this.server);
 
 		// onPreAuth
 		this.app.resolve(RateLimitPlugin).register(this.server);
