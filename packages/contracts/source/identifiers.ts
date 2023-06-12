@@ -84,7 +84,6 @@ export const Identifiers = {
 	},
 	// @deprecated
 	DatabaseInteraction: Symbol.for("Database<DatabaseInteraction>"),
-	DposState: Symbol.for("State<DposState>"),
 	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),
 	EventDispatcherService: Symbol.for("Service<EventDispatcher>"),
 	Fee: {
