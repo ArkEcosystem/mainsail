@@ -4,10 +4,11 @@ import { Configuration } from "@mainsail/crypto-config";
 import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-schnorr";
 import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
-import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { BigNumber } from "@mainsail/utils";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
+import {  ServiceProvider as CryptoConsensusServiceProvider } from "../../../crypto-consensus-bls12-381";
 import { describe, Sandbox } from "../../../test-framework";
 import { schemas } from "../validation/schemas";
 import { ValidatorRegistrationTransaction } from "./1";
@@ -21,9 +22,11 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
 		await context.sandbox.app.resolve(ValidationServiceProvider).register();
 		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
+		await context.sandbox.app.resolve(CryptoConsensusServiceProvider).register();
 
 		context.validator = context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator);
 
@@ -53,6 +56,7 @@ describe<{
 		amount: 0,
 		asset: {
 			validator: {
+				publicKey: "a".repeat(96),
 				username: "username",
 			},
 		},
@@ -116,6 +120,7 @@ describe<{
 			asset: {
 				test: "test",
 				validator: {
+					publicKey: "a".repeat(96),
 					username: "username",
 				},
 			},
@@ -131,8 +136,10 @@ describe<{
 			...transactionOriginal,
 			asset: {
 				validator: {
+					publicKey: "a".repeat(96),
 					test: "test",
 					username: "username",
+
 				},
 			},
 		};
@@ -157,7 +164,7 @@ describe<{
 		}
 	});
 
-	it("#getSchema - usernae should be validatorUsername", ({ validator }) => {
+	it("#getSchema - username should be validatorUsername", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "", "a".repeat(21), null, undefined, {}];
@@ -167,12 +174,33 @@ describe<{
 				...transactionOriginal,
 				asset: {
 					validator: {
+						publicKey: "a".repeat(96),
 						username: value,
 					},
 				},
 			};
 
 			assert.true(validator.validate("validatorRegistration", transaction).error.includes("username"));
+		}
+	});
+
+	it("#getSchema - publicKey should be consensusPublicKey", ({ validator }) => {
+		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
+
+		const invalidValues = [1, BigNumber.ONE, "", "a".repeat(21), null, undefined, {}];
+
+		for (const value of invalidValues) {
+			const transaction = {
+				...transactionOriginal,
+				asset: {
+					validator: {
+						publicKey: value,
+						username: "username",
+					},
+				},
+			};
+
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("publicKey"));
 		}
 	});
 
