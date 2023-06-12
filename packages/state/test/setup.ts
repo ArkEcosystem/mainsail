@@ -24,10 +24,8 @@ import {
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { StateBuilder } from "../source";
-import { BuildValidatorRankingAction } from "../source/actions";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
-import { DposState } from "../source/dpos";
 import { StateStore } from "../source/stores";
 import { TransactionValidator } from "../source/transaction-validator";
 import {
@@ -63,7 +61,6 @@ export interface Setup {
 	factory: Factories.FactoryBuilder;
 	blockState: BlockState;
 	stateStore: StateStore;
-	dPosState: DposState;
 	stateBuilder: StateBuilder;
 	transactionValidator: TransactionValidator;
 	spies: Spies;
@@ -123,9 +120,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration)
 		.set("storage.maxLastTransactionIds", defaults.storage.maxLastTransactionIds);
 	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
-	sandbox.app
-		.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-		.bind("buildDelegateRanking", new BuildValidatorRankingAction());
+
 
 	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
 
@@ -265,17 +260,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.BlockState).to(BlockState);
 
-	sandbox.app
-		.bind(Identifiers.DposState)
-		.to(DposState)
-		.inSingletonScope()
-		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
-
-	sandbox.app
-		.bind(Identifiers.DposState)
-		.to(DposState)
-		.inRequestScope()
-		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
@@ -294,8 +278,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.State.ValidatorMutator).to(MockValidatorMutator).inSingletonScope();
 
 	const blockState = sandbox.app.get<BlockState>(Identifiers.BlockState);
-
-	const dPosState = sandbox.app.getTagged<DposState>(Identifiers.DposState, "state", "blockchain");
 
 	sandbox.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
 
@@ -327,7 +309,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	return {
 		blockState,
-		dPosState,
 		factory,
 		sandbox,
 		spies: {
