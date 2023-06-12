@@ -5,7 +5,6 @@ import Joi from "joi";
 
 import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
-import { DposState } from "./dpos";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { RoundState } from "./round-state";
@@ -58,7 +57,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
-		this.app.bind(Identifiers.DposState).to(DposState);
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 		this.app.bind(Identifiers.RoundState).to(RoundState).inSingletonScope();
 

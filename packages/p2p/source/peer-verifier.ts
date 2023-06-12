@@ -26,10 +26,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	// @inject(Identifiers.DposState)
-	// @tagged("state", "blockchain")
-	// private readonly dposState!: Contracts.State.DposState;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 

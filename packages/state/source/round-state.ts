@@ -9,10 +9,6 @@ export class RoundState {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.DposState)
-	@tagged("state", "blockchain")
-	private readonly dposState!: Contracts.State.DposState;
-
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
@@ -138,12 +134,12 @@ export class RoundState {
 
 			await this.#detectMissedRound();
 
-			this.dposState.buildValidatorRanking();
-			this.dposState.setValidatorsRound(roundInfo);
+			// this.dposState.buildValidatorRanking();
+			// this.dposState.setValidatorsRound(roundInfo);
 
-			await this.#setForgingValidatorsOfRound(roundInfo, [...this.dposState.getRoundValidators()]);
+			// await this.#setForgingValidatorsOfRound(roundInfo, [...this.dposState.getRoundValidators()]);
 
-			await this.databaseService.saveRound(this.dposState.getRoundValidators());
+			// await this.databaseService.saveRound(this.dposState.getRoundValidators());
 
 			this.#blocksInCurrentRound = [];
 
