@@ -7,7 +7,6 @@ import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
-import { RoundState } from "./round-state";
 import { StateBuilder } from "./state-builder";
 import { StateStore } from "./stores/state";
 import { TransactionValidator } from "./transaction-validator";
@@ -58,7 +57,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
 		this.app.bind(Identifiers.BlockState).to(BlockState);
-		this.app.bind(Identifiers.RoundState).to(RoundState).inSingletonScope();
 
 		this.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
 
