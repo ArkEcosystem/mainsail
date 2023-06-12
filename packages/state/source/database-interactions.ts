@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
-
 @injectable()
 export class DatabaseInteraction {
 	@inject(Identifiers.Application)
@@ -46,7 +45,6 @@ export class DatabaseInteraction {
 			await this.app.terminate("Failed to initialize database service.", error);
 		}
 	}
-
 
 	async #reset(): Promise<void> {
 		await this.#createGenesisBlock();
