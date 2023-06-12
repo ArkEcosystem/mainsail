@@ -19,8 +19,9 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 						validator: {
 							properties: {
 								username: { $ref: "validatorUsername" },
+								publicKey: { $ref: "consensusPublicKey" },
 							},
-							required: ["username"],
+							required: ["username", "publicKey"],
 							type: "object",
 							unevaluatedProperties: false,
 						},
