@@ -1,5 +1,5 @@
 import { Selectors } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts,Identifiers } from "@mainsail/contracts";
 import {
 	KeyPairFactory,
 	PrivateKeyFactory,
@@ -8,6 +8,8 @@ import {
 } from "@mainsail/crypto-key-pair-bls12-381";
 import { Signature } from "@mainsail/crypto-signature-bls12-381";
 import { Providers } from "@mainsail/kernel";
+
+import { schemas } from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -51,9 +53,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
-		// TODO: register schema
-		// for (const schema of Object.values(schemas)) {
-		//     this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
-		// }
+		for (const schema of Object.values(schemas)) {
+		    this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
 	}
 }
