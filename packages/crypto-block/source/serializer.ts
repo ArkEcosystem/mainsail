@@ -15,6 +15,10 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	@tagged("type", "wallet")
 	private readonly generatorPublicKeyByteLength!: number;
 
+	@inject(Identifiers.Cryptography.Size.Signature)
+	@tagged("type", "consensus")
+	private readonly consensusSignatureByteLength!: number;
+
 	public headerSize(): number {
 		return (
 			4 + // version
@@ -28,6 +32,16 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			4 + // payloadLength
 			this.hashByteLength + // payloadHash
 			this.generatorPublicKeyByteLength
+		);
+	}
+
+	public commitSize(): number {
+		return (
+			this.hashByteLength + // blockId
+			4 + // height
+			4 + // round
+			this.consensusSignatureByteLength + // signature
+			1 + 51 // validator bit matrix  TODO optimize
 		);
 	}
 
@@ -120,5 +134,35 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 				},
 			},
 		});
+	}
+
+	public async serializeCommit(commit: Contracts.Crypto.IBlockCommit): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IBlockCommit>(commit, {
+			length: this.commitSize(),
+			skip: 0,
+			schema: {
+				blockId: {
+					type: "hash",
+				},
+				height: {
+					type: "uint32",
+				},
+				round: {
+					type: "uint32",
+				},
+				signature: {
+					type: "consensusSignature",
+				},
+				validators: {
+					type: "validatorSet",
+				},
+			},
+		});
+	}
+
+	public async serializeFull(committedBlock: Contracts.Crypto.ICommittedBlockSerializable): Promise<Buffer> {
+		const serializedCommit = await this.serializeCommit(committedBlock.commit);
+		const serializedBlock = Buffer.from(committedBlock.block.serialized, "hex");
+		return Buffer.concat([serializedCommit, serializedBlock]);
 	}
 }

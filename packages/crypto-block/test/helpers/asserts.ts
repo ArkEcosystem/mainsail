@@ -25,3 +25,14 @@ export const assertTransactionData = (assert, transactionData1, transactionData2
 		assert.equal(transactionData1[field].toString(), transactionData2[field].toString());
 	}
 };
+
+
+
+export const assertCommitData = (assert, commitData1, commitData2) => {
+	const transactionFields = ["blockId", "height", "round", "signature", "validators"];
+
+	for (const field of transactionFields) {
+		assert.equal(commitData1[field].toString(), commitData2[field].toString());
+	}
+};
+

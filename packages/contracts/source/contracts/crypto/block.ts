@@ -55,7 +55,35 @@ export interface IBlockJson {
 	readonly transactions: ITransactionJson[];
 }
 
+export interface IBlockCommit {
+	readonly blockId: string;
+	readonly height: number;
+	readonly round: number;
+	readonly signature: string;
+	readonly validators: boolean[];
+}
+
+// TODO: clean up interfaces so we do not store everything in a redundant manner
+export interface ICommittedBlock {
+	readonly block: IBlock;
+	readonly commit: IBlockCommit;
+	readonly serialized: string;
+}
+
+export interface ICommittedBlockData {
+	readonly block: IBlockData;
+	readonly commit: IBlockCommit;
+	readonly serialized: string;
+}
+
+export interface ICommittedBlockJson {
+	readonly block: IBlockJson;
+	readonly commit: IBlockCommit;
+	readonly serialized: string;
+}
+
 export type IBlockDataSerializable = Omit<IBlockData, "id">;
+export type ICommittedBlockSerializable = Omit<ICommittedBlock, "serialized">;
 
 export interface IBlockFactory {
 	make(data: Mutable<IBlockDataSerializable>): Promise<IBlock>;
@@ -67,15 +95,26 @@ export interface IBlockFactory {
 	fromJson(json: IBlockJson): Promise<IBlock>;
 
 	fromData(data: IBlockData): Promise<IBlock>;
+
+	fromCommittedBytes(buff: Buffer): Promise<ICommittedBlock>;
+
+	fromCommittedJson(json: ICommittedBlockJson): Promise<ICommittedBlock>;
 }
 
 export interface IBlockSerializer {
 	headerSize(): number;
+
+	commitSize(): number;
+
 	totalSize(block: IBlockDataSerializable): number;
 
 	serializeHeader(block: IBlockDataSerializable): Promise<Buffer>;
 
 	serializeWithTransactions(block: IBlockDataSerializable): Promise<Buffer>;
+
+	serializeCommit(commit: IBlockCommit): Promise<Buffer>;
+
+	serializeFull(committedBlock: ICommittedBlockSerializable): Promise<Buffer>;
 }
 
 export interface IBlockWithTransactions {
@@ -85,7 +124,10 @@ export interface IBlockWithTransactions {
 
 export interface IBlockDeserializer {
 	deserializeHeader(serialized: Buffer): Promise<IBlockHeader>;
+
 	deserializeWithTransactions(serialized: Buffer): Promise<IBlockWithTransactions>;
+
+	deserializeCommit(serialized: Buffer): Promise<IBlockCommit>;
 }
 
 export interface IBlockVerifier {
