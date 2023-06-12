@@ -123,7 +123,6 @@ export const Identifiers = {
 	QueueFactory: Symbol.for("Factory<Queue>"),
 	QueueManager: Symbol.for("Manager<Queue>"),
 	QueueService: Symbol.for("Service<Queue>"),
-	RoundState: Symbol.for("State<Round>"),
 	ScheduleService: Symbol.for("Service<Schedule>"),
 	ServiceProviderRepository: Symbol.for("Repository<ServiceProvider>"),
 	SnapshotService: Symbol.for("Service<Snapshot>"),

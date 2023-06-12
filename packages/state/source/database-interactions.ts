@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
-import { RoundState } from "./round-state";
 
 @injectable()
 export class DatabaseInteraction {
@@ -20,9 +19,6 @@ export class DatabaseInteraction {
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.RoundState)
-	private readonly roundState!: RoundState;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
@@ -51,17 +47,6 @@ export class DatabaseInteraction {
 		}
 	}
 
-	public async restoreCurrentRound(): Promise<void> {
-		await this.roundState.restore();
-	}
-
-	// TODO: Remove
-	public async getActiveValidators(
-		roundInfo?: Contracts.Shared.RoundInfo,
-		validators?: Contracts.State.Wallet[],
-	): Promise<Contracts.State.Wallet[]> {
-		return this.roundState.getActiveValidators(roundInfo, validators);
-	}
 
 	async #reset(): Promise<void> {
 		await this.#createGenesisBlock();
