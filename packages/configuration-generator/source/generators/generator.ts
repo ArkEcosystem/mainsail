@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
@@ -13,6 +13,10 @@ export class Generator {
 
 	@inject(InternalIdentifiers.Generator.Mnemonic)
 	private mnemonicGenerator!: MnemonicGenerator;
+
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "consensus")
+	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
 	protected async createWallet(mnemonic?: string): Promise<Wallet> {
 		if (!mnemonic) {
@@ -35,6 +39,7 @@ export class Generator {
 					"wallet",
 				)
 				.fromPublicKey(keys.publicKey),
+			consenusPublicKey: await this.publicKeyFactory.fromMnemonic(mnemonic),
 			keys,
 			passphrase: mnemonic,
 			username: undefined,

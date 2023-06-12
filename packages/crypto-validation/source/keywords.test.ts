@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { Validator } from "@mainsail/validation/source/validator";
 import { BigNumber } from "@mainsail/utils";
+import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../test-framework";
@@ -179,7 +179,7 @@ describe<{
 		assert.undefined(
 			context.validator.validate("test", {
 				fee: 0,
-				id: "da74c78b522ea015b2ae552d7f2fec76dfda0477b5d349ea17b633b8d417c037",
+				id: "f2df90a98e7bd99a0c2c9172bb6aed2f79f3f85e002229161d716dabff9cf96a",
 			}).error,
 		);
 	});
