@@ -44,19 +44,21 @@ describe<{
 			match("crypto.json"),
 			match({
 				genesisBlock: {
-					generatorPublicKey: match.string,
-					height: 1,
-					id: match.string,
-					numberOfTransactions: 103,
-					payloadHash: match.string,
-					payloadLength: 15328,
-					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-					reward: BigNumber.ZERO,
-					timestamp: match.number,
-					totalAmount: BigNumber.make("12500000000000000"),
-					totalFee: BigNumber.ZERO,
-					transactions: match.array,
-					version: 1,
+					block: {
+						generatorPublicKey: match.string,
+						height: 1,
+						id: match.string,
+						numberOfTransactions: 103,
+						payloadHash: match.string,
+						payloadLength: 15328,
+						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+						reward: BigNumber.ZERO,
+						timestamp: match.number,
+						totalAmount: BigNumber.make("12500000000000000"),
+						totalFee: BigNumber.ZERO,
+						transactions: match.array,
+						version: 1,
+					},
 				},
 				milestones: [
 					match({
@@ -92,7 +94,7 @@ describe<{
 
 	it("should log if logger is provided", async ({ generator, app }) => {
 		const logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		app.bind(InternalIdentifiers.LogService).toConstantValue(logger);
@@ -174,19 +176,21 @@ describe<{
 			match("crypto.json"),
 			match({
 				genesisBlock: {
-					generatorPublicKey: match.string,
-					height: 1,
-					id: match.string,
-					numberOfTransactions: 153,
-					payloadHash: match.string,
-					payloadLength: 24828,
-					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-					reward: BigNumber.ZERO,
-					timestamp: match.number,
-					totalAmount: BigNumber.make("12499999999999986"),
-					totalFee: BigNumber.ZERO,
-					transactions: match.array,
-					version: 1,
+					block: {
+						generatorPublicKey: match.string,
+						height: 1,
+						id: match.string,
+						numberOfTransactions: 153,
+						payloadHash: match.string,
+						payloadLength: 24828,
+						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+						reward: BigNumber.ZERO,
+						timestamp: match.number,
+						totalAmount: BigNumber.make("12499999999999986"),
+						totalFee: BigNumber.ZERO,
+						transactions: match.array,
+						version: 1,
+					},
 				},
 				milestones: [
 					match({

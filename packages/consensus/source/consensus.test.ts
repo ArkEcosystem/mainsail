@@ -986,7 +986,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
-		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${2} received +2/3 precommti but is invalid`);
+		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${2} received +2/3 precommit but is invalid`);
 		assert.equal(consensus.getHeight(), 2);
 	});
 

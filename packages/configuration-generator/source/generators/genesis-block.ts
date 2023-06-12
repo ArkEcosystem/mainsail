@@ -186,8 +186,6 @@ export class GenesisBlockGenerator extends Generator {
 			commit: proof,
 		}
 
-		console.log(commitBlock);
-
 		const serialized = await this.blockSerializer.serializeFull(commitBlock)
 
 		return {

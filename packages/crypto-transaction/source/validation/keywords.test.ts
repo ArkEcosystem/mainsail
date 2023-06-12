@@ -53,7 +53,7 @@ describe<{
 		assert.defined(context.validator.validate("test", "a").error);
 	});
 
-	it.only("keyword network - should not be ok if value is false ", (context) => {
+	it("keyword network - should not be ok if value is false ", (context) => {
 		const schema = {
 			$id: "test",
 			network: false,

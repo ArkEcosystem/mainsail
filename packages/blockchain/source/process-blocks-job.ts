@@ -18,8 +18,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	// @inject(Identifiers.Database.Service)
-	// private readonly databaseService!: Contracts.Database.IDatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
@@ -103,8 +103,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 		if (acceptedBlocks.length > 0) {
 			try {
-				// TODO
-				//await this.databaseService.saveBlocks(acceptedBlocks);
+				// TODO: process committed block
+				await this.databaseService.saveBlocks(acceptedBlocks.map(block => ({ block } as Contracts.Crypto.ICommittedBlock)));
 				// eslint-disable-next-line unicorn/prefer-at
 				this.stateStore.setLastStoredBlockHeight(acceptedBlocks[acceptedBlocks.length - 1].data.height);
 			} catch (error) {
