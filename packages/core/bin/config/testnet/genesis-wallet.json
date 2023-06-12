@@ -1,9 +1,14 @@
 {
-	"address": "ark10mk0h5cn98e2ddr4vvggm2pzx9mpj5kjkamhh8xl6d474z87605s6hsywj",
+	"address": "ark179f0nxzx8qk0gsjaj4342h9r55ph3qn5uarqy0wfjryhvpg4lkusv0x995",
 	"keys": {
 		"compressed": true,
-		"privateKey": "adc3b71ef0702b42c74b786b87c43dc1513094c3046e771c2f7486829493a963",
-		"publicKey": "7eecfbd31329f2a6b47563108da82231761952d2b7777b9cdfd36bea88fed3e9"
+		"privateKey": "1af670834cebffa1b51d6c7c9faa163bf11e5a670fc5d4e935881f1d00b181cc",
+		"publicKey": "f152f99846382cf4425d9563555ca3a503788274e746023dc990c9760515fdb9"
 	},
-	"passphrase": "exact torch pluck seed fix flame promote remain survey question two enroll trust budget welcome common exit plastic toilet pizza truck brick blur electric"
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "215acd014194987539c208a2cdaf167a51cc1c69d4ca05263138a81f51fd2737",
+		"publicKey": "806f70fdb7df8ddbe241c23476758fa0c3062f5451d72641937c69398cfb8e8a9c86734785038c8bbe5d118e1d4ab0b5"
+	},
+	"passphrase": "fee plate report rally caution gallery ticket march output silent disease canoe debate domain lizard dentist mass cat letter unaware prefer old inject broom"
 }
