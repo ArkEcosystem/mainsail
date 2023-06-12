@@ -43,13 +43,13 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
-		const { data } = this;
+		const { data, publicKeySize } = this;
 
 		Utils.assert.defined<Contracts.Crypto.ITransactionData>(data.asset);
 		Utils.assert.defined<{ username: string, publicKey: string }>(data.asset.validator);
 
 		const validatorBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
-		const buff: ByteBuffer = ByteBuffer.fromSize(validatorBytes.length + 1);
+		const buff: ByteBuffer = ByteBuffer.fromSize(validatorBytes.length + 1 + publicKeySize);
 
 		buff.writeUint8(validatorBytes.length);
 		buff.writeBytes(validatorBytes);
@@ -64,8 +64,9 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 
 		data.asset = {
 			validator: {
-				publicKey: buf.readBytes(publicKeySize).toString("hex"),
 				username: buf.readBytes(usernameLength).toString("utf8"),
+				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				publicKey: buf.readBytes(publicKeySize).toString("hex"),
 			},
 		};
 	}
