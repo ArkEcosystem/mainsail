@@ -20,20 +20,16 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
 		// const block = roundState.getProposal()?.block;
 		// Utils.assert.defined<Contracts.Crypto.IBlock>(block);
-
 		// const roundInfo: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(
 		// 	block.data.height,
 		// 	this.configuration,
 		// );
-
 		// const validators = await this.triggers.call<Contracts.State.Wallet[]>("getActiveValidators", {
 		// 	roundInfo,
 		// });
 		// Utils.assert.defined<Contracts.State.Wallet[]>(validators);
-
 		// // TODO: Fix
 		// const forgingValidator: Contracts.State.Wallet = validators[0];
-
 		// const walletRepository = this.app.getTagged<Contracts.State.WalletRepository>(
 		// 	Identifiers.WalletRepository,
 		// 	"state",
@@ -42,14 +38,12 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 		// const generatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 		// 	block.data.generatorPublicKey,
 		// );
-
 		// let generatorUsername: string;
 		// try {
 		// 	generatorUsername = generatorWallet.getAttribute("validator.username");
 		// } catch {
 		// 	return false;
 		// }
-
 		// if (!forgingValidator) {
 		// 	this.logger.debug(
 		// 		`Could not decide if validator ${generatorUsername} (${
@@ -58,27 +52,22 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 		// 	);
 		// } else if (forgingValidator.getPublicKey() !== block.data.generatorPublicKey) {
 		// 	Utils.assert.defined<string>(forgingValidator.getPublicKey());
-
 		// 	const forgingWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 		// 		forgingValidator.getPublicKey()!,
 		// 	);
 		// 	const forgingUsername: string = forgingWallet.getAttribute("validator.username");
-
 		// 	this.logger.warning(
 		// 		`Validator ${generatorUsername} (${
 		// 			block.data.generatorPublicKey
 		// 		}) not allowed to forge, should be ${forgingUsername} (${forgingValidator.getPublicKey()})`,
 		// 	);
-
 		// 	return false;
 		// }
-
 		// this.logger.debug(
 		// 	`Validator ${generatorUsername} (${
 		// 		block.data.generatorPublicKey
 		// 	}) allowed to forge block ${block.data.height.toLocaleString()}`,
 		// );
-
 		// return true;
 	}
 }

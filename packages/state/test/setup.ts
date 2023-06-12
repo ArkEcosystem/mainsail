@@ -121,7 +121,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.set("storage.maxLastTransactionIds", defaults.storage.maxLastTransactionIds);
 	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
-
 	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
@@ -259,7 +258,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	);
 
 	sandbox.app.bind(Identifiers.BlockState).to(BlockState);
-
 
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
