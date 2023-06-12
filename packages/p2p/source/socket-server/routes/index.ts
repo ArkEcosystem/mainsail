@@ -5,4 +5,5 @@ export * from "./get-status";
 export * from "./post-block";
 export * from "./post-precommit";
 export * from "./post-prevote";
+export * from "./post-proposal";
 export * from "./post-transactions";

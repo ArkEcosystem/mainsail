@@ -9,7 +9,7 @@ export class PostProposalRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
 		const controller = this.getController();
 		return {
-			"/postPrevote": {
+			"/postProposal": {
 				codec: Codecs.postProposal,
 				handler: controller.handle,
 				id: Routes.PostProposal,
