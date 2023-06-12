@@ -2,7 +2,6 @@ import { Container } from "@mainsail/container";
 import { Constants, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-// import { Managers } from "@mainsail/crypto";
 import { describe } from "../../../../test-framework";
 import { Initialize } from "./initialize";
 
@@ -14,7 +13,6 @@ describe<{
 	stateStore: any;
 	transactionPool: any;
 	databaseService: any;
-	databaseInteractions: any;
 	peerNetworkMonitor: any;
 	stateBuilder: any;
 	configuration: any;
@@ -44,18 +42,6 @@ describe<{
 			deleteRound: () => {},
 			verifyBlockchain: () => {},
 		};
-		context.databaseInteractions = {
-			applyBlock: () => {},
-			deleteRound: () => {},
-			getActiveDelegates: () => [],
-			getLastBlock: () => {},
-			getTopBlocks: () => {},
-			loadBlocksFromCurrentRound: () => {},
-			restoreCurrentRound: () => {},
-			walletRepository: {
-				getNonce: () => {},
-			},
-		};
 		context.peerNetworkMonitor = {
 			boot: () => {},
 		};
@@ -82,7 +68,6 @@ describe<{
 		context.container.bind(Identifiers.Application).toConstantValue(context.application);
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
-		context.container.bind(Identifiers.DatabaseInteraction).toConstantValue(context.databaseInteractions);
 		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
 		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
@@ -105,7 +90,6 @@ describe<{
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const deleteRoundSpy = spy(context.databaseService, "deleteRound");
-		const restoreCurrentRoundSpy = spy(context.databaseInteractions, "restoreCurrentRound");
 		const readdTransactionsSpy = spy(context.transactionPool, "readdTransactions");
 		const bootSpy = spy(context.peerNetworkMonitor, "boot");
 		const runSpy = spy(context.stateBuilder, "run");
@@ -116,7 +100,6 @@ describe<{
 		await initialize.handle();
 
 		deleteRoundSpy.calledOnce();
-		restoreCurrentRoundSpy.calledOnce();
 		readdTransactionsSpy.calledOnce();
 		bootSpy.calledOnce();
 		consenususRunSpy.calledOnce();
@@ -259,7 +242,6 @@ describe<{
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const deleteRoundSpy = spy(context.databaseService, "deleteRound");
-		const restoreCurrentRoundSpy = spy(context.databaseInteractions, "restoreCurrentRound");
 		const readdTransactionsSpy = spy(context.transactionPool, "readdTransactions");
 		const bootSpy = spy(context.peerNetworkMonitor, "boot");
 		const runSpy = spy(context.stateBuilder, "run");
@@ -269,7 +251,6 @@ describe<{
 		await initialize.handle();
 
 		deleteRoundSpy.calledOnce();
-		restoreCurrentRoundSpy.calledOnce();
 		readdTransactionsSpy.neverCalled();
 		bootSpy.calledOnce();
 		runSpy.calledOnce();
