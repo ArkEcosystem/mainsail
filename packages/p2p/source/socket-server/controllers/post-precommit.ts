@@ -17,7 +17,7 @@ export class PostPrecommitController implements Contracts.P2P.Controller {
 	private readonly deserializer!: Contracts.Crypto.IMessageDeserializer;
 
 	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<{}> {
-		const precommit = await this.deserializer.deserializePrevote(request.payload.precommit);
+		const precommit = await this.deserializer.deserializePrecommit(request.payload.precommit);
 
 		await this.consensusHandler.onPrecommit(precommit);
 
