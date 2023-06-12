@@ -21,10 +21,12 @@ describe<{
 	});
 
 	it("#generate - should return wallet from mnemonic", async ({ generator }) => {
-		const wallet = await generator.generate("mnemonic");
+		const mnemonic = "sugar clump talent range royal era tomorrow century fame captain tattoo ghost dilemma grace window gallery narrow menu cinnamon area height crime calm edge"
+
+		const wallet = await generator.generate(mnemonic);
 
 		assert.string(wallet.address);
-		assert.equal(wallet.passphrase, "mnemonic");
+		assert.equal(wallet.passphrase, mnemonic);
 		assert.object(wallet.keys);
 	});
 });
