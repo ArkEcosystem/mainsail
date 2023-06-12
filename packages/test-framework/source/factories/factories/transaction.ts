@@ -108,7 +108,8 @@ export const registerValidatorRegistrationFactory = (
 		applyModifiers(
 			app
 				.resolve(ValidatorRegistrationBuilder)
-				.usernameAsset(options.username || Math.random().toString(36).slice(8)),
+				.usernameAsset(options.username || Math.random().toString(36).slice(8))
+				.publicKeyAsset(options.publicKey || "a".repeat(96)),
 			options,
 		),
 	);

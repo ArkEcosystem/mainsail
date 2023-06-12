@@ -29,6 +29,7 @@ describe<{
 		const options: Types.ValidatorRegistrationOptions = {
 			fee: "5",
 			passphrase: passphrases[0],
+			publicKey: "a".repeat(96),
 			username: "dummy",
 		};
 
