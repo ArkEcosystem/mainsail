@@ -33,6 +33,8 @@ export interface IBlockData {
 	readonly payloadHash: string;
 	readonly generatorPublicKey: string;
 
+	// TODO: transactions field is missing when retrieved from storage
+	// and numberOfTransactions = 0
 	readonly transactions: ITransactionData[];
 }
 

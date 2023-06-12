@@ -210,7 +210,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 			const nextMilestone = milestoneHeights[0] && milestoneHeights[0] === block.height;
 
 			if (
-				currentTransactionsCount >= 150 ||
+				currentTransactionsCount >= 150 || // TODO: double check hardcoded heuristic
 				currentBlocksChunk.length >= Math.min(this.stateStore.getMaxLastBlocks(), 100) ||
 				nextMilestone
 			) {
