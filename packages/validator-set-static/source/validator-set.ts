@@ -14,10 +14,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	@tagged("type", "wallet")
 	private readonly walletPublicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	@tagged("type", "consensus")
-	private readonly consensusPublicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
-
 	#validators: Contracts.State.Wallet[] = [];
 
 	public async configure(): Promise<ValidatorSet> {
@@ -26,12 +22,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#validators = await Promise.all(
 			secrets.map(async (secret) => {
 				const walletPublicKey = await this.walletPublicKeyFactory.fromMnemonic(secret);
-				const wallet = await this.walletRepository.findByPublicKey(walletPublicKey);
 
-				// TODO: shouldn't be an attribute
-				wallet.setAttribute("consensus.publicKey", await this.consensusPublicKeyFactory.fromMnemonic(secret));
-
-				return wallet;
+				return await this.walletRepository.findByPublicKey(walletPublicKey);
 			}),
 		);
 

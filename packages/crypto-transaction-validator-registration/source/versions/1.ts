@@ -1,10 +1,15 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
+import { Utils } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export abstract class ValidatorRegistrationTransaction extends Transaction {
+	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@tagged("type", "consensus")
+	private readonly publicKeySize!: number;
+
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.ValidatorRegistration;
 	public static key = "validatorRegistration";
@@ -18,9 +23,10 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 					properties: {
 						validator: {
 							properties: {
+								publicKey: { $ref: "consensusPublicKey" },
 								username: { $ref: "validatorUsername" },
 							},
-							required: ["username"],
+							required: ["username", "publicKey"],
 							type: "object",
 							unevaluatedProperties: false,
 						},
@@ -37,29 +43,30 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
-		const { data } = this;
+		const { data, publicKeySize } = this;
 
-		if (data.asset && data.asset.validator) {
-			const validatorBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
-			const buff: ByteBuffer = ByteBuffer.fromSize(validatorBytes.length + 1);
+		Utils.assert.defined<Contracts.Crypto.ITransactionData>(data.asset);
+		Utils.assert.defined<{ username: string; publicKey: string }>(data.asset.validator);
 
-			buff.writeUint8(validatorBytes.length);
-			// buffer.writeBytes(validatorBytes, "hex");
-			buff.writeBytes(validatorBytes);
+		const validatorBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
+		const buff: ByteBuffer = ByteBuffer.fromSize(validatorBytes.length + 1 + publicKeySize);
 
-			return buff;
-		}
+		buff.writeUint8(validatorBytes.length);
+		buff.writeBytes(validatorBytes);
+		buff.writeBytes(Buffer.from(data.asset.validator.publicKey, "hex"));
 
-		return undefined;
+		return buff;
 	}
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
-		const { data } = this;
+		const { data, publicKeySize } = this;
 		const usernameLength = buf.readUint8();
 
 		data.asset = {
 			validator: {
 				username: buf.readBytes(usernameLength).toString("utf8"),
+				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				publicKey: buf.readBytes(publicKeySize).toString("hex"),
 			},
 		};
 	}

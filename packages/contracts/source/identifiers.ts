@@ -84,7 +84,6 @@ export const Identifiers = {
 	},
 	// @deprecated
 	DatabaseInteraction: Symbol.for("Database<DatabaseInteraction>"),
-	DposState: Symbol.for("State<DposState>"),
 	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),
 	EventDispatcherService: Symbol.for("Service<EventDispatcher>"),
 	Fee: {
@@ -124,7 +123,6 @@ export const Identifiers = {
 	QueueFactory: Symbol.for("Factory<Queue>"),
 	QueueManager: Symbol.for("Manager<Queue>"),
 	QueueService: Symbol.for("Service<Queue>"),
-	RoundState: Symbol.for("State<Round>"),
 	ScheduleService: Symbol.for("Service<Schedule>"),
 	ServiceProviderRepository: Symbol.for("Repository<ServiceProvider>"),
 	SnapshotService: Symbol.for("Service<Snapshot>"),

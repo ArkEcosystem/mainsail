@@ -24,6 +24,7 @@ export type TransferOptions = TransactionOptions & {
 
 export type ValidatorRegistrationOptions = TransactionOptions & {
 	username?: string;
+	publicKey?: string;
 };
 
 export type ValidatorResignationOptions = TransactionOptions & {};

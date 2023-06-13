@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { DatabaseInteraction } from "@mainsail/state";
 
 import { Action } from "../contracts";
 
@@ -27,9 +26,6 @@ export class Initialize implements Action {
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
-
-	@inject(Identifiers.DatabaseInteraction)
-	private readonly databaseInteraction!: DatabaseInteraction;
 
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
@@ -77,7 +73,6 @@ export class Initialize implements Action {
 
 			if (this.stateStore.getNetworkStart()) {
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
-				await this.databaseInteraction.restoreCurrentRound();
 				await this.transactionPool.readdTransactions();
 				await this.consensus.run();
 				await this.networkMonitor.boot();
@@ -89,7 +84,6 @@ export class Initialize implements Action {
 				this.logger.notice("TEST SUITE DETECTED! SYNCING WALLETS AND STARTING IMMEDIATELY.");
 
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
-				await this.databaseInteraction.restoreCurrentRound();
 				await this.consensus.run();
 				await this.networkMonitor.boot();
 
@@ -105,7 +99,6 @@ export class Initialize implements Action {
 
 			await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 
-			await this.databaseInteraction.restoreCurrentRound();
 			await this.transactionPool.readdTransactions();
 
 			await this.consensus.run();

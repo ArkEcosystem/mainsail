@@ -14,10 +14,6 @@ export class StateBuilder {
 	@tagged("state", "blockchain")
 	private walletRepository!: Contracts.State.WalletRepository;
 
-	@inject(Identifiers.DposState)
-	@tagged("state", "blockchain")
-	private dposState!: Contracts.State.DposState;
-
 	@inject(Identifiers.EventDispatcherService)
 	private events!: Contracts.Kernel.EventDispatcher;
 
@@ -58,9 +54,9 @@ export class StateBuilder {
 				}
 			}
 
-			this.logger.info(`State Generation - Vote Balances & Validator Ranking`);
-			this.dposState.buildVoteBalances();
-			this.dposState.buildValidatorRanking();
+			// this.logger.info(`State Generation - Vote Balances & Validator Ranking`);
+			// this.dposState.buildVoteBalances();
+			// this.dposState.buildValidatorRanking();
 
 			this.logger.info(
 				`Number of registered validators: ${Object.keys(

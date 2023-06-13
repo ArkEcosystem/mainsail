@@ -50,7 +50,7 @@ describe<{
 						id: match.string,
 						numberOfTransactions: 103,
 						payloadHash: match.string,
-						payloadLength: 15328,
+						payloadLength: 17776,
 						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 						reward: BigNumber.ZERO,
 						timestamp: match.number,
@@ -182,7 +182,7 @@ describe<{
 						id: match.string,
 						numberOfTransactions: 153,
 						payloadHash: match.string,
-						payloadLength: 24828,
+						payloadLength: 27276,
 						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 						reward: BigNumber.ZERO,
 						timestamp: match.number,
@@ -203,6 +203,8 @@ describe<{
 						multiPaymentLimit: 256,
 						reward: "0", // TODO: Check
 						satoshi: match.object,
+						stageTimeout: 2000,
+						stageTimeoutIncrease: 2000,
 						vendorFieldLength: 255,
 					}),
 					match({
