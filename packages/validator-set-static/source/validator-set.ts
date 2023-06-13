@@ -13,7 +13,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	#validators: Contracts.State.Wallet[] = [];
 
 	public async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
-		if(this.#validators.length === 0) {
+		if (this.#validators.length === 0) {
 			this.#init();
 		}
 
@@ -23,7 +23,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	#init(): void {
 		const usernames: string[] = [];
 
-		for(let index = 1; index <= this.cryptoConfiguration.getMilestone().activeValidators; index++) {
+		for (let index = 1; index <= this.cryptoConfiguration.getMilestone().activeValidators; index++) {
 			usernames.push(`genesis_${index}`);
 		}
 

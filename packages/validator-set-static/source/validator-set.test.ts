@@ -1,4 +1,3 @@
-
 import { Identifiers } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework";
@@ -12,21 +11,21 @@ describe<{
 }>("ValidatorSet", ({ it, assert, beforeEach, stub }) => {
 	beforeEach(async (context) => {
 		context.walletRepository = {
-			findByUsername: () => {}
-		}
+			findByUsername: () => {},
+		};
 
 		context.cryptoConfiguration = {
 			getMilestone: () => ({
-				activeValidators: 2
-				})
-		}
+				activeValidators: 2,
+			}),
+		};
 
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 
-		context.validatorSet = context.sandbox.app.resolve(ValidatorSet)
+		context.validatorSet = context.sandbox.app.resolve(ValidatorSet);
 	});
 
 	it("#getActiveValidators - should return active validators", async ({ validatorSet, walletRepository }) => {
@@ -35,8 +34,8 @@ describe<{
 		const validators = await validatorSet.getActiveValidators();
 		assert.equal(validators.length, 2);
 
-		findByUsernameSpy.calledTimes(2)
-		findByUsernameSpy.calledWith("genesis_1")
-		findByUsernameSpy.calledWith("genesis_2")
+		findByUsernameSpy.calledTimes(2);
+		findByUsernameSpy.calledWith("genesis_1");
+		findByUsernameSpy.calledWith("genesis_2");
 	});
 });
