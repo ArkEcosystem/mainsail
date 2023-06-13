@@ -57,7 +57,7 @@ export class BlocksController extends Controller {
 		if (request.query.transform) {
 			return this.respondWithResource(block, BlockWithTransactionsResource, true);
 		} else {
-			return this.respondWithResource(block.data, BlockResource, false);
+			return this.respondWithResource(block.block.data, BlockResource, false);
 		}
 	}
 
