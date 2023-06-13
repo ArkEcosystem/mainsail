@@ -1,13 +1,13 @@
-import { IBlockJson } from "./block";
+import { ICommittedBlockJson } from "./block";
 
 export type NetworkConfig = {
-	genesisBlock: IBlockJson;
+	genesisBlock: ICommittedBlockJson;
 	milestones: Milestone[];
 	network: Network;
 };
 
 export type NetworkConfigPartial = {
-	genesisBlock: IBlockJson;
+	genesisBlock: ICommittedBlockJson;
 	milestones: MilestonePartial[];
 	network: Network;
 };

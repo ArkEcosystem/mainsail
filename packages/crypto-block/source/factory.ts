@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
+import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 import { sealBlock } from "./block";
 import { IDFactory } from "./id.factory";
@@ -50,6 +50,34 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		}
 
 		return this.fromData(data);
+	}
+
+	// TODO: separate factory ?
+	public async fromCommittedBytes(buff: Buffer): Promise<Contracts.Crypto.ICommittedBlock> {
+		const buffer = ByteBuffer.fromBuffer(buff);
+
+		const commitBuffer = buffer.readBytes(this.serializer.commitSize());
+		const commit = await this.deserializer.deserializeCommit(commitBuffer);
+
+		const block = await this.#fromSerialized(buffer.getRemainder());
+
+		return {
+			block,
+			commit,
+			serialized: buff.toString("hex"),
+		};
+	}
+
+	// TODO: separate factory ?
+	public async fromCommittedJson(
+		json: Contracts.Crypto.ICommittedBlockJson,
+	): Promise<Contracts.Crypto.ICommittedBlock> {
+		const block = await this.fromJson(json.block);
+		return {
+			block,
+			commit: json.commit,
+			serialized: json.serialized,
+		};
 	}
 
 	public async fromData(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock> {

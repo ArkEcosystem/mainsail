@@ -22,7 +22,7 @@ export class StateStore implements Contracts.State.StateStore {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	#blockchain: any = {};
-	#genesisBlock?: Contracts.Crypto.IBlock;
+	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastDownloadedBlock?: Contracts.Crypto.IBlockData;
 	#lastStoredBlockHeight = 1;
 	#blockPing?: Contracts.State.BlockPing;
@@ -48,13 +48,13 @@ export class StateStore implements Contracts.State.StateStore {
 		this.#blockchain = blockchain;
 	}
 
-	public getGenesisBlock(): Contracts.Crypto.IBlock {
-		Utils.assert.defined<Contracts.Crypto.IBlock>(this.#genesisBlock);
+	public getGenesisBlock(): Contracts.Crypto.ICommittedBlock {
+		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(this.#genesisBlock);
 
 		return this.#genesisBlock;
 	}
 
-	public setGenesisBlock(block: Contracts.Crypto.IBlock): void {
+	public setGenesisBlock(block: Contracts.Crypto.ICommittedBlock): void {
 		this.#genesisBlock = block;
 	}
 

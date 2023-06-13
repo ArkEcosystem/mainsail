@@ -1141,8 +1141,8 @@ importers:
   packages/crypto-key-pair-bls12-381:
     dependencies:
       '@chainsafe/blst':
-        specifier: ^0.2.8
-        version: 0.2.8
+        specifier: ^0.2.9
+        version: 0.2.9
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -1338,8 +1338,8 @@ importers:
   packages/crypto-signature-bls12-381:
     dependencies:
       '@chainsafe/blst':
-        specifier: ^0.2.8
-        version: 0.2.8
+        specifier: ^0.2.9
+        version: 0.2.9
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
@@ -3006,10 +3006,11 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@chainsafe/blst@0.2.8:
-    resolution: {integrity: sha512-f3uXSSJcQ+go7qIh9uYZfMaWeA2+XiU8QhRUKor6aqYjVT6N2JdEip3hbVbJu7BIr/qSWOKRQEeGMVNvNfwJQQ==}
+  /@chainsafe/blst@0.2.9:
+    resolution: {integrity: sha512-6MXBUy5Co6k6V9Bv0EC5YrHD7kwWIpzwBO4yCqurLw//Zm3cUmN6DohuYuEGcS4QMNEswa/cXqzZLf+LFBJPiw==}
     requiresBuild: true
     dependencies:
+      '@types/tar': 6.1.4
       node-fetch: 2.6.7
       node-gyp: 8.4.1
     transitivePeerDependencies:
@@ -5584,7 +5585,6 @@ packages:
     dependencies:
       '@types/node': 20.1.0
       minipass: 4.2.8
-    dev: true
 
   /@types/tmp@0.2.1:
     resolution: {integrity: sha512-7cTXwKP/HLOPVgjg+YhBdQ7bMiobGMuoBmrGmqwIWJv8elC6t1DfVc/mn4fD9UE1IjhwmhaQ5pGVXkmXbH0rhg==}
@@ -12284,7 +12284,6 @@ packages:
   /minipass@4.2.8:
     resolution: {integrity: sha512-fNzuVyifolSLFL4NzpF+wEF4qrgqaaKX0haXPQEdQ7NKAN+WecoKMHV09YcuL/DHxrUsYQOK3MiuDf7Ip2OXfQ==}
     engines: {node: '>=8'}
-    dev: true
 
   /minipass@5.0.0:
     resolution: {integrity: sha512-3FnjYuehv9k6ovOEbyOswadCDPX1piCfhV8ncmYtHOjuPwylVWsghTLo7rabjC3Rx5xD4HDx8Wm1xnMF7S5qFQ==}

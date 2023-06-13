@@ -16,49 +16,49 @@ describe<{
 	});
 
 	it("should create a single block", async ({ factoryBuilder }) => {
-		const entity = await factoryBuilder.get("Block").make<Contracts.Crypto.IBlock>();
+		const entity = await factoryBuilder.get("Block").make<Contracts.Crypto.ICommittedBlock>();
 
-		assert.string(entity.data.generatorPublicKey);
-		assert.number(entity.data.height);
-		assert.string(entity.data.id);
-		assert.number(entity.data.numberOfTransactions);
-		assert.string(entity.data.payloadHash);
-		assert.number(entity.data.payloadLength);
-		assert.string(entity.data.previousBlock);
-		assert.instance(entity.data.reward, BigNumber);
-		assert.number(entity.data.timestamp);
-		assert.instance(entity.data.totalAmount, BigNumber);
-		assert.instance(entity.data.totalFee, BigNumber);
-		assert.number(entity.data.version);
-		assert.string(entity.serialized);
-		assert.array(entity.transactions);
+		assert.string(entity.block.data.generatorPublicKey);
+		assert.number(entity.block.data.height);
+		assert.string(entity.block.data.id);
+		assert.number(entity.block.data.numberOfTransactions);
+		assert.string(entity.block.data.payloadHash);
+		assert.number(entity.block.data.payloadLength);
+		assert.string(entity.block.data.previousBlock);
+		assert.instance(entity.block.data.reward, BigNumber);
+		assert.number(entity.block.data.timestamp);
+		assert.instance(entity.block.data.totalAmount, BigNumber);
+		assert.instance(entity.block.data.totalFee, BigNumber);
+		assert.number(entity.block.data.version);
+		assert.string(entity.block.serialized);
+		assert.array(entity.block.transactions);
 	});
 
 	it("should create a single block with previous block in options", async ({ factoryBuilder }) => {
-		const previousBlock = await factoryBuilder.get("Block").make<Contracts.Crypto.IBlock>();
+		const previousBlock = await factoryBuilder.get("Block").make<Contracts.Crypto.ICommittedBlock>();
 
 		const options = {
 			getPreviousBlock(): Contracts.Crypto.IBlockData {
-				return previousBlock.data;
+				return previousBlock.block.data;
 			},
 		};
 
-		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.IBlock>();
+		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.ICommittedBlock>();
 
-		assert.string(entity.data.generatorPublicKey);
-		assert.number(entity.data.height);
-		assert.string(entity.data.id);
-		assert.number(entity.data.numberOfTransactions);
-		assert.string(entity.data.payloadHash);
-		assert.number(entity.data.payloadLength);
-		assert.string(entity.data.previousBlock);
-		assert.instance(entity.data.reward, BigNumber);
-		assert.number(entity.data.timestamp);
-		assert.instance(entity.data.totalAmount, BigNumber);
-		assert.instance(entity.data.totalFee, BigNumber);
-		assert.number(entity.data.version);
-		assert.string(entity.serialized);
-		assert.array(entity.transactions);
+		assert.string(entity.block.data.generatorPublicKey);
+		assert.number(entity.block.data.height);
+		assert.string(entity.block.data.id);
+		assert.number(entity.block.data.numberOfTransactions);
+		assert.string(entity.block.data.payloadHash);
+		assert.number(entity.block.data.payloadLength);
+		assert.string(entity.block.data.previousBlock);
+		assert.instance(entity.block.data.reward, BigNumber);
+		assert.number(entity.block.data.timestamp);
+		assert.instance(entity.block.data.totalAmount, BigNumber);
+		assert.instance(entity.block.data.totalFee, BigNumber);
+		assert.number(entity.block.data.version);
+		assert.string(entity.block.serialized);
+		assert.array(entity.block.transactions);
 	});
 
 	it("should create a single block with transactions in options", async ({ factoryBuilder }) => {
@@ -66,22 +66,22 @@ describe<{
 			transactionsCount: 1,
 		};
 
-		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.IBlock>();
+		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.ICommittedBlock>();
 
-		assert.string(entity.data.generatorPublicKey);
-		assert.number(entity.data.height);
-		assert.string(entity.data.id);
-		assert.number(entity.data.numberOfTransactions);
-		assert.string(entity.data.payloadHash);
-		assert.number(entity.data.payloadLength);
-		assert.string(entity.data.previousBlock);
-		assert.instance(entity.data.reward, BigNumber);
-		assert.number(entity.data.timestamp);
-		assert.instance(entity.data.totalAmount, BigNumber);
-		assert.instance(entity.data.totalFee, BigNumber);
-		assert.number(entity.data.version);
-		assert.string(entity.serialized);
-		assert.array(entity.transactions);
-		assert.equal(entity.transactions.length, 1);
+		assert.string(entity.block.data.generatorPublicKey);
+		assert.number(entity.block.data.height);
+		assert.string(entity.block.data.id);
+		assert.number(entity.block.data.numberOfTransactions);
+		assert.string(entity.block.data.payloadHash);
+		assert.number(entity.block.data.payloadLength);
+		assert.string(entity.block.data.previousBlock);
+		assert.instance(entity.block.data.reward, BigNumber);
+		assert.number(entity.block.data.timestamp);
+		assert.instance(entity.block.data.totalAmount, BigNumber);
+		assert.instance(entity.block.data.totalFee, BigNumber);
+		assert.number(entity.block.data.version);
+		assert.string(entity.block.serialized);
+		assert.array(entity.block.transactions);
+		assert.equal(entity.block.transactions.length, 1);
 	});
 });

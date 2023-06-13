@@ -21,13 +21,15 @@ describe<{
 	});
 
 	it("#generate - should return wallet from mnemonic", async ({ generator }) => {
-		const mnemonic =
-			"sugar clump talent range royal era tomorrow century fame captain tattoo ghost dilemma grace window gallery narrow menu cinnamon area height crime calm edge";
-
-		const wallet = await generator.generate(mnemonic);
+		const wallet = await generator.generate(
+			"endless deposit bright clip school doctor later surround strategy blouse damage drink diesel erase scrap inside over pledge talent blood bus luggage glad whale",
+		);
 
 		assert.string(wallet.address);
-		assert.equal(wallet.passphrase, mnemonic);
+		assert.equal(
+			wallet.passphrase,
+			"endless deposit bright clip school doctor later surround strategy blouse damage drink diesel erase scrap inside over pledge talent blood bus luggage glad whale",
+		);
 		assert.object(wallet.keys);
 	});
 });

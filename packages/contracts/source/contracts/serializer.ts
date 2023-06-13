@@ -9,7 +9,9 @@ export type MandatoryPropertyType =
 	| "publicKey"
 	| "hex"
 	| "signature"
-	| "transactions";
+	| "transactions"
+	| "consensusSignature"
+	| "validatorSet";
 
 export type OptionalPropertyType = "blockId";
 

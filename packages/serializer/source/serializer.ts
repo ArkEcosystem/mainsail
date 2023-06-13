@@ -1,5 +1,5 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
@@ -16,6 +16,10 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 	@inject(Identifiers.Cryptography.Signature)
 	private readonly signatureSerializer!: Contracts.Crypto.ISignature;
+
+	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "consensus")
+	private readonly consensusSignatureSerializer!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly transactionUtils: any;
@@ -34,10 +38,16 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		}
 
 		for (const [property, schema] of Object.entries(configuration.schema)) {
-			const value = data[property];
+			let value = data[property];
 			const isOptional = schema["optional"] ?? false;
 
 			if (!isOptional) {
+				// TODO: temporary workaround for `getBlocksForRound` returning block data without a `transactions` field
+
+				if (schema.type === "transactions") {
+					value = value ?? [];
+				}
+
 				Utils.assert.defined(value);
 			}
 
@@ -86,6 +96,29 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				continue;
 			}
 
+			if (schema.type === "consensusSignature") {
+				this.consensusSignatureSerializer.serialize(result, data[property]);
+				continue;
+			}
+
+			if (schema.type === "validatorSet") {
+				const validatorSet = data[property];
+				Utils.assert.array(validatorSet);
+
+				result.writeUint8(validatorSet.length);
+
+				// TODO: write bit mask instead of individual bytes
+				for (const element of validatorSet) {
+					if (element) {
+						result.writeUint8(1);
+					} else {
+						result.writeUint8(0);
+					}
+				}
+
+				continue;
+			}
+
 			if (schema.type === "hex") {
 				Utils.assert.string(data[property]["serialized"]);
 
@@ -96,7 +129,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "transactions") {
-				for (const transaction of data[property].values()) {
+				for (const transaction of value) {
 					const serialized: Buffer = await this.transactionUtils.toBytes(transaction);
 
 					result.writeUint32(serialized.length);
@@ -104,6 +137,8 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				}
 				continue;
 			}
+
+			throw new Exceptions.NotImplemented(this.constructor.name, schema.type);
 		}
 
 		return result.toBuffer();
@@ -155,6 +190,23 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				continue;
 			}
 
+			if (schema.type === "consensusSignature") {
+				target[property] = this.consensusSignatureSerializer.deserialize(source).toString("hex");
+				continue;
+			}
+
+			if (schema.type === "validatorSet") {
+				const length = source.readUint8();
+
+				const validatorSet: boolean[] = [];
+				for (let index = 0; index < length; index++) {
+					validatorSet.push(source.readUint8() === 1);
+				}
+
+				target[property] = validatorSet;
+				continue;
+			}
+
 			if (schema.type === "hex") {
 				target[property] = source.readBytes(source.readUint32()).toString("hex");
 				continue;
@@ -168,6 +220,8 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				}
 				continue;
 			}
+
+			throw new Exceptions.NotImplemented(this.constructor.name, schema.type);
 		}
 
 		return target;

@@ -248,7 +248,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (!roundState.getProcessorResult()) {
 			this.logger.info(
-				`Block ${proposal.block.data.id} on height ${this.#height} received +2/3 precommti but is invalid`,
+				`Block ${proposal.block.data.id} on height ${this.#height} received +2/3 precommit but is invalid`,
 			);
 			return;
 		}
