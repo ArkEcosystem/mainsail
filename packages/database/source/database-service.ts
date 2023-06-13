@@ -89,7 +89,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 			// TODO: return committed block or even have a dedicated storage for it?
 			return lastCommittedBlock.block;
-		} catch (ex) {
+		} catch {
 			return undefined;
 		}
 	}
@@ -261,7 +261,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return result;
 	}
 
-	async #map<T>(data: unknown[], callback: (...args: any[]) => Promise<T>): Promise<T[]> {
+	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
 		const result: T[] = [];
 
 		for (const [index, datum] of data.entries()) {

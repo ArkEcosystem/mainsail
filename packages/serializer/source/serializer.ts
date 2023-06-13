@@ -42,7 +42,6 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			const isOptional = schema["optional"] ?? false;
 
 			if (!isOptional) {
-
 				// TODO: temporary workaround for `getBlocksForRound` returning block data without a `transactions` field
 
 				if (schema.type === "transactions") {
@@ -109,8 +108,8 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				result.writeUint8(validatorSet.length);
 
 				// TODO: write bit mask instead of individual bytes
-				for (let i = 0; i < validatorSet.length; i++) {
-					if (validatorSet[i]) {
+				for (const element of validatorSet) {
+					if (element) {
 						result.writeUint8(1);
 					} else {
 						result.writeUint8(0);
@@ -201,7 +200,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 				const validatorSet: boolean[] = [];
 				for (let index = 0; index < length; index++) {
-					validatorSet.push(source.readUint8() === 1 ? true : false);
+					validatorSet.push(source.readUint8() === 1);
 				}
 
 				target[property] = validatorSet;

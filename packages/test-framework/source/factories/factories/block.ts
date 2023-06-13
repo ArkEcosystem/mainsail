@@ -20,7 +20,9 @@ export const registerBlockFactory = async (
 	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.ICommittedBlock> => {
 		const previousBlock: Contracts.Crypto.IBlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
-			: await app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).get("genesisBlock.block");
+			: await app
+					.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+					.get("genesisBlock.block");
 
 		const { reward } = app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
@@ -97,22 +99,76 @@ export const registerBlockFactory = async (
 			}),
 			// TODO: dont hardcode
 			commit: {
+				blockId: "365dbc2f380b65737b439f98ce9ef0318b00d5bbdda57daabea8341f91ce39e7",
 				height: 1,
 				round: 1,
-				signature: "97a16d3e938a1bc6866701b946e703cfa502d57a226e540f270c16585405378e93086dfb3b32ab2039aa2c197177c66b0fec074df5bfac037efd3dc41d98d50455a69ff1934d503ef69dffa08429f75e5677efca4f2de36d46f8258635e32a95",
-				blockId: "365dbc2f380b65737b439f98ce9ef0318b00d5bbdda57daabea8341f91ce39e7",
+				signature:
+					"97a16d3e938a1bc6866701b946e703cfa502d57a226e540f270c16585405378e93086dfb3b32ab2039aa2c197177c66b0fec074df5bfac037efd3dc41d98d50455a69ff1934d503ef69dffa08429f75e5677efca4f2de36d46f8258635e32a95",
 				validators: [
-					true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true
-				]
-			}
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+					true,
+				],
+			},
 		};
 
 		// const serializedCommit = "365dbc2f380b65737b439f98ce9ef0318b00d5bbdda57daabea8341f91ce39e7010000000100000097a16d3e938a1bc6866701b946e703cfa502d57a226e540f270c16585405378e93086dfb3b32ab2039aa2c197177c66b0fec074df5bfac037efd3dc41d98d50455a69ff1934d503ef69dffa08429f75e5677efca4f2de36d46f8258635e32a9533010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101";
 
 		return {
 			...blockCommit,
-			serialized: (await app
-				.get<Contracts.Crypto.IBlockSerializer>(Identifiers.Cryptography.Block.Serializer).serializeFull(blockCommit)).toString("hex")
+			serialized: (
+				await app
+					.get<Contracts.Crypto.IBlockSerializer>(Identifiers.Cryptography.Block.Serializer)
+					.serializeFull(blockCommit)
+			).toString("hex"),
 		};
 	});
 };

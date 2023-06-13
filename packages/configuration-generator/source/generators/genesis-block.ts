@@ -12,7 +12,6 @@ import { Generator } from "./generator";
 
 @injectable()
 export class GenesisBlockGenerator extends Generator {
-
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
@@ -178,29 +177,27 @@ export class GenesisBlockGenerator extends Generator {
 		transactions: Contracts.Crypto.ITransaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
 	): Promise<Contracts.Crypto.ICommittedBlock> {
-		const genesisBlock = await this.#createGenesisBlock(
-			premineKeys, transactions, options
-		);
+		const genesisBlock = await this.#createGenesisBlock(premineKeys, transactions, options);
 
 		const proof = await this.#createCommitProof(validators, genesisBlock.block.data);
 		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
 			block: genesisBlock.block,
 			commit: proof,
-		}
+		};
 
-		const serialized = await this.blockSerializer.serializeFull(commitBlock)
+		const serialized = await this.blockSerializer.serializeFull(commitBlock);
 
 		return {
 			...commitBlock,
 			serialized: serialized.toString("hex"),
-		}
+		};
 	}
 
 	async #createGenesisBlock(
 		keys: Contracts.Crypto.IKeyPair,
 		transactions: Contracts.Crypto.ITransaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<{ block: Contracts.Crypto.IBlock, transactions: Contracts.Crypto.ITransactionData[] }> {
+	): Promise<{ block: Contracts.Crypto.IBlock; transactions: Contracts.Crypto.ITransactionData[] }> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -262,16 +259,19 @@ export class GenesisBlockGenerator extends Generator {
 
 		for (const wallet of validators) {
 			const message = Buffer.concat([Buffer.from(wallet.keys.publicKey, "hex"), serialized]);
-			const signature = await this.signatureFactory.sign(message, Buffer.from(wallet.consensusKeys.privateKey, "hex"));
+			const signature = await this.signatureFactory.sign(
+				message,
+				Buffer.from(wallet.consensusKeys.privateKey, "hex"),
+			);
 			signatures.push(Buffer.from(signature, "hex"));
 		}
 
 		return {
+			blockId: genesisBlock.id,
 			height: genesisBlock.height,
 			round: 1,
 			signature: await this.signatureFactory.aggregate(signatures),
-			blockId: genesisBlock.id,
-			validators: validators.map(v => true),
+			validators: validators.map((v) => true),
 		};
 	}
 }

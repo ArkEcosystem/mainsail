@@ -236,11 +236,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 				round,
 				signature: majority.aggSignature,
 				// TODO: calcualte validator set matrix
-				validators: [...majority.validatorSet].map(v => true),
-			}
+				validators: [...majority.validatorSet].map((v) => true),
+			},
 		};
 
-		const serialized = await this.blockSerializer.serializeFull(commitBlock)
+		const serialized = await this.blockSerializer.serializeFull(commitBlock);
 
 		return {
 			...commitBlock,

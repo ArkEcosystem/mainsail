@@ -86,7 +86,7 @@ describe<{
 		context.sandbox.app.useDataPath(dirSync().name);
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
-			info: () => { },
+			info: () => {},
 		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
@@ -184,7 +184,10 @@ describe<{
 		const blocks = await generateBlocks(4);
 		await databaseService.saveBlocks(blocks);
 
-		assert.equal(await databaseService.findBlocksByHeightRange(2, 5), blocks.map(({ block }) => block));
+		assert.equal(
+			await databaseService.findBlocksByHeightRange(2, 5),
+			blocks.map(({ block }) => block),
+		);
 	});
 
 	it("#getBlocks - should return empty array if blocks are not found", async ({ databaseService }) => {
@@ -232,7 +235,10 @@ describe<{
 		const blocks = await generateBlocks(4);
 		await databaseService.saveBlocks(blocks);
 
-		assert.equal(await databaseService.findBlockByHeights([2, 3, 4, 5]), blocks.map(({ block }) => block));
+		assert.equal(
+			await databaseService.findBlockByHeights([2, 3, 4, 5]),
+			blocks.map(({ block }) => block),
+		);
 	});
 
 	it("#getLastBlock - should return undefined if block is not found", async ({ databaseService }) => {
@@ -364,9 +370,10 @@ describe<{
 		const block = await generateBlock();
 		await databaseService.saveBlocks([block]);
 
-
 		assert.equal(
-			await databaseService.getForgedTransactionsIds(block.block.transactions.map((transaction) => transaction.id!)),
+			await databaseService.getForgedTransactionsIds(
+				block.block.transactions.map((transaction) => transaction.id!),
+			),
 			block.block.transactions.map((transaction) => transaction.id),
 		);
 	});

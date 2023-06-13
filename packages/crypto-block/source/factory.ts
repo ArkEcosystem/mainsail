@@ -65,11 +65,13 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			block,
 			commit,
 			serialized: buff.toString("hex"),
-		}
+		};
 	}
 
 	// TODO: separate factory ?
-	public async fromCommittedJson(json: Contracts.Crypto.ICommittedBlockJson): Promise<Contracts.Crypto.ICommittedBlock> {
+	public async fromCommittedJson(
+		json: Contracts.Crypto.ICommittedBlockJson,
+	): Promise<Contracts.Crypto.ICommittedBlock> {
 		const block = await this.fromJson(json.block);
 		return {
 			block,
@@ -136,7 +138,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 				throw new Exceptions.BlockSchemaError(
 					data.height,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-					`${error.message}: ${JSON.stringify(error.data)}`,
+						`${error.message}: ${JSON.stringify(error.data)}`,
 				);
 			}
 		}

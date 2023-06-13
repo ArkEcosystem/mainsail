@@ -94,7 +94,7 @@ describe<{
 
 	it("should log if logger is provided", async ({ generator, app }) => {
 		const logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		app.bind(InternalIdentifiers.LogService).toConstantValue(logger);

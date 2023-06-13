@@ -1008,9 +1008,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"dab8a825673deb7471717811efb09eb2c9488ff963db32742ae042858331ef0d"
-						]
+						"votes": ["dab8a825673deb7471717811efb09eb2c9488ff963db32742ae042858331ef0d"]
 					},
 					"signature": "b73cf06a11e02e2fad21ba770b2cd8c07f4e463795a9038e504d93a2687e2d2649487663b87704a656749622a3d56f7814246911ec812b833fd31e46a93b3539",
 					"id": "70dfc7db41402292703a50bed7a14558b4bb8454fb0a0ab1866244c6a15149e2",
@@ -1027,9 +1025,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"0d842e302b926d66dc70b355ba3cc90289c57a8035e41bbaa69fa44c91f82a3f"
-						]
+						"votes": ["0d842e302b926d66dc70b355ba3cc90289c57a8035e41bbaa69fa44c91f82a3f"]
 					},
 					"signature": "d1b95588696ab72e789e5e9c4bfd5ce136bd96686e8b7e580089bb01134f1918b59ed707ebd88723e9c6e29ba2e873d98fd4775398a39e523fb7283693882167",
 					"id": "c5436da20e0c0a203bc1cf48e38d1786cbc21302126ea5e4bdddbe9dabc23b12",
@@ -1046,9 +1042,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"f82ac8983977621114df0d403fabc3b2b31a743c25ceca297bd1d0520bea6bf1"
-						]
+						"votes": ["f82ac8983977621114df0d403fabc3b2b31a743c25ceca297bd1d0520bea6bf1"]
 					},
 					"signature": "c0caa7a679e36e2293d53b43a5ae831c0881711151e9af69fd24ea2e3cb97fa97330a96ed97b19c0304e247e7f2fd7fd8964091001401ddf76f6d379a4c63df6",
 					"id": "6d4c7c8a7379827850a65706be56c6ed3caba647b4300e7cea3e5c6d456cdb04",
@@ -1065,9 +1059,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"1e7a95a90893bcfeb8ebb132846d81ad9b93e9c4447232654e8bd138ae12336c"
-						]
+						"votes": ["1e7a95a90893bcfeb8ebb132846d81ad9b93e9c4447232654e8bd138ae12336c"]
 					},
 					"signature": "592d7968662cf019ad30bc1f885711427c4ec22eb56bf8de82a670a3a1d7b58c77b6b81749126bf325fcb61edd71c403c4e36e3625f052626f16773a5000a7fc",
 					"id": "ea15405f6a768975cdc54921e7eeef75f80ec169052c973d5449dc0839f0ac2c",
@@ -1084,9 +1076,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"33b2a573765f3239b12abe8c7740d9ec246fce62cb3e4e7c29ebe40bf850dbdc"
-						]
+						"votes": ["33b2a573765f3239b12abe8c7740d9ec246fce62cb3e4e7c29ebe40bf850dbdc"]
 					},
 					"signature": "08f7c47e8100aaf99f52393cdc431bf8d4dbf5448300d700aaea3c53b5763b9b9f896ce83c8ff688da83c543100bb2a5ed4b956d70e7af86657824fae3cad446",
 					"id": "afa5486d210f6f47a523787ac0ae8ccf246bb0bc061b81e03e31fd85c9de0369",
@@ -1103,9 +1093,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"dc9ddd0e673c2a7ea86262687b994171279d871968cb35e7c7943995db809659"
-						]
+						"votes": ["dc9ddd0e673c2a7ea86262687b994171279d871968cb35e7c7943995db809659"]
 					},
 					"signature": "2ba8ef59167cd7beec2fc11f8ef6e33971956c1c8e63e0bf5af6819080b3be07bb4fe3cb2918caa23fa0277ceb8449ee9bfae384b7b2736c849591f4590f9664",
 					"id": "0c09510f7bdeb5ccab382b41e2902015385e71601acaf9310923fca050846e90",
@@ -1122,9 +1110,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"fcb8384894c559ba09e0d3759da6b2524d695df8856785de3a71ebbea6a84186"
-						]
+						"votes": ["fcb8384894c559ba09e0d3759da6b2524d695df8856785de3a71ebbea6a84186"]
 					},
 					"signature": "c808351ca5c7b39976627773f393eee5cd5c2dc048efced2779daabfcd99452c46c4c2cbb90163b75544a1b16ca839e4b8d0892d5b0f945fb0fa3031c7b46151",
 					"id": "027d7c5e4fccfd0ba09e2c203a098e288853784cf6962d312f5e37431f649e60",
@@ -1141,9 +1127,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"90454146fdf2eba221a1d6a4b02c8204f99216292dcdfbdbf17034600dbc2af3"
-						]
+						"votes": ["90454146fdf2eba221a1d6a4b02c8204f99216292dcdfbdbf17034600dbc2af3"]
 					},
 					"signature": "8903232cc0bd0581d642c0586980316e1047599e642c08567de78dd8fca4e343464348777cc805e0e8a9a33605a4929897651a94fe9db95f15dd5baa7885fe1d",
 					"id": "7f916d75fcb5551cf02636b6fae8b558f7177a00155a450cf80487cff87d2eef",
@@ -1160,9 +1144,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"0343eae6ef2359547023d6492be3d26d50744a4434257dfdc8a1d8e2a7ac49bf"
-						]
+						"votes": ["0343eae6ef2359547023d6492be3d26d50744a4434257dfdc8a1d8e2a7ac49bf"]
 					},
 					"signature": "8b09ea990377f1f255e9ebe33a69c08fde3722fcc51acd9c8837af1b543aa1a80ef5ab0fa7ca29b95e5f669cfb2dd693051517f4bb4cad705791a8fb9d608d22",
 					"id": "8bb25e5f37edf47527a4425c69d1fdfdbfe8d9bcba78295802aba342e60dbc17",
@@ -1179,9 +1161,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"5ca5a2abf0be230aecb0b18f01d49b4a80b8fbef3cf78fee95166fbcd4fc7e6e"
-						]
+						"votes": ["5ca5a2abf0be230aecb0b18f01d49b4a80b8fbef3cf78fee95166fbcd4fc7e6e"]
 					},
 					"signature": "27514963db969ab614f96bda923a5d64a51c5645f3d2560939c3f898de0a52272585b0f4c24dfa95a410b8ac62fad30e6c3a02b0629d3562aa92037f638cf323",
 					"id": "199c5d998ef88b0b3413fbfb43e43ce84c6d671fa1a954eeb49c088321e91a18",
@@ -1198,9 +1178,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"61cd2925bc1a851974c745e2bae1af05f670a5efb3fc5b8bf891ddb0ef3e45c0"
-						]
+						"votes": ["61cd2925bc1a851974c745e2bae1af05f670a5efb3fc5b8bf891ddb0ef3e45c0"]
 					},
 					"signature": "b9085ffb1e9760e42ec80058d97819a9083e7bfcba81b823a68f7eda123168021ff82402754c1c5f38b5f113c0989620b2cdec1b089b4a308500e5cfdba7e287",
 					"id": "947889c798a458e6015f3a5ca22c506fca2fed0a05557d39ce6cd1b9480f712a",
@@ -1217,9 +1195,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"ee71f1915ade739673a8aeba382cd367b2d5e4f0af79f9ab7368d540cbcb449a"
-						]
+						"votes": ["ee71f1915ade739673a8aeba382cd367b2d5e4f0af79f9ab7368d540cbcb449a"]
 					},
 					"signature": "c70dd86f669fd90ff8ee7767e9a0f27a56da0fefee06586a0429d02726a8cb9c0c0cd31ec63e3e878928d501b3f00b239d394644bedf932b7b318133f8623416",
 					"id": "83d6626a4b888ed9b954a9ddba6860272cf19cd38d0b8b1c1bc74d69e5dbf025",
@@ -1236,9 +1212,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"0d7730d06a70d7a577b850a35e00116c9354b21da236565086abe479e9344929"
-						]
+						"votes": ["0d7730d06a70d7a577b850a35e00116c9354b21da236565086abe479e9344929"]
 					},
 					"signature": "87cb7acf155ef0748bf7235ed149260fb7bb19925094c9f27b382b6f75c59730933a5fe68fa45be85533fc18b9845e667a0ff508f7a13caf96545da8e70f6776",
 					"id": "ab9e123b4630bc17ada6ba7ffb22752dc677774ff72aabd544d4711ad8a50de8",
@@ -1255,9 +1229,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"4b6cd30c001016442882ef6e3f27e69b6cbf850a65e04b782812ec461d432ee5"
-						]
+						"votes": ["4b6cd30c001016442882ef6e3f27e69b6cbf850a65e04b782812ec461d432ee5"]
 					},
 					"signature": "51563168737bbd894d0b74e978088989d259145ec367026557b7c69431701bc301d4f6086fad155bf9f26c0fdc0dfb118101d04fe7ab45e210837ab25ed22642",
 					"id": "90620712ab383676daf811b4ddf3060ba5d044284d1cc24bb32312be0f3c3c8b",
@@ -1274,9 +1246,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"9eb32b6e39812cff4bb8e2840f47fc22025d5abbeb6e9cac15b87ca4734ac5cd"
-						]
+						"votes": ["9eb32b6e39812cff4bb8e2840f47fc22025d5abbeb6e9cac15b87ca4734ac5cd"]
 					},
 					"signature": "efde3a8dc75c97563c0fb424563742784451bdac308bbfbe4a9463e039f31119c7366b804e18dcec848d15b074f26a939a2512619d07dbdf85725decc09a75fb",
 					"id": "b4cc9967b358d98873cf2f52bc85e378168cf4519e7d822f819b9dde2bd11837",
@@ -1293,9 +1263,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"1b0cf1794b833583aec81e3ed602d6bdeb697f9f4de2a2bdadc3e069dca90745"
-						]
+						"votes": ["1b0cf1794b833583aec81e3ed602d6bdeb697f9f4de2a2bdadc3e069dca90745"]
 					},
 					"signature": "5c4d97c0a41b0cc257b4aa1c1a0d5ad5484436daeb59a85b8795fa4ad749170d314cf38ebee47bef5c878419bc7209334158c0d8cdaa25efd2e4ac315b2065fc",
 					"id": "d64f737e22646ffed4415805247a6f3007616fe5927bc6d1c28161a86608c90a",
@@ -1312,9 +1280,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"62da41c693b8b5190f0c822594b9e0a22b07fd095040a6b1beb106594349f6fb"
-						]
+						"votes": ["62da41c693b8b5190f0c822594b9e0a22b07fd095040a6b1beb106594349f6fb"]
 					},
 					"signature": "c0b85f27ffe494d511756ab0f5bad92a2a7a793a88297c6fcc79a8ca988d9e28ff872e7143dea0e506de6f649fea32d0f3e38e412164028a0ead7b9658469b62",
 					"id": "980a981f433e551ebefcb14c42a9b78eeb37320775acb05b82ce59aaae6b5669",
@@ -1331,9 +1297,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"5f336ef52c527147bbc6ecdcef9627d5bd806ce9bd1c6a5f0c1fbcf7eedc0338"
-						]
+						"votes": ["5f336ef52c527147bbc6ecdcef9627d5bd806ce9bd1c6a5f0c1fbcf7eedc0338"]
 					},
 					"signature": "e1f1e79fb0515e23963cf54cc4f1e8b34d6d3df28a5b280840ed8dbc97465c4673b65432c48734c8f1e34fa5c5e2e67112db9109a3de770423863cd32d618a2b",
 					"id": "591a15af8dbea7d99f1f3da019957b77aab8dd6783a5b6d3c00472215e0c18cd",
@@ -1350,9 +1314,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"b8ba6183c46804500825cb8e75d0c63a764dd332b7f991333734a20aa1fe0e9d"
-						]
+						"votes": ["b8ba6183c46804500825cb8e75d0c63a764dd332b7f991333734a20aa1fe0e9d"]
 					},
 					"signature": "5d118ef928fa097fde6363201c74af35a50a10038ea536ae2fc50bdcef11aae679f9c3ca74a487b653e2cbf1a953380ef09d0926181b51e6c14ff63e6dd4a918",
 					"id": "ab1b2c0cc46b8cb15de2c51b657e770ec264aee86874f2344f14f6a778689ce9",
@@ -1369,9 +1331,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"490bc1ade0018ba7023776495559af81e3b5a80d91c39af6d7905f2abf242945"
-						]
+						"votes": ["490bc1ade0018ba7023776495559af81e3b5a80d91c39af6d7905f2abf242945"]
 					},
 					"signature": "4ef215dcc1e44c8118ffe1f203c061df3e7b7ff074a58a124f54d955415ab82637c955f222f69f91a497ac6c1ea63e5e98fceb72be2908e87a4faca06bad791b",
 					"id": "ff47cc8ebbcdb5ef234f290c5925c7242847724b4e98cc5faa1188b89d7ba83d",
@@ -1388,9 +1348,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"c28094a3834bdf07a2de420002a3637182f5074d496943c8262958e65425da7e"
-						]
+						"votes": ["c28094a3834bdf07a2de420002a3637182f5074d496943c8262958e65425da7e"]
 					},
 					"signature": "0aaa2615cacdb198361d99d1da096913ba5305649ed42f0020401f2a3ae50e36b7b77d6a34a27dd648d74408e5cb29110f6875f4a0fde702d67962686d05dc2b",
 					"id": "a7735d5184f9626ca212d51465ad4cd2b280eadedb7c5049177b3bce37ccdbe1",
@@ -1407,9 +1365,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"dee9df82d4d59d967b6d913c6653be445243b3bb1c5a71c1e61fd611a2da55b6"
-						]
+						"votes": ["dee9df82d4d59d967b6d913c6653be445243b3bb1c5a71c1e61fd611a2da55b6"]
 					},
 					"signature": "3fafde01da3c886ac0cf80fba943e60791e891dca7c99acb6cdc0ecbf3ff91de1aa38631f11438a80892d82f8d99e8d1fc8f381772f2e369c604bde238818b4b",
 					"id": "8a82785c766fb0a8f17163c748d6f45d032a8ede4f1d0c689f4a7fc7026984c2",
@@ -1426,9 +1382,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"47fa19766e4581e1a86906b7c8756a870f5559de2f65a202737e773955799d12"
-						]
+						"votes": ["47fa19766e4581e1a86906b7c8756a870f5559de2f65a202737e773955799d12"]
 					},
 					"signature": "78c84bdb27610582eec0773a024df9a7d24553564bad25f82c07f0d138bc3e9e25a69e89c9521accd19573c07fe9d491b778437adfad99fc27c873744cad1933",
 					"id": "7e09310bc2b62d3fdf5cf1101af4f6503693fe0088876e417bc91db9f3296a4a",
@@ -1445,9 +1399,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"a3cf5a27d32cc2b334e9d90e462d28477fbe4514f85b2e44100cd9cc242dcda3"
-						]
+						"votes": ["a3cf5a27d32cc2b334e9d90e462d28477fbe4514f85b2e44100cd9cc242dcda3"]
 					},
 					"signature": "8d928167311c8ca522960e319090588be9d9d43039ea6d14cb7bfd74f1bd3f6f92928ec3424c4fdf32f51e43ef7da9de43c6a359b9f689bfd332ee15b6cc8bcd",
 					"id": "66222b4cb56c06695831158fb7ce24d874540d2ae4b887e91f857c18732c140a",
@@ -1464,9 +1416,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"e9041e50b12316d432d840591dd28db0b5c957ed341f72ddaef0b4871d211e98"
-						]
+						"votes": ["e9041e50b12316d432d840591dd28db0b5c957ed341f72ddaef0b4871d211e98"]
 					},
 					"signature": "2d5433bdc2276c6559144e9424efa7c15f4efc3714a3bfe6bacd1eb349f08f03659cff388b57e52073b90524104e82a133a580b90faebe43e7b7ae521b90452b",
 					"id": "af34d8d4297c98be940df467cadc43bde19058ae86ef0c1b5e26bac4072569f4",
@@ -1483,9 +1433,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"b98f90573d5ddcaae6c4ad9c001214b441f5e6e8176202af71026b13ea8e866a"
-						]
+						"votes": ["b98f90573d5ddcaae6c4ad9c001214b441f5e6e8176202af71026b13ea8e866a"]
 					},
 					"signature": "d49c8d77d90c60593b68b7a621558d4d29032a2f0336aa31dff5c702453a04914f0aadad34ff219a00b3f15a9d6c21da01c69c62b2b940e9eec89e4510113036",
 					"id": "16a519c9a7d8f53ea5be5930bed358a21c173d1f6abc269fa26f37fc8a4d52cd",
@@ -1502,9 +1450,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"dcb0df9ead7e0dc7ee02ac3c357cfe9a9ec8d45cc2bee3968156b479ec4e907a"
-						]
+						"votes": ["dcb0df9ead7e0dc7ee02ac3c357cfe9a9ec8d45cc2bee3968156b479ec4e907a"]
 					},
 					"signature": "72e1143d409659636c249ca8ce268eba4d9162da8462d8c01943936cd798c91c762b3032767813fd343edd0daf22d579fb14e90fd2db6471c52aa74559a70c85",
 					"id": "aafb41ba55c954c6572f64fbb749858d491e11a06d5d3ff79c9b6ec9531f1b46",
@@ -1521,9 +1467,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"ee60176a25389dc9fdae7cedf7268144334483669b5afa3fb7b79427814a95f8"
-						]
+						"votes": ["ee60176a25389dc9fdae7cedf7268144334483669b5afa3fb7b79427814a95f8"]
 					},
 					"signature": "0d4b40acdbb7abc63aa6370fee7446250b1a35ed5576ddb2398ce7b35736c1ced4a7b301b2b2562319bc648bf874c7d678e169c3ef3a7aeb5257836507b38d4f",
 					"id": "1b4c708085a0d4a60a4ffab8e5b33424dab4b028fa51fd10b16472a1d023e61f",
@@ -1540,9 +1484,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"5fafc24c1016dd347c5e6d546cfd91cae48327b08e1e049cd89eadbc730ac333"
-						]
+						"votes": ["5fafc24c1016dd347c5e6d546cfd91cae48327b08e1e049cd89eadbc730ac333"]
 					},
 					"signature": "331c6f9c80e7ffbb499fe6faa5323d6d0f6b57062087a68dec9f330a8ec9e62b0e5df1fe8dbb2ef93b8760371956ae48f058d25b19777c0cfea43467afa0ef99",
 					"id": "7138063c80d6f5916b16d9d2942cf5f70da1a16ad498fe6ae366bb88898f2f65",
@@ -1559,9 +1501,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"f1e4ebed778c827a7e9c47e63c81aefe46d9d564ba89f3a506514e5a2b1ac554"
-						]
+						"votes": ["f1e4ebed778c827a7e9c47e63c81aefe46d9d564ba89f3a506514e5a2b1ac554"]
 					},
 					"signature": "7525b81d0702ec7369fed514fa566fcd30f0e599a603083fa5b2bb75caa4d4e16eefb29ee0c900b77eda86c2a8d5c2771862e6d5f45881cdbe9cd00f909a0f91",
 					"id": "df8d38ed836857d41f04d2f72c8e4eac081d616b6774c6ca5b52fce9cca2696d",
@@ -1578,9 +1518,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"9a49cb2f22510df70dbc94334d8a6ee00540dcd62a5bac789c427ca9b2220a9b"
-						]
+						"votes": ["9a49cb2f22510df70dbc94334d8a6ee00540dcd62a5bac789c427ca9b2220a9b"]
 					},
 					"signature": "e13ef659295792cb42fcb8eb983cb2ff98bc20d9cefd13cb415be0c8928a35bb67a5dc0cc5a41e2c0e4a37844691f07fdc567dd6c7b879cc885a192bc655c09d",
 					"id": "bf8ed7d6ec22527e35882b1398c374fcfad63ae1f1ddb12b757f6cffe0e2495f",
@@ -1597,9 +1535,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"375ba92a68336940a2bd0e20c74a79fead63deaf77da006770e9c2d592110a9a"
-						]
+						"votes": ["375ba92a68336940a2bd0e20c74a79fead63deaf77da006770e9c2d592110a9a"]
 					},
 					"signature": "71e60510029817d9990f5792740f02a2552a2983a8fb0e7d393d070a9cb28880cbbc8af9adee6b5b2e64d180801b4d2d5d1aec41f14a37188d05541000ddbc3f",
 					"id": "09ad8b8429a945f6e865d7b56798bbcfaf9fa41176e80c1f73be97fdee24e701",
@@ -1616,9 +1552,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"4ee45cfb9ed57af3743ef01a7618353d87fd190b3ad3d465a996b00b14eaf71a"
-						]
+						"votes": ["4ee45cfb9ed57af3743ef01a7618353d87fd190b3ad3d465a996b00b14eaf71a"]
 					},
 					"signature": "47ebf4d00e831120ae566c329b677235022b1ac540bac103be7b9af519ad930a85823d68b9da081277daed0a37f9ad9adb4f35d32fc459206a8e930737283aac",
 					"id": "b763a27d349c932294e1cdd2f31701f20957bf669c578f5e7557c6d3b4ccfc28",
@@ -1635,9 +1569,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"b021faa3cd6fe9db937aab1f831efceaa0faf3acd8cda6f9c37734a722b8cfc1"
-						]
+						"votes": ["b021faa3cd6fe9db937aab1f831efceaa0faf3acd8cda6f9c37734a722b8cfc1"]
 					},
 					"signature": "99d0771eff4ac93397010759f5d193ceef571f785a6a1b057b31d4d2d264a5145c2a94917bf3a22747b9f872414c7a883f85b2278d50fd090e7b716f09a40cf0",
 					"id": "293fad90d155910a8823cd38375ca1462ebd04cd61b9285d6b4ef9a7f7dde0ae",
@@ -1654,9 +1586,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"38ea4e0c57d1d5fbb93f9b0f5b6dca69087fb18afc23e2a8a0bab6c7e9c9f1da"
-						]
+						"votes": ["38ea4e0c57d1d5fbb93f9b0f5b6dca69087fb18afc23e2a8a0bab6c7e9c9f1da"]
 					},
 					"signature": "247f3233a6b7667e6deb85df3baa28e27937fb995e93942b5e9999c899174cd0745a7c7be95967137a32be03021e1f4f128707137f87dc6ef43f651af03a4150",
 					"id": "e4322eb1af901e6cf166bffd44a5bd9de0f3400988981eb028d4965358d248a9",
@@ -1673,9 +1603,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"1fd0fa79698f6bfceb73d6af5b1e97376cecae64731d773f7f5e1b3dab67d4e9"
-						]
+						"votes": ["1fd0fa79698f6bfceb73d6af5b1e97376cecae64731d773f7f5e1b3dab67d4e9"]
 					},
 					"signature": "6b061998ac96bbb2dc32d5dac44a68fe78b9861e1065bf1039a9c597a0b119d3a28cbce9ca5465d2d0e0aeb934a6a92042775be37ad1806ca5ca9063ccd860e0",
 					"id": "2fbcba78f778a00e29ab806a2e692e4bdafddab70a344e35ed175f9f11155388",
@@ -1692,9 +1620,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"e2d43a33987c44ac0caa1179e3fdb0e6ae8353cf33d0d8e1f4803921452c2e3c"
-						]
+						"votes": ["e2d43a33987c44ac0caa1179e3fdb0e6ae8353cf33d0d8e1f4803921452c2e3c"]
 					},
 					"signature": "175cc8dc3dfa8a2bb0a71b6418b2e8f12a7d80a586663889472f2c56821c13143d36a3c9eac9853accd48996907415eb42047ea2c1fe49ba41a9eaa97317d41f",
 					"id": "d83c1083c20a40577a7f464cf0317790be5475e6044636f38899913698bd62be",
@@ -1711,9 +1637,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"62788afa451cefc1f50f024816a60188b6d8e0e917ea0db34e1a5a799be089b1"
-						]
+						"votes": ["62788afa451cefc1f50f024816a60188b6d8e0e917ea0db34e1a5a799be089b1"]
 					},
 					"signature": "e6f5c741d18c8a92de227549322a98909c7b35b27bfc10225bf7c4e809c93a3b946f6a56ab585f0c3a79c3667f258f2d6d214b464fff907f9c3008763b0882c4",
 					"id": "e37cdd6b07ebe1de560a741c6fd7c369a15e8fdaadc0a0f212a0f3cc301599f8",
@@ -1730,9 +1654,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"ab6f6a91c9421ff7f7c1a14ab57075a07e94c753895e4d16ff8907ae37130ffb"
-						]
+						"votes": ["ab6f6a91c9421ff7f7c1a14ab57075a07e94c753895e4d16ff8907ae37130ffb"]
 					},
 					"signature": "0a58d0afedaa60244d8cb3e8a4967cc7da6b536a9d1e59502ed7fa8c547a7de608edbab0cdafd329ec8fd13a47d37fb82320c07b4129c770193c69ab63fb0885",
 					"id": "f451618385508a56ce227a35d1e0c00717ab0f7f5827d5b62205a740a8526f7f",
@@ -1749,9 +1671,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"391f3056fe40f10adda7b5fdf469bb797764632456cd3ab89e4004144ddf60b9"
-						]
+						"votes": ["391f3056fe40f10adda7b5fdf469bb797764632456cd3ab89e4004144ddf60b9"]
 					},
 					"signature": "2d01cbd165092b2d97de287a06e27d31edfa12427abfd8f9dff6ce97b6e10773e5d40884c2a92767f2d7ceaf3ac59c6088f9b881edccae5dbf4b0223ac28e0e4",
 					"id": "59b6275d1c82d527494584cede435a075853d25d41917393acf6d8587be8fdf1",
@@ -1768,9 +1688,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"067cfac01055dfbcf53bb5875e41835225871e27be383533b19c289cbb94cb7f"
-						]
+						"votes": ["067cfac01055dfbcf53bb5875e41835225871e27be383533b19c289cbb94cb7f"]
 					},
 					"signature": "9e4748553b22788e7e3af1c36e38fc137bad0ec636a7bcd3f3324b3525873eb3b11025f9943c2aeca3814bc083ff93f2ac2f21b358af70e66f5a91b38c1ecaf5",
 					"id": "81e25499664644d92fe205446c87614ec559110e7f0b7c9b49c402f476044341",
@@ -1787,9 +1705,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"d0973f84428a8f792738ee343501477c5289fe838885c99310e20e06721f8ebc"
-						]
+						"votes": ["d0973f84428a8f792738ee343501477c5289fe838885c99310e20e06721f8ebc"]
 					},
 					"signature": "6566d191450d64d915051f98b748b58d50dc77d11271a48152e7f1b0f86639d015ffd3629244308ccb239530ff2f5f724fa70a00c94219d580c5006733e0c89c",
 					"id": "fd98f097a5717720ba1fe588e4b95ade0d2de30e5a4452efc376caa1c30f6d5d",
@@ -1806,9 +1722,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"a3c761495b2b7132a6b731e049afd1b2c0d75925a30d2107423f669741b16da1"
-						]
+						"votes": ["a3c761495b2b7132a6b731e049afd1b2c0d75925a30d2107423f669741b16da1"]
 					},
 					"signature": "9f82be316167238d7d2b3b95c610e9b9b493838f097f2cdc281e1f941db94afcd76081df4f3d0ac1f7dc6edf70ac42ee0f1d54ec0c5ca5a86438a69331cca26d",
 					"id": "cb2fb73f2e61b77008eacaaea8f5c480bdbbe8f68828a2de07eb5bffab55104d",
@@ -1825,9 +1739,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"015be74343c5a223b47cf244aeaec640fe11c7dfb1be6264eba3c5d8620c33f4"
-						]
+						"votes": ["015be74343c5a223b47cf244aeaec640fe11c7dfb1be6264eba3c5d8620c33f4"]
 					},
 					"signature": "c18693af6b66ebd3d3a11e13a76c35fe402436e298445528c15731f09890f79f0f81f7e0a506387869abbb0f7511751e3e148089fe79b029846c084593af3a92",
 					"id": "2b205f6892ef8a6291d340da71c77456f6ce3dac7494ac7a1782d000a83f5859",
@@ -1844,9 +1756,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"60d920448adc418928e3b72eaf048d8c185bef818ec616f6967a2bb5f327192d"
-						]
+						"votes": ["60d920448adc418928e3b72eaf048d8c185bef818ec616f6967a2bb5f327192d"]
 					},
 					"signature": "16784669eb386f1ad016fd1c23d2faf1842488b9ee5f1264508e30fe21be014acd72809dc024e2f1b281e4383a665af0d555ed74058d69882a21b35bd7af4c89",
 					"id": "dbd722a7b6f3fe4b5bfe8ca178e2be9db66d46197841bb2ac2dd3aeaa8b455d5",
@@ -1863,9 +1773,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"37e43e16e27c91fed56c629f16959008e6e8f349713c5230790db567da79cda8"
-						]
+						"votes": ["37e43e16e27c91fed56c629f16959008e6e8f349713c5230790db567da79cda8"]
 					},
 					"signature": "2b90b4eae3daaf475e776177c7e0237750d69c9d05f1ba2a4a403d826592b29ab6b7b192f9dd95e09226cc1937f71b7192c4de63eac1688ce421d07e2a44b60c",
 					"id": "d4a288261bb26566198a01194638a9cb7f68044f929aaf739750a9c07ba395de",
@@ -1882,9 +1790,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"fed1374ebb0ae1060e242b0966408ff7fea78121ce9e2200bcaf003328421c33"
-						]
+						"votes": ["fed1374ebb0ae1060e242b0966408ff7fea78121ce9e2200bcaf003328421c33"]
 					},
 					"signature": "094bd75122094ba38bdb1e926328916466cccc4e1fdf1f9f03e8615288c057b45defabb0608db4633844d78fc60fe0d9e18109948007ef78ab6f96b2633eff09",
 					"id": "f37cc584565ef67f6bae89936554378a578def76a812ea36b2bdc1b9d4972473",
@@ -1901,9 +1807,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"7c37072ef4721f7535ae397b0ccbc32f592e2960325ffa27e232aaed0a4cb960"
-						]
+						"votes": ["7c37072ef4721f7535ae397b0ccbc32f592e2960325ffa27e232aaed0a4cb960"]
 					},
 					"signature": "3cd4b95250df2acb8062bf9a1c9865fa2d95c9f66cf9c31c9d6d6c887b62f1c6288d11664cf17599e1ac48fc8819ece5e97aa930be06841354f9bd15a8efe609",
 					"id": "41b4be5f63b1c68071ef6b0b6589a6186006948dba875121292ce5d755f9d395",
@@ -1920,9 +1824,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"54679e5857e018af368262a65c6dbc320e1f5f91d3905d435f3a842875e4550c"
-						]
+						"votes": ["54679e5857e018af368262a65c6dbc320e1f5f91d3905d435f3a842875e4550c"]
 					},
 					"signature": "14d453a09f36e9c9f56fbdf297525fc8c4af99ce23c3cbd873cf6a0a478d8a213d26c54cc8e7cf61ac5f8f0570ea43bfeaeea1205fd4e80e8a779a2202b45aea",
 					"id": "7a778ea927378a19f240faac4298f0e85e42e9ad06a2093b1e8340a9241004eb",
@@ -1939,9 +1841,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"2cbc606b05d40da423696b060f67c2598b829adeae0a0c739072c9e8158faea8"
-						]
+						"votes": ["2cbc606b05d40da423696b060f67c2598b829adeae0a0c739072c9e8158faea8"]
 					},
 					"signature": "9dcf64048777da16122402133c10b5a866aa46f0236ffec8fe621a4327cd4f5a8f227dbc66b831cf6b3e54dc7436f57cd2df5e03cb2fa1b4a2784374bca8f139",
 					"id": "a3c222f2ec9393643adde775246be7a823d620ad524b764e6e2beac4706b5118",
@@ -1958,9 +1858,7 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": [
-							"09360a1246a1fca5e9b9f9a850aa49e458ed6fbb4cbfa5d53ff936cc748e32cc"
-						]
+						"votes": ["09360a1246a1fca5e9b9f9a850aa49e458ed6fbb4cbfa5d53ff936cc748e32cc"]
 					},
 					"signature": "c433efe72c188cea6cd1afe50757eeb411668b615a965efb957811d81022688dcb522bc1b017b25989f3ed57398c7ae43d8cb5ab30a5e6dd099117dfc55a0b42",
 					"id": "4ea3f9917ff9f5afc4b3c67a4475e87429fff45323565b22378cea07f736cfc4",

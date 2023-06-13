@@ -43,8 +43,8 @@ export class Generator {
 					"wallet",
 				)
 				.fromPublicKey(keys.publicKey),
-			keys,
 			consensusKeys,
+			keys,
 			passphrase: mnemonic,
 			username: undefined,
 		};

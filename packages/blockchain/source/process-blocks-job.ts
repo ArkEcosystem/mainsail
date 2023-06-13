@@ -104,12 +104,15 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		if (acceptedBlocks.length > 0) {
 			try {
 				// TODO: process committed block
-				await this.databaseService.saveBlocks(acceptedBlocks.map(block => ({ block } as Contracts.Crypto.ICommittedBlock)));
+				await this.databaseService.saveBlocks(
+					acceptedBlocks.map((block) => ({ block } as Contracts.Crypto.ICommittedBlock)),
+				);
 				// eslint-disable-next-line unicorn/prefer-at
 				this.stateStore.setLastStoredBlockHeight(acceptedBlocks[acceptedBlocks.length - 1].data.height);
 			} catch (error) {
 				this.logger.error(
-					`Could not save ${Utils.pluralize("block", acceptedBlocks.length, true)}) to database : ${error.stack
+					`Could not save ${Utils.pluralize("block", acceptedBlocks.length, true)}) to database : ${
+						error.stack
 					}`,
 				);
 

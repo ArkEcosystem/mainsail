@@ -41,7 +41,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			4 + // height
 			4 + // round
 			this.consensusSignatureByteLength + // signature
-			1 + 51 // validator bit matrix  TODO optimize
+			1 +
+			51 // validator bit matrix  TODO optimize
 		);
 	}
 

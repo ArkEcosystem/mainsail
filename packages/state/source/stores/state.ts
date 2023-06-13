@@ -288,7 +288,8 @@ export class StateStore implements Contracts.State.StateStore {
 	public pushPingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): void {
 		if (this.#blockPing) {
 			this.logger.info(
-				`Previous block ${this.#blockPing.block.height.toLocaleString()} pinged blockchain ${this.#blockPing.count
+				`Previous block ${this.#blockPing.block.height.toLocaleString()} pinged blockchain ${
+					this.#blockPing.count
 				} times`,
 			);
 		}
