@@ -54,21 +54,18 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	public async commit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		roundState.getWalletRepository().commitChanges();
 
-		const block = roundState.getProposal()?.block;
-		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+		const commitBlock = await roundState.getProposedCommitBlock();
+		await this.databaseService.saveBlocks([commitBlock]);
 
-		// TODO: Save commitBlock
-		await this.databaseService.saveBlocks([block]);
+		this.state.setLastBlock(commitBlock.block);
 
-		this.state.setLastBlock(block);
+		this.logger.info(`Block ${commitBlock.block.header.height.toLocaleString()} committed`);
 
-		this.logger.info(`Block ${block.data.height.toLocaleString()} committed`);
-
-		for (const transaction of block.transactions) {
+		for (const transaction of commitBlock.block.transactions) {
 			await this.#emitTransactionEvents(transaction);
 		}
 
-		void this.events.dispatch(Enums.BlockEvent.Applied, block.data);
+		void this.events.dispatch(Enums.BlockEvent.Applied, commitBlock);
 	}
 
 	async #verify(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {

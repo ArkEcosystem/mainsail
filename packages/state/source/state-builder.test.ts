@@ -137,7 +137,7 @@ describeSkip<{
 
 	it("should not fail for negative genesis wallet balances", async (context) => {
 		const genesisPublicKeys: string[] = context.configuration
-			.get("genesisBlock.transactions")
+			.get("genesisBlock.block.transactions")
 			.reduce((accumulator, current) => [...accumulator, current.senderPublicKey], []);
 
 		const wallet = await context.walletRepo.findByPublicKey(genesisPublicKeys[0]);

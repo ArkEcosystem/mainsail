@@ -44,19 +44,21 @@ describe<{
 			match("crypto.json"),
 			match({
 				genesisBlock: {
-					generatorPublicKey: match.string,
-					height: 1,
-					id: match.string,
-					numberOfTransactions: 103,
-					payloadHash: match.string,
-					payloadLength: 17776,
-					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-					reward: BigNumber.ZERO,
-					timestamp: match.number,
-					totalAmount: BigNumber.make("12500000000000000"),
-					totalFee: BigNumber.ZERO,
-					transactions: match.array,
-					version: 1,
+					block: {
+						generatorPublicKey: match.string,
+						height: 1,
+						id: match.string,
+						numberOfTransactions: 103,
+						payloadHash: match.string,
+						payloadLength: 17776,
+						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+						reward: BigNumber.ZERO,
+						timestamp: match.number,
+						totalAmount: BigNumber.make("12500000000000000"),
+						totalFee: BigNumber.ZERO,
+						transactions: match.array,
+						version: 1,
+					},
 				},
 				milestones: [
 					match({
@@ -174,19 +176,21 @@ describe<{
 			match("crypto.json"),
 			match({
 				genesisBlock: {
-					generatorPublicKey: match.string,
-					height: 1,
-					id: match.string,
-					numberOfTransactions: 153,
-					payloadHash: match.string,
-					payloadLength: match.number,
-					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-					reward: BigNumber.ZERO,
-					timestamp: match.number,
-					totalAmount: BigNumber.make("12499999999999986"),
-					totalFee: BigNumber.ZERO,
-					transactions: match.array,
-					version: 1,
+					block: {
+						generatorPublicKey: match.string,
+						height: 1,
+						id: match.string,
+						numberOfTransactions: 153,
+						payloadHash: match.string,
+						payloadLength: 27276,
+						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+						reward: BigNumber.ZERO,
+						timestamp: match.number,
+						totalAmount: BigNumber.make("12499999999999986"),
+						totalFee: BigNumber.ZERO,
+						transactions: match.array,
+						version: 1,
+					},
 				},
 				milestones: [
 					match({
@@ -199,6 +203,8 @@ describe<{
 						multiPaymentLimit: 256,
 						reward: "0", // TODO: Check
 						satoshi: match.object,
+						stageTimeout: 2000,
+						stageTimeoutIncrease: 2000,
 						vendorFieldLength: 255,
 					}),
 					match({

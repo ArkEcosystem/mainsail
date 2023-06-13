@@ -47,6 +47,35 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		return { data: block, transactions };
 	}
 
+	public async deserializeCommit(serialized: Buffer): Promise<Contracts.Crypto.IBlockCommit> {
+		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
+
+		const commit = {} as Contracts.Crypto.IBlockCommit;
+
+		await this.serializer.deserialize<Contracts.Crypto.IBlockCommit>(buffer, commit, {
+			length: this.blockSerializer.commitSize(),
+			schema: {
+				blockId: {
+					type: "hash",
+				},
+				height: {
+					type: "uint32",
+				},
+				round: {
+					type: "uint32",
+				},
+				signature: {
+					type: "consensusSignature",
+				},
+				validators: {
+					type: "validatorSet",
+				},
+			},
+		});
+
+		return commit;
+	}
+
 	async #deserializeBufferHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.IBlockHeader> {
 		const block = {} as Contracts.Crypto.IBlockHeader;
 

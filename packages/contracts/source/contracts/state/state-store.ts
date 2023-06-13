@@ -1,4 +1,4 @@
-import { IBlock, IBlockData, ITransactionData } from "../crypto";
+import { IBlock, IBlockData, ICommittedBlock, ITransactionData } from "../crypto";
 
 export interface BlockPing {
 	count: number;
@@ -13,9 +13,9 @@ export interface StateStore {
 
 	setBlockchain(blockchain: any): void;
 
-	getGenesisBlock(): IBlock;
+	getGenesisBlock(): ICommittedBlock;
 
-	setGenesisBlock(block: IBlock): void;
+	setGenesisBlock(block: ICommittedBlock): void;
 
 	getLastDownloadedBlock(): IBlockData | undefined;
 

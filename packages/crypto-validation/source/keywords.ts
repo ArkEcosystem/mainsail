@@ -5,13 +5,13 @@ import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 let genesisTransactions;
 
 const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id: string) => {
-	if (!configuration.get("genesisBlock.transactions")) {
+	if (!configuration.get("genesisBlock.block.transactions")) {
 		return true;
 	}
 
 	if (!genesisTransactions) {
 		genesisTransactions = Object.fromEntries(
-			configuration.get("genesisBlock.transactions").map((current) => [current.id, true]),
+			configuration.get("genesisBlock.block.transactions").map((current) => [current.id, true]),
 		);
 	}
 

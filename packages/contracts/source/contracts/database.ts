@@ -1,6 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { IBlock, IBlockData, ITransaction } from "./crypto";
+import { IBlock, IBlockData, ICommittedBlock, ITransaction } from "./crypto";
 import { DownloadBlock } from "./shared";
 import { Wallet } from "./state";
 
@@ -25,7 +25,7 @@ export interface IDatabaseService {
 
 	getTransaction(id: string): Promise<ITransaction | undefined>;
 
-	saveBlocks(blocks: IBlock[]): Promise<void>;
+	saveBlocks(blocks: ICommittedBlock[]): Promise<void>;
 
 	findBlocksByIds(ids: string[]): Promise<IBlockData[]>;
 
