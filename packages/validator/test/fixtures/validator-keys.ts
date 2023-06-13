@@ -6,9 +6,9 @@ export const validatorKeys = [
 			publicKey:
 				"a17c634621405b637424586119e423fe6d1e899faa4654cbc08457da3488e9b822a8e5229c4b059c5720ee5f70f555fe",
 		},
-		walletPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 		mnemonic:
 			"endless deposit bright clip school doctor later surround strategy blouse damage drink diesel erase scrap inside over pledge talent blood bus luggage glad whale",
+		walletPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 	},
 	{
 		consensusKeyPair: {
@@ -17,8 +17,8 @@ export const validatorKeys = [
 			publicKey:
 				"a17c634621405b637424586119e423fe6d1e899faa4654cbc08457da3488e9b822a8e5229c4b059c5720ee5f70f555fe",
 		},
-		walletPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 		mnemonic:
 			"endless deposit bright clip school doctor later surround strategy blouse damage drink diesel erase scrap inside over pledge talent blood bus luggage glad whale",
+		walletPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 	},
 ];
