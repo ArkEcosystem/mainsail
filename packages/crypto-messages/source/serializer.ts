@@ -37,7 +37,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					type: "uint32",
 				},
 				validatorIndex: {
-					type: "uint16", // TODO: can also do uint8 if 255 is fine for the upper limit of validators
+					type: "uint8",
 				},
 				block: {
 					type: "hex",
@@ -45,10 +45,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "signature",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}
@@ -74,7 +74,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					type: "uint32",
 				},
 				validatorIndex: {
-					type: "uint16",
+					type: "uint8",
 				},
 				blockId: {
 					type: "blockId",
@@ -83,10 +83,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "signature",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}
@@ -112,7 +112,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					type: "uint32",
 				},
 				validatorIndex: {
-					type: "uint16",
+					type: "uint8",
 				},
 				blockId: {
 					type: "blockId",
@@ -121,10 +121,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "signature",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}

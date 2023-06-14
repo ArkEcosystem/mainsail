@@ -23,7 +23,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "uint32",
 				},
 				validatorIndex: {
-					type: "uint16",
+					type: "uint8",
 				},
 				block: {
 					type: "hex",
@@ -51,7 +51,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "uint32",
 				},
 				validatorIndex: {
-					type: "uint16",
+					type: "uint8",
 				},
 				blockId: {
 					type: "blockId",
@@ -79,7 +79,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "uint32",
 				},
 				validatorIndex: {
-					type: "uint16",
+					type: "uint8",
 				},
 				blockId: {
 					type: "blockId",
