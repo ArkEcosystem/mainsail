@@ -42,7 +42,7 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 	await context.sandbox.app.resolve(CoreTransactions).register();
 
-	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => { } });
+	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => {} });
 
 	context.sandbox.app.get(Identifiers.WalletAttributes).set("validator");
 	context.sandbox.app.get(Identifiers.WalletAttributes).set("validator.username");
@@ -51,15 +51,14 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreState).register();
 	await context.sandbox.app.resolve(CoreValidatorSet).register();
 
-
-	const walletRepository = context.sandbox.app.getTagged(
-		Identifiers.WalletRepository,
-		"state",
-		"blockchain",
-	);
+	const walletRepository = context.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 
 	const secrets: string[] = [];
-	const consensusPublicKeyFactory = context.sandbox.app.getTagged(Identifiers.Cryptography.Identity.PublicKeyFactory, "type", "consensus");
+	const consensusPublicKeyFactory = context.sandbox.app.getTagged(
+		Identifiers.Cryptography.Identity.PublicKeyFactory,
+		"type",
+		"consensus",
+	);
 	for (let i = 0; i < validatorsJson.secrets.length; i++) {
 		const mnemonic = validatorsJson.secrets[i];
 		const wallet = walletRepository.findByAddress(mnemonic);
@@ -71,7 +70,7 @@ export const prepareSandbox = async (context) => {
 	}
 
 	context.sandbox.app.get(Identifiers.ConfigRepository).set("validators", {
-		secrets
+		secrets,
 	});
 
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer);

@@ -28,22 +28,30 @@ describe<{
 	});
 
 	it("#serializeProposal - should correctly serialize without signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: true })).toString("hex");
+		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: true })).toString(
+			"hex",
+		);
 		assert.equal(serialized, serializedProposalWithoutSignature);
 	});
 
 	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: false })).toString("hex");
+		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: false })).toString(
+			"hex",
+		);
 		assert.equal(serialized, serializedProposal);
 	});
 
 	it("#serializePrecommit - should correctly serialize without signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: true })).toString("hex");
+		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: true })).toString(
+			"hex",
+		);
 		assert.equal(serialized, serializedPrecommitWithoutSignature);
 	});
 
 	it("#serializePrecommit - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: false })).toString("hex");
+		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: false })).toString(
+			"hex",
+		);
 		assert.equal(serialized, serializedPrecommit);
 	});
 
@@ -60,7 +68,9 @@ describe<{
 	});
 
 	it("#serializePrevote - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrevote(prevoteData, { excludeSignature: false })).toString("hex");
+		const serialized = (await serializer.serializePrevote(prevoteData, { excludeSignature: false })).toString(
+			"hex",
+		);
 		assert.equal(serialized, serializedPrevote);
 	});
 

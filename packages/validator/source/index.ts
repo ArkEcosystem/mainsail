@@ -22,15 +22,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const secrets = this.app.config("validators.secrets");
 		Utils.assert.defined<string[]>(secrets);
 
-		for (let i = 0; i < secrets.length; i++) {
-			const secret = secrets[i];
+		for (const [index, secret] of secrets.entries()) {
 			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(secret);
 			const walletPublicKey = await walletPublicKeyFactory.fromMnemonic(secret);
 
 			validators.push(
 				this.app
 					.resolve<Contracts.Consensus.IValidator>(Validator)
-					.configure(walletPublicKey, consensusKeyPair, i),
+					.configure(walletPublicKey, consensusKeyPair, index),
 			);
 		}
 

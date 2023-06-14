@@ -38,10 +38,7 @@ describe<{
 	});
 
 	it("#validatorIndex", async () => {
-		assert.equal(
-			proposal.validatorIndex,
-			0,
-		);
+		assert.equal(proposal.validatorIndex, 0);
 	});
 
 	it("#signature", async () => {

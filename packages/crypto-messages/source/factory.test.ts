@@ -14,7 +14,6 @@ describe<{
 	verifier: Verifier;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
-
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 		context.factory = context.sandbox.app.resolve(MessageFactory);
@@ -23,8 +22,9 @@ describe<{
 		const identityFactory = await Factories.factory("Identity", crypto);
 		const identity = await identityFactory
 			.withOptions({
-				passphrase:
-					validatorsJson.secrets[0], keyType: "consensus", app: context.sandbox.app
+				passphrase: validatorsJson.secrets[0],
+				keyType: "consensus",
+				app: context.sandbox.app,
 			})
 			.make<Types.Identity>();
 

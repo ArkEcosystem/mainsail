@@ -20,7 +20,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		const errors: string[] = [];
 
 		const bytes = await this.serializer.serializeProposal(proposal, { excludeSignature: true });
-		if (!await this.#verifySignature(proposal.signature, proposal.validatorIndex, bytes)) {
+		if (!(await this.#verifySignature(proposal.signature, proposal.validatorIndex, bytes))) {
 			errors.push("invalid signature");
 		}
 
@@ -36,7 +36,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		const errors: string[] = [];
 
 		const bytes = await this.serializer.serializePrevote(prevote, { excludeSignature: true });
-		if (!await this.#verifySignature(prevote.signature, prevote.validatorIndex, bytes)) {
+		if (!(await this.#verifySignature(prevote.signature, prevote.validatorIndex, bytes))) {
 			errors.push("invalid signature");
 		}
 
@@ -52,7 +52,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		const errors: string[] = [];
 
 		const bytes = await this.serializer.serializePrecommit(precommit, { excludeSignature: true });
-		if (!await this.#verifySignature(precommit.signature, precommit.validatorIndex, bytes)) {
+		if (!(await this.#verifySignature(precommit.signature, precommit.validatorIndex, bytes))) {
 			errors.push("invalid signature");
 		}
 

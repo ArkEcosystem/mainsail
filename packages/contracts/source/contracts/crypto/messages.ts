@@ -73,9 +73,9 @@ export interface IMessageFactory {
 export interface IMessageSerializeOptions {
 	excludeSignature?: boolean;
 }
-export interface IMessageSerializeProposalOptions extends IMessageSerializeOptions { }
-export interface IMessageSerializePrevoteOptions extends IMessageSerializeOptions { }
-export interface IMessageSerializePrecommitOptions extends IMessageSerializeOptions { }
+export interface IMessageSerializeProposalOptions extends IMessageSerializeOptions {}
+export interface IMessageSerializePrevoteOptions extends IMessageSerializeOptions {}
+export interface IMessageSerializePrecommitOptions extends IMessageSerializeOptions {}
 
 export type IMessageSerializableProposal = OptionalSignature<IProposalData>;
 export type IMessageSerializablePrevote = OptionalSignature<IPrevoteData>;

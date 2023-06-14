@@ -34,7 +34,11 @@ export class Validator implements Contracts.Consensus.IValidator {
 	#walletPublicKey!: string;
 	#validatorIndex!: number;
 
-	public configure(walletPublicKey: string, keyPair: Contracts.Crypto.IKeyPair, validatorIndex: number): Contracts.Consensus.IValidator {
+	public configure(
+		walletPublicKey: string,
+		keyPair: Contracts.Crypto.IKeyPair,
+		validatorIndex: number,
+	): Contracts.Consensus.IValidator {
 		this.#walletPublicKey = walletPublicKey;
 		this.#keyPair = keyPair;
 		this.#validatorIndex = validatorIndex;
@@ -95,7 +99,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 		this.logger.debug(
 			`Received ${pluralize("transaction", transactions.length, true)} ` +
-			`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
+				`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
 		);
 
 		return transactions;
