@@ -12,8 +12,12 @@ import { ServiceProvider as CoreConsensusBls12381 } from "../../../crypto-consen
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "../../../crypto-transaction";
+import { ServiceProvider as CoreTransactions } from "../../../transactions";
+import { ServiceProvider as CoreState } from "../../../state";
+import { ServiceProvider as CoreValidatorSet } from "../../../validator-set-static";
 
 import { Configuration } from "../../../crypto-config/source/configuration";
+import validatorsJson from "../../../core/bin/config/testnet/validators.json";
 
 import { Serializer } from "../../source/serializer";
 import { Deserializer } from "../../source/deserializer";
@@ -36,6 +40,38 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
+	await context.sandbox.app.resolve(CoreTransactions).register();
+
+	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => {} });
+
+	context.sandbox.app.get(Identifiers.WalletAttributes).set("validator");
+	context.sandbox.app.get(Identifiers.WalletAttributes).set("validator.username");
+	context.sandbox.app.get(Identifiers.WalletAttributes).set("validator.resigned");
+
+	await context.sandbox.app.resolve(CoreState).register();
+	await context.sandbox.app.resolve(CoreValidatorSet).register();
+
+	const walletRepository = context.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
+
+	const secrets: string[] = [];
+	const consensusPublicKeyFactory = context.sandbox.app.getTagged(
+		Identifiers.Cryptography.Identity.PublicKeyFactory,
+		"type",
+		"consensus",
+	);
+	for (let i = 0; i < validatorsJson.secrets.length; i++) {
+		const mnemonic = validatorsJson.secrets[i];
+		const wallet = walletRepository.findByAddress(mnemonic);
+		wallet.setAttribute("validator.username", `genesis_${i + 1}`);
+		wallet.setAttribute("consensus.publicKey", await consensusPublicKeyFactory.fromMnemonic(mnemonic));
+
+		walletRepository.index(wallet);
+		secrets.push(mnemonic);
+	}
+
+	context.sandbox.app.get(Identifiers.ConfigRepository).set("validators", {
+		secrets,
+	});
 
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer);

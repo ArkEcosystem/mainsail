@@ -29,7 +29,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		}
 
 		const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round);
-		if (roundState.addProposal(proposal)) {
+		if (await roundState.addProposal(proposal)) {
 			await this.#handle(roundState);
 		}
 	}
@@ -47,7 +47,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 		const roundState = await this.roundStateRepo.getRoundState(prevote.height, prevote.round);
 
-		if (roundState.addPrevote(prevote)) {
+		if (await roundState.addPrevote(prevote)) {
 			await this.#handle(roundState);
 		}
 	}
@@ -67,7 +67,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 		const roundState = await this.roundStateRepo.getRoundState(precommit.height, precommit.round);
 
-		if (roundState.addPrecommit(precommit)) {
+		if (await roundState.addPrecommit(precommit)) {
 			await this.#handle(roundState);
 		}
 	}

@@ -20,6 +20,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		return this.#validators;
 	}
 
+	public async getValidatorPublicKeyByIndex(index: number): Promise<string> {
+		return this.#validators[index].getAttribute("consensus.publicKey");
+	}
+
 	#init(): void {
 		const usernames: string[] = [];
 

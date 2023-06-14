@@ -51,6 +51,16 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				Utils.assert.defined(value);
 			}
 
+			if (schema.type === "uint8") {
+				result.writeUint8(value);
+				continue;
+			}
+
+			if (schema.type === "uint16") {
+				result.writeUint16(value);
+				continue;
+			}
+
 			if (schema.type === "uint32") {
 				result.writeUint32(value);
 				continue;
@@ -150,6 +160,16 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		configuration: Contracts.Serializer.DeserializationConfiguration,
 	): Promise<T> {
 		for (const [property, schema] of Object.entries(configuration.schema)) {
+			if (schema.type === "uint8") {
+				target[property] = source.readUint8();
+				continue;
+			}
+
+			if (schema.type === "uint16") {
+				target[property] = source.readUint16();
+				continue;
+			}
+
 			if (schema.type === "uint32") {
 				target[property] = source.readUint32();
 				continue;

@@ -15,11 +15,11 @@ export interface IRoundState {
 	readonly proposer: string;
 	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
-	addProposal(proposal: IProposal): boolean;
+	addProposal(proposal: IProposal): Promise<boolean>;
 	setProcessorResult(processorResult: boolean): void;
 	getProcessorResult(): boolean;
-	addPrevote(prevote: IPrevote): boolean;
-	addPrecommit(precommit: IPrecommit): boolean;
+	addPrevote(prevote: IPrevote): Promise<boolean>;
+	addPrecommit(precommit: IPrecommit): Promise<boolean>;
 	hasMajorityPrevotes(): boolean;
 	hasMajorityPrevotesAny(): boolean;
 	hasMajorityPrevotesNull(): boolean;
@@ -69,7 +69,7 @@ export interface IScheduler {
 }
 
 export interface IValidator {
-	configure(publicKey: string, keyPair: IKeyPair): IValidator;
+	configure(publicKey: string, keyPair: IKeyPair, validatorIndex: number): IValidator;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<IBlock>;
 	propose(height: number, round: number, block: IBlock, validRound: number | undefined): Promise<IProposal>;

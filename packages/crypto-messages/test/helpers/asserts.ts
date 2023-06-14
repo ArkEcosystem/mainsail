@@ -3,7 +3,7 @@ export const assertProposal = (assert, data1, data2) => {
 		"height",
 		"round",
 		// "block", TODO
-		"validatorPublicKey",
+		"validatorIndex",
 		"signature",
 	];
 	for (const field of fields) {
@@ -20,7 +20,7 @@ export const assertPrevote = (assert, data1, data2) => {
 };
 
 const assertPrecommitOrPrevote = (assert, data1, data2) => {
-	const fields = ["height", "round", "blockId", "validatorPublicKey", "signature"];
+	const fields = ["height", "round", "blockId", "validatorIndex", "signature"];
 	for (const field of fields) {
 		let v1 = data1[field];
 		let v2 = data2[field];
