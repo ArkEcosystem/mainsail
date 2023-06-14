@@ -23,7 +23,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			length:
 				4 + // height
 				4 + // round
-				2 + // validatorIndex
+				1 + // validatorIndex
 				4 +
 				proposal.block.serialized.length / 2 + // serialized block
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
@@ -61,7 +61,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			length:
 				4 + // height
 				4 + // round
-				2 + // validatorIndex
+				1 + // validatorIndex
 				this.hashSize + // blockId
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
@@ -99,7 +99,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			length:
 				4 + // height
 				4 + // round
-				2 + // validatorIndex
+				1 + // validatorIndex
 				this.hashSize + // blockId
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
