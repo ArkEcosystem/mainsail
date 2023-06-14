@@ -2166,6 +2166,600 @@ export namespace postBlock {
     }
 }
 
+/** Namespace postPrecommit. */
+export namespace postPrecommit {
+
+    /** Properties of a PostPrecommitRequest. */
+    interface IPostPrecommitRequest {
+
+        /** PostPrecommitRequest precommit */
+        precommit?: (Uint8Array|null);
+
+        /** PostPrecommitRequest headers */
+        headers?: (shared.IHeaders|null);
+    }
+
+    /** Represents a PostPrecommitRequest. */
+    class PostPrecommitRequest implements IPostPrecommitRequest {
+
+        /**
+         * Constructs a new PostPrecommitRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postPrecommit.IPostPrecommitRequest);
+
+        /** PostPrecommitRequest precommit. */
+        public precommit: Uint8Array;
+
+        /** PostPrecommitRequest headers. */
+        public headers?: (shared.IHeaders|null);
+
+        /**
+         * Creates a new PostPrecommitRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostPrecommitRequest instance
+         */
+        public static create(properties?: postPrecommit.IPostPrecommitRequest): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Encodes the specified PostPrecommitRequest message. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
+         * @param message PostPrecommitRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postPrecommit.IPostPrecommitRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostPrecommitRequest message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitRequest.verify|verify} messages.
+         * @param message PostPrecommitRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postPrecommit.IPostPrecommitRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostPrecommitRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostPrecommitRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Decodes a PostPrecommitRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostPrecommitRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Verifies a PostPrecommitRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostPrecommitRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostPrecommitRequest
+         */
+        public static fromObject(object: { [k: string]: any }): postPrecommit.PostPrecommitRequest;
+
+        /**
+         * Creates a plain object from a PostPrecommitRequest message. Also converts values to other types if specified.
+         * @param message PostPrecommitRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postPrecommit.PostPrecommitRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostPrecommitRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostPrecommitRequest
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a PostPrecommitResponse. */
+    interface IPostPrecommitResponse {
+    }
+
+    /** Represents a PostPrecommitResponse. */
+    class PostPrecommitResponse implements IPostPrecommitResponse {
+
+        /**
+         * Constructs a new PostPrecommitResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postPrecommit.IPostPrecommitResponse);
+
+        /**
+         * Creates a new PostPrecommitResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostPrecommitResponse instance
+         */
+        public static create(properties?: postPrecommit.IPostPrecommitResponse): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Encodes the specified PostPrecommitResponse message. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
+         * @param message PostPrecommitResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postPrecommit.IPostPrecommitResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostPrecommitResponse message, length delimited. Does not implicitly {@link postPrecommit.PostPrecommitResponse.verify|verify} messages.
+         * @param message PostPrecommitResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postPrecommit.IPostPrecommitResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostPrecommitResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostPrecommitResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Decodes a PostPrecommitResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostPrecommitResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Verifies a PostPrecommitResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostPrecommitResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostPrecommitResponse
+         */
+        public static fromObject(object: { [k: string]: any }): postPrecommit.PostPrecommitResponse;
+
+        /**
+         * Creates a plain object from a PostPrecommitResponse message. Also converts values to other types if specified.
+         * @param message PostPrecommitResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postPrecommit.PostPrecommitResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostPrecommitResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostPrecommitResponse
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
+/** Namespace postPrevote. */
+export namespace postPrevote {
+
+    /** Properties of a PostPrevoteRequest. */
+    interface IPostPrevoteRequest {
+
+        /** PostPrevoteRequest prevote */
+        prevote?: (Uint8Array|null);
+
+        /** PostPrevoteRequest headers */
+        headers?: (shared.IHeaders|null);
+    }
+
+    /** Represents a PostPrevoteRequest. */
+    class PostPrevoteRequest implements IPostPrevoteRequest {
+
+        /**
+         * Constructs a new PostPrevoteRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postPrevote.IPostPrevoteRequest);
+
+        /** PostPrevoteRequest prevote. */
+        public prevote: Uint8Array;
+
+        /** PostPrevoteRequest headers. */
+        public headers?: (shared.IHeaders|null);
+
+        /**
+         * Creates a new PostPrevoteRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostPrevoteRequest instance
+         */
+        public static create(properties?: postPrevote.IPostPrevoteRequest): postPrevote.PostPrevoteRequest;
+
+        /**
+         * Encodes the specified PostPrevoteRequest message. Does not implicitly {@link postPrevote.PostPrevoteRequest.verify|verify} messages.
+         * @param message PostPrevoteRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postPrevote.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostPrevoteRequest message, length delimited. Does not implicitly {@link postPrevote.PostPrevoteRequest.verify|verify} messages.
+         * @param message PostPrevoteRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postPrevote.IPostPrevoteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostPrevoteRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostPrevoteRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrevote.PostPrevoteRequest;
+
+        /**
+         * Decodes a PostPrevoteRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostPrevoteRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrevote.PostPrevoteRequest;
+
+        /**
+         * Verifies a PostPrevoteRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostPrevoteRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostPrevoteRequest
+         */
+        public static fromObject(object: { [k: string]: any }): postPrevote.PostPrevoteRequest;
+
+        /**
+         * Creates a plain object from a PostPrevoteRequest message. Also converts values to other types if specified.
+         * @param message PostPrevoteRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postPrevote.PostPrevoteRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostPrevoteRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostPrevoteRequest
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a PostPrevoteResponse. */
+    interface IPostPrevoteResponse {
+    }
+
+    /** Represents a PostPrevoteResponse. */
+    class PostPrevoteResponse implements IPostPrevoteResponse {
+
+        /**
+         * Constructs a new PostPrevoteResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postPrevote.IPostPrevoteResponse);
+
+        /**
+         * Creates a new PostPrevoteResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostPrevoteResponse instance
+         */
+        public static create(properties?: postPrevote.IPostPrevoteResponse): postPrevote.PostPrevoteResponse;
+
+        /**
+         * Encodes the specified PostPrevoteResponse message. Does not implicitly {@link postPrevote.PostPrevoteResponse.verify|verify} messages.
+         * @param message PostPrevoteResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postPrevote.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostPrevoteResponse message, length delimited. Does not implicitly {@link postPrevote.PostPrevoteResponse.verify|verify} messages.
+         * @param message PostPrevoteResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postPrevote.IPostPrevoteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostPrevoteResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostPrevoteResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postPrevote.PostPrevoteResponse;
+
+        /**
+         * Decodes a PostPrevoteResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostPrevoteResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postPrevote.PostPrevoteResponse;
+
+        /**
+         * Verifies a PostPrevoteResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostPrevoteResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostPrevoteResponse
+         */
+        public static fromObject(object: { [k: string]: any }): postPrevote.PostPrevoteResponse;
+
+        /**
+         * Creates a plain object from a PostPrevoteResponse message. Also converts values to other types if specified.
+         * @param message PostPrevoteResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postPrevote.PostPrevoteResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostPrevoteResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostPrevoteResponse
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
+/** Namespace postProposal. */
+export namespace postProposal {
+
+    /** Properties of a PostProposalRequest. */
+    interface IPostProposalRequest {
+
+        /** PostProposalRequest proposal */
+        proposal?: (Uint8Array|null);
+
+        /** PostProposalRequest headers */
+        headers?: (shared.IHeaders|null);
+    }
+
+    /** Represents a PostProposalRequest. */
+    class PostProposalRequest implements IPostProposalRequest {
+
+        /**
+         * Constructs a new PostProposalRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postProposal.IPostProposalRequest);
+
+        /** PostProposalRequest proposal. */
+        public proposal: Uint8Array;
+
+        /** PostProposalRequest headers. */
+        public headers?: (shared.IHeaders|null);
+
+        /**
+         * Creates a new PostProposalRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostProposalRequest instance
+         */
+        public static create(properties?: postProposal.IPostProposalRequest): postProposal.PostProposalRequest;
+
+        /**
+         * Encodes the specified PostProposalRequest message. Does not implicitly {@link postProposal.PostProposalRequest.verify|verify} messages.
+         * @param message PostProposalRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postProposal.IPostProposalRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostProposalRequest message, length delimited. Does not implicitly {@link postProposal.PostProposalRequest.verify|verify} messages.
+         * @param message PostProposalRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postProposal.IPostProposalRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostProposalRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostProposalRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postProposal.PostProposalRequest;
+
+        /**
+         * Decodes a PostProposalRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostProposalRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postProposal.PostProposalRequest;
+
+        /**
+         * Verifies a PostProposalRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostProposalRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostProposalRequest
+         */
+        public static fromObject(object: { [k: string]: any }): postProposal.PostProposalRequest;
+
+        /**
+         * Creates a plain object from a PostProposalRequest message. Also converts values to other types if specified.
+         * @param message PostProposalRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postProposal.PostProposalRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostProposalRequest to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostProposalRequest
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a PostProposalResponse. */
+    interface IPostProposalResponse {
+    }
+
+    /** Represents a PostProposalResponse. */
+    class PostProposalResponse implements IPostProposalResponse {
+
+        /**
+         * Constructs a new PostProposalResponse.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: postProposal.IPostProposalResponse);
+
+        /**
+         * Creates a new PostProposalResponse instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PostProposalResponse instance
+         */
+        public static create(properties?: postProposal.IPostProposalResponse): postProposal.PostProposalResponse;
+
+        /**
+         * Encodes the specified PostProposalResponse message. Does not implicitly {@link postProposal.PostProposalResponse.verify|verify} messages.
+         * @param message PostProposalResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: postProposal.IPostProposalResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PostProposalResponse message, length delimited. Does not implicitly {@link postProposal.PostProposalResponse.verify|verify} messages.
+         * @param message PostProposalResponse message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: postProposal.IPostProposalResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PostProposalResponse message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PostProposalResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postProposal.PostProposalResponse;
+
+        /**
+         * Decodes a PostProposalResponse message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PostProposalResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postProposal.PostProposalResponse;
+
+        /**
+         * Verifies a PostProposalResponse message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PostProposalResponse message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PostProposalResponse
+         */
+        public static fromObject(object: { [k: string]: any }): postProposal.PostProposalResponse;
+
+        /**
+         * Creates a plain object from a PostProposalResponse message. Also converts values to other types if specified.
+         * @param message PostProposalResponse
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: postProposal.PostProposalResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PostProposalResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PostProposalResponse
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+}
+
 /** Namespace postTransactions. */
 export namespace postTransactions {
 

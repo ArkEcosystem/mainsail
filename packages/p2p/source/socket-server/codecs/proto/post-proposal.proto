@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package postProposal;
+
+message PostProposalRequest {
+    bytes proposal = 1;
+    shared.Headers headers = 2;
+}
+
+message PostProposalResponse {}

@@ -14,8 +14,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
 
-	@inject(Identifiers.Consensus.Broadcaster)
-	private readonly broadcaster!: Contracts.Consensus.IBroadcaster;
+	@inject(Identifiers.PeerBroadcaster)
+	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler!: Contracts.Consensus.IScheduler;

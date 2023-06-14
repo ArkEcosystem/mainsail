@@ -9,6 +9,9 @@ import {
 	GetPeersRoute,
 	GetStausRoute,
 	PostBlockRoute,
+	PostPrecommitRoute,
+	PostPrevoteRoute,
+	PostProposalRoute,
 	PostTransactionsRoute,
 } from "../routes";
 
@@ -25,6 +28,9 @@ export class ValidatePlugin {
 			...this.app.resolve(GetStausRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostBlockRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostTransactionsRoute).getRoutesConfigByPath(),
+			...this.app.resolve(PostProposalRoute).getRoutesConfigByPath(),
+			...this.app.resolve(PostPrevoteRoute).getRoutesConfigByPath(),
+			...this.app.resolve(PostPrecommitRoute).getRoutesConfigByPath(),
 		};
 
 		server.ext({

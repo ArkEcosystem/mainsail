@@ -11,7 +11,7 @@ import { PeerCommunicator } from "./peer-communicator";
 describeSkip<{
 	sandbox: Sandbox;
 	peerCommunicator: PeerCommunicator;
-}>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, spyFn, match, each }) => {
+}>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, match }) => {
 	const codec = { request: { serialize: (item) => item }, response: { deserialize: (item) => item } };
 
 	const { PeerCommunicator: PeerCommunicatorProxy } = rewiremock.proxy<{

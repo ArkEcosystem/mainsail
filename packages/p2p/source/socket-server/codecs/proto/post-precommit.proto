@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package postPrecommit;
+
+message PostPrecommitRequest {
+    bytes precommit = 1;
+    shared.Headers headers = 2;
+}
+
+message PostPrecommitResponse {}

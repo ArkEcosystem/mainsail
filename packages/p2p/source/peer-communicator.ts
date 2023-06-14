@@ -63,6 +63,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			peer,
 			Routes.PostBlock,
 			{
+				// TODO: move serialization out
 				block: await this.serializer.serializeWithTransactions({
 					...block.data,
 					transactions: block.transactions.map((tx) => tx.data),
@@ -90,6 +91,18 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				// optimized here because default throttling would not be effective for postTransactions
 			},
 		});
+	}
+
+	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
+		await this.emit(peer, Routes.PostProposal, { proposal }, 10_000);
+	}
+
+	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
+		await this.emit(peer, Routes.PostPrevote, { prevote }, 10_000);
+	}
+
+	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
+		await this.emit(peer, Routes.PostPrecommit, { precommit }, 10_000);
 	}
 
 	// ! do not rely on parameter timeoutMsec as guarantee that ping method will resolve within it !

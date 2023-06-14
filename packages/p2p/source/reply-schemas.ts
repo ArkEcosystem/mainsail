@@ -154,13 +154,6 @@ export const replySchemas = {
 			},
 			state: {
 				properties: {
-					currentSlot: {
-						minimum: 1,
-						type: "integer",
-					},
-					forgingAllowed: {
-						type: "boolean",
-					},
 					header: {
 						anyOf: [
 							{
@@ -178,7 +171,7 @@ export const replySchemas = {
 						type: "integer",
 					},
 				},
-				required: ["height", "forgingAllowed", "currentSlot", "header"],
+				required: ["height", "header"],
 				type: "object",
 			},
 		},
@@ -191,6 +184,15 @@ export const replySchemas = {
 			height: { minimum: 1, type: "integer" },
 			status: { type: "boolean" },
 		},
+		type: "object",
+	},
+	postPrecommit: {
+		type: "object",
+	},
+	postPrevote: {
+		type: "object",
+	},
+	postProposal: {
 		type: "object",
 	},
 	postTransactions: {

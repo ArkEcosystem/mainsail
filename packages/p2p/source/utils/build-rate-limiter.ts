@@ -31,6 +31,18 @@ export const buildRateLimiter = (options) =>
 					endpoint: Routes.PostTransactions,
 					rateLimit: options.rateLimitPostTransactions || 25,
 				},
+				{
+					endpoint: Routes.PostProposal,
+					rateLimit: 1,
+				},
+				{
+					endpoint: Routes.PostPrevote,
+					rateLimit: 51, // TODO: From milestones
+				},
+				{
+					endpoint: Routes.PostPrecommit,
+					rateLimit: 51, // TODO: From milestones
+				},
 			],
 			global: {
 				rateLimit: options.rateLimit,
