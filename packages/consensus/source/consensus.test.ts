@@ -640,7 +640,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyHandlerOnPrecommit.calledOnce();
 		spyHandlerOnPrecommit.calledWith(precommit);
 		spyLoggerInfo.calledWith(
-			`Received +2/3 prevotes for ${2}/${0} proposer: ${proposal.validatorIndex} blockId: ${proposal.block.data.id
+			`Received +2/3 prevotes for ${2}/${0} proposer: ${proposal.validatorIndex} blockId: ${
+				proposal.block.data.id
 			}`,
 		);
 
@@ -957,7 +958,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyConsensusStartRound.calledOnce();
 		spyConsensusStartRound.calledWith(0);
 		spyLoggerInfo.calledWith(
-			`Received +2/3 precommits for ${2}/${0} proposer: ${proposal.validatorIndex} blockId: ${proposal.block.data.id
+			`Received +2/3 precommits for ${2}/${0} proposer: ${proposal.validatorIndex} blockId: ${
+				proposal.block.data.id
 			}`,
 		);
 		assert.equal(consensus.getHeight(), 3);
