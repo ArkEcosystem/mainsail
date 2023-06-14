@@ -7,9 +7,12 @@ import {
 	proposalData,
 	serializedPrecommit,
 	serializedPrecommitNoBlock,
+	serializedPrecommitWithoutSignature,
 	serializedPrevote,
 	serializedPrevoteNoBlock,
+	serializedPrevoteWithoutSignature,
 	serializedProposal,
+	serializedProposalWithoutSignature,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Serializer } from "./serializer";
@@ -24,12 +27,24 @@ describe<{
 		context.serializer = context.sandbox.app.resolve(Serializer);
 	});
 
-	it("#serializeProposal - should correctly serialize", async ({ serializer }) => {
-		assert.equal(await serializer.serializeProposal(proposalData), Buffer.from(serializedProposal, "hex"));
+	it("#serializeProposal - should correctly serialize without signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: true })).toString("hex");
+		assert.equal(serialized, serializedProposalWithoutSignature);
 	});
 
-	it("#serializePrecommit - should correctly serialize", async ({ serializer }) => {
-		assert.equal(await serializer.serializePrecommit(precommitData), Buffer.from(serializedPrecommit, "hex"));
+	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: false })).toString("hex");
+		assert.equal(serialized, serializedProposal);
+	});
+
+	it("#serializePrecommit - should correctly serialize without signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: true })).toString("hex");
+		assert.equal(serialized, serializedPrecommitWithoutSignature);
+	});
+
+	it("#serializePrecommit - should correctly serialize with signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: false })).toString("hex");
+		assert.equal(serialized, serializedPrecommit);
 	});
 
 	it("#serializePrecommit - should correctly serialize without block", async ({ serializer }) => {
@@ -39,8 +54,14 @@ describe<{
 		);
 	});
 
-	it("#serializePrevote - should correctly serialize", async ({ serializer }) => {
-		assert.equal(await serializer.serializePrevote(prevoteData), Buffer.from(serializedPrevote, "hex"));
+	it("#serializePrevote - should correctly serialize without signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializePrevote(prevoteData, { excludeSignature: true })).toString("hex");
+		assert.equal(serialized, serializedPrevoteWithoutSignature);
+	});
+
+	it("#serializePrevote - should correctly serialize with signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializePrevote(prevoteData, { excludeSignature: false })).toString("hex");
+		assert.equal(serialized, serializedPrevote);
 	});
 
 	it("#serializePrevote - should correctly serialize without block", async ({ serializer }) => {

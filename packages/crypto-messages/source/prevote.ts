@@ -4,20 +4,20 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;
-	#validatorPublicKey: string;
+	#validatorIndex: number;
 	#signature: string;
 
 	constructor(
 		height: number,
 		round: number,
 		blockId: string | undefined,
-		validatorPublicKey: string,
+		validatorIndex: number,
 		signature: string,
 	) {
 		this.#height = height;
 		this.#round = round;
 		this.#blockId = blockId;
-		this.#validatorPublicKey = validatorPublicKey;
+		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 	}
 
@@ -33,8 +33,8 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 		return this.#blockId;
 	}
 
-	get validatorPublicKey(): string {
-		return this.#validatorPublicKey;
+	get validatorIndex(): number {
+		return this.#validatorIndex;
 	}
 
 	get signature(): string {
@@ -55,7 +55,7 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
-			validatorPublicKey: this.#validatorPublicKey,
+			validatorIndex: this.#validatorIndex,
 		};
 	}
 }

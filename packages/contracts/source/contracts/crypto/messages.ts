@@ -6,7 +6,7 @@ export interface IProposalData {
 	round: number;
 	validRound?: number;
 	block: IBlock;
-	validatorPublicKey: string;
+	validatorIndex: number;
 	signature: string;
 }
 
@@ -15,7 +15,7 @@ export interface IProposal {
 	round: number;
 	validRound?: number;
 	block: IBlock;
-	validatorPublicKey: string;
+	validatorIndex: number;
 	signature: string;
 	toString(): string;
 	// toData(): IProposalData;
@@ -25,7 +25,7 @@ export interface IPrevoteData {
 	height: number;
 	round: number;
 	blockId?: string;
-	validatorPublicKey: string;
+	validatorIndex: number;
 	signature: string;
 }
 
@@ -33,7 +33,7 @@ export interface IPrevote {
 	height: number;
 	round: number;
 	blockId?: string;
-	validatorPublicKey: string;
+	validatorIndex: number;
 	signature: string;
 	toString(): string;
 	// toData(): IPrevoteData;
@@ -43,7 +43,7 @@ export interface IPrecommitData {
 	height: number;
 	round: number;
 	blockId?: string;
-	validatorPublicKey: string;
+	validatorIndex: number;
 	signature: string;
 }
 
@@ -51,7 +51,7 @@ export interface IPrecommit {
 	height: number;
 	round: number;
 	blockId?: string;
-	validatorPublicKey: string;
+	validatorIndex: number;
 	signature: string;
 	toString(): string;
 	// toData(): IPrecommitData;
@@ -73,9 +73,9 @@ export interface IMessageFactory {
 export interface IMessageSerializeOptions {
 	excludeSignature?: boolean;
 }
-export interface IMessageSerializeProposalOptions extends IMessageSerializeOptions {}
-export interface IMessageSerializePrevoteOptions extends IMessageSerializeOptions {}
-export interface IMessageSerializePrecommitOptions extends IMessageSerializeOptions {}
+export interface IMessageSerializeProposalOptions extends IMessageSerializeOptions { }
+export interface IMessageSerializePrevoteOptions extends IMessageSerializeOptions { }
+export interface IMessageSerializePrecommitOptions extends IMessageSerializeOptions { }
 
 export type IMessageSerializableProposal = OptionalSignature<IProposalData>;
 export type IMessageSerializablePrevote = OptionalSignature<IPrevoteData>;

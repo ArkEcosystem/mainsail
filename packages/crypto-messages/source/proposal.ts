@@ -5,7 +5,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 	#round: number;
 	#validRound?: number;
 	#block: Contracts.Crypto.IBlock;
-	#validatorPublicKey: string;
+	#validatorIndex: number;
 	#signature: string;
 
 	constructor(
@@ -13,14 +13,14 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		round: number,
 		block: Contracts.Crypto.IBlock,
 		validRound: number | undefined,
-		validatorPublicKey: string,
+		validatorIndex: number,
 		signature: string,
 	) {
 		this.#height = height;
 		this.#round = round;
 		this.#validRound = validRound;
 		this.#block = block;
-		this.#validatorPublicKey = validatorPublicKey;
+		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 	}
 
@@ -40,8 +40,8 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		return this.#block;
 	}
 
-	get validatorPublicKey(): string {
-		return this.#validatorPublicKey;
+	get validatorIndex(): number {
+		return this.#validatorIndex;
 	}
 
 	get signature(): string {
@@ -53,7 +53,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 			block: this.#block.data.id,
 			height: this.#height,
 			round: this.#round,
-			validatorPublicKey: this.#validatorPublicKey,
+			validatorIndex: this.#validatorIndex,
 		});
 	}
 
@@ -64,7 +64,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
-			validatorPublicKey: this.#validatorPublicKey,
+			validatorIndex: this.#validatorIndex,
 		};
 	}
 }

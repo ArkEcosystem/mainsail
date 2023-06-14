@@ -23,8 +23,8 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 			Math.max(
 				0,
 				this.state.getLastBlock().data.timestamp -
-					dayjs().unix() +
-					this.cryptoConfiguration.getMilestone().blockTime,
+				dayjs().unix() +
+				this.cryptoConfiguration.getMilestone().blockTime,
 			),
 		);
 	}

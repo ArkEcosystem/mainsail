@@ -6,6 +6,7 @@ import { MessageFactory } from "./factory";
 import { Types } from "../../test-framework/source/factories";
 import { Verifier } from "./verifier";
 import { Contracts } from "@mainsail/contracts";
+import validatorsJson from "../../core/bin/config/testnet/validators.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -13,8 +14,6 @@ describe<{
 	verifier: Verifier;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
-	const mnemonic =
-		"question measure debris increase false feature journey height fun agent coach office only shell nation skill track upset distance behave easy devote floor shy";
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
@@ -23,7 +22,10 @@ describe<{
 
 		const identityFactory = await Factories.factory("Identity", crypto);
 		const identity = await identityFactory
-			.withOptions({ passphrase: mnemonic, keyType: "consensus", app: context.sandbox.app })
+			.withOptions({
+				passphrase:
+					validatorsJson.secrets[0], keyType: "consensus", app: context.sandbox.app
+			})
 			.make<Types.Identity>();
 
 		context.identity = identity;
@@ -42,17 +44,19 @@ describe<{
 				block,
 				height: 1,
 				round: 1,
-				validatorPublicKey:
-					"b4865127896c3c5286296a7b26e7c8002586a3ecf5832bfb59e689336f1f4c75e10491b9dfaed8dfb2c2fbe22d11fa93",
+				validatorIndex: 0,
 			},
 			identity.keys,
 		);
 
 		assert.equal(
 			proposal.signature,
-			"a46860c81f6530994fa6e23d513dec7a377926db8798916aee1f9d05ed29f00e8560e1c5a5e4860f6b6aca2f1fc2f92f142ac71a82696d889365f1e06bb68b78dc2e762b5811f6646abffc1b566d00efb80be1027904379e057e0806091c0622",
+			"92bed4f1f944f9f1afaccbd69099ca63580aa5d516a295a70815be478066efbe49ea9ab49afb064c018ce1dfc6ca98150ebbebc445cc3e6a3fb3871e6dff77843439d8993c614e9eebb8f4509386f82104d783f8b46716eddb16388aeed14c64",
 		);
-		assert.true((await verifier.verifyProposal(proposal.toData())).verified);
+
+		const { verified, errors } = await verifier.verifyProposal(proposal.toData());
+		assert.equal(errors, []);
+		assert.true(verified);
 	});
 
 	it("#makePrecommit - should correctly make signed precommit", async ({ factory, identity, verifier }) => {
@@ -60,18 +64,41 @@ describe<{
 			{
 				height: 1,
 				round: 1,
-				blockId: undefined,
-				validatorPublicKey:
-					"b4865127896c3c5286296a7b26e7c8002586a3ecf5832bfb59e689336f1f4c75e10491b9dfaed8dfb2c2fbe22d11fa93",
+				blockId: blockData.id,
+				validatorIndex: 0,
 			},
 			identity.keys,
 		);
 
 		assert.equal(
 			precommit.signature,
-			"8c32ffc4d5fe8aa9a3b3a5623c1b805a50095bc5b53940abc62d22f84e55fab406ba530b3dc3d8082ed9bec0c660094a010c2320e5a201612b9fbac78b0d2664b3e7bc1e4442734ab8a3fc378567c0d8109ba0192da90c6faaa0e215be842ee0",
+			"8b3721603129afea5e6aa7e4201875b070228decfcba8acdd89d94066caddcc62e516d2f0502d910af9128d722b16c141489d765e7c7388fdcdc7932f25fd4e32a55cdf02c2ba1f35fec306873ed25c7b139656deac0a9f73608569cec3c0a63",
 		);
-		assert.true((await verifier.verifyPrecommit(precommit.toData())).verified);
+
+		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
+		assert.equal(errors, []);
+		assert.true(verified);
+	});
+
+	it("#makePrecommit - should correctly make signed precommit no block", async ({ factory, identity, verifier }) => {
+		const precommit = await factory.makePrecommit(
+			{
+				height: 1,
+				round: 1,
+				blockId: undefined,
+				validatorIndex: 0,
+			},
+			identity.keys,
+		);
+
+		assert.equal(
+			precommit.signature,
+			"a306c92bc07dbb276d7f6ed586fface06f5e2a4f19789062fd7884d15b05ce7ba4fdc94eb996c25eb911940376cf94f4112ec60e168d40b7874cbf362a55162348def985b6b499b9b06d08d6d262a343f9a08a5026ad979632ee9c5c894e24ae",
+		);
+
+		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
+		assert.equal(errors, []);
+		assert.true(verified);
 	});
 
 	it("#makePrevote - should correctly make signed prevote", async ({ factory, identity, verifier }) => {
@@ -79,17 +106,40 @@ describe<{
 			{
 				height: 1,
 				round: 1,
-				blockId: undefined,
-				validatorPublicKey:
-					"b4865127896c3c5286296a7b26e7c8002586a3ecf5832bfb59e689336f1f4c75e10491b9dfaed8dfb2c2fbe22d11fa93",
+				blockId: blockData.id,
+				validatorIndex: 0,
 			},
 			identity.keys,
 		);
 
 		assert.equal(
 			prevote.signature,
-			"8c32ffc4d5fe8aa9a3b3a5623c1b805a50095bc5b53940abc62d22f84e55fab406ba530b3dc3d8082ed9bec0c660094a010c2320e5a201612b9fbac78b0d2664b3e7bc1e4442734ab8a3fc378567c0d8109ba0192da90c6faaa0e215be842ee0",
+			"8b3721603129afea5e6aa7e4201875b070228decfcba8acdd89d94066caddcc62e516d2f0502d910af9128d722b16c141489d765e7c7388fdcdc7932f25fd4e32a55cdf02c2ba1f35fec306873ed25c7b139656deac0a9f73608569cec3c0a63",
 		);
-		assert.true((await verifier.verifyPrevote(prevote.toData())).verified);
+
+		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
+		assert.equal(errors, []);
+		assert.true(verified);
+	});
+
+	it("#makePrevote - should correctly make signed prevote no block", async ({ factory, identity, verifier }) => {
+		const prevote = await factory.makePrevote(
+			{
+				height: 1,
+				round: 1,
+				blockId: undefined,
+				validatorIndex: 0,
+			},
+			identity.keys,
+		);
+
+		assert.equal(
+			prevote.signature,
+			"a306c92bc07dbb276d7f6ed586fface06f5e2a4f19789062fd7884d15b05ce7ba4fdc94eb996c25eb911940376cf94f4112ec60e168d40b7874cbf362a55162348def985b6b499b9b06d08d6d262a343f9a08a5026ad979632ee9c5c894e24ae",
+		);
+
+		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
+		assert.equal(errors, []);
+		assert.true(verified);
 	});
 });

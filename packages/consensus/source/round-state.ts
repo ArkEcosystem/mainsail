@@ -70,8 +70,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.walletRepository;
 	}
 
-	public addProposal(proposal: Contracts.Crypto.IProposal): boolean {
-		if (this.#proposer !== proposal.validatorPublicKey) {
+	public async addProposal(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
+		const validatorPublicKey = await this.validatorSet.getValidatorPublicKeyByIndex(proposal.validatorIndex);
+
+		if (this.#proposer !== validatorPublicKey) {
 			return false;
 		}
 
@@ -97,32 +99,34 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return !!this.#processorResult;
 	}
 
-	public addPrevote(prevote: Contracts.Crypto.IPrevote): boolean {
-		if (!this.#validators.has(prevote.validatorPublicKey)) {
+	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
+		const validatorPublicKey = await this.validatorSet.getValidatorPublicKeyByIndex(prevote.validatorIndex);
+		if (!this.#validators.has(validatorPublicKey)) {
 			return false;
 		}
 
-		if (this.#prevotes.has(prevote.validatorPublicKey)) {
+		if (this.#prevotes.has(validatorPublicKey)) {
 			// TODO: Handle evidence
 
 			return false;
 		}
 
-		this.#prevotes.set(prevote.validatorPublicKey, prevote);
+		this.#prevotes.set(validatorPublicKey, prevote);
 		this.#increasePrevoteCount(prevote.blockId);
 		return true;
 	}
 
-	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): boolean {
-		if (!this.#validators.has(precommit.validatorPublicKey)) {
+	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
+		const validatorPublicKey = await this.validatorSet.getValidatorPublicKeyByIndex(precommit.validatorIndex);
+		if (!this.#validators.has(validatorPublicKey)) {
 			return false;
 		}
 
-		if (this.#precommits.has(precommit.validatorPublicKey)) {
+		if (this.#precommits.has(validatorPublicKey)) {
 			return false;
 		}
 
-		this.#precommits.set(precommit.validatorPublicKey, precommit);
+		this.#precommits.set(validatorPublicKey, precommit);
 		this.#increasePrecommitCount(precommit.blockId);
 		return true;
 	}

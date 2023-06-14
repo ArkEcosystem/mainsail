@@ -32,10 +32,12 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 	#keyPair!: Contracts.Crypto.IKeyPair;
 	#walletPublicKey!: string;
+	#validatorIndex!: number;
 
-	public configure(publicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Consensus.IValidator {
-		this.#walletPublicKey = publicKey;
+	public configure(walletPublicKey: string, keyPair: Contracts.Crypto.IKeyPair, validatorIndex: number): Contracts.Consensus.IValidator {
+		this.#walletPublicKey = walletPublicKey;
 		this.#keyPair = keyPair;
+		this.#validatorIndex = validatorIndex;
 
 		return this;
 	}
@@ -57,7 +59,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		validRound: number | undefined,
 	): Promise<Contracts.Crypto.IProposal> {
 		return this.messagesFactory.makeProposal(
-			{ block, height, round, validRound, validatorPublicKey: this.#keyPair.publicKey },
+			{ block, height, round, validRound, validatorIndex: this.#validatorIndex },
 			this.#keyPair,
 		);
 	}
@@ -68,7 +70,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		blockId: string | undefined,
 	): Promise<Contracts.Crypto.IPrevote> {
 		return this.messagesFactory.makePrevote(
-			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
+			{ blockId, height, round, validatorIndex: this.#validatorIndex },
 			this.#keyPair,
 		);
 	}
@@ -79,7 +81,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		blockId: string | undefined,
 	): Promise<Contracts.Crypto.IPrecommit> {
 		return this.messagesFactory.makePrecommit(
-			{ blockId, height, round, validatorPublicKey: this.#keyPair.publicKey },
+			{ blockId, height, round, validatorIndex: this.#validatorIndex },
 			this.#keyPair,
 		);
 	}
@@ -93,7 +95,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 		this.logger.debug(
 			`Received ${pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
+			`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
 		);
 
 		return transactions;
