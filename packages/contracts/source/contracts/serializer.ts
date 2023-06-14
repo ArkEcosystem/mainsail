@@ -1,6 +1,8 @@
 import { ByteBuffer } from "@mainsail/utils";
 
 export type MandatoryPropertyType =
+	| "uint8"
+	| "uint16"
 	| "uint32"
 	| "uint64"
 	| "address"

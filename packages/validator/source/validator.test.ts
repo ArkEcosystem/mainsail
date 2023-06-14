@@ -1,8 +1,9 @@
 import { Contracts } from "@mainsail/contracts";
+
 import { describe, Sandbox } from "../../test-framework";
+import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Validator } from "./validator";
-import { validatorKeys } from "../../validator-set-static/test/fixtures/validatorKeys";
 
 describe<{
 	sandbox: Sandbox;
@@ -14,7 +15,7 @@ describe<{
 		const { consensusKeyPair, walletPublicKey } = validatorKeys[0];
 		context.validator = context.sandbox.app
 			.resolve<Contracts.Consensus.IValidator>(Validator)
-			.configure(walletPublicKey, consensusKeyPair);
+			.configure(walletPublicKey, consensusKeyPair, 0);
 	});
 
 	it("#getConsensusPublicKey", async ({ validator }) => {
@@ -29,7 +30,7 @@ describe<{
 
 	it("#propose - should create signed proposal", async ({ validator }) => {
 		const block = await validator.prepareBlock(1, 1);
-		const proposal = await validator.propose(1, 1, block);
+		const proposal = await validator.propose(1, 1, block, undefined);
 		assert.defined(proposal);
 		assert.defined(proposal.signature);
 	});

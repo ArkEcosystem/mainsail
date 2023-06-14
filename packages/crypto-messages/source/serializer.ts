@@ -8,10 +8,6 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@tagged("type", "consensus")
 	private readonly serializer!: Contracts.Serializer.ISerializer;
 
-	@inject(Identifiers.Cryptography.Size.PublicKey)
-	@tagged("type", "consensus")
-	private readonly validatorPublicKeySize!: number;
-
 	@inject(Identifiers.Cryptography.Size.Signature)
 	@tagged("type", "consensus")
 	private readonly signatureSize!: number;
@@ -27,7 +23,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			length:
 				4 + // height
 				4 + // round
-				this.validatorPublicKeySize + // validator
+				1 + // validatorIndex
 				4 +
 				proposal.block.serialized.length / 2 + // serialized block
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
@@ -40,8 +36,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				round: {
 					type: "uint32",
 				},
-				validatorPublicKey: {
-					type: "publicKey",
+				validatorIndex: {
+					type: "uint8",
 				},
 				block: {
 					type: "hex",
@@ -65,7 +61,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			length:
 				4 + // height
 				4 + // round
-				this.validatorPublicKeySize + // validator
+				1 + // validatorIndex
 				this.hashSize + // blockId
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
@@ -77,8 +73,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				round: {
 					type: "uint32",
 				},
-				validatorPublicKey: {
-					type: "publicKey",
+				validatorIndex: {
+					type: "uint8",
 				},
 				blockId: {
 					type: "blockId",
@@ -103,7 +99,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 			length:
 				4 + // height
 				4 + // round
-				this.validatorPublicKeySize + // validator
+				1 + // validatorIndex
 				this.hashSize + // blockId
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
@@ -115,8 +111,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				round: {
 					type: "uint32",
 				},
-				validatorPublicKey: {
-					type: "publicKey",
+				validatorIndex: {
+					type: "uint8",
 				},
 				blockId: {
 					type: "blockId",

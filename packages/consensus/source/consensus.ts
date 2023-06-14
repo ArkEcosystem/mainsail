@@ -188,9 +188,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorPublicKey
-			} blockId: ${proposal.block.data.id}`,
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
+				proposal.block.data.id
+			}`,
 		);
 
 		this.#didMajorityPrevote = true;
@@ -254,7 +254,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 		this.logger.info(
 			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorPublicKey
+				proposal.validatorIndex
 			} blockId: ${proposal.block.data.id}`,
 		);
 

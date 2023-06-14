@@ -20,7 +20,7 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	): Promise<Contracts.Crypto.IProposal> {
 		const bytes = await this.serializer.serializeProposal(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorPublicKey, signature);
+		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorIndex, signature);
 	}
 
 	public async makePrevote(
@@ -29,7 +29,7 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	): Promise<Contracts.Crypto.IPrevote> {
 		const bytes = await this.serializer.serializePrevote(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Prevote(data.height, data.round, data.blockId, data.validatorPublicKey, signature);
+		return new Prevote(data.height, data.round, data.blockId, data.validatorIndex, signature);
 	}
 
 	public async makePrecommit(
@@ -38,6 +38,6 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	): Promise<Contracts.Crypto.IPrecommit> {
 		const bytes = await this.serializer.serializePrecommit(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Precommit(data.height, data.round, data.blockId, data.validatorPublicKey, signature);
+		return new Precommit(data.height, data.round, data.blockId, data.validatorIndex, signature);
 	}
 }

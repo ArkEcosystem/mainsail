@@ -14,14 +14,20 @@ describe<{
 	});
 
 	it("#verifyProposal - should correctly verify", async ({ verifier }) => {
-		assert.true((await verifier.verifyProposal(proposalData)).verified);
+		const { verified, errors } = await verifier.verifyProposal(proposalData);
+		assert.equal(errors, []);
+		assert.true(verified);
 	});
 
 	it("#verifyPrecommit - should correctly verify", async ({ verifier }) => {
-		assert.true((await verifier.verifyPrecommit(precommitData)).verified);
+		const { verified, errors } = await verifier.verifyPrecommit(precommitData);
+		assert.equal(errors, []);
+		assert.true(verified);
 	});
 
 	it("#verifyPrevote - should correctly verify", async ({ verifier }) => {
-		assert.true((await verifier.verifyPrevote(prevoteData)).verified);
+		const { verified, errors } = await verifier.verifyPrevote(prevoteData);
+		assert.equal(errors, []);
+		assert.true(verified);
 	});
 });

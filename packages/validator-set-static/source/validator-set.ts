@@ -3,34 +3,34 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	@tagged("type", "wallet")
-	private readonly walletPublicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	#validators: Contracts.State.Wallet[] = [];
 
-	public async configure(): Promise<ValidatorSet> {
-		const secrets = this.app.config<string[]>("validators.secrets") ?? [];
+	public async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
+		if (this.#validators.length === 0) {
+			this.#init();
+		}
 
-		this.#validators = await Promise.all(
-			secrets.map(async (secret) => {
-				const walletPublicKey = await this.walletPublicKeyFactory.fromMnemonic(secret);
-
-				return await this.walletRepository.findByPublicKey(walletPublicKey);
-			}),
-		);
-
-		return this;
+		return this.#validators;
 	}
 
-	public async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
-		return this.#validators;
+	public async getValidatorPublicKeyByIndex(index: number): Promise<string> {
+		return this.#validators[index].getAttribute("consensus.publicKey");
+	}
+
+	#init(): void {
+		const usernames: string[] = [];
+
+		for (let index = 1; index <= this.cryptoConfiguration.getMilestone().activeValidators; index++) {
+			usernames.push(`genesis_${index}`);
+		}
+
+		this.#validators = usernames.map((username) => this.walletRepository.findByUsername(username));
 	}
 }

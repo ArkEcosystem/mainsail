@@ -1,9 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
+
 import { describe, Sandbox } from "../../test-framework";
+import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { ValidatorRepository } from "./validator-repository";
 import { Validator } from "./validator";
-import { validatorKeys } from "../../validator-set-static/test/fixtures/validatorKeys";
+import { ValidatorRepository } from "./validator-repository";
 
 describe<{
 	sandbox: Sandbox;
