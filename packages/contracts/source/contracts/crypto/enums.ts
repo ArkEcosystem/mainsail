@@ -14,3 +14,4 @@ export enum TransactionTypeGroup {
 	// Everything above is available to anyone
 	Reserved = 1000,
 }
+
