@@ -51,7 +51,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"92bed4f1f944f9f1afaccbd69099ca63580aa5d516a295a70815be478066efbe49ea9ab49afb064c018ce1dfc6ca98150ebbebc445cc3e6a3fb3871e6dff77843439d8993c614e9eebb8f4509386f82104d783f8b46716eddb16388aeed14c64",
+			"8de4ef3411e8ad5d90ca57077a1dabe1c0a680d69e621d182e618678fccd47ec18d6cca8f6e711f9329c70d8253c5a33032068e766004ea161792fe3ea17ce7e93307e9045e2586a4f06407224a6ee9faab6a421b28b715d77a9ec5b8ef6837d",
 		);
 
 		const { verified, errors } = await verifier.verifyProposal(proposal.toData());
@@ -72,7 +72,7 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"8b3721603129afea5e6aa7e4201875b070228decfcba8acdd89d94066caddcc62e516d2f0502d910af9128d722b16c141489d765e7c7388fdcdc7932f25fd4e32a55cdf02c2ba1f35fec306873ed25c7b139656deac0a9f73608569cec3c0a63",
+			"98c038d18ceca69b37759bab0a83e6d40d129b7885686de0f0b651f401fab7970f9c2d5bb9a6d0cf56377f13175a56c516fed75e56f7fbe2c610f19791af5bdec74abf79c9292019134983a8ebb9d8c51fcabd55571791fdf25a4615a6421fe9",
 		);
 
 		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
@@ -93,7 +93,7 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"a306c92bc07dbb276d7f6ed586fface06f5e2a4f19789062fd7884d15b05ce7ba4fdc94eb996c25eb911940376cf94f4112ec60e168d40b7874cbf362a55162348def985b6b499b9b06d08d6d262a343f9a08a5026ad979632ee9c5c894e24ae",
+			"938354609ccf7ad10eca105f5f2990c847c3f0dc11ae7b75ef5512b32621ab8a21c1f34e22da54bd821d29edbc809c8007b49b4d04dc1df04aa0d328e07718f469f440f5b7de21d4fb5e85b40af925db73fc87df84b372dd31d66145390a334b",
 		);
 
 		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
@@ -114,7 +114,7 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"8b3721603129afea5e6aa7e4201875b070228decfcba8acdd89d94066caddcc62e516d2f0502d910af9128d722b16c141489d765e7c7388fdcdc7932f25fd4e32a55cdf02c2ba1f35fec306873ed25c7b139656deac0a9f73608569cec3c0a63",
+			"98c038d18ceca69b37759bab0a83e6d40d129b7885686de0f0b651f401fab7970f9c2d5bb9a6d0cf56377f13175a56c516fed75e56f7fbe2c610f19791af5bdec74abf79c9292019134983a8ebb9d8c51fcabd55571791fdf25a4615a6421fe9",
 		);
 
 		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
@@ -135,7 +135,7 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"a306c92bc07dbb276d7f6ed586fface06f5e2a4f19789062fd7884d15b05ce7ba4fdc94eb996c25eb911940376cf94f4112ec60e168d40b7874cbf362a55162348def985b6b499b9b06d08d6d262a343f9a08a5026ad979632ee9c5c894e24ae",
+			"938354609ccf7ad10eca105f5f2990c847c3f0dc11ae7b75ef5512b32621ab8a21c1f34e22da54bd821d29edbc809c8007b49b4d04dc1df04aa0d328e07718f469f440f5b7de21d4fb5e85b40af925db73fc87df84b372dd31d66145390a334b",
 		);
 
 		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
