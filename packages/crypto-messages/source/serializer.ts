@@ -16,7 +16,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 
 	public async serializeProposal(
 		proposal: Contracts.Crypto.IMessageSerializableProposal,
-		options: Contracts.Crypto.IMessageSerializeProposalOptions = {},
+		options: Contracts.Crypto.IMessageSerializeOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(proposal, {
 			length:
@@ -54,7 +54,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 
 	public async serializePrecommit(
 		precommit: Contracts.Crypto.IPrecommitData,
-		options: Contracts.Crypto.IMessageSerializePrecommitOptions = {},
+		options: Contracts.Crypto.IMessageSerializeOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrecommitData>(precommit, {
 			length:
@@ -92,7 +92,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 
 	public async serializePrevote(
 		prevote: Contracts.Crypto.IPrevoteData,
-		options: Contracts.Crypto.IMessageSerializePrevoteOptions = {},
+		options: Contracts.Crypto.IMessageSerializeOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
 			length:
