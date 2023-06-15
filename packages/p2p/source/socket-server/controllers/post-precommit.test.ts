@@ -7,7 +7,7 @@ describe<{
 	sandbox: Sandbox;
 	controller: PostPrecommitController;
 }>("PostProvoteController", ({ it, assert, beforeEach, stub, spy }) => {
-	const deserializer = { deserializePrecommit: () => {} };
+	const factory = { makePrecommitFromBytes: () => {} };
 	const handler = {
 		onPrecommit: () => {},
 	};
@@ -16,7 +16,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue(handler);
-		context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).toConstantValue(deserializer);
+		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
 
 		context.controller = context.sandbox.app.resolve(PostPrecommitController);
 	});
@@ -24,7 +24,7 @@ describe<{
 	it("#handle - should deserialize prevote and call onPrecommit handler", async ({ controller }) => {
 		const prevote = { height: 1 };
 
-		stub(deserializer, "deserializePrecommit").resolvedValue(prevote);
+		stub(factory, "makePrecommitFromBytes").resolvedValue(prevote);
 		const spyOnPrecommit = spy(handler, "onPrecommit");
 
 		await controller.handle({ payload: { precommit: Buffer.from("") } }, {});
