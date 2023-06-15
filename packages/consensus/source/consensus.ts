@@ -126,7 +126,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async onProposal(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
-		if (this.#step !== Contracts.Consensus.Step.Propose || this.#isInvalidRoundState(roundState) || !proposal || proposal.validRound) {
+		if (
+			this.#step !== Contracts.Consensus.Step.Propose ||
+			this.#isInvalidRoundState(roundState) ||
+			!proposal ||
+			proposal.validRound
+		) {
 			return;
 		}
 

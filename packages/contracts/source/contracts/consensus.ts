@@ -76,7 +76,6 @@ export interface IValidatorRepository {
 	getValidators(publicKeys: string[]): IValidator[];
 }
 
-
 export enum Step {
 	Propose = 0,
 	Prevote = 1,
