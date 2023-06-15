@@ -232,7 +232,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "hex") {
-				target[property] = { serialized: source.readBytes(source.readUint32()).toString("hex") }
+				target[property] = { serialized: source.readBytes(source.readUint32()).toString("hex") };
 				continue;
 			}
 
