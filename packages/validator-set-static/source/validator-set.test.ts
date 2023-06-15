@@ -29,7 +29,7 @@ describe<{
 	});
 
 	it("#getActiveValidators - should return active validators", async ({ validatorSet, walletRepository }) => {
-		const findByUsernameSpy = stub(walletRepository, "findByUsername").returnValue({});
+		const findByUsernameSpy = stub(walletRepository, "findByUsername").returnValue({ getPublicKey: () => "publicKey" });
 
 		const validators = await validatorSet.getActiveValidators();
 		assert.equal(validators.length, 2);
