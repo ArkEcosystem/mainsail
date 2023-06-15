@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../core/bin/config/testnet/crypto.json";
 import validatorsJson from "../../core/bin/config/testnet/validators.json";
@@ -6,6 +6,7 @@ import { describe, Factories, Sandbox } from "../../test-framework";
 import { Types } from "../../test-framework/source/factories";
 import { blockData, serializedBlock } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
+import { prepareWallet } from "../test/helpers/prepare-wallet";
 import { MessageFactory } from "./factory";
 import { Verifier } from "./verifier";
 
@@ -17,6 +18,14 @@ describe<{
 }>("Factory", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
+
+		const wallet = await prepareWallet(context);
+		const validatorSet = {
+			getActiveValidators: () => [wallet]
+		}
+
+		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
+
 		context.factory = context.sandbox.app.resolve(MessageFactory);
 		context.verifier = context.sandbox.app.resolve(Verifier);
 
