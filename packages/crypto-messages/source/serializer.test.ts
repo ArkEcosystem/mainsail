@@ -56,7 +56,7 @@ describe<{
 	});
 
 	it("#serializePrecommit - should correctly serialize without block", async ({ serializer }) => {
-		const serialized = await (await serializer.serializePrecommit(precommitDataNoBlock)).toString("hex");
+		const serialized = (await serializer.serializePrecommit(precommitDataNoBlock)).toString("hex");
 		assert.equal(serialized, serializedPrecommitNoBlock);
 	});
 

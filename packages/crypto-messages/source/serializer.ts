@@ -19,8 +19,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		proposal: Contracts.Crypto.IMessageSerializableProposal,
 		options: Contracts.Crypto.IMessageSerializeProposalOptions = {},
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(proposal, {
+		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(
+			{ ...proposal, type: Contracts.Crypto.MessageType.Proposal } as Contracts.Crypto.IMessageSerializableProposal, {
 			length:
+				1 + // type
 				4 + // height
 				4 + // round
 				1 + // validatorIndex
@@ -28,8 +30,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				proposal.block.serialized.length / 2 + // serialized block
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
-			// TODO
 			schema: {
+				type: {
+					type: "uint8",
+				},
 				height: {
 					type: "uint32",
 				},
@@ -45,28 +49,32 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "signature",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}
 
 	public async serializePrecommit(
-		precommit: Contracts.Crypto.IPrecommitData,
+		precommit: Contracts.Crypto.IMessageSerializablePrecommit,
 		options: Contracts.Crypto.IMessageSerializePrecommitOptions = {},
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IPrecommitData>(precommit, {
+		return this.serializer.serialize<Contracts.Crypto.IMessageSerializablePrecommit>(
+			{ ...precommit, type: Contracts.Crypto.MessageType.Precommit } as Contracts.Crypto.IMessageSerializablePrecommit, {
 			length:
+				1 + // type
 				4 + // height
 				4 + // round
 				1 + // validatorIndex
 				this.hashSize + // blockId
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
-			// TODO
 			schema: {
+				type: {
+					type: "uint8",
+				},
 				height: {
 					type: "uint32",
 				},
@@ -83,28 +91,32 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "signature",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}
 
 	public async serializePrevote(
-		prevote: Contracts.Crypto.IPrevoteData,
+		prevote: Contracts.Crypto.IMessageSerializablePrevote,
 		options: Contracts.Crypto.IMessageSerializePrevoteOptions = {},
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
+		return this.serializer.serialize<Contracts.Crypto.IMessageSerializablePrevote>(
+			{ ...prevote, type: Contracts.Crypto.MessageType.Prevote } as Contracts.Crypto.IMessageSerializablePrevote, {
 			length:
+				1 + // type
 				4 + // height
 				4 + // round
 				1 + // validatorIndex
 				this.hashSize + // blockId
 				(options.excludeSignature ? 0 : this.signatureSize), // signature
 			skip: 0,
-			// TODO
 			schema: {
+				type: {
+					type: "uint8",
+				},
 				height: {
 					type: "uint32",
 				},
@@ -121,10 +133,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				...(options.excludeSignature
 					? {}
 					: {
-							signature: {
-								type: "signature",
-							},
-					  }),
+						signature: {
+							type: "signature",
+						},
+					}),
 			},
 		});
 	}

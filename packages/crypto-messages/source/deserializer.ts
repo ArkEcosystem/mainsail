@@ -16,6 +16,9 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 
 		await this.serializer.deserialize<Contracts.Crypto.IProposal>(buffer, proposal, {
 			schema: {
+				type: {
+					type: "uint8",
+				},
 				height: {
 					type: "uint32",
 				},
@@ -44,6 +47,9 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 
 		await this.serializer.deserialize<Contracts.Crypto.IPrecommit>(buffer, precommit, {
 			schema: {
+				type: {
+					type: "uint8",
+				},
 				height: {
 					type: "uint32",
 				},
@@ -72,6 +78,9 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 
 		await this.serializer.deserialize<Contracts.Crypto.IPrevote>(buffer, prevote, {
 			schema: {
+				type: {
+					type: "uint8",
+				},
 				height: {
 					type: "uint32",
 				},
