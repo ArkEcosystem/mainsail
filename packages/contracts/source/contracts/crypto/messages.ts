@@ -94,9 +94,9 @@ export interface IMessageSerializer {
 }
 
 export interface IMessageDeserializer {
-	deserializeProposal(serialized: Buffer): Promise<IProposal>;
-	deserializePrevote(serialized: Buffer): Promise<IPrevote>;
-	deserializePrecommit(serialized: Buffer): Promise<IPrecommit>;
+	deserializeProposal(serialized: Buffer): Promise<IProposalData>;
+	deserializePrevote(serialized: Buffer): Promise<IPrevoteData>;
+	deserializePrecommit(serialized: Buffer): Promise<IPrecommitData>;
 }
 
 export interface IMessageVerificationResult {
