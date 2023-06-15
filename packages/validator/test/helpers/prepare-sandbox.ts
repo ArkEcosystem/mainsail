@@ -58,6 +58,11 @@ export const prepareSandbox = async (context) => {
 		}),
 	});
 
+	context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
+		getValidatorIndexByPublicKey: () => 0,
+	});
+
+
 	// @ts-ignore
 	context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
 	// @ts-ignore
