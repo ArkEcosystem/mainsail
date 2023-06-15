@@ -55,6 +55,7 @@ export interface IHandler {
 }
 
 export interface IScheduler {
+	delayStart(): Promise<void>;
 	delayProposal(): Promise<void>;
 	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
