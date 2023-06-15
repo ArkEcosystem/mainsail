@@ -5,7 +5,7 @@ export interface IProposalData {
 	height: number;
 	round: number;
 	validRound?: number;
-	block: IBlock;
+	block: { serialized: string };
 	validatorIndex: number;
 	signature: string;
 }
@@ -60,7 +60,7 @@ export interface IPrecommit {
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type IMakeProposalData = WithoutSignature<IProposalData>;
+export type IMakeProposalData = WithoutSignature<IProposalData & { block: IBlock }>;
 export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
 export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
 
