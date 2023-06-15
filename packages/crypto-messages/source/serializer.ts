@@ -20,13 +20,9 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		options: Contracts.Crypto.IMessageSerializeProposalOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(
-			{
-				...proposal,
-				type: Contracts.Crypto.MessageType.Proposal,
-			} as Contracts.Crypto.IMessageSerializableProposal,
+			proposal,
 			{
 				length:
-					1 + // type
 					4 + // height
 					4 + // round
 					1 + // validatorIndex
@@ -35,9 +31,6 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					(options.excludeSignature ? 0 : this.signatureSize), // signature
 				skip: 0,
 				schema: {
-					type: {
-						type: "uint8",
-					},
 					height: {
 						type: "uint32",
 					},
