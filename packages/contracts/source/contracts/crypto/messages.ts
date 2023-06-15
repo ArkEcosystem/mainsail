@@ -2,9 +2,8 @@ import { IBlock } from "./block";
 import { IKeyPair } from "./identities";
 
 export enum MessageType {
-	Proposal,
-	Prevote,
-	Precommit,
+	Prevote = 1,
+	Precommit = 2,
 }
 
 export interface IProposalData {
