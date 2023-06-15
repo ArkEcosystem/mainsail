@@ -5,7 +5,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
-	@tagged("type", "consensus")
 	private readonly serializer!: Contracts.Serializer.ISerializer;
 
 	@inject(Identifiers.Cryptography.Size.Signature)
@@ -46,7 +45,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					? {}
 					: {
 							signature: {
-								type: "signature",
+								type: "consensusSignature",
 							},
 					  }),
 			},
@@ -84,7 +83,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					? {}
 					: {
 							signature: {
-								type: "signature",
+								type: "consensusSignature",
 							},
 					  }),
 			},
@@ -122,7 +121,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					? {}
 					: {
 							signature: {
-								type: "signature",
+								type: "consensusSignature",
 							},
 					  }),
 			},

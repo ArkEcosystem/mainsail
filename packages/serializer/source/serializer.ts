@@ -6,15 +6,19 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 @injectable()
 export class Serializer implements Contracts.Serializer.ISerializer {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@tagged("type", "wallet")
 	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
+	@tagged("type", "wallet")
 	private readonly addressSerializer!: Contracts.Crypto.IAddressSerializer;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	@tagged("type", "wallet")
 	private readonly publicKeySerializer!: Contracts.Crypto.IPublicKeySerializer;
 
 	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "wallet")
 	private readonly signatureSerializer!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Signature)
