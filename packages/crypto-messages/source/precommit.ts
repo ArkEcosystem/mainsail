@@ -40,6 +40,8 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 			blockId: this.#blockId,
 			height: this.#height,
 			round: this.#round,
+			signature: this.#signature,
+			validatorIndex: this.#validatorIndex,
 		});
 	}
 

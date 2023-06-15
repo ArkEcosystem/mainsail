@@ -7,7 +7,7 @@ describe<{
 	sandbox: Sandbox;
 	controller: PostProposalController;
 }>("PostProvoteController", ({ it, assert, beforeEach, stub, spy }) => {
-	const deserializer = { deserializeProposal: () => {} };
+	const factory = { makeProposalFromBytes: () => {} };
 	const handler = {
 		onProposal: () => {},
 	};
@@ -16,7 +16,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue(handler);
-		context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).toConstantValue(deserializer);
+		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
 
 		context.controller = context.sandbox.app.resolve(PostProposalController);
 	});
@@ -24,7 +24,7 @@ describe<{
 	it("#handle - should deserialize prevote and call onPrevote handler", async ({ controller }) => {
 		const prevote = { height: 1 };
 
-		stub(deserializer, "deserializeProposal").resolvedValue(prevote);
+		stub(factory, "makeProposalFromBytes").resolvedValue(prevote);
 		const spyOnPrevote = spy(handler, "onProposal");
 
 		await controller.handle({ payload: { proposal: Buffer.from("") } }, {});

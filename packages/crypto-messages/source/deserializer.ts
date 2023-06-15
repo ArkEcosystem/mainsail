@@ -1,15 +1,14 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
-	@tagged("type", "consensus")
 	private readonly serializer!: Contracts.Serializer.ISerializer;
 
-	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.IProposal> {
+	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.IProposalData> {
 		const proposal = {} as Contracts.Crypto.IProposal;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -29,7 +28,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "hex",
 				},
 				signature: {
-					type: "signature",
+					type: "consensusSignature",
 				},
 			},
 		});
@@ -37,7 +36,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		return proposal;
 	}
 
-	public async deserializePrecommit(serialized: Buffer): Promise<Contracts.Crypto.IPrecommit> {
+	public async deserializePrecommit(serialized: Buffer): Promise<Contracts.Crypto.IPrecommitData> {
 		const precommit = {} as Contracts.Crypto.IPrecommit;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -57,7 +56,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "blockId",
 				},
 				signature: {
-					type: "signature",
+					type: "consensusSignature",
 				},
 			},
 		});
@@ -65,7 +64,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		return precommit;
 	}
 
-	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.IPrevote> {
+	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.IPrevoteData> {
 		const prevote = {} as Contracts.Crypto.IPrevote;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -85,7 +84,7 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 					type: "blockId",
 				},
 				signature: {
-					type: "signature",
+					type: "consensusSignature",
 				},
 			},
 		});

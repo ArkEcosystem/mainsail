@@ -40,6 +40,8 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 			blockId: this.#blockId,
 			height: this.#height,
 			round: this.#round,
+			signature: this.#signature,
+			validatorIndex: this.#validatorIndex,
 		});
 	}
 

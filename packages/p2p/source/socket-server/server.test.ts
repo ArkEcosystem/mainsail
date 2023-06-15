@@ -53,7 +53,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({});
 
 		context.server = context.sandbox.app.resolve(ServerProxy);
 	});
