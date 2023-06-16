@@ -29,7 +29,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	public getValidatorIndexByPublicKey(publicKey: string): number {
 		const result = this.#indexByPublicKey.get(publicKey);
 
-		if(result === undefined) {
+		if (result === undefined) {
 			throw new Error(`Validator ${publicKey} not found.`);
 		}
 
@@ -41,9 +41,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#indexByPublicKey = new Map();
 
 		for (let index = 0; index < this.cryptoConfiguration.getMilestone().activeValidators; index++) {
-			 const wallet = this.walletRepository.findByUsername(`genesis_${index+1}`);
+			const wallet = this.walletRepository.findByUsername(`genesis_${index + 1}`);
 
-			 this.#validators.push(wallet);
+			this.#validators.push(wallet);
 
 			const publicKey = wallet.getPublicKey();
 			Utils.assert.defined<string>(publicKey);

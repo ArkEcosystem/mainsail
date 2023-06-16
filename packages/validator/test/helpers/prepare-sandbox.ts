@@ -1,4 +1,4 @@
-import { Contracts,Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
@@ -61,7 +61,6 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
 		getValidatorIndexByPublicKey: () => 0,
 	});
-
 
 	context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);

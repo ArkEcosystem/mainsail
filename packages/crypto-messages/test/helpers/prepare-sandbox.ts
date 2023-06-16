@@ -1,4 +1,4 @@
-import { Contracts,Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";

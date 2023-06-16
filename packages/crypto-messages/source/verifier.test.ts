@@ -1,11 +1,10 @@
-import {Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework";
 import { precommitData, prevoteData, proposalData } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { prepareWallet } from "../test/helpers/prepare-wallet";
 import { Verifier } from "./verifier";
-
 
 describe<{
 	sandbox: Sandbox;
@@ -16,8 +15,8 @@ describe<{
 
 		const wallet = await prepareWallet(context);
 		const validatorSet = {
-			getActiveValidators: () => [wallet]
-		}
+			getActiveValidators: () => [wallet],
+		};
 
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
 		context.verifier = context.sandbox.app.resolve(Verifier);

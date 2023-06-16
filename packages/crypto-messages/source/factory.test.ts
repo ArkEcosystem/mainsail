@@ -21,8 +21,8 @@ describe<{
 
 		const wallet = await prepareWallet(context);
 		const validatorSet = {
-			getActiveValidators: () => [wallet]
-		}
+			getActiveValidators: () => [wallet],
+		};
 
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
 
