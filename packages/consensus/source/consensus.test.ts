@@ -82,7 +82,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			getProposal: () => context.proposal,
 			height: 2,
 			round: 0,
-			setProcessorResult: () => {},
+			setProcessorResult: () => { },
+			hasValidProposalLockProof: () => true,
 		} as unknown as Contracts.Consensus.IRoundState;
 
 		context.sandbox = new Sandbox();
@@ -428,6 +429,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerInfo = spy(logger, "info");
 
 		proposal.validRound = 0;
+		proposal.lockProof = { signature: "1234", validators: [] };
 		roundState.round = 1;
 		consensus.setRound(1);
 		await consensus.onProposalLocked(roundState);
@@ -482,6 +484,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyHandlerOnPrevote = spy(handler, "onPrevote");
 
 		proposal.validRound = 0;
+		proposal.lockProof = { signature: "1234", validators: [] };
 		roundState.round = 1;
 		consensus.setRound(1);
 		await consensus.onProposalLocked(roundState);

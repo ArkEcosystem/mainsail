@@ -25,6 +25,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	@inject(Identifiers.Cryptography.Message.Verifier)
+	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
+
 	#height = 0;
 	#round = 0;
 	#proposal?: Contracts.Crypto.IProposal;
@@ -161,6 +164,20 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	public hasMinorityPrevotesOrPrecommits(): boolean {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
+	}
+
+	public async hasValidProposalLockProof(): Promise<boolean> {
+		const lockProof = this.#proposal?.lockProof;
+		if (!lockProof) {
+			return false;
+		}
+
+		const { verified } = await this.verifier.verifyProposalLockProof(
+			lockProof,
+			{  /* TODO pass correct prevotes data */ } as unknown as Contracts.Crypto.IPrevoteData
+		);
+
+		return verified;
 	}
 
 	#hasMinorityPrevotes(): boolean {
