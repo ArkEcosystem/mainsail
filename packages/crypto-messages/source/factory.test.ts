@@ -62,6 +62,7 @@ describe<{
 	it("#makePrecommit - should correctly make signed precommit", async ({ factory, identity, verifier }) => {
 		const precommit = await factory.makePrecommit(
 			{
+				type: Contracts.Crypto.MessageType.Precommit,
 				height: 1,
 				round: 1,
 				blockId: blockData.id,
@@ -83,6 +84,7 @@ describe<{
 	it("#makePrecommit - should correctly make signed precommit no block", async ({ factory, identity, verifier }) => {
 		const precommit = await factory.makePrecommit(
 			{
+				type: Contracts.Crypto.MessageType.Precommit,
 				height: 1,
 				round: 1,
 				blockId: undefined,
@@ -104,6 +106,7 @@ describe<{
 	it("#makePrevote - should correctly make signed prevote", async ({ factory, identity, verifier }) => {
 		const prevote = await factory.makePrevote(
 			{
+				type: Contracts.Crypto.MessageType.Prevote,
 				height: 1,
 				round: 1,
 				blockId: blockData.id,
@@ -125,6 +128,7 @@ describe<{
 	it("#makePrevote - should correctly make signed prevote no block", async ({ factory, identity, verifier }) => {
 		const prevote = await factory.makePrevote(
 			{
+				type: Contracts.Crypto.MessageType.Prevote,
 				height: 1,
 				round: 1,
 				blockId: undefined,

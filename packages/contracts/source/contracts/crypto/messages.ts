@@ -27,6 +27,7 @@ export interface IProposal {
 }
 
 export interface IPrevoteData {
+	type: MessageType;
 	height: number;
 	round: number;
 	blockId?: string;
@@ -35,6 +36,7 @@ export interface IPrevoteData {
 }
 
 export interface IPrevote {
+	type: MessageType;
 	height: number;
 	round: number;
 	blockId?: string;
@@ -45,6 +47,7 @@ export interface IPrevote {
 }
 
 export interface IPrecommitData {
+	type: MessageType;
 	height: number;
 	round: number;
 	blockId?: string;
@@ -53,6 +56,7 @@ export interface IPrecommitData {
 }
 
 export interface IPrecommit {
+	type: MessageType;
 	height: number;
 	round: number;
 	blockId?: string;

@@ -60,10 +60,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		options: Contracts.Crypto.IMessageSerializePrecommitOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializablePrecommit>(
-			{
-				...precommit,
-				type: Contracts.Crypto.MessageType.Precommit,
-			} as Contracts.Crypto.IMessageSerializablePrecommit,
+			precommit,
 			{
 				length:
 					1 + // type
@@ -107,7 +104,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		options: Contracts.Crypto.IMessageSerializePrevoteOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializablePrevote>(
-			{ ...prevote, type: Contracts.Crypto.MessageType.Prevote } as Contracts.Crypto.IMessageSerializablePrevote,
+			prevote,
 			{
 				length:
 					1 + // type

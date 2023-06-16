@@ -1,3 +1,4 @@
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "../../test-framework";
 import { Precommit } from "./precommit";
 
@@ -41,6 +42,7 @@ describe<{
 
 	it("#toData", async () => {
 		assert.equal(precommit.toData(), {
+			type: Contracts.Crypto.MessageType.Precommit,
 			height: 1,
 			round: 1,
 			blockId: undefined,

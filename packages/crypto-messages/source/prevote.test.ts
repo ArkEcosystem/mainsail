@@ -1,3 +1,4 @@
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "../../test-framework";
 import { Prevote } from "./prevote";
 
@@ -41,6 +42,7 @@ describe<{
 
 	it("#toData", async () => {
 		assert.equal(prevote.toData(), {
+			type: Contracts.Crypto.MessageType.Prevote,
 			height: 1,
 			round: 1,
 			blockId: undefined,
