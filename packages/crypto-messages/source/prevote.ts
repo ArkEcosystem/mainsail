@@ -15,6 +15,10 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 		this.#signature = signature;
 	}
 
+	get type(): Contracts.Crypto.MessageType {
+		return Contracts.Crypto.MessageType.Prevote;
+	}
+
 	get height(): number {
 		return this.#height;
 	}
@@ -51,6 +55,7 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
+			type: this.type,
 			validatorIndex: this.#validatorIndex,
 		};
 	}

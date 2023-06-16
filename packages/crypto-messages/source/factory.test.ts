@@ -63,6 +63,7 @@ describe<{
 	it("#makePrecommit - should correctly make signed precommit", async ({ factory, identity, verifier }) => {
 		const precommit = await factory.makePrecommit(
 			{
+				type: Contracts.Crypto.MessageType.Precommit,
 				blockId: blockData.id,
 				height: 1,
 				round: 1,
@@ -73,7 +74,7 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"98c038d18ceca69b37759bab0a83e6d40d129b7885686de0f0b651f401fab7970f9c2d5bb9a6d0cf56377f13175a56c516fed75e56f7fbe2c610f19791af5bdec74abf79c9292019134983a8ebb9d8c51fcabd55571791fdf25a4615a6421fe9",
+			"ad61353c7ab1a22cf92b350ecfc0d7ba1989f3d8212ed4fed4beee88491fd07f57e819ec066071388a45e92c5ec2128a0885284ad9691b9f5bf4277a8e2e60b37c4bb75d10674f20fa11547d201b168d8ff4fbefa1aba936187529a0e6ca4875",
 		);
 
 		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
@@ -84,6 +85,7 @@ describe<{
 	it("#makePrecommit - should correctly make signed precommit no block", async ({ factory, identity, verifier }) => {
 		const precommit = await factory.makePrecommit(
 			{
+				type: Contracts.Crypto.MessageType.Precommit,
 				blockId: undefined,
 				height: 1,
 				round: 1,
@@ -94,7 +96,7 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"938354609ccf7ad10eca105f5f2990c847c3f0dc11ae7b75ef5512b32621ab8a21c1f34e22da54bd821d29edbc809c8007b49b4d04dc1df04aa0d328e07718f469f440f5b7de21d4fb5e85b40af925db73fc87df84b372dd31d66145390a334b",
+			"aa8647bcb0168beded3a5fa3f7cde55c25d4d4202a5619e2dcda420481e8966954fb32f840335b67d4ad4f1df0101c2d15ceadb7f92fd1659fa6ba4f22facc44c339c0d187f92bb6501d71a7044500a15180495bea31d90a0bbf28fa62590bda",
 		);
 
 		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
@@ -105,6 +107,7 @@ describe<{
 	it("#makePrevote - should correctly make signed prevote", async ({ factory, identity, verifier }) => {
 		const prevote = await factory.makePrevote(
 			{
+				type: Contracts.Crypto.MessageType.Prevote,
 				blockId: blockData.id,
 				height: 1,
 				round: 1,
@@ -115,7 +118,7 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"98c038d18ceca69b37759bab0a83e6d40d129b7885686de0f0b651f401fab7970f9c2d5bb9a6d0cf56377f13175a56c516fed75e56f7fbe2c610f19791af5bdec74abf79c9292019134983a8ebb9d8c51fcabd55571791fdf25a4615a6421fe9",
+			"98efe3774344600672805398fceed75ced4ca89a4a7b1b66273ff2017a9b22b277e7d54eacb01c114d617376a2f3b41e0287ed450f689e82c475c36ed003ca0b2b4cafaa7282eff1cca3faba287c4d752c313fc5d791911f24d46d006fc93b30",
 		);
 
 		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
@@ -126,6 +129,7 @@ describe<{
 	it("#makePrevote - should correctly make signed prevote no block", async ({ factory, identity, verifier }) => {
 		const prevote = await factory.makePrevote(
 			{
+				type: Contracts.Crypto.MessageType.Prevote,
 				blockId: undefined,
 				height: 1,
 				round: 1,
@@ -136,7 +140,7 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"938354609ccf7ad10eca105f5f2990c847c3f0dc11ae7b75ef5512b32621ab8a21c1f34e22da54bd821d29edbc809c8007b49b4d04dc1df04aa0d328e07718f469f440f5b7de21d4fb5e85b40af925db73fc87df84b372dd31d66145390a334b",
+			"955d77cfaec08b05504654bf2593c36ac515a3c2f5776ce4d5ab6472b2f8b60c24fdf435439e8758dbee24bc67d4110d114e600b6a90b9d814a051c6bd2578e1081c2576d4a5938343555d78cf83042d3e4ece474cfce00b00d25bff4c4beb2a",
 		);
 
 		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
