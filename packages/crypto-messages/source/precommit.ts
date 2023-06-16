@@ -51,11 +51,11 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 
 	toData(): Contracts.Crypto.IPrecommitData {
 		return {
-			type: this.type,
 			blockId: this.#blockId,
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
+			type: this.type,
 			validatorIndex: this.#validatorIndex,
 		};
 	}

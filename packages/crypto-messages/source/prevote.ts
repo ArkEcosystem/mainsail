@@ -51,11 +51,11 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 
 	toData(): Contracts.Crypto.IPrevoteData {
 		return {
-			type: this.type,
 			blockId: this.#blockId,
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
+			type: this.type,
 			validatorIndex: this.#validatorIndex,
 		};
 	}
