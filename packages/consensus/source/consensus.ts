@@ -25,6 +25,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	@inject(Identifiers.Cryptography.Message.Verifier)
+	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -148,13 +151,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#prevote(result ? proposal.block.data.id : undefined);
 	}
 
-	// TODO: Proposal should include +2/3 prevotes
 	public async onProposalLocked(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 		if (
 			this.#step !== Contracts.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
+			!proposal.lockProof ||
 			proposal.validRound === undefined ||
 			proposal.validRound >= this.#round
 		) {
@@ -164,6 +167,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.logger.info(
 			`Received proposal ${this.#height}/${this.#round} with locked blockId: ${proposal.block.data.id}`,
 		);
+
+		if (!this.verifier.verifyProposalLockProof(proposal.lockProof, {  /* TODO pass correct prevotes data */ } as unknown as Contracts.Crypto.IPrevoteData)) {
+			this.logger.info(
+				`Lock block ${proposal.block.data.id} on height ${this.#height} received +2/3 prevotes but the proof is invalid`,
+			);
+			return;
+		}
 
 		this.#step = Contracts.Consensus.Step.Prevote;
 		if (!this.#lockedRound || this.#lockedRound <= proposal.validRound) {
@@ -322,14 +332,17 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
 		let block: Contracts.Crypto.IBlock;
+		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
+
 		const existingProposal = this.#validValue?.getProposal();
 		if (this.#validValue && existingProposal) {
 			block = existingProposal.block;
+			lockProof = await this.#validValue.getProposalLockProof();
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
 		}
 
-		const proposal = await proposer.propose(this.#height, this.#round, block, this.#validRound);
+		const proposal = await proposer.propose(this.#height, this.#round, block, lockProof, this.#validRound);
 
 		await this.broadcaster.broadcastProposal(proposal);
 		await this.handler.onProposal(proposal);
@@ -337,10 +350,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #prevote(value?: string): Promise<void> {
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
-			const precommit = await validator.prevote(this.#height, this.#round, value);
+			const prevote = await validator.prevote(this.#height, this.#round, value);
 
-			await this.broadcaster.broadcastPrevote(precommit);
-			await this.handler.onPrevote(precommit);
+			await this.broadcaster.broadcastPrevote(prevote);
+			await this.handler.onPrevote(prevote);
 		}
 	}
 

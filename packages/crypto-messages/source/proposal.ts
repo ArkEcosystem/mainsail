@@ -7,6 +7,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 	#block: Contracts.Crypto.IBlock;
 	#validatorIndex: number;
 	#signature: string;
+	#lockProof?: Contracts.Crypto.IProposalLockProof;
 
 	constructor(
 		height: number,
@@ -14,6 +15,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		block: Contracts.Crypto.IBlock,
 		validRound: number | undefined,
 		validatorIndex: number,
+		lockProof: Contracts.Crypto.IProposalLockProof | undefined,
 		signature: string,
 	) {
 		this.#height = height;
@@ -22,6 +24,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		this.#block = block;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
+		this.#lockProof = lockProof;
 	}
 
 	get height(): number {
@@ -34,6 +37,10 @@ export class Proposal implements Contracts.Crypto.IProposal {
 
 	get validRound(): number | undefined {
 		return this.#validRound;
+	}
+
+	get lockProof(): Contracts.Crypto.IProposalLockProof | undefined {
+		return this.#lockProof;
 	}
 
 	get block(): Contracts.Crypto.IBlock {
@@ -64,6 +71,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
+			lockProof: this.#lockProof,
 			validatorIndex: this.#validatorIndex,
 		};
 	}

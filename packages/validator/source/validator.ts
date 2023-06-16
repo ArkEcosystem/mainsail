@@ -57,7 +57,8 @@ export class Validator implements Contracts.Consensus.IValidator {
 		height: number,
 		round: number,
 		block: Contracts.Crypto.IBlock,
-		validRound: number | undefined,
+		lockProof?: Contracts.Crypto.IProposalLockProof,
+		validRound?: number,
 	): Promise<Contracts.Crypto.IProposal> {
 		return this.messagesFactory.makeProposal(
 			{
@@ -66,6 +67,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 				round,
 				validRound,
 				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
+				lockProof,
 			},
 			this.#keyPair,
 		);
@@ -114,7 +116,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 		this.logger.debug(
 			`Received ${pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
+			`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
 		);
 
 		return transactions;

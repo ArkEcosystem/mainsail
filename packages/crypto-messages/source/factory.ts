@@ -26,14 +26,14 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	): Promise<Contracts.Crypto.IProposal> {
 		const bytes = await this.serializer.serializeProposal(data, { excludeSignature: true });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorIndex, signature);
+		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorIndex, data.lockProof, signature);
 	}
 
 	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const data = await this.deserializer.deserializeProposal(bytes);
 		const block = await this.blockFactory.fromHex(data.block.serialized);
 
-		return new Proposal(data.height, data.round, block, data.validRound, data.validatorIndex, data.signature);
+		return new Proposal(data.height, data.round, block, data.validRound, data.validatorIndex, data.lockProof, data.signature);
 	}
 
 	public async makePrevote(

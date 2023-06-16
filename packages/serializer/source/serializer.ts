@@ -26,7 +26,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 	private readonly consensusSignatureSerializer!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly transactionUtils: any;
+	private readonly transactionUtils!: Contracts.Crypto.ITransactionUtils;
 
 	@inject(Identifiers.Cryptography.Size.HASH256)
 	private readonly hashSize!: number;

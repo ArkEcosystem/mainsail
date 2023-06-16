@@ -224,6 +224,19 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		};
 	}
 
+	public async getProposalLockProof(): Promise<Contracts.Crypto.IProposalLockProof> {
+		const majority = await this.aggregateMajorityPrevotes();
+
+		const proposal = this.getProposal();
+		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+
+		return {
+			signature: majority.aggSignature,
+			// TODO: calcualte validator set matrix
+			validators: [...majority.validatorSet].map((v) => true),
+		};
+	}
+
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
 		const majority = await this.aggregateMajorityPrecommits();
 

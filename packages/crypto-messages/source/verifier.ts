@@ -11,6 +11,10 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	@tagged("type", "consensus")
 	private readonly signature!: Contracts.Crypto.ISignature;
 
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "consensus")
+	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -62,6 +66,20 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		};
 	}
 
+	public async verifyProposalLockProof(lockProof: Contracts.Crypto.IProposalLockProof, prevote: Contracts.Crypto.IPrevoteData): Promise<Contracts.Crypto.IMessageVerificationResult> {
+		const errors: string[] = [];
+
+		const bytes = await this.serializer.serializePrevote(prevote, { excludeSignature: true });
+		if (!(await this.#verifyAggSignature(lockProof.signature, lockProof.validators, bytes))) {
+			errors.push("invalid signature");
+		}
+
+		return {
+			errors,
+			verified: errors.length === 0,
+		};
+	}
+
 	async #verifySignature(signature: string, validatorIndex: number, message: Buffer): Promise<boolean> {
 		const activeValidators = await this.validatorSet.getActiveValidators();
 
@@ -72,5 +90,19 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		Utils.assert.defined<string>(validatorPublicKey);
 
 		return this.signature.verify(Buffer.from(signature, "hex"), message, Buffer.from(validatorPublicKey, "hex"));
+	}
+
+	async #verifyAggSignature(signature: string, validators: boolean[], message: Buffer): Promise<boolean> {
+		// TODO: take round / height into account
+		const activeValidators = await this.validatorSet.getActiveValidators();
+
+		const validatorPublicKeys = validators.map((v, index) => v
+			? Buffer.from(activeValidators[index].getAttribute<string>("consensus.publicKey"), "hex")
+			: undefined
+		).filter(v => v !== undefined) as Buffer[];
+
+		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys);
+
+		return this.signature.verify(Buffer.from(signature, "hex"), message, Buffer.from(aggregatedPublicKey, "hex"));
 	}
 }
