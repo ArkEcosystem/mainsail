@@ -75,7 +75,13 @@ export class Validator implements Contracts.Consensus.IValidator {
 		blockId: string | undefined,
 	): Promise<Contracts.Crypto.IPrevote> {
 		return this.messagesFactory.makePrevote(
-			{ blockId, height, round, validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey) },
+			{
+				blockId,
+				height,
+				round,
+				type: Contracts.Crypto.MessageType.Prevote,
+				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey)
+			},
 			this.#keyPair,
 		);
 	}
@@ -86,7 +92,13 @@ export class Validator implements Contracts.Consensus.IValidator {
 		blockId: string | undefined,
 	): Promise<Contracts.Crypto.IPrecommit> {
 		return this.messagesFactory.makePrecommit(
-			{ blockId, height, round, validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey) },
+			{
+				blockId,
+				height,
+				round,
+				type: Contracts.Crypto.MessageType.Precommit,
+				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
+			},
 			this.#keyPair,
 		);
 	}

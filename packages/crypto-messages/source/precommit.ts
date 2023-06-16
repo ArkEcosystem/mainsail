@@ -15,6 +15,10 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 		this.#signature = signature;
 	}
 
+	get type(): Contracts.Crypto.MessageType {
+		return Contracts.Crypto.MessageType.Precommit;
+	}
+
 	get height(): number {
 		return this.#height;
 	}
@@ -51,6 +55,7 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
+			type: this.type,
 			validatorIndex: this.#validatorIndex,
 		};
 	}
