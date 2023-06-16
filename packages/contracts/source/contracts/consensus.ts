@@ -55,6 +55,7 @@ export interface IHandler {
 }
 
 export interface IScheduler {
+	delayStart(): Promise<void>;
 	delayProposal(): Promise<void>;
 	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
@@ -74,4 +75,10 @@ export interface IValidator {
 export interface IValidatorRepository {
 	getValidator(publicKey: string): IValidator | undefined;
 	getValidators(publicKeys: string[]): IValidator[];
+}
+
+export enum Step {
+	Propose = 0,
+	Prevote = 1,
+	Precommit = 2,
 }

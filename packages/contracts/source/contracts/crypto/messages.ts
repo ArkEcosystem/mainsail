@@ -10,7 +10,7 @@ export interface IProposalData {
 	height: number;
 	round: number;
 	validRound?: number;
-	block: IBlock;
+	block: { serialized: string };
 	validatorIndex: number;
 	signature: string;
 }
@@ -69,43 +69,36 @@ export interface IPrecommit {
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type IMakeProposalData = WithoutSignature<IProposalData>;
+export type IMakeProposalData = WithoutSignature<IProposalData & { block: IBlock }>;
 export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
 export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
 
 export interface IMessageFactory {
 	makeProposal(data: IMakeProposalData, keyPair: IKeyPair): Promise<IProposal>;
+	makeProposalFromBytes(data: Buffer): Promise<IProposal>;
 	makePrevote(data: IMakePrevoteData, keyPair: IKeyPair): Promise<IPrevote>;
+	makePrevoteFromBytes(data: Buffer): Promise<IPrevote>;
 	makePrecommit(data: IMakePrecommitData, keyPair: IKeyPair): Promise<IPrecommit>;
+	makePrecommitFromBytes(data: Buffer): Promise<IPrecommit>;
 }
-
-export interface IMessageSerializeOptions {
-	excludeSignature?: boolean;
-}
-export interface IMessageSerializeProposalOptions extends IMessageSerializeOptions {}
-export interface IMessageSerializePrevoteOptions extends IMessageSerializeOptions {}
-export interface IMessageSerializePrecommitOptions extends IMessageSerializeOptions {}
 
 export type IMessageSerializableProposal = OptionalSignature<IProposalData>;
 export type IMessageSerializablePrevote = OptionalSignature<IPrevoteData>;
 export type IMessageSerializablePrecommit = OptionalSignature<IPrecommitData>;
 
+export interface IMessageSerializeOptions {
+	excludeSignature?: boolean;
+}
 export interface IMessageSerializer {
-	serializeProposal(
-		proposal: IMessageSerializableProposal,
-		options?: IMessageSerializeProposalOptions,
-	): Promise<Buffer>;
-	serializePrevote(prevote: IMessageSerializablePrevote, options?: IMessageSerializePrevoteOptions): Promise<Buffer>;
-	serializePrecommit(
-		precommit: IMessageSerializablePrecommit,
-		options?: IMessageSerializePrecommitOptions,
-	): Promise<Buffer>;
+	serializeProposal(proposal: IMessageSerializableProposal, options?: IMessageSerializeOptions): Promise<Buffer>;
+	serializePrevote(prevote: IMessageSerializablePrevote, options?: IMessageSerializeOptions): Promise<Buffer>;
+	serializePrecommit(precommit: IMessageSerializablePrecommit, options?: IMessageSerializeOptions): Promise<Buffer>;
 }
 
 export interface IMessageDeserializer {
-	deserializeProposal(serialized: Buffer): Promise<IProposal>;
-	deserializePrevote(serialized: Buffer): Promise<IPrevote>;
-	deserializePrecommit(serialized: Buffer): Promise<IPrecommit>;
+	deserializeProposal(serialized: Buffer): Promise<IProposalData>;
+	deserializePrevote(serialized: Buffer): Promise<IPrevoteData>;
+	deserializePrecommit(serialized: Buffer): Promise<IPrecommitData>;
 }
 
 export interface IMessageVerificationResult {

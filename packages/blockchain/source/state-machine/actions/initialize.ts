@@ -74,7 +74,7 @@ export class Initialize implements Action {
 			if (this.stateStore.getNetworkStart()) {
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 				await this.transactionPool.readdTransactions();
-				await this.consensus.run();
+				void this.consensus.run();
 				await this.networkMonitor.boot();
 
 				return this.blockchain.dispatch("STARTED");
@@ -84,7 +84,7 @@ export class Initialize implements Action {
 				this.logger.notice("TEST SUITE DETECTED! SYNCING WALLETS AND STARTING IMMEDIATELY.");
 
 				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
-				await this.consensus.run();
+				void this.consensus.run();
 				await this.networkMonitor.boot();
 
 				return this.blockchain.dispatch("STARTED");
@@ -101,7 +101,7 @@ export class Initialize implements Action {
 
 			await this.transactionPool.readdTransactions();
 
-			await this.consensus.run();
+			void this.consensus.run();
 
 			await this.networkMonitor.boot();
 

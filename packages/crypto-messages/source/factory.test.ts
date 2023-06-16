@@ -1,12 +1,13 @@
+import { Contracts } from "@mainsail/contracts";
+
 import crypto from "../../core/bin/config/testnet/crypto.json";
+import validatorsJson from "../../core/bin/config/testnet/validators.json";
 import { describe, Factories, Sandbox } from "../../test-framework";
+import { Types } from "../../test-framework/source/factories";
 import { blockData, serializedBlock } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { MessageFactory } from "./factory";
-import { Types } from "../../test-framework/source/factories";
 import { Verifier } from "./verifier";
-import { Contracts } from "@mainsail/contracts";
-import validatorsJson from "../../core/bin/config/testnet/validators.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -22,9 +23,9 @@ describe<{
 		const identityFactory = await Factories.factory("Identity", crypto);
 		const identity = await identityFactory
 			.withOptions({
-				passphrase: validatorsJson.secrets[0],
-				keyType: "consensus",
 				app: context.sandbox.app,
+				keyType: "consensus",
+				passphrase: validatorsJson.secrets[0],
 			})
 			.make<Types.Identity>();
 
@@ -33,10 +34,10 @@ describe<{
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity, verifier }) => {
 		const block: Contracts.Crypto.IBlock = {
+			data: blockData,
 			header: { ...blockData },
 			serialized: serializedBlock,
 			transactions: [],
-			data: blockData,
 		};
 
 		const proposal = await factory.makeProposal(
@@ -63,9 +64,9 @@ describe<{
 		const precommit = await factory.makePrecommit(
 			{
 				type: Contracts.Crypto.MessageType.Precommit,
+				blockId: blockData.id,
 				height: 1,
 				round: 1,
-				blockId: blockData.id,
 				validatorIndex: 0,
 			},
 			identity.keys,
@@ -85,9 +86,9 @@ describe<{
 		const precommit = await factory.makePrecommit(
 			{
 				type: Contracts.Crypto.MessageType.Precommit,
+				blockId: undefined,
 				height: 1,
 				round: 1,
-				blockId: undefined,
 				validatorIndex: 0,
 			},
 			identity.keys,
@@ -107,9 +108,9 @@ describe<{
 		const prevote = await factory.makePrevote(
 			{
 				type: Contracts.Crypto.MessageType.Prevote,
+				blockId: blockData.id,
 				height: 1,
 				round: 1,
-				blockId: blockData.id,
 				validatorIndex: 0,
 			},
 			identity.keys,
@@ -129,9 +130,9 @@ describe<{
 		const prevote = await factory.makePrevote(
 			{
 				type: Contracts.Crypto.MessageType.Prevote,
+				blockId: undefined,
 				height: 1,
 				round: 1,
-				blockId: undefined,
 				validatorIndex: 0,
 			},
 			identity.keys,

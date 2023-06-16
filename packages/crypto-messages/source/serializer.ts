@@ -5,7 +5,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
-	@tagged("type", "consensus")
 	private readonly serializer!: Contracts.Serializer.ISerializer;
 
 	@inject(Identifiers.Cryptography.Size.Signature)
@@ -17,7 +16,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 
 	public async serializeProposal(
 		proposal: Contracts.Crypto.IMessageSerializableProposal,
-		options: Contracts.Crypto.IMessageSerializeProposalOptions = {},
+		options: Contracts.Crypto.IMessageSerializeOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializableProposal>(
 			proposal,
@@ -46,10 +45,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					...(options.excludeSignature
 						? {}
 						: {
-								signature: {
-									type: "signature",
-								},
-						  }),
+							signature: {
+								type: "consensusSignature",
+							},
+						}),
 				},
 			},
 		);
@@ -57,7 +56,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 
 	public async serializePrecommit(
 		precommit: Contracts.Crypto.IMessageSerializablePrecommit,
-		options: Contracts.Crypto.IMessageSerializePrecommitOptions = {},
+		options: Contracts.Crypto.IMessageSerializeOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializablePrecommit>(
 			precommit,
@@ -90,10 +89,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					...(options.excludeSignature
 						? {}
 						: {
-								signature: {
-									type: "signature",
-								},
-						  }),
+							signature: {
+								type: "consensusSignature",
+							},
+						}),
 				},
 			},
 		);
@@ -101,7 +100,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 
 	public async serializePrevote(
 		prevote: Contracts.Crypto.IMessageSerializablePrevote,
-		options: Contracts.Crypto.IMessageSerializePrevoteOptions = {},
+		options: Contracts.Crypto.IMessageSerializeOptions = {},
 	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IMessageSerializablePrevote>(
 			prevote,
@@ -134,10 +133,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 					...(options.excludeSignature
 						? {}
 						: {
-								signature: {
-									type: "signature",
-								},
-						  }),
+							signature: {
+								type: "consensusSignature",
+							},
+						}),
 				},
 			},
 		);
