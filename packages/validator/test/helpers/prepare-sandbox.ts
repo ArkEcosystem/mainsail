@@ -1,10 +1,10 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Services } from "@mainsail/kernel";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "../../../crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config";
-import { Configuration } from "../../../crypto-config/source/configuration";
 import { ServiceProvider as CoreConsensusBls12381 } from "../../../crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key-pair-schnorr";
@@ -20,7 +20,7 @@ import { Sandbox } from "../../../test-framework";
 import { ServiceProvider as CoreTransactions } from "../../../transactions";
 import { ServiceProvider as CoreValidation } from "../../../validation";
 
-export const prepareSandbox = async (context) => {
+export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox = new Sandbox();
 
 	await context.sandbox.app.resolve(CoreTriggers).register();
@@ -58,8 +58,10 @@ export const prepareSandbox = async (context) => {
 		}),
 	});
 
-	// @ts-ignore
+	context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
+		getValidatorIndexByPublicKey: () => 0,
+	});
+
 	context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
-	// @ts-ignore
-	context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 };

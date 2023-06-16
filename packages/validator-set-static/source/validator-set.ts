@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
@@ -11,6 +12,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	#validators: Contracts.State.Wallet[] = [];
+	#indexByPublicKey: Map<string, number> = new Map();
 
 	public async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
 		if (this.#validators.length === 0) {
@@ -24,13 +26,28 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		return this.#validators[index].getAttribute("consensus.publicKey");
 	}
 
-	#init(): void {
-		const usernames: string[] = [];
+	public getValidatorIndexByPublicKey(publicKey: string): number {
+		const result = this.#indexByPublicKey.get(publicKey);
 
-		for (let index = 1; index <= this.cryptoConfiguration.getMilestone().activeValidators; index++) {
-			usernames.push(`genesis_${index}`);
+		if (result === undefined) {
+			throw new Error(`Validator ${publicKey} not found.`);
 		}
 
-		this.#validators = usernames.map((username) => this.walletRepository.findByUsername(username));
+		return result;
+	}
+
+	#init(): void {
+		this.#validators = [];
+		this.#indexByPublicKey = new Map();
+
+		for (let index = 0; index < this.cryptoConfiguration.getMilestone().activeValidators; index++) {
+			const wallet = this.walletRepository.findByUsername(`genesis_${index + 1}`);
+
+			this.#validators.push(wallet);
+
+			const publicKey = wallet.getPublicKey();
+			Utils.assert.defined<string>(publicKey);
+			this.#indexByPublicKey.set(publicKey, index);
+		}
 	}
 }

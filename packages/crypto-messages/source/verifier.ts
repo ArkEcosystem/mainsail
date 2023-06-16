@@ -63,7 +63,6 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	}
 
 	async #verifySignature(signature: string, validatorIndex: number, message: Buffer): Promise<boolean> {
-		// TODO: take round / height into account
 		const activeValidators = await this.validatorSet.getActiveValidators();
 
 		const validator = activeValidators[validatorIndex];

@@ -91,10 +91,10 @@
 			"package": "@mainsail/crypto-messages"
 		},
 		{
-			"package": "@mainsail/validator"
+			"package": "@mainsail/validator-set-static"
 		},
 		{
-			"package": "@mainsail/validator-set-static"
+			"package": "@mainsail/validator"
 		},
 		{
 			"package": "@mainsail/consensus"

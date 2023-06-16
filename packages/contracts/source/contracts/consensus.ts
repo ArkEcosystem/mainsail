@@ -64,7 +64,7 @@ export interface IScheduler {
 }
 
 export interface IValidator {
-	configure(publicKey: string, keyPair: IKeyPair, validatorIndex: number): IValidator;
+	configure(publicKey: string, keyPair: IKeyPair): IValidator;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<IBlock>;
 	propose(height: number, round: number, block: IBlock, validRound: number | undefined): Promise<IProposal>;

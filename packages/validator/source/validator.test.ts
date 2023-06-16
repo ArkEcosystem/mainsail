@@ -30,7 +30,7 @@ describe<{
 
 	it("#propose - should create signed proposal", async ({ validator }) => {
 		const block = await validator.prepareBlock(1, 1);
-		const proposal = await validator.propose(1, 1, block, undefined);
+		const proposal = await validator.propose(1, 1, block);
 		assert.defined(proposal);
 		assert.defined(proposal.signature);
 	});
