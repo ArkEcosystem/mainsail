@@ -1315,19 +1315,34 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ajv:
+        specifier: 8.12.0
+        version: 8.12.0
       delay:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../crypto-block
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
