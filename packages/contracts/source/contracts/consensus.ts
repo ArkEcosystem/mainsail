@@ -26,6 +26,8 @@ export interface IRoundState {
 	hasMajorityPrecommits(): boolean;
 	hasMajorityPrecommitsAny(): boolean;
 	hasMinorityPrevotesOrPrecommits(): boolean;
+	getValidatorsSignedPrevote(): boolean[];
+	getValidatorsSignedPrecommit(): boolean[];
 	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
 	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
 	getProposedCommitBlock(): Promise<ICommittedBlock>;

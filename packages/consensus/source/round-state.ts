@@ -169,12 +169,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
 	}
 
-	public getValidatorsSignedPrecommit(): boolean[] {
-		return this.#validatorsSignedPrecommit;
-	}
-
 	public getValidatorsSignedPrevote(): boolean[] {
 		return this.#validatorsSignedPrevote;
+	}
+
+	public getValidatorsSignedPrecommit(): boolean[] {
+		return this.#validatorsSignedPrecommit;
 	}
 
 	#hasMinorityPrevotes(): boolean {
