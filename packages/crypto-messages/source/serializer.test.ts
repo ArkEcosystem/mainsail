@@ -1,5 +1,6 @@
 import { describe, Sandbox } from "../../test-framework";
 import {
+	blockData,
 	precommitData,
 	precommitDataNoBlock,
 	prevoteData,
@@ -7,12 +8,12 @@ import {
 	proposalData,
 	serializedPrecommit,
 	serializedPrecommitNoBlock,
-	serializedPrecommitWithoutSignature,
+	serializedPrecommitForSignature,
 	serializedPrevote,
 	serializedPrevoteNoBlock,
-	serializedPrevoteWithoutSignature,
+	serializedPrevoteForSignature,
 	serializedProposal,
-	serializedProposalWithoutSignature,
+	serializedProposalForSignature,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Serializer } from "./serializer";
@@ -27,29 +28,29 @@ describe<{
 		context.serializer = context.sandbox.app.resolve(Serializer);
 	});
 
-	it("#serializeProposal - should correctly serialize without signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: true })).toString(
+	it("#serializeProposal - should correctly serialize for signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializeProposalForSignature({ height: proposalData.height, round: proposalData.round, blockId: blockData.id })).toString(
 			"hex",
 		);
-		assert.equal(serialized, serializedProposalWithoutSignature);
+		assert.equal(serialized, serializedProposalForSignature);
 	});
 
 	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposal(proposalData, { excludeSignature: false })).toString(
+		const serialized = (await serializer.serializeProposal(proposalData)).toString(
 			"hex",
 		);
 		assert.equal(serialized, serializedProposal);
 	});
 
-	it("#serializePrecommit - should correctly serialize without signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: true })).toString(
+	it("#serializePrecommit - should correctly serialize for signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializePrecommitForSignature(precommitData)).toString(
 			"hex",
 		);
-		assert.equal(serialized, serializedPrecommitWithoutSignature);
+		assert.equal(serialized, serializedPrecommitForSignature);
 	});
 
 	it("#serializePrecommit - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrecommit(precommitData, { excludeSignature: false })).toString(
+		const serialized = (await serializer.serializePrecommit(precommitData)).toString(
 			"hex",
 		);
 		assert.equal(serialized, serializedPrecommit);
@@ -60,22 +61,22 @@ describe<{
 		assert.equal(serialized, serializedPrecommitNoBlock);
 	});
 
-	it("#serializePrevote - should correctly serialize without signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrevote(prevoteData, { excludeSignature: true })).toString("hex");
-		assert.equal(serialized, serializedPrevoteWithoutSignature);
+	it("#serializePrevote - should correctly serialize for signature", async ({ serializer }) => {
+		const serialized = (await serializer.serializePrevoteForSignature(prevoteData)).toString("hex");
+		assert.equal(serialized, serializedPrevoteForSignature);
 	});
 
 	it("#serializePrevote - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrevote(prevoteData, { excludeSignature: false })).toString(
+		const serialized = (await serializer.serializePrevote(prevoteData)).toString(
 			"hex",
 		);
 		assert.equal(serialized, serializedPrevote);
 	});
 
 	it("#serializePrevote - should correctly serialize without block", async ({ serializer }) => {
-		assert.equal(
-			await serializer.serializePrevote(prevoteDataNoBlock),
-			Buffer.from(serializedPrevoteNoBlock, "hex"),
+		const serialized = (await serializer.serializePrevote(prevoteDataNoBlock)).toString(
+			"hex"
 		);
+		assert.equal(serialized, serializedPrevoteNoBlock);
 	});
 });

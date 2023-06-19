@@ -19,11 +19,11 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	public async verifyProposal(
-		proposal: Contracts.Crypto.IProposalData,
+		proposal: Contracts.Crypto.IProposal,
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 
-		const bytes = await this.serializer.serializeProposal(proposal, { excludeSignature: true });
+		const bytes = await this.serializer.serializeProposalForSignature(proposal.toSignatureData());
 		if (!(await this.#verifySignature(proposal.signature, proposal.validatorIndex, bytes))) {
 			errors.push("invalid signature");
 		}
@@ -35,11 +35,11 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	}
 
 	public async verifyPrevote(
-		prevote: Contracts.Crypto.IPrevoteData,
+		prevote: Contracts.Crypto.IPrevote,
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 
-		const bytes = await this.serializer.serializePrevote(prevote, { excludeSignature: true });
+		const bytes = await this.serializer.serializePrevoteForSignature(prevote.toSignatureData());
 		if (!(await this.#verifySignature(prevote.signature, prevote.validatorIndex, bytes))) {
 			errors.push("invalid signature");
 		}
@@ -51,11 +51,11 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	}
 
 	public async verifyPrecommit(
-		precommit: Contracts.Crypto.IPrecommitData,
+		precommit: Contracts.Crypto.IPrecommit,
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 
-		const bytes = await this.serializer.serializePrecommit(precommit, { excludeSignature: true });
+		const bytes = await this.serializer.serializePrecommitForSignature(precommit.toSignatureData());
 		if (!(await this.#verifySignature(precommit.signature, precommit.validatorIndex, bytes))) {
 			errors.push("invalid signature");
 		}
@@ -66,10 +66,10 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		};
 	}
 
-	public async verifyProposalLockProof(lockProof: Contracts.Crypto.IProposalLockProof, prevote: Contracts.Crypto.IPrevoteData): Promise<Contracts.Crypto.IMessageVerificationResult> {
+	public async verifyProposalLockProof(prevote: Contracts.Crypto.IPrevote, lockProof: Contracts.Crypto.IProposalLockProof): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 
-		const bytes = await this.serializer.serializePrevote(prevote, { excludeSignature: true });
+		const bytes = await this.serializer.serializePrevoteForSignature(prevote.toSignatureData());
 		if (!(await this.#verifyAggSignature(lockProof.signature, lockProof.validators, bytes))) {
 			errors.push("invalid signature");
 		}

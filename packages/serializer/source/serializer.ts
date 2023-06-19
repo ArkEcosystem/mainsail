@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
@@ -30,6 +30,13 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 	@inject(Identifiers.Cryptography.Size.HASH256)
 	private readonly hashSize!: number;
+
+
+	private _emptyBlockIdBuffer!: Buffer;
+	@postConstruct()
+	public initialize() {
+		this._emptyBlockIdBuffer = Buffer.alloc(this.hashSize, "1");
+	}
 
 	public async serialize<T>(
 		data: T,
@@ -87,7 +94,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 			if (schema.type === "blockId") {
 				if (value === undefined) {
-					result.writeBytes(Buffer.alloc(this.hashSize));
+					result.writeBytes(this._emptyBlockIdBuffer);
 				} else {
 					result.writeBytes(Buffer.from(value, "hex"));
 				}
@@ -195,7 +202,13 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-				target[property] = source.readBytes(schema.size ?? this.hashSize).toString("hex");
+				const blockId = source.readBytes(schema.size ?? this.hashSize);
+				if (Buffer.compare(blockId, this._emptyBlockIdBuffer) === 0) {
+					target[property] = undefined;
+				} else {
+					target[property] = blockId.toString("hex");
+				}
+
 				continue;
 			}
 

@@ -64,6 +64,14 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		});
 	}
 
+	toSignatureData(): Contracts.Crypto.ISignatureProposalData {
+		return {
+			height: this.#height,
+			round: this.#round,
+			blockId: this.#block.header.id,
+		};
+	}
+
 	toData(): Contracts.Crypto.IProposalData {
 		return {
 			block: this.#block,

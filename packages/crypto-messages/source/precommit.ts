@@ -49,6 +49,15 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 		});
 	}
 
+	toSignatureData(): Contracts.Crypto.ISignaturePrecommitData {
+		return {
+			type: this.type,
+			height: this.#height,
+			round: this.#round,
+			blockId: this.#blockId,
+		};
+	}
+
 	toData(): Contracts.Crypto.IPrecommitData {
 		return {
 			blockId: this.#blockId,

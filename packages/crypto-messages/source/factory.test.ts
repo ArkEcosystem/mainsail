@@ -4,7 +4,7 @@ import crypto from "../../core/bin/config/testnet/crypto.json";
 import validatorsJson from "../../core/bin/config/testnet/validators.json";
 import { describe, Factories, Sandbox } from "../../test-framework";
 import { Types } from "../../test-framework/source/factories";
-import { blockData, serializedBlock } from "../test/fixtures/proposal";
+import { blockData, precommitData, precommitDataNoBlock, prevoteData, prevoteDataNoBlock, proposalData, serializedBlock, serializedPrecommit, serializedPrecommitNoBlock, serializedPrevote, serializedPrevoteNoBlock, serializedProposal } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { prepareWallet } from "../test/helpers/prepare-wallet";
 import { MessageFactory } from "./factory";
@@ -61,10 +61,10 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"8de4ef3411e8ad5d90ca57077a1dabe1c0a680d69e621d182e618678fccd47ec18d6cca8f6e711f9329c70d8253c5a33032068e766004ea161792fe3ea17ce7e93307e9045e2586a4f06407224a6ee9faab6a421b28b715d77a9ec5b8ef6837d",
+			"a0e335c16132d3049c10ae2d013b8acd4404c79894787578fef37b8a5a0844bda59cdd13f24f19eb7908763b6f42184f010747c8f3011b0abfb907d830fbb6336e2151a72df426215e291bc79a4c194b4843eb260d5fb1081f3460feba09d226",
 		);
 
-		const { verified, errors } = await verifier.verifyProposal(proposal.toData());
+		const { verified, errors } = await verifier.verifyProposal(proposal);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -83,10 +83,10 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"ad61353c7ab1a22cf92b350ecfc0d7ba1989f3d8212ed4fed4beee88491fd07f57e819ec066071388a45e92c5ec2128a0885284ad9691b9f5bf4277a8e2e60b37c4bb75d10674f20fa11547d201b168d8ff4fbefa1aba936187529a0e6ca4875",
+			"8bbef0999968534965df6d7422b72a62e4fee579394f657130d055d77860eba25942431892ac868a1aa552e6c9af83ab0b5c29fe23882feaa217bcf606b2a14ba1238b390864175a925093acfcfb34b17a05559ff0c8f69d31ef2100a71c93e4",
 		);
 
-		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
+		const { verified, errors } = await verifier.verifyPrecommit(precommit);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -105,10 +105,10 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"aa8647bcb0168beded3a5fa3f7cde55c25d4d4202a5619e2dcda420481e8966954fb32f840335b67d4ad4f1df0101c2d15ceadb7f92fd1659fa6ba4f22facc44c339c0d187f92bb6501d71a7044500a15180495bea31d90a0bbf28fa62590bda",
+			"a4f3752c49a483892af7178fa01f65639ad385eba3c8b502d981f6717e3a09a7edd7a2b99a46e6c5f40daee77602a6170b73e1afb6756fa72f9fa22595af5c5bb6f497c602e3c1ffaf65e84b9a51b10cf8b6ea7f928637a67c754c0d1ad82ead",
 		);
 
-		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
+		const { verified, errors } = await verifier.verifyPrecommit(precommit);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -127,10 +127,10 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"98efe3774344600672805398fceed75ced4ca89a4a7b1b66273ff2017a9b22b277e7d54eacb01c114d617376a2f3b41e0287ed450f689e82c475c36ed003ca0b2b4cafaa7282eff1cca3faba287c4d752c313fc5d791911f24d46d006fc93b30",
+			"b0174f546363b476fe0153d0092ff8a8da9fda11b225fda82d994ba7a9078a28fc609079d745054bb14089651fa7361e0b7772878217e5502e28b32c6ce827741aa7196a7cb4618fe6ff2bf6fcaf9833b5cf14328cd10293b9c689eff018a1ee",
 		);
 
-		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
+		const { verified, errors } = await verifier.verifyPrevote(prevote);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -149,11 +149,68 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"955d77cfaec08b05504654bf2593c36ac515a3c2f5776ce4d5ab6472b2f8b60c24fdf435439e8758dbee24bc67d4110d114e600b6a90b9d814a051c6bd2578e1081c2576d4a5938343555d78cf83042d3e4ece474cfce00b00d25bff4c4beb2a",
+			"a466d5b0c3667ef1250d19eb4ad5cac579877a4ca455790eb3174ea796de5999765aed67014f14315b742025b7047b240b5e62f8bfe060600b6b307cdbedee447a08425ecff0260aef0d5c912c8a4c7dbe59667d2c2f86f09207793fd05d1f53",
 		);
 
-		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
+		const { verified, errors } = await verifier.verifyPrevote(prevote);
 		assert.equal(errors, []);
 		assert.true(verified);
+	});
+
+	it.skip("#makeProposalFromBytes - should be ok", async ({ factory, identity, verifier }) => {
+		const proposal = await factory.makeProposalFromBytes(
+			Buffer.from(serializedProposal, "hex")
+		);
+
+		assert.equal(
+			proposal.toData(),
+			proposalData,
+		);
+	});
+
+	it("#makePrevoteFromBytes - should be ok", async ({ factory, identity, verifier }) => {
+		const prevote = await factory.makePrevoteFromBytes(
+			Buffer.from(serializedPrevote, "hex")
+		);
+
+		assert.equal(
+			prevote.toData(),
+			prevoteData,
+		);
+	});
+
+	it("#makePrevoteFromBytes - should be ok with no block", async ({ factory, identity, verifier }) => {
+		const prevote = await factory.makePrevoteFromBytes(
+			Buffer.from(serializedPrevoteNoBlock, "hex")
+		);
+
+		console.log(prevote.toSignatureData());
+
+		assert.equal(
+			prevote.toData(),
+			prevoteDataNoBlock,
+		);
+	});
+
+	it("#makePrecommitFromBytes - should be ok", async ({ factory, identity, verifier }) => {
+		const precommit = await factory.makePrecommitFromBytes(
+			Buffer.from(serializedPrecommit, "hex")
+		);
+
+		assert.equal(
+			precommit.toData(),
+			precommitData,
+		);
+	});
+
+	it("#makePrecommitFromBytes - should be ok with no block", async ({ factory, identity, verifier }) => {
+		const precommit = await factory.makePrecommitFromBytes(
+			Buffer.from(serializedPrecommitNoBlock, "hex")
+		);
+
+		assert.equal(
+			precommit.toData(),
+			precommitDataNoBlock,
+		);
 	});
 });

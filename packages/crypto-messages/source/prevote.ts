@@ -49,6 +49,15 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 		});
 	}
 
+	toSignatureData(): Contracts.Crypto.ISignaturePrevoteData {
+		return {
+			type: this.type,
+			height: this.#height,
+			round: this.#round,
+			blockId: this.#blockId,
+		};
+	}
+
 	toData(): Contracts.Crypto.IPrevoteData {
 		return {
 			blockId: this.#blockId,
