@@ -2978,6 +2978,9 @@ export namespace shared {
 
         /** Headers round */
         round?: (number|null);
+
+        /** Headers step */
+        step?: (number|null);
     }
 
     /** Represents a Headers. */
@@ -2997,6 +3000,9 @@ export namespace shared {
 
         /** Headers round. */
         public round: number;
+
+        /** Headers step. */
+        public step: number;
 
         /**
          * Creates a new Headers instance using the specified properties.

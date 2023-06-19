@@ -35,6 +35,7 @@ export interface IConsensusService {
 	run(): Promise<void>;
 	getHeight(): number;
 	getRound(): number;
+	getStep(): Step;
 	onProposal(roundState: IRoundState): Promise<void>;
 	onProposalLocked(roudnState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;

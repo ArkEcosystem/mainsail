@@ -6957,6 +6957,7 @@ $root.shared = (function() {
          * @property {string|null} [version] Headers version
          * @property {number|null} [height] Headers height
          * @property {number|null} [round] Headers round
+         * @property {number|null} [step] Headers step
          */
 
         /**
@@ -6999,6 +7000,14 @@ $root.shared = (function() {
         Headers.prototype.round = 0;
 
         /**
+         * Headers step.
+         * @member {number} step
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.step = 0;
+
+        /**
          * Creates a new Headers instance using the specified properties.
          * @function create
          * @memberof shared.Headers
@@ -7028,6 +7037,8 @@ $root.shared = (function() {
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);
             if (message.round != null && Object.hasOwnProperty.call(message, "round"))
                 writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
+            if (message.step != null && Object.hasOwnProperty.call(message, "step"))
+                writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
             return writer;
         };
 
@@ -7074,6 +7085,10 @@ $root.shared = (function() {
                         message.round = reader.uint32();
                         break;
                     }
+                case 4: {
+                        message.step = reader.uint32();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -7118,6 +7133,9 @@ $root.shared = (function() {
             if (message.round != null && message.hasOwnProperty("round"))
                 if (!$util.isInteger(message.round))
                     return "round: integer expected";
+            if (message.step != null && message.hasOwnProperty("step"))
+                if (!$util.isInteger(message.step))
+                    return "step: integer expected";
             return null;
         };
 
@@ -7139,6 +7157,8 @@ $root.shared = (function() {
                 message.height = object.height >>> 0;
             if (object.round != null)
                 message.round = object.round >>> 0;
+            if (object.step != null)
+                message.step = object.step >>> 0;
             return message;
         };
 
@@ -7159,6 +7179,7 @@ $root.shared = (function() {
                 object.version = "";
                 object.height = 0;
                 object.round = 0;
+                object.step = 0;
             }
             if (message.version != null && message.hasOwnProperty("version"))
                 object.version = message.version;
@@ -7166,6 +7187,8 @@ $root.shared = (function() {
                 object.height = message.height;
             if (message.round != null && message.hasOwnProperty("round"))
                 object.round = message.round;
+            if (message.step != null && message.hasOwnProperty("step"))
+                object.step = message.step;
             return object;
         };
 

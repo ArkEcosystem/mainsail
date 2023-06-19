@@ -5,6 +5,7 @@ type HeaderData = {
 	version: string;
 	height: number;
 	round: number;
+	step: number;
 }
 
 @injectable()
@@ -18,6 +19,7 @@ export class Header {
 		return {
 			height: consensus.getHeight(),
 			round: consensus.getRound(),
+			step: consensus.getStep(),
 			version: this.app.version(),
 		};
 	}
