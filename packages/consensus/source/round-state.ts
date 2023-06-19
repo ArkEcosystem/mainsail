@@ -177,12 +177,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		const { verified } = await this.verifier.verifyProposalLockProof(
 			{
-				type: Contracts.Crypto.MessageType.Prevote,
+				blockId: proposal.block.block.header.id,
 				height: proposal.height,
 				round: proposal.round,
-				blockId: proposal.block.block.header.id
+				type: Contracts.Crypto.MessageType.Prevote,
 			},
-			lockProof
+			lockProof,
 		);
 
 		return verified;
@@ -249,7 +249,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		};
 	}
 
-	#getValidatorMajority(s: Map<string, { signature: string, blockId?: string }>): Map<string, { signature: string }> {
+	#getValidatorMajority(s: Map<string, { signature: string; blockId?: string }>): Map<string, { signature: string }> {
 		if (!this.hasMajorityPrevotes() || !this.hasMajorityPrecommits()) {
 			throw new Error("called #getValidatorMajority without majority");
 		}
@@ -285,7 +285,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		const proposal = this.getProposal();
 		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
 
-		const { round, block: { block } } = proposal;
+		const {
+			round,
+			block: { block },
+		} = proposal;
 
 		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
 			block,

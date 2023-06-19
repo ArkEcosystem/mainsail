@@ -68,10 +68,10 @@ export class Validator implements Contracts.Consensus.IValidator {
 			{
 				block: { block, lockProof, serialized: serializedProposedBlock.toString("hex") },
 				height,
+				lockProof,
 				round,
 				validRound,
 				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
-				lockProof,
 			},
 			this.#keyPair,
 		);
@@ -120,7 +120,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 		this.logger.debug(
 			`Received ${pluralize("transaction", transactions.length, true)} ` +
-			`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
+				`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
 		);
 
 		return transactions;

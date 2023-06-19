@@ -40,7 +40,8 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 
 		if (!verification.verified) {
 			this.logger.warning(
-				`Block ${block.data.height.toLocaleString()} (${block.data.id
+				`Block ${block.data.height.toLocaleString()} (${
+					block.data.id
 				}) disregarded because verification failed`,
 			);
 

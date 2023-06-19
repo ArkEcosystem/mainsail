@@ -24,7 +24,11 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakeProposalData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IProposal> {
-		const bytes = await this.serializer.serializeProposalForSignature({ height: data.height, round: data.round, blockId: data.block.block.header.id });
+		const bytes = await this.serializer.serializeProposalForSignature({
+			blockId: data.block.block.header.id,
+			height: data.height,
+			round: data.round,
+		});
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
 		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorIndex, signature);
 	}
@@ -40,7 +44,12 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakePrevoteData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IPrevote> {
-		const bytes = await this.serializer.serializePrevoteForSignature({ type: data.type, height: data.height, round: data.round, blockId: data.blockId });
+		const bytes = await this.serializer.serializePrevoteForSignature({
+			blockId: data.blockId,
+			height: data.height,
+			round: data.round,
+			type: data.type,
+		});
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
 		return new Prevote(data.height, data.round, data.blockId, data.validatorIndex, signature);
 	}
@@ -54,7 +63,12 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakePrecommitData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IPrecommit> {
-		const bytes = await this.serializer.serializePrecommitForSignature({ type: data.type, height: data.height, round: data.round, blockId: data.blockId });
+		const bytes = await this.serializer.serializePrecommitForSignature({
+			blockId: data.blockId,
+			height: data.height,
+			round: data.round,
+			type: data.type,
+		});
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
 		return new Precommit(data.height, data.round, data.blockId, data.validatorIndex, signature);
 	}

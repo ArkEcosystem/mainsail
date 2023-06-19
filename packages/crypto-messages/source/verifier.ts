@@ -66,7 +66,10 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		};
 	}
 
-	public async verifyProposalLockProof(prevote: Contracts.Crypto.ISignaturePrevoteData, lockProof: Contracts.Crypto.IProposalLockProof): Promise<Contracts.Crypto.IMessageVerificationResult> {
+	public async verifyProposalLockProof(
+		prevote: Contracts.Crypto.ISignaturePrevoteData,
+		lockProof: Contracts.Crypto.IProposalLockProof,
+	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 
 		const bytes = await this.serializer.serializePrevoteForSignature(prevote);
@@ -96,10 +99,11 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		// TODO: take round / height into account
 		const activeValidators = await this.validatorSet.getActiveValidators();
 
-		const validatorPublicKeys = validators.map((v, index) => v
-			? Buffer.from(activeValidators[index].getAttribute<string>("consensus.publicKey"), "hex")
-			: undefined
-		).filter(v => v !== undefined) as Buffer[];
+		const validatorPublicKeys = validators
+			.map((v, index) =>
+				v ? Buffer.from(activeValidators[index].getAttribute<string>("consensus.publicKey"), "hex") : undefined,
+			)
+			.filter((v) => v !== undefined);
 
 		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys);
 

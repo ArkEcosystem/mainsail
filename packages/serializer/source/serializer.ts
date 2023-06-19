@@ -31,7 +31,6 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 	@inject(Identifiers.Cryptography.Size.HASH256)
 	private readonly hashSize!: number;
 
-
 	private _emptyBlockIdBuffer!: Buffer;
 	@postConstruct()
 	public initialize() {

@@ -164,9 +164,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const { block } = proposal.block;
 
-		this.logger.info(
-			`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`,
-		);
+		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
 
 		if (!(await roundState.hasValidProposalLockProof())) {
 			this.logger.info(
@@ -205,7 +203,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${block.data.id
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
+				block.data.id
 			}`,
 		);
 
@@ -265,13 +264,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		if (!roundState.getProcessorResult()) {
-			this.logger.info(
-				`Block ${block.data.id} on height ${this.#height} received +2/3 precommit but is invalid`,
-			);
+			this.logger.info(`Block ${block.data.id} on height ${this.#height} received +2/3 precommit but is invalid`);
 			return;
 		}
 		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+				proposal.validatorIndex
 			} blockId: ${block.data.id}`,
 		);
 

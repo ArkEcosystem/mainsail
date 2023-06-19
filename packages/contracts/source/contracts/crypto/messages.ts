@@ -28,12 +28,12 @@ export interface ISignatureMessageData {
 	readonly blockId: string;
 }
 
-export type HasBlockId = { blockId: string }
+export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> { }
-export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> { }
-export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> { }
+export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> {}
+export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
 
 export interface IProposal {
 	readonly height: number;
@@ -129,5 +129,8 @@ export interface IMessageVerifier {
 	verifyProposal(proposal: IProposal): Promise<IMessageVerificationResult>;
 	verifyPrevote(prevote: IPrevote): Promise<IMessageVerificationResult>;
 	verifyPrecommit(precommit: IPrecommit): Promise<IMessageVerificationResult>;
-	verifyProposalLockProof(prevote: ISignaturePrevoteData, lockProof: IProposalLockProof,): Promise<IMessageVerificationResult>;
+	verifyProposalLockProof(
+		prevote: ISignaturePrevoteData,
+		lockProof: IProposalLockProof,
+	): Promise<IMessageVerificationResult>;
 }

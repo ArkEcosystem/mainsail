@@ -14,14 +14,13 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@inject(Identifiers.Cryptography.Size.SHA256)
 	private readonly hashSize!: number;
 
-	public async serializeProposal(
-		proposal: Contracts.Crypto.IProposalData,
-	): Promise<Buffer> {
+	public async serializeProposal(proposal: Contracts.Crypto.IProposalData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IProposalData>(proposal, {
 			length:
 				4 + // height
 				4 + // round
-				4 + proposal.block.serialized.length / 2 + // serialized block
+				4 +
+				proposal.block.serialized.length / 2 + // serialized block
 				1 + // validatorIndex
 				this.signatureSize, // signature
 			skip: 0,
@@ -45,9 +44,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
-	public async serializeProposalForSignature(
-		proposal: Contracts.Crypto.ISignatureProposalData,
-	): Promise<Buffer> {
+	public async serializeProposalForSignature(proposal: Contracts.Crypto.ISignatureProposalData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.ISignatureProposalData>(proposal, {
 			length:
 				4 + // height
@@ -64,14 +61,12 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				blockId: {
 					type: "blockId",
 					optional: false,
-				}
+				},
 			},
 		});
 	}
 
-	public async serializePrecommit(
-		precommit: Contracts.Crypto.IPrecommitData,
-	): Promise<Buffer> {
+	public async serializePrecommit(precommit: Contracts.Crypto.IPrecommitData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrecommitData>(precommit, {
 			length:
 				1 + // type
@@ -105,9 +100,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
-	public async serializePrevoteForSignature(
-		prevote: Contracts.Crypto.ISignaturePrevoteData,
-	): Promise<Buffer> {
+	public async serializePrevoteForSignature(prevote: Contracts.Crypto.ISignaturePrevoteData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.ISignaturePrevoteData>(prevote, {
 			length:
 				1 + // type
@@ -128,14 +121,12 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				blockId: {
 					type: "blockId",
 					optional: true,
-				}
+				},
 			},
 		});
 	}
 
-	public async serializePrevote(
-		prevote: Contracts.Crypto.IPrevoteData,
-	): Promise<Buffer> {
+	public async serializePrevote(prevote: Contracts.Crypto.IPrevoteData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
 			length:
 				1 + // type
@@ -169,9 +160,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
-	public async serializePrecommitForSignature(
-		prevote: Contracts.Crypto.ISignaturePrevoteData,
-	): Promise<Buffer> {
+	public async serializePrecommitForSignature(prevote: Contracts.Crypto.ISignaturePrevoteData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.ISignaturePrevoteData>(prevote, {
 			length:
 				1 + // type
@@ -192,17 +181,16 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				blockId: {
 					type: "blockId",
 					optional: true,
-				}
+				},
 			},
 		});
 	}
 
-	public async serializeProposalLockProof(
-		lockProof: Contracts.Crypto.IProposalLockProof,
-	): Promise<Buffer> {
+	public async serializeProposalLockProof(lockProof: Contracts.Crypto.IProposalLockProof): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.IProposalLockProof>(lockProof, {
 			length:
-				1 + 51 + // validator bit matrix (TODO: optimize)
+				1 +
+				51 + // validator bit matrix (TODO: optimize)
 				this.signatureSize, // signature
 			skip: 0,
 			schema: {

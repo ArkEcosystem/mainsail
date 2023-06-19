@@ -29,30 +29,28 @@ describe<{
 	});
 
 	it("#serializeProposal - should correctly serialize for signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposalForSignature({ height: proposalData.height, round: proposalData.round, blockId: blockData.id })).toString(
-			"hex",
-		);
+		const serialized = (
+			await serializer.serializeProposalForSignature({
+				height: proposalData.height,
+				round: proposalData.round,
+				blockId: blockData.id,
+			})
+		).toString("hex");
 		assert.equal(serialized, serializedProposalForSignature);
 	});
 
 	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposal(proposalData)).toString(
-			"hex",
-		);
+		const serialized = (await serializer.serializeProposal(proposalData)).toString("hex");
 		assert.equal(serialized, serializedProposal);
 	});
 
 	it("#serializePrecommit - should correctly serialize for signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrecommitForSignature(precommitData)).toString(
-			"hex",
-		);
+		const serialized = (await serializer.serializePrecommitForSignature(precommitData)).toString("hex");
 		assert.equal(serialized, serializedPrecommitForSignature);
 	});
 
 	it("#serializePrecommit - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrecommit(precommitData)).toString(
-			"hex",
-		);
+		const serialized = (await serializer.serializePrecommit(precommitData)).toString("hex");
 		assert.equal(serialized, serializedPrecommit);
 	});
 
@@ -67,16 +65,12 @@ describe<{
 	});
 
 	it("#serializePrevote - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrevote(prevoteData)).toString(
-			"hex",
-		);
+		const serialized = (await serializer.serializePrevote(prevoteData)).toString("hex");
 		assert.equal(serialized, serializedPrevote);
 	});
 
 	it("#serializePrevote - should correctly serialize without block", async ({ serializer }) => {
-		const serialized = (await serializer.serializePrevote(prevoteDataNoBlock)).toString(
-			"hex"
-		);
+		const serialized = (await serializer.serializePrevote(prevoteDataNoBlock)).toString("hex");
 		assert.equal(serialized, serializedPrevoteNoBlock);
 	});
 });

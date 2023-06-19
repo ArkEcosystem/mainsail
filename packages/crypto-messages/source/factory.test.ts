@@ -4,7 +4,20 @@ import crypto from "../../core/bin/config/testnet/crypto.json";
 import validatorsJson from "../../core/bin/config/testnet/validators.json";
 import { describe, Factories, Sandbox } from "../../test-framework";
 import { Types } from "../../test-framework/source/factories";
-import { blockData, precommitData, precommitDataNoBlock, prevoteData, prevoteDataNoBlock, proposalData, serializedBlock, serializedPrecommit, serializedPrecommitNoBlock, serializedPrevote, serializedPrevoteNoBlock, serializedProposal } from "../test/fixtures/proposal";
+import {
+	blockData,
+	precommitData,
+	precommitDataNoBlock,
+	prevoteData,
+	prevoteDataNoBlock,
+	proposalData,
+	serializedBlock,
+	serializedPrecommit,
+	serializedPrecommitNoBlock,
+	serializedPrevote,
+	serializedPrevoteNoBlock,
+	serializedProposal,
+} from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { prepareWallet } from "../test/helpers/prepare-wallet";
 import { MessageFactory } from "./factory";
@@ -49,7 +62,7 @@ describe<{
 				serialized: serializedBlock,
 				transactions: [],
 			},
-			serialized: ""
+			serialized: "",
 		};
 
 		const proposal = await factory.makeProposal(
@@ -161,59 +174,34 @@ describe<{
 	});
 
 	it.skip("#makeProposalFromBytes - should be ok", async ({ factory, identity, verifier }) => {
-		const proposal = await factory.makeProposalFromBytes(
-			Buffer.from(serializedProposal, "hex")
-		);
+		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
 
-		assert.equal(
-			proposal.toData(),
-			proposalData,
-		);
+		assert.equal(proposal.toData(), proposalData);
 	});
 
 	it("#makePrevoteFromBytes - should be ok", async ({ factory, identity, verifier }) => {
-		const prevote = await factory.makePrevoteFromBytes(
-			Buffer.from(serializedPrevote, "hex")
-		);
+		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevote, "hex"));
 
-		assert.equal(
-			prevote.toData(),
-			prevoteData,
-		);
+		assert.equal(prevote.toData(), prevoteData);
 	});
 
 	it("#makePrevoteFromBytes - should be ok with no block", async ({ factory, identity, verifier }) => {
-		const prevote = await factory.makePrevoteFromBytes(
-			Buffer.from(serializedPrevoteNoBlock, "hex")
-		);
+		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
 
 		console.log(prevote.toSignatureData());
 
-		assert.equal(
-			prevote.toData(),
-			prevoteDataNoBlock,
-		);
+		assert.equal(prevote.toData(), prevoteDataNoBlock);
 	});
 
 	it("#makePrecommitFromBytes - should be ok", async ({ factory, identity, verifier }) => {
-		const precommit = await factory.makePrecommitFromBytes(
-			Buffer.from(serializedPrecommit, "hex")
-		);
+		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommit, "hex"));
 
-		assert.equal(
-			precommit.toData(),
-			precommitData,
-		);
+		assert.equal(precommit.toData(), precommitData);
 	});
 
 	it("#makePrecommitFromBytes - should be ok with no block", async ({ factory, identity, verifier }) => {
-		const precommit = await factory.makePrecommitFromBytes(
-			Buffer.from(serializedPrecommitNoBlock, "hex")
-		);
+		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
 
-		assert.equal(
-			precommit.toData(),
-			precommitDataNoBlock,
-		);
+		assert.equal(precommit.toData(), precommitDataNoBlock);
 	});
 });

@@ -13,7 +13,7 @@ describe<{
 			transactions: [],
 			data: blockData,
 		},
-		serialized: ""
+		serialized: "",
 	};
 
 	const proposal = new Proposal(

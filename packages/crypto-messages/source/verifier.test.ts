@@ -29,7 +29,14 @@ describe<{
 	});
 
 	it("#verifyProposal - should correctly verify", async ({ verifier }) => {
-		const proposal = new Proposal(proposalData.height, proposalData.round, { block: { header: blockData } } as Contracts.Crypto.IProposedBlock, proposalData.validRound, proposalData.validatorIndex, proposalData.signature);
+		const proposal = new Proposal(
+			proposalData.height,
+			proposalData.round,
+			{ block: { header: blockData } } as Contracts.Crypto.IProposedBlock,
+			proposalData.validRound,
+			proposalData.validatorIndex,
+			proposalData.signature,
+		);
 		const { verified, errors } = await verifier.verifyProposal(proposal);
 
 		assert.equal(errors, []);
@@ -37,7 +44,13 @@ describe<{
 	});
 
 	it("#verifyPrecommit - should correctly verify", async ({ verifier }) => {
-		const precommit = new Precommit(precommitData.height, precommitData.round, precommitData.blockId, precommitData.validatorIndex, precommitData.signature);
+		const precommit = new Precommit(
+			precommitData.height,
+			precommitData.round,
+			precommitData.blockId,
+			precommitData.validatorIndex,
+			precommitData.signature,
+		);
 		const { verified, errors } = await verifier.verifyPrecommit(precommit);
 
 		assert.equal(errors, []);
@@ -45,7 +58,13 @@ describe<{
 	});
 
 	it("#verifyPrevote - should correctly verify", async ({ verifier }) => {
-		const prevote = new Prevote(prevoteData.height, prevoteData.round, prevoteData.blockId, prevoteData.validatorIndex, prevoteData.signature);
+		const prevote = new Prevote(
+			prevoteData.height,
+			prevoteData.round,
+			prevoteData.blockId,
+			prevoteData.validatorIndex,
+			prevoteData.signature,
+		);
 		const { verified, errors } = await verifier.verifyPrevote(prevote);
 
 		assert.equal(errors, []);
