@@ -34,6 +34,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
 	#precommitsCount = new Map<string | undefined, number>();
 	#validators = new Map<string, Contracts.State.Wallet>();
+	#validatorsSignedPrevote: boolean[] = [];
+	#validatorsSignedPrecommit: boolean[] = [];
 	#proposer!: string;
 
 	get height(): number {
@@ -60,6 +62,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		for (const validator of validators) {
 			const consensuPublicKey = validator.getAttribute<string>("consensus.publicKey");
 			this.#validators.set(consensuPublicKey, validator);
+			this.#validatorsSignedPrecommit.push(false);
+			this.#validatorsSignedPrevote.push(false);
 		}
 		this.#proposer = validators[0].getAttribute<string>("consensus.publicKey");
 
@@ -112,6 +116,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		}
 
 		this.#prevotes.set(validatorPublicKey, prevote);
+		this.#validatorsSignedPrevote[prevote.validatorIndex] = true;
 		this.#increasePrevoteCount(prevote.blockId);
 		return true;
 	}
@@ -127,6 +132,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		}
 
 		this.#precommits.set(validatorPublicKey, precommit);
+		this.#validatorsSignedPrecommit[precommit.validatorIndex] = true;
 		this.#increasePrecommitCount(precommit.blockId);
 		return true;
 	}
@@ -161,6 +167,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	public hasMinorityPrevotesOrPrecommits(): boolean {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
+	}
+
+	public getValidatorsSignedPrecommit(): boolean[] {
+		return this.#validatorsSignedPrecommit;
+	}
+
+	public getValidatorsSignedPrevote(): boolean[] {
+		return this.#validatorsSignedPrevote;
 	}
 
 	#hasMinorityPrevotes(): boolean {
