@@ -6,6 +6,7 @@ import delay from "delay";
 
 import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
+import { Header } from "./header";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 import { replySchemas } from "./reply-schemas";
@@ -27,6 +28,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
+
+	@inject(Identifiers.PeerHeader)
+	private readonly header!: Header;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -297,7 +301,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				codec.request.serialize({
 					...payload,
 					headers: {
-						version: this.app.version(),
+						...await this.header.getHeader()
 					},
 				}),
 				timeout,
