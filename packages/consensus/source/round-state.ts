@@ -213,11 +213,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<Contracts.Consensus.IValidatorSetMajority> {
-		return this.#aggregateValidatorSetMajority(this.#prevotes);
+		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#prevotes));
 	}
 
 	public async aggregateMajorityPrecommits(): Promise<Contracts.Consensus.IValidatorSetMajority> {
-		return this.#aggregateValidatorSetMajority(this.#precommits);
+		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#precommits));
 	}
 
 	async #aggregateValidatorSetMajority(
@@ -239,6 +239,23 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			aggSignature,
 			validatorSet: new Set(publicKeys),
 		};
+	}
+
+	#getValidatorMajority(s: Map<string, { signature: string, blockId?: string }>): Map<string, { signature: string }> {
+		if (!this.hasMajorityPrevotes() || !this.hasMajorityPrecommits()) {
+			throw new Error("called #getValidatorMajority without majority");
+		}
+
+		Utils.assert.defined<Contracts.Crypto.IProposal>(this.#proposal);
+		const filtered = new Map();
+
+		for (const [key, value] of s) {
+			if (value.blockId === this.#proposal.block.header.id) {
+				filtered.set(key, value);
+			}
+		}
+
+		return filtered;
 	}
 
 	public async getProposalLockProof(): Promise<Contracts.Crypto.IProposalLockProof> {

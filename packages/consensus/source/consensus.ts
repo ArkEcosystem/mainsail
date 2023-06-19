@@ -332,7 +332,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
 
 		const existingProposal = this.#validValue?.getProposal();
-		if (this.#validValue && existingProposal) {
+		if (this.#validValue && existingProposal && this.#validValue.hasMajorityPrevotes()) {
 			block = existingProposal.block;
 			lockProof = await this.#validValue.getProposalLockProof();
 		} else {
