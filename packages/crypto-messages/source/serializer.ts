@@ -197,4 +197,22 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
+	public async serializeProposalLockProof(
+		lockProof: Contracts.Crypto.IProposalLockProof,
+	): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IProposalLockProof>(lockProof, {
+			length:
+				1 + 51 + // validator bit matrix (TODO: optimize)
+				this.signatureSize, // signature
+			skip: 0,
+			schema: {
+				validators: {
+					type: "validatorSet",
+				},
+				signature: {
+					type: "consensusSignature",
+				},
+			},
+		});
+	}
 }

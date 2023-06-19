@@ -139,7 +139,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrevoteCount(this.#proposal.block.data.id));
+		return this.#isMajority(this.#getPrevoteCount(this.#proposal.block.block.data.id));
 	}
 
 	public hasMajorityPrevotesAny(): boolean {
@@ -155,7 +155,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrecommitCount(this.#proposal.block.data.id));
+		return this.#isMajority(this.#getPrecommitCount(this.#proposal.block.block.data.id));
 	}
 
 	public hasMajorityPrecommitsAny(): boolean {
@@ -167,14 +167,22 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async hasValidProposalLockProof(): Promise<boolean> {
-		const lockProof = this.#proposal?.lockProof;
+		const proposal = this.#proposal;
+		const lockProof = this.#proposal?.block?.lockProof;
 		if (!lockProof) {
 			return false;
 		}
 
+		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+
 		const { verified } = await this.verifier.verifyProposalLockProof(
-			lockProof,
-			{  /* TODO pass correct prevotes data */ } as unknown as Contracts.Crypto.IPrevoteData
+			{
+				type: Contracts.Crypto.MessageType.Prevote,
+				height: proposal.height,
+				round: proposal.round,
+				blockId: proposal.block.block.header.id
+			},
+			lockProof
 		);
 
 		return verified;
@@ -250,7 +258,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		const filtered = new Map();
 
 		for (const [key, value] of s) {
-			if (value.blockId === this.#proposal.block.header.id) {
+			if (value.blockId === this.#proposal.block.block.header.id) {
 				filtered.set(key, value);
 			}
 		}
@@ -277,7 +285,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		const proposal = this.getProposal();
 		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
 
-		const { round, block } = proposal;
+		const { round, block: { block } } = proposal;
 
 		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
 			block,

@@ -46,6 +46,14 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		);
 	}
 
+	public lockProofSize(): number {
+		return (
+			this.consensusSignatureByteLength + // signature
+			1 +
+			51 // validator bit matrix  TODO optimize
+		);
+	}
+
 	public totalSize(block: Contracts.Crypto.IBlockDataSerializable): number {
 		return this.headerSize() + block.payloadLength;
 	}
@@ -135,6 +143,30 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 				},
 			},
 		});
+	}
+
+	public async serializeLockProof(lockProof: Contracts.Crypto.IBlockLockProof): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IBlockLockProof>(lockProof, {
+			length: this.lockProofSize(),
+			skip: 0,
+			schema: {
+				signature: {
+					type: "consensusSignature",
+				},
+				validators: {
+					type: "validatorSet",
+				},
+			},
+		});
+	}
+
+	public async serializeProposed(proposedBlock: Contracts.Crypto.IProposedBlockSerializable): Promise<Buffer> {
+		const serializedLockProof = proposedBlock.lockProof
+			? await this.serializeLockProof(proposedBlock.lockProof)
+			: Buffer.alloc(this.lockProofSize()); // TODO: write magic byte to indicate absence?
+
+		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
+		return Buffer.concat([serializedLockProof, serializedBlock]);
 	}
 
 	public async serializeCommit(commit: Contracts.Crypto.IBlockCommit): Promise<Buffer> {

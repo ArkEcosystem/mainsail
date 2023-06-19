@@ -17,8 +17,10 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal()?.block;
-		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+		const proposedBlock = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
+
+		const { block } = proposedBlock;
 
 		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
 
@@ -38,8 +40,7 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 
 		if (!verification.verified) {
 			this.logger.warning(
-				`Block ${block.data.height.toLocaleString()} (${
-					block.data.id
+				`Block ${block.data.height.toLocaleString()} (${block.data.id
 				}) disregarded because verification failed`,
 			);
 

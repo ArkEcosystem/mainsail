@@ -18,6 +18,9 @@ export class Validator implements Contracts.Consensus.IValidator {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+
 	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
@@ -60,9 +63,10 @@ export class Validator implements Contracts.Consensus.IValidator {
 		lockProof?: Contracts.Crypto.IProposalLockProof,
 		validRound?: number,
 	): Promise<Contracts.Crypto.IProposal> {
+		const serializedProposedBlock = await this.blockSerializer.serializeProposed({ block, lockProof });
 		return this.messagesFactory.makeProposal(
 			{
-				block,
+				block: { block, lockProof, serialized: serializedProposedBlock.toString("hex") },
 				height,
 				round,
 				validRound,

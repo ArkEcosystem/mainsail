@@ -1,4 +1,4 @@
-import { IBlock } from "./block";
+import { IProposedBlock } from "./block";
 import { IKeyPair } from "./identities";
 
 export enum MessageType {
@@ -39,9 +39,8 @@ export interface IProposal {
 	readonly height: number;
 	readonly round: number;
 	readonly validRound?: number;
-	readonly block: IBlock;
+	readonly block: IProposedBlock;
 	readonly validatorIndex: number;
-	readonly lockProof?: IProposalLockProof;
 	readonly signature: string;
 	toSignatureData(): ISignatureProposalData;
 	toString(): string;
@@ -93,7 +92,7 @@ export interface IPrecommit {
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type IMakeProposalData = WithoutSignature<IProposalData & { block: IBlock }>;
+export type IMakeProposalData = WithoutSignature<IProposalData & { block: IProposedBlock }>;
 export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
 export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
 
@@ -130,5 +129,5 @@ export interface IMessageVerifier {
 	verifyProposal(proposal: IProposal): Promise<IMessageVerificationResult>;
 	verifyPrevote(prevote: IPrevote): Promise<IMessageVerificationResult>;
 	verifyPrecommit(precommit: IPrecommit): Promise<IMessageVerificationResult>;
-	verifyProposalLockProof(prevote: IPrevote, lockProof: IProposalLockProof,): Promise<IMessageVerificationResult>;
+	verifyProposalLockProof(prevote: ISignaturePrevoteData, lockProof: IProposalLockProof,): Promise<IMessageVerificationResult>;
 }

@@ -42,11 +42,14 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity, verifier }) => {
-		const block: Contracts.Crypto.IBlock = {
-			data: blockData,
-			header: { ...blockData },
-			serialized: serializedBlock,
-			transactions: [],
+		const block: Contracts.Crypto.IProposedBlock = {
+			block: {
+				data: blockData,
+				header: { ...blockData },
+				serialized: serializedBlock,
+				transactions: [],
+			},
+			serialized: ""
 		};
 
 		const proposal = await factory.makeProposal(

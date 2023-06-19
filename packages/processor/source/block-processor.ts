@@ -39,8 +39,10 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 				return false;
 			}
 
-			const block = roundState.getProposal()?.block;
-			Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+			const proposedBlock = roundState.getProposal()?.block;
+			Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
+
+			const { block } = proposedBlock;
 			await this.blockState.applyBlock(roundState.getWalletRepository(), block);
 
 			return true;

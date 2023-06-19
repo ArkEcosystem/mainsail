@@ -66,10 +66,10 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		};
 	}
 
-	public async verifyProposalLockProof(prevote: Contracts.Crypto.IPrevote, lockProof: Contracts.Crypto.IProposalLockProof): Promise<Contracts.Crypto.IMessageVerificationResult> {
+	public async verifyProposalLockProof(prevote: Contracts.Crypto.ISignaturePrevoteData, lockProof: Contracts.Crypto.IProposalLockProof): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 
-		const bytes = await this.serializer.serializePrevoteForSignature(prevote.toSignatureData());
+		const bytes = await this.serializer.serializePrevoteForSignature(prevote);
 		if (!(await this.#verifyAggSignature(lockProof.signature, lockProof.validators, bytes))) {
 			errors.push("invalid signature");
 		}

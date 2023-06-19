@@ -66,6 +66,29 @@ export interface IBlockCommit {
 }
 
 // TODO: clean up interfaces so we do not store everything in a redundant manner
+export interface IBlockLockProof {
+	readonly signature: string;
+	readonly validators: boolean[];
+}
+
+export interface IProposedBlock {
+	readonly block: IBlock;
+	readonly lockProof?: IBlockLockProof;
+	readonly serialized: string;
+}
+
+export interface IProposedBlockData {
+	readonly block: IBlockData;
+	readonly lockProof?: IBlockLockProof;
+	readonly serialized: string;
+}
+
+export interface IProposedBlockJson {
+	readonly block: IBlockJson;
+	readonly lockProof?: IBlockLockProof;
+	readonly serialized: string;
+}
+
 export interface ICommittedBlock {
 	readonly block: IBlock;
 	readonly commit: IBlockCommit;
@@ -85,6 +108,7 @@ export interface ICommittedBlockJson {
 }
 
 export type IBlockDataSerializable = Omit<IBlockData, "id">;
+export type IProposedBlockSerializable = Omit<IProposedBlock, "serialized">;
 export type ICommittedBlockSerializable = Omit<ICommittedBlock, "serialized">;
 
 export interface IBlockFactory {
@@ -98,6 +122,10 @@ export interface IBlockFactory {
 
 	fromData(data: IBlockData): Promise<IBlock>;
 
+	fromProposedBytes(buff: Buffer): Promise<IProposedBlock>;
+
+	fromProposedJson(json: IProposedBlockJson): Promise<IProposedBlock>;
+
 	fromCommittedBytes(buff: Buffer): Promise<ICommittedBlock>;
 
 	fromCommittedJson(json: ICommittedBlockJson): Promise<ICommittedBlock>;
@@ -108,6 +136,8 @@ export interface IBlockSerializer {
 
 	commitSize(): number;
 
+	lockProofSize(): number;
+
 	totalSize(block: IBlockDataSerializable): number;
 
 	serializeHeader(block: IBlockDataSerializable): Promise<Buffer>;
@@ -115,6 +145,10 @@ export interface IBlockSerializer {
 	serializeWithTransactions(block: IBlockDataSerializable): Promise<Buffer>;
 
 	serializeCommit(commit: IBlockCommit): Promise<Buffer>;
+
+	serializeLockProof(proof: IBlockLockProof): Promise<Buffer>;
+
+	serializeProposed(proposedBlock: IProposedBlockSerializable): Promise<Buffer>;
 
 	serializeFull(committedBlock: ICommittedBlockSerializable): Promise<Buffer>;
 }
@@ -128,6 +162,8 @@ export interface IBlockDeserializer {
 	deserializeHeader(serialized: Buffer): Promise<IBlockHeader>;
 
 	deserializeWithTransactions(serialized: Buffer): Promise<IBlockWithTransactions>;
+
+	deserializeLockProof(serialized: Buffer): Promise<IBlockLockProof>;
 
 	deserializeCommit(serialized: Buffer): Promise<IBlockCommit>;
 }

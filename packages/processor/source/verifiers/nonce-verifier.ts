@@ -12,8 +12,10 @@ export class NonceVerifier implements Contracts.BlockProcessor.Handler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal()?.block;
-		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+		const proposedBlock = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
+
+		const { block } = proposedBlock;
 
 		const nonceBySender = {};
 

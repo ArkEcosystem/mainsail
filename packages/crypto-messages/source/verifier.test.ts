@@ -28,8 +28,8 @@ describe<{
 		context.verifier = context.sandbox.app.resolve(Verifier);
 	});
 
-	it("#verifyProposal - should correctly verify", async ({ factory, verifier }) => {
-		const proposal = new Proposal(proposalData.height, proposalData.round, { header: blockData } as Contracts.Crypto.IBlock, proposalData.validRound, proposalData.validatorIndex, proposalData.lockProof, proposalData.signature);
+	it("#verifyProposal - should correctly verify", async ({ verifier }) => {
+		const proposal = new Proposal(proposalData.height, proposalData.round, { block: { header: blockData } } as Contracts.Crypto.IProposedBlock, proposalData.validRound, proposalData.validatorIndex, proposalData.signature);
 		const { verified, errors } = await verifier.verifyProposal(proposal);
 
 		assert.equal(errors, []);

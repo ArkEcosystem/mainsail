@@ -24,16 +24,16 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakeProposalData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IProposal> {
-		const bytes = await this.serializer.serializeProposalForSignature({ height: data.height, round: data.round, blockId: data.block.header.id });
+		const bytes = await this.serializer.serializeProposalForSignature({ height: data.height, round: data.round, blockId: data.block.block.header.id });
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorIndex, data.lockProof, signature);
+		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorIndex, signature);
 	}
 
 	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const data = await this.deserializer.deserializeProposal(bytes);
-		const block = await this.blockFactory.fromHex(data.block.serialized);
+		const block = await this.blockFactory.fromProposedBytes(Buffer.from(data.block.serialized, "hex"));
 
-		return new Proposal(data.height, data.round, block, data.validRound, data.validatorIndex, data.lockProof, data.signature);
+		return new Proposal(data.height, data.round, block, data.validRound, data.validatorIndex, data.signature);
 	}
 
 	public async makePrevote(
