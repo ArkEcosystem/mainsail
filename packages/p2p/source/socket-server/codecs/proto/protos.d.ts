@@ -2975,6 +2975,9 @@ export namespace shared {
 
         /** Headers height */
         height?: (number|null);
+
+        /** Headers round */
+        round?: (number|null);
     }
 
     /** Represents a Headers. */
@@ -2991,6 +2994,9 @@ export namespace shared {
 
         /** Headers height. */
         public height: number;
+
+        /** Headers round. */
+        public round: number;
 
         /**
          * Creates a new Headers instance using the specified properties.

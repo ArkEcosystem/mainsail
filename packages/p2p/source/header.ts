@@ -4,6 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 type HeaderData = {
 	version: string;
 	height: number;
+	round: number;
 }
 
 @injectable()
@@ -16,6 +17,7 @@ export class Header {
 
 		return {
 			height: consensus.getHeight(),
+			round: consensus.getRound(),
 			version: this.app.version(),
 		};
 	}

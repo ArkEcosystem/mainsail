@@ -6956,6 +6956,7 @@ $root.shared = (function() {
          * @interface IHeaders
          * @property {string|null} [version] Headers version
          * @property {number|null} [height] Headers height
+         * @property {number|null} [round] Headers round
          */
 
         /**
@@ -6990,6 +6991,14 @@ $root.shared = (function() {
         Headers.prototype.height = 0;
 
         /**
+         * Headers round.
+         * @member {number} round
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.round = 0;
+
+        /**
          * Creates a new Headers instance using the specified properties.
          * @function create
          * @memberof shared.Headers
@@ -7017,6 +7026,8 @@ $root.shared = (function() {
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
             if (message.height != null && Object.hasOwnProperty.call(message, "height"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);
+            if (message.round != null && Object.hasOwnProperty.call(message, "round"))
+                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
             return writer;
         };
 
@@ -7057,6 +7068,10 @@ $root.shared = (function() {
                     }
                 case 2: {
                         message.height = reader.uint32();
+                        break;
+                    }
+                case 3: {
+                        message.round = reader.uint32();
                         break;
                     }
                 default:
@@ -7100,6 +7115,9 @@ $root.shared = (function() {
             if (message.height != null && message.hasOwnProperty("height"))
                 if (!$util.isInteger(message.height))
                     return "height: integer expected";
+            if (message.round != null && message.hasOwnProperty("round"))
+                if (!$util.isInteger(message.round))
+                    return "round: integer expected";
             return null;
         };
 
@@ -7119,6 +7137,8 @@ $root.shared = (function() {
                 message.version = String(object.version);
             if (object.height != null)
                 message.height = object.height >>> 0;
+            if (object.round != null)
+                message.round = object.round >>> 0;
             return message;
         };
 
@@ -7138,11 +7158,14 @@ $root.shared = (function() {
             if (options.defaults) {
                 object.version = "";
                 object.height = 0;
+                object.round = 0;
             }
             if (message.version != null && message.hasOwnProperty("version"))
                 object.version = message.version;
             if (message.height != null && message.hasOwnProperty("height"))
                 object.height = message.height;
+            if (message.round != null && message.hasOwnProperty("round"))
+                object.round = message.round;
             return object;
         };
 
