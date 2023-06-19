@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { RoundState } from "./round-state";
 
 @injectable()
-export class RoundStateRepository {
+export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepository {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 

@@ -33,6 +33,10 @@ export interface IRoundState {
 	getProposedCommitBlock(): Promise<ICommittedBlock>;
 }
 
+export interface IRoundStateRepository {
+	getRoundState(height: number, round: number): Promise<IRoundState>;
+}
+
 export interface IConsensusService {
 	run(): Promise<void>;
 	getHeight(): number;
