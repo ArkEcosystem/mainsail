@@ -2984,6 +2984,9 @@ export namespace shared {
 
         /** Headers validatorsSignedPrevote */
         validatorsSignedPrevote?: (boolean[]|null);
+
+        /** Headers validatorsSignedPrecommit */
+        validatorsSignedPrecommit?: (boolean[]|null);
     }
 
     /** Represents a Headers. */
@@ -3009,6 +3012,9 @@ export namespace shared {
 
         /** Headers validatorsSignedPrevote. */
         public validatorsSignedPrevote: boolean[];
+
+        /** Headers validatorsSignedPrecommit. */
+        public validatorsSignedPrecommit: boolean[];
 
         /**
          * Creates a new Headers instance using the specified properties.

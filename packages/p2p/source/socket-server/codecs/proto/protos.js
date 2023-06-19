@@ -6959,6 +6959,7 @@ $root.shared = (function() {
          * @property {number|null} [round] Headers round
          * @property {number|null} [step] Headers step
          * @property {Array.<boolean>|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
+         * @property {Array.<boolean>|null} [validatorsSignedPrecommit] Headers validatorsSignedPrecommit
          */
 
         /**
@@ -6971,6 +6972,7 @@ $root.shared = (function() {
          */
         function Headers(properties) {
             this.validatorsSignedPrevote = [];
+            this.validatorsSignedPrecommit = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -7018,6 +7020,14 @@ $root.shared = (function() {
         Headers.prototype.validatorsSignedPrevote = $util.emptyArray;
 
         /**
+         * Headers validatorsSignedPrecommit.
+         * @member {Array.<boolean>} validatorsSignedPrecommit
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.validatorsSignedPrecommit = $util.emptyArray;
+
+        /**
          * Creates a new Headers instance using the specified properties.
          * @function create
          * @memberof shared.Headers
@@ -7053,6 +7063,12 @@ $root.shared = (function() {
                 writer.uint32(/* id 5, wireType 2 =*/42).fork();
                 for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
                     writer.bool(message.validatorsSignedPrevote[i]);
+                writer.ldelim();
+            }
+            if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
+                writer.uint32(/* id 6, wireType 2 =*/50).fork();
+                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                    writer.bool(message.validatorsSignedPrecommit[i]);
                 writer.ldelim();
             }
             return writer;
@@ -7116,6 +7132,17 @@ $root.shared = (function() {
                             message.validatorsSignedPrevote.push(reader.bool());
                         break;
                     }
+                case 6: {
+                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
+                            message.validatorsSignedPrecommit = [];
+                        if ((tag & 7) === 2) {
+                            var end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.validatorsSignedPrecommit.push(reader.bool());
+                        } else
+                            message.validatorsSignedPrecommit.push(reader.bool());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -7170,6 +7197,13 @@ $root.shared = (function() {
                     if (typeof message.validatorsSignedPrevote[i] !== "boolean")
                         return "validatorsSignedPrevote: boolean[] expected";
             }
+            if (message.validatorsSignedPrecommit != null && message.hasOwnProperty("validatorsSignedPrecommit")) {
+                if (!Array.isArray(message.validatorsSignedPrecommit))
+                    return "validatorsSignedPrecommit: array expected";
+                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                    if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
+                        return "validatorsSignedPrecommit: boolean[] expected";
+            }
             return null;
         };
 
@@ -7200,6 +7234,13 @@ $root.shared = (function() {
                 for (var i = 0; i < object.validatorsSignedPrevote.length; ++i)
                     message.validatorsSignedPrevote[i] = Boolean(object.validatorsSignedPrevote[i]);
             }
+            if (object.validatorsSignedPrecommit) {
+                if (!Array.isArray(object.validatorsSignedPrecommit))
+                    throw TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");
+                message.validatorsSignedPrecommit = [];
+                for (var i = 0; i < object.validatorsSignedPrecommit.length; ++i)
+                    message.validatorsSignedPrecommit[i] = Boolean(object.validatorsSignedPrecommit[i]);
+            }
             return message;
         };
 
@@ -7216,8 +7257,10 @@ $root.shared = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.arrays || options.defaults)
+            if (options.arrays || options.defaults) {
                 object.validatorsSignedPrevote = [];
+                object.validatorsSignedPrecommit = [];
+            }
             if (options.defaults) {
                 object.version = "";
                 object.height = 0;
@@ -7236,6 +7279,11 @@ $root.shared = (function() {
                 object.validatorsSignedPrevote = [];
                 for (var j = 0; j < message.validatorsSignedPrevote.length; ++j)
                     object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
+            }
+            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
+                object.validatorsSignedPrecommit = [];
+                for (var j = 0; j < message.validatorsSignedPrecommit.length; ++j)
+                    object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
             }
             return object;
         };

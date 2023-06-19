@@ -7,6 +7,7 @@ type HeaderData = {
 	round: number;
 	step: number;
 	validatorsSignedPrevote: boolean[];
+	validatorsSignedPrecommit: boolean[];
 }
 
 @injectable()
@@ -28,6 +29,7 @@ export class Header {
 			height,
 			round,
 			step,
+			validatorsSignedPrecommit: roundState.getValidatorsSignedPrecommit(),
 			validatorsSignedPrevote: roundState.getValidatorsSignedPrevote(),
 			version: this.app.version(),
 		};
