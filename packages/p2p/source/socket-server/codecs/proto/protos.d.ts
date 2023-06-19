@@ -2972,6 +2972,9 @@ export namespace shared {
 
         /** Headers version */
         version?: (string|null);
+
+        /** Headers height */
+        height?: (number|null);
     }
 
     /** Represents a Headers. */
@@ -2985,6 +2988,9 @@ export namespace shared {
 
         /** Headers version. */
         public version: string;
+
+        /** Headers height. */
+        public height: number;
 
         /**
          * Creates a new Headers instance using the specified properties.

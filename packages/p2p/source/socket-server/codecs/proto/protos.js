@@ -6955,6 +6955,7 @@ $root.shared = (function() {
          * @memberof shared
          * @interface IHeaders
          * @property {string|null} [version] Headers version
+         * @property {number|null} [height] Headers height
          */
 
         /**
@@ -6979,6 +6980,14 @@ $root.shared = (function() {
          * @instance
          */
         Headers.prototype.version = "";
+
+        /**
+         * Headers height.
+         * @member {number} height
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.height = 0;
 
         /**
          * Creates a new Headers instance using the specified properties.
@@ -7006,6 +7015,8 @@ $root.shared = (function() {
                 writer = $Writer.create();
             if (message.version != null && Object.hasOwnProperty.call(message, "version"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
+            if (message.height != null && Object.hasOwnProperty.call(message, "height"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);
             return writer;
         };
 
@@ -7042,6 +7053,10 @@ $root.shared = (function() {
                 switch (tag >>> 3) {
                 case 1: {
                         message.version = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.height = reader.uint32();
                         break;
                     }
                 default:
@@ -7082,6 +7097,9 @@ $root.shared = (function() {
             if (message.version != null && message.hasOwnProperty("version"))
                 if (!$util.isString(message.version))
                     return "version: string expected";
+            if (message.height != null && message.hasOwnProperty("height"))
+                if (!$util.isInteger(message.height))
+                    return "height: integer expected";
             return null;
         };
 
@@ -7099,6 +7117,8 @@ $root.shared = (function() {
             var message = new $root.shared.Headers();
             if (object.version != null)
                 message.version = String(object.version);
+            if (object.height != null)
+                message.height = object.height >>> 0;
             return message;
         };
 
@@ -7115,10 +7135,14 @@ $root.shared = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 object.version = "";
+                object.height = 0;
+            }
             if (message.version != null && message.hasOwnProperty("version"))
                 object.version = message.version;
+            if (message.height != null && message.hasOwnProperty("height"))
+                object.height = message.height;
             return object;
         };
 
