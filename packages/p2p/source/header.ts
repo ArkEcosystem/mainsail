@@ -1,4 +1,4 @@
-import { inject,injectable } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 type HeaderData = {
@@ -8,7 +8,7 @@ type HeaderData = {
 	step: number;
 	validatorsSignedPrevote: boolean[];
 	validatorsSignedPrecommit: boolean[];
-}
+};
 
 @injectable()
 export class Header {
@@ -17,7 +17,9 @@ export class Header {
 
 	public async getHeader(): Promise<HeaderData> {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(Identifiers.Consensus.RoundStateRepository);
+		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
+			Identifiers.Consensus.RoundStateRepository,
+		);
 
 		const height = consensus.getHeight();
 		const round = consensus.getRound();

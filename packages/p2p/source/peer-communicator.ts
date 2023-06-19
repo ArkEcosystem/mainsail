@@ -301,7 +301,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				codec.request.serialize({
 					...payload,
 					headers: {
-						...await this.header.getHeader()
+						...(await this.header.getHeader()),
 					},
 				}),
 				timeout,
