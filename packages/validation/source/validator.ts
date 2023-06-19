@@ -1,6 +1,7 @@
 import { injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import Ajv, { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv/dist/2020";
+import formats from "ajv-formats";
 import keywords from "ajv-keywords";
 
 @injectable()
@@ -15,6 +16,7 @@ export class Validator implements Contracts.Crypto.IValidator {
 		});
 
 		keywords(this.#ajv);
+		formats(this.#ajv);
 	}
 
 	public validate<T = any>(
