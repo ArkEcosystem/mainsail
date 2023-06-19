@@ -2981,6 +2981,9 @@ export namespace shared {
 
         /** Headers step */
         step?: (number|null);
+
+        /** Headers validatorsSignedPrevote */
+        validatorsSignedPrevote?: (boolean[]|null);
     }
 
     /** Represents a Headers. */
@@ -3003,6 +3006,9 @@ export namespace shared {
 
         /** Headers step. */
         public step: number;
+
+        /** Headers validatorsSignedPrevote. */
+        public validatorsSignedPrevote: boolean[];
 
         /**
          * Creates a new Headers instance using the specified properties.

@@ -6958,6 +6958,7 @@ $root.shared = (function() {
          * @property {number|null} [height] Headers height
          * @property {number|null} [round] Headers round
          * @property {number|null} [step] Headers step
+         * @property {Array.<boolean>|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
          */
 
         /**
@@ -6969,6 +6970,7 @@ $root.shared = (function() {
          * @param {shared.IHeaders=} [properties] Properties to set
          */
         function Headers(properties) {
+            this.validatorsSignedPrevote = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -7008,6 +7010,14 @@ $root.shared = (function() {
         Headers.prototype.step = 0;
 
         /**
+         * Headers validatorsSignedPrevote.
+         * @member {Array.<boolean>} validatorsSignedPrevote
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.validatorsSignedPrevote = $util.emptyArray;
+
+        /**
          * Creates a new Headers instance using the specified properties.
          * @function create
          * @memberof shared.Headers
@@ -7039,6 +7049,12 @@ $root.shared = (function() {
                 writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
             if (message.step != null && Object.hasOwnProperty.call(message, "step"))
                 writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
+            if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
+                writer.uint32(/* id 5, wireType 2 =*/42).fork();
+                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                    writer.bool(message.validatorsSignedPrevote[i]);
+                writer.ldelim();
+            }
             return writer;
         };
 
@@ -7089,6 +7105,17 @@ $root.shared = (function() {
                         message.step = reader.uint32();
                         break;
                     }
+                case 5: {
+                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
+                            message.validatorsSignedPrevote = [];
+                        if ((tag & 7) === 2) {
+                            var end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.validatorsSignedPrevote.push(reader.bool());
+                        } else
+                            message.validatorsSignedPrevote.push(reader.bool());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -7136,6 +7163,13 @@ $root.shared = (function() {
             if (message.step != null && message.hasOwnProperty("step"))
                 if (!$util.isInteger(message.step))
                     return "step: integer expected";
+            if (message.validatorsSignedPrevote != null && message.hasOwnProperty("validatorsSignedPrevote")) {
+                if (!Array.isArray(message.validatorsSignedPrevote))
+                    return "validatorsSignedPrevote: array expected";
+                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                    if (typeof message.validatorsSignedPrevote[i] !== "boolean")
+                        return "validatorsSignedPrevote: boolean[] expected";
+            }
             return null;
         };
 
@@ -7159,6 +7193,13 @@ $root.shared = (function() {
                 message.round = object.round >>> 0;
             if (object.step != null)
                 message.step = object.step >>> 0;
+            if (object.validatorsSignedPrevote) {
+                if (!Array.isArray(object.validatorsSignedPrevote))
+                    throw TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
+                message.validatorsSignedPrevote = [];
+                for (var i = 0; i < object.validatorsSignedPrevote.length; ++i)
+                    message.validatorsSignedPrevote[i] = Boolean(object.validatorsSignedPrevote[i]);
+            }
             return message;
         };
 
@@ -7175,6 +7216,8 @@ $root.shared = (function() {
             if (!options)
                 options = {};
             var object = {};
+            if (options.arrays || options.defaults)
+                object.validatorsSignedPrevote = [];
             if (options.defaults) {
                 object.version = "";
                 object.height = 0;
@@ -7189,6 +7232,11 @@ $root.shared = (function() {
                 object.round = message.round;
             if (message.step != null && message.hasOwnProperty("step"))
                 object.step = message.step;
+            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
+                object.validatorsSignedPrevote = [];
+                for (var j = 0; j < message.validatorsSignedPrevote.length; ++j)
+                    object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
+            }
             return object;
         };
 

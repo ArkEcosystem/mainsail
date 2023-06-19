@@ -6,6 +6,7 @@ type HeaderData = {
 	height: number;
 	round: number;
 	step: number;
+	validatorsSignedPrevote: boolean[];
 }
 
 @injectable()
@@ -15,11 +16,19 @@ export class Header {
 
 	public async getHeader(): Promise<HeaderData> {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
+		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(Identifiers.Consensus.RoundStateRepository);
+
+		const height = consensus.getHeight();
+		const round = consensus.getRound();
+		const step = consensus.getStep();
+
+		const roundState = await roundStateRepo.getRoundState(height, round);
 
 		return {
-			height: consensus.getHeight(),
-			round: consensus.getRound(),
-			step: consensus.getStep(),
+			height,
+			round,
+			step,
+			validatorsSignedPrevote: roundState.getValidatorsSignedPrevote(),
 			version: this.app.version(),
 		};
 	}
