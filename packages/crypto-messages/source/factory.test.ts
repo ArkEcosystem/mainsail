@@ -4,7 +4,20 @@ import crypto from "../../core/bin/config/testnet/crypto.json";
 import validatorsJson from "../../core/bin/config/testnet/validators.json";
 import { describe, Factories, Sandbox } from "../../test-framework";
 import { Types } from "../../test-framework/source/factories";
-import { blockData, serializedBlock } from "../test/fixtures/proposal";
+import {
+	blockData,
+	precommitData,
+	precommitDataNoBlock,
+	prevoteData,
+	prevoteDataNoBlock,
+	proposalData,
+	serializedBlock,
+	serializedPrecommit,
+	serializedPrecommitNoBlock,
+	serializedPrevote,
+	serializedPrevoteNoBlock,
+	serializedProposal,
+} from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { prepareWallet } from "../test/helpers/prepare-wallet";
 import { MessageFactory } from "./factory";
@@ -42,11 +55,14 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity, verifier }) => {
-		const block: Contracts.Crypto.IBlock = {
-			data: blockData,
-			header: { ...blockData },
-			serialized: serializedBlock,
-			transactions: [],
+		const block: Contracts.Crypto.IProposedBlock = {
+			block: {
+				data: blockData,
+				header: { ...blockData },
+				serialized: serializedBlock,
+				transactions: [],
+			},
+			serialized: "",
 		};
 
 		const proposal = await factory.makeProposal(
@@ -61,10 +77,10 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"8de4ef3411e8ad5d90ca57077a1dabe1c0a680d69e621d182e618678fccd47ec18d6cca8f6e711f9329c70d8253c5a33032068e766004ea161792fe3ea17ce7e93307e9045e2586a4f06407224a6ee9faab6a421b28b715d77a9ec5b8ef6837d",
+			"a0e335c16132d3049c10ae2d013b8acd4404c79894787578fef37b8a5a0844bda59cdd13f24f19eb7908763b6f42184f010747c8f3011b0abfb907d830fbb6336e2151a72df426215e291bc79a4c194b4843eb260d5fb1081f3460feba09d226",
 		);
 
-		const { verified, errors } = await verifier.verifyProposal(proposal.toData());
+		const { verified, errors } = await verifier.verifyProposal(proposal);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -83,10 +99,10 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"ad61353c7ab1a22cf92b350ecfc0d7ba1989f3d8212ed4fed4beee88491fd07f57e819ec066071388a45e92c5ec2128a0885284ad9691b9f5bf4277a8e2e60b37c4bb75d10674f20fa11547d201b168d8ff4fbefa1aba936187529a0e6ca4875",
+			"b58caa80f1fefffd2fc890fc21462a021d3cb3575368d6e349b9bbff9d8425dc407f915e81af33f5b20c8335d4ec02c3159463bd05a218feb0e4ca2ba368040cdfdf440de3a3b73c7e4e6820196f208ca81cea992fada3d29812339e2e31a77c",
 		);
 
-		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
+		const { verified, errors } = await verifier.verifyPrecommit(precommit);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -105,10 +121,10 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"aa8647bcb0168beded3a5fa3f7cde55c25d4d4202a5619e2dcda420481e8966954fb32f840335b67d4ad4f1df0101c2d15ceadb7f92fd1659fa6ba4f22facc44c339c0d187f92bb6501d71a7044500a15180495bea31d90a0bbf28fa62590bda",
+			"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
 		);
 
-		const { verified, errors } = await verifier.verifyPrecommit(precommit.toData());
+		const { verified, errors } = await verifier.verifyPrecommit(precommit);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -127,10 +143,10 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"98efe3774344600672805398fceed75ced4ca89a4a7b1b66273ff2017a9b22b277e7d54eacb01c114d617376a2f3b41e0287ed450f689e82c475c36ed003ca0b2b4cafaa7282eff1cca3faba287c4d752c313fc5d791911f24d46d006fc93b30",
+			"aa33ad938e8d8ef0446faa6548e2bd57f0be6cc8f924ea31d4432f0de0a8a76d24cf277af818098a289b28343d724f61127595eb1258b68487abf4921af7ddb1ef4313aa8307b6721f916b6ee1385c722d773edb8f34864015369f7b9c7bb14e",
 		);
 
-		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
+		const { verified, errors } = await verifier.verifyPrevote(prevote);
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
@@ -149,11 +165,43 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"955d77cfaec08b05504654bf2593c36ac515a3c2f5776ce4d5ab6472b2f8b60c24fdf435439e8758dbee24bc67d4110d114e600b6a90b9d814a051c6bd2578e1081c2576d4a5938343555d78cf83042d3e4ece474cfce00b00d25bff4c4beb2a",
+			"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",
 		);
 
-		const { verified, errors } = await verifier.verifyPrevote(prevote.toData());
+		const { verified, errors } = await verifier.verifyPrevote(prevote);
 		assert.equal(errors, []);
 		assert.true(verified);
+	});
+
+	it.skip("#makeProposalFromBytes - should be ok", async ({ factory, identity, verifier }) => {
+		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
+
+		assert.equal(proposal.toData(), proposalData);
+	});
+
+	it("#makePrevoteFromBytes - should be ok", async ({ factory, identity, verifier }) => {
+		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevote, "hex"));
+
+		assert.equal(prevote.toData(), prevoteData);
+	});
+
+	it("#makePrevoteFromBytes - should be ok with no block", async ({ factory, identity, verifier }) => {
+		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
+
+		console.log(prevote.toSignatureData());
+
+		assert.equal(prevote.toData(), prevoteDataNoBlock);
+	});
+
+	it("#makePrecommitFromBytes - should be ok", async ({ factory, identity, verifier }) => {
+		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommit, "hex"));
+
+		assert.equal(precommit.toData(), precommitData);
+	});
+
+	it("#makePrecommitFromBytes - should be ok with no block", async ({ factory, identity, verifier }) => {
+		const precommit = await factory.makePrecommitFromBytes(Buffer.from(serializedPrecommitNoBlock, "hex"));
+
+		assert.equal(precommit.toData(), precommitDataNoBlock);
 	});
 });

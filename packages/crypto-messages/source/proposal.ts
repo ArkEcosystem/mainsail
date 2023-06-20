@@ -4,14 +4,14 @@ export class Proposal implements Contracts.Crypto.IProposal {
 	#height: number;
 	#round: number;
 	#validRound?: number;
-	#block: Contracts.Crypto.IBlock;
+	#block: Contracts.Crypto.IProposedBlock;
 	#validatorIndex: number;
 	#signature: string;
 
 	constructor(
 		height: number,
 		round: number,
-		block: Contracts.Crypto.IBlock,
+		block: Contracts.Crypto.IProposedBlock,
 		validRound: number | undefined,
 		validatorIndex: number,
 		signature: string,
@@ -36,7 +36,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		return this.#validRound;
 	}
 
-	get block(): Contracts.Crypto.IBlock {
+	get block(): Contracts.Crypto.IProposedBlock {
 		return this.#block;
 	}
 
@@ -50,11 +50,19 @@ export class Proposal implements Contracts.Crypto.IProposal {
 
 	toString(): string {
 		return JSON.stringify({
-			block: this.#block.data.id,
+			block: this.#block.block.header.id,
 			height: this.#height,
 			round: this.#round,
 			validatorIndex: this.#validatorIndex,
 		});
+	}
+
+	toSignatureData(): Contracts.Crypto.ISignatureProposalData {
+		return {
+			blockId: this.#block.block.header.id,
+			height: this.#height,
+			round: this.#round,
+		};
 	}
 
 	toData(): Contracts.Crypto.IProposalData {

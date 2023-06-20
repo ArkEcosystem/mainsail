@@ -1,4 +1,4 @@
-import { IBlock } from "./block";
+import { IProposedBlock } from "./block";
 import { IKeyPair } from "./identities";
 
 export enum MessageType {
@@ -6,62 +6,85 @@ export enum MessageType {
 	Precommit = 2,
 }
 
-export interface IProposalData {
-	height: number;
-	round: number;
-	validRound?: number;
-	block: { serialized: string };
-	validatorIndex: number;
-	signature: string;
+export interface IProposalLockProof {
+	readonly signature: string;
+	readonly validators: boolean[];
 }
 
+export interface IProposalData {
+	readonly height: number;
+	readonly round: number;
+	readonly validRound?: number;
+	readonly block: { serialized: string };
+	readonly validatorIndex: number;
+	readonly lockProof?: IProposalLockProof;
+	readonly signature: string;
+}
+
+export interface ISignatureMessageData {
+	readonly type: MessageType;
+	readonly height: number;
+	readonly round: number;
+	readonly blockId: string;
+}
+
+export type HasBlockId = { blockId: string };
+export type WithoutBlockId<T> = Omit<T, "blockId">;
+export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
+export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> {}
+export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
+
 export interface IProposal {
-	height: number;
-	round: number;
-	validRound?: number;
-	block: IBlock;
-	validatorIndex: number;
-	signature: string;
+	readonly height: number;
+	readonly round: number;
+	readonly validRound?: number;
+	readonly block: IProposedBlock;
+	readonly validatorIndex: number;
+	readonly signature: string;
+	toSignatureData(): ISignatureProposalData;
 	toString(): string;
 	// toData(): IProposalData;
 }
 
 export interface IPrevoteData {
-	type: MessageType;
-	height: number;
-	round: number;
-	blockId?: string;
-	validatorIndex: number;
-	signature: string;
+	readonly type: MessageType;
+	readonly height: number;
+	readonly round: number;
+	readonly blockId?: string;
+	readonly validatorIndex: number;
+	readonly signature: string;
 }
 
 export interface IPrevote {
-	type: MessageType;
-	height: number;
-	round: number;
-	blockId?: string;
-	validatorIndex: number;
-	signature: string;
+	readonly type: MessageType;
+	readonly height: number;
+	readonly round: number;
+	readonly blockId?: string;
+	readonly validatorIndex: number;
+	readonly signature: string;
+	toSignatureData(): ISignaturePrevoteData;
 	toString(): string;
 	// toData(): IPrevoteData;
 }
 
 export interface IPrecommitData {
-	type: MessageType;
-	height: number;
-	round: number;
-	blockId?: string;
-	validatorIndex: number;
-	signature: string;
+	readonly type: MessageType;
+	readonly height: number;
+	readonly round: number;
+	readonly blockId?: string;
+	readonly validatorIndex: number;
+	readonly signature: string;
 }
 
 export interface IPrecommit {
-	type: MessageType;
-	height: number;
-	round: number;
-	blockId?: string;
-	validatorIndex: number;
-	signature: string;
+	readonly type: MessageType;
+	readonly height: number;
+	readonly round: number;
+	readonly blockId?: string;
+	readonly validatorIndex: number;
+	readonly signature: string;
+	toSignatureData(): ISignaturePrecommitData;
 	toString(): string;
 	// toData(): IPrecommitData;
 }
@@ -69,7 +92,7 @@ export interface IPrecommit {
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type IMakeProposalData = WithoutSignature<IProposalData & { block: IBlock }>;
+export type IMakeProposalData = WithoutSignature<IProposalData & { block: IProposedBlock }>;
 export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
 export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
 
@@ -82,17 +105,13 @@ export interface IMessageFactory {
 	makePrecommitFromBytes(data: Buffer): Promise<IPrecommit>;
 }
 
-export type IMessageSerializableProposal = OptionalSignature<IProposalData>;
-export type IMessageSerializablePrevote = OptionalSignature<IPrevoteData>;
-export type IMessageSerializablePrecommit = OptionalSignature<IPrecommitData>;
-
-export interface IMessageSerializeOptions {
-	excludeSignature?: boolean;
-}
 export interface IMessageSerializer {
-	serializeProposal(proposal: IMessageSerializableProposal, options?: IMessageSerializeOptions): Promise<Buffer>;
-	serializePrevote(prevote: IMessageSerializablePrevote, options?: IMessageSerializeOptions): Promise<Buffer>;
-	serializePrecommit(precommit: IMessageSerializablePrecommit, options?: IMessageSerializeOptions): Promise<Buffer>;
+	serializeProposal(proposal: IProposalData): Promise<Buffer>;
+	serializeProposalForSignature(proposal: ISignatureProposalData): Promise<Buffer>;
+	serializePrevote(prevote: IPrevoteData): Promise<Buffer>;
+	serializePrevoteForSignature(prevote: ISignaturePrevoteData): Promise<Buffer>;
+	serializePrecommit(precommit: IPrecommitData): Promise<Buffer>;
+	serializePrecommitForSignature(precommit: ISignaturePrecommitData): Promise<Buffer>;
 }
 
 export interface IMessageDeserializer {
@@ -102,12 +121,16 @@ export interface IMessageDeserializer {
 }
 
 export interface IMessageVerificationResult {
-	verified: boolean;
-	errors: string[];
+	readonly verified: boolean;
+	readonly errors: string[];
 }
 
 export interface IMessageVerifier {
-	verifyProposal(proposal: IProposalData): Promise<IMessageVerificationResult>;
-	verifyPrevote(prevote: IPrevoteData): Promise<IMessageVerificationResult>;
-	verifyPrecommit(precommit: IPrecommitData): Promise<IMessageVerificationResult>;
+	verifyProposal(proposal: IProposal): Promise<IMessageVerificationResult>;
+	verifyPrevote(prevote: IPrevote): Promise<IMessageVerificationResult>;
+	verifyPrecommit(precommit: IPrecommit): Promise<IMessageVerificationResult>;
+	verifyProposalLockProof(
+		prevote: ISignaturePrevoteData,
+		lockProof: IProposalLockProof,
+	): Promise<IMessageVerificationResult>;
 }

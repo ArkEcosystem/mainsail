@@ -26,7 +26,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 	private readonly consensusSignatureSerializer!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly transactionUtils: any;
+	private readonly transactionUtils!: Contracts.Crypto.ITransactionUtils;
 
 	@inject(Identifiers.Cryptography.Size.HASH256)
 	private readonly hashSize!: number;
@@ -86,8 +86,15 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-				if (value === undefined) {
-					result.writeBytes(Buffer.alloc(this.hashSize));
+				if (schema.optional) {
+					// When marked as optional, prepend a length byte
+					// to prevent having to pad the buffer for the full hash size.
+					const blockId = value ?? "";
+					result.writeUint8(blockId.length / 2);
+
+					if (blockId) {
+						result.writeBytes(Buffer.from(blockId, "hex"));
+					}
 				} else {
 					result.writeBytes(Buffer.from(value, "hex"));
 				}
@@ -195,7 +202,20 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-				target[property] = source.readBytes(schema.size ?? this.hashSize).toString("hex");
+				// If the blockId is marked as optional, read the length first, otherwise
+				// the length is equal to the hashSize.
+				let blockId: string | undefined;
+				if (schema.optional) {
+					const blockIdLength = source.readUint8();
+					if (blockIdLength > 0) {
+						blockId = source.readBytes(blockIdLength).toString("hex");
+					}
+				} else {
+					blockId = source.readBytes(this.hashSize).toString("hex");
+				}
+
+				target[property] = blockId;
+
 				continue;
 			}
 

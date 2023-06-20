@@ -23,8 +23,10 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const block = roundState.getProposal()?.block;
-		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+		const proposedBlock = roundState.getProposal()?.block;
+		Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
+
+		const { block } = proposedBlock;
 
 		try {
 			// await this.databaseInteraction.applyBlock(block);

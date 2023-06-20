@@ -21,11 +21,11 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				round: {
 					type: "uint32",
 				},
-				validatorIndex: {
-					type: "uint8",
-				},
 				block: {
 					type: "hex",
+				},
+				validatorIndex: {
+					type: "uint8",
 				},
 				signature: {
 					type: "consensusSignature",
@@ -52,11 +52,12 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				round: {
 					type: "uint32",
 				},
-				validatorIndex: {
-					type: "uint8",
-				},
 				blockId: {
 					type: "blockId",
+					optional: true,
+				},
+				validatorIndex: {
+					type: "uint8",
 				},
 				signature: {
 					type: "consensusSignature",
@@ -83,11 +84,12 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				round: {
 					type: "uint32",
 				},
-				validatorIndex: {
-					type: "uint8",
-				},
 				blockId: {
 					type: "blockId",
+					optional: true,
+				},
+				validatorIndex: {
+					type: "uint8",
 				},
 				signature: {
 					type: "consensusSignature",
