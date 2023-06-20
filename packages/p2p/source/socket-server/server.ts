@@ -13,7 +13,7 @@ import {
 	GetBlocksRoute,
 	GetCommonBlocksRoute,
 	GetPeersRoute,
-	GetStausRoute,
+	GetStatusRoute,
 	PostBlockRoute,
 	PostPrecommitRoute,
 	PostPrevoteRoute,
@@ -52,7 +52,7 @@ export class Server {
 		this.app.resolve(GetBlocksRoute).register(this.server);
 		this.app.resolve(GetCommonBlocksRoute).register(this.server);
 		this.app.resolve(GetPeersRoute).register(this.server);
-		this.app.resolve(GetStausRoute).register(this.server);
+		this.app.resolve(GetStatusRoute).register(this.server);
 		this.app.resolve(PostBlockRoute).register(this.server);
 		this.app.resolve(PostTransactionsRoute).register(this.server);
 		this.app.resolve(PostProposalRoute).register(this.server);
@@ -96,7 +96,7 @@ export class Server {
 	}
 
 	public async route(routes: ServerRoute | ServerRoute[]): Promise<void> {
-		await this.server.route(routes);
+		this.server.route(routes);
 	}
 
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
