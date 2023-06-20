@@ -22,8 +22,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		return this.#validators;
 	}
 
-	public async getValidatorPublicKeyByIndex(index: number): Promise<string> {
-		return this.#validators[index].getAttribute("consensus.publicKey");
+	public getValidatorPublicKeyByIndex(index: number): string {
+		return this.#validators[index].getAttribute<string>("consensus.publicKey");
 	}
 
 	public getValidatorIndexByPublicKey(publicKey: string): number {
