@@ -73,7 +73,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // height
 				4 + // round
 				1 + // validatorIndex
-				this.hashSize + // blockId
+				1 + (precommit.blockId ? this.hashSize : 0) + // blockId
 				this.signatureSize, // signature
 			skip: 0,
 			schema: {
@@ -100,13 +100,39 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
+	public async serializePrecommitForSignature(precommit: Contracts.Crypto.ISignaturePrecommitData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.ISignaturePrecommitData>(precommit, {
+			length:
+				1 + // type
+				4 + // height
+				4 + // round
+				1 + (precommit.blockId ? this.hashSize : 0), // blockId
+			skip: 0,
+			schema: {
+				type: {
+					type: "uint8",
+				},
+				height: {
+					type: "uint32",
+				},
+				round: {
+					type: "uint32",
+				},
+				blockId: {
+					type: "blockId",
+					optional: true,
+				},
+			},
+		});
+	}
+
 	public async serializePrevoteForSignature(prevote: Contracts.Crypto.ISignaturePrevoteData): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.ISignaturePrevoteData>(prevote, {
 			length:
 				1 + // type
 				4 + // height
 				4 + // round
-				this.hashSize, // blockId
+				1 + (prevote.blockId ? this.hashSize : 0), // blockId
 			skip: 0,
 			schema: {
 				type: {
@@ -132,7 +158,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				1 + // type
 				4 + // height
 				4 + // round
-				this.hashSize + // blockId
+				1 + (prevote.blockId ? this.hashSize : 0) + // blockId
 				1 + // validatorIndex
 				this.signatureSize, // signature
 			skip: 0,
@@ -155,32 +181,6 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				},
 				signature: {
 					type: "consensusSignature",
-				},
-			},
-		});
-	}
-
-	public async serializePrecommitForSignature(prevote: Contracts.Crypto.ISignaturePrevoteData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.ISignaturePrevoteData>(prevote, {
-			length:
-				1 + // type
-				4 + // height
-				4 + // round
-				this.hashSize, // blockId
-			skip: 0,
-			schema: {
-				type: {
-					type: "uint8",
-				},
-				height: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				blockId: {
-					type: "blockId",
-					optional: true,
 				},
 			},
 		});

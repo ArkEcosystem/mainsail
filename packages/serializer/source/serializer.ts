@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
@@ -30,12 +30,6 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 	@inject(Identifiers.Cryptography.Size.HASH256)
 	private readonly hashSize!: number;
-
-	private _emptyBlockIdBuffer!: Buffer;
-	@postConstruct()
-	public initialize() {
-		this._emptyBlockIdBuffer = Buffer.alloc(this.hashSize, "1");
-	}
 
 	public async serialize<T>(
 		data: T,
@@ -92,8 +86,16 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-				if (value === undefined) {
-					result.writeBytes(this._emptyBlockIdBuffer);
+				if (schema.optional) {
+					// When marked as optional, prepend a length byte
+					// to prevent having to pad the buffer for the full hash size.
+					const blockId = value ?? "";
+					result.writeUint8(blockId.length / 2);
+
+					if (blockId) {
+						result.writeBytes(Buffer.from(blockId, "hex"));
+					}
+
 				} else {
 					result.writeBytes(Buffer.from(value, "hex"));
 				}
@@ -201,12 +203,19 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-				const blockId = source.readBytes(schema.size ?? this.hashSize);
-				if (Buffer.compare(blockId, this._emptyBlockIdBuffer) === 0) {
-					target[property] = undefined;
+				// If the blockId is marked as optional, read the length first, otherwise
+				// the length is equal to the hashSize.
+				let blockId: string | undefined;
+				if (schema.optional) {
+					const blockIdLength = source.readUint8();
+					if (blockIdLength > 0) {
+						blockId = source.readBytes(blockIdLength).toString("hex");
+					}
 				} else {
-					target[property] = blockId.toString("hex");
+					blockId = source.readBytes(this.hashSize).toString("hex");
 				}
+
+				target[property] = blockId;
 
 				continue;
 			}
