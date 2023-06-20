@@ -95,7 +95,6 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 					if (blockId) {
 						result.writeBytes(Buffer.from(blockId, "hex"));
 					}
-
 				} else {
 					result.writeBytes(Buffer.from(value, "hex"));
 				}

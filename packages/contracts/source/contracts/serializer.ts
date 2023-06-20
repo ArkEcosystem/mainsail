@@ -17,9 +17,7 @@ export type MandatoryPropertyType =
 
 export type OptionalPropertyType = "blockId";
 
-export type SerializationSchema =
-	| { type: MandatoryPropertyType }
-	| { type: OptionalPropertyType, optional: boolean };
+export type SerializationSchema = { type: MandatoryPropertyType } | { type: OptionalPropertyType; optional: boolean };
 
 export interface SerializationConfiguration {
 	schema: Record<string, SerializationSchema>;
@@ -28,8 +26,8 @@ export interface SerializationConfiguration {
 }
 
 export type DeserializationSchema =
-	| { type: MandatoryPropertyType, size?: number }
-	| { type: OptionalPropertyType, optional: boolean }
+	| { type: MandatoryPropertyType; size?: number }
+	| { type: OptionalPropertyType; optional: boolean };
 
 export interface DeserializationConfiguration {
 	schema: Record<string, DeserializationSchema>;

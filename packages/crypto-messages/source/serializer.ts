@@ -73,7 +73,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				4 + // height
 				4 + // round
 				1 + // validatorIndex
-				1 + (precommit.blockId ? this.hashSize : 0) + // blockId
+				1 +
+				(precommit.blockId ? this.hashSize : 0) + // blockId
 				this.signatureSize, // signature
 			skip: 0,
 			schema: {
@@ -106,7 +107,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				1 + // type
 				4 + // height
 				4 + // round
-				1 + (precommit.blockId ? this.hashSize : 0), // blockId
+				1 +
+				(precommit.blockId ? this.hashSize : 0), // blockId
 			skip: 0,
 			schema: {
 				type: {
@@ -132,7 +134,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				1 + // type
 				4 + // height
 				4 + // round
-				1 + (prevote.blockId ? this.hashSize : 0), // blockId
+				1 +
+				(prevote.blockId ? this.hashSize : 0), // blockId
 			skip: 0,
 			schema: {
 				type: {
@@ -158,7 +161,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				1 + // type
 				4 + // height
 				4 + // round
-				1 + (prevote.blockId ? this.hashSize : 0) + // blockId
+				1 +
+				(prevote.blockId ? this.hashSize : 0) + // blockId
 				1 + // validatorIndex
 				this.signatureSize, // signature
 			skip: 0,
