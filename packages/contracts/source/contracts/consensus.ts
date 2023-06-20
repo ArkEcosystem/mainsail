@@ -26,6 +26,8 @@ export interface IRoundState {
 	hasMajorityPrecommits(): boolean;
 	hasMajorityPrecommitsAny(): boolean;
 	hasMinorityPrevotesOrPrecommits(): boolean;
+	getPrevote(validatorIndex: number): IPrevote | undefined;
+	getPrecommit(validatorIndex: number): IPrecommit | undefined;
 	getValidatorsSignedPrevote(): boolean[];
 	getValidatorsSignedPrecommit(): boolean[];
 	hasValidProposalLockProof(): Promise<boolean>;
