@@ -105,7 +105,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 			)
 			.filter((v) => v !== undefined);
 
-		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys);
+		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys as unknown as Buffer[]);
 
 		return this.signature.verify(Buffer.from(signature, "hex"), message, Buffer.from(aggregatedPublicKey, "hex"));
 	}
