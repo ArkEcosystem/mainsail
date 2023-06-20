@@ -33,6 +33,17 @@ export const replySchemas = {
 		required: ["common"],
 		type: "object",
 	},
+	getMessages: {
+		properties: {
+			// TODO: Improve this schema
+			precommits: {
+				type: "array",
+			},
+			prevotes: {
+				type: "array",
+			},
+		},
+	},
 	getPeers: {
 		items: {
 			properties: {
