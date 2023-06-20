@@ -2972,6 +2972,21 @@ export namespace shared {
 
         /** Headers version */
         version?: (string|null);
+
+        /** Headers height */
+        height?: (number|null);
+
+        /** Headers round */
+        round?: (number|null);
+
+        /** Headers step */
+        step?: (number|null);
+
+        /** Headers validatorsSignedPrevote */
+        validatorsSignedPrevote?: (boolean[]|null);
+
+        /** Headers validatorsSignedPrecommit */
+        validatorsSignedPrecommit?: (boolean[]|null);
     }
 
     /** Represents a Headers. */
@@ -2985,6 +3000,21 @@ export namespace shared {
 
         /** Headers version. */
         public version: string;
+
+        /** Headers height. */
+        public height: number;
+
+        /** Headers round. */
+        public round: number;
+
+        /** Headers step. */
+        public step: number;
+
+        /** Headers validatorsSignedPrevote. */
+        public validatorsSignedPrevote: boolean[];
+
+        /** Headers validatorsSignedPrecommit. */
+        public validatorsSignedPrecommit: boolean[];
 
         /**
          * Creates a new Headers instance using the specified properties.

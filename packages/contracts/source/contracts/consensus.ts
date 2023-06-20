@@ -26,6 +26,8 @@ export interface IRoundState {
 	hasMajorityPrecommits(): boolean;
 	hasMajorityPrecommitsAny(): boolean;
 	hasMinorityPrevotesOrPrecommits(): boolean;
+	getValidatorsSignedPrevote(): boolean[];
+	getValidatorsSignedPrecommit(): boolean[];
 	hasValidProposalLockProof(): Promise<boolean>;
 	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
 	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
@@ -33,10 +35,15 @@ export interface IRoundState {
 	getProposedCommitBlock(): Promise<ICommittedBlock>;
 }
 
+export interface IRoundStateRepository {
+	getRoundState(height: number, round: number): Promise<IRoundState>;
+}
+
 export interface IConsensusService {
 	run(): Promise<void>;
 	getHeight(): number;
 	getRound(): number;
+	getStep(): Step;
 	onProposal(roundState: IRoundState): Promise<void>;
 	onProposalLocked(roudnState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;
