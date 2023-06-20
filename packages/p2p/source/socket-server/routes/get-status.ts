@@ -4,7 +4,7 @@ import { GetStatusController } from "../controllers";
 import { Schemas } from "../schemas";
 import { Route, RouteConfig } from "./route";
 
-export class GetStausRoute extends Route {
+export class GetStatusRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {
 		const controller = this.getController();
 		return {
