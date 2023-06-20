@@ -1738,22 +1738,34 @@ $root.getCommonBlocks = (function() {
         return GetCommonBlocksResponse;
     })();
 
-    getCommonBlocks.GetMessagesRequest = (function() {
+    return getCommonBlocks;
+})();
+
+$root.getMessages = (function() {
+
+    /**
+     * Namespace getMessages.
+     * @exports getMessages
+     * @namespace
+     */
+    var getMessages = {};
+
+    getMessages.GetMessagesRequest = (function() {
 
         /**
          * Properties of a GetMessagesRequest.
-         * @memberof getCommonBlocks
+         * @memberof getMessages
          * @interface IGetMessagesRequest
          * @property {shared.IHeaders|null} [headers] GetMessagesRequest headers
          */
 
         /**
          * Constructs a new GetMessagesRequest.
-         * @memberof getCommonBlocks
+         * @memberof getMessages
          * @classdesc Represents a GetMessagesRequest.
          * @implements IGetMessagesRequest
          * @constructor
-         * @param {getCommonBlocks.IGetMessagesRequest=} [properties] Properties to set
+         * @param {getMessages.IGetMessagesRequest=} [properties] Properties to set
          */
         function GetMessagesRequest(properties) {
             if (properties)
@@ -1765,7 +1777,7 @@ $root.getCommonBlocks = (function() {
         /**
          * GetMessagesRequest headers.
          * @member {shared.IHeaders|null|undefined} headers
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @instance
          */
         GetMessagesRequest.prototype.headers = null;
@@ -1773,21 +1785,21 @@ $root.getCommonBlocks = (function() {
         /**
          * Creates a new GetMessagesRequest instance using the specified properties.
          * @function create
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
-         * @param {getCommonBlocks.IGetMessagesRequest=} [properties] Properties to set
-         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest instance
+         * @param {getMessages.IGetMessagesRequest=} [properties] Properties to set
+         * @returns {getMessages.GetMessagesRequest} GetMessagesRequest instance
          */
         GetMessagesRequest.create = function create(properties) {
             return new GetMessagesRequest(properties);
         };
 
         /**
-         * Encodes the specified GetMessagesRequest message. Does not implicitly {@link getCommonBlocks.GetMessagesRequest.verify|verify} messages.
+         * Encodes the specified GetMessagesRequest message. Does not implicitly {@link getMessages.GetMessagesRequest.verify|verify} messages.
          * @function encode
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
-         * @param {getCommonBlocks.IGetMessagesRequest} message GetMessagesRequest message or plain object to encode
+         * @param {getMessages.IGetMessagesRequest} message GetMessagesRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -1800,11 +1812,11 @@ $root.getCommonBlocks = (function() {
         };
 
         /**
-         * Encodes the specified GetMessagesRequest message, length delimited. Does not implicitly {@link getCommonBlocks.GetMessagesRequest.verify|verify} messages.
+         * Encodes the specified GetMessagesRequest message, length delimited. Does not implicitly {@link getMessages.GetMessagesRequest.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
-         * @param {getCommonBlocks.IGetMessagesRequest} message GetMessagesRequest message or plain object to encode
+         * @param {getMessages.IGetMessagesRequest} message GetMessagesRequest message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -1815,18 +1827,18 @@ $root.getCommonBlocks = (function() {
         /**
          * Decodes a GetMessagesRequest message from the specified reader or buffer.
          * @function decode
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest
+         * @returns {getMessages.GetMessagesRequest} GetMessagesRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetMessagesRequest.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getCommonBlocks.GetMessagesRequest();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getMessages.GetMessagesRequest();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -1845,10 +1857,10 @@ $root.getCommonBlocks = (function() {
         /**
          * Decodes a GetMessagesRequest message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest
+         * @returns {getMessages.GetMessagesRequest} GetMessagesRequest
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -1861,7 +1873,7 @@ $root.getCommonBlocks = (function() {
         /**
          * Verifies a GetMessagesRequest message.
          * @function verify
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -1880,18 +1892,18 @@ $root.getCommonBlocks = (function() {
         /**
          * Creates a GetMessagesRequest message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest
+         * @returns {getMessages.GetMessagesRequest} GetMessagesRequest
          */
         GetMessagesRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.getCommonBlocks.GetMessagesRequest)
+            if (object instanceof $root.getMessages.GetMessagesRequest)
                 return object;
-            var message = new $root.getCommonBlocks.GetMessagesRequest();
+            var message = new $root.getMessages.GetMessagesRequest();
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
-                    throw TypeError(".getCommonBlocks.GetMessagesRequest.headers: object expected");
+                    throw TypeError(".getMessages.GetMessagesRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             return message;
@@ -1900,9 +1912,9 @@ $root.getCommonBlocks = (function() {
         /**
          * Creates a plain object from a GetMessagesRequest message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
-         * @param {getCommonBlocks.GetMessagesRequest} message GetMessagesRequest
+         * @param {getMessages.GetMessagesRequest} message GetMessagesRequest
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -1920,7 +1932,7 @@ $root.getCommonBlocks = (function() {
         /**
          * Converts this GetMessagesRequest to JSON.
          * @function toJSON
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -1931,7 +1943,7 @@ $root.getCommonBlocks = (function() {
         /**
          * Gets the default type url for GetMessagesRequest
          * @function getTypeUrl
-         * @memberof getCommonBlocks.GetMessagesRequest
+         * @memberof getMessages.GetMessagesRequest
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
@@ -1940,17 +1952,17 @@ $root.getCommonBlocks = (function() {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/getCommonBlocks.GetMessagesRequest";
+            return typeUrlPrefix + "/getMessages.GetMessagesRequest";
         };
 
         return GetMessagesRequest;
     })();
 
-    getCommonBlocks.GetMessagesResponse = (function() {
+    getMessages.GetMessagesResponse = (function() {
 
         /**
          * Properties of a GetMessagesResponse.
-         * @memberof getCommonBlocks
+         * @memberof getMessages
          * @interface IGetMessagesResponse
          * @property {Array.<Uint8Array>|null} [prevotes] GetMessagesResponse prevotes
          * @property {Array.<Uint8Array>|null} [precommits] GetMessagesResponse precommits
@@ -1958,11 +1970,11 @@ $root.getCommonBlocks = (function() {
 
         /**
          * Constructs a new GetMessagesResponse.
-         * @memberof getCommonBlocks
+         * @memberof getMessages
          * @classdesc Represents a GetMessagesResponse.
          * @implements IGetMessagesResponse
          * @constructor
-         * @param {getCommonBlocks.IGetMessagesResponse=} [properties] Properties to set
+         * @param {getMessages.IGetMessagesResponse=} [properties] Properties to set
          */
         function GetMessagesResponse(properties) {
             this.prevotes = [];
@@ -1976,7 +1988,7 @@ $root.getCommonBlocks = (function() {
         /**
          * GetMessagesResponse prevotes.
          * @member {Array.<Uint8Array>} prevotes
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @instance
          */
         GetMessagesResponse.prototype.prevotes = $util.emptyArray;
@@ -1984,7 +1996,7 @@ $root.getCommonBlocks = (function() {
         /**
          * GetMessagesResponse precommits.
          * @member {Array.<Uint8Array>} precommits
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @instance
          */
         GetMessagesResponse.prototype.precommits = $util.emptyArray;
@@ -1992,21 +2004,21 @@ $root.getCommonBlocks = (function() {
         /**
          * Creates a new GetMessagesResponse instance using the specified properties.
          * @function create
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
-         * @param {getCommonBlocks.IGetMessagesResponse=} [properties] Properties to set
-         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse instance
+         * @param {getMessages.IGetMessagesResponse=} [properties] Properties to set
+         * @returns {getMessages.GetMessagesResponse} GetMessagesResponse instance
          */
         GetMessagesResponse.create = function create(properties) {
             return new GetMessagesResponse(properties);
         };
 
         /**
-         * Encodes the specified GetMessagesResponse message. Does not implicitly {@link getCommonBlocks.GetMessagesResponse.verify|verify} messages.
+         * Encodes the specified GetMessagesResponse message. Does not implicitly {@link getMessages.GetMessagesResponse.verify|verify} messages.
          * @function encode
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
-         * @param {getCommonBlocks.IGetMessagesResponse} message GetMessagesResponse message or plain object to encode
+         * @param {getMessages.IGetMessagesResponse} message GetMessagesResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2023,11 +2035,11 @@ $root.getCommonBlocks = (function() {
         };
 
         /**
-         * Encodes the specified GetMessagesResponse message, length delimited. Does not implicitly {@link getCommonBlocks.GetMessagesResponse.verify|verify} messages.
+         * Encodes the specified GetMessagesResponse message, length delimited. Does not implicitly {@link getMessages.GetMessagesResponse.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
-         * @param {getCommonBlocks.IGetMessagesResponse} message GetMessagesResponse message or plain object to encode
+         * @param {getMessages.IGetMessagesResponse} message GetMessagesResponse message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
@@ -2038,18 +2050,18 @@ $root.getCommonBlocks = (function() {
         /**
          * Decodes a GetMessagesResponse message from the specified reader or buffer.
          * @function decode
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse
+         * @returns {getMessages.GetMessagesResponse} GetMessagesResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
         GetMessagesResponse.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getCommonBlocks.GetMessagesResponse();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getMessages.GetMessagesResponse();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -2076,10 +2088,10 @@ $root.getCommonBlocks = (function() {
         /**
          * Decodes a GetMessagesResponse message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse
+         * @returns {getMessages.GetMessagesResponse} GetMessagesResponse
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
@@ -2092,7 +2104,7 @@ $root.getCommonBlocks = (function() {
         /**
          * Verifies a GetMessagesResponse message.
          * @function verify
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
@@ -2120,18 +2132,18 @@ $root.getCommonBlocks = (function() {
         /**
          * Creates a GetMessagesResponse message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse
+         * @returns {getMessages.GetMessagesResponse} GetMessagesResponse
          */
         GetMessagesResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.getCommonBlocks.GetMessagesResponse)
+            if (object instanceof $root.getMessages.GetMessagesResponse)
                 return object;
-            var message = new $root.getCommonBlocks.GetMessagesResponse();
+            var message = new $root.getMessages.GetMessagesResponse();
             if (object.prevotes) {
                 if (!Array.isArray(object.prevotes))
-                    throw TypeError(".getCommonBlocks.GetMessagesResponse.prevotes: array expected");
+                    throw TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");
                 message.prevotes = [];
                 for (var i = 0; i < object.prevotes.length; ++i)
                     if (typeof object.prevotes[i] === "string")
@@ -2141,7 +2153,7 @@ $root.getCommonBlocks = (function() {
             }
             if (object.precommits) {
                 if (!Array.isArray(object.precommits))
-                    throw TypeError(".getCommonBlocks.GetMessagesResponse.precommits: array expected");
+                    throw TypeError(".getMessages.GetMessagesResponse.precommits: array expected");
                 message.precommits = [];
                 for (var i = 0; i < object.precommits.length; ++i)
                     if (typeof object.precommits[i] === "string")
@@ -2155,9 +2167,9 @@ $root.getCommonBlocks = (function() {
         /**
          * Creates a plain object from a GetMessagesResponse message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
-         * @param {getCommonBlocks.GetMessagesResponse} message GetMessagesResponse
+         * @param {getMessages.GetMessagesResponse} message GetMessagesResponse
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
@@ -2185,7 +2197,7 @@ $root.getCommonBlocks = (function() {
         /**
          * Converts this GetMessagesResponse to JSON.
          * @function toJSON
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
@@ -2196,7 +2208,7 @@ $root.getCommonBlocks = (function() {
         /**
          * Gets the default type url for GetMessagesResponse
          * @function getTypeUrl
-         * @memberof getCommonBlocks.GetMessagesResponse
+         * @memberof getMessages.GetMessagesResponse
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
@@ -2205,13 +2217,13 @@ $root.getCommonBlocks = (function() {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/getCommonBlocks.GetMessagesResponse";
+            return typeUrlPrefix + "/getMessages.GetMessagesResponse";
         };
 
         return GetMessagesResponse;
     })();
 
-    return getCommonBlocks;
+    return getMessages;
 })();
 
 $root.getPeers = (function() {
