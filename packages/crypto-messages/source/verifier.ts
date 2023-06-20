@@ -103,7 +103,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 			.map((v, index) =>
 				v ? Buffer.from(activeValidators[index].getAttribute<string>("consensus.publicKey"), "hex") : undefined,
 			)
-			.filter((v) => v !== undefined);
+			.filter((v) => v !== undefined) as Buffer[];
 
 		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys);
 

@@ -221,10 +221,18 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<Contracts.Consensus.IValidatorSetMajority> {
+		if (!this.hasMajorityPrevotes()) {
+			throw new Error("called #aggregateMajorityPrevotes without majority");
+		}
+
 		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#prevotes));
 	}
 
 	public async aggregateMajorityPrecommits(): Promise<Contracts.Consensus.IValidatorSetMajority> {
+		if (!this.hasMajorityPrecommits()) {
+			throw new Error("called #aggregateMajorityPrecommits without majority");
+		}
+
 		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#precommits));
 	}
 
@@ -250,10 +258,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	#getValidatorMajority(s: Map<string, { signature: string; blockId?: string }>): Map<string, { signature: string }> {
-		if (!this.hasMajorityPrevotes() || !this.hasMajorityPrecommits()) {
-			throw new Error("called #getValidatorMajority without majority");
-		}
-
 		Utils.assert.defined<Contracts.Crypto.IProposal>(this.#proposal);
 		const filtered = new Map();
 

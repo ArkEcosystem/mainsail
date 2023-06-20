@@ -56,9 +56,10 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	public async fromProposedBytes(buff: Buffer): Promise<Contracts.Crypto.IProposedBlock> {
 		const buffer = ByteBuffer.fromBuffer(buff);
 
-		const lockProofBuffer = buffer.readBytes(this.serializer.lockProofSize());
+		const lockProofLength = buffer.readUint8();
 		let lockProof: Contracts.Crypto.IBlockLockProof | undefined;
-		if (lockProofBuffer.some((b) => b !== 0)) {
+		if (lockProofLength > 0) {
+			const lockProofBuffer = buffer.readBytes(lockProofLength);
 			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
 		}
 

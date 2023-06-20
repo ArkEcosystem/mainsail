@@ -155,7 +155,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#step !== Contracts.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
-			!proposal.block?.lockProof ||
+			!proposal.block.lockProof ||
 			proposal.validRound === undefined ||
 			proposal.validRound >= this.#round
 		) {
