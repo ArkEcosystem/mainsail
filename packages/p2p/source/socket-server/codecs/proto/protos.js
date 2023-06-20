@@ -1738,6 +1738,479 @@ $root.getCommonBlocks = (function() {
         return GetCommonBlocksResponse;
     })();
 
+    getCommonBlocks.GetMessagesRequest = (function() {
+
+        /**
+         * Properties of a GetMessagesRequest.
+         * @memberof getCommonBlocks
+         * @interface IGetMessagesRequest
+         * @property {shared.IHeaders|null} [headers] GetMessagesRequest headers
+         */
+
+        /**
+         * Constructs a new GetMessagesRequest.
+         * @memberof getCommonBlocks
+         * @classdesc Represents a GetMessagesRequest.
+         * @implements IGetMessagesRequest
+         * @constructor
+         * @param {getCommonBlocks.IGetMessagesRequest=} [properties] Properties to set
+         */
+        function GetMessagesRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetMessagesRequest headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @instance
+         */
+        GetMessagesRequest.prototype.headers = null;
+
+        /**
+         * Creates a new GetMessagesRequest instance using the specified properties.
+         * @function create
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {getCommonBlocks.IGetMessagesRequest=} [properties] Properties to set
+         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest instance
+         */
+        GetMessagesRequest.create = function create(properties) {
+            return new GetMessagesRequest(properties);
+        };
+
+        /**
+         * Encodes the specified GetMessagesRequest message. Does not implicitly {@link getCommonBlocks.GetMessagesRequest.verify|verify} messages.
+         * @function encode
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {getCommonBlocks.IGetMessagesRequest} message GetMessagesRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetMessagesRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetMessagesRequest message, length delimited. Does not implicitly {@link getCommonBlocks.GetMessagesRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {getCommonBlocks.IGetMessagesRequest} message GetMessagesRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetMessagesRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetMessagesRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetMessagesRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getCommonBlocks.GetMessagesRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetMessagesRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetMessagesRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetMessagesRequest message.
+         * @function verify
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetMessagesRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetMessagesRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getCommonBlocks.GetMessagesRequest} GetMessagesRequest
+         */
+        GetMessagesRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.getCommonBlocks.GetMessagesRequest)
+                return object;
+            var message = new $root.getCommonBlocks.GetMessagesRequest();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getCommonBlocks.GetMessagesRequest.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetMessagesRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {getCommonBlocks.GetMessagesRequest} message GetMessagesRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetMessagesRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
+        };
+
+        /**
+         * Converts this GetMessagesRequest to JSON.
+         * @function toJSON
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetMessagesRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GetMessagesRequest
+         * @function getTypeUrl
+         * @memberof getCommonBlocks.GetMessagesRequest
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GetMessagesRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/getCommonBlocks.GetMessagesRequest";
+        };
+
+        return GetMessagesRequest;
+    })();
+
+    getCommonBlocks.GetMessagesResponse = (function() {
+
+        /**
+         * Properties of a GetMessagesResponse.
+         * @memberof getCommonBlocks
+         * @interface IGetMessagesResponse
+         * @property {Array.<Uint8Array>|null} [prevotes] GetMessagesResponse prevotes
+         * @property {Array.<Uint8Array>|null} [precommits] GetMessagesResponse precommits
+         */
+
+        /**
+         * Constructs a new GetMessagesResponse.
+         * @memberof getCommonBlocks
+         * @classdesc Represents a GetMessagesResponse.
+         * @implements IGetMessagesResponse
+         * @constructor
+         * @param {getCommonBlocks.IGetMessagesResponse=} [properties] Properties to set
+         */
+        function GetMessagesResponse(properties) {
+            this.prevotes = [];
+            this.precommits = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetMessagesResponse prevotes.
+         * @member {Array.<Uint8Array>} prevotes
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @instance
+         */
+        GetMessagesResponse.prototype.prevotes = $util.emptyArray;
+
+        /**
+         * GetMessagesResponse precommits.
+         * @member {Array.<Uint8Array>} precommits
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @instance
+         */
+        GetMessagesResponse.prototype.precommits = $util.emptyArray;
+
+        /**
+         * Creates a new GetMessagesResponse instance using the specified properties.
+         * @function create
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {getCommonBlocks.IGetMessagesResponse=} [properties] Properties to set
+         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse instance
+         */
+        GetMessagesResponse.create = function create(properties) {
+            return new GetMessagesResponse(properties);
+        };
+
+        /**
+         * Encodes the specified GetMessagesResponse message. Does not implicitly {@link getCommonBlocks.GetMessagesResponse.verify|verify} messages.
+         * @function encode
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {getCommonBlocks.IGetMessagesResponse} message GetMessagesResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetMessagesResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.prevotes != null && message.prevotes.length)
+                for (var i = 0; i < message.prevotes.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.prevotes[i]);
+            if (message.precommits != null && message.precommits.length)
+                for (var i = 0; i < message.precommits.length; ++i)
+                    writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.precommits[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetMessagesResponse message, length delimited. Does not implicitly {@link getCommonBlocks.GetMessagesResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {getCommonBlocks.IGetMessagesResponse} message GetMessagesResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetMessagesResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetMessagesResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetMessagesResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getCommonBlocks.GetMessagesResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.prevotes && message.prevotes.length))
+                            message.prevotes = [];
+                        message.prevotes.push(reader.bytes());
+                        break;
+                    }
+                case 2: {
+                        if (!(message.precommits && message.precommits.length))
+                            message.precommits = [];
+                        message.precommits.push(reader.bytes());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetMessagesResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetMessagesResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetMessagesResponse message.
+         * @function verify
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetMessagesResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.prevotes != null && message.hasOwnProperty("prevotes")) {
+                if (!Array.isArray(message.prevotes))
+                    return "prevotes: array expected";
+                for (var i = 0; i < message.prevotes.length; ++i)
+                    if (!(message.prevotes[i] && typeof message.prevotes[i].length === "number" || $util.isString(message.prevotes[i])))
+                        return "prevotes: buffer[] expected";
+            }
+            if (message.precommits != null && message.hasOwnProperty("precommits")) {
+                if (!Array.isArray(message.precommits))
+                    return "precommits: array expected";
+                for (var i = 0; i < message.precommits.length; ++i)
+                    if (!(message.precommits[i] && typeof message.precommits[i].length === "number" || $util.isString(message.precommits[i])))
+                        return "precommits: buffer[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetMessagesResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getCommonBlocks.GetMessagesResponse} GetMessagesResponse
+         */
+        GetMessagesResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.getCommonBlocks.GetMessagesResponse)
+                return object;
+            var message = new $root.getCommonBlocks.GetMessagesResponse();
+            if (object.prevotes) {
+                if (!Array.isArray(object.prevotes))
+                    throw TypeError(".getCommonBlocks.GetMessagesResponse.prevotes: array expected");
+                message.prevotes = [];
+                for (var i = 0; i < object.prevotes.length; ++i)
+                    if (typeof object.prevotes[i] === "string")
+                        $util.base64.decode(object.prevotes[i], message.prevotes[i] = $util.newBuffer($util.base64.length(object.prevotes[i])), 0);
+                    else if (object.prevotes[i].length >= 0)
+                        message.prevotes[i] = object.prevotes[i];
+            }
+            if (object.precommits) {
+                if (!Array.isArray(object.precommits))
+                    throw TypeError(".getCommonBlocks.GetMessagesResponse.precommits: array expected");
+                message.precommits = [];
+                for (var i = 0; i < object.precommits.length; ++i)
+                    if (typeof object.precommits[i] === "string")
+                        $util.base64.decode(object.precommits[i], message.precommits[i] = $util.newBuffer($util.base64.length(object.precommits[i])), 0);
+                    else if (object.precommits[i].length >= 0)
+                        message.precommits[i] = object.precommits[i];
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetMessagesResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {getCommonBlocks.GetMessagesResponse} message GetMessagesResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetMessagesResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults) {
+                object.prevotes = [];
+                object.precommits = [];
+            }
+            if (message.prevotes && message.prevotes.length) {
+                object.prevotes = [];
+                for (var j = 0; j < message.prevotes.length; ++j)
+                    object.prevotes[j] = options.bytes === String ? $util.base64.encode(message.prevotes[j], 0, message.prevotes[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.prevotes[j]) : message.prevotes[j];
+            }
+            if (message.precommits && message.precommits.length) {
+                object.precommits = [];
+                for (var j = 0; j < message.precommits.length; ++j)
+                    object.precommits[j] = options.bytes === String ? $util.base64.encode(message.precommits[j], 0, message.precommits[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.precommits[j]) : message.precommits[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this GetMessagesResponse to JSON.
+         * @function toJSON
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetMessagesResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GetMessagesResponse
+         * @function getTypeUrl
+         * @memberof getCommonBlocks.GetMessagesResponse
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GetMessagesResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/getCommonBlocks.GetMessagesResponse";
+        };
+
+        return GetMessagesResponse;
+    })();
+
     return getCommonBlocks;
 })();
 

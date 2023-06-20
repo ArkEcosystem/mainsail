@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package getCommonBlocks;
+
+message GetMessagesRequest {
+    shared.Headers headers = 1;
+}
+
+message GetMessagesResponse {
+    repeated bytes prevotes = 1;
+    repeated bytes precommits = 2;
+}
