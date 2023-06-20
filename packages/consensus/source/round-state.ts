@@ -25,6 +25,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	@inject(Identifiers.Cryptography.Message.Verifier)
+	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
+
 	#height = 0;
 	#round = 0;
 	#proposal?: Contracts.Crypto.IProposal;
@@ -142,7 +145,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrevoteCount(this.#proposal.block.data.id));
+		return this.#isMajority(this.#getPrevoteCount(this.#proposal.block.block.data.id));
 	}
 
 	public hasMajorityPrevotesAny(): boolean {
@@ -158,7 +161,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrecommitCount(this.#proposal.block.data.id));
+		return this.#isMajority(this.#getPrecommitCount(this.#proposal.block.block.data.id));
 	}
 
 	public hasMajorityPrecommitsAny(): boolean {
@@ -175,6 +178,28 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	public getValidatorsSignedPrecommit(): boolean[] {
 		return this.#validatorsSignedPrecommit;
+	}
+
+	public async hasValidProposalLockProof(): Promise<boolean> {
+		const proposal = this.#proposal;
+		const lockProof = this.#proposal?.block?.lockProof;
+		if (!lockProof) {
+			return false;
+		}
+
+		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+
+		const { verified } = await this.verifier.verifyProposalLockProof(
+			{
+				blockId: proposal.block.block.header.id,
+				height: proposal.height,
+				round: proposal.round,
+				type: Contracts.Crypto.MessageType.Prevote,
+			},
+			lockProof,
+		);
+
+		return verified;
 	}
 
 	#hasMinorityPrevotes(): boolean {
@@ -210,11 +235,19 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<Contracts.Consensus.IValidatorSetMajority> {
-		return this.#aggregateValidatorSetMajority(this.#prevotes);
+		if (!this.hasMajorityPrevotes()) {
+			throw new Error("called #aggregateMajorityPrevotes without majority");
+		}
+
+		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#prevotes));
 	}
 
 	public async aggregateMajorityPrecommits(): Promise<Contracts.Consensus.IValidatorSetMajority> {
-		return this.#aggregateValidatorSetMajority(this.#precommits);
+		if (!this.hasMajorityPrecommits()) {
+			throw new Error("called #aggregateMajorityPrecommits without majority");
+		}
+
+		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#precommits));
 	}
 
 	async #aggregateValidatorSetMajority(
@@ -238,13 +271,42 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		};
 	}
 
+	#getValidatorMajority(s: Map<string, { signature: string; blockId?: string }>): Map<string, { signature: string }> {
+		Utils.assert.defined<Contracts.Crypto.IProposal>(this.#proposal);
+		const filtered = new Map();
+
+		for (const [key, value] of s) {
+			if (value.blockId === this.#proposal.block.block.header.id) {
+				filtered.set(key, value);
+			}
+		}
+
+		return filtered;
+	}
+
+	public async getProposalLockProof(): Promise<Contracts.Crypto.IProposalLockProof> {
+		const majority = await this.aggregateMajorityPrevotes();
+
+		const proposal = this.getProposal();
+		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+
+		return {
+			signature: majority.aggSignature,
+			// TODO: calcualte validator set matrix
+			validators: [...majority.validatorSet].map((v) => true),
+		};
+	}
+
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
 		const majority = await this.aggregateMajorityPrecommits();
 
 		const proposal = this.getProposal();
 		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
 
-		const { round, block } = proposal;
+		const {
+			round,
+			block: { block },
+		} = proposal;
 
 		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
 			block,

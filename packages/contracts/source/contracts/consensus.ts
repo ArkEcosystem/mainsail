@@ -1,4 +1,4 @@
-import { IBlock, ICommittedBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
+import { IBlock, ICommittedBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
 // TODO: Move to crypto
@@ -28,8 +28,10 @@ export interface IRoundState {
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	getValidatorsSignedPrevote(): boolean[];
 	getValidatorsSignedPrecommit(): boolean[];
+	hasValidProposalLockProof(): Promise<boolean>;
 	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
 	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
+	getProposalLockProof(): Promise<IProposalLockProof>;
 	getProposedCommitBlock(): Promise<ICommittedBlock>;
 }
 
@@ -74,7 +76,13 @@ export interface IValidator {
 	configure(publicKey: string, keyPair: IKeyPair): IValidator;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<IBlock>;
-	propose(height: number, round: number, block: IBlock, validRound: number | undefined): Promise<IProposal>;
+	propose(
+		height: number,
+		round: number,
+		block: IBlock,
+		lockProof?: IProposalLockProof,
+		validRound?: number,
+	): Promise<IProposal>;
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
 	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
 }

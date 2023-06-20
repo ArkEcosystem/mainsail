@@ -1,3 +1,4 @@
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "../../test-framework";
 import { blockData } from "../test/fixtures/proposal";
 import { Proposal } from "./proposal";
@@ -5,11 +6,14 @@ import { Proposal } from "./proposal";
 describe<{
 	sandbox: Sandbox;
 }>("Proposal", ({ it, assert }) => {
-	const block = {
-		header: { ...blockData, transactions: [] },
+	const block: Contracts.Crypto.IProposedBlock = {
+		block: {
+			header: { ...blockData, transactions: [] },
+			serialized: "",
+			transactions: [],
+			data: blockData,
+		},
 		serialized: "",
-		transactions: [],
-		data: blockData,
 	};
 
 	const proposal = new Proposal(

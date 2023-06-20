@@ -25,8 +25,10 @@ const assertPrecommitOrPrevote = (assert, data1, data2) => {
 		let v1 = data1[field];
 		let v2 = data2[field];
 		if (field === "blockId") {
-			v1 = v1 || "0000000000000000000000000000000000000000000000000000000000000000";
-			v2 = v2 || "0000000000000000000000000000000000000000000000000000000000000000";
+			if (v1 === undefined || v2 === undefined) {
+				assert.equal(v1, v2);
+				continue;
+			}
 		}
 
 		assert.equal(v1.toString(), v2.toString());
