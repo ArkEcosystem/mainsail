@@ -37,12 +37,20 @@ export const replySchemas = {
 		properties: {
 			// TODO: Improve this schema
 			precommits: {
+				items: {
+					$ref: "hex",
+				},
 				type: "array",
 			},
 			prevotes: {
+				items: {
+					$ref: "hex",
+				},
 				type: "array",
 			},
 		},
+		required: ["precommits", "prevotes"],
+		type: "object",
 	},
 	getPeers: {
 		items: {

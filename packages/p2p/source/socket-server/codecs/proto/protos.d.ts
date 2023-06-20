@@ -814,10 +814,10 @@ export namespace getMessages {
     interface IGetMessagesResponse {
 
         /** GetMessagesResponse prevotes */
-        prevotes?: (Uint8Array[]|null);
+        prevotes?: (string[]|null);
 
         /** GetMessagesResponse precommits */
-        precommits?: (Uint8Array[]|null);
+        precommits?: (string[]|null);
     }
 
     /** Represents a GetMessagesResponse. */
@@ -830,10 +830,10 @@ export namespace getMessages {
         constructor(properties?: getMessages.IGetMessagesResponse);
 
         /** GetMessagesResponse prevotes. */
-        public prevotes: Uint8Array[];
+        public prevotes: string[];
 
         /** GetMessagesResponse precommits. */
-        public precommits: Uint8Array[];
+        public precommits: string[];
 
         /**
          * Creates a new GetMessagesResponse instance using the specified properties.

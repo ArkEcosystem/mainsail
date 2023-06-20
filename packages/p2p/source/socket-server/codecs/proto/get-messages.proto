@@ -7,6 +7,6 @@ message GetMessagesRequest {
 }
 
 message GetMessagesResponse {
-    repeated bytes prevotes = 1;
-    repeated bytes precommits = 2;
+    repeated string prevotes = 1;
+    repeated string precommits = 2;
 }
