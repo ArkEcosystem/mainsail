@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import { IBlockData } from "../crypto";
 import { DownloadBlock } from "../shared";
 import { IHeaderData } from "./header";
-import { PeerBroadcast } from "./peer";
+import { PeerBroadcast, PeerPingResponse } from "./peer";
 
 export interface IGetBlocksRequest extends Hapi.Request {
 	payload: {
@@ -37,6 +37,8 @@ export interface IGetMessagesResponse {
 }
 
 export type IGetPeersResponse = PeerBroadcast[];
+
+export type IGetStatusResponse = PeerPingResponse;
 
 export interface IGetProposalRequest extends Hapi.Request {
 	payload: {
