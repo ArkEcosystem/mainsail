@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package getMessages;
+
+message GetMessagesRequest {
+    shared.Headers headers = 1;
+}
+
+message GetMessagesResponse {
+    repeated string prevotes = 1;
+    repeated string precommits = 2;
+}

@@ -8,6 +8,7 @@ import { buildRateLimiter } from "../../utils/build-rate-limiter";
 import {
 	GetBlocksRoute,
 	GetCommonBlocksRoute,
+	GetMessagesRoute,
 	GetPeersRoute,
 	GetStatusRoute,
 	PostBlockRoute,
@@ -39,6 +40,7 @@ export class RateLimitPlugin {
 		const allRoutesConfigByPath = {
 			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetCommonBlocksRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetMessagesRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetStatusRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostBlockRoute).getRoutesConfigByPath(),

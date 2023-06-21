@@ -172,6 +172,18 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
 	}
 
+	getPrevote(validatorIndex: number): Contracts.Crypto.IPrevote | undefined {
+		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex);
+
+		return this.#prevotes.get(validatorPublicKey);
+	}
+
+	getPrecommit(validatorIndex: number): Contracts.Crypto.IPrecommit | undefined {
+		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex);
+
+		return this.#precommits.get(validatorPublicKey);
+	}
+
 	public getValidatorsSignedPrevote(): boolean[] {
 		return this.#validatorsSignedPrevote;
 	}
