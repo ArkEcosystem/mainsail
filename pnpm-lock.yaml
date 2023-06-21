@@ -531,9 +531,6 @@ importers:
         specifier: 0.21.3
         version: 0.21.3
     devDependencies:
-      '@types/hapi__hapi':
-        specifier: 21.0.0
-        version: 21.0.0
       '@types/plur':
         specifier: ^3.1.0
         version: 3.1.0
@@ -2259,9 +2256,6 @@ importers:
       '@types/delay':
         specifier: 3.1.0
         version: 3.1.0
-      '@types/hapi__hapi':
-        specifier: 21.0.0
-        version: 21.0.0
       '@types/hapi__sntp':
         specifier: 3.1.2
         version: 3.1.2
