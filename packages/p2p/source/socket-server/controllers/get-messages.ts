@@ -4,12 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 interface Request extends Hapi.Request {
 	payload: {
-		headers: {
-			height: number;
-			round: number;
-			validatorsSignedPrevote: boolean[];
-			validatorsSignedPrecommit: boolean[];
-		};
+		headers: Contracts.P2P.IHeaderData;
 	};
 }
 
