@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package getProposal;
+
+message GetProposalRequest {
+    shared.Headers headers = 1;
+}
+
+message GetProposalResponse {
+    string proposal = 1;
+}

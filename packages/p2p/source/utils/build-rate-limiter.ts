@@ -47,6 +47,10 @@ export const buildRateLimiter = (options) =>
 					endpoint: Routes.GetMessages,
 					rateLimit: 5,
 				},
+				{
+					endpoint: Routes.GetProposal,
+					rateLimit: 5,
+				},
 			],
 			global: {
 				rateLimit: options.rateLimit,

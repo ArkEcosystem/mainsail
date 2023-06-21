@@ -79,6 +79,15 @@ export const replySchemas = {
 		maxItems: constants.MAX_PEERS_GETPEERS,
 		type: "array",
 	},
+	getProposal: {
+		properties: {
+			proposal: {
+				type: "string",
+			},
+		},
+		required: ["proposal"],
+		type: "object",
+	},
 	getStatus: {
 		additionalProperties: false,
 		properties: {
