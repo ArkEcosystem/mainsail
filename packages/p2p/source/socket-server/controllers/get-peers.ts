@@ -16,7 +16,7 @@ export class GetPeersController implements Contracts.P2P.Controller {
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerBroadcast[]> {
+	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.IGetPeersResponse> {
 		const peerIp = getPeerIp(request.socket);
 
 		return this.peerRepository

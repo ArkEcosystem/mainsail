@@ -5,11 +5,6 @@ import { Utils } from "@mainsail/kernel";
 
 import { mapAddr } from "../utils/map-addr";
 
-interface Request extends Hapi.Request {
-	payload: {
-		block: Buffer;
-	};
-}
 @injectable()
 export class PostBlockController implements Contracts.P2P.Controller {
 	@inject(Identifiers.LogService)
@@ -24,7 +19,10 @@ export class PostBlockController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer!: Contracts.Crypto.IBlockDeserializer;
 
-	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<{ status: boolean; height: number }> {
+	public async handle(
+		request: Contracts.P2P.IPostBlockRequest,
+		h: Hapi.ResponseToolkit,
+	): Promise<Contracts.P2P.IPostBlockResponse> {
 		const blockBuffer: Buffer = request.payload.block;
 
 		const deserializedHeader = await this.deserializer.deserializeHeader(blockBuffer);
