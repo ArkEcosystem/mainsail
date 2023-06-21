@@ -2,6 +2,7 @@ export * from "./block-downloader";
 export * from "./blocks";
 export * from "./broadcaster";
 export * from "./chunk-cache";
+export * from "./endpoints";
 export * from "./header";
 export * from "./nes-client";
 export * from "./network-monitor";
