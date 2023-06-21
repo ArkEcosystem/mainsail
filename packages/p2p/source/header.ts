@@ -1,14 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-type HeaderData = {
-	version: string;
-	height: number;
-	round: number;
-	step: number;
-	validatorsSignedPrevote: boolean[];
-	validatorsSignedPrecommit: boolean[];
-};
+export interface CompareResponse {
+	downloadBlocks?: true;
+	downloadMessages?: true;
+	downloadProposal?: true;
+}
 
 export interface CompareResponse {
 	downloadBlocks?: true;
@@ -17,11 +14,11 @@ export interface CompareResponse {
 }
 
 @injectable()
-export class Header {
+export class Header implements Contracts.P2P.IHeader {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	public async getHeader(): Promise<HeaderData> {
+	public async getHeader(): Promise<Contracts.P2P.IHeaderData> {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,

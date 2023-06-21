@@ -2,21 +2,6 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-interface Request extends Hapi.Request {
-	payload: {
-		headers: {
-			height: number;
-			round: number;
-			validatorsSignedPrevote: boolean[];
-			validatorsSignedPrecommit: boolean[];
-		};
-	};
-}
-
-interface Response {
-	proposal: string;
-}
-
 @injectable()
 export class GetProposalController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Application)
@@ -25,7 +10,10 @@ export class GetProposalController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
 
-	public async handle(request: Request, h: Hapi.ResponseToolkit): Promise<Response> {
+	public async handle(
+		request: Contracts.P2P.IGetProposalRequest,
+		h: Hapi.ResponseToolkit,
+	): Promise<Contracts.P2P.IGetProposalResponse> {
 		const result = {
 			proposal: "",
 		};

@@ -11,7 +11,7 @@ export class GetStatusController implements Contracts.P2P.Controller {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.PeerPingResponse> {
+	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.IGetStatusResponse> {
 		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
 		return {
