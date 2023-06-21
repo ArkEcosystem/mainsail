@@ -1322,7 +1322,7 @@ export namespace getProposal {
     interface IGetProposalResponse {
 
         /** GetProposalResponse proposal */
-        proposal?: (string[]|null);
+        proposal?: (string|null);
     }
 
     /** Represents a GetProposalResponse. */
@@ -1335,7 +1335,7 @@ export namespace getProposal {
         constructor(properties?: getProposal.IGetProposalResponse);
 
         /** GetProposalResponse proposal. */
-        public proposal: string[];
+        public proposal: string;
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.

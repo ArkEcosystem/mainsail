@@ -7,5 +7,5 @@ message GetProposalRequest {
 }
 
 message GetProposalResponse {
-    repeated string proposal = 1;
+    string proposal = 1;
 }

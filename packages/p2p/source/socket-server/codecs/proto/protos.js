@@ -3114,7 +3114,7 @@ $root.getProposal = (function() {
          * Properties of a GetProposalResponse.
          * @memberof getProposal
          * @interface IGetProposalResponse
-         * @property {Array.<string>|null} [proposal] GetProposalResponse proposal
+         * @property {string|null} [proposal] GetProposalResponse proposal
          */
 
         /**
@@ -3126,7 +3126,6 @@ $root.getProposal = (function() {
          * @param {getProposal.IGetProposalResponse=} [properties] Properties to set
          */
         function GetProposalResponse(properties) {
-            this.proposal = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -3135,11 +3134,11 @@ $root.getProposal = (function() {
 
         /**
          * GetProposalResponse proposal.
-         * @member {Array.<string>} proposal
+         * @member {string} proposal
          * @memberof getProposal.GetProposalResponse
          * @instance
          */
-        GetProposalResponse.prototype.proposal = $util.emptyArray;
+        GetProposalResponse.prototype.proposal = "";
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.
@@ -3165,9 +3164,8 @@ $root.getProposal = (function() {
         GetProposalResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.proposal != null && message.proposal.length)
-                for (var i = 0; i < message.proposal.length; ++i)
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.proposal[i]);
+            if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.proposal);
             return writer;
         };
 
@@ -3203,9 +3201,7 @@ $root.getProposal = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
-                        if (!(message.proposal && message.proposal.length))
-                            message.proposal = [];
-                        message.proposal.push(reader.string());
+                        message.proposal = reader.string();
                         break;
                     }
                 default:
@@ -3243,13 +3239,9 @@ $root.getProposal = (function() {
         GetProposalResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.proposal != null && message.hasOwnProperty("proposal")) {
-                if (!Array.isArray(message.proposal))
-                    return "proposal: array expected";
-                for (var i = 0; i < message.proposal.length; ++i)
-                    if (!$util.isString(message.proposal[i]))
-                        return "proposal: string[] expected";
-            }
+            if (message.proposal != null && message.hasOwnProperty("proposal"))
+                if (!$util.isString(message.proposal))
+                    return "proposal: string expected";
             return null;
         };
 
@@ -3265,13 +3257,8 @@ $root.getProposal = (function() {
             if (object instanceof $root.getProposal.GetProposalResponse)
                 return object;
             var message = new $root.getProposal.GetProposalResponse();
-            if (object.proposal) {
-                if (!Array.isArray(object.proposal))
-                    throw TypeError(".getProposal.GetProposalResponse.proposal: array expected");
-                message.proposal = [];
-                for (var i = 0; i < object.proposal.length; ++i)
-                    message.proposal[i] = String(object.proposal[i]);
-            }
+            if (object.proposal != null)
+                message.proposal = String(object.proposal);
             return message;
         };
 
@@ -3288,13 +3275,10 @@ $root.getProposal = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.arrays || options.defaults)
-                object.proposal = [];
-            if (message.proposal && message.proposal.length) {
-                object.proposal = [];
-                for (var j = 0; j < message.proposal.length; ++j)
-                    object.proposal[j] = message.proposal[j];
-            }
+            if (options.defaults)
+                object.proposal = "";
+            if (message.proposal != null && message.hasOwnProperty("proposal"))
+                object.proposal = message.proposal;
             return object;
         };
 
