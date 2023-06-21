@@ -2891,6 +2891,445 @@ $root.getPeers = (function() {
     return getPeers;
 })();
 
+$root.getProposal = (function() {
+
+    /**
+     * Namespace getProposal.
+     * @exports getProposal
+     * @namespace
+     */
+    var getProposal = {};
+
+    getProposal.GetProposalRequest = (function() {
+
+        /**
+         * Properties of a GetProposalRequest.
+         * @memberof getProposal
+         * @interface IGetProposalRequest
+         * @property {shared.IHeaders|null} [headers] GetProposalRequest headers
+         */
+
+        /**
+         * Constructs a new GetProposalRequest.
+         * @memberof getProposal
+         * @classdesc Represents a GetProposalRequest.
+         * @implements IGetProposalRequest
+         * @constructor
+         * @param {getProposal.IGetProposalRequest=} [properties] Properties to set
+         */
+        function GetProposalRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetProposalRequest headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getProposal.GetProposalRequest
+         * @instance
+         */
+        GetProposalRequest.prototype.headers = null;
+
+        /**
+         * Creates a new GetProposalRequest instance using the specified properties.
+         * @function create
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {getProposal.IGetProposalRequest=} [properties] Properties to set
+         * @returns {getProposal.GetProposalRequest} GetProposalRequest instance
+         */
+        GetProposalRequest.create = function create(properties) {
+            return new GetProposalRequest(properties);
+        };
+
+        /**
+         * Encodes the specified GetProposalRequest message. Does not implicitly {@link getProposal.GetProposalRequest.verify|verify} messages.
+         * @function encode
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {getProposal.IGetProposalRequest} message GetProposalRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetProposalRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetProposalRequest message, length delimited. Does not implicitly {@link getProposal.GetProposalRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {getProposal.IGetProposalRequest} message GetProposalRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetProposalRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetProposalRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getProposal.GetProposalRequest} GetProposalRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetProposalRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getProposal.GetProposalRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetProposalRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getProposal.GetProposalRequest} GetProposalRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetProposalRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetProposalRequest message.
+         * @function verify
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetProposalRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetProposalRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getProposal.GetProposalRequest} GetProposalRequest
+         */
+        GetProposalRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.getProposal.GetProposalRequest)
+                return object;
+            var message = new $root.getProposal.GetProposalRequest();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getProposal.GetProposalRequest.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetProposalRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {getProposal.GetProposalRequest} message GetProposalRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetProposalRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
+        };
+
+        /**
+         * Converts this GetProposalRequest to JSON.
+         * @function toJSON
+         * @memberof getProposal.GetProposalRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetProposalRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GetProposalRequest
+         * @function getTypeUrl
+         * @memberof getProposal.GetProposalRequest
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GetProposalRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/getProposal.GetProposalRequest";
+        };
+
+        return GetProposalRequest;
+    })();
+
+    getProposal.GetProposalResponse = (function() {
+
+        /**
+         * Properties of a GetProposalResponse.
+         * @memberof getProposal
+         * @interface IGetProposalResponse
+         * @property {Array.<string>|null} [proposal] GetProposalResponse proposal
+         */
+
+        /**
+         * Constructs a new GetProposalResponse.
+         * @memberof getProposal
+         * @classdesc Represents a GetProposalResponse.
+         * @implements IGetProposalResponse
+         * @constructor
+         * @param {getProposal.IGetProposalResponse=} [properties] Properties to set
+         */
+        function GetProposalResponse(properties) {
+            this.proposal = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetProposalResponse proposal.
+         * @member {Array.<string>} proposal
+         * @memberof getProposal.GetProposalResponse
+         * @instance
+         */
+        GetProposalResponse.prototype.proposal = $util.emptyArray;
+
+        /**
+         * Creates a new GetProposalResponse instance using the specified properties.
+         * @function create
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {getProposal.IGetProposalResponse=} [properties] Properties to set
+         * @returns {getProposal.GetProposalResponse} GetProposalResponse instance
+         */
+        GetProposalResponse.create = function create(properties) {
+            return new GetProposalResponse(properties);
+        };
+
+        /**
+         * Encodes the specified GetProposalResponse message. Does not implicitly {@link getProposal.GetProposalResponse.verify|verify} messages.
+         * @function encode
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {getProposal.IGetProposalResponse} message GetProposalResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetProposalResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.proposal != null && message.proposal.length)
+                for (var i = 0; i < message.proposal.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.proposal[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetProposalResponse message, length delimited. Does not implicitly {@link getProposal.GetProposalResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {getProposal.IGetProposalResponse} message GetProposalResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetProposalResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetProposalResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getProposal.GetProposalResponse} GetProposalResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetProposalResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getProposal.GetProposalResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.proposal && message.proposal.length))
+                            message.proposal = [];
+                        message.proposal.push(reader.string());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetProposalResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getProposal.GetProposalResponse} GetProposalResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetProposalResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetProposalResponse message.
+         * @function verify
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetProposalResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.proposal != null && message.hasOwnProperty("proposal")) {
+                if (!Array.isArray(message.proposal))
+                    return "proposal: array expected";
+                for (var i = 0; i < message.proposal.length; ++i)
+                    if (!$util.isString(message.proposal[i]))
+                        return "proposal: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetProposalResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getProposal.GetProposalResponse} GetProposalResponse
+         */
+        GetProposalResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.getProposal.GetProposalResponse)
+                return object;
+            var message = new $root.getProposal.GetProposalResponse();
+            if (object.proposal) {
+                if (!Array.isArray(object.proposal))
+                    throw TypeError(".getProposal.GetProposalResponse.proposal: array expected");
+                message.proposal = [];
+                for (var i = 0; i < object.proposal.length; ++i)
+                    message.proposal[i] = String(object.proposal[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetProposalResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {getProposal.GetProposalResponse} message GetProposalResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetProposalResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.proposal = [];
+            if (message.proposal && message.proposal.length) {
+                object.proposal = [];
+                for (var j = 0; j < message.proposal.length; ++j)
+                    object.proposal[j] = message.proposal[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this GetProposalResponse to JSON.
+         * @function toJSON
+         * @memberof getProposal.GetProposalResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetProposalResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GetProposalResponse
+         * @function getTypeUrl
+         * @memberof getProposal.GetProposalResponse
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GetProposalResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/getProposal.GetProposalResponse";
+        };
+
+        return GetProposalResponse;
+    })();
+
+    return getProposal;
+})();
+
 $root.getStatus = (function() {
 
     /**
