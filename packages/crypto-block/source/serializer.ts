@@ -161,16 +161,17 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 	}
 
 	public async serializeProposed(proposedBlock: Contracts.Crypto.IProposedBlockSerializable): Promise<Buffer> {
-		const serializedLockProof = proposedBlock.lockProof
-			? await this.serializeLockProof(proposedBlock.lockProof)
-			: Buffer.of(0);
+		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
 
 		// NOTE: The lock proof is undefined most of the time, hence we can safe a lot of bytes
 		// here by explicitly storing it's length instead of padding it with zero bytes.
-		const proofLength = Buffer.of(serializedLockProof.length);
+		if (proposedBlock.lockProof) {
+			const serializedLockProof = await this.serializeLockProof(proposedBlock.lockProof);
+			const proofLength = Buffer.of(serializedLockProof.length);
+			return Buffer.concat([proofLength, serializedLockProof, serializedBlock]);
+		}
 
-		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
-		return Buffer.concat([proofLength, serializedLockProof, serializedBlock]);
+		return Buffer.concat([Buffer.of(0), serializedBlock]);
 	}
 
 	public async serializeCommit(commit: Contracts.Crypto.IBlockCommit): Promise<Buffer> {
