@@ -103,7 +103,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerBroadcaster).to(Broadcaster);
+		this.app.bind(Identifiers.PeerBroadcaster).to(Broadcaster).inSingletonScope();
 
 		this.app.bind<Server>(Identifiers.P2PServer).to(Server).inSingletonScope();
 	}
