@@ -175,6 +175,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return this.emit(peer, Routes.GetMessages, {}, 5000);
 	}
 
+	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.PeerBroadcast[]> {
+		return this.emit(peer, Routes.GetProposal, {}, 5000);
+	}
+
 	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.PeerBroadcast[]> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
 
