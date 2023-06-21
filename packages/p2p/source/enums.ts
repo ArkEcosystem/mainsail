@@ -31,6 +31,7 @@ export enum Routes {
 	GetBlocks = "getBlocks",
 	GetCommonBlocks = "getCommonBlocks",
 	GetMessages = "getMessages",
+	GetProposal = "getProposal",
 	GetPeers = "getPeers",
 	GetStatus = "getStatus",
 	PostBlock = "postBlock",
