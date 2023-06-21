@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -507,8 +507,8 @@ importers:
   packages/contracts:
     dependencies:
       '@hapi/hapi':
-        specifier: 20.1.5
-        version: 20.1.5
+        specifier: 21.3.2
+        version: 21.3.2
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils

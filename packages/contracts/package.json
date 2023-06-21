@@ -19,7 +19,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@hapi/hapi": "20.1.5",
+		"@hapi/hapi": "21.3.2",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.12.0",
 		"dayjs": "1.10.7",
@@ -29,7 +29,6 @@
 		"type-fest": "0.21.3"
 	},
 	"devDependencies": {
-		"@types/hapi__hapi": "21.0.0",
 		"@types/plur": "^3.1.0",
 		"uvu": "^0.5.6"
 	},
