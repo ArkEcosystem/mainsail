@@ -9,5 +9,5 @@ export type IHeaderData = {
 
 export interface IHeader {
 	getHeader(): Promise<IHeaderData>;
-	handle(header: IHeaderData): Promise<void>;
+	// handle(header: IHeaderData): Promise<void>;
 }
