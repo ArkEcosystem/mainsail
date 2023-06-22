@@ -40,9 +40,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			this.hashByteLength + // blockId
 			4 + // height
 			4 + // round
-			this.consensusSignatureByteLength + // signature
-			1 +
-			51 // validator bit matrix  TODO optimize
+			+this.lockProofSize()
 		);
 	}
 
@@ -50,7 +48,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		return (
 			this.consensusSignatureByteLength + // signature
 			1 +
-			51 // validator bit matrix  TODO optimize
+			8 // validator set bitmap
 		);
 	}
 
@@ -145,8 +143,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		});
 	}
 
-	public async serializeLockProof(lockProof: Contracts.Crypto.IBlockLockProof): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IBlockLockProof>(lockProof, {
+	public async serializeLockProof(lockProof: Contracts.Crypto.IProposalLockProof): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IProposalLockProof>(lockProof, {
 			length: this.lockProofSize(),
 			skip: 0,
 			schema: {

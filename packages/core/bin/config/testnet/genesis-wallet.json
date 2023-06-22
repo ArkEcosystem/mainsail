@@ -1,14 +1,14 @@
 {
-	"address": "ark16xclqqgrky5mguuwyf4eswqtlg087rs00na7s7fv4r6aezn65l6sdhjp2e",
-	"keys": {
-		"compressed": true,
-		"privateKey": "d9e886be92cfa965e6784571eb81f3875f2e8f2d1b575630c46d348d4160ca30",
-		"publicKey": "d1b1f00103b129b4738e226b98380bfa1e7f0e0f7cfbe8792ca8f5dc8a7aa7f5"
-	},
+	"address": "ark1ym9j6pprxhufmhpt0f7fu0pln4wl3729hzd5960s64rh36mxjl2s83t3sw",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "3df7dc92b1bad7924489d5daa3067efd33323f836da1641cad31886da49e2ce5",
-		"publicKey": "85ffa411a229c61d406bf802ef636cecbb85dd95f14a4fef9af2df499481bf192128e3ee33f6449dc875116b9ac206bb"
+		"privateKey": "56852bfd41a1fb3a730770538410f2d595fad3aeb58ea9f7ad7bde92a21e7551",
+		"publicKey": "8c3c301af0a92aa61fac502a8ba9378ef9f6529ede6124e6945c814ec3904598f782af3365848c2a2f896381c1124579"
 	},
-	"passphrase": "session merry siege motor brain arrow input metal predict cherry emotion review kid diagram giraffe usual umbrella patient coast identify indicate chalk anchor pulse"
+	"keys": {
+		"compressed": true,
+		"privateKey": "d98bb8f6a1d2ff4e859e659bb143994fd71bb3544017c7a00b1863319b8aceb1",
+		"publicKey": "26cb2d042335f89ddc2b7a7c9e3c3f9d5df8f945b89b42e9f0d54778eb6697d5"
+	},
+	"passphrase": "talent enlist ocean aunt way parade tower secret lab car puppy boss eight inherit snake salon arch concert casual guess raccoon visa vacant isolate"
 }

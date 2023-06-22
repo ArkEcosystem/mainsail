@@ -368,12 +368,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
 		const activeValidators = await this.validatorSet.getActiveValidators();
-		return activeValidators[0].getAttribute("consensus.publicKey");
+		return activeValidators[0].getAttribute("validator.consensusPublicKey");
 	}
 
 	async #getActiveValidators(): Promise<string[]> {
 		const activeValidators = await this.validatorSet.getActiveValidators();
 
-		return activeValidators.map((wallet) => wallet.getAttribute("consensus.publicKey"));
+		return activeValidators.map((wallet) => wallet.getAttribute("validator.consensusPublicKey"));
 	}
 }

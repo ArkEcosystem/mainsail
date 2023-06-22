@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import validatorsJson from "../../../core/bin/config/testnet/validators.json";
 import { Sandbox } from "../../../test-framework";
+import { validatorMnemonic } from "../fixtures/proposal";
 
 export const prepareWallet = async (context: { sandbox: Sandbox }): Promise<Contracts.State.Wallet> => {
 	const walletRepository = context.sandbox.app.getTagged<Contracts.State.WalletRepository>(
@@ -15,9 +15,9 @@ export const prepareWallet = async (context: { sandbox: Sandbox }): Promise<Cont
 		"consensus",
 	);
 
-	const mnemonic = validatorsJson.secrets[0];
+	const mnemonic = validatorMnemonic;
 	const wallet = walletRepository.findByAddress(mnemonic);
-	wallet.setAttribute("consensus.publicKey", await consensusPublicKeyFactory.fromMnemonic(mnemonic));
+	wallet.setAttribute("validator.consensusPublicKey", await consensusPublicKeyFactory.fromMnemonic(mnemonic));
 
 	return wallet;
 };

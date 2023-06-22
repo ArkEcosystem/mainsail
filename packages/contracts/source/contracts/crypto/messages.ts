@@ -6,21 +6,6 @@ export enum MessageType {
 	Precommit = 2,
 }
 
-export interface IProposalLockProof {
-	readonly signature: string;
-	readonly validators: boolean[];
-}
-
-export interface IProposalData {
-	readonly height: number;
-	readonly round: number;
-	readonly validRound?: number;
-	readonly block: { serialized: string };
-	readonly validatorIndex: number;
-	readonly lockProof?: IProposalLockProof;
-	readonly signature: string;
-}
-
 export interface ISignatureMessageData {
 	readonly type: MessageType;
 	readonly height: number;
@@ -35,16 +20,26 @@ export interface ISignatureProposalData extends Omit<ISignatureMessageData, "typ
 export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
 export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
 
-export interface IProposal {
+export interface IProposalData {
 	readonly height: number;
 	readonly round: number;
-	readonly validRound?: number;
-	readonly block: IProposedBlock;
+	readonly block: { serialized: string };
 	readonly validatorIndex: number;
+	readonly validRound?: number;
 	readonly signature: string;
+}
+
+export interface IProposal extends IProposalData {
+	readonly block: IProposedBlock;
+
 	toSignatureData(): ISignatureProposalData;
+	toData(): IProposalData;
 	toString(): string;
-	// toData(): IProposalData;
+}
+
+export interface IProposalLockProof {
+	readonly signature: string;
+	readonly validators: boolean[];
 }
 
 export interface IPrevoteData {
@@ -56,16 +51,10 @@ export interface IPrevoteData {
 	readonly signature: string;
 }
 
-export interface IPrevote {
-	readonly type: MessageType;
-	readonly height: number;
-	readonly round: number;
-	readonly blockId?: string;
-	readonly validatorIndex: number;
-	readonly signature: string;
+export interface IPrevote extends IPrevoteData {
 	toSignatureData(): ISignaturePrevoteData;
+	toData(): IPrevoteData;
 	toString(): string;
-	// toData(): IPrevoteData;
 }
 
 export interface IPrecommitData {
@@ -77,16 +66,15 @@ export interface IPrecommitData {
 	readonly signature: string;
 }
 
-export interface IPrecommit {
-	readonly type: MessageType;
-	readonly height: number;
-	readonly round: number;
-	readonly blockId?: string;
-	readonly validatorIndex: number;
-	readonly signature: string;
+export interface IPrecommit extends IPrecommitData {
 	toSignatureData(): ISignaturePrecommitData;
+	toData(): IPrecommitData;
 	toString(): string;
-	// toData(): IPrecommitData;
+}
+
+export interface IValidatorSetMajority {
+	signature: string;
+	validators: boolean[];
 }
 
 export type HasSignature = { signature: string };

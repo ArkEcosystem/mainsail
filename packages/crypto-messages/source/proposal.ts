@@ -8,14 +8,14 @@ export class Proposal implements Contracts.Crypto.IProposal {
 	#validatorIndex: number;
 	#signature: string;
 
-	constructor(
-		height: number,
-		round: number,
-		block: Contracts.Crypto.IProposedBlock,
-		validRound: number | undefined,
-		validatorIndex: number,
-		signature: string,
-	) {
+	constructor({
+		height,
+		round,
+		validatorIndex,
+		block,
+		validRound,
+		signature,
+	}: Contracts.Crypto.IProposalData & { block: Contracts.Crypto.IProposedBlock }) {
 		this.#height = height;
 		this.#round = round;
 		this.#validRound = validRound;
@@ -67,7 +67,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 
 	toData(): Contracts.Crypto.IProposalData {
 		return {
-			block: this.#block,
+			block: { serialized: this.#block.serialized },
 			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,

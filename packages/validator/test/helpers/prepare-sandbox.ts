@@ -12,6 +12,7 @@ import { ServiceProvider as CoreCryptoMessages } from "../../../crypto-messages"
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "../../../crypto-transaction";
 import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
+import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation";
 import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/events";
 import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers";
 import { ServiceProvider as CoreSerializer } from "../../../serializer";
@@ -36,6 +37,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 
 	await context.sandbox.app.resolve(CoreCryptoAddressBech32m).register();
+	await context.sandbox.app.resolve(CoreCryptoValidation).register();
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
 	await context.sandbox.app.resolve(CoreState).register();
@@ -62,6 +64,8 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		getValidatorIndexByPublicKey: () => 0,
 	});
 
-	context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
+	context.sandbox.app
+		.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
+		.set("validator.consensusPublicKey");
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 };
