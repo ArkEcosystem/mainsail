@@ -3,9 +3,9 @@ import { Providers } from "@mainsail/kernel";
 
 import { Deserializer } from "./deserializer";
 import { MessageFactory } from "./factory";
+import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
 import { Verifier } from "./verifier";
-import { schemas } from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
