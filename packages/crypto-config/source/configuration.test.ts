@@ -28,10 +28,7 @@ describe<{
 	});
 
 	it('key should be "get"', ({ configManager }) => {
-		assert.equal(
-			configManager.get("network.nethash"),
-			cryptoJson.network.nethash,
-		);
+		assert.equal(configManager.get("network.nethash"), cryptoJson.network.nethash);
 	});
 
 	it("should build milestones", ({ configManager }) => {
