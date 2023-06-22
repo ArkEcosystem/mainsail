@@ -6,6 +6,7 @@ import { plugin as hapiNesPlugin } from "../hapi-nes";
 import { AcceptPeerPlugin } from "./plugins/accept-peer";
 import { AwaitBlockPlugin } from "./plugins/await-block";
 import { CodecPlugin } from "./plugins/codec";
+import { HeaderHandlePlugin } from "./plugins/header-handle";
 import { IsAppReadyPlugin } from "./plugins/is-app-ready";
 import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
@@ -74,6 +75,7 @@ export class Server {
 
 		// onPreHandler
 		this.app.resolve(AcceptPeerPlugin).register(this.server);
+		this.app.resolve(HeaderHandlePlugin).register(this.server);
 	}
 
 	public async boot(): Promise<void> {
