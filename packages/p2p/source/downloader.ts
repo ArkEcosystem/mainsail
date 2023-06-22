@@ -15,6 +15,11 @@ export class Downloader {
 	// TODO: Handle errors & response checks
 	public async downloadProposal(peer: Contracts.P2P.Peer): Promise<void> {
 		const result = await this.communicator.getProposal(peer);
+
+		if (result.proposal.length === 0) {
+			return;
+		}
+
 		const proposal = await this.factory.makeProposalFromBytes(Buffer.from(result.proposal, "hex"));
 
 		await this.handler.onProposal(proposal);
