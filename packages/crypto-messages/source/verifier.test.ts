@@ -1,10 +1,9 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../core/bin/config/testnet/crypto.json";
-import validatorsJson from "../../core/bin/config/testnet/validators.json";
 
 import { describe, Factories, Sandbox } from "../../test-framework";
-import { blockData, precommitData, prevoteData, proposalData, serializedBlock } from "../test/fixtures/proposal";
+import { blockData, precommitData, prevoteData, proposalData, serializedBlock, validatorMnemonic } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { prepareWallet } from "../test/helpers/prepare-wallet";
 import { Verifier } from "./verifier";
@@ -40,7 +39,7 @@ describe<{
 			.withOptions({
 				app: context.sandbox.app,
 				keyType: "consensus",
-				passphrase: validatorsJson.secrets[0],
+				passphrase: validatorMnemonic,
 			})
 			.make<Types.Identity>();
 

@@ -30,7 +30,7 @@ describe<{
 	it('key should be "get"', ({ configManager }) => {
 		assert.equal(
 			configManager.get("network.nethash"),
-			"1e09a19d28592bb7a79a81be435f522d693d6cef9d2ee37ab113f40f580dc8d7",
+			cryptoJson.network.nethash,
 		);
 	});
 
@@ -41,7 +41,7 @@ describe<{
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
-				epoch: "2023-06-13T00:00:00.000Z",
+				epoch: cryptoJson.milestones[0].epoch,
 				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
@@ -55,7 +55,7 @@ describe<{
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
-				epoch: "2023-06-13T00:00:00.000Z",
+				epoch: cryptoJson.milestones[0].epoch,
 				height: 75_600,
 				multiPaymentLimit: 256,
 				reward: "200000000",

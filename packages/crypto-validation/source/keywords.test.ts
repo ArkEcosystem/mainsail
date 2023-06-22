@@ -179,7 +179,7 @@ describe<{
 		assert.undefined(
 			context.validator.validate("test", {
 				fee: 0,
-				id: "0d9448d3b4a3ff621975a5715ff7ca159899e9d81c417d33f5d4895878d955c5",
+				id: cryptoJson.genesisBlock.block.transactions[0].id,
 			}).error,
 		);
 	});
