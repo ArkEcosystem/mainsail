@@ -68,7 +68,6 @@ export class Validator implements Contracts.Consensus.IValidator {
 			{
 				block: { block, lockProof, serialized: serializedProposedBlock.toString("hex") },
 				height,
-				lockProof,
 				round,
 				validRound,
 				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
