@@ -51,7 +51,7 @@ export class Header implements Contracts.P2P.IHeader {
 		if (result.downloadMessages) {
 			const messageDownloader = this.app.resolve<Downloader>(Downloader);
 
-			await messageDownloader.download(peer);
+			await messageDownloader.downloadMessages(peer);
 		}
 	}
 

@@ -13,7 +13,7 @@ export class Downloader {
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
 	// TODO: Handle errors
-	public async download(peer: Contracts.P2P.Peer): Promise<void> {
+	public async downloadMessages(peer: Contracts.P2P.Peer): Promise<void> {
 		const result = await this.communicator.getMessages(peer);
 
 		for (const prevoteHex of result.prevotes) {
