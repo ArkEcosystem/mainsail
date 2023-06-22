@@ -25,10 +25,7 @@ describe<{
 	});
 
 	it("#signature", async () => {
-		assert.equal(
-			precommit.signature,
-			precommitData.signature,
-		);
+		assert.equal(precommit.signature, precommitData.signature);
 	});
 
 	it("#toString", async () => {

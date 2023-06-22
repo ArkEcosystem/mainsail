@@ -42,7 +42,9 @@ describe<{
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);
 		context.verifier = context.sandbox.app.resolve(Verifier);
-		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory);
+		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(
+			Identifiers.Cryptography.Block.Factory,
+		);
 
 		const identityFactory = await Factories.factory("Identity", crypto);
 		const identity = await identityFactory
@@ -56,7 +58,12 @@ describe<{
 		context.identity = identity;
 	});
 
-	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity, verifier }) => {
+	it("#makeProposal - should correctly make signed proposal", async ({
+		blockFactory,
+		factory,
+		identity,
+		verifier,
+	}) => {
 		const block: Contracts.Crypto.IProposedBlock = {
 			block: await blockFactory.fromData(blockData),
 			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),

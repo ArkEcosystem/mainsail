@@ -29,7 +29,9 @@ describe<{
 		};
 
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
-		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory);
+		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(
+			Identifiers.Cryptography.Block.Factory,
+		);
 		context.factory = context.sandbox.app.resolve(MessageFactory);
 		context.verifier = context.sandbox.app.resolve(Verifier);
 

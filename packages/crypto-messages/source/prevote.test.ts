@@ -25,10 +25,7 @@ describe<{
 	});
 
 	it("#signature", async () => {
-		assert.equal(
-			prevote.signature,
-			prevoteData.signature,
-		);
+		assert.equal(prevote.signature, prevoteData.signature);
 	});
 
 	it("#toString", async () => {

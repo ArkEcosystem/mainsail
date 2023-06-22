@@ -39,10 +39,7 @@ describe<{
 	});
 
 	it("#signature", async () => {
-		assert.equal(
-			proposal.signature,
-			proposalData.signature,
-		);
+		assert.equal(proposal.signature, proposalData.signature);
 	});
 
 	it("#toString", async () => {
