@@ -10,7 +10,7 @@ export const schemas: Record<
 		properties: {
 			blockId: { $ref: "blockId" },
 			height: { minimum: 1, type: "integer" },
-			round: { minimum: 1, type: "integer" },
+			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Contracts.Crypto.MessageType.Precommit] },
 			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
@@ -23,7 +23,7 @@ export const schemas: Record<
 		properties: {
 			blockId: { $ref: "blockId" },
 			height: { minimum: 1, type: "integer" },
-			round: { minimum: 1, type: "integer" },
+			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Contracts.Crypto.MessageType.Prevote] },
 			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
@@ -36,15 +36,15 @@ export const schemas: Record<
 		properties: {
 			block: {
 				properties: {
-					serialized: { $ref: "alphanumeric" },
+					serialized: { $ref: "hex" },
 				},
 				required: ["serialized"],
 				type: "object",
 			},
 			height: { minimum: 1, type: "integer" },
-			round: { minimum: 1, type: "integer" },
+			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
-			validRound: { minimum: 1, type: "integer" },
+			validRound: { minimum: 0, type: "integer" },
 			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
 		},
 		required: ["height", "round", "block", "validatorIndex", "signature"],
@@ -65,7 +65,7 @@ export const schemas: Record<
 		$id: "validatorBitmap",
 		items: { type: "boolean" },
 		maxItems: 51,
-		minItems: 0, // TODO: milestone
+		minItems: 51, // TODO: milestone
 		type: "array",
 	},
 };
