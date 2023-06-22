@@ -11,10 +11,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@tagged("state", "clone")
 	private readonly walletRepository!: Contracts.State.WalletRepositoryClone;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	@tagged("type", "consensus")
-	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
-
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
@@ -246,7 +242,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#precommitsCount.get(blockId) ?? 0;
 	}
 
-	public async aggregateMajorityPrevotes(): Promise<Contracts.Consensus.IValidatorSetMajority> {
+	public async aggregateMajorityPrevotes(): Promise<Contracts.Crypto.IValidatorSetMajority> {
 		if (!this.hasMajorityPrevotes()) {
 			throw new Error("called #aggregateMajorityPrevotes without majority");
 		}
@@ -254,7 +250,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#prevotes));
 	}
 
-	public async aggregateMajorityPrecommits(): Promise<Contracts.Consensus.IValidatorSetMajority> {
+	public async aggregateMajorityPrecommits(): Promise<Contracts.Crypto.IValidatorSetMajority> {
 		if (!this.hasMajorityPrecommits()) {
 			throw new Error("called #aggregateMajorityPrecommits without majority");
 		}
@@ -264,22 +260,26 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	async #aggregateValidatorSetMajority(
 		majority: Map<string, { signature: string }>,
-	): Promise<Contracts.Consensus.IValidatorSetMajority> {
+	): Promise<Contracts.Crypto.IValidatorSetMajority> {
 		const publicKeys: Buffer[] = [];
 		const signatures: Buffer[] = [];
+
+		const numberOfValidators = this.configuration.getMilestone().activeValidators;
+		const validators: boolean[] = Array(numberOfValidators).fill(false);
 
 		for (const [key, { signature }] of majority) {
 			publicKeys.push(Buffer.from(key, "hex"));
 			signatures.push(Buffer.from(signature, "hex"));
+
+			const validatorIndex = this.validatorSet.getValidatorIndexByPublicKey(key);
+			validators[validatorIndex] = true;
 		}
 
-		const aggPublicKey = await this.publicKeyFactory.aggregate(publicKeys);
-		const aggSignature = await this.signatureFactory.aggregate(signatures);
+		const signature = await this.signatureFactory.aggregate(signatures);
 
 		return {
-			aggPublicKey, // TODO: possibly not needed in this context
-			aggSignature,
-			validatorSet: new Set(publicKeys),
+			signature,
+			validators,
 		};
 	}
 
@@ -303,9 +303,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
 
 		return {
-			signature: majority.aggSignature,
-			// TODO: calcualte validator set matrix
-			validators: [...majority.validatorSet].map((v) => true),
+			...majority,
 		};
 	}
 
@@ -326,9 +324,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 				blockId: block.data.id,
 				height: block.data.height,
 				round,
-				signature: majority.aggSignature,
-				// TODO: calcualte validator set matrix
-				validators: [...majority.validatorSet].map((v) => true),
+				...majority,
 			},
 		};
 

@@ -188,8 +188,6 @@ describe<{
 	it("#makePrevoteFromBytes - should be ok with no block", async ({ factory, identity, verifier }) => {
 		const prevote = await factory.makePrevoteFromBytes(Buffer.from(serializedPrevoteNoBlock, "hex"));
 
-		console.log(prevote.toSignatureData());
-
 		assert.equal(prevote.toData(), prevoteDataNoBlock);
 	});
 

@@ -1,12 +1,5 @@
-import { IBlock, ICommittedBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof } from "./crypto";
+import { IBlock, ICommittedBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof, IValidatorSetMajority } from "./crypto";
 import { WalletRepositoryClone } from "./state";
-
-// TODO: Move to crypto
-export interface IValidatorSetMajority {
-	aggSignature: string;
-	aggPublicKey: string;
-	validatorSet: Set<Buffer>;
-}
 
 export interface IRoundState {
 	readonly height: number;

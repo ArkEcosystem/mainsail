@@ -31,9 +31,9 @@ export interface ISignatureMessageData {
 export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> {}
-export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
-export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> { }
+export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> { }
+export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> { }
 
 export interface IProposal {
 	readonly height: number;
@@ -87,6 +87,11 @@ export interface IPrecommit {
 	toSignatureData(): ISignaturePrecommitData;
 	toString(): string;
 	// toData(): IPrecommitData;
+}
+
+export interface IValidatorSetMajority {
+	signature: string;
+	validators: boolean[];
 }
 
 export type HasSignature = { signature: string };

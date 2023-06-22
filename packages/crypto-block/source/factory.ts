@@ -57,7 +57,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		const buffer = ByteBuffer.fromBuffer(buff);
 
 		const lockProofLength = buffer.readUint8();
-		let lockProof: Contracts.Crypto.IBlockLockProof | undefined;
+		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
 		if (lockProofLength > 0) {
 			const lockProofBuffer = buffer.readBytes(lockProofLength);
 			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
@@ -168,7 +168,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 				throw new Exceptions.BlockSchemaError(
 					data.height,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-						`${error.message}: ${JSON.stringify(error.data)}`,
+					`${error.message}: ${JSON.stringify(error.data)}`,
 				);
 			}
 		}
