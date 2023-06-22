@@ -6,7 +6,26 @@ export class MessageDownloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
+	@inject(Identifiers.Consensus.Handler)
+	private readonly handler!: Contracts.Consensus.IHandler;
+
+	@inject(Identifiers.Cryptography.Message.Factory)
+	private readonly factory!: Contracts.Crypto.IMessageFactory;
+
+	// TODO: Handle errors
 	public async download(peer: Contracts.P2P.Peer): Promise<void> {
-		await this.communicator.getMessages(peer);
+		const result = await this.communicator.getMessages(peer);
+
+		for (const prevoteHex of result.prevotes) {
+			const prevote = await this.factory.makePrevoteFromBytes(Buffer.from(prevoteHex, "hex"));
+
+			await this.handler.onPrevote(prevote);
+		}
+
+		for (const precommitHex of result.precommits) {
+			const precommit = await this.factory.makePrecommitFromBytes(Buffer.from(precommitHex, "hex"));
+
+			await this.handler.onPrecommit(precommit);
+		}
 	}
 }
