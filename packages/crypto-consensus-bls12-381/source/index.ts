@@ -10,6 +10,7 @@ import { Signature } from "@mainsail/crypto-signature-bls12-381";
 import { Providers } from "@mainsail/kernel";
 
 import { schemas } from "./schemas";
+export * from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

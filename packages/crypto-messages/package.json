@@ -21,12 +21,18 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
+		"ajv": "8.12.0",
 		"delay": "5.0.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

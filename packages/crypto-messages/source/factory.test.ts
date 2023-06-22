@@ -26,6 +26,7 @@ import { Verifier } from "./verifier";
 describe<{
 	sandbox: Sandbox;
 	factory: MessageFactory;
+	blockFactory: Contracts.Crypto.IBlockFactory;
 	verifier: Verifier;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
@@ -41,6 +42,9 @@ describe<{
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);
 		context.verifier = context.sandbox.app.resolve(Verifier);
+		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(
+			Identifiers.Cryptography.Block.Factory,
+		);
 
 		const identityFactory = await Factories.factory("Identity", crypto);
 		const identity = await identityFactory
@@ -54,15 +58,15 @@ describe<{
 		context.identity = identity;
 	});
 
-	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity, verifier }) => {
+	it("#makeProposal - should correctly make signed proposal", async ({
+		blockFactory,
+		factory,
+		identity,
+		verifier,
+	}) => {
 		const block: Contracts.Crypto.IProposedBlock = {
-			block: {
-				data: blockData,
-				header: { ...blockData },
-				serialized: serializedBlock,
-				transactions: [],
-			},
-			serialized: "",
+			block: await blockFactory.fromData(blockData),
+			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
 		};
 
 		const proposal = await factory.makeProposal(

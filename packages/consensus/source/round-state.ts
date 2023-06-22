@@ -269,7 +269,13 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		for (const [key, { signature }] of majority) {
 			signatures.push(Buffer.from(signature, "hex"));
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByPublicKey(key);
+			const validator = this.#validators.get(key);
+			Utils.assert.defined<Contracts.State.Wallet>(validator);
+
+			const walletPublicKey = validator.getPublicKey();
+			Utils.assert.defined<string>(walletPublicKey);
+
+			const validatorIndex = this.validatorSet.getValidatorIndexByPublicKey(walletPublicKey);
 			validators[validatorIndex] = true;
 		}
 

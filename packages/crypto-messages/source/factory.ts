@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { Precommit } from "./precommit";
 import { Prevote } from "./prevote";
@@ -20,6 +20,9 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	@tagged("type", "consensus")
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.IValidator;
+
 	public async makeProposal(
 		data: Contracts.Crypto.IMakeProposalData,
 		keyPair: Contracts.Crypto.IKeyPair,
@@ -30,14 +33,17 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 			round: data.round,
 		});
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Proposal(data.height, data.round, data.block, data.validRound, data.validatorIndex, signature);
+		const serialized = await this.serializer.serializeProposal({ ...data, signature });
+		return this.makeProposalFromBytes(serialized);
 	}
 
 	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const data = await this.deserializer.deserializeProposal(bytes);
+		this.#applySchema("proposal", data);
+
 		const block = await this.blockFactory.fromProposedBytes(Buffer.from(data.block.serialized, "hex"));
 
-		return new Proposal(data.height, data.round, block, data.validRound, data.validatorIndex, data.signature);
+		return new Proposal({ ...data, block });
 	}
 
 	public async makePrevote(
@@ -51,12 +57,14 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 			type: data.type,
 		});
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Prevote(data.height, data.round, data.blockId, data.validatorIndex, signature);
+		const serialized = await this.serializer.serializePrevote({ ...data, signature });
+		return this.makePrevoteFromBytes(serialized);
 	}
 
 	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
 		const data = await this.deserializer.deserializePrevote(bytes);
-		return new Prevote(data.height, data.round, data.blockId, data.validatorIndex, data.signature);
+		this.#applySchema("prevote", data);
+		return new Prevote(data);
 	}
 
 	public async makePrecommit(
@@ -70,11 +78,24 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 			type: data.type,
 		});
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		return new Precommit(data.height, data.round, data.blockId, data.validatorIndex, signature);
+
+		const serialized = await this.serializer.serializePrecommit({ ...data, signature });
+		return this.makePrecommitFromBytes(serialized);
 	}
 
 	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
 		const data = await this.deserializer.deserializePrecommit(bytes);
-		return new Precommit(data.height, data.round, data.blockId, data.validatorIndex, data.signature);
+		this.#applySchema("precommit", data);
+		return new Precommit(data);
+	}
+
+	#applySchema<T>(schema: string, data: T): T {
+		const result = this.validator.validate(schema, data);
+
+		if (!result.error) {
+			return result.value;
+		}
+
+		throw new Exceptions.MessageSchemaError(schema, result.error);
 	}
 }
