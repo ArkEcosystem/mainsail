@@ -126,16 +126,15 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				const validatorSet = data[property];
 				Utils.assert.array(validatorSet);
 
-				result.writeUint8(validatorSet.length);
-
-				// TODO: write bit mask instead of individual bytes
-				for (const element of validatorSet) {
+				let packed = 0n;
+				for (const [index, element] of validatorSet.entries()) {
 					if (element) {
-						result.writeUint8(1);
-					} else {
-						result.writeUint8(0);
+						packed += 2n ** BigInt(index);
 					}
 				}
+
+				result.writeUint8(validatorSet.length);
+				result.writeUint64(packed);
 
 				continue;
 			}
@@ -241,10 +240,13 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 			if (schema.type === "validatorSet") {
 				const length = source.readUint8();
+				const packed = source.readUint64();
 
 				const validatorSet: boolean[] = [];
 				for (let index = 0; index < length; index++) {
-					validatorSet.push(source.readUint8() === 1);
+					const mask = 2n ** BigInt(index);
+					const isSet = (packed & mask) > 0;
+					validatorSet.push(isSet);
 				}
 
 				target[property] = validatorSet;

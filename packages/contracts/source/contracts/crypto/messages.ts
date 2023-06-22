@@ -89,6 +89,11 @@ export interface IPrecommit {
 	// toData(): IPrecommitData;
 }
 
+export interface IValidatorSetMajority {
+	signature: string;
+	validators: boolean[];
+}
+
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
