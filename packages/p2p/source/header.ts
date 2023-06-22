@@ -1,11 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-export interface CompareResponse {
-	downloadBlocks?: true;
-	downloadMessages?: true;
-	downloadProposal?: true;
-}
+import { MessageDownloader } from "./message-downloader";
+import { Peer } from "./peer";
 
 export interface CompareResponse {
 	downloadBlocks?: true;
@@ -40,7 +37,25 @@ export class Header implements Contracts.P2P.IHeader {
 		};
 	}
 
-	public async compare(header: Contracts.P2P.IHeaderData): Promise<CompareResponse> {
+	public async handle(peer: Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
+		const result = await this.#compare(header);
+
+		if (result.downloadBlocks) {
+			// TODO: Download blocks
+		}
+
+		if (result.downloadProposal) {
+			// TODO: Download proposal
+		}
+
+		if (result.downloadMessages) {
+			const messageDownloader = this.app.resolve<MessageDownloader>(MessageDownloader);
+
+			await messageDownloader.download(peer);
+		}
+	}
+
+	async #compare(header: Contracts.P2P.IHeaderData): Promise<CompareResponse> {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 
 		const height = consensus.getHeight();
