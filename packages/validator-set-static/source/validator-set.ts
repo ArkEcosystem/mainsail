@@ -23,7 +23,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	}
 
 	public getValidatorPublicKeyByIndex(index: number): string {
-		return this.#validators[index].getAttribute<string>("consensus.publicKey");
+		return this.#validators[index].getAttribute<string>("validator.consensusPublicKey");
 	}
 
 	public getValidatorIndexByPublicKey(publicKey: string): number {

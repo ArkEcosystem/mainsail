@@ -17,7 +17,7 @@ export const prepareWallet = async (context: { sandbox: Sandbox }): Promise<Cont
 
 	const mnemonic = validatorsJson.secrets[0];
 	const wallet = walletRepository.findByAddress(mnemonic);
-	wallet.setAttribute("consensus.publicKey", await consensusPublicKeyFactory.fromMnemonic(mnemonic));
+	wallet.setAttribute("validator.consensusPublicKey", await consensusPublicKeyFactory.fromMnemonic(mnemonic));
 
 	return wallet;
 };

@@ -6,7 +6,7 @@ import { ValidatorSet } from "./validator-set";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		// TODO: Rename and remove attribute
-		this.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
+		this.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.consensusPublicKey");
 
 		this.app.bind(Identifiers.ValidatorSet).to(ValidatorSet).inSingletonScope();
 	}

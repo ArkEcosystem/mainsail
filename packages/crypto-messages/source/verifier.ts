@@ -89,7 +89,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		const validator = activeValidators[validatorIndex];
 		Utils.assert.defined<Contracts.State.Wallet>(validator);
 
-		const validatorPublicKey = validator.getAttribute("consensus.publicKey");
+		const validatorPublicKey = validator.getAttribute("validator.consensusPublicKey");
 		Utils.assert.defined<string>(validatorPublicKey);
 
 		return this.signature.verify(Buffer.from(signature, "hex"), message, Buffer.from(validatorPublicKey, "hex"));
@@ -101,7 +101,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 
 		const validatorPublicKeys = validators
 			.map((v, index) =>
-				v ? Buffer.from(activeValidators[index].getAttribute<string>("consensus.publicKey"), "hex") : undefined,
+				v ? Buffer.from(activeValidators[index].getAttribute<string>("validator.consensusPublicKey"), "hex") : undefined,
 			)
 			.filter((v) => v !== undefined);
 

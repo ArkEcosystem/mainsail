@@ -40,7 +40,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreTransactions).register();
 	await context.sandbox.app.resolve(CryptoBlock).register();
 
-	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => {} });
+	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => { } });
 
 	await context.sandbox.app.resolve(CoreState).register();
 
@@ -49,7 +49,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Verifier).to(Verifier).inSingletonScope();
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).to(MessageFactory).inSingletonScope();
 
-	context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
+	context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.consensusPublicKey");
 
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 };
