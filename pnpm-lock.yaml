@@ -1318,6 +1318,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel

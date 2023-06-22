@@ -2,11 +2,11 @@ import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as baseSchemas, makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
+import { schemas as consensusSchemas } from "@mainsail/crypto-consensus-bls12-381";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../test-framework";
-import { MessageFactory } from "./factory";
 import { schemas } from "./schemas";
 import { precommitData, precommitDataNoBlock, prevoteData, prevoteDataNoBlock, proposalData } from "../test/fixtures/proposal";
 
@@ -33,6 +33,7 @@ describe<{
         for (const schema of Object.values({
             ...baseSchemas,
             ...blockSchemas,
+            ...consensusSchemas,
             ...schemas,
         })) {
             context.validator.addSchema(schema);

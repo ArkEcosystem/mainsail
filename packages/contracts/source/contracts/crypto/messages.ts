@@ -6,21 +6,6 @@ export enum MessageType {
 	Precommit = 2,
 }
 
-export interface IProposalLockProof {
-	readonly signature: string;
-	readonly validators: boolean[];
-}
-
-export interface IProposalData {
-	readonly height: number;
-	readonly round: number;
-	readonly validRound?: number;
-	readonly block: { serialized: string };
-	readonly validatorIndex: number;
-	readonly lockProof?: IProposalLockProof;
-	readonly signature: string;
-}
-
 export interface ISignatureMessageData {
 	readonly type: MessageType;
 	readonly height: number;
@@ -31,20 +16,34 @@ export interface ISignatureMessageData {
 export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> {}
-export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
-export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> { }
+export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> { }
+export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> { }
 
 export interface IProposal {
 	readonly height: number;
 	readonly round: number;
-	readonly validRound?: number;
 	readonly block: IProposedBlock;
 	readonly validatorIndex: number;
+	readonly validRound?: number;
 	readonly signature: string;
 	toSignatureData(): ISignatureProposalData;
 	toString(): string;
 	// toData(): IProposalData;
+}
+
+export interface IProposalData {
+	readonly height: number;
+	readonly round: number;
+	readonly block: { serialized: string };
+	readonly validatorIndex: number;
+	readonly validRound?: number;
+	readonly signature: string;
+}
+
+export interface IProposalLockProof {
+	readonly signature: string;
+	readonly validators: boolean[];
 }
 
 export interface IPrevoteData {

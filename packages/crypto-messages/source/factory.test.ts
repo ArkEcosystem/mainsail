@@ -62,7 +62,7 @@ describe<{
 				serialized: serializedBlock,
 				transactions: [],
 			},
-			serialized: "",
+			serialized: serializedBlock,
 		};
 
 		const proposal = await factory.makeProposal(

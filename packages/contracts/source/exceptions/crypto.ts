@@ -50,6 +50,12 @@ export class AddressNetworkError extends Exception {
 	}
 }
 
+export class MessageSchemaError extends Exception {
+	public constructor(type: string, what: string) {
+		super(`${type}: ${what}`);
+	}
+}
+
 export class TransactionTypeError extends Exception {
 	public constructor(given: string) {
 		super(`Type ${given} not supported.`);
