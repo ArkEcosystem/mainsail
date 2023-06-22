@@ -42,7 +42,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			});
 
 			// TODO: Add this as a wallet attribute
-			wallet.setAttribute("consensus.publicKey", transaction.asset.validator.publicKey);
+			wallet.setAttribute("validator.consensusPublicKey", transaction.asset.validator.publicKey);
 
 			walletRepository.index(wallet);
 		}
@@ -144,7 +144,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			voteBalance: BigNumber.ZERO,
 		});
 
-		sender.setAttribute("consensus.publicKey", transaction.data.asset.validator.publicKey);
+		sender.setAttribute("validator.consensusPublicKey", transaction.data.asset.validator.publicKey);
 
 		walletRepository.index(sender);
 	}
@@ -160,7 +160,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		sender.forgetAttribute("validator");
-		sender.forgetAttribute("consensus.publicKey");
+		sender.forgetAttribute("validator.consensusPublicKey");
 
 		walletRepository.index(sender);
 	}

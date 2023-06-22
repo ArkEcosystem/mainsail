@@ -59,12 +59,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		const validators = await this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
-			const consensuPublicKey = validator.getAttribute<string>("consensus.publicKey");
+			const consensuPublicKey = validator.getAttribute<string>("validator.consensusPublicKey");
 			this.#validators.set(consensuPublicKey, validator);
 			this.#validatorsSignedPrecommit.push(false);
 			this.#validatorsSignedPrevote.push(false);
 		}
-		this.#proposer = validators[0].getAttribute<string>("consensus.publicKey");
+		this.#proposer = validators[0].getAttribute<string>("validator.consensusPublicKey");
 
 		return this;
 	}
