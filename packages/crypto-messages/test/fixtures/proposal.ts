@@ -1,6 +1,9 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
+export const validatorMnemonic =
+	"sudden head royal retire duck discover danger then basic rice wish left whip chronic enrich sun behind idea remind retire coyote select goddess exile";
+
 export const blockData: Contracts.Crypto.IBlockData = {
 	id: "de6fbaaf4535dee0e243d455793a0f869a5af59de7989271d45583df5f710e8a",
 	version: 1,
