@@ -90,7 +90,7 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		return new Precommit(data.height, data.round, data.blockId, data.validatorIndex, data.signature);
 	}
 
-	async #applySchema<T>(schema: string, data: T): Promise<T> {
+	#applySchema<T>(schema: string, data: T): T {
 		const result = this.validator.validate(schema, data);
 
 		if (!result.error) {
