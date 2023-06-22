@@ -40,18 +40,18 @@ export class Header implements Contracts.P2P.IHeader {
 	public async handle(peer: Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
 		const result = await this.#compare(header);
 
+		const downloader = this.app.resolve<Downloader>(Downloader);
+
 		if (result.downloadBlocks) {
 			// TODO: Download blocks
 		}
 
 		if (result.downloadProposal) {
-			// TODO: Download proposal
+			await downloader.downloadProposal(peer);
 		}
 
 		if (result.downloadMessages) {
-			const messageDownloader = this.app.resolve<Downloader>(Downloader);
-
-			await messageDownloader.downloadMessages(peer);
+			await downloader.downloadMessages(peer);
 		}
 	}
 

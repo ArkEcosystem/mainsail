@@ -12,6 +12,14 @@ export class Downloader {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
+	// TODO: Handle errors & response checks
+	public async downloadProposal(peer: Contracts.P2P.Peer): Promise<void> {
+		const result = await this.communicator.getProposal(peer);
+		const proposal = await this.factory.makeProposalFromBytes(Buffer.from(result.proposal, "hex"));
+
+		await this.handler.onProposal(proposal);
+	}
+
 	// TODO: Handle errors
 	public async downloadMessages(peer: Contracts.P2P.Peer): Promise<void> {
 		const result = await this.communicator.getMessages(peer);
