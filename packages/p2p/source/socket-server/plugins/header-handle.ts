@@ -22,9 +22,11 @@ export class HeaderHandlePlugin {
 			async method(request, h) {
 				const peerIp = request.socket ? getPeerIp(request.socket) : request.info.remoteAddress;
 
-				const peer = peerRepository.getPeer(peerIp);
+				if (peerRepository.hasPeer(peerIp)) {
+					const peer = peerRepository.getPeer(peerIp);
 
-				header.handle(peer, request.headers);
+					void header.handle(peer, request.headers);
+				}
 
 				return h.continue;
 			},
