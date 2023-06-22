@@ -26,9 +26,11 @@ export class Header implements Contracts.P2P.IHeader {
 		const step = consensus.getStep();
 
 		const roundState = await roundStateRepo.getRoundState(height, round);
+		const proposal = roundState.getProposal();
 
 		return {
 			height,
+			proposedBlockId: proposal ? proposal.block.block.data.id : undefined,
 			round,
 			step,
 			validatorsSignedPrecommit: roundState.getValidatorsSignedPrecommit(),
