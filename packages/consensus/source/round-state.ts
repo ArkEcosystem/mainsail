@@ -264,7 +264,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		const signatures: Buffer[] = [];
 
 		const numberOfValidators = this.configuration.getMilestone().activeValidators;
-		const validators: boolean[] = Array(numberOfValidators).fill(false);
+		const validators: boolean[] = new Array(numberOfValidators).fill(false);
 
 		for (const [key, { signature }] of majority) {
 			signatures.push(Buffer.from(signature, "hex"));

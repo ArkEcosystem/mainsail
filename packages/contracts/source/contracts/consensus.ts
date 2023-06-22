@@ -1,4 +1,13 @@
-import { IBlock, ICommittedBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof, IValidatorSetMajority } from "./crypto";
+import {
+	IBlock,
+	ICommittedBlock,
+	IKeyPair,
+	IPrecommit,
+	IPrevote,
+	IProposal,
+	IProposalLockProof,
+	IValidatorSetMajority,
+} from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
 export interface IRoundState {

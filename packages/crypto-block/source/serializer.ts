@@ -40,14 +40,15 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			this.hashByteLength + // blockId
 			4 + // height
 			4 + // round
-			+ this.lockProofSize()
+			+this.lockProofSize()
 		);
 	}
 
 	public lockProofSize(): number {
 		return (
 			this.consensusSignatureByteLength + // signature
-			1 + 8 // validator set bitmap
+			1 +
+			8 // validator set bitmap
 		);
 	}
 

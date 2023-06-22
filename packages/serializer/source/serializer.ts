@@ -127,9 +127,9 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				Utils.assert.array(validatorSet);
 
 				let packed = 0n;
-				for (let i = 0; i < validatorSet.length; i++) {
-					if (validatorSet[i]) {
-						packed += 2n ** BigInt(i);
+				for (const [index, element] of validatorSet.entries()) {
+					if (element) {
+						packed += 2n ** BigInt(index);
 					}
 				}
 
@@ -243,8 +243,8 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				const packed = source.readUint64();
 
 				const validatorSet: boolean[] = [];
-				for (let i = 0; i < length; i++) {
-					const mask = 2n ** BigInt(i);
+				for (let index = 0; index < length; index++) {
+					const mask = 2n ** BigInt(index);
 					const isSet = (packed & mask) > 0;
 					validatorSet.push(isSet);
 				}
