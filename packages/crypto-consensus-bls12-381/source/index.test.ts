@@ -33,6 +33,6 @@ describe<{
 			Identifiers.Cryptography.Signature,
 		].forEach((identifier) => assert.true(sandbox.app.isBoundTagged(identifier, "type", "consensus")));
 
-		spyAddSchema.calledOnce();
+		spyAddSchema.calledTimes(2);
 	});
 });
