@@ -25,7 +25,7 @@ export class HeaderHandlePlugin {
 				if (peerRepository.hasPeer(peerIp)) {
 					const peer = peerRepository.getPeer(peerIp);
 
-					void header.handle(peer, request.headers);
+					void header.handle(peer, request.payload.headers);
 				}
 
 				return h.continue;
