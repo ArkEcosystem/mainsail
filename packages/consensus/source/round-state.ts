@@ -261,14 +261,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	async #aggregateValidatorSetMajority(
 		majority: Map<string, { signature: string }>,
 	): Promise<Contracts.Crypto.IValidatorSetMajority> {
-		const publicKeys: Buffer[] = [];
 		const signatures: Buffer[] = [];
 
 		const numberOfValidators = this.configuration.getMilestone().activeValidators;
 		const validators: boolean[] = Array(numberOfValidators).fill(false);
 
 		for (const [key, { signature }] of majority) {
-			publicKeys.push(Buffer.from(key, "hex"));
 			signatures.push(Buffer.from(signature, "hex"));
 
 			const validatorIndex = this.validatorSet.getValidatorIndexByPublicKey(key);
