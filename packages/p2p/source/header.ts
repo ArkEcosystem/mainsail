@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { MessageDownloader } from "./message-downloader";
+import { Downloader } from "./downloader";
 import { Peer } from "./peer";
 
 export interface CompareResponse {
@@ -49,7 +49,7 @@ export class Header implements Contracts.P2P.IHeader {
 		}
 
 		if (result.downloadMessages) {
-			const messageDownloader = this.app.resolve<MessageDownloader>(MessageDownloader);
+			const messageDownloader = this.app.resolve<Downloader>(Downloader);
 
 			await messageDownloader.download(peer);
 		}
