@@ -56,7 +56,9 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
 	}
 
-	context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("consensus.publicKey");
+	context.sandbox.app
+		.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
+		.set("validator.consensusPublicKey");
 
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 };

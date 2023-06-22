@@ -1,6 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utils";
+import { IProposalLockProof } from "./messages";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
 export interface IBlockVerification {
@@ -66,26 +67,22 @@ export interface IBlockCommit {
 }
 
 // TODO: clean up interfaces so we do not store everything in a redundant manner
-export interface IBlockLockProof {
-	readonly signature: string;
-	readonly validators: boolean[];
-}
 
 export interface IProposedBlock {
 	readonly block: IBlock;
-	readonly lockProof?: IBlockLockProof;
+	readonly lockProof?: IProposalLockProof;
 	readonly serialized: string;
 }
 
 export interface IProposedBlockData {
 	readonly block: IBlockData;
-	readonly lockProof?: IBlockLockProof;
+	readonly lockProof?: IProposalLockProof;
 	readonly serialized: string;
 }
 
 export interface IProposedBlockJson {
 	readonly block: IBlockJson;
-	readonly lockProof?: IBlockLockProof;
+	readonly lockProof?: IProposalLockProof;
 	readonly serialized: string;
 }
 
@@ -146,7 +143,7 @@ export interface IBlockSerializer {
 
 	serializeCommit(commit: IBlockCommit): Promise<Buffer>;
 
-	serializeLockProof(proof: IBlockLockProof): Promise<Buffer>;
+	serializeLockProof(proof: IProposalLockProof): Promise<Buffer>;
 
 	serializeProposed(proposedBlock: IProposedBlockSerializable): Promise<Buffer>;
 
@@ -163,7 +160,7 @@ export interface IBlockDeserializer {
 
 	deserializeWithTransactions(serialized: Buffer): Promise<IBlockWithTransactions>;
 
-	deserializeLockProof(serialized: Buffer): Promise<IBlockLockProof>;
+	deserializeLockProof(serialized: Buffer): Promise<IProposalLockProof>;
 
 	deserializeCommit(serialized: Buffer): Promise<IBlockCommit>;
 }
