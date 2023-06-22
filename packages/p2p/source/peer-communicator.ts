@@ -60,7 +60,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		});
 	}
 
-	public async postBlock(peer: Contracts.P2P.Peer, block: Contracts.Crypto.IBlock) {
+	public async postBlock(peer: Contracts.P2P.Peer, block: Contracts.Crypto.IBlock): Promise<void> {
 		const postBlockTimeout = 10_000;
 
 		const response = await this.emit(
@@ -171,15 +171,15 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		);
 	}
 
-	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.PeerBroadcast[]> {
+	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetMessagesResponse> {
 		return this.emit(peer, Routes.GetMessages, {}, 5000);
 	}
 
-	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.PeerBroadcast[]> {
+	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetProposalResponse> {
 		return this.emit(peer, Routes.GetProposal, {}, 5000);
 	}
 
-	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.PeerBroadcast[]> {
+	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetPeersResponse> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
 
 		const getPeersTimeout = 5000;

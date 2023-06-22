@@ -6,7 +6,7 @@ export class MessageDownloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	public download(peer: Contracts.P2P.Peer): void {
-		const response = this.communicator.getMessages(peer);
+	public async download(peer: Contracts.P2P.Peer): Promise<void> {
+		await this.communicator.getMessages(peer);
 	}
 }

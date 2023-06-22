@@ -40,7 +40,7 @@ export class Header implements Contracts.P2P.IHeader {
 		};
 	}
 
-	public async compare(header: HeaderData): Promise<CompareResponse> {
+	public async compare(header: Contracts.P2P.IHeaderData): Promise<CompareResponse> {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 
 		const height = consensus.getHeight();
