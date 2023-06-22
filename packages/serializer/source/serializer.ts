@@ -126,15 +126,15 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				const validatorSet = data[property];
 				Utils.assert.array(validatorSet);
 
-				let packed = BigNumber.ZERO;
+				let packed = 0n;
 				for (let i = 0; i < validatorSet.length; i++) {
 					if (validatorSet[i]) {
-						packed = packed.plus(BigNumber.make(2n ** BigInt(i)));
+						packed += 2n ** BigInt(i);
 					}
 				}
 
 				result.writeUint8(validatorSet.length);
-				result.writeUint64(packed.toBigInt());
+				result.writeUint64(packed);
 
 				continue;
 			}
