@@ -15,7 +15,7 @@ export const schemas: Record<
 			type: { enum: [Contracts.Crypto.MessageType.Precommit] },
 			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
 		},
-		required: ["type", "height", "round", "validatorIndex"],
+		required: ["type", "height", "round", "validatorIndex", "signature"],
 		type: "object",
 	},
 	prevote: {
@@ -28,7 +28,7 @@ export const schemas: Record<
 			type: { enum: [Contracts.Crypto.MessageType.Prevote] },
 			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
 		},
-		required: ["type", "height", "round", "validatorIndex"],
+		required: ["type", "height", "round", "validatorIndex", "signature"],
 		type: "object",
 	},
 	proposal: {
@@ -47,7 +47,7 @@ export const schemas: Record<
 			validRound: { minimum: 1, type: "integer" },
 			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
 		},
-		required: ["height", "round", "block", "validatorIndex"],
+		required: ["height", "round", "block", "validatorIndex", "signature"],
 		type: "object",
 	},
 	proposalLockProof: {

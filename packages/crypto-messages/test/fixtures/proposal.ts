@@ -61,6 +61,7 @@ export const proposalData: Contracts.Crypto.IProposalData = {
 	signature:
 		"a0e335c16132d3049c10ae2d013b8acd4404c79894787578fef37b8a5a0844bda59cdd13f24f19eb7908763b6f42184f010747c8f3011b0abfb907d830fbb6336e2151a72df426215e291bc79a4c194b4843eb260d5fb1081f3460feba09d226",
 	height: 1,
+	validRound: undefined,
 	block: {
 		serialized: serializedBlock,
 	},
