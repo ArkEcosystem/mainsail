@@ -81,7 +81,7 @@ export class Header implements Contracts.P2P.IHeader {
 
 		const response: CompareResponse = {};
 
-		if (roundState.getProposal() === undefined) {
+		if (roundState.getProposal() === undefined && !!header.proposedBlockId) {
 			response.downloadProposal = true;
 		}
 
