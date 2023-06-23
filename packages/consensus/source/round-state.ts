@@ -18,6 +18,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
 
+	@inject(Identifiers.Cryptography.Message.Serializer)
+	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
+
+	@inject(Identifiers.Cryptography.Message.Factory)
+	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -338,5 +344,106 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			...commitBlock,
 			serialized: serialized.toString("hex"),
 		};
+	}
+
+	public async serialize(): Promise<Contracts.Consensus.ISerializedRoundStateData> {
+		// TODO: optimize format
+		const proposal: string =
+			this.#proposal
+				? (await this.messageSerializer.serializeProposal(this.#proposal)).toString("hex")
+				: "undefined";
+
+		const prevotes: Record<string, string> = {};
+		for (const [key, value] of this.#prevotes.entries()) {
+			prevotes[key] = (await this.messageSerializer.serializePrevote(value)).toString("hex");
+		}
+
+		const prevotesCount: Record<string, number> = {};
+		for (const [key, value] of this.#prevotesCount.entries()) {
+			prevotesCount[key === undefined ? "undefined" : key] = value;
+		}
+
+		const precommits: Record<string, string> = {};
+		for (const [key, value] of this.#precommits.entries()) {
+			precommits[key] = (await this.messageSerializer.serializePrecommit(value)).toString("hex");
+		}
+
+		const precommitsCount: Record<string, number> = {};
+		for (const [key, value] of this.#precommitsCount.entries()) {
+			precommitsCount[key === undefined ? "undefined" : key] = value;
+		}
+
+		const validators: Record<string, string> = {};
+		for (const [key, value] of this.#validators.entries()) {
+			validators[key] = value.getPublicKey()!;
+		}
+
+		return {
+			height: this.#height,
+			round: this.#round,
+			processorResult: this.#processorResult,
+			validatorsSignedPrevote: this.#validatorsSignedPrevote,
+			validatorsSignedPrecommit: this.#validatorsSignedPrecommit,
+			proposer: this.#proposer,
+
+			// JSON objects
+			proposal,
+			prevotes,
+			prevotesCount,
+			precommits,
+			precommitsCount,
+			validators,
+		};
+	}
+
+	public async deserialize(serialized: Contracts.Consensus.ISerializedRoundStateData): Promise<Contracts.Consensus.IRoundState> {
+		this.#height = serialized.height;
+		this.#round = serialized.round;
+		this.#processorResult = serialized.processorResult;
+		this.#validatorsSignedPrevote = this.#validatorsSignedPrevote;
+		this.#validatorsSignedPrecommit = this.#validatorsSignedPrecommit;
+		this.#proposer = serialized.proposer;
+
+		this.#proposal = serialized.proposal !== "undefined"
+			? await this.messageFactory.makeProposalFromBytes(Buffer.from(serialized.proposal, "hex"))
+			: undefined;
+
+		this.#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
+		for (const [key, value] of Object.entries(serialized.prevotes)) {
+			const prevote = await this.messageFactory.makePrevoteFromBytes(Buffer.from(value, "hex"));
+			this.#prevotes.set(key, prevote);
+		}
+
+		this.#prevotesCount = new Map<string | undefined, number>();
+		for (const [key, value] of Object.entries(serialized.prevotesCount)) {
+			if (key === "undefined") {
+				this.#prevotesCount.set(undefined, value);
+			} else {
+				this.#prevotesCount.set(key, value);
+			}
+		}
+
+		this.#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
+		for (const [key, value] of Object.entries(serialized.precommits)) {
+			const prevote = await this.messageFactory.makePrecommitFromBytes(Buffer.from(value, "hex"));
+			this.#precommits.set(key, prevote);
+		}
+
+		this.#precommitsCount = new Map<string | undefined, number>();
+		for (const [key, value] of Object.entries(serialized.precommitsCount)) {
+			if (key === "undefined") {
+				this.#precommitsCount.set(undefined, value);
+			} else {
+				this.#precommitsCount.set(key, value);
+			}
+		}
+
+		this.#validators = new Map<string, Contracts.State.Wallet>();
+		for (const [key, value] of Object.entries(serialized.validators)) {
+			const wallet = this.walletRepository.findByAddress(value);
+			this.#validators.set(key, wallet);
+		}
+
+		return this;
 	}
 }

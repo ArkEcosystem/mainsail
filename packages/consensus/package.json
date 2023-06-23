@@ -24,7 +24,8 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.10.7",
-		"delay": "5.0.0"
+		"delay": "5.0.0",
+		"lmdb": "2.4.2"
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",

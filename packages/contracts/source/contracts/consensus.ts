@@ -37,6 +37,37 @@ export interface IRoundState {
 	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
 	getProposalLockProof(): Promise<IProposalLockProof>;
 	getProposedCommitBlock(): Promise<ICommittedBlock>;
+
+	serialize(): Promise<ISerializedRoundStateData>;
+	deserialize(serialized: ISerializedRoundStateData): Promise<IRoundState>;
+}
+
+export interface ISerializedRoundStateData {
+	readonly height: number;
+	readonly round: number;
+	readonly processorResult: boolean | undefined;
+	readonly validatorsSignedPrevote: boolean[];
+	readonly validatorsSignedPrecommit: boolean[];
+
+	readonly proposer: string;
+
+	readonly proposal: string;
+	readonly prevotes: Record<string, string>;
+	readonly prevotesCount: Record<string, number>;
+	readonly precommits: Record<string, string>;
+	readonly precommitsCount: Record<string, number>;
+	// consensus key => wallet key
+	readonly validators: Record<string, string>
+}
+
+export interface ISerializedConsensusState {
+	readonly height: number;
+	readonly round: number;
+	readonly step: Step;
+	readonly validRound?: number;
+	readonly lockedRound?: number;
+	readonly lockedValue: ISerializedRoundStateData | null;
+	readonly validValue: ISerializedRoundStateData | null;
 }
 
 export interface IRoundStateRepository {
@@ -48,6 +79,7 @@ export interface IConsensusService {
 	getHeight(): number;
 	getRound(): number;
 	getStep(): Step;
+	getState(): IConsensusState;
 	onProposal(roundState: IRoundState): Promise<void>;
 	onProposalLocked(roudnState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;
@@ -59,6 +91,21 @@ export interface IConsensusService {
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
+}
+
+export interface IConsensusState {
+	readonly height: number;
+	readonly round: number;
+	readonly step: Step;
+	readonly validRound?: number;
+	readonly lockedRound?: number;
+	readonly lockedValue?: IRoundState;
+	readonly validValue?: IRoundState;
+}
+
+export interface IConsensusStorage {
+	saveState(state: IConsensusState): Promise<void>;
+	getState(): Promise<IConsensusState | undefined>;
 }
 
 export interface IHandler {

@@ -8,6 +8,7 @@ type Context = {
 	consensus: Consensus;
 	blockProcessor: any;
 	state: any;
+	storage: any
 	handler: any;
 	broadcaster: any;
 	scheduler: any;
@@ -47,7 +48,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			scheduleTimeoutPrecommit: () => {},
 			scheduleTimeoutPrevote: () => {},
 			scheduleTimeoutPropose: () => {},
-			clear: () => {},
+			clear: () => { },
+		};
+
+		context.storage = {
+			saveState: () => { },
+			getState: () => { },
 		};
 
 		context.validatorsRepository = {
@@ -95,6 +101,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue(context.handler);
 		context.sandbox.app.bind(Identifiers.PeerBroadcaster).toConstantValue(context.broadcaster);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
+		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);

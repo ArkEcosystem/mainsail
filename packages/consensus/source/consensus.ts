@@ -22,6 +22,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
 
+	@inject(Identifiers.Consensus.Storage)
+	private readonly consensusStorage!: Contracts.Consensus.IConsensusStorage;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -77,7 +80,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return this.#validRound;
 	}
 
-	public getState(): Record<string, unknown> {
+	public getState(): Contracts.Consensus.IConsensusState {
 		return {
 			height: this.#height,
 			lockedRound: this.#lockedRound,
@@ -93,6 +96,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const lastBlock = this.state.getLastBlock();
 		this.#height = lastBlock.data.height + 1;
 
+		// Restore state if any
+		const state = await this.consensusStorage.getState();
+		if (state) {
+			await this.#restore(state);
+		}
+
+		// TODO: continue round from restored state
 		void this.startRound(this.#round);
 	}
 
@@ -101,6 +111,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#step = Contracts.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
+
+		// TODO: save in each step ?
+		await this.consensusStorage.saveState(this.getState());
 
 		this.scheduler.clear();
 
@@ -201,8 +214,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
-				block.data.id
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${block.data.id
 			}`,
 		);
 
@@ -266,8 +278,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorIndex
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex
 			} blockId: ${block.data.id}`,
 		);
 
@@ -373,5 +384,19 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const activeValidators = await this.validatorSet.getActiveValidators();
 
 		return activeValidators.map((wallet) => wallet.getAttribute("validator.consensusPublicKey"));
+	}
+
+	async #restore(state: Contracts.Consensus.IConsensusState): Promise<void> {
+		this.logger.info(
+			`Restoring existing consensus state for ${state.height}/${state.round}`,
+		);
+
+		this.#step = state.step;
+		this.#height = state.height;
+		this.#round = state.round;
+		this.#lockedRound = state.lockedRound;
+		this.#lockedValue = state.lockedValue;
+		this.#validRound = state.validRound;
+		this.#validValue = state.validValue;
 	}
 }
