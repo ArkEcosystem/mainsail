@@ -18,22 +18,6 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
 
-	// Temporary feature, to sync nodes faster
-	// Start every full 30 seconds
-	public async delayStart(): Promise<void> {
-		let differenceS = 60 - dayjs().second();
-
-		if (differenceS > 30) {
-			differenceS -= 30;
-		}
-
-		if (differenceS < 15) {
-			differenceS += 15;
-		}
-
-		await delay(differenceS * 1000 + 1000 - dayjs().millisecond());
-	}
-
 	public async delayProposal(): Promise<void> {
 		await delay(
 			Math.max(
