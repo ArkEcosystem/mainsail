@@ -93,8 +93,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const lastBlock = this.state.getLastBlock();
 		this.#height = lastBlock.data.height + 1;
 
-		await this.scheduler.delayStart();
-
 		void this.startRound(this.#round);
 	}
 
