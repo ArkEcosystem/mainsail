@@ -8,7 +8,7 @@ type Context = {
 	consensus: Consensus;
 	blockProcessor: any;
 	state: any;
-	storage: any
+	storage: any;
 	handler: any;
 	broadcaster: any;
 	scheduler: any;
@@ -48,12 +48,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			scheduleTimeoutPrecommit: () => {},
 			scheduleTimeoutPrevote: () => {},
 			scheduleTimeoutPropose: () => {},
-			clear: () => { },
+			clear: () => {},
 		};
 
 		context.storage = {
-			saveState: () => { },
-			getState: () => { },
+			saveState: () => {},
+			getState: () => {},
 		};
 
 		context.validatorsRepository = {

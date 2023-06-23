@@ -1,13 +1,12 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+import { RootDatabase } from "lmdb";
 
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
 import { Storage } from "./storage";
-
-import { RootDatabase } from "lmdb";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

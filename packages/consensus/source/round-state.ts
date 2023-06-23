@@ -348,10 +348,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	public async serialize(): Promise<Contracts.Consensus.ISerializedRoundStateData> {
 		// TODO: optimize format
-		const proposal: string =
-			this.#proposal
-				? (await this.messageSerializer.serializeProposal(this.#proposal)).toString("hex")
-				: "undefined";
+		const proposal: string = this.#proposal
+			? (await this.messageSerializer.serializeProposal(this.#proposal)).toString("hex")
+			: "undefined";
 
 		const prevotes: Record<string, string> = {};
 		for (const [key, value] of this.#prevotes.entries()) {
@@ -380,23 +379,29 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		return {
 			height: this.#height,
-			round: this.#round,
+			precommits,
+
+			precommitsCount,
+
+			prevotes,
+
+			prevotesCount,
+
 			processorResult: this.#processorResult,
-			validatorsSignedPrevote: this.#validatorsSignedPrevote,
-			validatorsSignedPrecommit: this.#validatorsSignedPrecommit,
-			proposer: this.#proposer,
 
 			// JSON objects
 			proposal,
-			prevotes,
-			prevotesCount,
-			precommits,
-			precommitsCount,
+			proposer: this.#proposer,
+			round: this.#round,
 			validators,
+			validatorsSignedPrecommit: this.#validatorsSignedPrecommit,
+			validatorsSignedPrevote: this.#validatorsSignedPrevote,
 		};
 	}
 
-	public async deserialize(serialized: Contracts.Consensus.ISerializedRoundStateData): Promise<Contracts.Consensus.IRoundState> {
+	public async deserialize(
+		serialized: Contracts.Consensus.ISerializedRoundStateData,
+	): Promise<Contracts.Consensus.IRoundState> {
 		this.#height = serialized.height;
 		this.#round = serialized.round;
 		this.#processorResult = serialized.processorResult;
@@ -404,9 +409,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		this.#validatorsSignedPrecommit = serialized.validatorsSignedPrecommit;
 		this.#proposer = serialized.proposer;
 
-		this.#proposal = serialized.proposal !== "undefined"
-			? await this.messageFactory.makeProposalFromBytes(Buffer.from(serialized.proposal, "hex"))
-			: undefined;
+		this.#proposal =
+			serialized.proposal !== "undefined"
+				? await this.messageFactory.makeProposalFromBytes(Buffer.from(serialized.proposal, "hex"))
+				: undefined;
 
 		this.#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 		for (const [key, value] of Object.entries(serialized.prevotes)) {

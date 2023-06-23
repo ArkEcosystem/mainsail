@@ -7,27 +7,27 @@ import { Controller } from "./controller";
 
 @injectable()
 export class ConsensusController extends Controller {
-    @inject(Identifiers.Consensus.Storage)
-    private readonly storage!: Contracts.Consensus.IConsensusStorage;
+	@inject(Identifiers.Consensus.Storage)
+	private readonly storage!: Contracts.Consensus.IConsensusStorage;
 
-    public async state(request: Hapi.Request) {
-        const state = await this.storage.getState();
-        if (!state) {
-            return {};
-        }
+	public async state(request: Hapi.Request) {
+		const state = await this.storage.getState();
+		if (!state) {
+			return {};
+		}
 
-        Utils.assert.defined<Contracts.Consensus.IConsensusState>(state);
+		Utils.assert.defined<Contracts.Consensus.IConsensusState>(state);
 
-        return {
-            data: {
-                height: state.height,
-                round: state.round,
-                step: state.step,
-                validRound: state.validRound,
-                lockedRound: state.lockedRound,
-                validValue: state.validValue ? await state.validValue.serialize() : null,
-                lockedValue: state.lockedValue ? await state.lockedValue.serialize() : null,
-            },
-        };
-    }
+		return {
+			data: {
+				height: state.height,
+				lockedRound: state.lockedRound,
+				lockedValue: state.lockedValue ? await state.lockedValue.serialize() : null,
+				round: state.round,
+				step: state.step,
+				validRound: state.validRound,
+				validValue: state.validValue ? await state.validValue.serialize() : null,
+			},
+		};
+	}
 }

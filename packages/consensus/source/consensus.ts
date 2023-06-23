@@ -387,9 +387,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #restore(state: Contracts.Consensus.IConsensusState): Promise<void> {
-		this.logger.info(
-			`Restoring existing consensus state for ${state.height}/${state.round}`,
-		);
+		this.logger.info(`Restoring existing consensus state for ${state.height}/${state.round}`);
 
 		this.#step = state.step;
 		this.#height = state.height;

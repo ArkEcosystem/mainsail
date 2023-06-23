@@ -57,7 +57,7 @@ export interface ISerializedRoundStateData {
 	readonly precommits: Record<string, string>;
 	readonly precommitsCount: Record<string, number>;
 	// consensus key => wallet key
-	readonly validators: Record<string, string>
+	readonly validators: Record<string, string>;
 }
 
 export interface ISerializedConsensusState {
