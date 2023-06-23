@@ -30,7 +30,8 @@ export class Header implements Contracts.P2P.IHeader {
 
 		return {
 			height,
-			proposedBlockId: proposal ? proposal.block.block.data.id : undefined,
+			// eslint-disable-next-line unicorn/no-null
+			proposedBlockId: proposal ? proposal.block.block.data.id : null,
 			round,
 			step,
 			validatorsSignedPrecommit: roundState.getValidatorsSignedPrecommit(),
