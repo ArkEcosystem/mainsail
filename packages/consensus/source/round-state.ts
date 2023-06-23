@@ -400,8 +400,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		this.#height = serialized.height;
 		this.#round = serialized.round;
 		this.#processorResult = serialized.processorResult;
-		this.#validatorsSignedPrevote = this.#validatorsSignedPrevote;
-		this.#validatorsSignedPrecommit = this.#validatorsSignedPrecommit;
+		this.#validatorsSignedPrevote = serialized.validatorsSignedPrevote;
+		this.#validatorsSignedPrecommit = serialized.validatorsSignedPrecommit;
 		this.#proposer = serialized.proposer;
 
 		this.#proposal = serialized.proposal !== "undefined"
