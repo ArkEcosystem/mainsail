@@ -7860,6 +7860,7 @@ $root.shared = (function() {
          * @property {number|null} [height] Headers height
          * @property {number|null} [round] Headers round
          * @property {number|null} [step] Headers step
+         * @property {string|null} [proposedBlockId] Headers proposedBlockId
          * @property {Array.<boolean>|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
          * @property {Array.<boolean>|null} [validatorsSignedPrecommit] Headers validatorsSignedPrecommit
          */
@@ -7914,6 +7915,14 @@ $root.shared = (function() {
         Headers.prototype.step = 0;
 
         /**
+         * Headers proposedBlockId.
+         * @member {string|null|undefined} proposedBlockId
+         * @memberof shared.Headers
+         * @instance
+         */
+        Headers.prototype.proposedBlockId = null;
+
+        /**
          * Headers validatorsSignedPrevote.
          * @member {Array.<boolean>} validatorsSignedPrevote
          * @memberof shared.Headers
@@ -7928,6 +7937,20 @@ $root.shared = (function() {
          * @instance
          */
         Headers.prototype.validatorsSignedPrecommit = $util.emptyArray;
+
+        // OneOf field names bound to virtual getters and setters
+        var $oneOfFields;
+
+        /**
+         * Headers _proposedBlockId.
+         * @member {"proposedBlockId"|undefined} _proposedBlockId
+         * @memberof shared.Headers
+         * @instance
+         */
+        Object.defineProperty(Headers.prototype, "_proposedBlockId", {
+            get: $util.oneOfGetter($oneOfFields = ["proposedBlockId"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
 
         /**
          * Creates a new Headers instance using the specified properties.
@@ -7961,14 +7984,16 @@ $root.shared = (function() {
                 writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
             if (message.step != null && Object.hasOwnProperty.call(message, "step"))
                 writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
+            if (message.proposedBlockId != null && Object.hasOwnProperty.call(message, "proposedBlockId"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.proposedBlockId);
             if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
-                writer.uint32(/* id 5, wireType 2 =*/42).fork();
+                writer.uint32(/* id 6, wireType 2 =*/50).fork();
                 for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
                     writer.bool(message.validatorsSignedPrevote[i]);
                 writer.ldelim();
             }
             if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
-                writer.uint32(/* id 6, wireType 2 =*/50).fork();
+                writer.uint32(/* id 7, wireType 2 =*/58).fork();
                 for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
                     writer.bool(message.validatorsSignedPrecommit[i]);
                 writer.ldelim();
@@ -8024,6 +8049,10 @@ $root.shared = (function() {
                         break;
                     }
                 case 5: {
+                        message.proposedBlockId = reader.string();
+                        break;
+                    }
+                case 6: {
                         if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
                             message.validatorsSignedPrevote = [];
                         if ((tag & 7) === 2) {
@@ -8034,7 +8063,7 @@ $root.shared = (function() {
                             message.validatorsSignedPrevote.push(reader.bool());
                         break;
                     }
-                case 6: {
+                case 7: {
                         if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
                             message.validatorsSignedPrecommit = [];
                         if ((tag & 7) === 2) {
@@ -8080,6 +8109,7 @@ $root.shared = (function() {
         Headers.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            var properties = {};
             if (message.version != null && message.hasOwnProperty("version"))
                 if (!$util.isString(message.version))
                     return "version: string expected";
@@ -8092,6 +8122,11 @@ $root.shared = (function() {
             if (message.step != null && message.hasOwnProperty("step"))
                 if (!$util.isInteger(message.step))
                     return "step: integer expected";
+            if (message.proposedBlockId != null && message.hasOwnProperty("proposedBlockId")) {
+                properties._proposedBlockId = 1;
+                if (!$util.isString(message.proposedBlockId))
+                    return "proposedBlockId: string expected";
+            }
             if (message.validatorsSignedPrevote != null && message.hasOwnProperty("validatorsSignedPrevote")) {
                 if (!Array.isArray(message.validatorsSignedPrevote))
                     return "validatorsSignedPrevote: array expected";
@@ -8129,6 +8164,8 @@ $root.shared = (function() {
                 message.round = object.round >>> 0;
             if (object.step != null)
                 message.step = object.step >>> 0;
+            if (object.proposedBlockId != null)
+                message.proposedBlockId = String(object.proposedBlockId);
             if (object.validatorsSignedPrevote) {
                 if (!Array.isArray(object.validatorsSignedPrevote))
                     throw TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
@@ -8177,6 +8214,11 @@ $root.shared = (function() {
                 object.round = message.round;
             if (message.step != null && message.hasOwnProperty("step"))
                 object.step = message.step;
+            if (message.proposedBlockId != null && message.hasOwnProperty("proposedBlockId")) {
+                object.proposedBlockId = message.proposedBlockId;
+                if (options.oneofs)
+                    object._proposedBlockId = "proposedBlockId";
+            }
             if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
                 object.validatorsSignedPrevote = [];
                 for (var j = 0; j < message.validatorsSignedPrevote.length; ++j)

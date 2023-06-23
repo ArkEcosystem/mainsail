@@ -3384,6 +3384,9 @@ export namespace shared {
         /** Headers step */
         step?: (number|null);
 
+        /** Headers proposedBlockId */
+        proposedBlockId?: (string|null);
+
         /** Headers validatorsSignedPrevote */
         validatorsSignedPrevote?: (boolean[]|null);
 
@@ -3412,11 +3415,17 @@ export namespace shared {
         /** Headers step. */
         public step: number;
 
+        /** Headers proposedBlockId. */
+        public proposedBlockId?: (string|null);
+
         /** Headers validatorsSignedPrevote. */
         public validatorsSignedPrevote: boolean[];
 
         /** Headers validatorsSignedPrecommit. */
         public validatorsSignedPrecommit: boolean[];
+
+        /** Headers _proposedBlockId. */
+        public _proposedBlockId?: "proposedBlockId";
 
         /**
          * Creates a new Headers instance using the specified properties.

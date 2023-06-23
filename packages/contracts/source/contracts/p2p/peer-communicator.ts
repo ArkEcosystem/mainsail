@@ -1,22 +1,23 @@
 import { IBlock, IBlockData } from "../crypto";
+import { IGetMessagesResponse, IGetPeersResponse, IGetProposalResponse } from "./endpoints";
 import { Peer } from "./peer";
 
 export interface PeerCommunicator {
 	initialize();
 
-	postBlock(peer: Peer, block: IBlock);
-	postTransactions(peer: Peer, transactions: Buffer[]): Promise<any>;
-	postProposal(peer: Peer, proposal: Buffer): Promise<any>;
-	postPrevote(peer: Peer, prevote: Buffer): Promise<any>;
-	postPrecommit(peer: Peer, prevote: Buffer): Promise<any>;
+	postBlock(peer: Peer, block: IBlock): Promise<void>;
+	postTransactions(peer: Peer, transactions: Buffer[]): Promise<void>;
+	postProposal(peer: Peer, proposal: Buffer): Promise<void>;
+	postPrevote(peer: Peer, prevote: Buffer): Promise<void>;
+	postPrecommit(peer: Peer, prevote: Buffer): Promise<void>;
 
 	ping(peer: Peer, timeoutMsec: number, force?: boolean): Promise<any>;
 
 	pingPorts(peer: Peer): Promise<void>;
 
-	getPeers(peer: Peer): Promise<any>;
-	getMessages(peer: Peer): Promise<any>;
-	getProposal(peer: Peer): Promise<any>;
+	getPeers(peer: Peer): Promise<IGetPeersResponse>;
+	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
+	getProposal(peer: Peer): Promise<IGetProposalResponse>;
 
 	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
 
