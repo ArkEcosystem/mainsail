@@ -247,9 +247,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		const rng = seedrandom(`${height}-${round}`);
 
 		const validatorIndex = Math.floor(rng() * validators.length - 1);
-		const proposer = validators[validatorIndex].getAttribute<string>("validator.consensusPublicKey");
-
-		return proposer;
+		return validators[validatorIndex].getAttribute<string>("validator.consensusPublicKey");
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<Contracts.Crypto.IValidatorSetMajority> {

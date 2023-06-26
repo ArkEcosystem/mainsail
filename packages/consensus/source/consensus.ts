@@ -204,7 +204,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${block.data.id
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
+				block.data.id
 			}`,
 		);
 
@@ -268,7 +269,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+				proposal.validatorIndex
 			} blockId: ${block.data.id}`,
 		);
 
