@@ -109,6 +109,7 @@ export interface IConsensusStorage {
 }
 
 export interface IHandler {
+	handle(roundState: IRoundState): Promise<void>;
 	onProposal(proposal: IProposal): Promise<void>;
 	onPrevote(prevote: IPrevote): Promise<void>;
 	onPrecommit(precommit: IPrecommit): Promise<void>;

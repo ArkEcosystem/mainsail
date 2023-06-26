@@ -7,6 +7,7 @@ import { Handler } from "./handler";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
 import { Storage } from "./storage";
+import { Bootstrapper } from "./bootstrapper";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -21,6 +22,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Database.PrecommitStorage).toConstantValue(rootStorage.openDB({ name: "precommits" }));
 		this.app.bind(Identifiers.Database.ConsensusStorage).toConstantValue(rootStorage.openDB({ name: "consensus" }));
 		this.app.bind(Identifiers.Consensus.Storage).to(Storage).inSingletonScope();
+
+		this.app.bind(Identifiers.Consensus.Bootstrapper).to(Bootstrapper).inSingletonScope();
 
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(this.app.resolve(Consensus));
 	}

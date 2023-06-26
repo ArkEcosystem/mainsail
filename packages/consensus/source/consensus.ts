@@ -1,8 +1,14 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Bootstrapper } from "./bootstrapper";
+import { Storage } from "./storage";
+import { RoundStateRepository } from "./round-state-repository";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
+	@inject(Identifiers.Consensus.Bootstrapper)
+	private readonly bootstrapper!: Bootstrapper;
+
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
@@ -22,8 +28,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
 
+	@inject(Identifiers.Consensus.RoundStateRepository)
+	private readonly roundStateRepo!: RoundStateRepository;
+
 	@inject(Identifiers.Consensus.Storage)
-	private readonly consensusStorage!: Contracts.Consensus.IConsensusStorage;
+	private readonly storage!: Storage;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -93,17 +102,18 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async run(): Promise<void> {
-		const lastBlock = this.state.getLastBlock();
-		this.#height = lastBlock.data.height + 1;
+		await this.#bootstrap();
 
-		// Restore state if any
-		const state = await this.consensusStorage.getState();
-		if (state) {
-			await this.#restore(state);
+		// Start a new round if no proposal yet
+		const roundState = this.roundStateRepo.tryGetRoundState(this.#height, this.#round);
+		if (!roundState || !roundState.getProposal()) {
+			await this.startRound(this.#round);
+			return;
 		}
 
-		// TODO: continue round from restored state
-		void this.startRound(this.#round);
+		// Otherwise, let the handler figure out which state we are in
+		// TODO: we need to be able to download missed prevotes/precommits
+		await this.handler.handle(roundState);
 	}
 
 	public async startRound(round: number): Promise<void> {
@@ -111,9 +121,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#step = Contracts.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
-
-		// TODO: save in each step ?
-		await this.consensusStorage.saveState(this.getState());
 
 		this.scheduler.clear();
 
@@ -283,6 +290,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		);
 
 		await this.processor.commit(roundState);
+		await this.storage.clear();
 
 		this.#height++;
 		this.#lockedRound = undefined;
@@ -386,15 +394,22 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return activeValidators.map((wallet) => wallet.getAttribute("validator.consensusPublicKey"));
 	}
 
-	async #restore(state: Contracts.Consensus.IConsensusState): Promise<void> {
-		this.logger.info(`Restoring existing consensus state for ${state.height}/${state.round}`);
+	async #bootstrap(): Promise<void> {
+		const state = await this.bootstrapper.run();
+		if (state) {
+			this.#step = state.step;
+			this.#height = state.height;
+			this.#round = state.round;
+			this.#lockedRound = state.lockedRound;
+			this.#lockedValue = state.lockedValue;
+			this.#validRound = state.validRound;
+			this.#validValue = state.validValue;
 
-		this.#step = state.step;
-		this.#height = state.height;
-		this.#round = state.round;
-		this.#lockedRound = state.lockedRound;
-		this.#lockedValue = state.lockedValue;
-		this.#validRound = state.validRound;
-		this.#validValue = state.validValue;
+		} else {
+			const lastBlock = this.state.getLastBlock();
+			this.#height = lastBlock.data.height + 1;
+		}
+
+		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}`);
 	}
 }
