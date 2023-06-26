@@ -16,9 +16,9 @@ export interface ISignatureMessageData {
 export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> {}
-export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
-export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> { }
+export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> { }
+export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> { }
 
 export interface IProposalData {
 	readonly height: number;
@@ -87,10 +87,13 @@ export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
 export interface IMessageFactory {
 	makeProposal(data: IMakeProposalData, keyPair: IKeyPair): Promise<IProposal>;
 	makeProposalFromBytes(data: Buffer): Promise<IProposal>;
+	makeProposalFromData(data: IProposalData): Promise<IProposal>;
 	makePrevote(data: IMakePrevoteData, keyPair: IKeyPair): Promise<IPrevote>;
 	makePrevoteFromBytes(data: Buffer): Promise<IPrevote>;
+	makePrevoteFromData(data: IPrevoteData): Promise<IPrevote>;
 	makePrecommit(data: IMakePrecommitData, keyPair: IKeyPair): Promise<IPrecommit>;
 	makePrecommitFromBytes(data: Buffer): Promise<IPrecommit>;
+	makePrecommitFromData(data: IPrecommitData): Promise<IPrecommit>;
 }
 
 export interface IMessageSerializer {
