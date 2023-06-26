@@ -1,26 +1,7 @@
-import {
-	IBlock,
-	ICommittedBlock,
-	IKeyPair,
-	IPrecommit,
-	IPrevote,
-	IProposal,
-	IProposalLockProof,
-	IValidatorSetMajority,
-} from "./crypto";
-import { WalletRepositoryClone } from "./state";
+import { IProcessableUnit } from "./block-processor";
+import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof, IValidatorSetMajority } from "./crypto";
 
-export interface IProcessableState {
-	readonly height: number;
-	readonly round: number;
-	getWalletRepository(): WalletRepositoryClone;
-	getProcessorResult(): boolean;
-	setProcessorResult(processorResult: boolean): void;
-	getBlock(): IBlock;
-	getProposedCommitBlock(): Promise<ICommittedBlock>;
-}
-
-export interface IRoundState extends IProcessableState {
+export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
 	readonly proposer: string;
 	getProposal(): IProposal | undefined;

@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
@@ -16,11 +15,8 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const proposedBlock = roundState.getProposal()?.block;
-		Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
-
-		const { block } = proposedBlock;
+	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+		const block = unit.getBlock();
 
 		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
 
@@ -28,7 +24,7 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 			try {
 				for (const transaction of block.transactions) {
 					const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-					await handler.verify(roundState.getWalletRepository(), transaction);
+					await handler.verify(unit.getWalletRepository(), transaction);
 				}
 
 				// @TODO: check if we can remove this duplicate verification

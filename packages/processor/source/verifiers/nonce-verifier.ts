@@ -11,11 +11,8 @@ export class NonceVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const proposedBlock = roundState.getProposal()?.block;
-		Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
-
-		const { block } = proposedBlock;
+	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+		const block = unit.getBlock();
 
 		const nonceBySender = {};
 
@@ -31,7 +28,7 @@ export class NonceVerifier implements Contracts.BlockProcessor.Handler {
 			const sender: string = data.senderPublicKey;
 
 			if (nonceBySender[sender] === undefined) {
-				const wallet = await roundState.getWalletRepository().findByPublicKey(sender);
+				const wallet = await unit.getWalletRepository().findByPublicKey(sender);
 				nonceBySender[sender] = wallet.getNonce();
 			}
 
