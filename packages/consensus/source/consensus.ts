@@ -238,6 +238,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		} else {
 			this.#validValue = roundState;
 			this.#validRound = this.#round;
+
+			await this.#saveState();
 		}
 	}
 
@@ -290,13 +292,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		);
 
 		await this.processor.commit(roundState);
-		await this.storage.clear();
 
 		this.#height++;
 		this.#lockedRound = undefined;
 		this.#lockedValue = undefined;
 		this.#validRound = undefined;
 		this.#validValue = undefined;
+
+		// Remove persisted state
+		await this.storage.clear();
 
 		setImmediate(() => this.startRound(0));
 	}
@@ -363,6 +367,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		await this.broadcaster.broadcastProposal(proposal);
 		await this.handler.onProposal(proposal);
+
+		await this.#saveState();
 	}
 
 	async #prevote(value?: string): Promise<void> {
@@ -372,6 +378,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			await this.broadcaster.broadcastPrevote(prevote);
 			await this.handler.onPrevote(prevote);
 		}
+
+		await this.#saveState();
 	}
 
 	async #precommit(value?: string): Promise<void> {
@@ -381,6 +389,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
 		}
+
+		await this.#saveState();
 	}
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
@@ -394,7 +404,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return activeValidators.map((wallet) => wallet.getAttribute("validator.consensusPublicKey"));
 	}
 
+	async #saveState(): Promise<void> {
+		await this.storage.saveState(this.getState());
+	}
+
 	async #bootstrap(): Promise<void> {
+		// TODO: handle outdated state (e.g. last block height != stored height)
+
 		const state = await this.bootstrapper.run();
 		if (state) {
 			this.#step = state.step;
