@@ -40,13 +40,14 @@ export interface IRoundState {
 }
 
 export interface IRoundStateRepository {
-	getRoundState(height: number, round: number): Promise<IRoundState>;
+	getRoundState(height: number, round: number, seed: string): Promise<IRoundState>;
 }
 
 export interface IConsensusService {
 	run(): Promise<void>;
 	getHeight(): number;
 	getRound(): number;
+	getTotalRound(): number;
 	getStep(): Step;
 	onProposal(roundState: IRoundState): Promise<void>;
 	onProposalLocked(roudnState: IRoundState): Promise<void>;
@@ -73,6 +74,10 @@ export interface IScheduler {
 	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
 	clear(): void;
+}
+
+export interface IProposerPicker {
+	getValidatorIndex(height: number, seed: string): number;
 }
 
 export interface IValidator {

@@ -1,7 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import seedrandom from "seedrandom";
 
 @injectable()
 export class RoundState implements Contracts.Consensus.IRoundState {
@@ -21,6 +20,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+
+	@inject(Identifiers.Consensus.ProposerPicker)
+	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
 	@inject(Identifiers.Cryptography.Message.Verifier)
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
@@ -54,7 +56,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#proposer;
 	}
 
-	public async configure(height: number, round: number): Promise<RoundState> {
+	public async configure(height: number, round: number, seed: string): Promise<RoundState> {
 		this.#height = height;
 		this.#round = round;
 
@@ -65,7 +67,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			this.#validatorsSignedPrecommit.push(false);
 			this.#validatorsSignedPrevote.push(false);
 		}
-		this.#proposer = this.#chooseProposer(validators, height, round);
+		this.#proposer = validators[this.proposerPicker.getValidatorIndex(height, seed)]
+			.getAttribute<string>("validator.consensusPublicKey");
 
 		return this;
 	}
@@ -241,13 +244,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	#getPrecommitCount(blockId?: string): number {
 		return this.#precommitsCount.get(blockId) ?? 0;
-	}
-
-	#chooseProposer(validators: Contracts.State.Wallet[], height: number, round: number): string {
-		const rng = seedrandom(`${height}-${round}`);
-
-		const validatorIndex = Math.floor(rng() * validators.length - 1);
-		return validators[validatorIndex].getAttribute<string>("validator.consensusPublicKey");
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<Contracts.Crypto.IValidatorSetMajority> {

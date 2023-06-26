@@ -20,6 +20,7 @@ export const Identifiers = {
 	ConfigService: Symbol.for("Service<Config>"),
 	Consensus: {
 		Handler: Symbol.for("Handler<Consensus>"),
+		ProposerPicker: Symbol.for("Consensus<ProposerPicker>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
