@@ -10,27 +10,24 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
-	#height = 0;
-	#round = 0;
-	#committedBlock?: Contracts.Crypto.ICommittedBlock;
+	#committedBlock!: Contracts.Crypto.ICommittedBlock;
 	#processorResult?: boolean;
 	#validators = new Map<string, Contracts.State.Wallet>();
 
 	get height(): number {
-		return this.#height;
+		return this.#committedBlock.commit.height;
 	}
 
 	get round(): number {
-		return this.#round;
+		return this.#committedBlock.commit.round;
 	}
 
 	get validators(): string[] {
 		return [...this.#validators.keys()];
 	}
 
-	public async configure(height: number, round: number): Promise<CommittedBlockState> {
-		this.#height = height;
-		this.#round = round;
+	public async configure(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<CommittedBlockState> {
+		this.#committedBlock = committedBlock;
 
 		const validators = await this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
@@ -46,11 +43,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 	}
 
 	public getBlock(): Contracts.Crypto.IBlock {
-		if (this.#committedBlock) {
-			return this.#committedBlock.block;
-		}
-
-		throw new Error("Block is not available, because committed block is not set");
+		return this.#committedBlock.block;
 	}
 
 	public setProcessorResult(processorResult: boolean): void {
@@ -66,10 +59,6 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 	}
 
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
-		if (this.#committedBlock) {
-			return this.#committedBlock;
-		}
-
-		throw new Error("Committed block is not available, because it is not set");
+		return this.#committedBlock;
 	}
 }

@@ -250,26 +250,21 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		void this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
 	}
 
-	public async onMajorityPrecommit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		const proposal = roundState.getProposal();
-		// TODO: Round can be any
-		if (this.#didMajorityPrecommit || this.#isInvalidRoundState(roundState) || !proposal) {
+	public async onMajorityPrecommit(roundState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+		// TODO: Only height must match. Round can be any. Add tests
+		if (this.#didMajorityPrecommit || roundState.height !== this.#height) {
 			return;
 		}
 
 		this.#didMajorityPrecommit = true;
-
-		const { block } = proposal.block;
+		// TODO: Check if block can be missing
+		const block = roundState.getBlock();
 
 		if (!roundState.getProcessorResult()) {
 			this.logger.info(`Block ${block.data.id} on height ${this.#height} received +2/3 precommit but is invalid`);
 			return;
 		}
-		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorIndex
-			} blockId: ${block.data.id}`,
-		);
+		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 
 		await this.processor.commit(roundState);
 
@@ -282,7 +277,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		void this.startRound(0);
 	}
 
-	async onMinorityWithHigherRound(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	async onMinorityWithHigherRound(roundState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		if (roundState.height !== this.#height || roundState.round <= this.#round) {
 			return;
 		}
@@ -316,7 +311,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		void this.startRound(this.#round + 1);
 	}
 
-	#isInvalidRoundState(roundState: Contracts.Consensus.IRoundState): boolean {
+	#isInvalidRoundState(roundState: Contracts.BlockProcessor.IProcessableUnit): boolean {
 		if (roundState.height !== this.#height) {
 			return true;
 		}

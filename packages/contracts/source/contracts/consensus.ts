@@ -34,13 +34,13 @@ export interface IConsensusService {
 	getRound(): number;
 	getStep(): Step;
 	onProposal(roundState: IRoundState): Promise<void>;
-	onProposalLocked(roudnState: IRoundState): Promise<void>;
+	onProposalLocked(roundState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;
 	onMajorityPrevoteAny(roundState: IRoundState): Promise<void>;
 	onMajorityPrevoteNull(roundState: IRoundState): Promise<void>;
-	onMajorityPrecommitAny(roundState: IRoundState): Promise<void>;
-	onMajorityPrecommit(roundState: IRoundState): Promise<void>;
-	onMinorityWithHigherRound(roundState: IRoundState): Promise<void>;
+	onMajorityPrecommitAny(roundState: IProcessableUnit): Promise<void>;
+	onMajorityPrecommit(roundState: IProcessableUnit): Promise<void>;
+	onMinorityWithHigherRound(roundState: IProcessableUnit): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
