@@ -94,6 +94,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#proposal;
 	}
 
+	public getBlock(): Contracts.Crypto.IBlock {
+		if (this.#proposal) {
+			return this.#proposal.block.block;
+		}
+
+		throw new Error("Block is not available, because proposal is not set");
+	}
+
 	public setProcessorResult(processorResult: boolean): void {
 		this.#processorResult = processorResult;
 	}

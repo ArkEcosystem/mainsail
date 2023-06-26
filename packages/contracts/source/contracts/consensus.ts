@@ -10,16 +10,21 @@ import {
 } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
-export interface IRoundState {
+export interface IProcessableState {
 	readonly height: number;
 	readonly round: number;
+	getWalletRepository(): WalletRepositoryClone;
+	getProcessorResult(): boolean;
+	setProcessorResult(processorResult: boolean): void;
+	getBlock(): IBlock;
+	getProposedCommitBlock(): Promise<ICommittedBlock>;
+}
+
+export interface IRoundState extends IProcessableState {
 	readonly validators: string[];
 	readonly proposer: string;
-	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
 	addProposal(proposal: IProposal): Promise<boolean>;
-	setProcessorResult(processorResult: boolean): void;
-	getProcessorResult(): boolean;
 	addPrevote(prevote: IPrevote): Promise<boolean>;
 	addPrecommit(precommit: IPrecommit): Promise<boolean>;
 	hasMajorityPrevotes(): boolean;
@@ -36,7 +41,6 @@ export interface IRoundState {
 	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
 	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
 	getProposalLockProof(): Promise<IProposalLockProof>;
-	getProposedCommitBlock(): Promise<ICommittedBlock>;
 }
 
 export interface IRoundStateRepository {
