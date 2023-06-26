@@ -115,10 +115,18 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		await this.scheduler.delayProposal();
 
-		const { proposer: proposerPublicKey } = await this.roundStateRepository.getRoundState(this.#height, round, `${this.#totalRound}`);
+		const { proposer: proposerPublicKey } = await this.roundStateRepository.getRoundState(
+			this.#height,
+			round,
+			`${this.#totalRound}`,
+		);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
-		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round}/${this.#totalRound} with proposer ${proposerPublicKey}`);
+		this.logger.info(
+			`>> Starting new round: ${this.#height}/${this.#round}/${
+				this.#totalRound
+			} with proposer ${proposerPublicKey}`,
+		);
 
 		if (proposer) {
 			// TODO: Error handling
@@ -210,7 +218,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${block.data.id
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
+				block.data.id
 			}`,
 		);
 
@@ -274,7 +283,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
+				proposal.validatorIndex
 			} blockId: ${block.data.id}`,
 		);
 

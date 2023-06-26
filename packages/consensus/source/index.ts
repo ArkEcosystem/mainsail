@@ -3,9 +3,9 @@ import { Providers } from "@mainsail/kernel";
 
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
+import { ProposerPicker } from "./proposer-picker";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
-import { ProposerPicker } from "./proposer-picker";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
