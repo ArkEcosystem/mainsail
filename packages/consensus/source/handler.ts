@@ -72,6 +72,13 @@ export class Handler implements Contracts.Consensus.IHandler {
 		}
 	}
 
+	async onCommittedBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {
+		// TODO: Check precommits
+		// TODO: Check block
+		// TODO: Create roundState
+		// TODO: Call onMajorityPrecommit
+	}
+
 	#isValidHeightAndRound(message: { height: number; round: number }): boolean {
 		return message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound();
 	}
