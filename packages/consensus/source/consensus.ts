@@ -279,7 +279,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#validRound = undefined;
 		this.#validValue = undefined;
 
-		setImmediate(() => this.startRound(0));
+		void this.startRound(0);
 	}
 
 	async onMinorityWithHigherRound(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -287,7 +287,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		setImmediate(() => this.startRound(roundState.round));
+		void this.startRound(roundState.round);
 	}
 
 	public async onTimeoutPropose(height: number, round: number): Promise<void> {
@@ -313,7 +313,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		setImmediate(() => this.startRound(this.#round + 1));
+		void this.startRound(this.#round + 1);
 	}
 
 	#isInvalidRoundState(roundState: Contracts.Consensus.IRoundState): boolean {
