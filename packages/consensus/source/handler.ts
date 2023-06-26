@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { RoundStateRepository } from "./round-state-repository";
+import { Storage } from "./storage";
 
 @injectable()
 export class Handler implements Contracts.Consensus.IHandler {
@@ -14,10 +15,17 @@ export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: RoundStateRepository;
 
+	@inject(Identifiers.Consensus.Storage)
+	private readonly storage!: Storage;
+
 	@inject(Identifiers.Cryptography.Message.Verifier)
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
 
-	async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
+	public async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+		return this.#handle(roundState);
+	}
+
+	public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (!this.#isValidHeightAndRound(proposal)) {
 			return;
 		}
@@ -30,11 +38,13 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 		const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 		if (await roundState.addProposal(proposal)) {
+			await this.storage.saveProposal(proposal);
+
 			await this.#handle(roundState);
 		}
 	}
 
-	async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
+	public async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
 		if (!this.#isValidHeightAndRound(prevote)) {
 			return;
 		}
@@ -48,11 +58,13 @@ export class Handler implements Contracts.Consensus.IHandler {
 		const roundState = await this.roundStateRepo.getRoundState(prevote.height, prevote.round);
 
 		if (await roundState.addPrevote(prevote)) {
+			await this.storage.savePrevote(prevote);
+
 			await this.#handle(roundState);
 		}
 	}
 
-	async onPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
+	public async onPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
 		if (!this.#isValidHeightAndRound(precommit)) {
 			return;
 		}
@@ -68,6 +80,8 @@ export class Handler implements Contracts.Consensus.IHandler {
 		const roundState = await this.roundStateRepo.getRoundState(precommit.height, precommit.round);
 
 		if (await roundState.addPrecommit(precommit)) {
+			await this.storage.savePrecommit(precommit);
+
 			await this.#handle(roundState);
 		}
 	}
