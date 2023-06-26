@@ -7,7 +7,6 @@ import { AcceptPeerPlugin } from "./plugins/accept-peer";
 import { AwaitBlockPlugin } from "./plugins/await-block";
 import { CodecPlugin } from "./plugins/codec";
 import { HeaderHandlePlugin } from "./plugins/header-handle";
-import { IsAppReadyPlugin } from "./plugins/is-app-ready";
 import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
 import {
@@ -71,7 +70,6 @@ export class Server {
 		// onPostAuth
 		this.app.resolve(CodecPlugin).register(this.server);
 		this.app.resolve(ValidatePlugin).register(this.server);
-		this.app.resolve(IsAppReadyPlugin).register(this.server);
 
 		// onPreHandler
 		this.app.resolve(AcceptPeerPlugin).register(this.server);
