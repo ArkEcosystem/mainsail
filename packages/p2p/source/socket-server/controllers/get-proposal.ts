@@ -33,7 +33,7 @@ export class GetProposalController implements Contracts.P2P.Controller {
 			return result;
 		}
 
-		const roundState = await roundStateRepo.getRoundState(height, round);
+		const roundState = await roundStateRepo.getRoundState(height, round, `${consensus.getTotalRound()}`);
 		const proposal = roundState.getProposal();
 
 		if (!proposal) {
