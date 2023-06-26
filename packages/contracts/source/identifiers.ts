@@ -78,10 +78,10 @@ export const Identifiers = {
 	Database: {
 		BlockHeightStorage: Symbol.for("Database<BlockHeightStorage>"),
 		BlockStorage: Symbol.for("Database<BlockStorage>"),
-		ProposalStorage: Symbol.for("Database<ProposalStorage>"),
-		PrevoteStorage: Symbol.for("Database<PrevoteStorage>"),
-		PrecommitStorage: Symbol.for("Database<PrecommitStorage>"),
 		ConsensusStorage: Symbol.for("Database<ConsensusStorage>"),
+		PrecommitStorage: Symbol.for("Database<PrecommitStorage>"),
+		PrevoteStorage: Symbol.for("Database<PrevoteStorage>"),
+		ProposalStorage: Symbol.for("Database<ProposalStorage>"),
 		RootStorage: Symbol.for("Database<RootStorage>"),
 		RoundStorage: Symbol.for("Database<RoundStorage>"),
 		Service: Symbol.for("Database<Service>"),

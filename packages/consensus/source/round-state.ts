@@ -393,9 +393,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		};
 	}
 
-	public async fromData(
-		data: Contracts.Consensus.IRoundStateData,
-	): Promise<Contracts.Consensus.IRoundState> {
+	public async fromData(data: Contracts.Consensus.IRoundStateData): Promise<Contracts.Consensus.IRoundState> {
 		this.#height = data.height;
 		this.#round = data.round;
 		this.#processorResult = data.processorResult;
@@ -403,9 +401,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		this.#validatorsSignedPrecommit = data.validatorsSignedPrecommit;
 		this.#proposer = data.proposer;
 
-		this.#proposal = data.proposal
-			? await this.messageFactory.makeProposalFromData(data.proposal)
-			: undefined;
+		this.#proposal = data.proposal ? await this.messageFactory.makeProposalFromData(data.proposal) : undefined;
 
 		this.#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
 		for (const [key, value] of Object.entries(data.prevotes)) {

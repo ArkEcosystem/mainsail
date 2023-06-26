@@ -39,5 +39,4 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 
 		return this.storage.getState();
 	}
-
 }

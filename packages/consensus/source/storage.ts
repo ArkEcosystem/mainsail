@@ -84,23 +84,17 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 
 	public async getProposals(): Promise<Contracts.Crypto.IProposal[]> {
 		const proposals = [...this.proposalStorage.getValues(undefined as unknown as Key)];
-		return Promise.all(proposals.map(
-			(proposal) => this.messageFactory.makeProposalFromData(proposal)
-		));
+		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromData(proposal)));
 	}
 
 	public async getPrevotes(): Promise<Contracts.Crypto.IPrevote[]> {
 		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as Key)];
-		return Promise.all(prevotes.map(
-			(prevote) => this.messageFactory.makePrevoteFromData(prevote)
-		));
+		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromData(prevote)));
 	}
 
 	public async getPrecommits(): Promise<Contracts.Crypto.IPrecommit[]> {
 		const precommits = [...this.precommitStorage.getValues(undefined as unknown as Key)];
-		return Promise.all(precommits.map(
-			(precommit) => this.messageFactory.makePrecommitFromData(precommit)
-		));
+		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromData(precommit)));
 	}
 
 	public async clear(): Promise<void> {
@@ -109,6 +103,6 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 			this.prevoteStorage.clearAsync(),
 			this.precommitStorage.clearAsync(),
 			this.consensusStorage.clearAsync(),
-		])
+		]);
 	}
 }
