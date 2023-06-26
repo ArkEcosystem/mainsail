@@ -29,14 +29,42 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 			return undefined;
 		}
 
-		const state = await this.consensusStorage.get("consensus-state");
-		return this.#deserializeConsensusState(state);
+		const data = await this.consensusStorage.get("consensus-state");
+
+		let validValue: Contracts.Consensus.IRoundState | undefined;
+		if (data.validValue !== null) {
+			validValue = await new RoundState().fromData(data.validValue);
+		}
+
+		let lockedValue: Contracts.Consensus.IRoundState | undefined;
+		if (data.lockedValue !== null) {
+			lockedValue = await new RoundState().fromData(data.lockedValue);
+		}
+
+		return {
+			height: data.height,
+			lockedRound: data.lockedRound,
+			lockedValue,
+			round: data.round,
+			step: data.step,
+			validRound: data.validRound,
+			validValue,
+		};
 	}
 
 	public async saveState(state: Contracts.Consensus.IConsensusState): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
-		const serialized = await this.#serializeConsensusState(state);
-		await this.consensusStorage.put("consensus-state", serialized);
+		const data: Contracts.Consensus.IConsensusStateData = {
+			height: state.height,
+			lockedRound: state.lockedRound,
+			lockedValue: state.lockedValue?.toData() ?? null,
+			round: state.round,
+			step: state.step,
+			validRound: state.validRound,
+			validValue: state.validValue?.toData() ?? null,
+		};
+
+		await this.consensusStorage.put("consensus-state", data);
 	}
 
 	public async saveProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
@@ -80,45 +108,7 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 			this.proposalStorage.clearAsync(),
 			this.prevoteStorage.clearAsync(),
 			this.precommitStorage.clearAsync(),
+			this.consensusStorage.clearAsync(),
 		])
-	}
-
-	async #serializeConsensusState(state: Contracts.Consensus.IConsensusState): Promise<Buffer> {
-		// TODO: consider more optimized format
-		const serialized: Contracts.Consensus.ISerializedConsensusState = {
-			height: state.height,
-			lockedRound: state.lockedRound,
-			lockedValue: state.lockedValue ? await state.lockedValue.serialize() : null,
-			round: state.round,
-			step: state.step,
-			validRound: state.validRound,
-			validValue: state.validValue ? await state.validValue.serialize() : null,
-		};
-
-		return Buffer.from(JSON.stringify(serialized), "utf-8");
-	}
-
-	async #deserializeConsensusState(bytes: Buffer): Promise<Contracts.Consensus.IConsensusState> {
-		const data: Contracts.Consensus.ISerializedConsensusState = JSON.parse(bytes.toString("utf-8"));
-
-		let validValue: Contracts.Consensus.IRoundState | undefined;
-		if (data.validValue !== null) {
-			validValue = await new RoundState().deserialize(data.validValue);
-		}
-
-		let lockedValue: Contracts.Consensus.IRoundState | undefined;
-		if (data.lockedValue !== null) {
-			lockedValue = await new RoundState().deserialize(data.lockedValue);
-		}
-
-		return {
-			height: data.height,
-			lockedRound: data.lockedRound,
-			lockedValue,
-			round: data.round,
-			step: data.step,
-			validRound: data.validRound,
-			validValue,
-		};
 	}
 }

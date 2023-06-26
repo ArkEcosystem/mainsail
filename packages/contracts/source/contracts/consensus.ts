@@ -3,8 +3,11 @@ import {
 	ICommittedBlock,
 	IKeyPair,
 	IPrecommit,
+	IPrecommitData,
 	IPrevote,
+	IPrevoteData,
 	IProposal,
+	IProposalData,
 	IProposalLockProof,
 	IValidatorSetMajority,
 } from "./crypto";
@@ -38,11 +41,11 @@ export interface IRoundState {
 	getProposalLockProof(): Promise<IProposalLockProof>;
 	getProposedCommitBlock(): Promise<ICommittedBlock>;
 
-	serialize(): Promise<ISerializedRoundStateData>;
-	deserialize(serialized: ISerializedRoundStateData): Promise<IRoundState>;
+	toData(): IRoundStateData;
+	fromData(data: IRoundStateData): Promise<IRoundState>;
 }
 
-export interface ISerializedRoundStateData {
+export interface IRoundStateData {
 	readonly height: number;
 	readonly round: number;
 	readonly processorResult: boolean | undefined;
@@ -51,23 +54,23 @@ export interface ISerializedRoundStateData {
 
 	readonly proposer: string;
 
-	readonly proposal: string;
-	readonly prevotes: Record<string, string>;
+	readonly proposal: IProposalData | null;
+	readonly prevotes: Record<string, IPrevoteData>;
 	readonly prevotesCount: Record<string, number>;
-	readonly precommits: Record<string, string>;
+	readonly precommits: Record<string, IPrecommitData>;
 	readonly precommitsCount: Record<string, number>;
 	// consensus key => wallet key
 	readonly validators: Record<string, string>;
 }
 
-export interface ISerializedConsensusState {
+export interface IConsensusStateData {
 	readonly height: number;
 	readonly round: number;
 	readonly step: Step;
 	readonly validRound?: number;
 	readonly lockedRound?: number;
-	readonly lockedValue: ISerializedRoundStateData | null;
-	readonly validValue: ISerializedRoundStateData | null;
+	readonly lockedValue: IRoundStateData | null;
+	readonly validValue: IRoundStateData | null;
 }
 
 export interface IRoundStateRepository {
