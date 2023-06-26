@@ -75,6 +75,7 @@ export interface IConsensusStateData {
 
 export interface IRoundStateRepository {
 	getRoundState(height: number, round: number): Promise<IRoundState>;
+	tryGetRoundState(height: number, round: number): IRoundState | undefined;
 }
 
 export interface IConsensusService {
@@ -107,8 +108,19 @@ export interface IConsensusState {
 }
 
 export interface IConsensusStorage {
-	saveState(state: IConsensusState): Promise<void>;
 	getState(): Promise<IConsensusState | undefined>;
+	saveState(state: IConsensusState): Promise<void>;
+	saveProposal(state: IProposal): Promise<void>;
+	savePrevote(state: IPrevote): Promise<void>;
+	savePrecommit(state: IPrecommit): Promise<void>;
+	getProposals(): Promise<IProposal[]>;
+	getPrevotes(): Promise<IPrevote[]>;
+	getPrecommits(): Promise<IPrecommit[]>;
+	clear(): Promise<void>;
+}
+
+export interface IBootstrapper {
+	run(): Promise<IConsensusState | undefined>;
 }
 
 export interface IHandler {

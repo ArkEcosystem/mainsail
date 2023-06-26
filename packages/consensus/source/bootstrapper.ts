@@ -1,18 +1,16 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Storage } from "./storage";
-import { RoundStateRepository } from "./round-state-repository";
 
 @injectable()
-export class Bootstrapper {
+export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: RoundStateRepository;
+	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
 
 	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Storage;
+	private readonly storage!: Contracts.Consensus.IConsensusStorage;
 
 	public async run(): Promise<Contracts.Consensus.IConsensusState | undefined> {
 		const proposals = await this.storage.getProposals();

@@ -1,9 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { RoundStateRepository } from "./round-state-repository";
-import { Storage } from "./storage";
-
 @injectable()
 export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Application)
@@ -13,10 +10,10 @@ export class Handler implements Contracts.Consensus.IHandler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: RoundStateRepository;
+	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
 
 	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Storage;
+	private readonly storage!: Contracts.Consensus.IConsensusStorage;
 
 	@inject(Identifiers.Cryptography.Message.Verifier)
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
