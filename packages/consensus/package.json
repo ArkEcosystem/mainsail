@@ -24,10 +24,12 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.10.7",
-		"delay": "5.0.0"
+		"delay": "5.0.0",
+		"seedrandom": "^3.0.5"
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
+		"@types/seedrandom": "^3.0.5",
 		"rewiremock": "3.14.5",
 		"uvu": "^0.5.6"
 	},

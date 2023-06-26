@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import seedrandom from "seedrandom";
 
 @injectable()
 export class RoundState implements Contracts.Consensus.IRoundState {
@@ -64,7 +65,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			this.#validatorsSignedPrecommit.push(false);
 			this.#validatorsSignedPrevote.push(false);
 		}
-		this.#proposer = validators[0].getAttribute<string>("validator.consensusPublicKey");
+		this.#proposer = this.#chooseProposer(validators, height, round);
 
 		return this;
 	}
@@ -240,6 +241,15 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	#getPrecommitCount(blockId?: string): number {
 		return this.#precommitsCount.get(blockId) ?? 0;
+	}
+
+	#chooseProposer(validators: Contracts.State.Wallet[], height: number, round: number): string {
+		const rng = seedrandom(`${height}-${round}`);
+
+		const validatorIndex = Math.floor(rng() * validators.length - 1);
+		const proposer = validators[validatorIndex].getAttribute<string>("validator.consensusPublicKey");
+
+		return proposer;
 	}
 
 	public async aggregateMajorityPrevotes(): Promise<Contracts.Crypto.IValidatorSetMajority> {

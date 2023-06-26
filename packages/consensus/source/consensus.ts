@@ -22,6 +22,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
 
+	@inject(Identifiers.Consensus.RoundStateRepository)
+	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -106,7 +109,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		await this.scheduler.delayProposal();
 
-		const proposerPublicKey = await this.#getProposerPublicKey(this.#height, round);
+		const { proposer: proposerPublicKey } = await this.roundStateRepository.getRoundState(this.#height, round);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
@@ -201,8 +204,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
-				block.data.id
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${block.data.id
 			}`,
 		);
 
@@ -266,8 +268,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorIndex
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex
 			} blockId: ${block.data.id}`,
 		);
 
@@ -362,11 +363,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
 		}
-	}
-
-	async #getProposerPublicKey(height: number, round: number): Promise<string> {
-		const activeValidators = await this.validatorSet.getActiveValidators();
-		return activeValidators[0].getAttribute("validator.consensusPublicKey");
 	}
 
 	async #getActiveValidators(): Promise<string[]> {
