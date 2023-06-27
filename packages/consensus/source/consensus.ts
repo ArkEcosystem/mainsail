@@ -3,6 +3,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
+	@inject(Identifiers.Consensus.Bootstrapper)
+	private readonly bootstrapper!: Contracts.Consensus.IBootstrapper;
+
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
@@ -21,6 +24,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	// TODO: Rename identifier
 	@inject(Identifiers.Consensus.ValidatorRepository)
 	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
+
+	@inject(Identifiers.Consensus.RoundStateRepository)
+	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
+
+	@inject(Identifiers.Consensus.Storage)
+	private readonly storage!: Contracts.Consensus.IConsensusStorage;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -77,28 +86,34 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return this.#validRound;
 	}
 
-	public getState(): Record<string, unknown> {
+	public getState(): Contracts.Consensus.IConsensusState {
 		return {
 			height: this.#height,
 			lockedRound: this.#lockedRound,
-			lockedValue: this.#lockedValue,
 			round: this.#round,
 			step: this.#step,
 			validRound: this.#validRound,
-			validValue: this.#validValue,
 		};
 	}
 
 	public async run(): Promise<void> {
-		const lastBlock = this.state.getLastBlock();
-		this.#height = lastBlock.data.height + 1;
+		await this.#bootstrap();
 
-		void this.startRound(this.#round);
+		// Start a new round if no proposal yet
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+
+		await this.startRound(this.#round);
+
+		// TODO: we need to be able to download missed prevotes/precommits
+		await this.handler.handle(roundState);
 	}
 
 	public async startRound(round: number): Promise<void> {
 		this.#round = round;
 		this.#step = Contracts.Consensus.Step.Propose;
+
+		await this.#saveState();
+
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 
@@ -219,6 +234,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		} else {
 			this.#validValue = roundState;
 			this.#validRound = this.#round;
+
+			await this.#saveState();
 		}
 	}
 
@@ -279,6 +296,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#validRound = undefined;
 		this.#validValue = undefined;
 
+		// Remove persisted state
+		await this.storage.clear();
+
 		setImmediate(() => this.startRound(0));
 	}
 
@@ -329,6 +349,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+		if (roundState.hasProposal()) {
+			return;
+		}
+
 		let block: Contracts.Crypto.IBlock;
 		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
 
@@ -347,21 +372,35 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #prevote(value?: string): Promise<void> {
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
+			if (roundState.hasPrevote(validator)) {
+				continue;
+			}
+
 			const prevote = await validator.prevote(this.#height, this.#round, value);
 
 			await this.broadcaster.broadcastPrevote(prevote);
 			await this.handler.onPrevote(prevote);
 		}
+
+		await this.#saveState();
 	}
 
 	async #precommit(value?: string): Promise<void> {
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
+			if (roundState.hasPrecommit(validator)) {
+				continue;
+			}
+
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
 			await this.broadcaster.broadcastPrecommit(precommit);
 			await this.handler.onPrecommit(precommit);
 		}
+
+		await this.#saveState();
 	}
 
 	async #getProposerPublicKey(height: number, round: number): Promise<string> {
@@ -373,5 +412,29 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const activeValidators = await this.validatorSet.getActiveValidators();
 
 		return activeValidators.map((wallet) => wallet.getAttribute("validator.consensusPublicKey"));
+	}
+
+	async #saveState(): Promise<void> {
+		await this.storage.saveState(this.getState());
+	}
+
+	async #bootstrap(): Promise<void> {
+		// TODO: handle outdated state (e.g. last block height != stored height)
+
+		const state = await this.bootstrapper.run();
+		if (state) {
+			this.#step = state.step;
+			this.#height = state.height;
+			this.#round = state.round;
+			this.#lockedRound = state.lockedRound;
+			this.#lockedValue = state.lockedValue;
+			this.#validRound = state.validRound;
+			this.#validValue = state.validValue;
+		} else {
+			const lastBlock = this.state.getLastBlock();
+			this.#height = lastBlock.data.height + 1;
+		}
+
+		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}`);
 	}
 }

@@ -39,8 +39,11 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 
 	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const data = await this.deserializer.deserializeProposal(bytes);
-		this.#applySchema("proposal", data);
+		return this.makeProposalFromData(data);
+	}
 
+	public async makeProposalFromData(data: Contracts.Crypto.IProposalData): Promise<Contracts.Crypto.IProposal> {
+		this.#applySchema("proposal", data);
 		const block = await this.blockFactory.fromProposedBytes(Buffer.from(data.block.serialized, "hex"));
 
 		return new Proposal({ ...data, block });
@@ -63,6 +66,10 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 
 	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
 		const data = await this.deserializer.deserializePrevote(bytes);
+		return this.makePrevoteFromData(data);
+	}
+
+	public async makePrevoteFromData(data: Contracts.Crypto.IPrevoteData): Promise<Contracts.Crypto.IPrevote> {
 		this.#applySchema("prevote", data);
 		return new Prevote(data);
 	}
@@ -85,6 +92,11 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 
 	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
 		const data = await this.deserializer.deserializePrecommit(bytes);
+		this.#applySchema("precommit", data);
+		return new Precommit(data);
+	}
+
+	public async makePrecommitFromData(data: Contracts.Crypto.IPrecommitData): Promise<Contracts.Crypto.IPrecommit> {
 		this.#applySchema("precommit", data);
 		return new Precommit(data);
 	}

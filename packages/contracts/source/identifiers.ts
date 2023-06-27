@@ -19,10 +19,12 @@ export const Identifiers = {
 	ConfigRepository: Symbol.for("Repository<Config>"),
 	ConfigService: Symbol.for("Service<Config>"),
 	Consensus: {
+		Bootstrapper: Symbol.for("Bootstrapper<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
+		Storage: Symbol.for("Storage<Consensus>"),
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
@@ -76,6 +78,10 @@ export const Identifiers = {
 	Database: {
 		BlockHeightStorage: Symbol.for("Database<BlockHeightStorage>"),
 		BlockStorage: Symbol.for("Database<BlockStorage>"),
+		ConsensusStorage: Symbol.for("Database<ConsensusStorage>"),
+		PrecommitStorage: Symbol.for("Database<PrecommitStorage>"),
+		PrevoteStorage: Symbol.for("Database<PrevoteStorage>"),
+		ProposalStorage: Symbol.for("Database<ProposalStorage>"),
 		RootStorage: Symbol.for("Database<RootStorage>"),
 		RoundStorage: Symbol.for("Database<RoundStorage>"),
 		Service: Symbol.for("Database<Service>"),
