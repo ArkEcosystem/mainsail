@@ -669,50 +669,6 @@ describe<{
 		getLastBlockSpy.calledOnce();
 	});
 
-	for (const blockPing of [undefined, { block: { count: 3, data: { height: 444, id: "123" } } }]) {
-		it("getBlockPing should return the value of state.blockPing", (context) => {
-			const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-
-			stub(context.stateStore, "getBlockPing").returnValue(blockPing);
-
-			assert.equal(blockchain.getBlockPing(), blockPing);
-		});
-	}
-
-	it("pingBlock should call state.pingBlock", (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const pingBlockSpy = spy(context.stateStore, "pingBlock");
-
-		const incomingBlock = { height: 444, id: "123" };
-		blockchain.pingBlock(incomingBlock as Contracts.Crypto.IBlockData);
-
-		pingBlockSpy.calledOnce();
-		pingBlockSpy.calledWith(incomingBlock);
-	});
-
-	it("pushPingBlock should call state.pushPingBlock", (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const pushPingBlockSpy = spy(context.stateStore, "pushPingBlock");
-
-		const incomingBlock = { height: 444, id: "123" };
-		const fromForger = true;
-		blockchain.pushPingBlock(incomingBlock as Contracts.Crypto.IBlockData, fromForger);
-
-		pushPingBlockSpy.calledOnce();
-		pushPingBlockSpy.calledWith(incomingBlock, fromForger);
-	});
-
-	it("pushPingBlock should call state.pushPingBlock with fromForger=false if not specified", (context) => {
-		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const pushPingBlockSpy = spy(context.stateStore, "pushPingBlock");
-
-		const incomingBlock = { height: 444, id: "123" };
-		blockchain.pushPingBlock(incomingBlock as Contracts.Crypto.IBlockData);
-
-		pushPingBlockSpy.calledOnce();
-		pushPingBlockSpy.calledWith(incomingBlock, false);
-	});
-
 	it("checkMissingBlocks when missedBlocks passes the threshold and Math.random()<=0.8, should pass", async (context) => {
 		stub(context.configuration, "getMilestone").returnValue({
 			activeValidators: 51,

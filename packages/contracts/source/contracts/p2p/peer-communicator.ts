@@ -1,11 +1,10 @@
-import { IBlock, IBlockData } from "../crypto";
+import { IBlockData } from "../crypto";
 import { IGetMessagesResponse, IGetPeersResponse, IGetProposalResponse } from "./endpoints";
 import { Peer } from "./peer";
 
 export interface PeerCommunicator {
 	initialize();
 
-	postBlock(peer: Peer, block: IBlock): Promise<void>;
 	postTransactions(peer: Peer, transactions: Buffer[]): Promise<void>;
 	postProposal(peer: Peer, proposal: Buffer): Promise<void>;
 	postPrevote(peer: Peer, prevote: Buffer): Promise<void>;
