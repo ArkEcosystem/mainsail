@@ -37,7 +37,7 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 			await roundState.addPrecommit(precommit);
 		}
 
-		const state = await this.storage.getState() as Utils.Mutable<Contracts.Consensus.IConsensusState> | undefined;
+		const state = (await this.storage.getState()) as Utils.Mutable<Contracts.Consensus.IConsensusState> | undefined;
 		if (!state) {
 			return undefined;
 		}
