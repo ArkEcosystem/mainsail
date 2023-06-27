@@ -13,6 +13,8 @@ export interface IRound {
 export interface IDatabaseService {
 	getBlock(id: string): Promise<IBlock | undefined>;
 
+	findCommittedBlocks(start: number, end: number): Promise<Buffer[]>;
+
 	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
 
 	getBlocks(start: number, end: number): Promise<IBlockData[]>;
