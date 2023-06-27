@@ -31,9 +31,9 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 
 		return {
 			height: data.height,
+			lockedRound: data.lockedRound,
 			round: data.round,
 			step: data.step,
-			lockedRound: data.lockedRound,
 			validRound: data.validRound,
 		};
 	}

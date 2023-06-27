@@ -24,65 +24,65 @@ type Context = {
 describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
 	beforeEach((context) => {
 		context.blockProcessor = {
-			commit: () => { },
-			process: () => { },
+			commit: () => {},
+			process: () => {},
 		};
 
 		context.state = {
-			getLastBlock: () => { },
+			getLastBlock: () => {},
 		};
 
 		context.handler = {
-			onPrecommit: () => { },
-			onPrevote: () => { },
-			onProposal: () => { },
+			onPrecommit: () => {},
+			onPrevote: () => {},
+			onProposal: () => {},
 		};
 
 		context.broadcaster = {
-			broadcastPrecommit: () => { },
-			broadcastPrevote: () => { },
-			broadcastProposal: () => { },
+			broadcastPrecommit: () => {},
+			broadcastPrevote: () => {},
+			broadcastProposal: () => {},
 		};
 
 		context.scheduler = {
-			delayProposal: () => { },
-			scheduleTimeoutPrecommit: () => { },
-			scheduleTimeoutPrevote: () => { },
-			scheduleTimeoutPropose: () => { },
-			clear: () => { },
+			delayProposal: () => {},
+			scheduleTimeoutPrecommit: () => {},
+			scheduleTimeoutPrevote: () => {},
+			scheduleTimeoutPropose: () => {},
+			clear: () => {},
 		};
 
 		context.storage = {
-			saveState: () => { },
-			saveProposal: () => { },
-			savePrevote: () => { },
-			savePrecommit: () => { },
-			getState: () => { },
-			getProposals: () => { },
-			getPrecommits: () => { },
-			getPrevotes: () => { },
-			clear: () => { },
+			saveState: () => {},
+			saveProposal: () => {},
+			savePrevote: () => {},
+			savePrecommit: () => {},
+			getState: () => {},
+			getProposals: () => {},
+			getPrecommits: () => {},
+			getPrevotes: () => {},
+			clear: () => {},
 		};
 
 		context.bootstrapper = {
-			run: () => { },
+			run: () => {},
 		};
 
 		context.validatorsRepository = {
-			getValidator: () => { },
-			getValidators: () => { },
+			getValidator: () => {},
+			getValidators: () => {},
 		};
 
 		context.roundStateRepository = {
-			getRoundState: () => { },
+			getRoundState: () => {},
 		};
 
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		context.block = {
@@ -106,7 +106,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			getProposal: () => context.proposal,
 			height: 2,
 			round: 0,
-			setProcessorResult: () => { },
+			setProcessorResult: () => {},
 			hasValidProposalLockProof: () => true,
 		} as unknown as Contracts.Consensus.IRoundState;
 

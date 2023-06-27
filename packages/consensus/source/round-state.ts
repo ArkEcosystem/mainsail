@@ -339,5 +339,4 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			serialized: serialized.toString("hex"),
 		};
 	}
-
 }
