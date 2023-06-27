@@ -37,8 +37,4 @@ export interface Blockchain {
 	getLastHeight(): number;
 
 	getLastDownloadedBlock(): IBlockData;
-
-	pingBlock(incomingBlock: IBlockData): boolean;
-
-	pushPingBlock(block: IBlockData, fromForger): void;
 }

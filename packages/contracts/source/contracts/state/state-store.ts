@@ -1,13 +1,5 @@
 import { IBlock, IBlockData, ICommittedBlock, ITransactionData } from "../crypto";
 
-export interface BlockPing {
-	count: number;
-	first: number;
-	last: number;
-	fromForger: boolean;
-	block: IBlockData;
-}
-
 export interface StateStore {
 	getBlockchain(): any;
 
@@ -24,8 +16,6 @@ export interface StateStore {
 	getLastStoredBlockHeight(): number;
 
 	setLastStoredBlockHeight(height: number): void;
-
-	getBlockPing(): BlockPing | undefined;
 
 	isStarted(): boolean;
 
@@ -78,8 +68,4 @@ export interface StateStore {
 	clearCachedTransactionIds(): void;
 
 	getCachedTransactionIds(): string[];
-
-	pingBlock(incomingBlock: IBlockData): boolean;
-
-	pushPingBlock(block: IBlockData, fromForger?: boolean): void;
 }

@@ -41,10 +41,6 @@ export class PostBlockController implements Contracts.P2P.Controller {
 			transactions: deserialized.transactions.map((tx) => tx.data),
 		};
 
-		if (this.blockchain.pingBlock(block)) {
-			return { height: this.blockchain.getLastHeight(), status: true };
-		}
-
 		const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
 
 		if (!Utils.isBlockChained(lastDownloadedBlock, block)) {
