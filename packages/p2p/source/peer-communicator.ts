@@ -175,10 +175,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
-		{
-			fromBlockHeight,
-			blockLimit = constants.MAX_DOWNLOAD_BLOCKS,
-		}: { fromBlockHeight: number; blockLimit?: number },
+		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
 	): Promise<Contracts.Crypto.IBlockData[]> {
 		const maxPayload = constants.DEFAULT_MAX_PAYLOAD;
 
@@ -186,9 +183,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			peer,
 			Routes.GetBlocks,
 			{
-				blockLimit,
-				lastBlockHeight: fromBlockHeight,
-				serialized: true,
+				fromHeight,
+				limit,
 			},
 			this.configuration.getRequired<number>("getBlocksTimeout"),
 			maxPayload,
@@ -196,9 +192,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		);
 
 		if (!peerBlocks || peerBlocks.length === 0) {
-			this.logger.debug(
-				`Peer ${peer.ip} did not return any blocks via height ${fromBlockHeight.toLocaleString()}.`,
-			);
+			this.logger.debug(`Peer ${peer.ip} did not return any blocks via height ${fromHeight.toLocaleString()}.`);
 			return [];
 		}
 

@@ -101,8 +101,8 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 					peerPrint = `${peer.ip}:${peer.port}`;
 					try {
 						blocks = await this.communicator.getBlocks(peer, {
-							blockLimit: this.#downloadChunkSize,
-							fromBlockHeight: height,
+							fromHeight: height,
+							limit: this.#downloadChunkSize,
 						});
 
 						if (blocks.length > 0 || isLastChunk) {

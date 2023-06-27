@@ -17,7 +17,7 @@ export class Downloader {
 
 	public async downloadBlocks(peer: Contracts.P2P.Peer): Promise<void> {
 		const result = await this.communicator.getBlocks(peer, {
-			fromBlockHeight: this.state.getLastBlock().data.height + 1,
+			fromHeight: this.state.getLastBlock().data.height + 1,
 		});
 
 		console.log(result);
