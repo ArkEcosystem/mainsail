@@ -260,10 +260,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.stateStore.getLastDownloadedBlock() || this.getLastBlock().data;
 	}
 
-	public getBlockPing(): Contracts.State.BlockPing | undefined {
-		return this.stateStore.getBlockPing();
-	}
-
 	public pingBlock(incomingBlock: Contracts.Crypto.IBlockData): boolean {
 		return this.stateStore.pingBlock(incomingBlock);
 	}
