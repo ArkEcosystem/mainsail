@@ -90,10 +90,6 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 	async onCommittedBlock(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		// TODO: Check precommits
-		// TODO: Check block
-		// TODO: Create roundState
-		// TODO: Call onMajorityPrecommit
-
 		const committedBlockState = await this.app.resolve(CommittedBlockState).configure(committedBlock);
 
 		committedBlockState.setProcessorResult(await this.processor.process(committedBlockState));
