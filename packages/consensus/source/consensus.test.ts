@@ -15,6 +15,7 @@ type Context = {
 	scheduler: any;
 	validatorsRepository: any;
 	validatorSet: any;
+	roundStateRepository: any;
 	logger: any;
 	block: any;
 	proposal: any;
@@ -73,10 +74,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			getValidators: () => { },
 		};
 
-		context.roundStateRepository = {
-			getRoundState: () => { },
-		};
-
 		context.validatorSet = {
 			getActiveValidators: () => { },
 		};
@@ -104,11 +101,18 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.roundState = {
 			getProposal: () => context.proposal,
+			hasProposal: () => false,
+			hasPrevote: () => false,
+			hasPrecommit: () => false,
 			height: 2,
 			round: 0,
 			setProcessorResult: () => { },
 			hasValidProposalLockProof: () => true,
 		} as unknown as Contracts.Consensus.IRoundState;
+
+		context.roundStateRepository = {
+			getRoundState: () => context.roundState,
+		};
 
 		context.sandbox = new Sandbox();
 

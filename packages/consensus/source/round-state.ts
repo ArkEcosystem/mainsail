@@ -73,6 +73,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.walletRepository;
 	}
 
+	public hasProposal(validator: Contracts.Consensus.IValidator): boolean {
+		if (this.#proposal) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public async addProposal(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
 		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(proposal.validatorIndex);
 
@@ -102,6 +110,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return !!this.#processorResult;
 	}
 
+	public hasPrevote(validator: Contracts.Consensus.IValidator): boolean {
+		return this.#prevotes.has(validator.getConsensusPublicKey())
+	}
+
 	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
 		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(prevote.validatorIndex);
 		if (!this.#validators.has(validatorPublicKey)) {
@@ -118,6 +130,10 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		this.#validatorsSignedPrevote[prevote.validatorIndex] = true;
 		this.#increasePrevoteCount(prevote.blockId);
 		return true;
+	}
+
+	public hasPrecommit(validator: Contracts.Consensus.IValidator): boolean {
+		return this.#precommits.has(validator.getConsensusPublicKey())
 	}
 
 	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {

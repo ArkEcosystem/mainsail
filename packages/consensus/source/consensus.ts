@@ -102,18 +102,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		// Start a new round if no proposal yet
 		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
 
-		// TODO: always run startRound
-		if (!roundState.getProposal()) {
-			await this.startRound(this.#round);
-		}
+		await this.startRound(this.#round, this.#step);
 
 		// TODO: we need to be able to download missed prevotes/precommits
 		await this.handler.handle(roundState);
 	}
 
-	public async startRound(round: number): Promise<void> {
+	public async startRound(round: number, step = Contracts.Consensus.Step.Propose): Promise<void> {
 		this.#round = round;
-		this.#step = Contracts.Consensus.Step.Propose;
+		this.#step = step;
 
 		await this.#saveState();
 
@@ -350,6 +347,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+		if (roundState.hasProposal(proposer)) {
+			return;
+		}
+
 		let block: Contracts.Crypto.IBlock;
 		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
 
@@ -370,7 +372,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #prevote(value?: string): Promise<void> {
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
+			if (roundState.hasPrevote(validator)) {
+				continue;
+			}
+
 			const prevote = await validator.prevote(this.#height, this.#round, value);
 
 			await this.broadcaster.broadcastPrevote(prevote);
@@ -381,7 +388,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #precommit(value?: string): Promise<void> {
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
+			if (roundState.hasPrecommit(validator)) {
+				continue;
+			}
+
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
 			await this.broadcaster.broadcastPrecommit(precommit);
