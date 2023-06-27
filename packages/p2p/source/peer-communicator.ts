@@ -173,7 +173,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return body.common;
 	}
 
-	public async getPeerBlocks(
+	public async getBlocks(
 		peer: Contracts.P2P.Peer,
 		{
 			fromBlockHeight,

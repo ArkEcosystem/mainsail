@@ -372,7 +372,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			this.#throwIfPastDeadline(deadline);
 
 			// returns blocks from the next one, thus we do -1
-			response = await this.communicator.getPeerBlocks(this.#peer, {
+			response = await this.communicator.getBlocks(this.#peer, {
 				blockLimit: Math.max(Math.min(endHeight - height + 1, 400), 1),
 				fromBlockHeight: height - 1,
 				headersOnly: true,

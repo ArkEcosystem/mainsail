@@ -17,10 +17,7 @@ export interface PeerCommunicator {
 	getPeers(peer: Peer): Promise<IGetPeersResponse>;
 	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
 	getProposal(peer: Peer): Promise<IGetProposalResponse>;
-
-	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
-
-	getPeerBlocks(
+	getBlocks(
 		peer: Peer,
 		{
 			fromBlockHeight,
@@ -28,4 +25,6 @@ export interface PeerCommunicator {
 			headersOnly,
 		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
 	): Promise<IBlockData[]>;
+
+	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
 }

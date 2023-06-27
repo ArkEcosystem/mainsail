@@ -16,7 +16,7 @@ export class Downloader {
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
 	public async downloadBlocks(peer: Contracts.P2P.Peer): Promise<void> {
-		const result = await this.communicator.getPeerBlocks(peer, {
+		const result = await this.communicator.getBlocks(peer, {
 			fromBlockHeight: this.state.getLastBlock().data.height + 1,
 		});
 
