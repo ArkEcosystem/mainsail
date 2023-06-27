@@ -5,6 +5,9 @@ export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
 	readonly proposer: string;
 	getProposal(): IProposal | undefined;
+	hasProposal(): boolean;
+	hasPrevote(validator: IValidator): boolean;
+	hasPrecommit(validator: IValidator): boolean;
 	addProposal(proposal: IProposal): Promise<boolean>;
 	addPrevote(prevote: IPrevote): Promise<boolean>;
 	addPrecommit(precommit: IPrecommit): Promise<boolean>;
@@ -24,6 +27,14 @@ export interface IRoundState extends IProcessableUnit {
 	getProposalLockProof(): Promise<IProposalLockProof>;
 }
 
+export interface IConsensusStateData {
+	readonly height: number;
+	readonly round: number;
+	readonly step: Step;
+	readonly validRound?: number;
+	readonly lockedRound?: number;
+}
+
 export interface IRoundStateRepository {
 	getRoundState(height: number, round: number): Promise<IRoundState>;
 }
@@ -33,6 +44,7 @@ export interface IConsensusService {
 	getHeight(): number;
 	getRound(): number;
 	getStep(): Step;
+	getState(): IConsensusState;
 	onProposal(roundState: IRoundState): Promise<void>;
 	onProposalLocked(roundState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;
@@ -46,7 +58,37 @@ export interface IConsensusService {
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
 }
 
+export interface IConsensusStateData {
+	readonly height: number;
+	readonly round: number;
+	readonly step: Step;
+	readonly validRound?: number;
+	readonly lockedRound?: number;
+}
+
+export interface IConsensusState extends IConsensusStateData {
+	readonly lockedValue?: IRoundState;
+	readonly validValue?: IRoundState;
+}
+
+export interface IConsensusStorage {
+	getState(): Promise<IConsensusStateData | undefined>;
+	saveState(state: IConsensusState): Promise<void>;
+	saveProposal(state: IProposal): Promise<void>;
+	savePrevote(state: IPrevote): Promise<void>;
+	savePrecommit(state: IPrecommit): Promise<void>;
+	getProposals(): Promise<IProposal[]>;
+	getPrevotes(): Promise<IPrevote[]>;
+	getPrecommits(): Promise<IPrecommit[]>;
+	clear(): Promise<void>;
+}
+
+export interface IBootstrapper {
+	run(): Promise<IConsensusState | undefined>;
+}
+
 export interface IHandler {
+	handle(roundState: IRoundState): Promise<void>;
 	onProposal(proposal: IProposal): Promise<void>;
 	onPrevote(prevote: IPrevote): Promise<void>;
 	onPrecommit(precommit: IPrecommit): Promise<void>;

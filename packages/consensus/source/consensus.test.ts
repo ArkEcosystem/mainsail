@@ -7,12 +7,15 @@ type Context = {
 	sandbox: Sandbox;
 	consensus: Consensus;
 	blockProcessor: any;
+	bootstrapper: any;
 	state: any;
+	storage: any;
 	handler: any;
 	broadcaster: any;
 	scheduler: any;
 	validatorsRepository: any;
 	validatorSet: any;
+	roundStateRepository: any;
 	logger: any;
 	block: any;
 	proposal: any;
@@ -50,9 +53,29 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			clear: () => {},
 		};
 
+		context.storage = {
+			saveState: () => {},
+			saveProposal: () => {},
+			savePrevote: () => {},
+			savePrecommit: () => {},
+			getState: () => {},
+			getProposals: () => {},
+			getPrecommits: () => {},
+			getPrevotes: () => {},
+			clear: () => {},
+		};
+
+		context.bootstrapper = {
+			run: () => {},
+		};
+
 		context.validatorsRepository = {
 			getValidator: () => {},
 			getValidators: () => {},
+		};
+
+		context.roundStateRepository = {
+			getRoundState: () => {},
 		};
 
 		context.validatorSet = {
@@ -82,11 +105,18 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.roundState = {
 			getProposal: () => context.proposal,
+			hasProposal: () => false,
+			hasPrevote: () => false,
+			hasPrecommit: () => false,
 			height: 2,
 			round: 0,
 			setProcessorResult: () => {},
 			hasValidProposalLockProof: () => true,
 		} as unknown as Contracts.Consensus.IRoundState;
+
+		context.roundStateRepository = {
+			getRoundState: () => context.roundState,
+		};
 
 		context.sandbox = new Sandbox();
 
@@ -94,7 +124,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.state);
 		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue(context.handler);
 		context.sandbox.app.bind(Identifiers.PeerBroadcaster).toConstantValue(context.broadcaster);
+		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
+		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
+		context.sandbox.app
+			.bind(Identifiers.Consensus.RoundStateRepository)
+			.toConstantValue(context.roundStateRepository);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);
@@ -135,12 +170,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	it("#getState - should return initial value", async ({ consensus }) => {
 		assert.equal(consensus.getState(), {
 			height: 2,
-			lockedRound: undefined,
-			lockedValue: undefined,
 			round: 0,
 			step: Contracts.Consensus.Step.Propose,
 			validRound: undefined,
-			validValue: undefined,
+			lockedRound: undefined,
 		});
 	});
 
@@ -229,6 +262,35 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyScheduleTimeoutPropose.neverCalled();
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+	});
+
+	it("#startRound - should skip propose if already proposed", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		proposal,
+	}) => {
+		const validatorPublicKey = "publicKey";
+		const validator = {
+			prepareBlock: () => {},
+			propose: () => {},
+		};
+
+		stub(validatorSet, "getActiveValidators").resolvedValue([
+			{
+				getAttribute: () => validatorPublicKey,
+			},
+		]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+
+		roundState.hasProposal = () => true;
+
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+
+		await consensus.startRound(0);
+
+		spyValidatorPropose.neverCalled();
 	});
 
 	it("#startRound - local validator should locked value", async () => {});
@@ -388,6 +450,55 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBroadcastPrevote.calledWith(prevote);
 		spyHandlerOnPrevote.calledOnce();
 		spyHandlerOnPrevote.calledWith(prevote);
+		spyLoggerInfo.calledWith(`Received proposal ${2}/${0} blockId: ${proposal.block.block.data.id}`);
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
+	});
+
+	it("#onProposal - should skip prevote if already prevoted", async ({
+		consensus,
+		blockProcessor,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+		roundState,
+		logger,
+		proposal,
+	}) => {
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
+
+		const prevote = {
+			height: 2,
+			round: 0,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		const spyValidatorSetGetActoveValidators = stub(validatorSet, "getActiveValidators").returnValue([]);
+		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
+			validator,
+		]);
+		const spyBroadcastPrevote = spy(broadcaster, "broadcastPrevote");
+		const spyHandlerOnPrevote = spy(handler, "onPrevote");
+		const spyLoggerInfo = spy(logger, "info");
+
+		roundState.hasPrevote = () => true;
+		await consensus.onProposal(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+
+		spyValidatorSetGetActoveValidators.calledOnce();
+		spyValidatorsRepositoryGetValidators.calledOnce();
+
+		spyValidatorPrevote.neverCalled();
+		spyBroadcastPrevote.neverCalled();
+		spyHandlerOnPrevote.neverCalled();
+
 		spyLoggerInfo.calledWith(`Received proposal ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
@@ -750,6 +861,51 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getValidRound(), 0);
 		assert.equal(consensus.getValidValue(), roundState);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
+	});
+
+	it("#onMajorityPrevote - should skip precommit if already precommitted", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		broadcaster,
+		handler,
+		roundState,
+	}) => {
+		const validatorPublicKey = "publicKey";
+		const validator = {
+			precommit: () => {},
+		};
+
+		const precommit = {
+			height: 2,
+			round: 0,
+		};
+
+		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+			{
+				getAttribute: () => validatorPublicKey,
+			},
+		]);
+		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
+		const spyBroadcastPrecommit = spy(broadcaster, "broadcastPrecommit");
+		const spyHandlerOnPrecommit = spy(handler, "onPrecommit");
+
+		roundState.getProcessorResult = () => true;
+		roundState.hasPrecommit = () => true;
+
+		consensus.setStep(Contracts.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(roundState);
+
+		spyGetActiveValidators.calledOnce();
+		spyGetValidators.calledOnce();
+		spyGetValidators.calledWith([validatorPublicKey]);
+
+		spyValidatorPrecommit.neverCalled();
+		spyBroadcastPrecommit.neverCalled();
+		spyHandlerOnPrecommit.neverCalled();
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
 
 	it("#onMajorityPrevote - should return if step === propose", async ({ consensus, roundState }) => {

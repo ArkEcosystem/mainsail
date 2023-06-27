@@ -481,6 +481,9 @@ importers:
       delay:
         specifier: 5.0.0
         version: 5.0.0
+      lmdb:
+        specifier: 2.4.2
+        version: 2.4.2
     devDependencies:
       '@mainsail/test-framework':
         specifier: workspace:*
