@@ -11,7 +11,7 @@ export interface IGetBlocksRequest extends Hapi.Request {
 	};
 }
 
-export type IGetBlocksResponse = Buffer[];
+export type IGetBlocksResponse = { blocks: String[] };
 
 export interface IGetCommonBlocksRequest extends Hapi.Request {
 	payload: {

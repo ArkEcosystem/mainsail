@@ -116,7 +116,7 @@ export namespace getBlocks {
     interface IGetBlocksResponse {
 
         /** GetBlocksResponse blocks */
-        blocks?: (Uint8Array[]|null);
+        blocks?: (string[]|null);
     }
 
     /** Represents a GetBlocksResponse. */
@@ -129,7 +129,7 @@ export namespace getBlocks {
         constructor(properties?: getBlocks.IGetBlocksResponse);
 
         /** GetBlocksResponse blocks. */
-        public blocks: Uint8Array[];
+        public blocks: string[];
 
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.

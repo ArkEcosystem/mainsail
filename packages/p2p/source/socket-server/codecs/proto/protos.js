@@ -279,7 +279,7 @@ $root.getBlocks = (function() {
          * Properties of a GetBlocksResponse.
          * @memberof getBlocks
          * @interface IGetBlocksResponse
-         * @property {Array.<Uint8Array>|null} [blocks] GetBlocksResponse blocks
+         * @property {Array.<string>|null} [blocks] GetBlocksResponse blocks
          */
 
         /**
@@ -300,7 +300,7 @@ $root.getBlocks = (function() {
 
         /**
          * GetBlocksResponse blocks.
-         * @member {Array.<Uint8Array>} blocks
+         * @member {Array.<string>} blocks
          * @memberof getBlocks.GetBlocksResponse
          * @instance
          */
@@ -332,7 +332,7 @@ $root.getBlocks = (function() {
                 writer = $Writer.create();
             if (message.blocks != null && message.blocks.length)
                 for (var i = 0; i < message.blocks.length; ++i)
-                    writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.blocks[i]);
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.blocks[i]);
             return writer;
         };
 
@@ -370,7 +370,7 @@ $root.getBlocks = (function() {
                 case 1: {
                         if (!(message.blocks && message.blocks.length))
                             message.blocks = [];
-                        message.blocks.push(reader.bytes());
+                        message.blocks.push(reader.string());
                         break;
                     }
                 default:
@@ -412,8 +412,8 @@ $root.getBlocks = (function() {
                 if (!Array.isArray(message.blocks))
                     return "blocks: array expected";
                 for (var i = 0; i < message.blocks.length; ++i)
-                    if (!(message.blocks[i] && typeof message.blocks[i].length === "number" || $util.isString(message.blocks[i])))
-                        return "blocks: buffer[] expected";
+                    if (!$util.isString(message.blocks[i]))
+                        return "blocks: string[] expected";
             }
             return null;
         };
@@ -435,10 +435,7 @@ $root.getBlocks = (function() {
                     throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
                 message.blocks = [];
                 for (var i = 0; i < object.blocks.length; ++i)
-                    if (typeof object.blocks[i] === "string")
-                        $util.base64.decode(object.blocks[i], message.blocks[i] = $util.newBuffer($util.base64.length(object.blocks[i])), 0);
-                    else if (object.blocks[i].length >= 0)
-                        message.blocks[i] = object.blocks[i];
+                    message.blocks[i] = String(object.blocks[i]);
             }
             return message;
         };
@@ -461,7 +458,7 @@ $root.getBlocks = (function() {
             if (message.blocks && message.blocks.length) {
                 object.blocks = [];
                 for (var j = 0; j < message.blocks.length; ++j)
-                    object.blocks[j] = options.bytes === String ? $util.base64.encode(message.blocks[j], 0, message.blocks[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks[j]) : message.blocks[j];
+                    object.blocks[j] = message.blocks[j];
             }
             return object;
         };

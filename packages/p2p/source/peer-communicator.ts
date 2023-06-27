@@ -176,7 +176,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	): Promise<Buffer[]> {
 		const maxPayload = constants.DEFAULT_MAX_PAYLOAD;
 
-		const blocks = await this.emit(
+		const result = await this.emit(
 			peer,
 			Routes.GetBlocks,
 			{
@@ -188,12 +188,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			false, //TODO: check why this is false
 		);
 
-		if (!blocks || blocks.length === 0) {
+		if (result.blocks.length === 0) {
 			this.logger.debug(`Peer ${peer.ip} did not return any blocks via height ${fromHeight.toLocaleString()}.`);
-			return [];
 		}
 
-		return blocks;
+		return result;
 	}
 
 	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {

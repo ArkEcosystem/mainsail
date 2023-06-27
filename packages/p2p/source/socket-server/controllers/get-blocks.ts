@@ -26,7 +26,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 
 		const lastHeight: number = this.blockchain.getLastHeight();
 		if (requestBlockHeight > lastHeight) {
-			return [];
+			return { blocks: [] };
 		}
 
 		const committedBlocks: Buffer[] = await this.database.findCommittedBlocks(
@@ -35,7 +35,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
-		const blocksToReturn: Buffer[] = [];
+		const blocksToReturn: String[] = [];
 		const maxPayloadWithMargin = constants.DEFAULT_MAX_PAYLOAD;
 		let totalSize = 0;
 
@@ -45,7 +45,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 				break;
 			}
 
-			blocksToReturn.push(committedBlock);
+			blocksToReturn.push(committedBlock.toString("hex"));
 		}
 
 		this.logger.info(
@@ -56,6 +56,6 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			)} from height ${requestBlockHeight.toLocaleString()}`,
 		);
 
-		return blocksToReturn;
+		return { blocks: blocksToReturn };
 	}
 }

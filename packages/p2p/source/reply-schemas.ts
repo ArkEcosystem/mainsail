@@ -2,11 +2,17 @@ import { constants } from "./constants";
 
 export const replySchemas = {
 	getBlocks: {
-		items: {
-			$ref: "blockHeader",
+		properties: {
+			blocks: {
+				items: {
+					$ref: "hex",
+				},
+				maxItems: 400,
+				type: "array",
+			},
 		},
-		maxItems: 400,
-		type: "array",
+		required: ["blocks"],
+		type: "object",
 	},
 	getCommonBlocks: {
 		additionalProperties: false,

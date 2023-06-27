@@ -9,5 +9,5 @@ message GetBlocksRequest {
 }
 
 message GetBlocksResponse {
-    repeated bytes blocks = 1;
+    repeated string blocks = 1;
 }
