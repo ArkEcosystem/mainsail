@@ -2,8 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
 
-import { StateMachine } from "./state-machine";
-
 @injectable()
 export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.Application)
@@ -12,17 +10,11 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@inject(Identifiers.StateMachine)
-	private readonly stateMachine!: StateMachine;
-
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
-
-	@inject(Identifiers.PeerBroadcaster)
-	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
 	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
@@ -121,10 +113,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		if (!!lastProcessResult && lastProcessedBlock) {
-			if (this.stateStore.isStarted() && this.stateMachine.getState() === "newBlock") {
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.broadcaster.broadcastBlock(lastProcessedBlock);
-			}
 		} else {
 			this.blockchain.clearQueue();
 			this.blockchain.resetLastDownloadedBlock();
