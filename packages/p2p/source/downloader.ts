@@ -6,11 +6,22 @@ export class Downloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
+	@inject(Identifiers.StateStore)
+	private readonly state!: Contracts.State.StateStore;
+
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
+
+	public async downloadBlocks(peer: Contracts.P2P.Peer): Promise<void> {
+		const result = await this.communicator.getPeerBlocks(peer, {
+			fromBlockHeight: this.state.getLastBlock().data.height + 1,
+		});
+
+		console.log(result);
+	}
 
 	// TODO: Handle errors & response checks
 	public async downloadProposal(peer: Contracts.P2P.Peer): Promise<void> {
