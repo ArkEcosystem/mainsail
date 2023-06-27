@@ -111,7 +111,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public hasPrevote(validator: Contracts.Consensus.IValidator): boolean {
-		return this.#prevotes.has(validator.getConsensusPublicKey())
+		return this.#prevotes.has(validator.getConsensusPublicKey());
 	}
 
 	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
@@ -133,7 +133,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public hasPrecommit(validator: Contracts.Consensus.IValidator): boolean {
-		return this.#precommits.has(validator.getConsensusPublicKey())
+		return this.#precommits.has(validator.getConsensusPublicKey());
 	}
 
 	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
