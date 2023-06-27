@@ -24,10 +24,8 @@ $root.getBlocks = (function() {
          * Properties of a GetBlocksRequest.
          * @memberof getBlocks
          * @interface IGetBlocksRequest
-         * @property {number|null} [lastBlockHeight] GetBlocksRequest lastBlockHeight
-         * @property {number|null} [blockLimit] GetBlocksRequest blockLimit
-         * @property {boolean|null} [headersOnly] GetBlocksRequest headersOnly
-         * @property {boolean|null} [serialized] GetBlocksRequest serialized
+         * @property {number|null} [fromHeight] GetBlocksRequest fromHeight
+         * @property {number|null} [limit] GetBlocksRequest limit
          * @property {shared.IHeaders|null} [headers] GetBlocksRequest headers
          */
 
@@ -47,36 +45,20 @@ $root.getBlocks = (function() {
         }
 
         /**
-         * GetBlocksRequest lastBlockHeight.
-         * @member {number} lastBlockHeight
+         * GetBlocksRequest fromHeight.
+         * @member {number} fromHeight
          * @memberof getBlocks.GetBlocksRequest
          * @instance
          */
-        GetBlocksRequest.prototype.lastBlockHeight = 0;
+        GetBlocksRequest.prototype.fromHeight = 0;
 
         /**
-         * GetBlocksRequest blockLimit.
-         * @member {number} blockLimit
+         * GetBlocksRequest limit.
+         * @member {number} limit
          * @memberof getBlocks.GetBlocksRequest
          * @instance
          */
-        GetBlocksRequest.prototype.blockLimit = 0;
-
-        /**
-         * GetBlocksRequest headersOnly.
-         * @member {boolean} headersOnly
-         * @memberof getBlocks.GetBlocksRequest
-         * @instance
-         */
-        GetBlocksRequest.prototype.headersOnly = false;
-
-        /**
-         * GetBlocksRequest serialized.
-         * @member {boolean} serialized
-         * @memberof getBlocks.GetBlocksRequest
-         * @instance
-         */
-        GetBlocksRequest.prototype.serialized = false;
+        GetBlocksRequest.prototype.limit = 0;
 
         /**
          * GetBlocksRequest headers.
@@ -110,16 +92,12 @@ $root.getBlocks = (function() {
         GetBlocksRequest.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.lastBlockHeight != null && Object.hasOwnProperty.call(message, "lastBlockHeight"))
-                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.lastBlockHeight);
-            if (message.blockLimit != null && Object.hasOwnProperty.call(message, "blockLimit"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.blockLimit);
-            if (message.headersOnly != null && Object.hasOwnProperty.call(message, "headersOnly"))
-                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.headersOnly);
-            if (message.serialized != null && Object.hasOwnProperty.call(message, "serialized"))
-                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.serialized);
+            if (message.fromHeight != null && Object.hasOwnProperty.call(message, "fromHeight"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.fromHeight);
+            if (message.limit != null && Object.hasOwnProperty.call(message, "limit"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.limit);
             if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
 
@@ -155,22 +133,14 @@ $root.getBlocks = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
-                        message.lastBlockHeight = reader.uint32();
+                        message.fromHeight = reader.uint32();
                         break;
                     }
                 case 2: {
-                        message.blockLimit = reader.uint32();
+                        message.limit = reader.uint32();
                         break;
                     }
                 case 3: {
-                        message.headersOnly = reader.bool();
-                        break;
-                    }
-                case 4: {
-                        message.serialized = reader.bool();
-                        break;
-                    }
-                case 5: {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
@@ -209,18 +179,12 @@ $root.getBlocks = (function() {
         GetBlocksRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.lastBlockHeight != null && message.hasOwnProperty("lastBlockHeight"))
-                if (!$util.isInteger(message.lastBlockHeight))
-                    return "lastBlockHeight: integer expected";
-            if (message.blockLimit != null && message.hasOwnProperty("blockLimit"))
-                if (!$util.isInteger(message.blockLimit))
-                    return "blockLimit: integer expected";
-            if (message.headersOnly != null && message.hasOwnProperty("headersOnly"))
-                if (typeof message.headersOnly !== "boolean")
-                    return "headersOnly: boolean expected";
-            if (message.serialized != null && message.hasOwnProperty("serialized"))
-                if (typeof message.serialized !== "boolean")
-                    return "serialized: boolean expected";
+            if (message.fromHeight != null && message.hasOwnProperty("fromHeight"))
+                if (!$util.isInteger(message.fromHeight))
+                    return "fromHeight: integer expected";
+            if (message.limit != null && message.hasOwnProperty("limit"))
+                if (!$util.isInteger(message.limit))
+                    return "limit: integer expected";
             if (message.headers != null && message.hasOwnProperty("headers")) {
                 var error = $root.shared.Headers.verify(message.headers);
                 if (error)
@@ -241,14 +205,10 @@ $root.getBlocks = (function() {
             if (object instanceof $root.getBlocks.GetBlocksRequest)
                 return object;
             var message = new $root.getBlocks.GetBlocksRequest();
-            if (object.lastBlockHeight != null)
-                message.lastBlockHeight = object.lastBlockHeight >>> 0;
-            if (object.blockLimit != null)
-                message.blockLimit = object.blockLimit >>> 0;
-            if (object.headersOnly != null)
-                message.headersOnly = Boolean(object.headersOnly);
-            if (object.serialized != null)
-                message.serialized = Boolean(object.serialized);
+            if (object.fromHeight != null)
+                message.fromHeight = object.fromHeight >>> 0;
+            if (object.limit != null)
+                message.limit = object.limit >>> 0;
             if (object.headers != null) {
                 if (typeof object.headers !== "object")
                     throw TypeError(".getBlocks.GetBlocksRequest.headers: object expected");
@@ -271,20 +231,14 @@ $root.getBlocks = (function() {
                 options = {};
             var object = {};
             if (options.defaults) {
-                object.lastBlockHeight = 0;
-                object.blockLimit = 0;
-                object.headersOnly = false;
-                object.serialized = false;
+                object.fromHeight = 0;
+                object.limit = 0;
                 object.headers = null;
             }
-            if (message.lastBlockHeight != null && message.hasOwnProperty("lastBlockHeight"))
-                object.lastBlockHeight = message.lastBlockHeight;
-            if (message.blockLimit != null && message.hasOwnProperty("blockLimit"))
-                object.blockLimit = message.blockLimit;
-            if (message.headersOnly != null && message.hasOwnProperty("headersOnly"))
-                object.headersOnly = message.headersOnly;
-            if (message.serialized != null && message.hasOwnProperty("serialized"))
-                object.serialized = message.serialized;
+            if (message.fromHeight != null && message.hasOwnProperty("fromHeight"))
+                object.fromHeight = message.fromHeight;
+            if (message.limit != null && message.hasOwnProperty("limit"))
+                object.limit = message.limit;
             if (message.headers != null && message.hasOwnProperty("headers"))
                 object.headers = $root.shared.Headers.toObject(message.headers, options);
             return object;
@@ -325,7 +279,7 @@ $root.getBlocks = (function() {
          * Properties of a GetBlocksResponse.
          * @memberof getBlocks
          * @interface IGetBlocksResponse
-         * @property {Uint8Array|null} [blocks] GetBlocksResponse blocks
+         * @property {Array.<Uint8Array>|null} [blocks] GetBlocksResponse blocks
          */
 
         /**
@@ -337,6 +291,7 @@ $root.getBlocks = (function() {
          * @param {getBlocks.IGetBlocksResponse=} [properties] Properties to set
          */
         function GetBlocksResponse(properties) {
+            this.blocks = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -345,11 +300,11 @@ $root.getBlocks = (function() {
 
         /**
          * GetBlocksResponse blocks.
-         * @member {Uint8Array} blocks
+         * @member {Array.<Uint8Array>} blocks
          * @memberof getBlocks.GetBlocksResponse
          * @instance
          */
-        GetBlocksResponse.prototype.blocks = $util.newBuffer([]);
+        GetBlocksResponse.prototype.blocks = $util.emptyArray;
 
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.
@@ -375,8 +330,9 @@ $root.getBlocks = (function() {
         GetBlocksResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.blocks != null && Object.hasOwnProperty.call(message, "blocks"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.blocks);
+            if (message.blocks != null && message.blocks.length)
+                for (var i = 0; i < message.blocks.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.blocks[i]);
             return writer;
         };
 
@@ -412,7 +368,9 @@ $root.getBlocks = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
-                        message.blocks = reader.bytes();
+                        if (!(message.blocks && message.blocks.length))
+                            message.blocks = [];
+                        message.blocks.push(reader.bytes());
                         break;
                     }
                 default:
@@ -450,9 +408,13 @@ $root.getBlocks = (function() {
         GetBlocksResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.blocks != null && message.hasOwnProperty("blocks"))
-                if (!(message.blocks && typeof message.blocks.length === "number" || $util.isString(message.blocks)))
-                    return "blocks: buffer expected";
+            if (message.blocks != null && message.hasOwnProperty("blocks")) {
+                if (!Array.isArray(message.blocks))
+                    return "blocks: array expected";
+                for (var i = 0; i < message.blocks.length; ++i)
+                    if (!(message.blocks[i] && typeof message.blocks[i].length === "number" || $util.isString(message.blocks[i])))
+                        return "blocks: buffer[] expected";
+            }
             return null;
         };
 
@@ -468,11 +430,16 @@ $root.getBlocks = (function() {
             if (object instanceof $root.getBlocks.GetBlocksResponse)
                 return object;
             var message = new $root.getBlocks.GetBlocksResponse();
-            if (object.blocks != null)
-                if (typeof object.blocks === "string")
-                    $util.base64.decode(object.blocks, message.blocks = $util.newBuffer($util.base64.length(object.blocks)), 0);
-                else if (object.blocks.length >= 0)
-                    message.blocks = object.blocks;
+            if (object.blocks) {
+                if (!Array.isArray(object.blocks))
+                    throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
+                message.blocks = [];
+                for (var i = 0; i < object.blocks.length; ++i)
+                    if (typeof object.blocks[i] === "string")
+                        $util.base64.decode(object.blocks[i], message.blocks[i] = $util.newBuffer($util.base64.length(object.blocks[i])), 0);
+                    else if (object.blocks[i].length >= 0)
+                        message.blocks[i] = object.blocks[i];
+            }
             return message;
         };
 
@@ -489,16 +456,13 @@ $root.getBlocks = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
-                if (options.bytes === String)
-                    object.blocks = "";
-                else {
-                    object.blocks = [];
-                    if (options.bytes !== Array)
-                        object.blocks = $util.newBuffer(object.blocks);
-                }
-            if (message.blocks != null && message.hasOwnProperty("blocks"))
-                object.blocks = options.bytes === String ? $util.base64.encode(message.blocks, 0, message.blocks.length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks) : message.blocks;
+            if (options.arrays || options.defaults)
+                object.blocks = [];
+            if (message.blocks && message.blocks.length) {
+                object.blocks = [];
+                for (var j = 0; j < message.blocks.length; ++j)
+                    object.blocks[j] = options.bytes === String ? $util.base64.encode(message.blocks[j], 0, message.blocks[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks[j]) : message.blocks[j];
+            }
             return object;
         };
 
@@ -527,518 +491,6 @@ $root.getBlocks = (function() {
             }
             return typeUrlPrefix + "/getBlocks.GetBlocksResponse";
         };
-
-        GetBlocksResponse.BlockHeader = (function() {
-
-            /**
-             * Properties of a BlockHeader.
-             * @memberof getBlocks.GetBlocksResponse
-             * @interface IBlockHeader
-             * @property {string|null} [id] BlockHeader id
-             * @property {number|null} [version] BlockHeader version
-             * @property {number|null} [timestamp] BlockHeader timestamp
-             * @property {string|null} [previousBlock] BlockHeader previousBlock
-             * @property {number|null} [height] BlockHeader height
-             * @property {number|null} [numberOfTransactions] BlockHeader numberOfTransactions
-             * @property {string|null} [totalAmount] BlockHeader totalAmount
-             * @property {string|null} [totalFee] BlockHeader totalFee
-             * @property {string|null} [reward] BlockHeader reward
-             * @property {number|null} [payloadLength] BlockHeader payloadLength
-             * @property {string|null} [payloadHash] BlockHeader payloadHash
-             * @property {string|null} [generatorPublicKey] BlockHeader generatorPublicKey
-             * @property {string|null} [blockSignature] BlockHeader blockSignature
-             * @property {Uint8Array|null} [transactions] BlockHeader transactions
-             */
-
-            /**
-             * Constructs a new BlockHeader.
-             * @memberof getBlocks.GetBlocksResponse
-             * @classdesc Represents a BlockHeader.
-             * @implements IBlockHeader
-             * @constructor
-             * @param {getBlocks.GetBlocksResponse.IBlockHeader=} [properties] Properties to set
-             */
-            function BlockHeader(properties) {
-                if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * BlockHeader id.
-             * @member {string} id
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.id = "";
-
-            /**
-             * BlockHeader version.
-             * @member {number} version
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.version = 0;
-
-            /**
-             * BlockHeader timestamp.
-             * @member {number} timestamp
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.timestamp = 0;
-
-            /**
-             * BlockHeader previousBlock.
-             * @member {string} previousBlock
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.previousBlock = "";
-
-            /**
-             * BlockHeader height.
-             * @member {number} height
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.height = 0;
-
-            /**
-             * BlockHeader numberOfTransactions.
-             * @member {number} numberOfTransactions
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.numberOfTransactions = 0;
-
-            /**
-             * BlockHeader totalAmount.
-             * @member {string} totalAmount
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.totalAmount = "";
-
-            /**
-             * BlockHeader totalFee.
-             * @member {string} totalFee
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.totalFee = "";
-
-            /**
-             * BlockHeader reward.
-             * @member {string} reward
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.reward = "";
-
-            /**
-             * BlockHeader payloadLength.
-             * @member {number} payloadLength
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.payloadLength = 0;
-
-            /**
-             * BlockHeader payloadHash.
-             * @member {string} payloadHash
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.payloadHash = "";
-
-            /**
-             * BlockHeader generatorPublicKey.
-             * @member {string} generatorPublicKey
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.generatorPublicKey = "";
-
-            /**
-             * BlockHeader blockSignature.
-             * @member {string} blockSignature
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.blockSignature = "";
-
-            /**
-             * BlockHeader transactions.
-             * @member {Uint8Array} transactions
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             */
-            BlockHeader.prototype.transactions = $util.newBuffer([]);
-
-            /**
-             * Creates a new BlockHeader instance using the specified properties.
-             * @function create
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {getBlocks.GetBlocksResponse.IBlockHeader=} [properties] Properties to set
-             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader instance
-             */
-            BlockHeader.create = function create(properties) {
-                return new BlockHeader(properties);
-            };
-
-            /**
-             * Encodes the specified BlockHeader message. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
-             * @function encode
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {getBlocks.GetBlocksResponse.IBlockHeader} message BlockHeader message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            BlockHeader.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.id != null && Object.hasOwnProperty.call(message, "id"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
-                if (message.version != null && Object.hasOwnProperty.call(message, "version"))
-                    writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.version);
-                if (message.timestamp != null && Object.hasOwnProperty.call(message, "timestamp"))
-                    writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.timestamp);
-                if (message.previousBlock != null && Object.hasOwnProperty.call(message, "previousBlock"))
-                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.previousBlock);
-                if (message.height != null && Object.hasOwnProperty.call(message, "height"))
-                    writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.height);
-                if (message.numberOfTransactions != null && Object.hasOwnProperty.call(message, "numberOfTransactions"))
-                    writer.uint32(/* id 6, wireType 0 =*/48).uint32(message.numberOfTransactions);
-                if (message.totalAmount != null && Object.hasOwnProperty.call(message, "totalAmount"))
-                    writer.uint32(/* id 7, wireType 2 =*/58).string(message.totalAmount);
-                if (message.totalFee != null && Object.hasOwnProperty.call(message, "totalFee"))
-                    writer.uint32(/* id 8, wireType 2 =*/66).string(message.totalFee);
-                if (message.reward != null && Object.hasOwnProperty.call(message, "reward"))
-                    writer.uint32(/* id 9, wireType 2 =*/74).string(message.reward);
-                if (message.payloadLength != null && Object.hasOwnProperty.call(message, "payloadLength"))
-                    writer.uint32(/* id 10, wireType 0 =*/80).uint32(message.payloadLength);
-                if (message.payloadHash != null && Object.hasOwnProperty.call(message, "payloadHash"))
-                    writer.uint32(/* id 11, wireType 2 =*/90).string(message.payloadHash);
-                if (message.generatorPublicKey != null && Object.hasOwnProperty.call(message, "generatorPublicKey"))
-                    writer.uint32(/* id 12, wireType 2 =*/98).string(message.generatorPublicKey);
-                if (message.blockSignature != null && Object.hasOwnProperty.call(message, "blockSignature"))
-                    writer.uint32(/* id 13, wireType 2 =*/106).string(message.blockSignature);
-                if (message.transactions != null && Object.hasOwnProperty.call(message, "transactions"))
-                    writer.uint32(/* id 14, wireType 2 =*/114).bytes(message.transactions);
-                return writer;
-            };
-
-            /**
-             * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
-             * @function encodeDelimited
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {getBlocks.GetBlocksResponse.IBlockHeader} message BlockHeader message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            BlockHeader.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
-            };
-
-            /**
-             * Decodes a BlockHeader message from the specified reader or buffer.
-             * @function decode
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            BlockHeader.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getBlocks.GetBlocksResponse.BlockHeader();
-                while (reader.pos < end) {
-                    var tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 1: {
-                            message.id = reader.string();
-                            break;
-                        }
-                    case 2: {
-                            message.version = reader.uint32();
-                            break;
-                        }
-                    case 3: {
-                            message.timestamp = reader.uint32();
-                            break;
-                        }
-                    case 4: {
-                            message.previousBlock = reader.string();
-                            break;
-                        }
-                    case 5: {
-                            message.height = reader.uint32();
-                            break;
-                        }
-                    case 6: {
-                            message.numberOfTransactions = reader.uint32();
-                            break;
-                        }
-                    case 7: {
-                            message.totalAmount = reader.string();
-                            break;
-                        }
-                    case 8: {
-                            message.totalFee = reader.string();
-                            break;
-                        }
-                    case 9: {
-                            message.reward = reader.string();
-                            break;
-                        }
-                    case 10: {
-                            message.payloadLength = reader.uint32();
-                            break;
-                        }
-                    case 11: {
-                            message.payloadHash = reader.string();
-                            break;
-                        }
-                    case 12: {
-                            message.generatorPublicKey = reader.string();
-                            break;
-                        }
-                    case 13: {
-                            message.blockSignature = reader.string();
-                            break;
-                        }
-                    case 14: {
-                            message.transactions = reader.bytes();
-                            break;
-                        }
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Decodes a BlockHeader message from the specified reader or buffer, length delimited.
-             * @function decodeDelimited
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            BlockHeader.decodeDelimited = function decodeDelimited(reader) {
-                if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
-                return this.decode(reader, reader.uint32());
-            };
-
-            /**
-             * Verifies a BlockHeader message.
-             * @function verify
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            BlockHeader.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.id != null && message.hasOwnProperty("id"))
-                    if (!$util.isString(message.id))
-                        return "id: string expected";
-                if (message.version != null && message.hasOwnProperty("version"))
-                    if (!$util.isInteger(message.version))
-                        return "version: integer expected";
-                if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-                    if (!$util.isInteger(message.timestamp))
-                        return "timestamp: integer expected";
-                if (message.previousBlock != null && message.hasOwnProperty("previousBlock"))
-                    if (!$util.isString(message.previousBlock))
-                        return "previousBlock: string expected";
-                if (message.height != null && message.hasOwnProperty("height"))
-                    if (!$util.isInteger(message.height))
-                        return "height: integer expected";
-                if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
-                    if (!$util.isInteger(message.numberOfTransactions))
-                        return "numberOfTransactions: integer expected";
-                if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
-                    if (!$util.isString(message.totalAmount))
-                        return "totalAmount: string expected";
-                if (message.totalFee != null && message.hasOwnProperty("totalFee"))
-                    if (!$util.isString(message.totalFee))
-                        return "totalFee: string expected";
-                if (message.reward != null && message.hasOwnProperty("reward"))
-                    if (!$util.isString(message.reward))
-                        return "reward: string expected";
-                if (message.payloadLength != null && message.hasOwnProperty("payloadLength"))
-                    if (!$util.isInteger(message.payloadLength))
-                        return "payloadLength: integer expected";
-                if (message.payloadHash != null && message.hasOwnProperty("payloadHash"))
-                    if (!$util.isString(message.payloadHash))
-                        return "payloadHash: string expected";
-                if (message.generatorPublicKey != null && message.hasOwnProperty("generatorPublicKey"))
-                    if (!$util.isString(message.generatorPublicKey))
-                        return "generatorPublicKey: string expected";
-                if (message.blockSignature != null && message.hasOwnProperty("blockSignature"))
-                    if (!$util.isString(message.blockSignature))
-                        return "blockSignature: string expected";
-                if (message.transactions != null && message.hasOwnProperty("transactions"))
-                    if (!(message.transactions && typeof message.transactions.length === "number" || $util.isString(message.transactions)))
-                        return "transactions: buffer expected";
-                return null;
-            };
-
-            /**
-             * Creates a BlockHeader message from a plain object. Also converts values to their respective internal types.
-             * @function fromObject
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {Object.<string,*>} object Plain object
-             * @returns {getBlocks.GetBlocksResponse.BlockHeader} BlockHeader
-             */
-            BlockHeader.fromObject = function fromObject(object) {
-                if (object instanceof $root.getBlocks.GetBlocksResponse.BlockHeader)
-                    return object;
-                var message = new $root.getBlocks.GetBlocksResponse.BlockHeader();
-                if (object.id != null)
-                    message.id = String(object.id);
-                if (object.version != null)
-                    message.version = object.version >>> 0;
-                if (object.timestamp != null)
-                    message.timestamp = object.timestamp >>> 0;
-                if (object.previousBlock != null)
-                    message.previousBlock = String(object.previousBlock);
-                if (object.height != null)
-                    message.height = object.height >>> 0;
-                if (object.numberOfTransactions != null)
-                    message.numberOfTransactions = object.numberOfTransactions >>> 0;
-                if (object.totalAmount != null)
-                    message.totalAmount = String(object.totalAmount);
-                if (object.totalFee != null)
-                    message.totalFee = String(object.totalFee);
-                if (object.reward != null)
-                    message.reward = String(object.reward);
-                if (object.payloadLength != null)
-                    message.payloadLength = object.payloadLength >>> 0;
-                if (object.payloadHash != null)
-                    message.payloadHash = String(object.payloadHash);
-                if (object.generatorPublicKey != null)
-                    message.generatorPublicKey = String(object.generatorPublicKey);
-                if (object.blockSignature != null)
-                    message.blockSignature = String(object.blockSignature);
-                if (object.transactions != null)
-                    if (typeof object.transactions === "string")
-                        $util.base64.decode(object.transactions, message.transactions = $util.newBuffer($util.base64.length(object.transactions)), 0);
-                    else if (object.transactions.length >= 0)
-                        message.transactions = object.transactions;
-                return message;
-            };
-
-            /**
-             * Creates a plain object from a BlockHeader message. Also converts values to other types if specified.
-             * @function toObject
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {getBlocks.GetBlocksResponse.BlockHeader} message BlockHeader
-             * @param {$protobuf.IConversionOptions} [options] Conversion options
-             * @returns {Object.<string,*>} Plain object
-             */
-            BlockHeader.toObject = function toObject(message, options) {
-                if (!options)
-                    options = {};
-                var object = {};
-                if (options.defaults) {
-                    object.id = "";
-                    object.version = 0;
-                    object.timestamp = 0;
-                    object.previousBlock = "";
-                    object.height = 0;
-                    object.numberOfTransactions = 0;
-                    object.totalAmount = "";
-                    object.totalFee = "";
-                    object.reward = "";
-                    object.payloadLength = 0;
-                    object.payloadHash = "";
-                    object.generatorPublicKey = "";
-                    object.blockSignature = "";
-                    if (options.bytes === String)
-                        object.transactions = "";
-                    else {
-                        object.transactions = [];
-                        if (options.bytes !== Array)
-                            object.transactions = $util.newBuffer(object.transactions);
-                    }
-                }
-                if (message.id != null && message.hasOwnProperty("id"))
-                    object.id = message.id;
-                if (message.version != null && message.hasOwnProperty("version"))
-                    object.version = message.version;
-                if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-                    object.timestamp = message.timestamp;
-                if (message.previousBlock != null && message.hasOwnProperty("previousBlock"))
-                    object.previousBlock = message.previousBlock;
-                if (message.height != null && message.hasOwnProperty("height"))
-                    object.height = message.height;
-                if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
-                    object.numberOfTransactions = message.numberOfTransactions;
-                if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
-                    object.totalAmount = message.totalAmount;
-                if (message.totalFee != null && message.hasOwnProperty("totalFee"))
-                    object.totalFee = message.totalFee;
-                if (message.reward != null && message.hasOwnProperty("reward"))
-                    object.reward = message.reward;
-                if (message.payloadLength != null && message.hasOwnProperty("payloadLength"))
-                    object.payloadLength = message.payloadLength;
-                if (message.payloadHash != null && message.hasOwnProperty("payloadHash"))
-                    object.payloadHash = message.payloadHash;
-                if (message.generatorPublicKey != null && message.hasOwnProperty("generatorPublicKey"))
-                    object.generatorPublicKey = message.generatorPublicKey;
-                if (message.blockSignature != null && message.hasOwnProperty("blockSignature"))
-                    object.blockSignature = message.blockSignature;
-                if (message.transactions != null && message.hasOwnProperty("transactions"))
-                    object.transactions = options.bytes === String ? $util.base64.encode(message.transactions, 0, message.transactions.length) : options.bytes === Array ? Array.prototype.slice.call(message.transactions) : message.transactions;
-                return object;
-            };
-
-            /**
-             * Converts this BlockHeader to JSON.
-             * @function toJSON
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @instance
-             * @returns {Object.<string,*>} JSON object
-             */
-            BlockHeader.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-            };
-
-            /**
-             * Gets the default type url for BlockHeader
-             * @function getTypeUrl
-             * @memberof getBlocks.GetBlocksResponse.BlockHeader
-             * @static
-             * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns {string} The default type url
-             */
-            BlockHeader.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-                if (typeUrlPrefix === undefined) {
-                    typeUrlPrefix = "type.googleapis.com";
-                }
-                return typeUrlPrefix + "/getBlocks.GetBlocksResponse.BlockHeader";
-            };
-
-            return BlockHeader;
-        })();
 
         return GetBlocksResponse;
     })();
@@ -5603,486 +5055,6 @@ $root.getStatus = (function() {
     })();
 
     return getStatus;
-})();
-
-$root.postBlock = (function() {
-
-    /**
-     * Namespace postBlock.
-     * @exports postBlock
-     * @namespace
-     */
-    var postBlock = {};
-
-    postBlock.PostBlockRequest = (function() {
-
-        /**
-         * Properties of a PostBlockRequest.
-         * @memberof postBlock
-         * @interface IPostBlockRequest
-         * @property {Uint8Array|null} [block] PostBlockRequest block
-         * @property {shared.IHeaders|null} [headers] PostBlockRequest headers
-         */
-
-        /**
-         * Constructs a new PostBlockRequest.
-         * @memberof postBlock
-         * @classdesc Represents a PostBlockRequest.
-         * @implements IPostBlockRequest
-         * @constructor
-         * @param {postBlock.IPostBlockRequest=} [properties] Properties to set
-         */
-        function PostBlockRequest(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PostBlockRequest block.
-         * @member {Uint8Array} block
-         * @memberof postBlock.PostBlockRequest
-         * @instance
-         */
-        PostBlockRequest.prototype.block = $util.newBuffer([]);
-
-        /**
-         * PostBlockRequest headers.
-         * @member {shared.IHeaders|null|undefined} headers
-         * @memberof postBlock.PostBlockRequest
-         * @instance
-         */
-        PostBlockRequest.prototype.headers = null;
-
-        /**
-         * Creates a new PostBlockRequest instance using the specified properties.
-         * @function create
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {postBlock.IPostBlockRequest=} [properties] Properties to set
-         * @returns {postBlock.PostBlockRequest} PostBlockRequest instance
-         */
-        PostBlockRequest.create = function create(properties) {
-            return new PostBlockRequest(properties);
-        };
-
-        /**
-         * Encodes the specified PostBlockRequest message. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
-         * @function encode
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {postBlock.IPostBlockRequest} message PostBlockRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockRequest.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.block != null && Object.hasOwnProperty.call(message, "block"))
-                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.block);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PostBlockRequest message, length delimited. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {postBlock.IPostBlockRequest} message PostBlockRequest message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer.
-         * @function decode
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {postBlock.PostBlockRequest} PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockRequest.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postBlock.PostBlockRequest();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1: {
-                        message.block = reader.bytes();
-                        break;
-                    }
-                case 2: {
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {postBlock.PostBlockRequest} PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockRequest.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PostBlockRequest message.
-         * @function verify
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PostBlockRequest.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.block != null && message.hasOwnProperty("block"))
-                if (!(message.block && typeof message.block.length === "number" || $util.isString(message.block)))
-                    return "block: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers);
-                if (error)
-                    return "headers." + error;
-            }
-            return null;
-        };
-
-        /**
-         * Creates a PostBlockRequest message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {postBlock.PostBlockRequest} PostBlockRequest
-         */
-        PostBlockRequest.fromObject = function fromObject(object) {
-            if (object instanceof $root.postBlock.PostBlockRequest)
-                return object;
-            var message = new $root.postBlock.PostBlockRequest();
-            if (object.block != null)
-                if (typeof object.block === "string")
-                    $util.base64.decode(object.block, message.block = $util.newBuffer($util.base64.length(object.block)), 0);
-                else if (object.block.length >= 0)
-                    message.block = object.block;
-            if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".postBlock.PostBlockRequest.headers: object expected");
-                message.headers = $root.shared.Headers.fromObject(object.headers);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PostBlockRequest message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {postBlock.PostBlockRequest} message PostBlockRequest
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PostBlockRequest.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                if (options.bytes === String)
-                    object.block = "";
-                else {
-                    object.block = [];
-                    if (options.bytes !== Array)
-                        object.block = $util.newBuffer(object.block);
-                }
-                object.headers = null;
-            }
-            if (message.block != null && message.hasOwnProperty("block"))
-                object.block = options.bytes === String ? $util.base64.encode(message.block, 0, message.block.length) : options.bytes === Array ? Array.prototype.slice.call(message.block) : message.block;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            return object;
-        };
-
-        /**
-         * Converts this PostBlockRequest to JSON.
-         * @function toJSON
-         * @memberof postBlock.PostBlockRequest
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PostBlockRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for PostBlockRequest
-         * @function getTypeUrl
-         * @memberof postBlock.PostBlockRequest
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        PostBlockRequest.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/postBlock.PostBlockRequest";
-        };
-
-        return PostBlockRequest;
-    })();
-
-    postBlock.PostBlockResponse = (function() {
-
-        /**
-         * Properties of a PostBlockResponse.
-         * @memberof postBlock
-         * @interface IPostBlockResponse
-         * @property {boolean|null} [status] PostBlockResponse status
-         * @property {number|null} [height] PostBlockResponse height
-         */
-
-        /**
-         * Constructs a new PostBlockResponse.
-         * @memberof postBlock
-         * @classdesc Represents a PostBlockResponse.
-         * @implements IPostBlockResponse
-         * @constructor
-         * @param {postBlock.IPostBlockResponse=} [properties] Properties to set
-         */
-        function PostBlockResponse(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PostBlockResponse status.
-         * @member {boolean} status
-         * @memberof postBlock.PostBlockResponse
-         * @instance
-         */
-        PostBlockResponse.prototype.status = false;
-
-        /**
-         * PostBlockResponse height.
-         * @member {number} height
-         * @memberof postBlock.PostBlockResponse
-         * @instance
-         */
-        PostBlockResponse.prototype.height = 0;
-
-        /**
-         * Creates a new PostBlockResponse instance using the specified properties.
-         * @function create
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {postBlock.IPostBlockResponse=} [properties] Properties to set
-         * @returns {postBlock.PostBlockResponse} PostBlockResponse instance
-         */
-        PostBlockResponse.create = function create(properties) {
-            return new PostBlockResponse(properties);
-        };
-
-        /**
-         * Encodes the specified PostBlockResponse message. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
-         * @function encode
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {postBlock.IPostBlockResponse} message PostBlockResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockResponse.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
-                writer.uint32(/* id 1, wireType 0 =*/8).bool(message.status);
-            if (message.height != null && Object.hasOwnProperty.call(message, "height"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.height);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PostBlockResponse message, length delimited. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {postBlock.IPostBlockResponse} message PostBlockResponse message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PostBlockResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer.
-         * @function decode
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {postBlock.PostBlockResponse} PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockResponse.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.postBlock.PostBlockResponse();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1: {
-                        message.status = reader.bool();
-                        break;
-                    }
-                case 2: {
-                        message.height = reader.uint32();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {postBlock.PostBlockResponse} PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PostBlockResponse.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PostBlockResponse message.
-         * @function verify
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PostBlockResponse.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.status != null && message.hasOwnProperty("status"))
-                if (typeof message.status !== "boolean")
-                    return "status: boolean expected";
-            if (message.height != null && message.hasOwnProperty("height"))
-                if (!$util.isInteger(message.height))
-                    return "height: integer expected";
-            return null;
-        };
-
-        /**
-         * Creates a PostBlockResponse message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {postBlock.PostBlockResponse} PostBlockResponse
-         */
-        PostBlockResponse.fromObject = function fromObject(object) {
-            if (object instanceof $root.postBlock.PostBlockResponse)
-                return object;
-            var message = new $root.postBlock.PostBlockResponse();
-            if (object.status != null)
-                message.status = Boolean(object.status);
-            if (object.height != null)
-                message.height = object.height >>> 0;
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PostBlockResponse message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {postBlock.PostBlockResponse} message PostBlockResponse
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PostBlockResponse.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.status = false;
-                object.height = 0;
-            }
-            if (message.status != null && message.hasOwnProperty("status"))
-                object.status = message.status;
-            if (message.height != null && message.hasOwnProperty("height"))
-                object.height = message.height;
-            return object;
-        };
-
-        /**
-         * Converts this PostBlockResponse to JSON.
-         * @function toJSON
-         * @memberof postBlock.PostBlockResponse
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PostBlockResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for PostBlockResponse
-         * @function getTypeUrl
-         * @memberof postBlock.PostBlockResponse
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        PostBlockResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/postBlock.PostBlockResponse";
-        };
-
-        return PostBlockResponse;
-    })();
-
-    return postBlock;
 })();
 
 $root.postPrecommit = (function() {
