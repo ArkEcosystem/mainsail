@@ -15,8 +15,8 @@ export class Downloader {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
 
-	// @inject(Identifiers.Cryptography.Block.Factory)
-	// private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	public async downloadBlocks(peer: Contracts.P2P.Peer): Promise<void> {
 		console.log("Downloading blocks");
@@ -25,9 +25,11 @@ export class Downloader {
 			fromHeight: this.state.getLastBlock().data.height + 1,
 		});
 
-		// const blocks = result.map((buffer) => this.blockFactory.fromCommittedBytes(buffer));
+		const blocks = await Promise.all(
+			result.blocks.map(async (hex) => await this.blockFactory.fromCommittedBytes(Buffer.from(hex, "hex"))),
+		);
 
-		console.log("Blocks: ", result);
+		console.log("Blocks: ", blocks);
 	}
 
 	// TODO: Handle errors & response checks

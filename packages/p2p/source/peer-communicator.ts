@@ -173,7 +173,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
 		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
-	): Promise<Buffer[]> {
+	): Promise<Contracts.P2P.IGetBlocksResponse> {
 		const maxPayload = constants.DEFAULT_MAX_PAYLOAD;
 
 		const result = await this.emit(

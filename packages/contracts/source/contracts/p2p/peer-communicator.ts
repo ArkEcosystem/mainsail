@@ -1,4 +1,4 @@
-import { IGetMessagesResponse, IGetPeersResponse, IGetProposalResponse } from "./endpoints";
+import { IGetBlocksResponse, IGetMessagesResponse, IGetPeersResponse, IGetProposalResponse } from "./endpoints";
 import { Peer } from "./peer";
 
 export interface PeerCommunicator {
@@ -16,7 +16,7 @@ export interface PeerCommunicator {
 	getPeers(peer: Peer): Promise<IGetPeersResponse>;
 	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
 	getProposal(peer: Peer): Promise<IGetProposalResponse>;
-	getBlocks(peer: Peer, { fromHeight, limit }: { fromHeight: number; limit?: number }): Promise<Buffer[]>;
+	getBlocks(peer: Peer, { fromHeight, limit }: { fromHeight: number; limit?: number }): Promise<IGetBlocksResponse>;
 
 	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
 }
