@@ -17,7 +17,7 @@ export interface IRoundState {
 	readonly proposer: string;
 	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
-	hasProposal(validator: IValidator): boolean;
+	hasProposal(): boolean;
 	addProposal(proposal: IProposal): Promise<boolean>;
 	setProcessorResult(processorResult: boolean): void;
 	getProcessorResult(): boolean;

@@ -73,7 +73,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.walletRepository;
 	}
 
-	public hasProposal(validator: Contracts.Consensus.IValidator): boolean {
+	public hasProposal(): boolean {
 		if (this.#proposal) {
 			return true;
 		}

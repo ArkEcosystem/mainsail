@@ -102,15 +102,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		// Start a new round if no proposal yet
 		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
 
-		await this.startRound(this.#round, this.#step);
+		await this.startRound(this.#round);
 
 		// TODO: we need to be able to download missed prevotes/precommits
 		await this.handler.handle(roundState);
 	}
 
-	public async startRound(round: number, step = Contracts.Consensus.Step.Propose): Promise<void> {
+	public async startRound(round: number): Promise<void> {
 		this.#round = round;
-		this.#step = step;
+		this.#step = Contracts.Consensus.Step.Propose;
 
 		await this.#saveState();
 
@@ -350,7 +350,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
 		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
-		if (roundState.hasProposal(proposer)) {
+		if (roundState.hasProposal()) {
 			return;
 		}
 
@@ -369,8 +369,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		await this.broadcaster.broadcastProposal(proposal);
 		await this.handler.onProposal(proposal);
-
-		await this.#saveState();
 	}
 
 	async #prevote(value?: string): Promise<void> {
