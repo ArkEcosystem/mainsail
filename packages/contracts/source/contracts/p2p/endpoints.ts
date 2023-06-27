@@ -50,17 +50,6 @@ export interface IGetProposalResponse {
 	proposal: string;
 }
 
-export interface IPostBlockRequest extends Hapi.Request {
-	payload: {
-		block: Buffer;
-	};
-}
-
-export interface IPostBlockResponse {
-	status: boolean;
-	height: number;
-}
-
 export interface IPostPrecommitRequest extends Hapi.Request {
 	payload: {
 		precommit: Buffer;

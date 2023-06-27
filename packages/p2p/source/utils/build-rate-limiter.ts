@@ -6,11 +6,6 @@ export const buildRateLimiter = (options) =>
 		configurations: {
 			endpoints: [
 				{
-					duration: 4,
-					endpoint: Routes.PostBlock,
-					rateLimit: 2,
-				},
-				{
 					duration: 2,
 					endpoint: Routes.GetBlocks,
 					rateLimit: 1,
