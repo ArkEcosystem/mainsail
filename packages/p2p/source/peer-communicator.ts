@@ -178,17 +178,15 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		{
 			fromBlockHeight,
 			blockLimit = constants.MAX_DOWNLOAD_BLOCKS,
-			headersOnly,
-		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
+		}: { fromBlockHeight: number; blockLimit?: number },
 	): Promise<Contracts.Crypto.IBlockData[]> {
-		const maxPayload = headersOnly ? blockLimit * Constants.Units.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
+		const maxPayload = constants.DEFAULT_MAX_PAYLOAD;
 
 		const peerBlocks = await this.emit(
 			peer,
 			Routes.GetBlocks,
 			{
 				blockLimit,
-				headersOnly,
 				lastBlockHeight: fromBlockHeight,
 				serialized: true,
 			},
@@ -205,13 +203,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		for (const block of peerBlocks) {
-			if (headersOnly) {
-				// with headersOnly we still get block.transactions as empty array (protobuf deser) but in this case we actually
-				// don't want the transactions as a property at all (because it would make validation fail)
-				delete block.transactions;
-				continue;
-			}
-
 			for (let index = 0; index < block.transactions.length; index++) {
 				const { data } = await this.transactionFactory.fromBytes(Buffer.from(block.transactions[index], "hex"));
 				data.blockId = block.id;
