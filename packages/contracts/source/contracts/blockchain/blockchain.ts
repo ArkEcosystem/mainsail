@@ -1,6 +1,5 @@
 import { IBlock, IBlockData } from "../crypto";
 import { Queue } from "../kernel/queue";
-import { BlockPing } from "../state/state-store";
 
 export interface Blockchain {
 	isStopped(): boolean;
@@ -38,10 +37,4 @@ export interface Blockchain {
 	getLastHeight(): number;
 
 	getLastDownloadedBlock(): IBlockData;
-
-	getBlockPing(): BlockPing | undefined;
-
-	pingBlock(incomingBlock: IBlockData): boolean;
-
-	pushPingBlock(block: IBlockData, fromForger): void;
 }

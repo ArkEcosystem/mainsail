@@ -35,9 +35,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
-
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
@@ -58,27 +55,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			// them requests, ie we could spam them.
 			whitelist: [],
 		});
-	}
-
-	public async postBlock(peer: Contracts.P2P.Peer, block: Contracts.Crypto.IBlock): Promise<void> {
-		const postBlockTimeout = 10_000;
-
-		const response = await this.emit(
-			peer,
-			Routes.PostBlock,
-			{
-				// TODO: move serialization out
-				block: await this.serializer.serializeWithTransactions({
-					...block.data,
-					transactions: block.transactions.map((tx) => tx.data),
-				}),
-			},
-			postBlockTimeout,
-		);
-
-		if (response && response.height) {
-			peer.state.height = response.height;
-		}
 	}
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {

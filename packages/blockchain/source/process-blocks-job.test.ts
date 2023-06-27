@@ -207,31 +207,6 @@ describe<{
 		setLastStoredBlockHeightSpy.neverCalled();
 	});
 
-	it("should broadcast a block if state is newBlock", async (context) => {
-		stub(stateMachine, "getState").returnValue("newBlock");
-
-		const block = {
-			...context.currentBlock,
-		};
-
-		stub(stateStore, "isStarted").returnValue(true);
-		stub(blockchainService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(databaseService, "getLastBlock").returnValue({ data: context.lastBlock });
-		stub(context.triggers, "call").returnValue(true);
-
-		const saveBlocksSpy = spy(databaseService, "saveBlocks");
-		const broadcastBlockSpy = spy(broadcaster, "broadcastBlock");
-		const setLastStoredBlockHeightSpy = spy(stateStore, "setLastStoredBlockHeight");
-
-		context.processBlocksJob.setBlocks([block]);
-		await context.processBlocksJob.handle();
-
-		saveBlocksSpy.calledOnce();
-		setLastStoredBlockHeightSpy.calledOnce();
-		setLastStoredBlockHeightSpy.calledWith(block.height);
-		broadcastBlockSpy.calledOnce();
-	});
-
 	it("should skip broadcasting if state is downloadFinished", async (context) => {
 		stub(stateMachine, "getState").returnValue("downloadFinished");
 
