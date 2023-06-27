@@ -1,10 +1,21 @@
-import { IRoundState } from "./consensus";
+import { IBlock, ICommittedBlock } from "./crypto";
+import { WalletRepositoryClone } from "./state";
+
+export interface IProcessableUnit {
+	readonly height: number;
+	readonly round: number;
+	getWalletRepository(): WalletRepositoryClone;
+	getProcessorResult(): boolean;
+	setProcessorResult(processorResult: boolean): void;
+	getBlock(): IBlock;
+	getProposedCommitBlock(): Promise<ICommittedBlock>;
+}
 
 export interface Handler {
-	execute(roundState: IRoundState): Promise<boolean>;
+	execute(roundState: IProcessableUnit): Promise<boolean>;
 }
 
 export interface Processor {
-	process(roundState: IRoundState): Promise<boolean>;
-	commit(roundState: IRoundState): Promise<void>;
+	process(roundState: IProcessableUnit): Promise<boolean>;
+	commit(roundState: IProcessableUnit): Promise<void>;
 }

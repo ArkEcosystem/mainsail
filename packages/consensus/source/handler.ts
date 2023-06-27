@@ -1,10 +1,15 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { CommittedBlockState } from "./committed-block-state";
+
 @injectable()
 export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.BlockProcessor)
+	private readonly processor!: Contracts.BlockProcessor.Processor;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -81,6 +86,16 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 			await this.#handle(roundState);
 		}
+	}
+
+	async onCommittedBlock(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
+		// TODO: Check precommits
+		const committedBlockState = await this.app.resolve(CommittedBlockState).configure(committedBlock);
+
+		committedBlockState.setProcessorResult(await this.processor.process(committedBlockState));
+
+		const consensus = this.#getConsensus();
+		await consensus.onMajorityPrecommit(committedBlockState);
 	}
 
 	#isValidHeightAndRound(message: { height: number; round: number }): boolean {

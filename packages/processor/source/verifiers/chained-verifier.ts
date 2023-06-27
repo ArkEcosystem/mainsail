@@ -10,12 +10,7 @@ export class ChainedVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	public async execute(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		const proposedBlock = roundState.getProposal()?.block;
-		Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
-
-		const { block } = proposedBlock;
-
-		return Utils.isBlockChained(this.blockchain.getLastBlock().data, block.data);
+	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+		return Utils.isBlockChained(this.blockchain.getLastBlock().data, unit.getBlock().data);
 	}
 }
