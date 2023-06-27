@@ -18,9 +18,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
 
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
-
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -343,102 +340,4 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		};
 	}
 
-	public toData(): Contracts.Consensus.IRoundStateData {
-		const proposal = this.#proposal?.toData() ?? null;
-
-		const prevotes: Record<string, Contracts.Crypto.IPrevoteData> = {};
-		for (const [key, value] of this.#prevotes.entries()) {
-			prevotes[key] = value.toData();
-		}
-
-		const prevotesCount: Record<string, number> = {};
-		for (const [key, value] of this.#prevotesCount.entries()) {
-			prevotesCount[key === undefined ? "undefined" : key] = value;
-		}
-
-		const precommits: Record<string, Contracts.Crypto.IPrecommitData> = {};
-		for (const [key, value] of this.#precommits.entries()) {
-			precommits[key] = value.toData();
-		}
-
-		const precommitsCount: Record<string, number> = {};
-		for (const [key, value] of this.#precommitsCount.entries()) {
-			precommitsCount[key === undefined ? "undefined" : key] = value;
-		}
-
-		const validators: Record<string, string> = {};
-		for (const [key, value] of this.#validators.entries()) {
-			validators[key] = value.getPublicKey()!;
-		}
-
-		return {
-			height: this.#height,
-			precommits,
-
-			precommitsCount,
-
-			prevotes,
-
-			prevotesCount,
-
-			processorResult: this.#processorResult,
-
-			// JSON objects
-			proposal,
-			proposer: this.#proposer,
-			round: this.#round,
-			validators,
-			validatorsSignedPrecommit: this.#validatorsSignedPrecommit,
-			validatorsSignedPrevote: this.#validatorsSignedPrevote,
-		};
-	}
-
-	public async fromData(data: Contracts.Consensus.IRoundStateData): Promise<Contracts.Consensus.IRoundState> {
-		this.#height = data.height;
-		this.#round = data.round;
-		this.#processorResult = data.processorResult;
-		this.#validatorsSignedPrevote = data.validatorsSignedPrevote;
-		this.#validatorsSignedPrecommit = data.validatorsSignedPrecommit;
-		this.#proposer = data.proposer;
-
-		this.#proposal = data.proposal ? await this.messageFactory.makeProposalFromData(data.proposal) : undefined;
-
-		this.#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
-		for (const [key, value] of Object.entries(data.prevotes)) {
-			const prevote = await this.messageFactory.makePrevoteFromData(value);
-			this.#prevotes.set(key, prevote);
-		}
-
-		this.#prevotesCount = new Map<string | undefined, number>();
-		for (const [key, value] of Object.entries(data.prevotesCount)) {
-			if (key === "undefined") {
-				this.#prevotesCount.set(undefined, value);
-			} else {
-				this.#prevotesCount.set(key, value);
-			}
-		}
-
-		this.#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
-		for (const [key, value] of Object.entries(data.precommits)) {
-			const prevote = await this.messageFactory.makePrecommitFromData(value);
-			this.#precommits.set(key, prevote);
-		}
-
-		this.#precommitsCount = new Map<string | undefined, number>();
-		for (const [key, value] of Object.entries(data.precommitsCount)) {
-			if (key === "undefined") {
-				this.#precommitsCount.set(undefined, value);
-			} else {
-				this.#precommitsCount.set(key, value);
-			}
-		}
-
-		this.#validators = new Map<string, Contracts.State.Wallet>();
-		for (const [key, value] of Object.entries(data.validators)) {
-			const wallet = this.walletRepository.findByAddress(value);
-			this.#validators.set(key, wallet);
-		}
-
-		return this;
-	}
 }

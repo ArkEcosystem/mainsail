@@ -22,11 +22,11 @@ export class ConsensusController extends Controller {
 			data: {
 				height: state.height,
 				lockedRound: state.lockedRound,
-				lockedValue: state.lockedValue ? state.lockedValue.toData() : null,
+				lockedValue: state.lockedValue ? state.lockedValue.getProposal()?.block.block.header.id : null,
 				round: state.round,
 				step: state.step,
 				validRound: state.validRound,
-				validValue: state.validValue ? state.validValue.toData() : null,
+				validValue: state.validValue ? state.validValue.getProposal()?.block.block.header.id : null,
 			},
 		};
 	}

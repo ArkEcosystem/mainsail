@@ -89,12 +89,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public getState(): Contracts.Consensus.IConsensusState {
 		return {
 			height: this.#height,
-			lockedRound: this.#lockedRound,
-			lockedValue: this.#lockedValue,
 			round: this.#round,
 			step: this.#step,
+			lockedRound: this.#lockedRound,
 			validRound: this.#validRound,
-			validValue: this.#validValue,
 		};
 	}
 
@@ -102,13 +100,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#bootstrap();
 
 		// Start a new round if no proposal yet
-		const roundState = this.roundStateRepo.tryGetRoundState(this.#height, this.#round);
-		if (!roundState || !roundState.getProposal()) {
+		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+
+		// TODO: always run startRound
+		if (!roundState.getProposal()) {
 			await this.startRound(this.#round);
-			return;
 		}
 
-		// Otherwise, let the handler figure out which state we are in
 		// TODO: we need to be able to download missed prevotes/precommits
 		await this.handler.handle(roundState);
 	}
@@ -116,6 +114,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async startRound(round: number): Promise<void> {
 		this.#round = round;
 		this.#step = Contracts.Consensus.Step.Propose;
+
+		await this.#saveState();
+
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 
@@ -218,8 +219,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
-				block.data.id
+			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${block.data.id
 			}`,
 		);
 
@@ -285,8 +285,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 		this.logger.info(
-			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${
-				proposal.validatorIndex
+			`Received +2/3 precommits for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex
 			} blockId: ${block.data.id}`,
 		);
 

@@ -20,11 +20,6 @@ export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepo
 		return this.#roundStates.get(key)!;
 	}
 
-	public tryGetRoundState(height: number, round: number): Contracts.Consensus.IRoundState | undefined {
-		const key = `${height}-${round}`;
-		return this.#roundStates.get(key)!;
-	}
-
 	// TODO: Bind to factory
 	#createRoundState(height: number, round: number): Promise<Contracts.Consensus.IRoundState> {
 		return this.app.resolve(RoundState).configure(height, round);

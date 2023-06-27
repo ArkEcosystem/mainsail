@@ -2,8 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Database, Key } from "lmdb";
 
-import { RoundState } from "./round-state";
-
 @injectable()
 export class Storage implements Contracts.Consensus.IConsensusStorage {
 	@inject(Identifiers.Database.ProposalStorage)
@@ -24,31 +22,19 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
 
-	public async getState(): Promise<Contracts.Consensus.IConsensusState | undefined> {
+	public async getState(): Promise<Contracts.Consensus.IConsensusStateData | undefined> {
 		if (!this.consensusStorage.doesExist("consensus-state")) {
 			return undefined;
 		}
 
 		const data = await this.consensusStorage.get("consensus-state");
 
-		let validValue: Contracts.Consensus.IRoundState | undefined;
-		if (data.validValue !== null) {
-			validValue = await new RoundState().fromData(data.validValue);
-		}
-
-		let lockedValue: Contracts.Consensus.IRoundState | undefined;
-		if (data.lockedValue !== null) {
-			lockedValue = await new RoundState().fromData(data.lockedValue);
-		}
-
 		return {
 			height: data.height,
-			lockedRound: data.lockedRound,
-			lockedValue,
 			round: data.round,
 			step: data.step,
+			lockedRound: data.lockedRound,
 			validRound: data.validRound,
-			validValue,
 		};
 	}
 
@@ -57,11 +43,9 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 		const data: Contracts.Consensus.IConsensusStateData = {
 			height: state.height,
 			lockedRound: state.lockedRound,
-			lockedValue: state.lockedValue?.toData() ?? null,
 			round: state.round,
 			step: state.step,
 			validRound: state.validRound,
-			validValue: state.validValue?.toData() ?? null,
 		};
 
 		await this.consensusStorage.put("consensus-state", data);

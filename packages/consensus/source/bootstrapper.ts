@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
@@ -37,6 +37,23 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 			await roundState.addPrecommit(precommit);
 		}
 
-		return this.storage.getState();
+		const state = await this.storage.getState() as Utils.Mutable<Contracts.Consensus.IConsensusState> | undefined;
+		if (!state) {
+			return undefined;
+		}
+
+		if (state.validRound !== undefined) {
+			// TODO: ensure validRound points to an existing round?
+			const roundState = await this.roundStateRepo.getRoundState(state.height, state.validRound);
+			state.validValue = roundState;
+		}
+
+		if (state.lockedRound !== undefined) {
+			// TODO: ensure lockedRound points to an existing round?
+			const roundState = await this.roundStateRepo.getRoundState(state.height, state.lockedRound);
+			state.lockedValue = roundState;
+		}
+
+		return state;
 	}
 }
