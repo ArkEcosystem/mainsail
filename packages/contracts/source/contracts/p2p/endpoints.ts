@@ -6,8 +6,8 @@ import { PeerBroadcast, PeerPingResponse } from "./peer";
 
 export interface IGetBlocksRequest extends Hapi.Request {
 	payload: {
-		lastBlockHeight: number;
-		blockLimit: number;
+		fromHeight: number;
+		limit: number;
 	};
 }
 
