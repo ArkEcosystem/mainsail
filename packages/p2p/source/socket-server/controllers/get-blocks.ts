@@ -21,7 +21,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.IGetBlocksRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.IGetBlocksResponse> {
-		const requestBlockHeight: number = request.payload.fromHeight + 1;
+		const requestBlockHeight: number = request.payload.fromHeight;
 		const requestBlockLimit: number = request.payload.limit || 400;
 
 		const lastHeight: number = this.blockchain.getLastHeight();
