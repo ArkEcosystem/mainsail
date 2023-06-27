@@ -9,6 +9,9 @@ export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.BlockProcessor)
+	private readonly processor!: Contracts.BlockProcessor.Processor;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -80,6 +83,8 @@ export class Handler implements Contracts.Consensus.IHandler {
 		// TODO: Call onMajorityPrecommit
 
 		const committedBlockState = await this.app.resolve(CommittedBlockState).configure(committedBlock);
+
+		committedBlockState.setProcessorResult(await this.processor.process(committedBlockState));
 
 		const consensus = this.#getConsensus();
 		await consensus.onMajorityPrecommit(committedBlockState);
