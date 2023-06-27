@@ -352,9 +352,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		let block: Contracts.Crypto.IBlock;
 		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
 
-		const existingProposal = this.#validValue?.getProposal();
-		if (this.#validValue && existingProposal && this.#validValue.hasMajorityPrevotes()) {
-			block = existingProposal.block.block;
+		if (this.#validValue) {
+			block = roundState.getBlock();
 			lockProof = await this.#validValue.getProposalLockProof();
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
