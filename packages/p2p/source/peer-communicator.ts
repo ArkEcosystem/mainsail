@@ -35,9 +35,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
-
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
 
@@ -176,10 +173,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
 		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
-	): Promise<Contracts.Crypto.IBlockData[]> {
+	): Promise<Buffer[]> {
 		const maxPayload = constants.DEFAULT_MAX_PAYLOAD;
 
-		const peerBlocks = await this.emit(
+		const blocks = await this.emit(
 			peer,
 			Routes.GetBlocks,
 			{
@@ -188,25 +185,15 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			},
 			this.configuration.getRequired<number>("getBlocksTimeout"),
 			maxPayload,
-			false,
+			false, //TODO: check why this is false
 		);
 
-		if (!peerBlocks || peerBlocks.length === 0) {
+		if (!blocks || blocks.length === 0) {
 			this.logger.debug(`Peer ${peer.ip} did not return any blocks via height ${fromHeight.toLocaleString()}.`);
 			return [];
 		}
 
-		for (const block of peerBlocks) {
-			for (let index = 0; index < block.transactions.length; index++) {
-				const { data } = await this.transactionFactory.fromBytes(Buffer.from(block.transactions[index], "hex"));
-				data.blockId = block.id;
-
-				block.transactions[index] = data;
-			}
-		}
-		this.configuration;
-
-		return peerBlocks;
+		return blocks;
 	}
 
 	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
