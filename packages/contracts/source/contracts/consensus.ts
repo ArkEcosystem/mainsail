@@ -1,5 +1,14 @@
 import { IProcessableUnit } from "./block-processor";
-import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof, IValidatorSetMajority } from "./crypto";
+import {
+	IBlock,
+	ICommittedBlock,
+	IKeyPair,
+	IPrecommit,
+	IPrevote,
+	IProposal,
+	IProposalLockProof,
+	IValidatorSetMajority,
+} from "./crypto";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
@@ -92,6 +101,7 @@ export interface IHandler {
 	onProposal(proposal: IProposal): Promise<void>;
 	onPrevote(prevote: IPrevote): Promise<void>;
 	onPrecommit(precommit: IPrecommit): Promise<void>;
+	onCommittedBlock(committedBlock: ICommittedBlock): Promise<void>;
 }
 
 export interface IScheduler {

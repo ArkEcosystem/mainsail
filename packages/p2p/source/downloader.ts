@@ -29,7 +29,9 @@ export class Downloader {
 			result.blocks.map(async (hex) => await this.blockFactory.fromCommittedBytes(Buffer.from(hex, "hex"))),
 		);
 
-		console.log("Blocks: ", blocks);
+		for (const block of blocks) {
+			await this.handler.onCommittedBlock(block);
+		}
 	}
 
 	// TODO: Handle errors & response checks
