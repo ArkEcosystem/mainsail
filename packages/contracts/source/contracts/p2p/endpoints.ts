@@ -1,7 +1,6 @@
 import Hapi from "@hapi/hapi";
 
 import { IBlockData } from "../crypto";
-import { DownloadBlock } from "../shared";
 import { IHeaderData } from "./header";
 import { PeerBroadcast, PeerPingResponse } from "./peer";
 
@@ -12,7 +11,7 @@ export interface IGetBlocksRequest extends Hapi.Request {
 	};
 }
 
-export type IGetBlocksResponse = DownloadBlock[];
+export type IGetBlocksResponse = Buffer[];
 
 export interface IGetCommonBlocksRequest extends Hapi.Request {
 	payload: {
