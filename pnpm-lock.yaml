@@ -484,6 +484,9 @@ importers:
       seedrandom:
         specifier: ^3.0.5
         version: 3.0.5
+      lmdb:
+        specifier: 2.4.2
+        version: 2.4.2
     devDependencies:
       '@mainsail/test-framework':
         specifier: workspace:*
