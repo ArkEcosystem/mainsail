@@ -44,6 +44,6 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 			return this.databaseService.getCommittedRound(lastHeight);
 		}
 
-		return this.databaseService.getCommittedRound(height)
+		return this.databaseService.getCommittedRound(height);
 	}
 }

@@ -181,7 +181,9 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	public async deleteRound(round: number): Promise<void> {
 		// TODO: deleteRound needs a rework / can be removed
 		for (const key of this.roundStorage.getKeys({ start: round })) {
-			if (key.toString().endsWith("committed-round")) continue;
+			if (key.toString().endsWith("committed-round")) {
+				continue;
+			}
 			await this.roundStorage.remove(key);
 		}
 	}
