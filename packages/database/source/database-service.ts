@@ -140,7 +140,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 		this.logger.debug(`Updating last committed round from ${lastCommittedRound} to ${updatedCommittedRound}`);
 
-		this.roundStorage.put(`${height}-committed-round`, updatedCommittedRound);
+		await this.roundStorage.put(`${height}-committed-round`, updatedCommittedRound);
 
 		return updatedCommittedRound;
 	}
