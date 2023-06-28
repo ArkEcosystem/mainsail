@@ -111,13 +111,16 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async startRound(round: number): Promise<void> {
 		this.#round = round;
 		this.#step = Contracts.Consensus.Step.Propose;
-
-		await this.#saveState();
-
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 
 		this.scheduler.clear();
+
+		if (round === 0) {
+			// Remove persisted state, because new heigh is reached
+			await this.storage.clear();
+		}
+		await this.#saveState();
 
 		await this.scheduler.delayProposal();
 
@@ -286,9 +289,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#lockedValue = undefined;
 		this.#validRound = undefined;
 		this.#validValue = undefined;
-
-		// Remove persisted state
-		await this.storage.clear();
 
 		void this.startRound(0);
 	}
