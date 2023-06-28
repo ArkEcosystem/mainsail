@@ -62,6 +62,7 @@ export interface IConsensusService {
 	onMajorityPrecommitAny(roundState: IProcessableUnit): Promise<void>;
 	onMajorityPrecommit(roundState: IProcessableUnit): Promise<void>;
 	onMinorityWithHigherRound(roundState: IProcessableUnit): Promise<void>;
+	onTimeoutStartRound(): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
@@ -105,7 +106,7 @@ export interface IHandler {
 }
 
 export interface IScheduler {
-	delayProposal(): Promise<void>;
+	scheduleTimeoutStartRound(): Promise<void>;
 	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
 	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;

@@ -122,9 +122,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 		await this.#saveState();
 
-		await this.scheduler.delayProposal();
+		await this.scheduler.scheduleTimeoutStartRound();
+	}
 
-		const { proposer: proposerPublicKey } = await this.roundStateRepository.getRoundState(this.#height, round);
+	public async onTimeoutStartRound(): Promise<void> {
+		const { proposer: proposerPublicKey } = await this.roundStateRepository.getRoundState(
+			this.#height,
+			this.#round,
+		);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
