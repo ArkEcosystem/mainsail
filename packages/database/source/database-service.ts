@@ -60,18 +60,10 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 			await this.findCommittedBlocks(start, end),
 			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
 		);
-		// .sort((a: Contracts.Crypto.IBlock, b: Contracts.Crypto.IBlock) => a.data.height - b.data.height);
 	}
 
 	public async getBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlockData[]> {
 		return (await this.findBlocksByHeightRange(start, end)).map(({ data }) => data);
-	}
-
-	public async getBlocksForDownload(offset: number, limit: number): Promise<Contracts.Shared.DownloadBlock[]> {
-		return (await this.findBlocksByHeightRange(offset, offset + limit - 1)).map(({ data, transactions }) => ({
-			...data,
-			transactions: transactions.map(({ serialized }) => serialized.toString("hex")),
-		}));
 	}
 
 	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {

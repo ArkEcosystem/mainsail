@@ -1,7 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { IBlock, IBlockData, ICommittedBlock, ITransaction } from "./crypto";
-import { DownloadBlock } from "./shared";
 import { Wallet } from "./state";
 
 export interface IRound {
@@ -18,8 +17,6 @@ export interface IDatabaseService {
 	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
 
 	getBlocks(start: number, end: number): Promise<IBlockData[]>;
-
-	getBlocksForDownload(offset: number, limit: number): Promise<DownloadBlock[]>;
 
 	findBlockByHeights(heights: number[]): Promise<IBlock[]>;
 
