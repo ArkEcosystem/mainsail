@@ -2,19 +2,19 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBeach32m } from "@mainsail/crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
+import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
-import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
-import { ServiceProvider as CoreLmdb } from "@mainsail/storage-lmdb";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { ServiceProvider as CoreLmdb } from "@mainsail/storage-lmdb";
 import { BigNumber } from "@mainsail/utils";
+import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -174,6 +174,23 @@ describe<{
 		assert.equal(await databaseService.getBlock(block.block.data.id), block.block);
 	});
 
+	it("#findCommittedBlocks - should return empty array if blocks are not found", async ({ databaseService }) => {
+		await databaseService.saveBlocks(await generateBlocks(3));
+
+		assert.equal(await databaseService.findCommittedBlocks(5, 10), []);
+	});
+
+	it("#findCommittedBlocks - should return buffers", async ({ databaseService }) => {
+		await databaseService.saveBlocks(await generateBlocks(4));
+
+		const result = await databaseService.findCommittedBlocks(2, 5);
+		assert.equal(result.length, 4);
+		assert.instance(result[0], Buffer);
+		assert.instance(result[1], Buffer);
+		assert.instance(result[2], Buffer);
+		assert.instance(result[3], Buffer);
+	});
+
 	it("#findBlocksByHeightRange - should return empty array if blocks are not found", async ({ databaseService }) => {
 		await databaseService.saveBlocks(await generateBlocks(3));
 
@@ -203,25 +220,6 @@ describe<{
 		assert.equal(
 			await databaseService.getBlocks(2, 5),
 			blocks.map((block) => block.block.data),
-		);
-	});
-
-	it("#getBlocksForDownload - should return empty array if blocks are not found", async ({ databaseService }) => {
-		await databaseService.saveBlocks(await generateBlocks(3));
-
-		assert.equal(await databaseService.getBlocksForDownload(5, 10), []);
-	});
-
-	it("#getBlocksForDownload - should return block data by height", async ({ databaseService }) => {
-		const blocks = await generateBlocks(4);
-		await databaseService.saveBlocks(blocks);
-
-		assert.equal(
-			await databaseService.getBlocksForDownload(2, 4),
-			blocks.map(({ block }) => ({
-				...block.data,
-				transactions: block.transactions.map(({ serialized }) => serialized.toString("hex")),
-			})),
 		);
 	});
 
@@ -372,7 +370,7 @@ describe<{
 
 		assert.equal(
 			await databaseService.getForgedTransactionsIds(
-				block.block.transactions.map((transaction) => transaction.id!),
+				block.block.transactions.map((transaction) => transaction.id),
 			),
 			block.block.transactions.map((transaction) => transaction.id),
 		);
