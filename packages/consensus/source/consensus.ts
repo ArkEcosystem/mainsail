@@ -122,7 +122,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 		await this.#saveState();
 
-		await this.scheduler.scheduleTimeoutStartRound();
+		this.scheduler.scheduleTimeoutStartRound();
 	}
 
 	public async onTimeoutStartRound(): Promise<void> {
@@ -141,7 +141,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
 
 			// TODO: Can we call this even even proposer is known?
-			await this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
+			this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 		}
 	}
 
@@ -248,7 +248,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		void this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
+		this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
 	}
 
 	public async onMajorityPrevoteNull(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -268,7 +268,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		void this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
+		this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
 	}
 
 	public async onMajorityPrecommit(roundState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {

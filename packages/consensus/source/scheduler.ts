@@ -18,7 +18,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
 
-	public async scheduleTimeoutStartRound(): Promise<void> {
+	public scheduleTimeoutStartRound(): void {
 		if (this.#timeoutStartRound) {
 			return;
 		}
@@ -36,7 +36,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 		}, timeout);
 	}
 
-	public async scheduleTimeoutPropose(height: number, round: number): Promise<void> {
+	public scheduleTimeoutPropose(height: number, round: number): void {
 		if (this.#timeoutPropose) {
 			return;
 		}
@@ -47,7 +47,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 		}, this.#getTimeout(round));
 	}
 
-	public async scheduleTimeoutPrevote(height: number, round: number): Promise<void> {
+	public scheduleTimeoutPrevote(height: number, round: number): void {
 		if (this.#timeoutPrevote) {
 			return;
 		}
@@ -58,7 +58,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 		}, this.#getTimeout(round));
 	}
 
-	public async scheduleTimeoutPrecommit(height: number, round: number): Promise<void> {
+	public scheduleTimeoutPrecommit(height: number, round: number): void {
 		if (this.#timeoutPrecommit) {
 			return;
 		}

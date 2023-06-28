@@ -106,10 +106,10 @@ export interface IHandler {
 }
 
 export interface IScheduler {
-	scheduleTimeoutStartRound(): Promise<void>;
-	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
-	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
-	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
+	scheduleTimeoutStartRound(): void;
+	scheduleTimeoutPropose(height: number, round: number): void;
+	scheduleTimeoutPrevote(height: number, round: number): void;
+	scheduleTimeoutPrecommit(height: number, round: number): void;
 	clear(): void;
 }
 
