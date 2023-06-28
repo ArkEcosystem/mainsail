@@ -23,10 +23,6 @@ export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Cryptography.Message.Verifier)
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
 
-	public async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		return this.#handle(roundState);
-	}
-
 	public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (!this.#isValidHeightAndRound(proposal)) {
 			return;
@@ -43,7 +39,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		if (await roundState.addProposal(proposal)) {
 			await this.storage.saveProposal(proposal);
 
-			await this.#handle(roundState);
+			await this.#getConsensus().handle(roundState);
 		}
 	}
 
@@ -63,7 +59,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		if (await roundState.addPrevote(prevote)) {
 			await this.storage.savePrevote(prevote);
 
-			await this.#handle(roundState);
+			await this.#getConsensus().handle(roundState);
 		}
 	}
 
@@ -85,7 +81,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		if (await roundState.addPrecommit(precommit)) {
 			await this.storage.savePrecommit(precommit);
 
-			await this.#handle(roundState);
+			await this.#getConsensus().handle(roundState);
 		}
 	}
 
@@ -95,43 +91,13 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 		committedBlockState.setProcessorResult(await this.processor.process(committedBlockState));
 
-		const consensus = this.#getConsensus();
-		await consensus.onMajorityPrecommit(committedBlockState);
+		// const consensus = this.#getConsensus();
+		// TODO: Fix
+		// await consensus.onMajorityPrecommit(committedBlockState);
 	}
 
 	#isValidHeightAndRound(message: { height: number; round: number }): boolean {
 		return message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound();
-	}
-
-	async #handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		const consensus = this.#getConsensus();
-
-		await consensus.onProposal(roundState);
-		await consensus.onProposalLocked(roundState);
-
-		if (roundState.hasMajorityPrevotes()) {
-			await consensus.onMajorityPrevote(roundState);
-		}
-
-		if (roundState.hasMajorityPrevotesAny()) {
-			await consensus.onMajorityPrevoteAny(roundState);
-		}
-
-		if (roundState.hasMajorityPrevotesNull()) {
-			await consensus.onMajorityPrevoteNull(roundState);
-		}
-
-		if (roundState.hasMajorityPrecommitsAny()) {
-			await consensus.onMajorityPrecommitAny(roundState);
-		}
-
-		if (roundState.hasMajorityPrecommits()) {
-			await consensus.onMajorityPrecommit(roundState);
-		}
-
-		if (roundState.hasMinorityPrevotesOrPrecommits()) {
-			await consensus.onMinorityWithHigherRound(roundState);
-		}
 	}
 
 	#getConsensus(): Contracts.Consensus.IConsensusService {

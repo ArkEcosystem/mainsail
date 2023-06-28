@@ -98,14 +98,38 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	public async run(): Promise<void> {
 		await this.#bootstrap();
-
-		// Start a new round if no proposal yet
-		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
-
 		await this.startRound(this.#round);
 
-		// TODO: we need to be able to download missed prevotes/precommits
-		await this.handler.handle(roundState);
+		await this.handle(await this.roundStateRepository.getRoundState(this.#height, this.#round));
+	}
+
+	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+		await this.onProposal(roundState);
+		await this.onProposalLocked(roundState);
+
+		if (roundState.hasMajorityPrevotes()) {
+			await this.onMajorityPrevote(roundState);
+		}
+
+		if (roundState.hasMajorityPrevotesAny()) {
+			await this.onMajorityPrevoteAny(roundState);
+		}
+
+		if (roundState.hasMajorityPrevotesNull()) {
+			await this.onMajorityPrevoteNull(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommitsAny()) {
+			await this.onMajorityPrecommitAny(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommits()) {
+			await this.onMajorityPrecommit(roundState);
+		}
+
+		if (roundState.hasMinorityPrevotesOrPrecommits()) {
+			await this.onMinorityWithHigherRound(roundState);
+		}
 	}
 
 	public async startRound(round: number): Promise<void> {
