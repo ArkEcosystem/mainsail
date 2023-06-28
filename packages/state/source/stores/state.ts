@@ -25,7 +25,6 @@ export class StateStore implements Contracts.State.StateStore {
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastDownloadedBlock?: Contracts.Crypto.IBlockData;
 	#lastStoredBlockHeight = 1;
-	#blockPing?: Contracts.State.BlockPing;
 	#started = false;
 	#wakeUpTimeout?: NodeJS.Timeout;
 	#noBlockCounter = 0;
@@ -75,10 +74,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setLastStoredBlockHeight(height: number): void {
 		this.#lastStoredBlockHeight = height;
-	}
-
-	public getBlockPing(): Contracts.State.BlockPing | undefined {
-		return this.#blockPing;
 	}
 
 	public isStarted(): boolean {
@@ -279,38 +274,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public getCachedTransactionIds(): string[] {
 		return this.#cachedTransactionIds.toArray();
-	}
-
-	public pingBlock(incomingBlock: Contracts.Crypto.IBlockData): boolean {
-		if (!this.#blockPing) {
-			return false;
-		}
-
-		if (this.#blockPing.block.height === incomingBlock.height && this.#blockPing.block.id === incomingBlock.id) {
-			this.#blockPing.count++;
-			this.#blockPing.last = Date.now();
-
-			return true;
-		}
-
-		return false;
-	}
-
-	public pushPingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): void {
-		if (this.#blockPing) {
-			this.logger.info(
-				`Previous block ${this.#blockPing.block.height.toLocaleString()} pinged blockchain ${this.#blockPing.count
-				} times`,
-			);
-		}
-
-		this.#blockPing = {
-			block,
-			count: fromForger ? 0 : 1,
-			first: Date.now(),
-			fromForger: fromForger,
-			last: Date.now(),
-		};
 	}
 
 	// Map Block instances to block data.

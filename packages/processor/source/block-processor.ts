@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 // TODO: Move enums to contracts
-import { Enums, Utils } from "@mainsail/kernel";
+import { Enums } from "@mainsail/kernel";
 
 import {
 	ForgedTransactionsVerifier,
@@ -33,17 +33,13 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async process(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
+	public async process(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
 		try {
-			if (!(await this.#verify(roundState))) {
+			if (!(await this.#verify(unit))) {
 				return false;
 			}
 
-			const proposedBlock = roundState.getProposal()?.block;
-			Utils.assert.defined<Contracts.Crypto.IProposedBlock>(proposedBlock);
-
-			const { block } = proposedBlock;
-			await this.blockState.applyBlock(roundState.getWalletRepository(), block);
+			await this.blockState.applyBlock(unit.getWalletRepository(), unit.getBlock());
 
 			return true;
 		} catch (error) {
@@ -53,13 +49,13 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return false;
 	}
 
-	public async commit(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		roundState.getWalletRepository().commitChanges();
+	public async commit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+		unit.getWalletRepository().commitChanges();
 
-		const commitBlock = await roundState.getProposedCommitBlock();
+		const commitBlock = await unit.getProposedCommitBlock();
 		await this.databaseService.saveBlocks([commitBlock]);
 
-		const lastCommittedRound = await this.databaseService.updateCommittedRound(commitBlock.block.header.height, roundState.round);
+		const lastCommittedRound = await this.databaseService.updateCommittedRound(commitBlock.block.header.height, unit.round);
 
 		this.state.setLastCommittedRound(lastCommittedRound);
 
@@ -74,16 +70,16 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		void this.events.dispatch(Enums.BlockEvent.Applied, commitBlock);
 	}
 
-	async #verify(roundState: Contracts.Consensus.IRoundState): Promise<boolean> {
-		if (!(await this.app.resolve(VerifyBlockVerifier).execute(roundState))) {
+	async #verify(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+		if (!(await this.app.resolve(VerifyBlockVerifier).execute(unit))) {
 			return false;
 		}
 
-		if (!(await this.app.resolve(IncompatibleTransactionsVerifier).execute(roundState))) {
+		if (!(await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit))) {
 			return false;
 		}
 
-		if (!(await this.app.resolve(NonceVerifier).execute(roundState))) {
+		if (!(await this.app.resolve(NonceVerifier).execute(unit))) {
 			return false;
 		}
 
@@ -95,7 +91,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		// 	return false;
 		// }
 
-		if (!(await this.app.resolve(ForgedTransactionsVerifier).execute(roundState))) {
+		if (!(await this.app.resolve(ForgedTransactionsVerifier).execute(unit))) {
 			return false;
 		}
 

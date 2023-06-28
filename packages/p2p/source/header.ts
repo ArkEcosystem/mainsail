@@ -25,7 +25,7 @@ export class Header implements Contracts.P2P.IHeader {
 		const round = consensus.getRound();
 		const step = consensus.getStep();
 
-		const roundState = await roundStateRepo.getRoundState(height, round, `${consensus.getTotalRound()}`);
+		const roundState = await roundStateRepo.getRoundState(height, round);
 		const proposal = roundState.getProposal();
 
 		return {
@@ -78,7 +78,7 @@ export class Header implements Contracts.P2P.IHeader {
 
 		const roundState = await this.app
 			.get<Contracts.Consensus.IRoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
-			.getRoundState(height, round, `${consensus.getTotalRound()}`);
+			.getRoundState(height, round);
 
 		const response: CompareResponse = {};
 

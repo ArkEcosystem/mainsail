@@ -159,8 +159,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	}
 
 	public async handleIncomingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): Promise<void> {
-		this.pushPingBlock(block, fromForger);
-
 		if (this.stateStore.isStarted()) {
 			this.dispatch("NEWBLOCK");
 			this.enqueueBlocks([block]);
@@ -258,18 +256,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 	public getLastDownloadedBlock(): Contracts.Crypto.IBlockData {
 		return this.stateStore.getLastDownloadedBlock() || this.getLastBlock().data;
-	}
-
-	public getBlockPing(): Contracts.State.BlockPing | undefined {
-		return this.stateStore.getBlockPing();
-	}
-
-	public pingBlock(incomingBlock: Contracts.Crypto.IBlockData): boolean {
-		return this.stateStore.pingBlock(incomingBlock);
-	}
-
-	public pushPingBlock(block: Contracts.Crypto.IBlockData, fromForger = false): void {
-		this.stateStore.pushPingBlock(block, fromForger);
 	}
 
 	public async checkMissingBlocks(): Promise<void> {

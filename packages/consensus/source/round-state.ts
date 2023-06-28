@@ -62,8 +62,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		const validators = await this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
-			const consensuPublicKey = validator.getAttribute<string>("validator.consensusPublicKey");
-			this.#validators.set(consensuPublicKey, validator);
+			const consensusPublicKey = validator.getAttribute<string>("validator.consensusPublicKey");
+			this.#validators.set(consensusPublicKey, validator);
 			this.#validatorsSignedPrecommit.push(false);
 			this.#validatorsSignedPrevote.push(false);
 		}
@@ -109,6 +109,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	public getProposal(): Contracts.Crypto.IProposal | undefined {
 		return this.#proposal;
+	}
+
+	public getBlock(): Contracts.Crypto.IBlock {
+		if (this.#proposal) {
+			return this.#proposal.block.block;
+		}
+
+		throw new Error("Block is not available, because proposal is not set");
 	}
 
 	public setProcessorResult(processorResult: boolean): void {

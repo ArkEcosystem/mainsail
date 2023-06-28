@@ -34,7 +34,6 @@ export enum Routes {
 	GetProposal = "getProposal",
 	GetPeers = "getPeers",
 	GetStatus = "getStatus",
-	PostBlock = "postBlock",
 	PostPrecommit = "postPrecommit",
 	PostPrevote = "postPrevote",
 	PostProposal = "postProposal",

@@ -16,7 +16,6 @@ import {
 	GetPeersRoute,
 	GetProposalRoute,
 	GetStatusRoute,
-	PostBlockRoute,
 	PostPrecommitRoute,
 	PostPrevoteRoute,
 	PostProposalRoute,
@@ -57,7 +56,6 @@ export class Server {
 		this.app.resolve(GetPeersRoute).register(this.server);
 		this.app.resolve(GetProposalRoute).register(this.server);
 		this.app.resolve(GetStatusRoute).register(this.server);
-		this.app.resolve(PostBlockRoute).register(this.server);
 		this.app.resolve(PostPrecommitRoute).register(this.server);
 		this.app.resolve(PostPrevoteRoute).register(this.server);
 		this.app.resolve(PostProposalRoute).register(this.server);

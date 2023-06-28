@@ -1,28 +1,14 @@
-import {
-	IBlock,
-	ICommittedBlock,
-	IKeyPair,
-	IPrecommit,
-	IPrevote,
-	IProposal,
-	IProposalLockProof,
-	IValidatorSetMajority,
-} from "./crypto";
-import { WalletRepositoryClone } from "./state";
+import { IProcessableUnit } from "./block-processor";
+import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof, IValidatorSetMajority } from "./crypto";
 
-export interface IRoundState {
-	readonly height: number;
-	readonly round: number;
+export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
 	readonly proposer: string;
-	getWalletRepository(): WalletRepositoryClone;
 	getProposal(): IProposal | undefined;
 	hasProposal(): boolean;
-	addProposal(proposal: IProposal): Promise<boolean>;
-	setProcessorResult(processorResult: boolean): void;
-	getProcessorResult(): boolean;
 	hasPrevote(validator: IValidator): boolean;
 	hasPrecommit(validator: IValidator): boolean;
+	addProposal(proposal: IProposal): Promise<boolean>;
 	addPrevote(prevote: IPrevote): Promise<boolean>;
 	addPrecommit(precommit: IPrecommit): Promise<boolean>;
 	hasMajorityPrevotes(): boolean;
@@ -39,7 +25,6 @@ export interface IRoundState {
 	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
 	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
 	getProposalLockProof(): Promise<IProposalLockProof>;
-	getProposedCommitBlock(): Promise<ICommittedBlock>;
 }
 
 export interface IConsensusStateData {
@@ -61,13 +46,13 @@ export interface IConsensusService {
 	getStep(): Step;
 	getState(): IConsensusState;
 	onProposal(roundState: IRoundState): Promise<void>;
-	onProposalLocked(roudnState: IRoundState): Promise<void>;
+	onProposalLocked(roundState: IRoundState): Promise<void>;
 	onMajorityPrevote(roundState: IRoundState): Promise<void>;
 	onMajorityPrevoteAny(roundState: IRoundState): Promise<void>;
 	onMajorityPrevoteNull(roundState: IRoundState): Promise<void>;
-	onMajorityPrecommitAny(roundState: IRoundState): Promise<void>;
-	onMajorityPrecommit(roundState: IRoundState): Promise<void>;
-	onMinorityWithHigherRound(roundState: IRoundState): Promise<void>;
+	onMajorityPrecommitAny(roundState: IProcessableUnit): Promise<void>;
+	onMajorityPrecommit(roundState: IProcessableUnit): Promise<void>;
+	onMinorityWithHigherRound(roundState: IProcessableUnit): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;

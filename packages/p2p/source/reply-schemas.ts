@@ -206,14 +206,6 @@ export const replySchemas = {
 		required: ["state", "config"],
 		type: "object",
 	},
-	postBlock: {
-		additionalProperties: false,
-		properties: {
-			height: { minimum: 1, type: "integer" },
-			status: { type: "boolean" },
-		},
-		type: "object",
-	},
 	postPrecommit: {
 		type: "object",
 	},
