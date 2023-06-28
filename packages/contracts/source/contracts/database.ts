@@ -35,10 +35,6 @@ export interface IDatabaseService {
 
 	deleteRound(round: number): Promise<void>;
 
-	getCommittedRound(height: number): Promise<number>;
-
-	updateCommittedRound(height: number, round: number): Promise<number>;
-
 	getForgedTransactionsIds(ids: string[]): Promise<string[]>;
 
 	verifyBlockchain(): Promise<boolean>;

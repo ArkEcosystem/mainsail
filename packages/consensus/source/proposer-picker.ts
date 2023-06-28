@@ -7,43 +7,27 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Database.Service)
-	private readonly databaseService!: Contracts.Database.IDatabaseService;
-
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	public async getValidatorIndex(height: number, round: number): Promise<number> {
-		const seed = await this.#calculateSeed(height, round);
+	public async getValidatorIndex(round: number): Promise<number> {
+		const seed = await this.#calculateSeed(round);
 
-		const { activeValidators } = this.configuration.getMilestone(height);
+		const { activeValidators } = this.configuration.getMilestone();
 		const rng = seedrandom(seed);
 		return Math.floor(rng() * (activeValidators - 1));
 	}
 
-	async #calculateSeed(height: number, round: number): Promise<string> {
-		const totalRound = await this.#getTotalRound(height, round);
+	async #calculateSeed(round: number): Promise<string> {
+		const totalRound = await this.#getTotalRound(round);
 
 		// TODO: take block id into account
 
 		return `${totalRound}`;
 	}
 
-	async #getTotalRound(height: number, round: number): Promise<number> {
-		const committedRound = await this.#getCommittedRound(height);
+	async #getTotalRound(round: number): Promise<number> {
+		const committedRound = this.state.getLastCommittedRound();
 		return committedRound + round + 1;
-	}
-
-	async #getCommittedRound(height: number): Promise<number> {
-		const lastHeight = this.state.getLastHeight();
-		if (lastHeight === height) {
-			return this.state.getLastCommittedRound();
-		}
-
-		if (lastHeight < height) {
-			return this.databaseService.getCommittedRound(lastHeight);
-		}
-
-		return this.databaseService.getCommittedRound(height);
 	}
 }

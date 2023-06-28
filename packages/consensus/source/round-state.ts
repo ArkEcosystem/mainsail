@@ -68,7 +68,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 			this.#validatorsSignedPrevote.push(false);
 		}
 
-		const validatorIndex = await this.proposerPicker.getValidatorIndex(height, round);
+		const validatorIndex = await this.proposerPicker.getValidatorIndex(round);
 
 		this.#proposer = validators[validatorIndex].getAttribute<string>("validator.consensusPublicKey");
 

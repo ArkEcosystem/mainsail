@@ -20,6 +20,9 @@ export class StateBuilder {
 	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
+
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
@@ -46,7 +49,10 @@ export class StateBuilder {
 			for (const { value } of this.blockStorage.getRange({})) {
 				const {
 					block: { data, transactions },
+					commit,
 				} = await this.blockFactory.fromCommittedBytes(value);
+
+				this.#buildCommittedRound(commit);
 
 				await this.#buildBlockRewards(data);
 				await this.#buildSentTransactions(transactions);
@@ -65,6 +71,8 @@ export class StateBuilder {
 					this.walletRepository.allByUsername(),
 				).length.toLocaleString()}`,
 			);
+
+			this.logger.debug(`Last committed round: ${this.stateStore.getLastCommittedRound()}`);
 
 			this.#verifyWalletsConsistency();
 
@@ -85,6 +93,11 @@ export class StateBuilder {
 			wallet.setNonce(BigNumber.make(transaction.nonce));
 			wallet.decreaseBalance(BigNumber.make(transaction.amount).plus(transaction.fee));
 		}
+	}
+
+	#buildCommittedRound(commit: Contracts.Crypto.IBlockCommit): void {
+		const lastCommittedRound = this.stateStore.getLastCommittedRound();
+		this.stateStore.setLastCommittedRound(lastCommittedRound + commit.round + 1);
 	}
 
 	#verifyWalletsConsistency(): void {

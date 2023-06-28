@@ -81,8 +81,5 @@ export class DatabaseInteraction {
 
 	async #configureState(lastBlock: Contracts.Crypto.IBlock): Promise<void> {
 		this.stateStore.setLastBlock(lastBlock);
-
-		const lastCommittedRound = await this.databaseService.getCommittedRound(lastBlock.header.height);
-		this.stateStore.setLastCommittedRound(lastCommittedRound);
 	}
 }
