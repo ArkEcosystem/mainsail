@@ -481,6 +481,9 @@ importers:
       delay:
         specifier: 5.0.0
         version: 5.0.0
+      seedrandom:
+        specifier: ^3.0.5
+        version: 3.0.5
       lmdb:
         specifier: 2.4.2
         version: 2.4.2
@@ -488,6 +491,9 @@ importers:
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
+      '@types/seedrandom':
+        specifier: ^3.0.5
+        version: 3.0.5
       rewiremock:
         specifier: 3.14.5
         version: 3.14.5
@@ -5573,6 +5579,10 @@ packages:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
       '@types/node': 20.1.0
+
+  /@types/seedrandom@3.0.5:
+    resolution: {integrity: sha512-kopEpYpFQvQdYsZkZVwht/0THHmTFFYXDaqV/lM45eweJ8kcGVDgZHs0RVTolSq55UPZNmjhKc9r7UvLu/mQQg==}
+    dev: true
 
   /@types/semver@6.2.3:
     resolution: {integrity: sha512-KQf+QAMWKMrtBMsB8/24w53tEsxllMj6TuA80TT/5igJalLI/zm0L3oXRbIAl4Ohfc85gyHX/jhMwsVkmhLU4A==}
@@ -14853,6 +14863,10 @@ packages:
       invariant: 2.2.4
       lodash: 4.17.21
     dev: true
+
+  /seedrandom@3.0.5:
+    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
+    dev: false
 
   /semver-compare@1.0.0:
     resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}

@@ -32,6 +32,9 @@ export class StateStore implements Contracts.State.StateStore {
 	#networkStart = false;
 	#restoredDatabaseIntegrity = false;
 
+	// The last committed round
+	#committedRound = 0;
+
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
 	#lastBlocks: OrderedMap<number, Contracts.Crypto.IBlock> = OrderedMap<number, Contracts.Crypto.IBlock>();
@@ -220,6 +223,14 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.getLastBlocksData(true)
 			.filter((block) => idsHash[block.id])
 			.toArray() as Contracts.Crypto.IBlockData[];
+	}
+
+	public getLastCommittedRound(): number {
+		return this.#committedRound;
+	}
+
+	public setLastCommittedRound(committedRound: number): void {
+		this.#committedRound = committedRound;
 	}
 
 	public cacheTransactions(transactions: Contracts.Crypto.ITransactionData[]): {

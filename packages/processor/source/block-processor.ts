@@ -55,6 +55,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		const commitBlock = await unit.getProposedCommitBlock();
 		await this.databaseService.saveBlocks([commitBlock]);
 
+		const committedRound = this.state.getLastCommittedRound();
+		this.state.setLastCommittedRound(committedRound + unit.round + 1);
+
 		this.state.setLastBlock(commitBlock.block);
 
 		this.logger.info(`Block ${commitBlock.block.header.height.toLocaleString()} committed`);

@@ -102,6 +102,10 @@ export interface IScheduler {
 	clear(): void;
 }
 
+export interface IProposerPicker {
+	getValidatorIndex(round: number): Promise<number>;
+}
+
 export interface IValidator {
 	configure(publicKey: string, keyPair: IKeyPair): IValidator;
 	getConsensusPublicKey(): string;

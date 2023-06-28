@@ -61,6 +61,10 @@ export interface StateStore {
 
 	getCommonBlocks(ids: string[]): IBlockData[];
 
+	getLastCommittedRound(): number;
+
+	setLastCommittedRound(committedRound: number): void;
+
 	cacheTransactions(transactions: ITransactionData[]): {
 		[key in "added" | "notAdded"]: ITransactionData[];
 	};

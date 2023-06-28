@@ -39,6 +39,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 		}
 
 		const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round);
+
 		if (await roundState.addProposal(proposal)) {
 			await this.storage.saveProposal(proposal);
 
