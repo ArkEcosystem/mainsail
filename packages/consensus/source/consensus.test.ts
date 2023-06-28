@@ -157,10 +157,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getRound(), 0);
 	});
 
-	it("#getTotalRound - should return initial value", async ({ consensus }) => {
-		assert.equal(consensus.getTotalRound(), 0);
-	});
-
 	it("#getStep - should return initial value", async ({ consensus }) => {
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
@@ -215,10 +211,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(validatorPublicKey);
 		spyGetRoundState.calledOnce();
-		spyGetRoundState.calledWith(2, 0, "1");
+		spyGetRoundState.calledWith(2, 0);
 		spySchedulerClear.calledOnce();
 		spyScheduleTimeoutPropose.calledOnce();
-		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0}/${1} with proposer ${validatorPublicKey}`);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 		spyLoggerInfo.calledWith(`No registered proposer for ${validatorPublicKey}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
@@ -260,7 +256,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyDelayProposal.calledOnce();
 		spyGetRoundState.calledTimes(2);
-		spyGetRoundState.calledWith(2, 0, "1");
+		spyGetRoundState.calledWith(2, 0);
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(validatorPublicKey);
 		spyValidatorPrepareBlock.calledOnce();
@@ -273,7 +269,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyHandlerOnProposal.calledWith(proposal);
 		spySchedulerClear.calledOnce();
 		spyScheduleTimeoutPropose.neverCalled();
-		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0}/${1} with proposer ${validatorPublicKey}`);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 

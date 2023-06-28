@@ -130,6 +130,21 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		);
 	}
 
+	public async getCommittedRound(height: number): Promise<number> {
+		return this.roundStorage.get(`${height}-committed-round`) ?? 0;
+	}
+
+	public async updateCommittedRound(height: number, round: number): Promise<number> {
+		const lastCommittedRound: number = await this.getCommittedRound(height - 1);
+		const updatedCommittedRound = lastCommittedRound + round + 1;
+
+		this.logger.debug(`Updating last committed round from ${lastCommittedRound} to ${updatedCommittedRound}`);
+
+		this.roundStorage.put(`${height}-committed-round`, updatedCommittedRound);
+
+		return updatedCommittedRound;
+	}
+
 	public async getRound(round: number): Promise<Contracts.Database.IRound[]> {
 		const roundByNumber: Contracts.Database.IRound[] = this.roundStorage
 			.get(round)
@@ -164,7 +179,9 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async deleteRound(round: number): Promise<void> {
+		// TODO: deleteRound needs a rework / can be removed
 		for (const key of this.roundStorage.getKeys({ start: round })) {
+			if (key.toString().endsWith("committed-round")) continue;
 			await this.roundStorage.remove(key);
 		}
 	}

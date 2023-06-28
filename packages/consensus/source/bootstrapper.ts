@@ -17,10 +17,8 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 
 		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`);
 
-		const seed = "0"; // TODO
-
 		for (const proposal of proposals) {
-			const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round, seed);
+			const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 			await roundState.addProposal(proposal);
 		}
 
@@ -28,7 +26,7 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 
 		this.logger.info(`Consensus Bootstrap - Prevotes: ${prevotes.length}`);
 		for (const prevote of prevotes) {
-			const roundState = await this.roundStateRepo.getRoundState(prevote.height, prevote.round, seed);
+			const roundState = await this.roundStateRepo.getRoundState(prevote.height, prevote.round);
 			await roundState.addPrevote(prevote);
 		}
 
@@ -36,7 +34,7 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 
 		this.logger.info(`Consensus Bootstrap - Precommits: ${precommits.length}`);
 		for (const precommit of precommits) {
-			const roundState = await this.roundStateRepo.getRoundState(precommit.height, precommit.round, seed);
+			const roundState = await this.roundStateRepo.getRoundState(precommit.height, precommit.round);
 			await roundState.addPrecommit(precommit);
 		}
 
@@ -47,13 +45,13 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 
 		if (state.validRound !== undefined) {
 			// TODO: ensure validRound points to an existing round?
-			const roundState = await this.roundStateRepo.getRoundState(state.height, state.validRound, seed);
+			const roundState = await this.roundStateRepo.getRoundState(state.height, state.validRound);
 			state.validValue = roundState;
 		}
 
 		if (state.lockedRound !== undefined) {
 			// TODO: ensure lockedRound points to an existing round?
-			const roundState = await this.roundStateRepo.getRoundState(state.height, state.lockedRound, seed);
+			const roundState = await this.roundStateRepo.getRoundState(state.height, state.lockedRound);
 			state.lockedValue = roundState;
 		}
 

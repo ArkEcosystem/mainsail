@@ -68,7 +68,7 @@ export class DatabaseInteraction {
 			lastBlock = await this.#createGenesisBlock();
 		}
 
-		this.#configureState(lastBlock);
+		await this.#configureState(lastBlock);
 	}
 
 	async #createGenesisBlock(): Promise<Contracts.Crypto.IBlock> {
@@ -79,7 +79,10 @@ export class DatabaseInteraction {
 		return genesisBlock.block;
 	}
 
-	#configureState(lastBlock: Contracts.Crypto.IBlock): void {
+	async #configureState(lastBlock: Contracts.Crypto.IBlock): Promise<void> {
 		this.stateStore.setLastBlock(lastBlock);
+
+		const lastCommittedRound = await this.databaseService.getCommittedRound(lastBlock.header.height)
+		this.stateStore.setLastCommittedRound(lastCommittedRound);
 	}
 }

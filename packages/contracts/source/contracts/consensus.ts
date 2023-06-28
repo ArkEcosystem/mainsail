@@ -51,14 +51,13 @@ export interface IConsensusStateData {
 }
 
 export interface IRoundStateRepository {
-	getRoundState(height: number, round: number, seed: string): Promise<IRoundState>;
+	getRoundState(height: number, round: number): Promise<IRoundState>;
 }
 
 export interface IConsensusService {
 	run(): Promise<void>;
 	getHeight(): number;
 	getRound(): number;
-	getTotalRound(): number;
 	getStep(): Step;
 	getState(): IConsensusState;
 	onProposal(roundState: IRoundState): Promise<void>;
@@ -119,7 +118,7 @@ export interface IScheduler {
 }
 
 export interface IProposerPicker {
-	getValidatorIndex(height: number, seed: string): number;
+	getValidatorIndex(height: number, round: number): Promise<number>;
 }
 
 export interface IValidator {
