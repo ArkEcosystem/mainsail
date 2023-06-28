@@ -78,7 +78,7 @@ export class Header implements Contracts.P2P.IHeader {
 
 		const roundState = await this.app
 			.get<Contracts.Consensus.IRoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
-			.getRoundState(header.height, header.round);
+			.getRoundState(height, round);
 
 		const response: CompareResponse = {};
 

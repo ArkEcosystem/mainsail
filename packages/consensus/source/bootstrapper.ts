@@ -16,6 +16,7 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 		const proposals = await this.storage.getProposals();
 
 		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`);
+
 		for (const proposal of proposals) {
 			const roundState = await this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 			await roundState.addProposal(proposal);

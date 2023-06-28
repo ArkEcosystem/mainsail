@@ -26,7 +26,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
+	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
 
 	@inject(Identifiers.Consensus.Storage)
 	private readonly storage!: Contracts.Consensus.IConsensusStorage;
@@ -100,7 +100,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#bootstrap();
 
 		// Start a new round if no proposal yet
-		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
 
 		await this.startRound(this.#round);
 
@@ -121,7 +121,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		await this.scheduler.delayProposal();
 
-		const proposerPublicKey = await this.#getProposerPublicKey(this.#height, round);
+		const { proposer: proposerPublicKey } = await this.roundStateRepository.getRoundState(this.#height, round);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
@@ -215,11 +215,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const { block } = proposal.block;
 
-		this.logger.info(
-			`Received +2/3 prevotes for ${this.#height}/${this.#round} proposer: ${proposal.validatorIndex} blockId: ${
-				block.data.id
-			}`,
-		);
+		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 
 		this.#didMajorityPrevote = true;
 
@@ -344,7 +340,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
-		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
 		if (roundState.hasProposal()) {
 			return;
 		}
@@ -366,7 +362,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #prevote(value?: string): Promise<void> {
-		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
 			if (roundState.hasPrevote(validator)) {
 				continue;
@@ -382,7 +378,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #precommit(value?: string): Promise<void> {
-		const roundState = await this.roundStateRepo.getRoundState(this.#height, this.#round);
+		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(await this.#getActiveValidators())) {
 			if (roundState.hasPrecommit(validator)) {
 				continue;
@@ -395,11 +391,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		await this.#saveState();
-	}
-
-	async #getProposerPublicKey(height: number, round: number): Promise<string> {
-		const activeValidators = await this.validatorSet.getActiveValidators();
-		return activeValidators[0].getAttribute("validator.consensusPublicKey");
 	}
 
 	async #getActiveValidators(): Promise<string[]> {
@@ -429,6 +420,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#height = lastBlock.data.height + 1;
 		}
 
-		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}`);
+		this.logger.info(
+			`Completed consensus bootstrap for ${this.#height}/${this.#round}/${this.state.getLastCommittedRound()}`,
+		);
 	}
 }

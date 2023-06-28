@@ -5,6 +5,7 @@ import { RootDatabase } from "lmdb";
 import { Bootstrapper } from "./bootstrapper";
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
+import { ProposerPicker } from "./proposer-picker";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
 import { Storage } from "./storage";
@@ -14,6 +15,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(this.app.resolve(ProposerPicker));
 
 		// Storage for uncommitted blocks
 		const rootStorage = this.app.get<RootDatabase>(Identifiers.Database.RootStorage);

@@ -15,11 +15,12 @@ type Context = {
 	scheduler: any;
 	validatorsRepository: any;
 	validatorSet: any;
-	roundStateRepository: any;
+	proposerPicker: any;
 	logger: any;
 	block: any;
 	proposal: any;
 	roundState: Contracts.Consensus.IRoundState;
+	roundStateRepository: any;
 };
 
 describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
@@ -82,6 +83,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			getActiveValidators: () => {},
 		};
 
+		context.proposerPicker = {
+			getValidatorIndex: () => {},
+		};
+
 		context.logger = {
 			info: () => {},
 		};
@@ -101,6 +106,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			round: 0,
 			validRound: undefined,
 			validatorPublicKey: "validatorPublicKey",
+		};
+
+		context.roundStateRepository = {
+			getRoundState: () => {},
 		};
 
 		context.roundState = {
@@ -129,12 +138,13 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
 		context.sandbox.app
-			.bind(Identifiers.Consensus.RoundStateRepository)
-			.toConstantValue(context.roundStateRepository);
-		context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(context.validatorSet);
+		context.sandbox.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(context.proposerPicker);
+		context.sandbox.app
+			.bind(Identifiers.Consensus.RoundStateRepository)
+			.toConstantValue(context.roundStateRepository);
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 
 		context.consensus = context.sandbox.app.resolve(Consensus);
@@ -181,29 +191,28 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	it("#startRound - should schedule timout if proposer is not local validator", async ({
 		consensus,
 		scheduler,
-		validatorSet,
 		validatorsRepository,
+		roundStateRepository,
 		logger,
 	}) => {
 		const validatorPublicKey = "publicKey";
 
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDelayProposal = spy(scheduler, "delayProposal");
-		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
-			{
-				getAttribute: () => validatorPublicKey,
-			},
-		]);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
+		const spyGetRoundState = stub(roundStateRepository, "getRoundState").resolvedValue({
+			proposer: validatorPublicKey,
+		});
 		const spySchedulerClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutPropose = spy(scheduler, "scheduleTimeoutPropose");
 
 		await consensus.startRound(0);
 
 		spyDelayProposal.calledOnce();
-		spyGetActiveValidators.calledOnce();
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(validatorPublicKey);
+		spyGetRoundState.calledOnce();
+		spyGetRoundState.calledWith(2, 0);
 		spySchedulerClear.calledOnce();
 		spyScheduleTimeoutPropose.calledOnce();
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
@@ -214,8 +223,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	it("#startRound - local validator should propose", async ({
 		consensus,
 		scheduler,
-		validatorSet,
 		validatorsRepository,
+		roundStateRepository,
 		logger,
 		broadcaster,
 		handler,
@@ -233,11 +242,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
 
 		const spyLoggerInfo = spy(logger, "info");
-		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
-			{
-				getAttribute: () => validatorPublicKey,
-			},
-		]);
+		const spyGetRoundState = stub(roundStateRepository, "getRoundState").resolvedValue({
+			proposer: validatorPublicKey,
+			hasProposal: () => false,
+		});
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
 		const spyBroadcastProposal = spy(broadcaster, "broadcastProposal");
 		const spyHandlerOnProposal = spy(handler, "onProposal");
@@ -248,7 +256,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.startRound(0);
 
 		spyDelayProposal.calledOnce();
-		spyGetActiveValidators.calledOnce();
+		spyGetRoundState.calledTimes(2);
+		spyGetRoundState.calledWith(2, 0);
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(validatorPublicKey);
 		spyValidatorPrepareBlock.calledOnce();
@@ -755,11 +764,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBroadcastPrecommit.calledWith(precommit);
 		spyHandlerOnPrecommit.calledOnce();
 		spyHandlerOnPrecommit.calledWith(precommit);
-		spyLoggerInfo.calledWith(
-			`Received +2/3 prevotes for ${2}/${0} proposer: ${proposal.validatorIndex} blockId: ${
-				proposal.block.block.data.id
-			}`,
-		);
+		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 
 		assert.equal(consensus.getLockedRound(), 0);
 		assert.equal(consensus.getLockedValue(), roundState);
