@@ -91,9 +91,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 		committedBlockState.setProcessorResult(await this.processor.process(committedBlockState));
 
-		// const consensus = this.#getConsensus();
-		// TODO: Fix
-		// await consensus.onMajorityPrecommit(committedBlockState);
+		await this.#getConsensus().handleCommittedBlockState(committedBlockState);
 	}
 
 	#isValidHeightAndRound(message: { height: number; round: number }): boolean {

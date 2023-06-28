@@ -132,6 +132,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
+	// TODO: Check if can be joined with handle
+	async handleCommittedBlockState(committedBlockState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+		await this.onMajorityPrecommit(committedBlockState);
+	}
+
 	public async startRound(round: number): Promise<void> {
 		this.#round = round;
 		this.#step = Contracts.Consensus.Step.Propose;

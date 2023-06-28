@@ -55,6 +55,7 @@ export interface IConsensusService {
 	getStep(): Step;
 	getState(): IConsensusState;
 	handle(roundState: IRoundState): Promise<void>;
+	handleCommittedBlockState(committedBlockState: IProcessableUnit): Promise<void>;
 	onTimeoutStartRound(): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
