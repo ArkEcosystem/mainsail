@@ -21,29 +21,31 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.IGetBlocksRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.IGetBlocksResponse> {
-		const requestBlockHeight: number = request.payload.lastBlockHeight + 1;
-		const requestBlockLimit: number = request.payload.blockLimit || 400;
+		const requestBlockHeight: number = request.payload.fromHeight;
+		const requestBlockLimit: number = request.payload.limit || 400;
 
 		const lastHeight: number = this.blockchain.getLastHeight();
 		if (requestBlockHeight > lastHeight) {
-			return [];
+			return { blocks: [] };
 		}
 
-		const blocks: Contracts.Shared.DownloadBlock[] = await this.database.getBlocksForDownload(
+		const committedBlocks: Buffer[] = await this.database.findCommittedBlocks(
 			requestBlockHeight,
-			requestBlockLimit,
+			requestBlockHeight + requestBlockLimit,
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
-		const blocksToReturn: Contracts.Shared.DownloadBlock[] = [];
-		const maxPayloadWithMargin = constants.DEFAULT_MAX_PAYLOAD - 100 * 1024; // 100KB margin because we're dealing with estimates
-		for (let index = 0, sizeEstimate = 0; sizeEstimate < maxPayloadWithMargin && index < blocks.length; index++) {
-			blocksToReturn.push(blocks[index]);
-			sizeEstimate +=
-				blocks[index].transactions?.reduce((accumulator, current) => accumulator + current.length, 0) ?? 0;
-			// We estimate the size of each block -- as it will be sent through p2p -- with the length of the
-			// associated transactions. When blocks are big, size of the block header is negligible compared to its
-			// transactions. And here we just want a broad limit to stop when getting close to p2p max payload.
+		const blocksToReturn: String[] = [];
+		const maxPayloadWithMargin = constants.DEFAULT_MAX_PAYLOAD;
+		let totalSize = 0;
+
+		for (const committedBlock of committedBlocks) {
+			totalSize += committedBlock.length;
+			if (totalSize > maxPayloadWithMargin) {
+				break;
+			}
+
+			blocksToReturn.push(committedBlock.toString("hex"));
 		}
 
 		this.logger.info(
@@ -54,6 +56,6 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			)} from height ${requestBlockHeight.toLocaleString()}`,
 		);
 
-		return blocksToReturn;
+		return { blocks: blocksToReturn };
 	}
 }

@@ -37,38 +37,33 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return undefined;
 	}
 
-	public async findBlocksByHeightRange(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
+	public async findCommittedBlocks(start: number, end: number): Promise<Buffer[]> {
 		const heights: number[] = [];
 
 		for (const height of this.#range(start, end)) {
 			heights.push(height);
 		}
 
-		return (
-			await this.#map<Contracts.Crypto.IBlock>(
-				heights
-					.map((height: number) => {
-						try {
-							return this.blockStorage.get(this.blockStorageByHeight.get(height));
-						} catch {
-							return;
-						}
-					})
-					.filter(Boolean),
-				async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
-			)
-		).sort((a: Contracts.Crypto.IBlock, b: Contracts.Crypto.IBlock) => a.data.height - b.data.height);
+		return heights
+			.map((height: number) => {
+				try {
+					return this.blockStorage.get(this.blockStorageByHeight.get(height));
+				} catch {
+					return;
+				}
+			})
+			.filter(Boolean);
+	}
+
+	public async findBlocksByHeightRange(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
+		return await this.#map<Contracts.Crypto.IBlock>(
+			await this.findCommittedBlocks(start, end),
+			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
+		);
 	}
 
 	public async getBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlockData[]> {
 		return (await this.findBlocksByHeightRange(start, end)).map(({ data }) => data);
-	}
-
-	public async getBlocksForDownload(offset: number, limit: number): Promise<Contracts.Shared.DownloadBlock[]> {
-		return (await this.findBlocksByHeightRange(offset, offset + limit - 1)).map(({ data, transactions }) => ({
-			...data,
-			transactions: transactions.map(({ serialized }) => serialized.toString("hex")),
-		}));
 	}
 
 	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {

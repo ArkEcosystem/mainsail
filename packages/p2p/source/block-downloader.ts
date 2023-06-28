@@ -100,10 +100,11 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 				for (peer of peersToTry) {
 					peerPrint = `${peer.ip}:${peer.port}`;
 					try {
-						blocks = await this.communicator.getPeerBlocks(peer, {
-							blockLimit: this.#downloadChunkSize,
-							fromBlockHeight: height,
-						});
+						// TODO: Blocks are now buffers
+						blocks = (await this.communicator.getBlocks(peer, {
+							fromHeight: height,
+							limit: this.#downloadChunkSize,
+						})) as any;
 
 						if (blocks.length > 0 || isLastChunk) {
 							// when `isLastChunk` it can be normal that the peer does not send any block (when none were forged)

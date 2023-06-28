@@ -1,5 +1,4 @@
-import { IBlockData } from "../crypto";
-import { IGetMessagesResponse, IGetPeersResponse, IGetProposalResponse } from "./endpoints";
+import { IGetBlocksResponse, IGetMessagesResponse, IGetPeersResponse, IGetProposalResponse } from "./endpoints";
 import { Peer } from "./peer";
 
 export interface PeerCommunicator {
@@ -17,15 +16,7 @@ export interface PeerCommunicator {
 	getPeers(peer: Peer): Promise<IGetPeersResponse>;
 	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
 	getProposal(peer: Peer): Promise<IGetProposalResponse>;
+	getBlocks(peer: Peer, { fromHeight, limit }: { fromHeight: number; limit?: number }): Promise<IGetBlocksResponse>;
 
 	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
-
-	getPeerBlocks(
-		peer: Peer,
-		{
-			fromBlockHeight,
-			blockLimit,
-			headersOnly,
-		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
-	): Promise<IBlockData[]>;
 }

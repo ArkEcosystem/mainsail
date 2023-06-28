@@ -371,11 +371,11 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		try {
 			this.#throwIfPastDeadline(deadline);
 
+			// TODO: Check if headersOnly is possible
 			// returns blocks from the next one, thus we do -1
-			response = await this.communicator.getPeerBlocks(this.#peer, {
-				blockLimit: Math.max(Math.min(endHeight - height + 1, 400), 1),
-				fromBlockHeight: height - 1,
-				headersOnly: true,
+			response = await this.communicator.getBlocks(this.#peer, {
+				fromHeight: height,
+				limit: Math.max(Math.min(endHeight - height + 1, 400), 1),
 			});
 		} catch (error) {
 			this.#log(

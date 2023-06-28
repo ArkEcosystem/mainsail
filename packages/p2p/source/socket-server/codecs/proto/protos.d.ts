@@ -6,17 +6,11 @@ export namespace getBlocks {
     /** Properties of a GetBlocksRequest. */
     interface IGetBlocksRequest {
 
-        /** GetBlocksRequest lastBlockHeight */
-        lastBlockHeight?: (number|null);
+        /** GetBlocksRequest fromHeight */
+        fromHeight?: (number|null);
 
-        /** GetBlocksRequest blockLimit */
-        blockLimit?: (number|null);
-
-        /** GetBlocksRequest headersOnly */
-        headersOnly?: (boolean|null);
-
-        /** GetBlocksRequest serialized */
-        serialized?: (boolean|null);
+        /** GetBlocksRequest limit */
+        limit?: (number|null);
 
         /** GetBlocksRequest headers */
         headers?: (shared.IHeaders|null);
@@ -31,17 +25,11 @@ export namespace getBlocks {
          */
         constructor(properties?: getBlocks.IGetBlocksRequest);
 
-        /** GetBlocksRequest lastBlockHeight. */
-        public lastBlockHeight: number;
+        /** GetBlocksRequest fromHeight. */
+        public fromHeight: number;
 
-        /** GetBlocksRequest blockLimit. */
-        public blockLimit: number;
-
-        /** GetBlocksRequest headersOnly. */
-        public headersOnly: boolean;
-
-        /** GetBlocksRequest serialized. */
-        public serialized: boolean;
+        /** GetBlocksRequest limit. */
+        public limit: number;
 
         /** GetBlocksRequest headers. */
         public headers?: (shared.IHeaders|null);
@@ -128,7 +116,7 @@ export namespace getBlocks {
     interface IGetBlocksResponse {
 
         /** GetBlocksResponse blocks */
-        blocks?: (Uint8Array|null);
+        blocks?: (string[]|null);
     }
 
     /** Represents a GetBlocksResponse. */
@@ -141,7 +129,7 @@ export namespace getBlocks {
         constructor(properties?: getBlocks.IGetBlocksResponse);
 
         /** GetBlocksResponse blocks. */
-        public blocks: Uint8Array;
+        public blocks: string[];
 
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.
@@ -219,184 +207,6 @@ export namespace getBlocks {
          * @returns The default type url
          */
         public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    namespace GetBlocksResponse {
-
-        /** Properties of a BlockHeader. */
-        interface IBlockHeader {
-
-            /** BlockHeader id */
-            id?: (string|null);
-
-            /** BlockHeader version */
-            version?: (number|null);
-
-            /** BlockHeader timestamp */
-            timestamp?: (number|null);
-
-            /** BlockHeader previousBlock */
-            previousBlock?: (string|null);
-
-            /** BlockHeader height */
-            height?: (number|null);
-
-            /** BlockHeader numberOfTransactions */
-            numberOfTransactions?: (number|null);
-
-            /** BlockHeader totalAmount */
-            totalAmount?: (string|null);
-
-            /** BlockHeader totalFee */
-            totalFee?: (string|null);
-
-            /** BlockHeader reward */
-            reward?: (string|null);
-
-            /** BlockHeader payloadLength */
-            payloadLength?: (number|null);
-
-            /** BlockHeader payloadHash */
-            payloadHash?: (string|null);
-
-            /** BlockHeader generatorPublicKey */
-            generatorPublicKey?: (string|null);
-
-            /** BlockHeader blockSignature */
-            blockSignature?: (string|null);
-
-            /** BlockHeader transactions */
-            transactions?: (Uint8Array|null);
-        }
-
-        /** Represents a BlockHeader. */
-        class BlockHeader implements IBlockHeader {
-
-            /**
-             * Constructs a new BlockHeader.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: getBlocks.GetBlocksResponse.IBlockHeader);
-
-            /** BlockHeader id. */
-            public id: string;
-
-            /** BlockHeader version. */
-            public version: number;
-
-            /** BlockHeader timestamp. */
-            public timestamp: number;
-
-            /** BlockHeader previousBlock. */
-            public previousBlock: string;
-
-            /** BlockHeader height. */
-            public height: number;
-
-            /** BlockHeader numberOfTransactions. */
-            public numberOfTransactions: number;
-
-            /** BlockHeader totalAmount. */
-            public totalAmount: string;
-
-            /** BlockHeader totalFee. */
-            public totalFee: string;
-
-            /** BlockHeader reward. */
-            public reward: string;
-
-            /** BlockHeader payloadLength. */
-            public payloadLength: number;
-
-            /** BlockHeader payloadHash. */
-            public payloadHash: string;
-
-            /** BlockHeader generatorPublicKey. */
-            public generatorPublicKey: string;
-
-            /** BlockHeader blockSignature. */
-            public blockSignature: string;
-
-            /** BlockHeader transactions. */
-            public transactions: Uint8Array;
-
-            /**
-             * Creates a new BlockHeader instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns BlockHeader instance
-             */
-            public static create(properties?: getBlocks.GetBlocksResponse.IBlockHeader): getBlocks.GetBlocksResponse.BlockHeader;
-
-            /**
-             * Encodes the specified BlockHeader message. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
-             * @param message BlockHeader message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: getBlocks.GetBlocksResponse.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link getBlocks.GetBlocksResponse.BlockHeader.verify|verify} messages.
-             * @param message BlockHeader message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: getBlocks.GetBlocksResponse.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a BlockHeader message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns BlockHeader
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getBlocks.GetBlocksResponse.BlockHeader;
-
-            /**
-             * Decodes a BlockHeader message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns BlockHeader
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getBlocks.GetBlocksResponse.BlockHeader;
-
-            /**
-             * Verifies a BlockHeader message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a BlockHeader message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns BlockHeader
-             */
-            public static fromObject(object: { [k: string]: any }): getBlocks.GetBlocksResponse.BlockHeader;
-
-            /**
-             * Creates a plain object from a BlockHeader message. Also converts values to other types if specified.
-             * @param message BlockHeader
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: getBlocks.GetBlocksResponse.BlockHeader, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this BlockHeader to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for BlockHeader
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
     }
 }
 
@@ -2355,216 +2165,6 @@ export namespace getStatus {
                 public static getTypeUrl(typeUrlPrefix?: string): string;
             }
         }
-    }
-}
-
-/** Namespace postBlock. */
-export namespace postBlock {
-
-    /** Properties of a PostBlockRequest. */
-    interface IPostBlockRequest {
-
-        /** PostBlockRequest block */
-        block?: (Uint8Array|null);
-
-        /** PostBlockRequest headers */
-        headers?: (shared.IHeaders|null);
-    }
-
-    /** Represents a PostBlockRequest. */
-    class PostBlockRequest implements IPostBlockRequest {
-
-        /**
-         * Constructs a new PostBlockRequest.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: postBlock.IPostBlockRequest);
-
-        /** PostBlockRequest block. */
-        public block: Uint8Array;
-
-        /** PostBlockRequest headers. */
-        public headers?: (shared.IHeaders|null);
-
-        /**
-         * Creates a new PostBlockRequest instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostBlockRequest instance
-         */
-        public static create(properties?: postBlock.IPostBlockRequest): postBlock.PostBlockRequest;
-
-        /**
-         * Encodes the specified PostBlockRequest message. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
-         * @param message PostBlockRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: postBlock.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostBlockRequest message, length delimited. Does not implicitly {@link postBlock.PostBlockRequest.verify|verify} messages.
-         * @param message PostBlockRequest message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: postBlock.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postBlock.PostBlockRequest;
-
-        /**
-         * Decodes a PostBlockRequest message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostBlockRequest
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postBlock.PostBlockRequest;
-
-        /**
-         * Verifies a PostBlockRequest message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostBlockRequest message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostBlockRequest
-         */
-        public static fromObject(object: { [k: string]: any }): postBlock.PostBlockRequest;
-
-        /**
-         * Creates a plain object from a PostBlockRequest message. Also converts values to other types if specified.
-         * @param message PostBlockRequest
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: postBlock.PostBlockRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostBlockRequest to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PostBlockRequest
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    /** Properties of a PostBlockResponse. */
-    interface IPostBlockResponse {
-
-        /** PostBlockResponse status */
-        status?: (boolean|null);
-
-        /** PostBlockResponse height */
-        height?: (number|null);
-    }
-
-    /** Represents a PostBlockResponse. */
-    class PostBlockResponse implements IPostBlockResponse {
-
-        /**
-         * Constructs a new PostBlockResponse.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: postBlock.IPostBlockResponse);
-
-        /** PostBlockResponse status. */
-        public status: boolean;
-
-        /** PostBlockResponse height. */
-        public height: number;
-
-        /**
-         * Creates a new PostBlockResponse instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PostBlockResponse instance
-         */
-        public static create(properties?: postBlock.IPostBlockResponse): postBlock.PostBlockResponse;
-
-        /**
-         * Encodes the specified PostBlockResponse message. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
-         * @param message PostBlockResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: postBlock.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PostBlockResponse message, length delimited. Does not implicitly {@link postBlock.PostBlockResponse.verify|verify} messages.
-         * @param message PostBlockResponse message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: postBlock.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): postBlock.PostBlockResponse;
-
-        /**
-         * Decodes a PostBlockResponse message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PostBlockResponse
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): postBlock.PostBlockResponse;
-
-        /**
-         * Verifies a PostBlockResponse message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PostBlockResponse message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PostBlockResponse
-         */
-        public static fromObject(object: { [k: string]: any }): postBlock.PostBlockResponse;
-
-        /**
-         * Creates a plain object from a PostBlockResponse message. Also converts values to other types if specified.
-         * @param message PostBlockResponse
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: postBlock.PostBlockResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PostBlockResponse to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for PostBlockResponse
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 }
 

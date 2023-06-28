@@ -35,9 +35,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
-
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
 
@@ -173,55 +170,29 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return body.common;
 	}
 
-	public async getPeerBlocks(
+	public async getBlocks(
 		peer: Contracts.P2P.Peer,
-		{
-			fromBlockHeight,
-			blockLimit = constants.MAX_DOWNLOAD_BLOCKS,
-			headersOnly,
-		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
-	): Promise<Contracts.Crypto.IBlockData[]> {
-		const maxPayload = headersOnly ? blockLimit * Constants.Units.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
+		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
+	): Promise<Contracts.P2P.IGetBlocksResponse> {
+		const maxPayload = constants.DEFAULT_MAX_PAYLOAD;
 
-		const peerBlocks = await this.emit(
+		const result = await this.emit(
 			peer,
 			Routes.GetBlocks,
 			{
-				blockLimit,
-				headersOnly,
-				lastBlockHeight: fromBlockHeight,
-				serialized: true,
+				fromHeight,
+				limit,
 			},
 			this.configuration.getRequired<number>("getBlocksTimeout"),
 			maxPayload,
-			false,
+			false, //TODO: check why this is false
 		);
 
-		if (!peerBlocks || peerBlocks.length === 0) {
-			this.logger.debug(
-				`Peer ${peer.ip} did not return any blocks via height ${fromBlockHeight.toLocaleString()}.`,
-			);
-			return [];
+		if (result.blocks.length === 0) {
+			this.logger.debug(`Peer ${peer.ip} did not return any blocks via height ${fromHeight.toLocaleString()}.`);
 		}
 
-		for (const block of peerBlocks) {
-			if (headersOnly) {
-				// with headersOnly we still get block.transactions as empty array (protobuf deser) but in this case we actually
-				// don't want the transactions as a property at all (because it would make validation fail)
-				delete block.transactions;
-				continue;
-			}
-
-			for (let index = 0; index < block.transactions.length; index++) {
-				const { data } = await this.transactionFactory.fromBytes(Buffer.from(block.transactions[index], "hex"));
-				data.blockId = block.id;
-
-				block.transactions[index] = data;
-			}
-		}
-		this.configuration;
-
-		return peerBlocks;
+		return result;
 	}
 
 	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
