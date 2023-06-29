@@ -14,6 +14,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	#validators: Contracts.State.Wallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
+	public async initialize(): Promise<void> {
+		this.#init();
+	}
+
+	public async handleCommitBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {}
+
 	public getActiveValidators(): Contracts.State.Wallet[] {
 		if (this.#validators.length === 0) {
 			this.#init();
