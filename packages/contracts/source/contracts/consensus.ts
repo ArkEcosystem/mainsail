@@ -54,14 +54,9 @@ export interface IConsensusService {
 	getRound(): number;
 	getStep(): Step;
 	getState(): IConsensusState;
-	onProposal(roundState: IRoundState): Promise<void>;
-	onProposalLocked(roundState: IRoundState): Promise<void>;
-	onMajorityPrevote(roundState: IRoundState): Promise<void>;
-	onMajorityPrevoteAny(roundState: IRoundState): Promise<void>;
-	onMajorityPrevoteNull(roundState: IRoundState): Promise<void>;
-	onMajorityPrecommitAny(roundState: IProcessableUnit): Promise<void>;
-	onMajorityPrecommit(roundState: IProcessableUnit): Promise<void>;
-	onMinorityWithHigherRound(roundState: IProcessableUnit): Promise<void>;
+	handle(roundState: IRoundState): Promise<void>;
+	handleCommittedBlockState(committedBlockState: IProcessableUnit): Promise<void>;
+	onTimeoutStartRound(): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
@@ -97,7 +92,6 @@ export interface IBootstrapper {
 }
 
 export interface IHandler {
-	handle(roundState: IRoundState): Promise<void>;
 	onProposal(proposal: IProposal): Promise<void>;
 	onPrevote(prevote: IPrevote): Promise<void>;
 	onPrecommit(precommit: IPrecommit): Promise<void>;
@@ -105,10 +99,10 @@ export interface IHandler {
 }
 
 export interface IScheduler {
-	delayProposal(): Promise<void>;
-	scheduleTimeoutPropose(height: number, round: number): Promise<void>;
-	scheduleTimeoutPrevote(height: number, round: number): Promise<void>;
-	scheduleTimeoutPrecommit(height: number, round: number): Promise<void>;
+	scheduleTimeoutStartRound(): void;
+	scheduleTimeoutPropose(height: number, round: number): void;
+	scheduleTimeoutPrevote(height: number, round: number): void;
+	scheduleTimeoutPrecommit(height: number, round: number): void;
 	clear(): void;
 }
 

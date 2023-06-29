@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import dayjs from "dayjs";
-import delay from "delay";
 
 @injectable()
 export class Scheduler implements Contracts.Consensus.IScheduler {
@@ -14,22 +13,30 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
+	#timeoutStartRound?: NodeJS.Timeout;
 	#timeoutPropose?: NodeJS.Timeout;
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
 
-	public async delayProposal(): Promise<void> {
-		await delay(
-			Math.max(
-				0,
-				this.state.getLastBlock().data.timestamp -
-					dayjs().unix() +
-					this.cryptoConfiguration.getMilestone().blockTime,
-			),
+	public scheduleTimeoutStartRound(): void {
+		if (this.#timeoutStartRound) {
+			return;
+		}
+
+		const timeout = Math.max(
+			0,
+			this.state.getLastBlock().data.timestamp -
+				dayjs().unix() +
+				this.cryptoConfiguration.getMilestone().blockTime,
 		);
+
+		this.#timeoutStartRound = setTimeout(async () => {
+			await this.#getConsensus().onTimeoutStartRound();
+			this.#timeoutStartRound = undefined;
+		}, timeout);
 	}
 
-	public async scheduleTimeoutPropose(height: number, round: number): Promise<void> {
+	public scheduleTimeoutPropose(height: number, round: number): void {
 		if (this.#timeoutPropose) {
 			return;
 		}
@@ -40,7 +47,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 		}, this.#getTimeout(round));
 	}
 
-	public async scheduleTimeoutPrevote(height: number, round: number): Promise<void> {
+	public scheduleTimeoutPrevote(height: number, round: number): void {
 		if (this.#timeoutPrevote) {
 			return;
 		}
@@ -51,7 +58,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 		}, this.#getTimeout(round));
 	}
 
-	public async scheduleTimeoutPrecommit(height: number, round: number): Promise<void> {
+	public scheduleTimeoutPrecommit(height: number, round: number): void {
 		if (this.#timeoutPrecommit) {
 			return;
 		}
@@ -63,6 +70,11 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	}
 
 	public clear(): void {
+		if (this.#timeoutStartRound) {
+			clearTimeout(this.#timeoutStartRound);
+			this.#timeoutStartRound = undefined;
+		}
+
 		if (this.#timeoutPropose) {
 			clearTimeout(this.#timeoutPropose);
 			this.#timeoutPropose = undefined;
