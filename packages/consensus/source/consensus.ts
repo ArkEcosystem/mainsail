@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
@@ -47,6 +48,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
+
+	readonly #lock = new Utils.Lock();
 
 	public getHeight(): number {
 		return this.#height;
@@ -104,37 +107,41 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		await this.onProposal(roundState);
-		await this.onProposalLocked(roundState);
+		await this.#lock.runExclusive(async () => {
+			await this.onProposal(roundState);
+			await this.onProposalLocked(roundState);
 
-		if (roundState.hasMajorityPrevotes()) {
-			await this.onMajorityPrevote(roundState);
-		}
+			if (roundState.hasMajorityPrevotes()) {
+				await this.onMajorityPrevote(roundState);
+			}
 
-		if (roundState.hasMajorityPrevotesAny()) {
-			await this.onMajorityPrevoteAny(roundState);
-		}
+			if (roundState.hasMajorityPrevotesAny()) {
+				await this.onMajorityPrevoteAny(roundState);
+			}
 
-		if (roundState.hasMajorityPrevotesNull()) {
-			await this.onMajorityPrevoteNull(roundState);
-		}
+			if (roundState.hasMajorityPrevotesNull()) {
+				await this.onMajorityPrevoteNull(roundState);
+			}
 
-		if (roundState.hasMajorityPrecommitsAny()) {
-			await this.onMajorityPrecommitAny(roundState);
-		}
+			if (roundState.hasMajorityPrecommitsAny()) {
+				await this.onMajorityPrecommitAny(roundState);
+			}
 
-		if (roundState.hasMajorityPrecommits()) {
-			await this.onMajorityPrecommit(roundState);
-		}
+			if (roundState.hasMajorityPrecommits()) {
+				await this.onMajorityPrecommit(roundState);
+			}
 
-		if (roundState.hasMinorityPrevotesOrPrecommits()) {
-			await this.onMinorityWithHigherRound(roundState);
-		}
+			if (roundState.hasMinorityPrevotesOrPrecommits()) {
+				await this.onMinorityWithHigherRound(roundState);
+			}
+		});
 	}
 
 	// TODO: Check if can be joined with handle
 	async handleCommittedBlockState(committedBlockState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
-		await this.onMajorityPrecommit(committedBlockState);
+		await this.#lock.runExclusive(async () => {
+			await this.onMajorityPrecommit(committedBlockState);
+		});
 	}
 
 	public async startRound(round: number): Promise<void> {
@@ -336,29 +343,35 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onTimeoutPropose(height: number, round: number): Promise<void> {
-		if (this.#step !== Contracts.Consensus.Step.Propose || this.#height !== height || this.#round !== round) {
-			return;
-		}
+		await this.#lock.runExclusive(async () => {
+			if (this.#step !== Contracts.Consensus.Step.Propose || this.#height !== height || this.#round !== round) {
+				return;
+			}
 
-		this.#step = Contracts.Consensus.Step.Prevote;
-		await this.#prevote();
+			this.#step = Contracts.Consensus.Step.Prevote;
+			await this.#prevote();
+		});
 	}
 
 	public async onTimeoutPrevote(height: number, round: number): Promise<void> {
-		if (this.#step !== Contracts.Consensus.Step.Prevote || this.#height !== height || this.#round !== round) {
-			return;
-		}
+		await this.#lock.runExclusive(async () => {
+			if (this.#step !== Contracts.Consensus.Step.Prevote || this.#height !== height || this.#round !== round) {
+				return;
+			}
 
-		this.#step = Contracts.Consensus.Step.Precommit;
-		await this.#precommit();
+			this.#step = Contracts.Consensus.Step.Precommit;
+			await this.#precommit();
+		});
 	}
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {
-		if (this.#height !== height || this.#round !== round) {
-			return;
-		}
+		await this.#lock.runExclusive(async () => {
+			if (this.#height !== height || this.#round !== round) {
+				return;
+			}
 
-		await this.startRound(this.#round + 1);
+			await this.startRound(this.#round + 1);
+		});
 	}
 
 	#isInvalidRoundState(roundState: Contracts.BlockProcessor.IProcessableUnit): boolean {
@@ -391,8 +404,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const proposal = await proposer.propose(this.#height, this.#round, block, lockProof, this.#validRound);
 
-		await this.broadcaster.broadcastProposal(proposal);
-		await this.handler.onProposal(proposal);
+		void this.broadcaster.broadcastProposal(proposal);
+		void this.handler.onProposal(proposal);
 	}
 
 	async #prevote(value?: string): Promise<void> {
@@ -404,8 +417,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const prevote = await validator.prevote(this.#height, this.#round, value);
 
-			await this.broadcaster.broadcastPrevote(prevote);
-			await this.handler.onPrevote(prevote);
+			void this.broadcaster.broadcastPrevote(prevote);
+			void this.handler.onPrevote(prevote);
 		}
 
 		await this.#saveState();
@@ -420,8 +433,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
-			await this.broadcaster.broadcastPrecommit(precommit);
-			await this.handler.onPrecommit(precommit);
+			void this.broadcaster.broadcastPrecommit(precommit);
+			void this.handler.onPrecommit(precommit);
 		}
 
 		await this.#saveState();
