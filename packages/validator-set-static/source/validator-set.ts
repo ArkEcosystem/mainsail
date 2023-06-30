@@ -18,7 +18,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#init();
 	}
 
-	public async handleCommitBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> { }
+	public async handleCommitBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {}
 
 	public async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
 		if (this.#validators.length === 0) {

@@ -60,13 +60,23 @@ describe<{
 		context.sandbox.app.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
-		context.sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
-		context.sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.Cryptography.Identity.AddressFactory)
+			.to(AddressFactory)
+			.inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.to(KeyPairFactory)
+			.inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.Cryptography.Identity.PublicKeyFactory)
+			.to(PublicKeyFactory)
+			.inSingletonScope();
 
 		registerIndexers(context.sandbox.app);
 
-		context.sandbox.app.bind(Identifiers.WalletRepository)
+		context.sandbox.app
+			.bind(Identifiers.WalletRepository)
 			.to(Wallets.WalletRepository)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
@@ -89,10 +99,11 @@ describe<{
 			5,
 			context.walletRepository,
 		);
-
 	});
 
-	it.skip("buildValidatorRanking - should build ranking and sort validators by vote balance", async ({ validatorSet }) => {
+	it.skip("buildValidatorRanking - should build ranking and sort validators by vote balance", async ({
+		validatorSet,
+	}) => {
 		validatorSet.buildValidatorRanking();
 
 		const validators = await validatorSet.getActiveValidators();
@@ -118,7 +129,9 @@ describe<{
 
 		let currentHeight = 1;
 		for (let i = 0; i < activeValidators; i++) {
-			await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+			await validatorSet.handleCommitBlock({
+				commit: { height: currentHeight },
+			} as Contracts.Crypto.ICommittedBlock);
 			assert.true(buildValidatorRankingSpy.notCalled);
 			currentHeight++;
 		}
@@ -133,7 +146,9 @@ describe<{
 
 		// Simulate another round
 		for (let i = 0; i < activeValidators - 1; i++) {
-			await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+			await validatorSet.handleCommitBlock({
+				commit: { height: currentHeight },
+			} as Contracts.Crypto.ICommittedBlock);
 			assert.true(buildValidatorRankingSpy.notCalled);
 			currentHeight++;
 		}
