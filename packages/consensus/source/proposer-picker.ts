@@ -10,12 +10,28 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	public async getValidatorIndex(round: number): Promise<number> {
-		const seed = await this.#calculateSeed(round);
+	#firstValidatorIndex: number = 0;
 
+	public async handleCommittedBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		const { activeValidators } = this.configuration.getMilestone();
+		if (block.commit.height % activeValidators !== 0) {
+			return;
+		}
+
+		// Calculate a random validator starting index for the next 'activeValidators' rounds.
+		const seed = await this.#calculateSeed(block.commit.height);
 		const rng = seedrandom(seed);
-		return Math.floor(rng() * (activeValidators - 1));
+		this.#firstValidatorIndex = Math.floor(rng() * (activeValidators - 1));
+	}
+
+	public async getValidatorIndex(round: number): Promise<number> {
+		const totalRound = await this.#getTotalRound(round);
+		const { activeValidators } = this.configuration.getMilestone();
+
+		// On each round, move from the first index by offset with wrap around
+		// to traverse all active validators once each.
+		const offset = totalRound % activeValidators;
+		return (this.#firstValidatorIndex + offset) % activeValidators;
 	}
 
 	async #calculateSeed(round: number): Promise<string> {

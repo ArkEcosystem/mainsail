@@ -107,6 +107,7 @@ export interface IScheduler {
 }
 
 export interface IProposerPicker {
+	handleCommittedBlock(block: ICommittedBlock): Promise<void>
 	getValidatorIndex(round: number): Promise<number>;
 }
 
