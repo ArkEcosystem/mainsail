@@ -481,12 +481,12 @@ importers:
       delay:
         specifier: 5.0.0
         version: 5.0.0
-      seedrandom:
-        specifier: ^3.0.5
-        version: 3.0.5
       lmdb:
         specifier: 2.4.2
         version: 2.4.2
+      seedrandom:
+        specifier: ^3.0.5
+        version: 3.0.5
     devDependencies:
       '@mainsail/test-framework':
         specifier: workspace:*
@@ -2720,6 +2720,37 @@ importers:
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/validator-set-vote-weighted:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      delay:
+        specifier: 5.0.0
+        version: 5.0.0
+    devDependencies:
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
+      '@types/sinon':
+        specifier: ^10.0.14
+        version: 10.0.14
+      sinon:
+        specifier: ^15.0.4
+        version: 15.0.4
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
