@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
 
 import { Wallets } from "../../state";
@@ -105,5 +105,42 @@ describe<{
 			assert.equal(validator.getAttribute<number>("validator.rank"), index + 1);
 			assert.equal(validator.getAttribute<Utils.BigNumber>("validator.voteBalance"), total);
 		}
+	});
+
+	it("handleCommitBlock - should update ranking every full round", async ({ cryptoConfiguration, validatorSet }) => {
+		const buildValidatorRankingSpy = spy(validatorSet, "buildValidatorRanking");
+
+		const { activeValidators } = cryptoConfiguration.getMilestone();
+
+		await validatorSet.handleCommitBlock({ commit: { height: 1 } } as Contracts.Crypto.ICommittedBlock);
+
+		assert.true(buildValidatorRankingSpy.notCalled);
+
+		let currentHeight = 1;
+		for (let i = 0; i < activeValidators; i++) {
+			await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+			assert.true(buildValidatorRankingSpy.notCalled);
+			currentHeight++;
+		}
+
+		// Called first time after activeValidators + 1 heights (since genesisBlock accounts for the first one)
+		assert.equal(currentHeight, 6);
+		await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+		assert.true(buildValidatorRankingSpy.calledOnce);
+		currentHeight++;
+
+		buildValidatorRankingSpy.resetHistory();
+
+		// Simulate another round
+		for (let i = 0; i < activeValidators - 1; i++) {
+			await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+			assert.true(buildValidatorRankingSpy.notCalled);
+			currentHeight++;
+		}
+
+		// Called again after another round
+		assert.equal(currentHeight, 11);
+		await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+		assert.true(buildValidatorRankingSpy.calledOnce);
 	});
 });

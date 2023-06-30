@@ -19,6 +19,18 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.buildValidatorRanking();
 	}
 
+	public async handleCommitBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {
+		const { activeValidators } = this.cryptoConfiguration.getMilestone();
+
+		// Update ranking every `activeValidators` blocks.
+		// Height is reduced by 1 to take the genesis block into account or otherwise
+		// the first 'round' would only cover `activeValidators - 1` blocks.
+		const height = block.commit.height - 1;
+		if (height > 1 && height % activeValidators === 0) {
+			this.buildValidatorRanking();
+		}
+	}
+
 	public async getActiveValidators(): Promise<Contracts.State.Wallet[]> {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 		return this.#validators.slice(0, activeValidators);
@@ -53,7 +65,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		}
 	}
 
-	// TODO: call when new "round" starts (maybe via trigger)
 	public buildValidatorRanking(): void {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
