@@ -12,9 +12,11 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 
 	#firstValidatorIndex: number = 0;
 
+	get firstValidatorIndex(): number { return this.#firstValidatorIndex };
+
 	public async handleCommittedBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		const { activeValidators } = this.configuration.getMilestone();
-		if (block.commit.height % activeValidators !== 0) {
+		if (block.commit.height === 1 || (block.commit.height - 1) % activeValidators !== 0) {
 			return;
 		}
 
@@ -27,10 +29,9 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	public async getValidatorIndex(round: number): Promise<number> {
 		const totalRound = await this.#getTotalRound(round);
 		const { activeValidators } = this.configuration.getMilestone();
-
 		// On each round, move from the first index by offset with wrap around
 		// to traverse all active validators once each.
-		const offset = totalRound % activeValidators;
+		const offset = (totalRound - 1) % activeValidators;
 		return (this.#firstValidatorIndex + offset) % activeValidators;
 	}
 
