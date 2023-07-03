@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Downloader } from "./downloader";
-import { Peer } from "./peer";
 
 export interface CompareResponse {
 	downloadBlocks?: true;
@@ -40,7 +39,7 @@ export class Header implements Contracts.P2P.IHeader {
 		};
 	}
 
-	public async handle(peer: Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
+	public async handle(peer: Contracts.P2P.Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
 		const result = await this.#compare(header);
 
 		const downloader = this.app.resolve<Downloader>(Downloader);

@@ -26,7 +26,16 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public verificationResult: PeerVerificationResult | undefined;
 
-	public state?: Contracts.P2P.IHeaderData = {};
+	public state: Contracts.P2P.IHeaderData = {
+		height: 0,
+		// eslint-disable-next-line unicorn/no-null
+		proposedBlockId: null,
+		round: 0,
+		step: 0,
+		validatorsSignedPrecommit: [],
+		validatorsSignedPrevote: [],
+		version: "",
+	};
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
 
