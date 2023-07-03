@@ -73,7 +73,6 @@ describe<{
 
 	it("#toBroadcast - should return a Contracts.P2P.PeerBroadcast object for peer properties", ({ peer }) => {
 		peer.version = "3.0.1";
-		peer.state.height = 19;
 		peer.latency = 135;
 
 		const expectedBroadcast: Contracts.P2P.PeerBroadcast = {

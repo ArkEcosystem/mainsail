@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../../test-framework";
 
+import { describe, Sandbox } from "../../../test-framework";
 import { ValidateAndAcceptPeerAction } from "./validate-and-accept-peer";
 
 describe<{
@@ -20,12 +20,11 @@ describe<{
 	it("#execute - should call peerProcessor.validateAndAcceptPeer with arguments provided", async ({ action }) => {
 		const spyValidateAndAcceptPeer = spy(peerProcessor, "validateAndAcceptPeer");
 
-		const peer = { ip: "187.165.33.2", port: 4000 };
 		const options = { someParam: 1 };
 
-		await action.execute({ options, peer });
+		await action.execute({ ip: "187.165.33.2", options });
 
 		spyValidateAndAcceptPeer.calledOnce();
-		spyValidateAndAcceptPeer.calledWith(peer, options);
+		spyValidateAndAcceptPeer.calledWith("187.165.33.2", options);
 	});
 });

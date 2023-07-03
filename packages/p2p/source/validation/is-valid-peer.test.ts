@@ -1,7 +1,7 @@
 import os from "os";
 
 import { describe } from "../../../test-framework";
-import { isLocalHost, isValidPeer } from "./is-valid-peer";
+import { isLocalHost, isValidPeerIp } from "./is-valid-peer";
 
 describe("isValidPeer", ({ it, assert }) => {
 	it("#isLocalHost - should be ok for 127.0.0.1", () => {
@@ -34,31 +34,28 @@ describe("isValidPeer", ({ it, assert }) => {
 		assert.false(isLocalHost("garbage", false));
 	});
 
-	it("#isValidPeer - should not be ok for 127.0.0.1", () => {
-		assert.false(isValidPeer({ ip: "127.0.0.1" }));
+	it("#isValidPeerIp - should not be ok for 127.0.0.1", () => {
+		assert.false(isValidPeerIp("127.0.0.1"));
 	});
 
-	it("#isValidPeer - should not be ok for ::ffff:127.0.0.1", () => {
-		const peer = { ip: "::ffff:127.0.0.1" };
-		assert.false(isValidPeer(peer));
+	it("#isValidPeerIp - should not be ok for ::ffff:127.0.0.1", () => {
+		assert.false(isValidPeerIp("::ffff:127.0.0.1"));
 	});
 
-	it("#isValidPeer - should not be ok for 0.0.0.0", () => {
-		assert.false(isValidPeer({ ip: "0.0.0.0" }));
+	it("#isValidPeerIp - should not be ok for 0.0.0.0", () => {
+		assert.false(isValidPeerIp("0.0.0.0"));
 	});
 
-	it("#isValidPeer - should not be ok for ::1", () => {
-		const peer = { ip: "::1" };
-		assert.false(isValidPeer(peer));
+	it("#isValidPeerIp - should not be ok for ::1", () => {
+		assert.false(isValidPeerIp("::1"));
 	});
 
-	it("#isValidPeer - should not be ok for 2130706433", () => {
-		const peer = { ip: "2130706433" };
-		assert.false(isValidPeer(peer));
+	it("#isValidPeerIp - should not be ok for 2130706433", () => {
+		assert.false(isValidPeerIp("2130706433"));
 	});
 
-	it("#isValidPeer - should not be ok for garbage", () => {
-		assert.false(isValidPeer({ ip: "garbage" }));
+	it("#isValidPeerIp - should not be ok for garbage", () => {
+		assert.false(isValidPeerIp("garbage"));
 	});
 
 	it("should not be ok for LAN addresses", () => {
@@ -71,17 +68,17 @@ describe("isValidPeer", ({ it, assert }) => {
 		}
 
 		for (const ipAddress of addresses) {
-			assert.false(isValidPeer({ ip: ipAddress }));
+			assert.false(isValidPeerIp(ipAddress));
 		}
 	});
 
-	it("#isValidPeer - should be true", () => {
-		assert.true(isValidPeer({ ip: "192.168.178.0" }));
-		assert.true(isValidPeer({ ip: "5.196.105.32" }));
+	it("#isValidPeerIp - should be true", () => {
+		assert.true(isValidPeerIp("192.168.178.0"));
+		assert.true(isValidPeerIp("5.196.105.32"));
 	});
 
-	it("#isValidPeer - should be false", () => {
-		assert.false(isValidPeer({ ip: "127.0.0.1" }));
-		assert.false(isValidPeer({ ip: "test" }));
+	it("#isValidPeerIp - should be false", () => {
+		assert.false(isValidPeerIp("127.0.0.1"));
+		assert.false(isValidPeerIp("test"));
 	});
 });

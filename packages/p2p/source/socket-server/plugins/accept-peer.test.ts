@@ -78,6 +78,6 @@ describe<{
 		assert.equal(JSON.parse(responseValid.payload), responsePayload);
 		assert.equal(responseValid.statusCode, 200);
 		spyPeerProcessor.calledOnce();
-		spyPeerProcessor.calledWith({ ip: remoteAddress });
+		spyPeerProcessor.calledWith(remoteAddress);
 	});
 });
