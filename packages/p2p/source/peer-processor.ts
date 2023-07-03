@@ -48,38 +48,38 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		peer: Contracts.P2P.Peer,
 		options: Contracts.P2P.AcceptNewPeerOptions = {},
 	): Promise<void> {
-		if (this.validatePeerIp(peer, options)) {
-			await this.#acceptNewPeer(peer, options);
+		if (this.validatePeerIp(peer.ip, options)) {
+			await this.#acceptNewPeer(peer.ip, options);
 		}
 	}
 
-	public validatePeerIp(peer, options: Contracts.P2P.AcceptNewPeerOptions = {}): boolean {
+	public validatePeerIp(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): boolean {
 		if (this.configuration.get("disableDiscovery")) {
-			this.logger.warning(`Rejected ${peer.ip} because the relay is in non-discovery mode.`);
+			this.logger.warning(`Rejected ${ip} because the relay is in non-discovery mode.`);
 
 			return false;
 		}
 
-		if (!isValidPeer(peer) || this.repository.hasPendingPeer(peer.ip)) {
+		if (!isValidPeer(ip) || this.repository.hasPendingPeer(ip)) {
 			return false;
 		}
 
 		// Is Whitelisted
-		if (!KernelUtils.isWhitelisted(this.configuration.getRequired("whitelist"), peer.ip)) {
+		if (!KernelUtils.isWhitelisted(this.configuration.getRequired("whitelist"), ip)) {
 			return false;
 		}
 
 		// Is Blacklisted
-		if (KernelUtils.isBlacklisted(this.configuration.getRequired("blacklist"), peer.ip)) {
+		if (KernelUtils.isBlacklisted(this.configuration.getRequired("blacklist"), ip)) {
 			return false;
 		}
 
 		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
 
-		if (this.repository.getSameSubnetPeers(peer.ip).length >= maxSameSubnetPeers && !options.seed) {
+		if (this.repository.getSameSubnetPeers(ip).length >= maxSameSubnetPeers && !options.seed) {
 			if (process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
 				this.logger.warning(
-					`Rejected ${peer.ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
+					`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
 				);
 			}
 
@@ -97,30 +97,30 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		await this.events.dispatch(Enums.PeerEvent.Removed, peer);
 	}
 
-	async #acceptNewPeer(peer, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
-		if (this.repository.hasPeer(peer.ip)) {
+	async #acceptNewPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
+		if (this.repository.hasPeer(ip)) {
 			return;
 		}
 
-		const newPeer: Contracts.P2P.Peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(peer.ip);
+		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(ip);
 
 		try {
 			this.repository.setPendingPeer(peer);
 
 			const verifyTimeout = this.configuration.getRequired<number>("verifyTimeout");
 
-			await this.communicator.ping(newPeer, verifyTimeout);
+			await this.communicator.ping(peer, verifyTimeout);
 
-			this.repository.setPeer(newPeer);
+			this.repository.setPeer(peer);
 
 			if (!options.lessVerbose || process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
-				this.logger.debug(`Accepted new peer ${newPeer.ip}:${newPeer.port} (v${newPeer.version})`);
+				this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 			}
 
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(Enums.PeerEvent.Added, newPeer);
+			this.events.dispatch(Enums.PeerEvent.Added, peer);
 		} catch {
-			this.connector.disconnect(newPeer);
+			this.connector.disconnect(peer);
 		} finally {
 			this.repository.forgetPendingPeer(peer);
 		}

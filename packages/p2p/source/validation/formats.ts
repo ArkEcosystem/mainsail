@@ -7,7 +7,7 @@ export const makeFormats = () => {
 		type: "string",
 		validate: (ip: string) => {
 			try {
-				return isValidPeer({ ip }, false);
+				return isValidPeer(ip, false);
 			} catch {
 				return false;
 			}

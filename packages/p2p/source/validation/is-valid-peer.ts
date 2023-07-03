@@ -24,19 +24,17 @@ export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolea
 	return false;
 };
 
-export const isValidPeer = (
-	peer: { ip: string; status?: string | number },
-	includeNetworkInterfaces = true,
-): boolean => {
-	const sanitizedAddress: string | undefined = sanitizeRemoteAddress(peer.ip);
+// TODO: Return sanitized address
+export const isValidPeer = (ip: string, includeNetworkInterfaces = true): boolean => {
+	const sanitizedAddress: string | undefined = sanitizeRemoteAddress(ip);
 
 	if (!sanitizedAddress) {
 		return false;
 	}
 
-	peer.ip = sanitizedAddress;
+	ip = sanitizedAddress;
 
-	if (isLocalHost(peer.ip, includeNetworkInterfaces)) {
+	if (isLocalHost(ip, includeNetworkInterfaces)) {
 		return false;
 	}
 
