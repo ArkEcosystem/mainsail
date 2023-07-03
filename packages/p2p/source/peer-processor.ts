@@ -3,7 +3,7 @@ import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Utils as KernelUtils } from "@mainsail/kernel";
 
 import { isValidVersion } from "./utils";
-import { isValidPeer } from "./validation";
+import { isValidPeerIp } from "./validation";
 
 // @TODO review the implementation
 @injectable()
@@ -57,7 +57,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		if (!isValidPeer(ip) || this.repository.hasPendingPeer(ip)) {
+		if (!isValidPeerIp(ip) || this.repository.hasPendingPeer(ip)) {
 			return false;
 		}
 

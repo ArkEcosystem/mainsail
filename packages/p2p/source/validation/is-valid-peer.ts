@@ -24,15 +24,12 @@ export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolea
 	return false;
 };
 
-// TODO: Return sanitized address
-export const isValidPeer = (ip: string, includeNetworkInterfaces = true): boolean => {
+export const isValidPeerIp = (ip: string, includeNetworkInterfaces = true): boolean => {
 	const sanitizedAddress: string | undefined = sanitizeRemoteAddress(ip);
 
 	if (!sanitizedAddress) {
 		return false;
 	}
-
-	ip = sanitizedAddress;
 
 	if (isLocalHost(ip, includeNetworkInterfaces)) {
 		return false;
