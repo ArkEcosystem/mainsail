@@ -31,7 +31,7 @@ export const isValidPeerIp = (ip: string, includeNetworkInterfaces = true): bool
 		return false;
 	}
 
-	if (isLocalHost(ip, includeNetworkInterfaces)) {
+	if (isLocalHost(sanitizedAddress, includeNetworkInterfaces)) {
 		return false;
 	}
 
