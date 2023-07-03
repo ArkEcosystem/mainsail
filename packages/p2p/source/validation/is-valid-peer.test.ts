@@ -35,30 +35,27 @@ describe("isValidPeer", ({ it, assert }) => {
 	});
 
 	it("#isValidPeer - should not be ok for 127.0.0.1", () => {
-		assert.false(isValidPeer({ ip: "127.0.0.1" }));
+		assert.false(isValidPeer("127.0.0.1"));
 	});
 
 	it("#isValidPeer - should not be ok for ::ffff:127.0.0.1", () => {
-		const peer = { ip: "::ffff:127.0.0.1" };
-		assert.false(isValidPeer(peer));
+		assert.false(isValidPeer("::ffff:127.0.0.1"));
 	});
 
 	it("#isValidPeer - should not be ok for 0.0.0.0", () => {
-		assert.false(isValidPeer({ ip: "0.0.0.0" }));
+		assert.false(isValidPeer("0.0.0.0"));
 	});
 
 	it("#isValidPeer - should not be ok for ::1", () => {
-		const peer = { ip: "::1" };
-		assert.false(isValidPeer(peer));
+		assert.false(isValidPeer("::1"));
 	});
 
 	it("#isValidPeer - should not be ok for 2130706433", () => {
-		const peer = { ip: "2130706433" };
-		assert.false(isValidPeer(peer));
+		assert.false(isValidPeer("2130706433"));
 	});
 
 	it("#isValidPeer - should not be ok for garbage", () => {
-		assert.false(isValidPeer({ ip: "garbage" }));
+		assert.false(isValidPeer("garbage"));
 	});
 
 	it("should not be ok for LAN addresses", () => {
@@ -71,17 +68,17 @@ describe("isValidPeer", ({ it, assert }) => {
 		}
 
 		for (const ipAddress of addresses) {
-			assert.false(isValidPeer({ ip: ipAddress }));
+			assert.false(isValidPeer(ipAddress));
 		}
 	});
 
 	it("#isValidPeer - should be true", () => {
-		assert.true(isValidPeer({ ip: "192.168.178.0" }));
-		assert.true(isValidPeer({ ip: "5.196.105.32" }));
+		assert.true(isValidPeer("192.168.178.0"));
+		assert.true(isValidPeer("5.196.105.32"));
 	});
 
 	it("#isValidPeer - should be false", () => {
-		assert.false(isValidPeer({ ip: "127.0.0.1" }));
-		assert.false(isValidPeer({ ip: "test" }));
+		assert.false(isValidPeer("127.0.0.1"));
+		assert.false(isValidPeer("test"));
 	});
 });
