@@ -16,11 +16,8 @@ export class AcceptPeerPlugin {
 
 		server.ext({
 			async method(request, h) {
-				const peerIp = request.socket ? getPeerIp(request.socket) : request.info.remoteAddress;
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				peerProcessor.validateAndAcceptPeer({
-					ip: peerIp,
-				} as Contracts.P2P.Peer);
+				const ip = request.socket ? getPeerIp(request.socket) : request.info.remoteAddress;
+				void peerProcessor.validateAndAcceptPeer(ip);
 
 				return h.continue;
 			},

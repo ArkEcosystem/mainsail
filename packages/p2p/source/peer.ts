@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Types } from "@mainsail/kernel";
+import { Types, Utils } from "@mainsail/kernel";
 import dayjs, { Dayjs } from "dayjs";
 
 import { PeerVerificationResult } from "./peer-verifier";
@@ -26,12 +26,9 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public verificationResult: PeerVerificationResult | undefined;
 
-	public state: Contracts.P2P.PeerState = {
-		header: {},
-		height: undefined,
-	};
-
 	public plugins: Contracts.P2P.PeerPlugins = {};
+
+	#state: Contracts.P2P.IHeaderData | undefined;
 
 	#transactionsQueue!: Contracts.Kernel.Queue;
 
@@ -44,6 +41,17 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public get url(): string {
 		return `${this.port % 443 === 0 ? "https://" : "http://"}${this.ip}:${this.port}`;
+	}
+
+	public get state(): Contracts.P2P.IHeaderData {
+		// State can be undefined when the peer is not yet verified.
+		Utils.assert.defined<Contracts.P2P.IHeaderData>(this.#state);
+
+		return this.#state;
+	}
+
+	public set state(state: Contracts.P2P.IHeaderData) {
+		this.#state = state;
 	}
 
 	public isVerified(): boolean {

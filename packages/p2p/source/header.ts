@@ -40,6 +40,8 @@ export class Header implements Contracts.P2P.IHeader {
 	}
 
 	public async handle(peer: Contracts.P2P.Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
+		peer.state = header;
+
 		const result = await this.#compare(header);
 
 		const downloader = this.app.resolve<Downloader>(Downloader);

@@ -123,7 +123,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		peer.lastPinged = dayjs();
-		peer.state = pingResponse.state;
+		// TODO: Update state
+		// peer.state = pingResponse.state;
 		peer.plugins = pingResponse.config.plugins;
 
 		return pingResponse.state;
