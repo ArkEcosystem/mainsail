@@ -1,3 +1,4 @@
+import { ResponseToolkit } from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
@@ -13,8 +14,11 @@ export class HeaderIncludePlugin {
 		const header = this.header;
 
 		server.ext({
-			async method(request, h) {
-				request.response.headers = await header.getHeader();
+			async method(request, h: ResponseToolkit) {
+				request.response.source = {
+					...request.response.source,
+					headers: await header.getHeader(),
+				};
 
 				return h.continue;
 			},
