@@ -54,6 +54,7 @@ message GetStatusResponse {
         map<string, Plugin> plugins = 3;
     }
 
-    State state = 1;
-    Config config = 2;
+	shared.Headers headers = 1;
+    State state = 2;
+    Config config = 3;
 }

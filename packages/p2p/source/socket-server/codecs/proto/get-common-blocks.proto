@@ -13,5 +13,6 @@ message GetCommonBlocksResponse {
         string id = 2;
     }
 
-    Common common = 1;
+	shared.Headers headers = 1;
+    Common common = 2;
 }

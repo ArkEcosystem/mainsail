@@ -12,5 +12,6 @@ message GetPeersResponse {
         uint32 port = 2;
     }
 
-    repeated Peer peers = 1;
+	shared.Headers headers = 1;
+    repeated Peer peers = 2;
 }

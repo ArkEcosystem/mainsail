@@ -9,5 +9,6 @@ message GetBlocksRequest {
 }
 
 message GetBlocksResponse {
-    repeated string blocks = 1;
+	shared.Headers headers = 1;
+    repeated string blocks = 2;
 }

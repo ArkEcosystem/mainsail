@@ -8,5 +8,6 @@ message PostTransactionsRequest {
 }
 
 message PostTransactionsResponse {
-    repeated string accept = 1;
+	shared.Headers headers = 1;
+    repeated string accept = 2;
 }
