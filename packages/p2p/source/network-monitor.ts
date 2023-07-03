@@ -204,7 +204,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 				theirPeers.map((p) =>
 					this.app
 						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-						.call("validateAndAcceptPeer", { options: { lessVerbose: true }, peer: p }),
+						.call("validateAndAcceptPeer", { ip: p.ip, options: { lessVerbose: true } }),
 				),
 			);
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -381,7 +381,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 				return this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("validateAndAcceptPeer", { options: { lessVerbose: true, seed: true }, peer });
+					.call("validateAndAcceptPeer", { ip: peer.ip, options: { lessVerbose: true, seed: true } });
 			}),
 		);
 	}
