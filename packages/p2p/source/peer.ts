@@ -26,10 +26,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public verificationResult: PeerVerificationResult | undefined;
 
-	public state: Contracts.P2P.PeerState = {
-		header: {},
-		height: undefined,
-	};
+	public state?: Contracts.P2P.IHeaderData = {};
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
 
