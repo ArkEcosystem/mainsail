@@ -7,4 +7,6 @@ message PostPrevoteRequest {
     shared.Headers headers = 2;
 }
 
-message PostPrevoteResponse {}
+message PostPrevoteResponse {
+	shared.Headers headers = 1;
+}

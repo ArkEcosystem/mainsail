@@ -279,6 +279,7 @@ $root.getBlocks = (function() {
          * Properties of a GetBlocksResponse.
          * @memberof getBlocks
          * @interface IGetBlocksResponse
+         * @property {shared.IHeaders|null} [headers] GetBlocksResponse headers
          * @property {Array.<string>|null} [blocks] GetBlocksResponse blocks
          */
 
@@ -297,6 +298,14 @@ $root.getBlocks = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * GetBlocksResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getBlocks.GetBlocksResponse
+         * @instance
+         */
+        GetBlocksResponse.prototype.headers = null;
 
         /**
          * GetBlocksResponse blocks.
@@ -330,9 +339,11 @@ $root.getBlocks = (function() {
         GetBlocksResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.blocks != null && message.blocks.length)
                 for (var i = 0; i < message.blocks.length; ++i)
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.blocks[i]);
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.blocks[i]);
             return writer;
         };
 
@@ -368,6 +379,10 @@ $root.getBlocks = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
                         if (!(message.blocks && message.blocks.length))
                             message.blocks = [];
                         message.blocks.push(reader.string());
@@ -408,6 +423,11 @@ $root.getBlocks = (function() {
         GetBlocksResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             if (message.blocks != null && message.hasOwnProperty("blocks")) {
                 if (!Array.isArray(message.blocks))
                     return "blocks: array expected";
@@ -430,6 +450,11 @@ $root.getBlocks = (function() {
             if (object instanceof $root.getBlocks.GetBlocksResponse)
                 return object;
             var message = new $root.getBlocks.GetBlocksResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getBlocks.GetBlocksResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
             if (object.blocks) {
                 if (!Array.isArray(object.blocks))
                     throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
@@ -455,6 +480,10 @@ $root.getBlocks = (function() {
             var object = {};
             if (options.arrays || options.defaults)
                 object.blocks = [];
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.blocks && message.blocks.length) {
                 object.blocks = [];
                 for (var j = 0; j < message.blocks.length; ++j)
@@ -758,6 +787,7 @@ $root.getCommonBlocks = (function() {
          * Properties of a GetCommonBlocksResponse.
          * @memberof getCommonBlocks
          * @interface IGetCommonBlocksResponse
+         * @property {shared.IHeaders|null} [headers] GetCommonBlocksResponse headers
          * @property {getCommonBlocks.GetCommonBlocksResponse.ICommon|null} [common] GetCommonBlocksResponse common
          */
 
@@ -775,6 +805,14 @@ $root.getCommonBlocks = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * GetCommonBlocksResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getCommonBlocks.GetCommonBlocksResponse
+         * @instance
+         */
+        GetCommonBlocksResponse.prototype.headers = null;
 
         /**
          * GetCommonBlocksResponse common.
@@ -808,8 +846,10 @@ $root.getCommonBlocks = (function() {
         GetCommonBlocksResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.common != null && Object.hasOwnProperty.call(message, "common"))
-                $root.getCommonBlocks.GetCommonBlocksResponse.Common.encode(message.common, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                $root.getCommonBlocks.GetCommonBlocksResponse.Common.encode(message.common, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
@@ -845,6 +885,10 @@ $root.getCommonBlocks = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
                         message.common = $root.getCommonBlocks.GetCommonBlocksResponse.Common.decode(reader, reader.uint32());
                         break;
                     }
@@ -883,6 +927,11 @@ $root.getCommonBlocks = (function() {
         GetCommonBlocksResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             if (message.common != null && message.hasOwnProperty("common")) {
                 var error = $root.getCommonBlocks.GetCommonBlocksResponse.Common.verify(message.common);
                 if (error)
@@ -903,6 +952,11 @@ $root.getCommonBlocks = (function() {
             if (object instanceof $root.getCommonBlocks.GetCommonBlocksResponse)
                 return object;
             var message = new $root.getCommonBlocks.GetCommonBlocksResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getCommonBlocks.GetCommonBlocksResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
             if (object.common != null) {
                 if (typeof object.common !== "object")
                     throw TypeError(".getCommonBlocks.GetCommonBlocksResponse.common: object expected");
@@ -924,8 +978,12 @@ $root.getCommonBlocks = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
+                object.headers = null;
                 object.common = null;
+            }
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.common != null && message.hasOwnProperty("common"))
                 object.common = $root.getCommonBlocks.GetCommonBlocksResponse.Common.toObject(message.common, options);
             return object;
@@ -1413,6 +1471,7 @@ $root.getMessages = (function() {
          * Properties of a GetMessagesResponse.
          * @memberof getMessages
          * @interface IGetMessagesResponse
+         * @property {shared.IHeaders|null} [headers] GetMessagesResponse headers
          * @property {Array.<string>|null} [prevotes] GetMessagesResponse prevotes
          * @property {Array.<string>|null} [precommits] GetMessagesResponse precommits
          */
@@ -1433,6 +1492,14 @@ $root.getMessages = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * GetMessagesResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getMessages.GetMessagesResponse
+         * @instance
+         */
+        GetMessagesResponse.prototype.headers = null;
 
         /**
          * GetMessagesResponse prevotes.
@@ -1474,12 +1541,14 @@ $root.getMessages = (function() {
         GetMessagesResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.prevotes != null && message.prevotes.length)
                 for (var i = 0; i < message.prevotes.length; ++i)
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.prevotes[i]);
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.prevotes[i]);
             if (message.precommits != null && message.precommits.length)
                 for (var i = 0; i < message.precommits.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.precommits[i]);
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.precommits[i]);
             return writer;
         };
 
@@ -1515,12 +1584,16 @@ $root.getMessages = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
                         if (!(message.prevotes && message.prevotes.length))
                             message.prevotes = [];
                         message.prevotes.push(reader.string());
                         break;
                     }
-                case 2: {
+                case 3: {
                         if (!(message.precommits && message.precommits.length))
                             message.precommits = [];
                         message.precommits.push(reader.string());
@@ -1561,6 +1634,11 @@ $root.getMessages = (function() {
         GetMessagesResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             if (message.prevotes != null && message.hasOwnProperty("prevotes")) {
                 if (!Array.isArray(message.prevotes))
                     return "prevotes: array expected";
@@ -1590,6 +1668,11 @@ $root.getMessages = (function() {
             if (object instanceof $root.getMessages.GetMessagesResponse)
                 return object;
             var message = new $root.getMessages.GetMessagesResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getMessages.GetMessagesResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
             if (object.prevotes) {
                 if (!Array.isArray(object.prevotes))
                     throw TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");
@@ -1624,6 +1707,10 @@ $root.getMessages = (function() {
                 object.prevotes = [];
                 object.precommits = [];
             }
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.prevotes && message.prevotes.length) {
                 object.prevotes = [];
                 for (var j = 0; j < message.prevotes.length; ++j)
@@ -1892,6 +1979,7 @@ $root.getPeers = (function() {
          * Properties of a GetPeersResponse.
          * @memberof getPeers
          * @interface IGetPeersResponse
+         * @property {shared.IHeaders|null} [headers] GetPeersResponse headers
          * @property {Array.<getPeers.GetPeersResponse.IPeer>|null} [peers] GetPeersResponse peers
          */
 
@@ -1910,6 +1998,14 @@ $root.getPeers = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * GetPeersResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getPeers.GetPeersResponse
+         * @instance
+         */
+        GetPeersResponse.prototype.headers = null;
 
         /**
          * GetPeersResponse peers.
@@ -1943,9 +2039,11 @@ $root.getPeers = (function() {
         GetPeersResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.peers != null && message.peers.length)
                 for (var i = 0; i < message.peers.length; ++i)
-                    $root.getPeers.GetPeersResponse.Peer.encode(message.peers[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    $root.getPeers.GetPeersResponse.Peer.encode(message.peers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
@@ -1981,6 +2079,10 @@ $root.getPeers = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
                         if (!(message.peers && message.peers.length))
                             message.peers = [];
                         message.peers.push($root.getPeers.GetPeersResponse.Peer.decode(reader, reader.uint32()));
@@ -2021,6 +2123,11 @@ $root.getPeers = (function() {
         GetPeersResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             if (message.peers != null && message.hasOwnProperty("peers")) {
                 if (!Array.isArray(message.peers))
                     return "peers: array expected";
@@ -2045,6 +2152,11 @@ $root.getPeers = (function() {
             if (object instanceof $root.getPeers.GetPeersResponse)
                 return object;
             var message = new $root.getPeers.GetPeersResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getPeers.GetPeersResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
             if (object.peers) {
                 if (!Array.isArray(object.peers))
                     throw TypeError(".getPeers.GetPeersResponse.peers: array expected");
@@ -2073,6 +2185,10 @@ $root.getPeers = (function() {
             var object = {};
             if (options.arrays || options.defaults)
                 object.peers = [];
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.peers && message.peers.length) {
                 object.peers = [];
                 for (var j = 0; j < message.peers.length; ++j)
@@ -2563,6 +2679,7 @@ $root.getProposal = (function() {
          * Properties of a GetProposalResponse.
          * @memberof getProposal
          * @interface IGetProposalResponse
+         * @property {shared.IHeaders|null} [headers] GetProposalResponse headers
          * @property {string|null} [proposal] GetProposalResponse proposal
          */
 
@@ -2580,6 +2697,14 @@ $root.getProposal = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * GetProposalResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getProposal.GetProposalResponse
+         * @instance
+         */
+        GetProposalResponse.prototype.headers = null;
 
         /**
          * GetProposalResponse proposal.
@@ -2613,8 +2738,10 @@ $root.getProposal = (function() {
         GetProposalResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.proposal);
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.proposal);
             return writer;
         };
 
@@ -2650,6 +2777,10 @@ $root.getProposal = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
                         message.proposal = reader.string();
                         break;
                     }
@@ -2688,6 +2819,11 @@ $root.getProposal = (function() {
         GetProposalResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             if (message.proposal != null && message.hasOwnProperty("proposal"))
                 if (!$util.isString(message.proposal))
                     return "proposal: string expected";
@@ -2706,6 +2842,11 @@ $root.getProposal = (function() {
             if (object instanceof $root.getProposal.GetProposalResponse)
                 return object;
             var message = new $root.getProposal.GetProposalResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getProposal.GetProposalResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
             if (object.proposal != null)
                 message.proposal = String(object.proposal);
             return message;
@@ -2724,8 +2865,12 @@ $root.getProposal = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
+                object.headers = null;
                 object.proposal = "";
+            }
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.proposal != null && message.hasOwnProperty("proposal"))
                 object.proposal = message.proposal;
             return object;
@@ -2986,6 +3131,7 @@ $root.getStatus = (function() {
          * Properties of a GetStatusResponse.
          * @memberof getStatus
          * @interface IGetStatusResponse
+         * @property {shared.IHeaders|null} [headers] GetStatusResponse headers
          * @property {getStatus.GetStatusResponse.IState|null} [state] GetStatusResponse state
          * @property {getStatus.GetStatusResponse.IConfig|null} [config] GetStatusResponse config
          */
@@ -3004,6 +3150,14 @@ $root.getStatus = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * GetStatusResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof getStatus.GetStatusResponse
+         * @instance
+         */
+        GetStatusResponse.prototype.headers = null;
 
         /**
          * GetStatusResponse state.
@@ -3045,10 +3199,12 @@ $root.getStatus = (function() {
         GetStatusResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.state != null && Object.hasOwnProperty.call(message, "state"))
-                $root.getStatus.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                $root.getStatus.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             if (message.config != null && Object.hasOwnProperty.call(message, "config"))
-                $root.getStatus.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                $root.getStatus.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
 
@@ -3084,10 +3240,14 @@ $root.getStatus = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
-                        message.state = $root.getStatus.GetStatusResponse.State.decode(reader, reader.uint32());
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
                         break;
                     }
                 case 2: {
+                        message.state = $root.getStatus.GetStatusResponse.State.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 3: {
                         message.config = $root.getStatus.GetStatusResponse.Config.decode(reader, reader.uint32());
                         break;
                     }
@@ -3126,6 +3286,11 @@ $root.getStatus = (function() {
         GetStatusResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             if (message.state != null && message.hasOwnProperty("state")) {
                 var error = $root.getStatus.GetStatusResponse.State.verify(message.state);
                 if (error)
@@ -3151,6 +3316,11 @@ $root.getStatus = (function() {
             if (object instanceof $root.getStatus.GetStatusResponse)
                 return object;
             var message = new $root.getStatus.GetStatusResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".getStatus.GetStatusResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
             if (object.state != null) {
                 if (typeof object.state !== "object")
                     throw TypeError(".getStatus.GetStatusResponse.state: object expected");
@@ -3178,9 +3348,12 @@ $root.getStatus = (function() {
                 options = {};
             var object = {};
             if (options.defaults) {
+                object.headers = null;
                 object.state = null;
                 object.config = null;
             }
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.state != null && message.hasOwnProperty("state"))
                 object.state = $root.getStatus.GetStatusResponse.State.toObject(message.state, options);
             if (message.config != null && message.hasOwnProperty("config"))
@@ -5310,6 +5483,7 @@ $root.postPrecommit = (function() {
          * Properties of a PostPrecommitResponse.
          * @memberof postPrecommit
          * @interface IPostPrecommitResponse
+         * @property {shared.IHeaders|null} [headers] PostPrecommitResponse headers
          */
 
         /**
@@ -5326,6 +5500,14 @@ $root.postPrecommit = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * PostPrecommitResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postPrecommit.PostPrecommitResponse
+         * @instance
+         */
+        PostPrecommitResponse.prototype.headers = null;
 
         /**
          * Creates a new PostPrecommitResponse instance using the specified properties.
@@ -5351,6 +5533,8 @@ $root.postPrecommit = (function() {
         PostPrecommitResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -5385,6 +5569,10 @@ $root.postPrecommit = (function() {
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
+                case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -5420,6 +5608,11 @@ $root.postPrecommit = (function() {
         PostPrecommitResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             return null;
         };
 
@@ -5434,7 +5627,13 @@ $root.postPrecommit = (function() {
         PostPrecommitResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.postPrecommit.PostPrecommitResponse)
                 return object;
-            return new $root.postPrecommit.PostPrecommitResponse();
+            var message = new $root.postPrecommit.PostPrecommitResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postPrecommit.PostPrecommitResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
         };
 
         /**
@@ -5446,8 +5645,15 @@ $root.postPrecommit = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostPrecommitResponse.toObject = function toObject() {
-            return {};
+        PostPrecommitResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
         };
 
         /**
@@ -5738,6 +5944,7 @@ $root.postPrevote = (function() {
          * Properties of a PostPrevoteResponse.
          * @memberof postPrevote
          * @interface IPostPrevoteResponse
+         * @property {shared.IHeaders|null} [headers] PostPrevoteResponse headers
          */
 
         /**
@@ -5754,6 +5961,14 @@ $root.postPrevote = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * PostPrevoteResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postPrevote.PostPrevoteResponse
+         * @instance
+         */
+        PostPrevoteResponse.prototype.headers = null;
 
         /**
          * Creates a new PostPrevoteResponse instance using the specified properties.
@@ -5779,6 +5994,8 @@ $root.postPrevote = (function() {
         PostPrevoteResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -5813,6 +6030,10 @@ $root.postPrevote = (function() {
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
+                case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -5848,6 +6069,11 @@ $root.postPrevote = (function() {
         PostPrevoteResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             return null;
         };
 
@@ -5862,7 +6088,13 @@ $root.postPrevote = (function() {
         PostPrevoteResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.postPrevote.PostPrevoteResponse)
                 return object;
-            return new $root.postPrevote.PostPrevoteResponse();
+            var message = new $root.postPrevote.PostPrevoteResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postPrevote.PostPrevoteResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
         };
 
         /**
@@ -5874,8 +6106,15 @@ $root.postPrevote = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostPrevoteResponse.toObject = function toObject() {
-            return {};
+        PostPrevoteResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
         };
 
         /**
@@ -6166,6 +6405,7 @@ $root.postProposal = (function() {
          * Properties of a PostProposalResponse.
          * @memberof postProposal
          * @interface IPostProposalResponse
+         * @property {shared.IHeaders|null} [headers] PostProposalResponse headers
          */
 
         /**
@@ -6182,6 +6422,14 @@ $root.postProposal = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * PostProposalResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postProposal.PostProposalResponse
+         * @instance
+         */
+        PostProposalResponse.prototype.headers = null;
 
         /**
          * Creates a new PostProposalResponse instance using the specified properties.
@@ -6207,6 +6455,8 @@ $root.postProposal = (function() {
         PostProposalResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -6241,6 +6491,10 @@ $root.postProposal = (function() {
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
+                case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -6276,6 +6530,11 @@ $root.postProposal = (function() {
         PostProposalResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             return null;
         };
 
@@ -6290,7 +6549,13 @@ $root.postProposal = (function() {
         PostProposalResponse.fromObject = function fromObject(object) {
             if (object instanceof $root.postProposal.PostProposalResponse)
                 return object;
-            return new $root.postProposal.PostProposalResponse();
+            var message = new $root.postProposal.PostProposalResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postProposal.PostProposalResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
+            return message;
         };
 
         /**
@@ -6302,8 +6567,15 @@ $root.postProposal = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostProposalResponse.toObject = function toObject() {
-            return {};
+        PostProposalResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            return object;
         };
 
         /**
@@ -6594,6 +6866,7 @@ $root.postTransactions = (function() {
          * Properties of a PostTransactionsResponse.
          * @memberof postTransactions
          * @interface IPostTransactionsResponse
+         * @property {shared.IHeaders|null} [headers] PostTransactionsResponse headers
          * @property {Array.<string>|null} [accept] PostTransactionsResponse accept
          */
 
@@ -6612,6 +6885,14 @@ $root.postTransactions = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * PostTransactionsResponse headers.
+         * @member {shared.IHeaders|null|undefined} headers
+         * @memberof postTransactions.PostTransactionsResponse
+         * @instance
+         */
+        PostTransactionsResponse.prototype.headers = null;
 
         /**
          * PostTransactionsResponse accept.
@@ -6645,9 +6926,11 @@ $root.postTransactions = (function() {
         PostTransactionsResponse.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.accept != null && message.accept.length)
                 for (var i = 0; i < message.accept.length; ++i)
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.accept[i]);
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.accept[i]);
             return writer;
         };
 
@@ -6683,6 +6966,10 @@ $root.postTransactions = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 2: {
                         if (!(message.accept && message.accept.length))
                             message.accept = [];
                         message.accept.push(reader.string());
@@ -6723,6 +7010,11 @@ $root.postTransactions = (function() {
         PostTransactionsResponse.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.headers != null && message.hasOwnProperty("headers")) {
+                var error = $root.shared.Headers.verify(message.headers);
+                if (error)
+                    return "headers." + error;
+            }
             if (message.accept != null && message.hasOwnProperty("accept")) {
                 if (!Array.isArray(message.accept))
                     return "accept: array expected";
@@ -6745,6 +7037,11 @@ $root.postTransactions = (function() {
             if (object instanceof $root.postTransactions.PostTransactionsResponse)
                 return object;
             var message = new $root.postTransactions.PostTransactionsResponse();
+            if (object.headers != null) {
+                if (typeof object.headers !== "object")
+                    throw TypeError(".postTransactions.PostTransactionsResponse.headers: object expected");
+                message.headers = $root.shared.Headers.fromObject(object.headers);
+            }
             if (object.accept) {
                 if (!Array.isArray(object.accept))
                     throw TypeError(".postTransactions.PostTransactionsResponse.accept: array expected");
@@ -6770,6 +7067,10 @@ $root.postTransactions = (function() {
             var object = {};
             if (options.arrays || options.defaults)
                 object.accept = [];
+            if (options.defaults)
+                object.headers = null;
+            if (message.headers != null && message.hasOwnProperty("headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.accept && message.accept.length) {
                 object.accept = [];
                 for (var j = 0; j < message.accept.length; ++j)

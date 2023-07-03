@@ -1,5 +1,51 @@
 import { constants } from "./constants";
 
+const headers = {
+	properties: {
+		height: {
+			minimum: 1,
+			type: "integer",
+		},
+		proposedBlockId: {
+			type: ["string", "null"], // TODO: blockId
+		},
+		round: {
+			minimum: 0,
+			type: "integer",
+		},
+		step: {
+			maximum: 2,
+			minimum: 0,
+			type: "integer",
+		},
+		validatorsSignedPrecommit: {
+			items: {
+				type: "boolean",
+			},
+			type: "array",
+		},
+		validatorsSignedPrevote: {
+			items: {
+				type: "boolean",
+			},
+			type: "array",
+		},
+		version: {
+			type: "string", // TODO: version
+		},
+	},
+	required: [
+		"height",
+		"proposedBlockId",
+		"round",
+		"step",
+		"validatorsSignedPrecommit",
+		"validatorsSignedPrevote",
+		"version",
+	],
+	type: "object",
+};
+
 export const replySchemas = {
 	getBlocks: {
 		properties: {
@@ -10,8 +56,9 @@ export const replySchemas = {
 				maxItems: 400,
 				type: "array",
 			},
+			headers,
 		},
-		required: ["blocks"],
+		required: ["headers", "blocks"],
 		type: "object",
 	},
 	getCommonBlocks: {
@@ -35,12 +82,14 @@ export const replySchemas = {
 					},
 				],
 			},
+			headers,
 		},
-		required: ["common"],
+		required: ["headers", "common"],
 		type: "object",
 	},
 	getMessages: {
 		properties: {
+			headers,
 			// TODO: Improve this schema
 			precommits: {
 				items: {
@@ -55,10 +104,11 @@ export const replySchemas = {
 				type: "array",
 			},
 		},
-		required: ["precommits", "prevotes"],
+		required: ["headers", "precommits", "prevotes"],
 		type: "object",
 	},
 	getPeers: {
+		// TODO: Add headers
 		items: {
 			properties: {
 				ip: {
@@ -87,11 +137,12 @@ export const replySchemas = {
 	},
 	getProposal: {
 		properties: {
+			headers,
 			proposal: {
 				type: "string",
 			},
 		},
-		required: ["proposal"],
+		required: ["headers", "proposal"],
 		type: "object",
 	},
 	getStatus: {
@@ -186,6 +237,7 @@ export const replySchemas = {
 				required: ["version", "network", "plugins"],
 				type: "object",
 			},
+			headers,
 			state: {
 				properties: {
 					header: {
@@ -209,19 +261,32 @@ export const replySchemas = {
 				type: "object",
 			},
 		},
-		required: ["state", "config"],
+		required: ["headers", "state", "config"],
 		type: "object",
 	},
 	postPrecommit: {
+		properties: {
+			headers,
+		},
+		required: ["headers"],
 		type: "object",
 	},
 	postPrevote: {
+		properties: {
+			headers,
+		},
+		required: ["headers"],
 		type: "object",
 	},
 	postProposal: {
+		properties: {
+			headers,
+		},
+		required: ["headers"],
 		type: "object",
 	},
 	postTransactions: {
+		// TODO: Add headers
 		type: "array",
 	},
 };

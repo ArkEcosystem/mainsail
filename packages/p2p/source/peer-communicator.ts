@@ -275,6 +275,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				validationError.name = SocketErrors.Validation;
 				throw validationError;
 			}
+
+			void this.header.handle(peer, parsedResponsePayload.headers);
 		} catch (error) {
 			await this.handleSocketError(peer, event, error, disconnectOnError);
 			return;

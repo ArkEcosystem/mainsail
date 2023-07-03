@@ -7,5 +7,6 @@ message GetProposalRequest {
 }
 
 message GetProposalResponse {
-    string proposal = 1;
+	shared.Headers headers = 1;
+    string proposal = 2;
 }
