@@ -115,6 +115,9 @@ export namespace getBlocks {
     /** Properties of a GetBlocksResponse. */
     interface IGetBlocksResponse {
 
+        /** GetBlocksResponse headers */
+        headers?: (shared.IHeaders|null);
+
         /** GetBlocksResponse blocks */
         blocks?: (string[]|null);
     }
@@ -127,6 +130,9 @@ export namespace getBlocks {
          * @param [properties] Properties to set
          */
         constructor(properties?: getBlocks.IGetBlocksResponse);
+
+        /** GetBlocksResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /** GetBlocksResponse blocks. */
         public blocks: string[];
@@ -319,6 +325,9 @@ export namespace getCommonBlocks {
     /** Properties of a GetCommonBlocksResponse. */
     interface IGetCommonBlocksResponse {
 
+        /** GetCommonBlocksResponse headers */
+        headers?: (shared.IHeaders|null);
+
         /** GetCommonBlocksResponse common */
         common?: (getCommonBlocks.GetCommonBlocksResponse.ICommon|null);
     }
@@ -331,6 +340,9 @@ export namespace getCommonBlocks {
          * @param [properties] Properties to set
          */
         constructor(properties?: getCommonBlocks.IGetCommonBlocksResponse);
+
+        /** GetCommonBlocksResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /** GetCommonBlocksResponse common. */
         public common?: (getCommonBlocks.GetCommonBlocksResponse.ICommon|null);
@@ -623,6 +635,9 @@ export namespace getMessages {
     /** Properties of a GetMessagesResponse. */
     interface IGetMessagesResponse {
 
+        /** GetMessagesResponse headers */
+        headers?: (shared.IHeaders|null);
+
         /** GetMessagesResponse prevotes */
         prevotes?: (string[]|null);
 
@@ -638,6 +653,9 @@ export namespace getMessages {
          * @param [properties] Properties to set
          */
         constructor(properties?: getMessages.IGetMessagesResponse);
+
+        /** GetMessagesResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /** GetMessagesResponse prevotes. */
         public prevotes: string[];
@@ -827,6 +845,9 @@ export namespace getPeers {
     /** Properties of a GetPeersResponse. */
     interface IGetPeersResponse {
 
+        /** GetPeersResponse headers */
+        headers?: (shared.IHeaders|null);
+
         /** GetPeersResponse peers */
         peers?: (getPeers.GetPeersResponse.IPeer[]|null);
     }
@@ -839,6 +860,9 @@ export namespace getPeers {
          * @param [properties] Properties to set
          */
         constructor(properties?: getPeers.IGetPeersResponse);
+
+        /** GetPeersResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /** GetPeersResponse peers. */
         public peers: getPeers.GetPeersResponse.IPeer[];
@@ -1131,6 +1155,9 @@ export namespace getProposal {
     /** Properties of a GetProposalResponse. */
     interface IGetProposalResponse {
 
+        /** GetProposalResponse headers */
+        headers?: (shared.IHeaders|null);
+
         /** GetProposalResponse proposal */
         proposal?: (string|null);
     }
@@ -1143,6 +1170,9 @@ export namespace getProposal {
          * @param [properties] Properties to set
          */
         constructor(properties?: getProposal.IGetProposalResponse);
+
+        /** GetProposalResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /** GetProposalResponse proposal. */
         public proposal: string;
@@ -1329,6 +1359,9 @@ export namespace getStatus {
     /** Properties of a GetStatusResponse. */
     interface IGetStatusResponse {
 
+        /** GetStatusResponse headers */
+        headers?: (shared.IHeaders|null);
+
         /** GetStatusResponse state */
         state?: (getStatus.GetStatusResponse.IState|null);
 
@@ -1344,6 +1377,9 @@ export namespace getStatus {
          * @param [properties] Properties to set
          */
         constructor(properties?: getStatus.IGetStatusResponse);
+
+        /** GetStatusResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /** GetStatusResponse state. */
         public state?: (getStatus.GetStatusResponse.IState|null);
@@ -2276,6 +2312,9 @@ export namespace postPrecommit {
 
     /** Properties of a PostPrecommitResponse. */
     interface IPostPrecommitResponse {
+
+        /** PostPrecommitResponse headers */
+        headers?: (shared.IHeaders|null);
     }
 
     /** Represents a PostPrecommitResponse. */
@@ -2286,6 +2325,9 @@ export namespace postPrecommit {
          * @param [properties] Properties to set
          */
         constructor(properties?: postPrecommit.IPostPrecommitResponse);
+
+        /** PostPrecommitResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /**
          * Creates a new PostPrecommitResponse instance using the specified properties.
@@ -2474,6 +2516,9 @@ export namespace postPrevote {
 
     /** Properties of a PostPrevoteResponse. */
     interface IPostPrevoteResponse {
+
+        /** PostPrevoteResponse headers */
+        headers?: (shared.IHeaders|null);
     }
 
     /** Represents a PostPrevoteResponse. */
@@ -2484,6 +2529,9 @@ export namespace postPrevote {
          * @param [properties] Properties to set
          */
         constructor(properties?: postPrevote.IPostPrevoteResponse);
+
+        /** PostPrevoteResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /**
          * Creates a new PostPrevoteResponse instance using the specified properties.
@@ -2672,6 +2720,9 @@ export namespace postProposal {
 
     /** Properties of a PostProposalResponse. */
     interface IPostProposalResponse {
+
+        /** PostProposalResponse headers */
+        headers?: (shared.IHeaders|null);
     }
 
     /** Represents a PostProposalResponse. */
@@ -2682,6 +2733,9 @@ export namespace postProposal {
          * @param [properties] Properties to set
          */
         constructor(properties?: postProposal.IPostProposalResponse);
+
+        /** PostProposalResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /**
          * Creates a new PostProposalResponse instance using the specified properties.
@@ -2871,6 +2925,9 @@ export namespace postTransactions {
     /** Properties of a PostTransactionsResponse. */
     interface IPostTransactionsResponse {
 
+        /** PostTransactionsResponse headers */
+        headers?: (shared.IHeaders|null);
+
         /** PostTransactionsResponse accept */
         accept?: (string[]|null);
     }
@@ -2883,6 +2940,9 @@ export namespace postTransactions {
          * @param [properties] Properties to set
          */
         constructor(properties?: postTransactions.IPostTransactionsResponse);
+
+        /** PostTransactionsResponse headers. */
+        public headers?: (shared.IHeaders|null);
 
         /** PostTransactionsResponse accept. */
         public accept: string[];
