@@ -14,7 +14,7 @@ import { PeerConnector } from "./peer-connector";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { Server } from "./socket-server/server";
-import { makeFormats } from "./validation";
+import { makeFormats, sanitizeRemoteAddress } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -78,12 +78,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerFactories(): void {
-		this.app
-			.bind(Identifiers.PeerFactory)
-			.toFactory<Peer>(
-				() => (ip: string) =>
-					this.app.resolve(Peer).init(ip, Number(this.config().getRequired<number>("server.port"))),
-			);
+		this.app.bind(Identifiers.PeerFactory).toFactory<Peer>(() => (ip: string) => {
+			const sanitizedIp = sanitizeRemoteAddress(ip);
+			Utils.assert.defined<string>(sanitizedIp);
+
+			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
+		});
 	}
 
 	#registerServices(): void {

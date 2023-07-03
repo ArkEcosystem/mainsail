@@ -1,7 +1,7 @@
 import ipaddr from "ipaddr.js";
 import os from "os";
 
-const sanitizeRemoteAddress = (ip: string): string | undefined => {
+export const sanitizeRemoteAddress = (ip: string): string | undefined => {
 	try {
 		return ipaddr.process(ip).toString();
 	} catch {
