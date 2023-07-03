@@ -44,12 +44,9 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		return KernelUtils.isWhitelisted(this.configuration.getOptional<string[]>("remoteAccess", []), peer.ip);
 	}
 
-	public async validateAndAcceptPeer(
-		peer: Contracts.P2P.Peer,
-		options: Contracts.P2P.AcceptNewPeerOptions = {},
-	): Promise<void> {
-		if (this.validatePeerIp(peer.ip, options)) {
-			await this.#acceptNewPeer(peer.ip, options);
+	public async validateAndAcceptPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+		if (this.validatePeerIp(ip, options)) {
+			await this.#acceptNewPeer(ip, options);
 		}
 	}
 

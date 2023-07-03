@@ -8,7 +8,7 @@ export interface AcceptNewPeerOptions {
 export interface PeerProcessor {
 	initialize();
 
-	validateAndAcceptPeer(peer: Peer, options?: AcceptNewPeerOptions): Promise<void>;
+	validateAndAcceptPeer(ip: string, options?: AcceptNewPeerOptions): Promise<void>;
 
 	validatePeerIp(peer, options?: AcceptNewPeerOptions): boolean;
 

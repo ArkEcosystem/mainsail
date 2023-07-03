@@ -12,9 +12,9 @@ export class ValidateAndAcceptPeerAction extends Services.Triggers.Action {
 	}
 
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {
-		const peer: Contracts.P2P.Peer = arguments_.peer;
+		const ip: string = arguments_.peer;
 		const options: Contracts.P2P.AcceptNewPeerOptions = arguments_.options;
 
-		return this.#app.get<PeerProcessor>(Identifiers.PeerProcessor).validateAndAcceptPeer(peer, options);
+		return this.#app.get<PeerProcessor>(Identifiers.PeerProcessor).validateAndAcceptPeer(ip, options);
 	}
 }
