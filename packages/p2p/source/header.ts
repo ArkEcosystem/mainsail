@@ -42,7 +42,9 @@ export class Header implements Contracts.P2P.IHeader {
 	public async handle(peer: Contracts.P2P.Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
 		peer.state = header;
 
-		const result = await this.#compare(header);
+		await new Promise((resolve) => setTimeout(resolve, 300));
+
+		const result = await this.#compare(peer);
 
 		const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
 
@@ -59,7 +61,8 @@ export class Header implements Contracts.P2P.IHeader {
 		}
 	}
 
-	async #compare(header: Contracts.P2P.IHeaderData): Promise<CompareResponse> {
+	async #compare(peer: Contracts.P2P.Peer): Promise<CompareResponse> {
+		const header = peer.state;
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 
 		const height = consensus.getHeight();
