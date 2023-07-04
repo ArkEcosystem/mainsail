@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { constants } from "./constants";
 import { Downloader } from "./downloader";
 
 export interface CompareResponse {
@@ -74,7 +75,7 @@ export class Header implements Contracts.P2P.IHeader {
 	async #delay(peer: Contracts.P2P.Peer): Promise<void> {
 		this.#pending.add(peer);
 
-		await new Promise((resolve) => setTimeout(resolve, 300));
+		await new Promise((resolve) => setTimeout(resolve, constants.CHECK_HEADER_DELAY));
 
 		this.#pending.delete(peer);
 	}
