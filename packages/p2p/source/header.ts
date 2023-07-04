@@ -44,7 +44,7 @@ export class Header implements Contracts.P2P.IHeader {
 
 		const result = await this.#compare(header);
 
-		const downloader = this.app.resolve<Downloader>(Downloader);
+		const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
 
 		if (result.downloadBlocks) {
 			await downloader.downloadBlocks(peer);

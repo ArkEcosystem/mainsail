@@ -6,6 +6,7 @@ import { ValidateAndAcceptPeerAction } from "./actions";
 import { BlockDownloader } from "./block-downloader";
 import { Broadcaster } from "./broadcaster";
 import { ChunkCache } from "./chunk-cache";
+import { Downloader } from "./downloader";
 import { Header } from "./header";
 import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
@@ -100,6 +101,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerDownloader).to(Downloader).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 
