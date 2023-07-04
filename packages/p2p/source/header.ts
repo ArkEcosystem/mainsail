@@ -14,6 +14,8 @@ export class Header implements Contracts.P2P.IHeader {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
+	#pending = new Set<Contracts.P2P.Peer>();
+
 	public async getHeader(): Promise<Contracts.P2P.IHeaderData> {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
@@ -42,7 +44,11 @@ export class Header implements Contracts.P2P.IHeader {
 	public async handle(peer: Contracts.P2P.Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
 		peer.state = header;
 
-		await new Promise((resolve) => setTimeout(resolve, 300));
+		if (this.#hasPendingCheck(peer)) {
+			return;
+		}
+
+		await this.#delay(peer);
 
 		const result = await this.#compare(peer);
 
@@ -59,6 +65,18 @@ export class Header implements Contracts.P2P.IHeader {
 		if (result.downloadMessages) {
 			await downloader.downloadMessages(peer);
 		}
+	}
+
+	#hasPendingCheck(peer: Contracts.P2P.Peer): boolean {
+		return this.#pending.has(peer);
+	}
+
+	async #delay(peer: Contracts.P2P.Peer): Promise<void> {
+		this.#pending.add(peer);
+
+		await new Promise((resolve) => setTimeout(resolve, 300));
+
+		this.#pending.delete(peer);
 	}
 
 	async #compare(peer: Contracts.P2P.Peer): Promise<CompareResponse> {
