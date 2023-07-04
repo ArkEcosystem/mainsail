@@ -1,14 +1,4 @@
-import { Peer } from "./peer";
-
-export type IHeaderData = {
-	version: string;
-	height: number;
-	round: number;
-	step: number;
-	proposedBlockId: string | null;
-	validatorsSignedPrevote: boolean[];
-	validatorsSignedPrecommit: boolean[];
-};
+import { IHeaderData, Peer } from "./peer";
 
 export interface IHeader {
 	getHeader(): Promise<IHeaderData>;

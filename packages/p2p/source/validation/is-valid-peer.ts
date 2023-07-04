@@ -1,7 +1,7 @@
 import ipaddr from "ipaddr.js";
 import os from "os";
 
-const sanitizeRemoteAddress = (ip: string): string | undefined => {
+export const sanitizeRemoteAddress = (ip: string): string | undefined => {
 	try {
 		return ipaddr.process(ip).toString();
 	} catch {
@@ -24,19 +24,14 @@ export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolea
 	return false;
 };
 
-export const isValidPeer = (
-	peer: { ip: string; status?: string | number },
-	includeNetworkInterfaces = true,
-): boolean => {
-	const sanitizedAddress: string | undefined = sanitizeRemoteAddress(peer.ip);
+export const isValidPeerIp = (ip: string, includeNetworkInterfaces = true): boolean => {
+	const sanitizedAddress: string | undefined = sanitizeRemoteAddress(ip);
 
 	if (!sanitizedAddress) {
 		return false;
 	}
 
-	peer.ip = sanitizedAddress;
-
-	if (isLocalHost(peer.ip, includeNetworkInterfaces)) {
+	if (isLocalHost(sanitizedAddress, includeNetworkInterfaces)) {
 		return false;
 	}
 

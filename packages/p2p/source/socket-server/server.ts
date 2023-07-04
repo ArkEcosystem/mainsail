@@ -7,6 +7,7 @@ import { AcceptPeerPlugin } from "./plugins/accept-peer";
 import { AwaitBlockPlugin } from "./plugins/await-block";
 import { CodecPlugin } from "./plugins/codec";
 import { HeaderHandlePlugin } from "./plugins/header-handle";
+import { HeaderIncludePlugin } from "./plugins/header-include";
 import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
 import {
@@ -72,6 +73,9 @@ export class Server {
 		// onPreHandler
 		this.app.resolve(AcceptPeerPlugin).register(this.server);
 		this.app.resolve(HeaderHandlePlugin).register(this.server);
+
+		// onPostHandler
+		this.app.resolve(HeaderIncludePlugin).register(this.server);
 	}
 
 	public async boot(): Promise<void> {

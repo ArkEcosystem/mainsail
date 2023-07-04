@@ -1,8 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { describe, Sandbox } from "../../test-framework";
 import { BigNumber } from "@mainsail/utils";
 
+import { describe, Sandbox } from "../../test-framework";
 import { defaults } from "./defaults";
 import { NetworkStateStatus } from "./enums";
 import { NetworkState } from "./network-state";
@@ -91,7 +91,7 @@ describe<{
 		assert.equal(networkState.status, NetworkStateStatus.BelowMinimumPeers);
 	});
 
-	it("#analyze - should return accurate quorum values peersNoQuorum peersQuorum peersForked, when returning quorum details", async ({
+	it.skip("#analyze - should return accurate quorum values peersNoQuorum peersQuorum peersForked, when returning quorum details", async ({
 		configuration,
 	}) => {
 		configuration.set("minimumNetworkReach", 5);

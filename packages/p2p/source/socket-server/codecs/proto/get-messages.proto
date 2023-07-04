@@ -7,6 +7,7 @@ message GetMessagesRequest {
 }
 
 message GetMessagesResponse {
-    repeated string prevotes = 1;
-    repeated string precommits = 2;
+	shared.Headers headers = 1;
+    repeated string prevotes = 2;
+    repeated string precommits = 3;
 }

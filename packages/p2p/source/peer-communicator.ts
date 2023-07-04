@@ -123,7 +123,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		peer.lastPinged = dayjs();
-		peer.state = pingResponse.state;
+		// TODO: Update state
+		// peer.state = pingResponse.state;
 		peer.plugins = pingResponse.config.plugins;
 
 		return pingResponse.state;
@@ -274,6 +275,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				validationError.name = SocketErrors.Validation;
 				throw validationError;
 			}
+
+			void this.header.handle(peer, parsedResponsePayload.headers);
 		} catch (error) {
 			await this.handleSocketError(peer, event, error, disconnectOnError);
 			return;

@@ -2,6 +2,16 @@ import { Dayjs } from "dayjs";
 
 import { Queue } from "../kernel";
 
+export type IHeaderData = {
+	version: string;
+	height: number;
+	round: number;
+	step: number;
+	proposedBlockId: string | null;
+	validatorsSignedPrevote: boolean[];
+	validatorsSignedPrecommit: boolean[];
+};
+
 export interface PeerPorts {
 	[name: string]: number;
 }
@@ -20,7 +30,7 @@ export interface Peer {
 	version: string | undefined;
 	latency: number | undefined;
 
-	state: PeerState;
+	state: IHeaderData;
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;
