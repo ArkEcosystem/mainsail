@@ -29,8 +29,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@inject(Identifiers.PeerHeader)
-	private readonly header!: Header;
+	@inject(Identifiers.PeerHeaderService)
+	private readonly headerService!: Header;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -257,7 +257,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				codec.request.serialize({
 					...payload,
 					headers: {
-						...this.header.getHeader(),
+						...this.headerService.getHeader(),
 					},
 				}),
 				timeout,
@@ -276,7 +276,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				throw validationError;
 			}
 
-			void this.header.handle(peer, parsedResponsePayload.headers);
+			void this.headerService.handle(peer, parsedResponsePayload.headers);
 		} catch (error) {
 			await this.handleSocketError(peer, event, error, disconnectOnError);
 			return;

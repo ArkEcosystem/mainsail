@@ -119,7 +119,7 @@ export const Identifiers = {
 	PeerConnector: Symbol.for("Peer<Connector>"),
 	PeerDownloader: Symbol.for("Peer<Downloader>"),
 	PeerFactory: Symbol.for("Factory<Peer>"),
-	PeerHeader: Symbol.for("Peer<Header>"),
+	PeerHeaderService: Symbol.for("Peer<HeaderService>"),
 	PeerNetworkMonitor: Symbol.for("Peer<NetworkMonitor>"),
 	PeerProcessor: Symbol.for("Peer<Processor>"),
 	PeerRepository: Symbol.for("Peer<Repository>"),

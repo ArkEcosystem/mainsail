@@ -96,7 +96,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerHeader).to(Header).inSingletonScope();
+		this.app.bind(Identifiers.PeerHeaderService).to(Header).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
 

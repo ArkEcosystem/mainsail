@@ -8,14 +8,14 @@ export class HeaderHandlePlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerHeader)
-	private readonly header!: Contracts.P2P.IHeaderService;
+	@inject(Identifiers.PeerHeaderService)
+	private readonly headerService!: Contracts.P2P.IHeaderService;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public register(server) {
-		const header = this.header;
+		const header = this.headerService;
 		const peerRepository = this.peerRepository;
 
 		server.ext({
