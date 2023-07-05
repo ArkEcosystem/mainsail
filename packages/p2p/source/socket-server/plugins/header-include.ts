@@ -8,7 +8,7 @@ export class HeaderIncludePlugin {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PeerHeader)
-	private readonly header!: Contracts.P2P.IHeader;
+	private readonly header!: Contracts.P2P.IHeaderService;
 
 	public register(server) {
 		const header = this.header;

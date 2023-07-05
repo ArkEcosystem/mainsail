@@ -11,7 +11,7 @@ export interface CompareResponse {
 }
 
 @injectable()
-export class Header implements Contracts.P2P.IHeader {
+export class Header implements Contracts.P2P.IHeaderService {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
