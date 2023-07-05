@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { shuffle } from "@mainsail/utils";
+import { randomNumber } from "@mainsail/utils";
 
 @injectable()
 export class Downloader {
@@ -27,26 +27,26 @@ export class Downloader {
 	#isDownloadingMessages = false;
 
 	public tryToDownloadBlocks(): void {
-		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeers());
+		const peers = this.repository.getPeers();
 
 		if (peers.length > 0) {
-			void this.downloadBlocks(peers[0]);
+			void this.downloadBlocks(this.#getRandomPeer(peers));
 		}
 	}
 
 	public tryToDownloadProposal(): void {
-		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeers());
+		const peers = this.repository.getPeers();
 
 		if (peers.length > 0) {
-			void this.downloadProposal(peers[0]);
+			void this.downloadProposal(this.#getRandomPeer(peers));
 		}
 	}
 
 	public tryToDownloadMessages(): void {
-		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeers());
+		const peers = this.repository.getPeers();
 
 		if (peers.length > 0) {
-			void this.downloadMessages(peers[0]);
+			void this.downloadMessages(this.#getRandomPeer(peers));
 		}
 	}
 
@@ -131,5 +131,9 @@ export class Downloader {
 		} finally {
 			this.#isDownloadingMessages = false;
 		}
+	}
+
+	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
+		return peers[randomNumber(0, peers.length - 1)];
 	}
 }
