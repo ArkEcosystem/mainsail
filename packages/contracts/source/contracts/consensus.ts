@@ -107,7 +107,7 @@ export interface IScheduler {
 }
 
 export interface IProposerPicker {
-	getValidatorIndex(round: number): Promise<number>;
+	getValidatorIndex(round: number): number;
 }
 
 export interface IValidator {
