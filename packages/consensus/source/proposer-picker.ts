@@ -10,23 +10,23 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	public async getValidatorIndex(round: number): Promise<number> {
-		const seed = await this.#calculateSeed(round);
+	public getValidatorIndex(round: number): number {
+		const seed = this.#calculateSeed(round);
 
 		const { activeValidators } = this.configuration.getMilestone();
 		const rng = seedrandom(seed);
 		return Math.floor(rng() * (activeValidators - 1));
 	}
 
-	async #calculateSeed(round: number): Promise<string> {
-		const totalRound = await this.#getTotalRound(round);
+	#calculateSeed(round: number): string {
+		const totalRound = this.#getTotalRound(round);
 
 		// TODO: take block id into account
 
 		return `${totalRound}`;
 	}
 
-	async #getTotalRound(round: number): Promise<number> {
+	#getTotalRound(round: number): number {
 		const committedRound = this.state.getLastCommittedRound();
 		return committedRound + round + 1;
 	}
