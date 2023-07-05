@@ -25,5 +25,7 @@ export interface PeerRepository {
 
 	hasPendingPeer(ip: string): boolean;
 
+	getPeersWithHigherBlock(ip: string): Peer[];
+
 	getSameSubnetPeers(ip: string): Peer[];
 }
