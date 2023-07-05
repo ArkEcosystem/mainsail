@@ -11,13 +11,13 @@ export class HeaderIncludePlugin {
 	private readonly headerService!: Contracts.P2P.IHeaderService;
 
 	public register(server) {
-		const header = this.headerService;
+		const headerService = this.headerService;
 
 		server.ext({
 			async method(request, h: ResponseToolkit) {
 				request.response.source = {
 					...request.response.source,
-					headers: header.getHeader(),
+					headers: headerService.getHeader(),
 				};
 
 				return h.continue;

@@ -15,7 +15,7 @@ export class HeaderHandlePlugin {
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public register(server) {
-		const header = this.headerService;
+		const headerService = this.headerService;
 		const peerRepository = this.peerRepository;
 
 		server.ext({
@@ -25,7 +25,7 @@ export class HeaderHandlePlugin {
 				if (peerRepository.hasPeer(peerIp)) {
 					const peer = peerRepository.getPeer(peerIp);
 
-					void header.handle(peer, request.payload.headers);
+					void headerService.handle(peer, request.payload.headers);
 				}
 
 				return h.continue;
