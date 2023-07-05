@@ -14,3 +14,5 @@ export interface IHeader {
 	canDownloadProposal(headerData: IHeaderData): boolean;
 	canDownloadMessages(headerData: IHeaderData): boolean;
 }
+
+export type HeaderFactory = () => IHeader;

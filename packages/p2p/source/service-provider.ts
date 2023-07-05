@@ -7,6 +7,7 @@ import { BlockDownloader } from "./block-downloader";
 import { Broadcaster } from "./broadcaster";
 import { ChunkCache } from "./chunk-cache";
 import { Downloader } from "./downloader";
+import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
@@ -85,6 +86,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
 		});
+
+		this.app
+			.bind(Identifiers.PeerHeaderFactory)
+			.toFactory<Contracts.P2P.IHeader>(() => () => this.app.resolve(Header));
 	}
 
 	#registerServices(): void {
