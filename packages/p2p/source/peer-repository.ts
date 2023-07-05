@@ -6,8 +6,8 @@ import { cidr } from "ip";
 // @TODO review the implementation
 @injectable()
 export class PeerRepository implements Contracts.P2P.PeerRepository {
-	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	@inject(Identifiers.PeerHeaderService)
+	private readonly headerService!: Contracts.P2P.IHeaderService;
 
 	readonly #peers: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
 	readonly #peersPending: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
@@ -69,15 +69,18 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	}
 
 	public getPeersWithHigherBlock(): Contracts.P2P.Peer[] {
-		const height = this.state.getLastBlock().data.height;
-
-		return this.getPeers().filter((peer) => peer.state.height > height);
+		const header = this.headerService.getHeader();
+		return this.getPeers().filter((peer) => header.canDownloadBlocks(peer.state));
 	}
 
 	public getPeersWithProposal(): Contracts.P2P.Peer[] {
-		const height = this.state.getLastBlock().data.height;
+		const header = this.headerService.getHeader();
+		return this.getPeers().filter((peer) => header.canDownloadProposal(peer.state));
+	}
 
-		return this.getPeers().filter((peer) => peer.state.height === height + 1 && peer.state.proposedBlockId);
+	public getPeersWithMessages(): Contracts.P2P.Peer[] {
+		const header = this.headerService.getHeader();
+		return this.getPeers().filter((peer) => header.canDownloadMessages(peer.state));
 	}
 
 	public getSameSubnetPeers(ip: string): Contracts.P2P.Peer[] {

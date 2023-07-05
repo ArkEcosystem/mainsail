@@ -22,8 +22,8 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 		return this.app.resolve(Header);
 	}
 
-	public async handle(peer: Contracts.P2P.Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
-		peer.state = header;
+	public async handle(peer: Contracts.P2P.Peer, peerHeader: Contracts.P2P.IHeaderData): Promise<void> {
+		peer.state = peerHeader;
 
 		if (this.#hasPendingCheck(peer)) {
 			return;
@@ -31,19 +31,19 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		await this.#delay(peer);
 
-		const result = await this.#compare(peer);
+		const header = this.getHeader();
 
 		const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
 
-		if (result.downloadBlocks) {
+		if (header.canDownloadBlocks(peerHeader)) {
 			await downloader.downloadBlocks(peer);
 		}
 
-		if (result.downloadProposal) {
+		if (header.canDownloadProposal(peerHeader)) {
 			await downloader.downloadProposal(peer);
 		}
 
-		if (result.downloadMessages) {
+		if (header.canDownloadMessages(peerHeader)) {
 			await downloader.downloadMessages(peer);
 		}
 	}
@@ -58,51 +58,5 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 		await new Promise((resolve) => setTimeout(resolve, constants.CHECK_HEADER_DELAY));
 
 		this.#pending.delete(peer);
-	}
-
-	async #compare(peer: Contracts.P2P.Peer): Promise<CompareResponse> {
-		const header = peer.state;
-		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-
-		const height = consensus.getHeight();
-		const round = consensus.getRound();
-
-		if (header.height > height) {
-			return { downloadBlocks: true };
-		}
-
-		if (header.height < height) {
-			return {};
-		}
-
-		if (header.round < round) {
-			return {};
-		}
-
-		const roundState = this.app
-			.get<Contracts.Consensus.IRoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
-			.getRoundState(height, round);
-
-		const response: CompareResponse = {};
-
-		if (roundState.getProposal() === undefined && !!header.proposedBlockId) {
-			response.downloadProposal = true;
-		}
-
-		for (let index = 0; index < header.validatorsSignedPrevote.length; index++) {
-			if (header.validatorsSignedPrevote[index] && !roundState.getValidatorsSignedPrevote()[index]) {
-				response.downloadMessages = true;
-				break;
-			}
-		}
-
-		for (let index = 0; index < header.validatorsSignedPrecommit.length; index++) {
-			if (header.validatorsSignedPrecommit[index] && !roundState.getValidatorsSignedPrecommit()[index]) {
-				response.downloadMessages = true;
-				break;
-			}
-		}
-
-		return response;
 	}
 }
