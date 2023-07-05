@@ -10,7 +10,7 @@ export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepo
 
 	#roundStates = new Map<string, Contracts.Consensus.IRoundState>();
 
-	public async getRoundState(height: number, round: number): Promise<Contracts.Consensus.IRoundState> {
+	public getRoundState(height: number, round: number): Contracts.Consensus.IRoundState {
 		const key = `${height}-${round}`;
 
 		if (!this.#roundStates.has(key)) {

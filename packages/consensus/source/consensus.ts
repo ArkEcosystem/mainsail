@@ -103,7 +103,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#bootstrap();
 		await this.startRound(this.#round);
 
-		await this.handle(await this.roundStateRepository.getRoundState(this.#height, this.#round));
+		await this.handle(this.roundStateRepository.getRoundState(this.#height, this.#round));
 	}
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -162,10 +162,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onTimeoutStartRound(): Promise<void> {
-		const { proposer: proposerPublicKey } = await this.roundStateRepository.getRoundState(
-			this.#height,
-			this.#round,
-		);
+		const { proposer: proposerPublicKey } = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		const proposer = this.validatorsRepository.getValidator(proposerPublicKey);
 
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
@@ -387,7 +384,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
-		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
+		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		if (roundState.hasProposal()) {
 			return;
 		}
@@ -409,7 +406,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #prevote(value?: string): Promise<void> {
-		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
+		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
 			if (roundState.hasPrevote(validator)) {
 				continue;
@@ -425,7 +422,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #precommit(value?: string): Promise<void> {
-		const roundState = await this.roundStateRepository.getRoundState(this.#height, this.#round);
+		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
 			if (roundState.hasPrecommit(validator)) {
 				continue;
