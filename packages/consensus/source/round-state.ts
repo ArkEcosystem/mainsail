@@ -56,7 +56,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#proposer;
 	}
 
-	public async configure(height: number, round: number): Promise<RoundState> {
+	public configure(height: number, round: number): RoundState {
 		this.#height = height;
 		this.#round = round;
 

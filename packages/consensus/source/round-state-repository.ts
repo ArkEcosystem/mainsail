@@ -14,14 +14,13 @@ export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepo
 		const key = `${height}-${round}`;
 
 		if (!this.#roundStates.has(key)) {
-			this.#roundStates.set(key, await this.#createRoundState(height, round));
+			this.#roundStates.set(key, this.#createRoundState(height, round));
 		}
 
 		return this.#roundStates.get(key)!;
 	}
 
-	// TODO: Bind to factory
-	#createRoundState(height: number, round: number): Promise<Contracts.Consensus.IRoundState> {
+	#createRoundState(height: number, round: number): Contracts.Consensus.IRoundState {
 		return this.app.resolve(RoundState).configure(height, round);
 	}
 }
