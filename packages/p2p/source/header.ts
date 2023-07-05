@@ -14,7 +14,7 @@ export class Header implements Contracts.P2P.IHeader {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	public async getHeader(): Promise<Contracts.P2P.IHeaderData> {
+	public getHeader(): Contracts.P2P.IHeaderData {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
