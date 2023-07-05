@@ -217,7 +217,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			return false;
 		}
 
-		const { error } = await this.validator.validate(schema, reply);
+		const { error } = this.validator.validate(schema, reply);
 		if (error) {
 			if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
 				this.logger.debug(`Got unexpected reply from ${peer.url}/${endpoint}: ${error}`);
