@@ -1,7 +1,8 @@
 import Hapi from "@hapi/hapi";
 
 import { IBlockData } from "../crypto";
-import { IHeaderData, PeerBroadcast, PeerPingResponse } from "./peer";
+import { IHeaderData } from "./header";
+import { PeerBroadcast, PeerPingResponse } from "./peer";
 
 export interface IGetBlocksRequest extends Hapi.Request {
 	payload: {
