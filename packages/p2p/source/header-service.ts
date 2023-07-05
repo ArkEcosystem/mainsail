@@ -3,7 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
 import { Downloader } from "./downloader";
-import { Header } from "./header";
 
 export interface CompareResponse {
 	downloadBlocks?: true;
@@ -16,11 +15,10 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	#pending = new Set<Contracts.P2P.Peer>();
+	@inject(Identifiers.PeerHeaderFactory)
+	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
-	public getHeader(): Contracts.P2P.IHeader {
-		return this.app.resolve(Header);
-	}
+	#pending = new Set<Contracts.P2P.Peer>();
 
 	public async handle(peer: Contracts.P2P.Peer, peerHeader: Contracts.P2P.IHeaderData): Promise<void> {
 		peer.state = peerHeader;
@@ -31,8 +29,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		await this.#delay(peer);
 
-		const header = this.getHeader();
-
+		const header = this.headerFactory();
 		const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
 
 		if (header.canDownloadBlocks(peerHeader)) {

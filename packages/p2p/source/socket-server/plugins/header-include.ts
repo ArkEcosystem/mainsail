@@ -7,17 +7,17 @@ export class HeaderIncludePlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerHeaderService)
-	private readonly headerService!: Contracts.P2P.IHeaderService;
+	@inject(Identifiers.PeerHeaderFactory)
+	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
 	public register(server) {
-		const headerService = this.headerService;
+		const headerFactory = this.headerFactory;
 
 		server.ext({
 			async method(request, h: ResponseToolkit) {
 				request.response.source = {
 					...request.response.source,
-					headers: headerService.getHeader().toData(),
+					headers: headerFactory().toData(),
 				};
 
 				return h.continue;
