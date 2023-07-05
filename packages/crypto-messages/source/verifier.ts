@@ -84,7 +84,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	}
 
 	async #verifySignature(signature: string, validatorIndex: number, message: Buffer): Promise<boolean> {
-		const activeValidators = await this.validatorSet.getActiveValidators();
+		const activeValidators = this.validatorSet.getActiveValidators();
 
 		const validator = activeValidators[validatorIndex];
 		Utils.assert.defined<Contracts.State.Wallet>(validator);
@@ -97,7 +97,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 
 	async #verifyAggSignature(signature: string, validators: boolean[], message: Buffer): Promise<boolean> {
 		// TODO: take round / height into account
-		const activeValidators = await this.validatorSet.getActiveValidators();
+		const activeValidators = this.validatorSet.getActiveValidators();
 
 		const validatorPublicKeys = validators
 			.map((v, index) =>

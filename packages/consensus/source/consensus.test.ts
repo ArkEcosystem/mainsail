@@ -222,7 +222,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		const spyLoggerInfo = spy(logger, "info");
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
-		const spyGetRoundState = stub(roundStateRepository, "getRoundState").resolvedValue({
+		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
 			proposer: validatorPublicKey,
 		});
 
@@ -239,7 +239,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onTimeoutStartRound - local validator should propose", async ({
 		consensus,
-		scheduler,
 		validatorsRepository,
 		roundStateRepository,
 		logger,
@@ -258,7 +257,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
 
 		const spyLoggerInfo = spy(logger, "info");
-		const spyGetRoundState = stub(roundStateRepository, "getRoundState").resolvedValue({
+		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
 			hasProposal: () => false,
 			proposer: validatorPublicKey,
 		});
@@ -297,7 +296,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			propose: () => {},
 		};
 
-		stub(validatorSet, "getActiveValidators").resolvedValue([
+		stub(validatorSet, "getActiveValidators").returnValue([
 			{
 				getAttribute: () => validatorPublicKey,
 			},
@@ -745,7 +744,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
-		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
 				getAttribute: () => validatorPublicKey,
 			},
@@ -824,7 +823,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
-		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
 				getAttribute: () => validatorPublicKey,
 			},
@@ -898,7 +897,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
-		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
 				getAttribute: () => validatorPublicKey,
 			},
@@ -1048,7 +1047,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
-		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
 				getAttribute: () => validatorPublicKey,
 			},
@@ -1360,7 +1359,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
-		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").resolvedValue([
+		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
 				getAttribute: () => validatorPublicKey,
 			},

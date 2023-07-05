@@ -45,7 +45,7 @@ export interface IConsensusStateData {
 }
 
 export interface IRoundStateRepository {
-	getRoundState(height: number, round: number): Promise<IRoundState>;
+	getRoundState(height: number, round: number): IRoundState;
 }
 
 export interface IConsensusService {
@@ -60,14 +60,6 @@ export interface IConsensusService {
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
-}
-
-export interface IConsensusStateData {
-	readonly height: number;
-	readonly round: number;
-	readonly step: Step;
-	readonly validRound?: number;
-	readonly lockedRound?: number;
 }
 
 export interface IConsensusState extends IConsensusStateData {
@@ -107,7 +99,7 @@ export interface IScheduler {
 }
 
 export interface IProposerPicker {
-	getValidatorIndex(round: number): Promise<number>;
+	getValidatorIndex(round: number): number;
 }
 
 export interface IValidator {
