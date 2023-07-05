@@ -74,6 +74,12 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 		return this.getPeers().filter((peer) => peer.state.height > height);
 	}
 
+	public getPeersWithProposal(): Contracts.P2P.Peer[] {
+		const height = this.state.getLastBlock().data.height;
+
+		return this.getPeers().filter((peer) => peer.state.height === height + 1 && peer.state.proposedBlockId);
+	}
+
 	public getSameSubnetPeers(ip: string): Contracts.P2P.Peer[] {
 		return this.getPeers().filter((peer) => {
 			if (!Utils.IpAddress.isIPv6Address(peer.ip) && !Utils.IpAddress.isIPv6Address(ip)) {

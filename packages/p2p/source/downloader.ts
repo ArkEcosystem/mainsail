@@ -34,6 +34,14 @@ export class Downloader {
 		}
 	}
 
+	public tryToDownloadProposal(): void {
+		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeersWithProposal());
+
+		if (peers.length > 0) {
+			void this.downloadProposal(peers[0]);
+		}
+	}
+
 	public async downloadBlocks(peer: Contracts.P2P.Peer): Promise<void> {
 		if (this.#isDownloadingBlocks) {
 			return;
