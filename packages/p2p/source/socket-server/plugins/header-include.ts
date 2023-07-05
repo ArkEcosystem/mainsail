@@ -17,7 +17,7 @@ export class HeaderIncludePlugin {
 			async method(request, h: ResponseToolkit) {
 				request.response.source = {
 					...request.response.source,
-					headers: headerService.getHeader(),
+					headers: headerService.getHeader().toData(),
 				};
 
 				return h.continue;

@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
 import { Downloader } from "./downloader";
+import { Header } from "./header";
 
 export interface CompareResponse {
 	downloadBlocks?: true;
@@ -17,29 +18,8 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 	#pending = new Set<Contracts.P2P.Peer>();
 
-	public getHeader(): Contracts.P2P.IHeaderData {
-		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
-			Identifiers.Consensus.RoundStateRepository,
-		);
-
-		const height = consensus.getHeight();
-		const round = consensus.getRound();
-		const step = consensus.getStep();
-
-		const roundState = roundStateRepo.getRoundState(height, round);
-		const proposal = roundState.getProposal();
-
-		return {
-			height,
-			// eslint-disable-next-line unicorn/no-null
-			proposedBlockId: proposal ? proposal.block.block.data.id : null,
-			round,
-			step,
-			validatorsSignedPrecommit: roundState.getValidatorsSignedPrecommit(),
-			validatorsSignedPrevote: roundState.getValidatorsSignedPrevote(),
-			version: this.app.version(),
-		};
+	public getHeader(): Contracts.P2P.IHeader {
+		return this.app.resolve(Header);
 	}
 
 	public async handle(peer: Contracts.P2P.Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
