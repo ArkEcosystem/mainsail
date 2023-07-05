@@ -10,7 +10,7 @@ export type IHeaderData = {
 
 export interface IHeader {
 	toData(): IHeaderData;
-	// hasHigherHeight(headerData: IHeaderData): boolean;
-	// hasMissingProposal(headerData: IHeaderData): boolean;
-	// hasMissingMessages(headerData: IHeaderData): boolean;
+	canDownloadBlocks(headerData: IHeaderData): boolean;
+	canDownloadProposal(headerData: IHeaderData): boolean;
+	canDownloadMessages(headerData: IHeaderData): boolean;
 }

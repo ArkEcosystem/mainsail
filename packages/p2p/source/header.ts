@@ -39,4 +39,42 @@ export class Header implements Contracts.P2P.IHeader {
 			version: this.app.version(),
 		};
 	}
+
+	public canDownloadBlocks(data: Contracts.P2P.IHeaderData): boolean {
+		return data.height > this.height;
+	}
+
+	public canDownloadProposal(data: Contracts.P2P.IHeaderData): boolean {
+		if (!this.#isRoundSufficient(data)) {
+			return false;
+		}
+
+		return this.#roundState.getProposal() === undefined && !!data.proposedBlockId;
+	}
+
+	public canDownloadMessages(data: Contracts.P2P.IHeaderData): boolean {
+		if (!this.#isRoundSufficient(data)) {
+			return false;
+		}
+
+		if ([Contracts.Consensus.Step.Prevote, Contracts.Consensus.Step.Propose].includes(this.step)) {
+			for (let index = 0; index < data.validatorsSignedPrevote.length; index++) {
+				if (data.validatorsSignedPrevote[index] && !this.#roundState.getValidatorsSignedPrevote()[index]) {
+					return true;
+				}
+			}
+		}
+
+		for (let index = 0; index < data.validatorsSignedPrecommit.length; index++) {
+			if (data.validatorsSignedPrecommit[index] && !this.#roundState.getValidatorsSignedPrecommit()[index]) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	#isRoundSufficient(data: Contracts.P2P.IHeaderData): boolean {
+		return data.height === this.height && data.round >= this.round;
+	}
 }
