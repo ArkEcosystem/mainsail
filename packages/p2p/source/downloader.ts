@@ -27,7 +27,7 @@ export class Downloader {
 	#isDownloadingMessages = false;
 
 	public tryToDownloadBlocks(): void {
-		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeersWithHigherBlock());
+		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeers());
 
 		if (peers.length > 0) {
 			void this.downloadBlocks(peers[0]);
@@ -35,10 +35,18 @@ export class Downloader {
 	}
 
 	public tryToDownloadProposal(): void {
-		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeersWithProposal());
+		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeers());
 
 		if (peers.length > 0) {
 			void this.downloadProposal(peers[0]);
+		}
+	}
+
+	public tryToDownloadMessages(): void {
+		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeers());
+
+		if (peers.length > 0) {
+			void this.downloadMessages(peers[0]);
 		}
 	}
 
