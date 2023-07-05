@@ -1,10 +1,14 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { shuffle } from "@mainsail/utils";
 
 @injectable()
 export class Downloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+
+	@inject(Identifiers.PeerRepository)
+	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
@@ -21,6 +25,14 @@ export class Downloader {
 	#isDownloadingBlocks = false;
 	#isDownloadingProposal = false;
 	#isDownloadingMessages = false;
+
+	public tryToDownloadBlocks(): void {
+		const peers = shuffle<Contracts.P2P.Peer>(this.repository.getPeersWithHigherBlock());
+
+		if (peers.length > 0) {
+			void this.downloadBlocks(peers[0]);
+		}
+	}
 
 	public async downloadBlocks(peer: Contracts.P2P.Peer): Promise<void> {
 		if (this.#isDownloadingBlocks) {
@@ -45,6 +57,7 @@ export class Downloader {
 			// TODO: Handle errors
 		} finally {
 			this.#isDownloadingBlocks = false;
+			this.tryToDownloadBlocks();
 		}
 	}
 
@@ -71,6 +84,8 @@ export class Downloader {
 		} finally {
 			this.#isDownloadingProposal = false;
 		}
+
+		// TODO: Check if we have any missing blocks
 	}
 
 	// TODO: Handle errors
