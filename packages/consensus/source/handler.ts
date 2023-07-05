@@ -87,7 +87,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 
 	async onCommittedBlock(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		// TODO: Check precommits
-		const committedBlockState = await this.app.resolve(CommittedBlockState).configure(committedBlock);
+		const committedBlockState = this.app.resolve(CommittedBlockState).configure(committedBlock);
 
 		committedBlockState.setProcessorResult(await this.processor.process(committedBlockState));
 
