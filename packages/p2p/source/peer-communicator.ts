@@ -6,7 +6,7 @@ import delay from "delay";
 
 import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
-import { Header } from "./header";
+import { HeaderService } from "./header-service";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 import { replySchemas } from "./reply-schemas";
@@ -30,7 +30,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
 	@inject(Identifiers.PeerHeaderService)
-	private readonly headerService!: Header;
+	private readonly headerService!: HeaderService;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
