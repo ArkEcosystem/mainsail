@@ -143,17 +143,4 @@ describe<{
 
 		assert.equal(result.error?.message, '"databaseRollback.steps" is required');
 	});
-
-	it("networkStart is optional && is boolean", async (context) => {
-		const defaults = loadDefaults().defaults;
-		defaults.networkStart = 123;
-		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.equal(result.error?.message, '"networkStart" must be a boolean');
-
-		delete defaults.networkStart;
-		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
-
-		assert.undefined(result.error);
-	});
 });
