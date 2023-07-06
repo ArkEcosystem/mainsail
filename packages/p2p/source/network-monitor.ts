@@ -16,6 +16,9 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.PeerDiscoverer)
+	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
+
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
@@ -43,7 +46,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async boot(): Promise<void> {
-		// await this.#populateSeedPeers();
+		await this.peerDiscoverer.populateSeedPeers();
 
 		if (this.config.skipDiscovery) {
 			this.logger.warning("Skipped peer discovery because the relay is in skip-discovery mode.");
@@ -90,7 +93,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		let nextRunDelaySeconds = 600;
 
 		if (!this.#hasMinimumPeers()) {
-			// await this.#populateSeedPeers();
+			await this.peerDiscoverer.populateSeedPeers();
 
 			nextRunDelaySeconds = 60;
 
