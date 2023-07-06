@@ -11,6 +11,7 @@ import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
+import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { Server } from "./socket-server/server";
@@ -94,6 +95,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerCommunicator).to(PeerCommunicator).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerDiscoverer).to(PeerDiscoverer).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerHeader).to(Header).inSingletonScope();
 

@@ -1,6 +1,6 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";
@@ -16,14 +16,14 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.PeerDiscoverer)
+	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
+
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
-
-	@inject(Identifiers.PeerFactory)
-	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
 	@inject(Identifiers.PeerProcessor)
 	private readonly processor!: Contracts.P2P.PeerProcessor;
@@ -31,21 +31,15 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
 
 	#coldStart = false;
 	#initializing = true;
 
-	@postConstruct()
-	public initialize(): void {
-		this.config = this.configuration.all(); // >_<
-	}
-
 	public async boot(): Promise<void> {
-		await this.#populateSeedPeers();
+		await this.peerDiscoverer.populateSeedPeers();
 
-		if (this.config.skipDiscovery) {
+		if (this.configuration.getOptional("skipDiscovery", false)) {
 			this.logger.warning("Skipped peer discovery because the relay is in skip-discovery mode.");
 		} else {
 			await this.updateNetworkStatus(true);
@@ -69,18 +63,18 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			return;
 		}
 
-		if (this.config.networkStart) {
+		if (this.configuration.getOptional("networkStart", false)) {
 			this.#coldStart = true;
 			this.logger.warning("Entering cold start because the relay is in genesis-start mode.");
 		}
 
-		if (this.config.disableDiscovery) {
+		if (this.configuration.getOptional("disableDiscovery", false)) {
 			this.logger.warning("Skipped peer discovery because the relay is in non-discovery mode.");
 			return;
 		}
 
 		try {
-			if (await this.discoverPeers(initialRun)) {
+			if (await this.peerDiscoverer.discoverPeers(initialRun)) {
 				await this.cleansePeers();
 			}
 		} catch (error) {
@@ -89,8 +83,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		let nextRunDelaySeconds = 600;
 
-		if (!this.#hasMinimumPeers()) {
-			await this.#populateSeedPeers();
+		if (!this.repository.hasMinimumPeers()) {
+			await this.peerDiscoverer.populateSeedPeers();
 
 			nextRunDelaySeconds = 60;
 
@@ -110,7 +104,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		let max = peers.length;
 
 		let unresponsivePeers = 0;
-		const pingDelay = fast ? 1500 : this.config.verifyTimeout;
+		const pingDelay = fast ? 1500 : this.configuration.getRequired<number>("verifyTimeout");
 
 		if (peerCount) {
 			peers = Utils.shuffle(peers).slice(0, peerCount);
@@ -164,61 +158,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 	}
 
-	public async discoverPeers(pingAll?: boolean): Promise<boolean> {
-		const maxPeersPerPeer = 50;
-		const ownPeers: Contracts.P2P.Peer[] = this.repository.getPeers();
-		const theirPeers: Contracts.P2P.Peer[] = Object.values(
-			(
-				await Promise.all(
-					Utils.shuffle(this.repository.getPeers())
-						.slice(0, 8)
-						.map(async (peer: Contracts.P2P.Peer) => {
-							try {
-								const hisPeers = await this.communicator.getPeers(peer);
-								return hisPeers || [];
-							} catch (error) {
-								this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
-								return [];
-							}
-						}),
-				)
-			)
-				.map((peers) =>
-					Object.fromEntries(
-						Utils.shuffle(peers)
-							.slice(0, maxPeersPerPeer)
-							.map((current: Contracts.P2P.PeerBroadcast) => [current.ip, this.peerFactory(current.ip)]),
-					),
-				)
-				.reduce(
-					(accumulator: object, current: { [ip: string]: Contracts.P2P.Peer }) => ({
-						...accumulator,
-						...current,
-					}),
-					{},
-				),
-		);
-
-		if (pingAll || !this.#hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
-			await Promise.all(
-				theirPeers.map((p) =>
-					this.app
-						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-						.call("validateAndAcceptPeer", { ip: p.ip, options: { lessVerbose: true } }),
-				),
-			);
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.#pingPeerPorts(pingAll);
-
-			return true;
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.#pingPeerPorts();
-
-		return false;
-	}
-
 	public isColdStart(): boolean {
 		return this.#coldStart;
 	}
@@ -255,7 +194,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async checkNetworkHealth(): Promise<Contracts.P2P.NetworkStatus> {
-		await this.discoverPeers(true);
+		await this.peerDiscoverer.discoverPeers(true);
 		await this.cleansePeers({ forcePing: true });
 
 		const lastBlock: Contracts.Crypto.IBlock = this.app
@@ -312,17 +251,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		return { forked: false };
 	}
 
-	async #pingPeerPorts(pingAll?: boolean): Promise<void> {
-		let peers = this.repository.getPeers();
-		if (!pingAll) {
-			peers = Utils.shuffle(peers).slice(0, Math.floor(peers.length / 2));
-		}
-
-		this.logger.debug(`Checking ports of ${Utils.pluralize("peer", peers.length, true)}.`);
-
-		await Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
-	}
-
 	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
 		if (this.nextUpdateNetworkStatusScheduled) {
 			return;
@@ -336,71 +264,5 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.updateNetworkStatus();
-	}
-
-	#hasMinimumPeers(): boolean {
-		if (this.config.ignoreMinimumNetworkReach) {
-			this.logger.warning("Ignored the minimum network reach because the relay is in seed mode.");
-
-			return true;
-		}
-
-		return Object.keys(this.repository.getPeers()).length >= this.config.minimumNetworkReach;
-	}
-
-	async #populateSeedPeers(): Promise<any> {
-		const peerList: Contracts.P2P.PeerData[] = this.app.config("peers").list;
-
-		try {
-			const peersFromUrl = await this.#loadPeersFromUrlList();
-			for (const peer of peersFromUrl) {
-				if (!peerList.find((p) => p.ip === peer.ip)) {
-					peerList.push({
-						ip: peer.ip,
-						port: peer.port,
-					});
-				}
-			}
-		} catch {}
-
-		if (!peerList || peerList.length === 0) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.app.terminate("No seed peers defined in peers.json");
-		}
-
-		const peers: Contracts.P2P.Peer[] = peerList.map((peer) => {
-			const peerInstance = this.peerFactory(peer.ip);
-			peerInstance.version = this.app.version();
-			return peerInstance;
-		});
-
-		return Promise.all(
-			// @ts-ignore
-			Object.values(peers).map((peer: Contracts.P2P.Peer) => {
-				this.repository.forgetPeer(peer);
-
-				return this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("validateAndAcceptPeer", { ip: peer.ip, options: { lessVerbose: true, seed: true } });
-			}),
-		);
-	}
-
-	async #loadPeersFromUrlList(): Promise<Array<{ ip: string; port: number }>> {
-		const urls: string[] = this.app.config("peers").sources || [];
-
-		for (const url of urls) {
-			// Local File...
-			if (url.startsWith("/")) {
-				return require(url);
-			}
-
-			// URL...
-			this.logger.debug(`GET ${url}`);
-			const { data } = await Utils.http.get(url);
-			return typeof data === "object" ? data : JSON.parse(data);
-		}
-
-		return [];
 	}
 }
