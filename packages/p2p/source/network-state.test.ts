@@ -34,7 +34,7 @@ describe<{
 	};
 
 	const blockchainService = { getLastBlock: () => lastBlock };
-	const networkMonitor = { app: undefined, completeColdStart: () => {}, isColdStart: () => false };
+	const networkMonitor = { app: undefined };
 	const slots = { getSlotNumber: () => 8 };
 
 	const peerRepository = { getPeers: () => [] };

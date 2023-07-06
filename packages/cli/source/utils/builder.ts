@@ -24,7 +24,6 @@ export const Builder = {
 		const config = {
 			disableDiscovery: flags.disableDiscovery,
 			ignoreMinimumNetworkReach: flags.ignoreMinimumNetworkReach,
-			networkStart: flags.networkStart,
 			skipDiscovery: flags.skipDiscovery,
 		};
 

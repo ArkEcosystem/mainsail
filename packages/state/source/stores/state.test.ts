@@ -103,15 +103,6 @@ describeSkip<{
 		assert.equal(context.stateStorage.getNumberOfBlocksToRollback(), 3);
 	});
 
-	it("getNetworkStart - should return false by default", (context) => {
-		assert.false(context.stateStorage.getNetworkStart());
-	});
-
-	it("setNetworkStart - should set networkStart", (context) => {
-		context.stateStorage.setNetworkStart(true);
-		assert.true(context.stateStorage.getNetworkStart());
-	});
-
 	it("getRestoredDatabaseIntegrity - should return false by default", (context) => {
 		assert.false(context.stateStorage.getRestoredDatabaseIntegrity());
 	});

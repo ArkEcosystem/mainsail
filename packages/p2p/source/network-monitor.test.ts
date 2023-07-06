@@ -236,25 +236,6 @@ describeSkip<{
 	// 	delete process.env.CORE_ENV;
 	// });
 
-	// it.skip("#updateNetworkStatus - should set coldStart to true and discover peers", async ({
-	// 	networkMonitor,
-	// 	sandbox,
-	// 	configuration,
-	// }) => {
-	// 	configuration.set("networkStart", true);
-	// 	const spyDiscoverPeers = stub(networkMonitor, "discoverPeers").resolvedValue(false);
-	// 	stub(sandbox.app, "config").returnValue({
-	// 		list: [],
-	// 	});
-
-	// 	assert.false(networkMonitor.isColdStart());
-
-	// 	await networkMonitor.updateNetworkStatus();
-
-	// 	assert.true(networkMonitor.isColdStart());
-	// 	spyDiscoverPeers.calledOnce();
-	// });
-
 	it("#updateNetworkStatus - should log a warning message and not discover peers, when in 'disable discovery' mode", async ({
 		networkMonitor,
 		configuration,
@@ -528,25 +509,6 @@ describeSkip<{
 
 		spyCommunicatorGetPeers.calledTimes(8);
 		spyTriggerServiceCall.neverCalled();
-	});
-
-	it.skip("#completeColdStart - should set coldStart to false", async ({
-		networkMonitor,
-		sandbox,
-		configuration,
-	}) => {
-		configuration.set("networkStart", true);
-		stub(sandbox.app, "config").returnValue({
-			list: [],
-		});
-
-		await networkMonitor.updateNetworkStatus(); // setting cold start to true
-
-		assert.true(networkMonitor.isColdStart());
-
-		networkMonitor.completeColdStart();
-
-		assert.false(networkMonitor.isColdStart());
 	});
 
 	it("#getNetworkState - should call cleansePeers with {fast, forcePing} and return network state from NetworkState.analyze", async ({
