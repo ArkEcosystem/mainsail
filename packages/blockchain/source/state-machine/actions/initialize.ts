@@ -71,15 +71,6 @@ export class Initialize implements Action {
 			const roundInfo = AppUtils.roundCalculator.calculateRound(block.data.height, this.configuration);
 			await this.databaseService.deleteRound(roundInfo.round + 1);
 
-			if (this.stateStore.getNetworkStart()) {
-				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
-				await this.transactionPool.readdTransactions();
-				void this.consensus.run();
-				await this.networkMonitor.boot();
-
-				return this.blockchain.dispatch("STARTED");
-			}
-
 			if (process.env[Constants.Flags.CORE_ENV] === "test") {
 				this.logger.notice("TEST SUITE DETECTED! SYNCING WALLETS AND STARTING IMMEDIATELY.");
 

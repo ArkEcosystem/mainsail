@@ -29,7 +29,6 @@ export class StateStore implements Contracts.State.StateStore {
 	#wakeUpTimeout?: NodeJS.Timeout;
 	#noBlockCounter = 0;
 	#p2pUpdateCounter = 0;
-	#networkStart = false;
 	#restoredDatabaseIntegrity = false;
 
 	// The last committed round
@@ -98,14 +97,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setP2pUpdateCounter(p2pUpdateCounter: number): void {
 		this.#p2pUpdateCounter = p2pUpdateCounter;
-	}
-
-	public getNetworkStart(): boolean {
-		return this.#networkStart;
-	}
-
-	public setNetworkStart(networkStart: boolean): void {
-		this.#networkStart = networkStart;
 	}
 
 	public getRestoredDatabaseIntegrity(): boolean {

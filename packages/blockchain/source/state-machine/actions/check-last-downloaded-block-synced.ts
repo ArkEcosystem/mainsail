@@ -46,10 +46,6 @@ export class CheckLastDownloadedBlockSynced implements Action {
 			event = "SYNCED";
 		}
 
-		if (this.stateStore.getNetworkStart()) {
-			event = "SYNCED";
-		}
-
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			event = "TEST";
 		}
