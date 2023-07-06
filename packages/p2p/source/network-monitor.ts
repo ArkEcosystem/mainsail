@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";
@@ -24,9 +24,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
-
-	@inject(Identifiers.PeerFactory)
-	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
 	@inject(Identifiers.PeerProcessor)
 	private readonly processor!: Contracts.P2P.PeerProcessor;
@@ -83,7 +80,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		try {
-			if (await this.discoverPeers(initialRun)) {
+			if (await this.peerDiscoverer.discoverPeers(initialRun)) {
 				await this.cleansePeers();
 			}
 		} catch (error) {
@@ -167,61 +164,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 	}
 
-	public async discoverPeers(pingAll?: boolean): Promise<boolean> {
-		const maxPeersPerPeer = 50;
-		const ownPeers: Contracts.P2P.Peer[] = this.repository.getPeers();
-		const theirPeers: Contracts.P2P.Peer[] = Object.values(
-			(
-				await Promise.all(
-					Utils.shuffle(this.repository.getPeers())
-						.slice(0, 8)
-						.map(async (peer: Contracts.P2P.Peer) => {
-							try {
-								const hisPeers = await this.communicator.getPeers(peer);
-								return hisPeers || [];
-							} catch (error) {
-								this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
-								return [];
-							}
-						}),
-				)
-			)
-				.map((peers) =>
-					Object.fromEntries(
-						Utils.shuffle(peers)
-							.slice(0, maxPeersPerPeer)
-							.map((current: Contracts.P2P.PeerBroadcast) => [current.ip, this.peerFactory(current.ip)]),
-					),
-				)
-				.reduce(
-					(accumulator: object, current: { [ip: string]: Contracts.P2P.Peer }) => ({
-						...accumulator,
-						...current,
-					}),
-					{},
-				),
-		);
-
-		if (pingAll || !this.#hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
-			await Promise.all(
-				theirPeers.map((p) =>
-					this.app
-						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-						.call("validateAndAcceptPeer", { ip: p.ip, options: { lessVerbose: true } }),
-				),
-			);
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.#pingPeerPorts(pingAll);
-
-			return true;
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.#pingPeerPorts();
-
-		return false;
-	}
-
 	public isColdStart(): boolean {
 		return this.#coldStart;
 	}
@@ -258,7 +200,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async checkNetworkHealth(): Promise<Contracts.P2P.NetworkStatus> {
-		await this.discoverPeers(true);
+		await this.peerDiscoverer.discoverPeers(true);
 		await this.cleansePeers({ forcePing: true });
 
 		const lastBlock: Contracts.Crypto.IBlock = this.app
@@ -313,17 +255,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		return { forked: false };
-	}
-
-	async #pingPeerPorts(pingAll?: boolean): Promise<void> {
-		let peers = this.repository.getPeers();
-		if (!pingAll) {
-			peers = Utils.shuffle(peers).slice(0, Math.floor(peers.length / 2));
-		}
-
-		this.logger.debug(`Checking ports of ${Utils.pluralize("peer", peers.length, true)}.`);
-
-		await Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
 	}
 
 	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
