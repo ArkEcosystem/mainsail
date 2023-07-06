@@ -10,6 +10,9 @@ export class Downloader {
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
+	@inject(Identifiers.PeerHeaderFactory)
+	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
+
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
@@ -27,7 +30,8 @@ export class Downloader {
 	#isDownloadingMessages = false;
 
 	public tryToDownloadBlocks(): void {
-		const peers = this.repository.getPeers();
+		const header = this.headerFactory();
+		const peers = this.repository.getPeers().filter((peer) => header.canDownloadBlocks(peer.state));
 
 		if (peers.length > 0) {
 			void this.downloadBlocks(this.#getRandomPeer(peers));
@@ -35,7 +39,8 @@ export class Downloader {
 	}
 
 	public tryToDownloadProposal(): void {
-		const peers = this.repository.getPeers();
+		const header = this.headerFactory();
+		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.state));
 
 		if (peers.length > 0) {
 			void this.downloadProposal(this.#getRandomPeer(peers));
@@ -43,7 +48,8 @@ export class Downloader {
 	}
 
 	public tryToDownloadMessages(): void {
-		const peers = this.repository.getPeers();
+		const header = this.headerFactory();
+		const peers = this.repository.getPeers().filter((peer) => header.canDownloadMessages(peer.state));
 
 		if (peers.length > 0) {
 			void this.downloadMessages(this.#getRandomPeer(peers));
@@ -99,6 +105,7 @@ export class Downloader {
 			// TODO: Handle errors
 		} finally {
 			this.#isDownloadingProposal = false;
+			this.tryToDownloadProposal();
 		}
 
 		// TODO: Check if we have any missing blocks
@@ -130,6 +137,7 @@ export class Downloader {
 			// TODO: Handle errors
 		} finally {
 			this.#isDownloadingMessages = false;
+			this.tryToDownloadMessages();
 		}
 	}
 
