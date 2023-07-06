@@ -6,6 +6,12 @@ export class Header implements Contracts.P2P.IHeader {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Consensus.Service)
+	private readonly consensus!: Contracts.Consensus.IConsensusService;
+
+	@inject(Identifiers.Consensus.RoundStateRepository)
+	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
+
 	public height!: number;
 	public round!: number;
 	public step!: Contracts.Consensus.Step;
@@ -14,16 +20,11 @@ export class Header implements Contracts.P2P.IHeader {
 
 	@postConstruct()
 	public init() {
-		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
-			Identifiers.Consensus.RoundStateRepository,
-		);
+		this.height = this.consensus.getHeight();
+		this.round = this.consensus.getRound();
+		this.step = this.consensus.getStep();
 
-		this.height = consensus.getHeight();
-		this.round = consensus.getRound();
-		this.step = consensus.getStep();
-
-		this.#roundState = roundStateRepo.getRoundState(this.height, this.round);
+		this.#roundState = this.roundStateRepo.getRoundState(this.height, this.round);
 	}
 
 	public toData(): Contracts.P2P.IHeaderData {
