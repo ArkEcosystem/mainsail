@@ -43,7 +43,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async boot(): Promise<void> {
-		await this.#populateSeedPeers();
+		// await this.#populateSeedPeers();
 
 		if (this.config.skipDiscovery) {
 			this.logger.warning("Skipped peer discovery because the relay is in skip-discovery mode.");
@@ -90,7 +90,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		let nextRunDelaySeconds = 600;
 
 		if (!this.#hasMinimumPeers()) {
-			await this.#populateSeedPeers();
+			// await this.#populateSeedPeers();
 
 			nextRunDelaySeconds = 60;
 
@@ -346,61 +346,5 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		return Object.keys(this.repository.getPeers()).length >= this.config.minimumNetworkReach;
-	}
-
-	async #populateSeedPeers(): Promise<any> {
-		const peerList: Contracts.P2P.PeerData[] = this.app.config("peers").list;
-
-		try {
-			const peersFromUrl = await this.#loadPeersFromUrlList();
-			for (const peer of peersFromUrl) {
-				if (!peerList.find((p) => p.ip === peer.ip)) {
-					peerList.push({
-						ip: peer.ip,
-						port: peer.port,
-					});
-				}
-			}
-		} catch {}
-
-		if (!peerList || peerList.length === 0) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.app.terminate("No seed peers defined in peers.json");
-		}
-
-		const peers: Contracts.P2P.Peer[] = peerList.map((peer) => {
-			const peerInstance = this.peerFactory(peer.ip);
-			peerInstance.version = this.app.version();
-			return peerInstance;
-		});
-
-		return Promise.all(
-			// @ts-ignore
-			Object.values(peers).map((peer: Contracts.P2P.Peer) => {
-				this.repository.forgetPeer(peer);
-
-				return this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("validateAndAcceptPeer", { ip: peer.ip, options: { lessVerbose: true, seed: true } });
-			}),
-		);
-	}
-
-	async #loadPeersFromUrlList(): Promise<Array<{ ip: string; port: number }>> {
-		const urls: string[] = this.app.config("peers").sources || [];
-
-		for (const url of urls) {
-			// Local File...
-			if (url.startsWith("/")) {
-				return require(url);
-			}
-
-			// URL...
-			this.logger.debug(`GET ${url}`);
-			const { data } = await Utils.http.get(url);
-			return typeof data === "object" ? data : JSON.parse(data);
-		}
-
-		return [];
 	}
 }
