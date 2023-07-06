@@ -51,10 +51,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		);
 		const minimumNetworkReach = configuration.getRequired<number>("minimumNetworkReach");
 
-		if (monitor.isColdStart()) {
-			monitor.completeColdStart();
-			return new NetworkState(NetworkStateStatus.ColdStart, lastBlock);
-		} else if (process.env[Constants.Flags.CORE_ENV] === "test") {
+		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			return new NetworkState(NetworkStateStatus.Test, lastBlock);
 		} else if (peers.length < minimumNetworkReach) {
 			return new NetworkState(NetworkStateStatus.BelowMinimumPeers, lastBlock);

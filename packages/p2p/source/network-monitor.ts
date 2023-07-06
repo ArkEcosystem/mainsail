@@ -33,7 +33,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
 
-	#coldStart = false;
 	#initializing = true;
 
 	public async boot(): Promise<void> {
@@ -61,11 +60,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async updateNetworkStatus(initialRun?: boolean): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			return;
-		}
-
-		if (this.configuration.getOptional("networkStart", false)) {
-			this.#coldStart = true;
-			this.logger.warning("Entering cold start because the relay is in genesis-start mode.");
 		}
 
 		if (this.configuration.getOptional("disableDiscovery", false)) {
@@ -156,14 +150,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			);
 			this.logger.info(`Median Network Height: ${this.getNetworkHeight().toLocaleString()}`);
 		}
-	}
-
-	public isColdStart(): boolean {
-		return this.#coldStart;
-	}
-
-	public completeColdStart(): void {
-		this.#coldStart = false;
 	}
 
 	public getNetworkHeight(): number {
