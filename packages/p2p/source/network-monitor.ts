@@ -89,7 +89,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		let nextRunDelaySeconds = 600;
 
-		if (!this.#hasMinimumPeers()) {
+		if (!this.repository.hasMinimumPeers()) {
 			await this.peerDiscoverer.populateSeedPeers();
 
 			nextRunDelaySeconds = 60;
@@ -270,15 +270,5 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.updateNetworkStatus();
-	}
-
-	#hasMinimumPeers(): boolean {
-		if (this.config.ignoreMinimumNetworkReach) {
-			this.logger.warning("Ignored the minimum network reach because the relay is in seed mode.");
-
-			return true;
-		}
-
-		return Object.keys(this.repository.getPeers()).length >= this.config.minimumNetworkReach;
 	}
 }

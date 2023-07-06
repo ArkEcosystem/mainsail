@@ -1,14 +1,10 @@
-import { inject, tagged } from "@mainsail/container";
+import { inject } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services, Utils } from "@mainsail/kernel";
+import { Services, Utils } from "@mainsail/kernel";
 
 export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.PeerFactory)
 	private readonly peerFactory!: Contracts.P2P.PeerFactory;
@@ -57,7 +53,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 				),
 		);
 
-		if (pingAll || !this.#hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
+		if (pingAll || !this.repository.hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
 			await Promise.all(
 				theirPeers.map((p) =>
 					this.app
@@ -144,18 +140,5 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		this.logger.debug(`Checking ports of ${Utils.pluralize("peer", peers.length, true)}.`);
 
 		await Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
-	}
-
-	#hasMinimumPeers(): boolean {
-		if (this.configuration.getOptional<boolean>("ignoreMinimumNetworkReach", false)) {
-			this.logger.warning("Ignored the minimum network reach because the relay is in seed mode.");
-
-			return true;
-		}
-
-		return (
-			Object.keys(this.repository.getPeers()).length >=
-			this.configuration.getRequired<number>("minimumNetworkReach")
-		);
 	}
 }
