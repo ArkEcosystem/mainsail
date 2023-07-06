@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
@@ -6,13 +6,14 @@ export class Header implements Contracts.P2P.IHeader {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	public readonly height: number;
-	public readonly round: number;
-	public readonly step: Contracts.Consensus.Step;
+	public height!: number;
+	public round!: number;
+	public step!: Contracts.Consensus.Step;
 
-	#roundState: Contracts.Consensus.IRoundState;
+	#roundState!: Contracts.Consensus.IRoundState;
 
-	public constructor() {
+	@postConstruct()
+	public init() {
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
