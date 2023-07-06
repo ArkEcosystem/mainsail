@@ -1,7 +1,8 @@
-import { inject } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
 
+@injectable()
 export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
