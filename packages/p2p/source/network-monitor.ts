@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
@@ -31,21 +31,15 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
 
 	#coldStart = false;
 	#initializing = true;
 
-	@postConstruct()
-	public initialize(): void {
-		this.config = this.configuration.all(); // >_<
-	}
-
 	public async boot(): Promise<void> {
 		await this.peerDiscoverer.populateSeedPeers();
 
-		if (this.config.skipDiscovery) {
+		if (this.configuration.getOptional("skipDiscovery", false)) {
 			this.logger.warning("Skipped peer discovery because the relay is in skip-discovery mode.");
 		} else {
 			await this.updateNetworkStatus(true);
@@ -69,12 +63,12 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			return;
 		}
 
-		if (this.config.networkStart) {
+		if (this.configuration.getOptional("networkStart", false)) {
 			this.#coldStart = true;
 			this.logger.warning("Entering cold start because the relay is in genesis-start mode.");
 		}
 
-		if (this.config.disableDiscovery) {
+		if (this.configuration.getOptional("disableDiscovery", false)) {
 			this.logger.warning("Skipped peer discovery because the relay is in non-discovery mode.");
 			return;
 		}
@@ -110,7 +104,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		let max = peers.length;
 
 		let unresponsivePeers = 0;
-		const pingDelay = fast ? 1500 : this.config.verifyTimeout;
+		const pingDelay = fast ? 1500 : this.configuration.getRequired<number>("verifyTimeout");
 
 		if (peerCount) {
 			peers = Utils.shuffle(peers).slice(0, peerCount);
