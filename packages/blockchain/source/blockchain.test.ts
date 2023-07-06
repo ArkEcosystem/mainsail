@@ -51,7 +51,6 @@ describe<{
 			// getGenesisBlock: () => ({ data: Networks.testnet.genesisBlock }),
 			getLastDownloadedBlock: () => {},
 			getMaxLastBlocks: () => 200,
-			getNetworkStart: () => false,
 			getNumberOfBlocksToRollback: () => 0,
 			isStarted: () => {},
 			pingBlock: () => {},
@@ -60,7 +59,6 @@ describe<{
 			setLastBlock: () => {},
 			setLastDownloadedBlock: () => {},
 			setLastStoredBlockHeight: () => {},
-			setNetworkStart: () => {},
 			setNumberOfBlocksToRollback: () => {},
 			setWakeUpTimeout: () => {},
 			wakeUpTimeout: undefined,
@@ -202,26 +200,6 @@ describe<{
 		context.sandbox.app.bind(Identifiers.QueueFactory).toFactory(() => () => context.queue);
 
 		// Managers.configManager.setFromPreset("testnet");
-	});
-
-	it("initialize should log a warning if networkStart option is provided", (context) => {
-		stub(context.pluginConfiguration, "getOptional").returnValueOnce(true);
-		stub(context.stateStore, "getNetworkStart").returnValue(true);
-		const logWarningSpy = spy(context.logService, "warning");
-		const setNetworkStartSpy = spy(context.stateStore, "setNetworkStart");
-
-		context.sandbox.app.resolve<Blockchain>(Blockchain);
-
-		logWarningSpy.calledOnce();
-		setNetworkStartSpy.calledWith(true);
-	});
-
-	it("initialize should not log a warning if networkStart option isn't provided", (context) => {
-		const logWarningSpy = spy(context.logService, "warning");
-
-		context.sandbox.app.resolve<Blockchain>(Blockchain);
-
-		logWarningSpy.neverCalled();
 	});
 
 	it("getQueue should return instance of queue", async (context) => {

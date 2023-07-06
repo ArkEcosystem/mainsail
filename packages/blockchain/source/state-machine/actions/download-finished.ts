@@ -5,9 +5,6 @@ import { Action } from "../contracts";
 
 @injectable()
 export class DownloadFinished implements Action {
-	@inject(Identifiers.Application)
-	public readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 

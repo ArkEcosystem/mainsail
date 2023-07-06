@@ -23,7 +23,6 @@ describe<{
 		};
 		context.stateStore = {
 			getLastDownloadedBlock: () => {},
-			getNetworkStart: () => false,
 			getNoBlockCounter: () => 0,
 			getP2pUpdateCounter: () => 0,
 			noBlockCounter: undefined,
@@ -72,19 +71,6 @@ describe<{
 
 		dispatchSpy.calledOnce();
 		dispatchSpy.calledWith("TEST");
-	});
-
-	it("should dispatch SYNCED when stateStore.getNetworkStart", async (context) => {
-		const checkLastDownloadedBlockSynced =
-			context.container.resolve<CheckLastDownloadedBlockSynced>(CheckLastDownloadedBlockSynced);
-
-		stub(context.stateStore, "getNetworkStart").returnValue(true);
-		const dispatchSpy = spy(context.blockchain, "dispatch");
-
-		await checkLastDownloadedBlockSynced.handle();
-
-		dispatchSpy.calledOnce();
-		dispatchSpy.calledWith("SYNCED");
 	});
 
 	it("should dispatch PAUSED when blockchain.queue.length() > 100", async (context) => {

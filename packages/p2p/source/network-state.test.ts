@@ -150,7 +150,6 @@ describe<{
 		},
 		[
 			[NetworkStateStatus.Default, 5, "7aaf2d2dc30fdbe8808b010714fd429f893535f5a90aa2abdb0ca62aa7d35130"],
-			[NetworkStateStatus.ColdStart, 144, "416d6ac21f279d9b79dde1fe59c6084628779a3a3cb5b4ea11fa4bf10295143b"],
 			[
 				NetworkStateStatus.BelowMinimumPeers,
 				2,
