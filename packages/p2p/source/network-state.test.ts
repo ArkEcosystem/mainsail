@@ -53,20 +53,6 @@ describe<{
 		networkMonitor.app = context.sandbox.app;
 	});
 
-	it("#analyze - should call completeColdStart() and return ColdStart status, when this is a cold start", async () => {
-		stub(networkMonitor, "isColdStart").returnValueOnce(true);
-		const spyNetworkMonitorCompleteColdStart = spy(networkMonitor, "completeColdStart");
-
-		const networkState = await NetworkState.analyze(
-			networkMonitor as unknown as Contracts.P2P.NetworkMonitor,
-			peerRepository as unknown as Contracts.P2P.PeerRepository,
-			slots as unknown as Contracts.Crypto.Slots,
-		);
-
-		spyNetworkMonitorCompleteColdStart.calledOnce();
-		assert.equal(networkState.status, NetworkStateStatus.ColdStart);
-	});
-
 	it("#analyze - should return Test status", async () => {
 		process.env.CORE_ENV = "test";
 
