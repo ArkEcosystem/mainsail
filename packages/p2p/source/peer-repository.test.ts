@@ -6,17 +6,18 @@ import { PeerRepository } from "./peer-repository";
 
 describe<{
 	sandbox: Sandbox;
-	peerRepostiory: PeerRepository;
+	peerRepository: PeerRepository;
 }>("PeerRepository", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue({});
 
-		context.peerRepostiory = context.sandbox.app.resolve(PeerRepository);
+		context.peerRepository = context.sandbox.app.resolve(PeerRepository);
 	});
 
-	it("#getPeers - should return all the peers in an array", ({ peerRepostiory, sandbox }) => {
+	it("#getPeers - should return all the peers in an array", ({ peerRepository, sandbox }) => {
 		const peers = [
 			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
 			sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
@@ -24,17 +25,17 @@ describe<{
 		];
 
 		for (const peer of peers) {
-			peerRepostiory.setPeer(peer);
+			peerRepository.setPeer(peer);
 		}
 
-		assert.equal(peerRepostiory.getPeers(), peers);
+		assert.equal(peerRepository.getPeers(), peers);
 	});
 
-	it("#hasPeers - should return false if there is zero peer", ({ peerRepostiory }) => {
-		assert.false(peerRepostiory.hasPeers());
+	it("#hasPeers - should return false if there is zero peer", ({ peerRepository }) => {
+		assert.false(peerRepository.hasPeers());
 	});
 
-	it("#hasPeers - should return true if there is more than zero peer", ({ peerRepostiory, sandbox }) => {
+	it("#hasPeers - should return true if there is more than zero peer", ({ peerRepository, sandbox }) => {
 		const peers = [
 			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
 			sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
@@ -42,15 +43,15 @@ describe<{
 			sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		];
 
-		assert.false(peerRepostiory.hasPeers());
+		assert.false(peerRepository.hasPeers());
 
 		for (const peer of peers) {
-			peerRepostiory.setPeer(peer);
-			assert.true(peerRepostiory.hasPeers());
+			peerRepository.setPeer(peer);
+			assert.true(peerRepository.hasPeers());
 		}
 	});
 
-	it("#getPeer - should return the peer by its ip", ({ peerRepostiory, sandbox }) => {
+	it("#getPeer - should return the peer by its ip", ({ peerRepository, sandbox }) => {
 		const peersByIp = {
 			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
@@ -58,15 +59,15 @@ describe<{
 		};
 
 		for (const peerIp of Object.values(peersByIp)) {
-			peerRepostiory.setPeer(peerIp);
+			peerRepository.setPeer(peerIp);
 		}
 
 		for (const [ip, peer] of Object.entries(peersByIp)) {
-			assert.equal(peerRepostiory.getPeer(ip), peer);
+			assert.equal(peerRepository.getPeer(ip), peer);
 		}
 	});
 
-	it("#getPeer - should throw when no peer exists for the ip", ({ peerRepostiory, sandbox }) => {
+	it("#getPeer - should throw when no peer exists for the ip", ({ peerRepository, sandbox }) => {
 		const peersByIp = {
 			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
@@ -74,13 +75,13 @@ describe<{
 		};
 
 		for (const peerIp of Object.values(peersByIp)) {
-			peerRepostiory.setPeer(peerIp);
+			peerRepository.setPeer(peerIp);
 		}
 
-		assert.throws(() => peerRepostiory.getPeer("127.0.0.1"));
+		assert.throws(() => peerRepository.getPeer("127.0.0.1"));
 	});
 
-	it("#setPeer - should set the peer by its ip", ({ peerRepostiory, sandbox }) => {
+	it("#setPeer - should set the peer by its ip", ({ peerRepository, sandbox }) => {
 		const peersByIp = {
 			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
@@ -88,59 +89,59 @@ describe<{
 		};
 
 		for (const peer of Object.values(peersByIp)) {
-			peerRepostiory.setPeer(peer);
+			peerRepository.setPeer(peer);
 		}
 
 		for (const [ip, peer] of Object.entries(peersByIp)) {
-			assert.equal(peerRepostiory.getPeer(ip), peer);
+			assert.equal(peerRepository.getPeer(ip), peer);
 		}
 	});
 
-	it("#forgetPeer - should forget the peer", ({ peerRepostiory, sandbox }) => {
+	it("#forgetPeer - should forget the peer", ({ peerRepository, sandbox }) => {
 		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
-		peerRepostiory.setPeer(peer);
+		peerRepository.setPeer(peer);
 
-		assert.true(peerRepostiory.hasPeer(peer.ip));
-		assert.equal(peerRepostiory.getPeer(peer.ip), peer);
+		assert.true(peerRepository.hasPeer(peer.ip));
+		assert.equal(peerRepository.getPeer(peer.ip), peer);
 
-		peerRepostiory.forgetPeer(peer);
+		peerRepository.forgetPeer(peer);
 
-		assert.false(peerRepostiory.hasPeer(peer.ip));
-		assert.throws(() => peerRepostiory.getPeer(peer.ip));
+		assert.false(peerRepository.hasPeer(peer.ip));
+		assert.throws(() => peerRepository.getPeer(peer.ip));
 	});
 
-	it("#hasPeer - should return true if the peer exists", ({ peerRepostiory, sandbox }) => {
+	it("#hasPeer - should return true if the peer exists", ({ peerRepository, sandbox }) => {
 		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
-		peerRepostiory.setPeer(peer);
+		peerRepository.setPeer(peer);
 
-		assert.true(peerRepostiory.hasPeer(peer.ip));
+		assert.true(peerRepository.hasPeer(peer.ip));
 	});
 
-	it("#hasPeer - should return false if the peer does not exist", ({ peerRepostiory }) => {
-		assert.false(peerRepostiory.hasPeer("176.165.66.55"));
+	it("#hasPeer - should return false if the peer does not exist", ({ peerRepository }) => {
+		assert.false(peerRepository.hasPeer("176.165.66.55"));
 	});
 
-	it("#getPendingPeers - should return the pending peers", ({ peerRepostiory, sandbox }) => {
+	it("#getPendingPeers - should return the pending peers", ({ peerRepository, sandbox }) => {
 		const peers = [
 			sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
 			sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 		];
 
 		for (const peer of peers) {
-			peerRepostiory.setPendingPeer(peer);
+			peerRepository.setPendingPeer(peer);
 		}
 
-		assert.equal(peerRepostiory.getPendingPeers(), peers);
+		assert.equal(peerRepository.getPendingPeers(), peers);
 	});
 
-	it("#hasPendingPeers - should return false if there is zero pending peer", ({ peerRepostiory }) => {
-		assert.false(peerRepostiory.hasPendingPeers());
+	it("#hasPendingPeers - should return false if there is zero pending peer", ({ peerRepository }) => {
+		assert.false(peerRepository.hasPendingPeers());
 	});
 
 	it("#hasPendingPeers - should return true if there is more than zero pending peer", ({
-		peerRepostiory,
+		peerRepository,
 		sandbox,
 	}) => {
 		const peers = [
@@ -150,83 +151,88 @@ describe<{
 			sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		];
 
-		assert.false(peerRepostiory.hasPendingPeers());
+		assert.false(peerRepository.hasPendingPeers());
 
 		for (const peer of peers) {
-			peerRepostiory.setPendingPeer(peer);
-			assert.true(peerRepostiory.hasPendingPeers());
+			peerRepository.setPendingPeer(peer);
+			assert.true(peerRepository.hasPendingPeers());
 		}
 	});
 
-	it("#getPendingPeer - should return the pending peer by its ip", ({ peerRepostiory, sandbox }) => {
+	it("#getPendingPeer - should return the pending peer by its ip", ({ peerRepository, sandbox }) => {
 		const peersByIp = {
 			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
 			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 		for (const peer of Object.values(peersByIp)) {
-			peerRepostiory.setPendingPeer(peer);
+			peerRepository.setPendingPeer(peer);
 		}
 		for (const [ip, peer] of Object.entries(peersByIp)) {
-			assert.equal(peerRepostiory.getPendingPeer(ip), peer);
+			assert.equal(peerRepository.getPendingPeer(ip), peer);
 		}
 	});
 
-	it("#getPendingPeer - should throw when no pending peer exists for the ip", ({ peerRepostiory, sandbox }) => {
+	it("#getPendingPeer - should throw when no pending peer exists for the ip", ({ peerRepository, sandbox }) => {
 		const peersByIp = {
 			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
 			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 		for (const peer of Object.values(peersByIp)) {
-			peerRepostiory.setPendingPeer(peer);
+			peerRepository.setPendingPeer(peer);
 		}
 
-		assert.throws(() => peerRepostiory.getPendingPeer("127.0.0.1"));
+		assert.throws(() => peerRepository.getPendingPeer("127.0.0.1"));
 	});
 
-	it("#setPendingPeer - should set the pending peer by its ip", ({ peerRepostiory, sandbox }) => {
+	it("#setPendingPeer - should set the pending peer by its ip", ({ peerRepository, sandbox }) => {
 		const peersByIp = {
 			"176.165.44.33": sandbox.app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": sandbox.app.resolve(Peer).init("176.165.66.55", 4000),
 			"2001:3984:3989::104": sandbox.app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		};
 		for (const peer of Object.values(peersByIp)) {
-			peerRepostiory.setPendingPeer(peer);
+			peerRepository.setPendingPeer(peer);
 		}
 		for (const [ip, peer] of Object.entries(peersByIp)) {
-			assert.equal(peerRepostiory.getPendingPeer(ip), peer);
+			assert.equal(peerRepository.getPendingPeer(ip), peer);
 		}
 	});
 
-	it("#forgetPendingPeer - should forget the pending peer", ({ peerRepostiory, sandbox }) => {
+	it("#forgetPendingPeer - should forget the pending peer", ({ peerRepository, sandbox }) => {
 		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
-		peerRepostiory.setPendingPeer(peer);
+		peerRepository.setPendingPeer(peer);
 
-		assert.true(peerRepostiory.hasPendingPeer(peer.ip));
-		assert.equal(peerRepostiory.getPendingPeer(peer.ip), peer);
+		assert.true(peerRepository.hasPendingPeer(peer.ip));
+		assert.equal(peerRepository.getPendingPeer(peer.ip), peer);
 
-		peerRepostiory.forgetPendingPeer(peer);
+		peerRepository.forgetPendingPeer(peer);
 
-		assert.false(peerRepostiory.hasPendingPeer(peer.ip));
-		assert.throws(() => peerRepostiory.getPendingPeer(peer.ip));
+		assert.false(peerRepository.hasPendingPeer(peer.ip));
+		assert.throws(() => peerRepository.getPendingPeer(peer.ip));
 	});
 
-	it("#hasPendingPeer - should return true if the pending peer exists", ({ peerRepostiory, sandbox }) => {
+	it("#hasPendingPeer - should return true if the pending peer exists", ({
+		peerRepository: peerRepository,
+		sandbox,
+	}) => {
 		const peer = sandbox.app.resolve(Peer).init("176.165.66.55", 4000);
 
-		peerRepostiory.setPendingPeer(peer);
+		peerRepository.setPendingPeer(peer);
 
-		assert.true(peerRepostiory.hasPendingPeer(peer.ip));
+		assert.true(peerRepository.hasPendingPeer(peer.ip));
 	});
 
-	it("#hasPendingPeer - should return false if the pending peer does not exist", ({ peerRepostiory }) => {
-		assert.false(peerRepostiory.hasPendingPeer("176.165.66.55"));
+	it("#hasPendingPeer - should return false if the pending peer does not exist", ({
+		peerRepository: peerRepository,
+	}) => {
+		assert.false(peerRepository.hasPendingPeer("176.165.66.55"));
 	});
 
 	it("#getSameSubnetPeers - should get the peers within same subnet of provided ip", ({
-		peerRepostiory,
+		peerRepository: peerRepository,
 		sandbox,
 	}) => {
 		const peers = [
@@ -237,11 +243,11 @@ describe<{
 		];
 
 		for (const peer of peers) {
-			peerRepostiory.setPeer(peer);
+			peerRepository.setPeer(peer);
 		}
 
-		assert.equal(peerRepostiory.getSameSubnetPeers("176.165.66.10").length, 2);
-		assert.equal(peerRepostiory.getSameSubnetPeers("176.165.22.99").length, 1);
-		assert.equal(peerRepostiory.getSameSubnetPeers("176.165.23.10").length, 0);
+		assert.equal(peerRepository.getSameSubnetPeers("176.165.66.10").length, 2);
+		assert.equal(peerRepository.getSameSubnetPeers("176.165.22.99").length, 1);
+		assert.equal(peerRepository.getSameSubnetPeers("176.165.23.10").length, 0);
 	});
 });

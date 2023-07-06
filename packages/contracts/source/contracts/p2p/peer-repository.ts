@@ -17,5 +17,7 @@ export interface PeerRepository {
 	forgetPendingPeer(peer: Peer): void;
 	hasPendingPeer(ip: string): boolean;
 
+	hasMinimumPeers(): boolean;
+
 	getSameSubnetPeers(ip: string): Peer[];
 }

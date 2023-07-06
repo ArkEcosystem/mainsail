@@ -22,7 +22,6 @@ export interface NetworkMonitor {
 		forcePing?: boolean;
 		peerCount?: number;
 	}): Promise<void>;
-	discoverPeers(initialRun?: boolean): Promise<boolean>;
 	getNetworkHeight(): number;
 	getNetworkState(): Promise<NetworkState>;
 	refreshPeersAfterFork(): Promise<void>;

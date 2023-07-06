@@ -1,11 +1,15 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers, Utils } from "@mainsail/kernel";
 import { cidr } from "ip";
 
 // @TODO review the implementation
 @injectable()
 export class PeerRepository implements Contracts.P2P.PeerRepository {
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	readonly #peers: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
 	readonly #peersPending: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
 
@@ -63,6 +67,14 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 
 	public hasPendingPeer(ip: string): boolean {
 		return this.#peersPending.has(ip);
+	}
+
+	public hasMinimumPeers(): boolean {
+		if (this.configuration.getOptional<boolean>("ignoreMinimumNetworkReach", false)) {
+			return true;
+		}
+
+		return Object.keys(this.getPeers()).length >= this.configuration.getRequired<number>("minimumNetworkReach");
 	}
 
 	public getSameSubnetPeers(ip: string): Contracts.P2P.Peer[] {
