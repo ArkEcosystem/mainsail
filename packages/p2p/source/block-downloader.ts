@@ -25,6 +25,8 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 	#maxParallelDownloads = 10;
 
 	public async downloadBlocksFromHeight(fromBlockHeight: number): Promise<Contracts.Crypto.IBlockData[]> {
+		return [];
+
 		const peersAll: Contracts.P2P.Peer[] = this.repository.getPeers();
 
 		if (peersAll.length === 0) {
