@@ -1,106 +1,82 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-
-import { Downloader } from "./downloader";
-
-export interface CompareResponse {
-	downloadBlocks?: true;
-	downloadMessages?: true;
-	downloadProposal?: true;
-}
 
 @injectable()
 export class Header implements Contracts.P2P.IHeader {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	public getHeader(): Contracts.P2P.IHeaderData {
-		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
-			Identifiers.Consensus.RoundStateRepository,
-		);
+	@inject(Identifiers.Consensus.Service)
+	private readonly consensus!: Contracts.Consensus.IConsensusService;
 
-		const height = consensus.getHeight();
-		const round = consensus.getRound();
-		const step = consensus.getStep();
+	@inject(Identifiers.Consensus.RoundStateRepository)
+	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
 
-		const roundState = roundStateRepo.getRoundState(height, round);
-		const proposal = roundState.getProposal();
+	public height!: number;
+	public round!: number;
+	public step!: Contracts.Consensus.Step;
+
+	#roundState!: Contracts.Consensus.IRoundState;
+
+	@postConstruct()
+	public init() {
+		this.height = this.consensus.getHeight();
+		this.round = this.consensus.getRound();
+		this.step = this.consensus.getStep();
+
+		this.#roundState = this.roundStateRepo.getRoundState(this.height, this.round);
+	}
+
+	public toData(): Contracts.P2P.IHeaderData {
+		const proposal = this.#roundState.getProposal();
 
 		return {
-			height,
+			height: this.height,
 			// eslint-disable-next-line unicorn/no-null
 			proposedBlockId: proposal ? proposal.block.block.data.id : null,
-			round,
-			step,
-			validatorsSignedPrecommit: roundState.getValidatorsSignedPrecommit(),
-			validatorsSignedPrevote: roundState.getValidatorsSignedPrevote(),
+			round: this.round,
+			step: this.step,
+			validatorsSignedPrecommit: this.#roundState.getValidatorsSignedPrecommit(),
+			validatorsSignedPrevote: this.#roundState.getValidatorsSignedPrevote(),
 			version: this.app.version(),
 		};
 	}
 
-	public async handle(peer: Contracts.P2P.Peer, header: Contracts.P2P.IHeaderData): Promise<void> {
-		peer.state = header;
-
-		const result = await this.#compare(header);
-
-		const downloader = this.app.resolve<Downloader>(Downloader);
-
-		if (result.downloadBlocks) {
-			await downloader.downloadBlocks(peer);
-		}
-
-		if (result.downloadProposal) {
-			await downloader.downloadProposal(peer);
-		}
-
-		if (result.downloadMessages) {
-			await downloader.downloadMessages(peer);
-		}
+	public canDownloadBlocks(data: Contracts.P2P.IHeaderData): boolean {
+		return data.height > this.height;
 	}
 
-	async #compare(header: Contracts.P2P.IHeaderData): Promise<CompareResponse> {
-		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-
-		const height = consensus.getHeight();
-		const round = consensus.getRound();
-
-		if (header.height > height) {
-			return { downloadBlocks: true };
+	public canDownloadProposal(data: Contracts.P2P.IHeaderData): boolean {
+		if (!this.#isRoundSufficient(data)) {
+			return false;
 		}
 
-		if (header.height < height) {
-			return {};
+		return this.#roundState.getProposal() === undefined && !!data.proposedBlockId;
+	}
+
+	public canDownloadMessages(data: Contracts.P2P.IHeaderData): boolean {
+		if (!this.#isRoundSufficient(data)) {
+			return false;
 		}
 
-		if (header.round < round) {
-			return {};
-		}
-
-		const roundState = this.app
-			.get<Contracts.Consensus.IRoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
-			.getRoundState(height, round);
-
-		const response: CompareResponse = {};
-
-		if (roundState.getProposal() === undefined && !!header.proposedBlockId) {
-			response.downloadProposal = true;
-		}
-
-		for (let index = 0; index < header.validatorsSignedPrevote.length; index++) {
-			if (header.validatorsSignedPrevote[index] && !roundState.getValidatorsSignedPrevote()[index]) {
-				response.downloadMessages = true;
-				break;
+		if ([Contracts.Consensus.Step.Prevote, Contracts.Consensus.Step.Propose].includes(this.step)) {
+			for (let index = 0; index < data.validatorsSignedPrevote.length; index++) {
+				if (data.validatorsSignedPrevote[index] && !this.#roundState.getValidatorsSignedPrevote()[index]) {
+					return true;
+				}
 			}
 		}
 
-		for (let index = 0; index < header.validatorsSignedPrecommit.length; index++) {
-			if (header.validatorsSignedPrecommit[index] && !roundState.getValidatorsSignedPrecommit()[index]) {
-				response.downloadMessages = true;
-				break;
+		for (let index = 0; index < data.validatorsSignedPrecommit.length; index++) {
+			if (data.validatorsSignedPrecommit[index] && !this.#roundState.getValidatorsSignedPrecommit()[index]) {
+				return true;
 			}
 		}
 
-		return response;
+		return false;
+	}
+
+	#isRoundSufficient(data: Contracts.P2P.IHeaderData): boolean {
+		return data.height === this.height && data.round >= this.round;
 	}
 }

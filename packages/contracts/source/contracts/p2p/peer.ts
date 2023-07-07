@@ -1,16 +1,7 @@
 import { Dayjs } from "dayjs";
 
 import { Queue } from "../kernel";
-
-export type IHeaderData = {
-	version: string;
-	height: number;
-	round: number;
-	step: number;
-	proposedBlockId: string | null;
-	validatorsSignedPrevote: boolean[];
-	validatorsSignedPrecommit: boolean[];
-};
+import { IHeaderData } from "./header";
 
 export interface PeerPorts {
 	[name: string]: number;
