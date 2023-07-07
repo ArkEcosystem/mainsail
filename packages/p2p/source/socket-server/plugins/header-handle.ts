@@ -8,14 +8,14 @@ export class HeaderHandlePlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerHeader)
-	private readonly header!: Contracts.P2P.IHeader;
+	@inject(Identifiers.PeerHeaderService)
+	private readonly headerService!: Contracts.P2P.IHeaderService;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public register(server) {
-		const header = this.header;
+		const headerService = this.headerService;
 		const peerRepository = this.peerRepository;
 
 		server.ext({
@@ -25,7 +25,7 @@ export class HeaderHandlePlugin {
 				if (peerRepository.hasPeer(peerIp)) {
 					const peer = peerRepository.getPeer(peerIp);
 
-					void header.handle(peer, request.payload.headers);
+					void headerService.handle(peer, request.payload.headers);
 				}
 
 				return h.continue;

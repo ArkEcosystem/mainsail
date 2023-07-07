@@ -1,6 +1,18 @@
-import { IHeaderData, Peer } from "./peer";
+export type IHeaderData = {
+	version: string;
+	height: number;
+	round: number;
+	step: number;
+	proposedBlockId: string | null;
+	validatorsSignedPrevote: boolean[];
+	validatorsSignedPrecommit: boolean[];
+};
 
 export interface IHeader {
-	getHeader(): IHeaderData;
-	handle(peer: Peer, header: IHeaderData): Promise<void>;
+	toData(): IHeaderData;
+	canDownloadBlocks(headerData: IHeaderData): boolean;
+	canDownloadProposal(headerData: IHeaderData): boolean;
+	canDownloadMessages(headerData: IHeaderData): boolean;
 }
+
+export type HeaderFactory = () => IHeader;

@@ -4,6 +4,7 @@ export * from "./broadcaster";
 export * from "./chunk-cache";
 export * from "./endpoints";
 export * from "./header";
+export * from "./header-service";
 export * from "./nes-client";
 export * from "./network-monitor";
 export * from "./network-state";

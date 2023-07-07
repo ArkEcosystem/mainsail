@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-one-iteration-loop */
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
@@ -25,6 +26,8 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 	#maxParallelDownloads = 10;
 
 	public async downloadBlocksFromHeight(fromBlockHeight: number): Promise<Contracts.Crypto.IBlockData[]> {
+		return [];
+
 		const peersAll: Contracts.P2P.Peer[] = this.repository.getPeers();
 
 		if (peersAll.length === 0) {
