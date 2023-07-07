@@ -29,9 +29,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				maxBlockRewind: Joi.number().integer().min(1).required(),
 				steps: Joi.number().integer().min(1).required(),
 			}).required(),
-
-			// used in core:run & relay:run
-			networkStart: Joi.bool(),
 		}).unknown(true);
 	}
 }

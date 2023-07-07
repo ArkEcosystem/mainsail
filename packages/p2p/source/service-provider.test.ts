@@ -674,19 +674,6 @@ describe<{
 		assert.equal(result.error?.message, '"rateLimitPostTransactions" is required');
 	});
 
-	it("#schemaRestrictions - networkStart is optional && is boolean", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
-		defaults.networkStart = 123;
-		let result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"networkStart" must be a boolean');
-
-		delete defaults.networkStart;
-		result = serviceProvider.configSchema().validate(defaults);
-
-		assert.undefined(result.error);
-	});
-
 	it("#schemaRestrictions - disableDiscovery is optional && is boolean", async ({ serviceProvider }) => {
 		const defaults = importDefaults();
 		defaults.disableDiscovery = 123;

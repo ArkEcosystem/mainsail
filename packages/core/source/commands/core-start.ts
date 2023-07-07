@@ -14,7 +14,6 @@ export class Command extends Commands.Command {
 			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("env", "", Joi.string().default("production"))
-			.setFlag("networkStart", "Indicate that this is the first start of seeds.", Joi.boolean())
 			.setFlag("disableDiscovery", "Permanently disable all peer discovery.", Joi.boolean())
 			.setFlag("skipDiscovery", "Skip the initial peer discovery.", Joi.boolean())
 			.setFlag("ignoreMinimumNetworkReach", "Ignore the minimum network reach on start.", Joi.boolean())

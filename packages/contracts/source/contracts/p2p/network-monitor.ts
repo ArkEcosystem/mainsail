@@ -26,6 +26,4 @@ export interface NetworkMonitor {
 	getNetworkState(): Promise<NetworkState>;
 	refreshPeersAfterFork(): Promise<void>;
 	checkNetworkHealth(): Promise<NetworkStatus>;
-	isColdStart(): boolean;
-	completeColdStart(): void;
 }

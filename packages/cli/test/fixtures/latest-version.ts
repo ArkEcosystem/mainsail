@@ -51,8 +51,7 @@ export const versionLatest = {
 				"forger:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet yarn ark forger:run",
 				"forger:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet yarn ark forger:run",
 				"forger:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark forger:run --env=test",
-				"full:testnet":
-					"cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark core:run --networkStart --env=test",
+				"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark core:run --env=test",
 				prepack: "../../node_modules/.bin/oclif-dev manifest && npm shrinkwrap",
 				postpack: "rm -f oclif.manifest.json",
 				prepublishOnly: "yarn build",
@@ -237,8 +236,7 @@ export const versionNext = {
 				"forger:devnet": "cross-env CORE_PATH_CONFIG=./bin/config/devnet yarn ark forger:run",
 				"forger:mainnet": "cross-env CORE_PATH_CONFIG=./bin/config/mainnet yarn ark forger:run",
 				"forger:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark forger:run --env=test",
-				"full:testnet":
-					"cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark core:run --networkStart --env=test",
+				"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet yarn ark core:run --env=test",
 				prepack: "../../node_modules/.bin/oclif-dev manifest && npm shrinkwrap",
 				postpack: "rm -f oclif.manifest.json",
 				prepublishOnly: "yarn build",

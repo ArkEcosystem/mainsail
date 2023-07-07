@@ -1,6 +1,6 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Types, Utils } from "@mainsail/kernel";
+import { Enums, Types, Utils } from "@mainsail/kernel";
 
 import { ProcessBlocksJob } from "./process-blocks-job";
 import { StateMachine } from "./state-machine";
@@ -11,10 +11,6 @@ import { blockchainMachine } from "./state-machine/machine";
 export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "blockchain")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
@@ -47,15 +43,6 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@postConstruct()
 	public async initialize(): Promise<void> {
 		this.#stopped = false;
-
-		// flag to force a network start
-		this.stateStore.setNetworkStart(this.pluginConfiguration.getOptional("options.networkStart", false));
-
-		if (this.stateStore.getNetworkStart()) {
-			this.logger.warning(
-				"Mainsail is launched in Genesis Start mode. This is usually for starting the first node on the blockchain. Unless you know what you are doing, this is likely wrong.",
-			);
-		}
 
 		this.#queue = await this.app.get<Types.QueueFactory>(Identifiers.QueueFactory)();
 

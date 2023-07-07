@@ -31,7 +31,6 @@ describe<{
 		};
 		context.stateStore = {
 			getLastBlock: () => {},
-			getNetworkStart: () => false,
 			getRestoredDatabaseIntegrity: () => false,
 			setLastBlock: () => {},
 		};
@@ -203,30 +202,6 @@ describe<{
 		dispatchSpy.calledWith("STARTED");
 	});
 
-	it("when stateStore.networkStart should dispatch STARTED", async (context) => {
-		const initialize = context.container.resolve<Initialize>(Initialize);
-
-		const lastBlock = {
-			data: {
-				height: 334,
-				id: "345",
-			},
-		};
-		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
-		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
-		stub(context.stateStore, "getNetworkStart").returnValue(true);
-		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
-		const dispatchSpy = spy(context.blockchain, "dispatch");
-		const consenususRunSpy = spy(context.consensus, "run");
-
-		process.env.NODE_ENV = "";
-		await initialize.handle();
-
-		dispatchSpy.calledOnce();
-		consenususRunSpy.calledOnce();
-		dispatchSpy.calledWith("STARTED");
-	});
-
 	it("when process.env.CORE_ENV === 'test' should dispatch STARTED", async (context) => {
 		const initialize = context.container.resolve<Initialize>(Initialize);
 
@@ -238,7 +213,6 @@ describe<{
 		};
 		stub(Utils.roundCalculator, "calculateRound").returnValue({ round: 1 });
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
-		stub(context.stateStore, "getNetworkStart").returnValue(false);
 		stub(context.stateStore, "getRestoredDatabaseIntegrity").returnValue(true);
 		const dispatchSpy = spy(context.blockchain, "dispatch");
 		const deleteRoundSpy = spy(context.databaseService, "deleteRound");

@@ -34,7 +34,7 @@ describe<{
 	};
 
 	const blockchainService = { getLastBlock: () => lastBlock };
-	const networkMonitor = { app: undefined, completeColdStart: () => {}, isColdStart: () => false };
+	const networkMonitor = { app: undefined };
 	const slots = { getSlotNumber: () => 8 };
 
 	const peerRepository = { getPeers: () => [] };
@@ -51,20 +51,6 @@ describe<{
 		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
 
 		networkMonitor.app = context.sandbox.app;
-	});
-
-	it("#analyze - should call completeColdStart() and return ColdStart status, when this is a cold start", async () => {
-		stub(networkMonitor, "isColdStart").returnValueOnce(true);
-		const spyNetworkMonitorCompleteColdStart = spy(networkMonitor, "completeColdStart");
-
-		const networkState = await NetworkState.analyze(
-			networkMonitor as unknown as Contracts.P2P.NetworkMonitor,
-			peerRepository as unknown as Contracts.P2P.PeerRepository,
-			slots as unknown as Contracts.Crypto.Slots,
-		);
-
-		spyNetworkMonitorCompleteColdStart.calledOnce();
-		assert.equal(networkState.status, NetworkStateStatus.ColdStart);
 	});
 
 	it("#analyze - should return Test status", async () => {
@@ -164,7 +150,6 @@ describe<{
 		},
 		[
 			[NetworkStateStatus.Default, 5, "7aaf2d2dc30fdbe8808b010714fd429f893535f5a90aa2abdb0ca62aa7d35130"],
-			[NetworkStateStatus.ColdStart, 144, "416d6ac21f279d9b79dde1fe59c6084628779a3a3cb5b4ea11fa4bf10295143b"],
 			[
 				NetworkStateStatus.BelowMinimumPeers,
 				2,

@@ -29,10 +29,6 @@ export interface StateStore {
 
 	setP2pUpdateCounter(p2pUpdateCounter: number): void;
 
-	getNetworkStart(): boolean;
-
-	setNetworkStart(networkStart: boolean): void;
-
 	getRestoredDatabaseIntegrity(): boolean;
 
 	setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void;

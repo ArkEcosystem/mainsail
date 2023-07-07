@@ -17,7 +17,6 @@ export enum NetworkStateStatus {
 	Default,
 	BelowMinimumPeers,
 	Test,
-	ColdStart,
 	Unknown,
 }
 

@@ -61,7 +61,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
-			networkStart: Joi.bool(),
 			rateLimit: Joi.number().integer().min(1).required(),
 			rateLimitPostTransactions: Joi.number().integer().min(1).required(),
 			remoteAccess: Joi.array()

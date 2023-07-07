@@ -30,7 +30,6 @@ describe("buildPeerFlags", ({ it, assert }) => {
 		const flags = {
 			disableDiscovery: "disableDiscovery",
 			ignoreMinimumNetworkReach: "ignoreMinimumNetworkReach",
-			networkStart: "networkStart",
 			skipDiscovery: "skipDiscovery",
 		};
 
@@ -41,7 +40,6 @@ describe("buildPeerFlags", ({ it, assert }) => {
 		const flags = {
 			disableDiscovery: "disableDiscovery",
 			ignoreMinimumNetworkReach: "ignoreMinimumNetworkReach",
-			networkStart: "networkStart",
 			skipDiscovery: "skipDiscovery",
 		};
 
