@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-one-iteration-loop */
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
