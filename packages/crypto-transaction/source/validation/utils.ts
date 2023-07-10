@@ -20,18 +20,22 @@ export const extendSchema = (parent, properties): Contracts.Crypto.ITransactionS
 		},
 	});
 
-export const signedSchema = (schema: Contracts.Crypto.ITransactionSchema): Contracts.Crypto.ITransactionSchema => ({
-	$id: `${schema.$id}Signed`,
-	anyOf: [
-		extendSchema({ properties: schema.properties, required: schema.required }, { required: ["id", "signature"] }),
-		extendSchema(
-			{ properties: schema.properties, required: schema.required },
-			{ required: ["id", "signature", "signatures"] },
-		),
-		extendSchema({ properties: schema.properties, required: schema.required }, { required: ["id", "signatures"] }),
-	],
-	type: "object",
-});
+export const signedSchema = (schema: Contracts.Crypto.ITransactionSchema): Contracts.Crypto.ITransactionSchema => {
+	const schemaToExtend = {
+		properties: schema.properties,
+		required: schema.required,
+	};
+
+	return {
+		$id: `${schema.$id}Signed`,
+		anyOf: [
+			extendSchema(schemaToExtend, { required: ["id", "signature"] }),
+			extendSchema(schemaToExtend, { required: ["id", "signature", "signatures"] }),
+			extendSchema(schemaToExtend, { required: ["id", "signatures"] }),
+		],
+		type: "object",
+	};
+};
 
 export const strictSchema = (schema: Contracts.Crypto.ITransactionSchema): Contracts.Crypto.ITransactionSchema => {
 	const signed = signedSchema(schema);
