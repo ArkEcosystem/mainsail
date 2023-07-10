@@ -39,7 +39,8 @@ export const headers = {
 			type: "array",
 		},
 		version: {
-			type: "string", // TODO: version
+			pattern: "^\\d+\\.\\d+\\.\\d+$",
+			type: "string",
 		},
 	},
 	required: [

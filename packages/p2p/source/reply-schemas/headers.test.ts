@@ -127,4 +127,43 @@ describe<Context>("Schemas", ({ it, assert, beforeEach, each }) => {
 		},
 		[0, null, undefined, [1], [null], [undefined]],
 	);
+
+	each(
+		"validatorsSignedPrevote - should fail if not boolean array",
+		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
+			const result = validator.validate(headers, {
+				...data,
+				validatorsSignedPrevote: dataset,
+			});
+
+			assert.defined(result.error);
+		},
+		[0, null, undefined, [1], [null], [undefined]],
+	);
+
+	each(
+		"version - should pass if node version",
+		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
+			const result = validator.validate(headers, {
+				...data,
+				version: dataset,
+			});
+
+			assert.undefined(result.error);
+		},
+		["1.1.1", "2.3.1"],
+	);
+
+	each(
+		"version - should fail if not node version",
+		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
+			const result = validator.validate(headers, {
+				...data,
+				version: dataset,
+			});
+
+			assert.defined(result.error);
+		},
+		[0, null, undefined, "1", "1.1", "1.1.1.1"],
+	);
 });
