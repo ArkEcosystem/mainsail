@@ -162,9 +162,6 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			}
 
 			if (fatal) {
-				console.log("Block data:", data);
-				console.trace();
-
 				throw new Exceptions.BlockSchemaError(
 					data.height,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +

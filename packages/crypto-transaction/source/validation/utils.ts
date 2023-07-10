@@ -1,24 +1,40 @@
 import { Contracts } from "@mainsail/contracts";
-import deepmerge from "deepmerge";
-
-const signedTransaction = {
-	anyOf: [
-		{ required: ["id", "signature"] },
-		{ required: ["id", "signature", "signatures"] },
-		{ required: ["id", "signatures"] },
-	],
-};
+import { merge } from "@mainsail/utils";
 
 const strictTransaction = {
 	unevaluatedProperties: false,
 };
 
-export const extendSchema = (parent, properties): Contracts.Crypto.ITransactionSchema => deepmerge(parent, properties);
+export const extendSchema = (parent, properties): Contracts.Crypto.ITransactionSchema =>
+	merge(parent, properties, {
+		arrayMerge(target, source, options) {
+			const result = source;
+
+			for (const item of target) {
+				if (!result.includes(item)) {
+					result.push(item);
+				}
+			}
+
+			return result;
+		},
+	});
 
 export const signedSchema = (schema: Contracts.Crypto.ITransactionSchema): Contracts.Crypto.ITransactionSchema => {
-	const signed = extendSchema(schema, signedTransaction);
-	signed.$id = `${schema.$id}Signed`;
-	return signed;
+	const schemaToExtend = {
+		properties: schema.properties,
+		required: schema.required,
+	};
+
+	return {
+		$id: `${schema.$id}Signed`,
+		anyOf: [
+			extendSchema(schemaToExtend, { required: ["id", "signature"] }),
+			extendSchema(schemaToExtend, { required: ["id", "signature", "signatures"] }),
+			extendSchema(schemaToExtend, { required: ["id", "signatures"] }),
+		],
+		type: "object",
+	};
 };
 
 export const strictSchema = (schema: Contracts.Crypto.ITransactionSchema): Contracts.Crypto.ITransactionSchema => {

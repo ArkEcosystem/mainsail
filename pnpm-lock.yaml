@@ -1473,16 +1473,10 @@ importers:
       ajv:
         specifier: 8.12.0
         version: 8.12.0
-      deepmerge:
-        specifier: 4.2.2
-        version: 4.2.2
     devDependencies:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
-      '@types/deepmerge':
-        specifier: 2.2.0
-        version: 2.2.0
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

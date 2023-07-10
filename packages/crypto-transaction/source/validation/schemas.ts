@@ -17,7 +17,6 @@ export const schemas = {
 };
 
 export const transactionBaseSchema: SchemaObject = {
-	$id: undefined,
 	properties: {
 		amount: { bignumber: { bypassGenesis: true, minimum: 1 } },
 		fee: { bignumber: { bypassGenesis: true, minimum: 0 } },
