@@ -12,7 +12,7 @@ describe<{
 		context.validator = sandbox.app.resolve(Validator);
 	});
 
-	it("#validate - should passs", ({ validator }) => {
+	it("#validate - should pass", ({ validator }) => {
 		validator.addSchema({
 			$id: "test",
 			type: "string",
@@ -25,7 +25,7 @@ describe<{
 		assert.undefined(result.errors);
 	});
 
-	it("#validate - should not passs", ({ validator }) => {
+	it("#validate - should not pass", ({ validator }) => {
 		validator.addSchema({
 			$id: "test",
 			type: "string",
