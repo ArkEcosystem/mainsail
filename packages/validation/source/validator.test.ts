@@ -39,6 +39,66 @@ describe<{
 		assert.length(result.errors, 1);
 	});
 
+	it("#validate - should pass, when additionalProperties are enabled", ({ validator }) => {
+		validator.addSchema({
+			$id: "test",
+			additionalProperties: true,
+			properties: {
+				test: {
+					type: "string",
+				},
+			},
+			required: ["test"],
+			type: "object",
+		});
+
+		const result = validator.validate("test", { test: "test", test2: "test2" });
+
+		assert.equal(result.value, { test: "test", test2: "test2" });
+		assert.undefined(result.error);
+		assert.undefined(result.errors);
+	});
+
+	it("#validate - should pass, when additionalProperties are enabled by default", ({ validator }) => {
+		validator.addSchema({
+			$id: "test",
+			properties: {
+				test: {
+					type: "string",
+				},
+			},
+			required: ["test"],
+			type: "object",
+		});
+
+		const result = validator.validate("test", { test: "test", test2: "test2" });
+
+		assert.equal(result.value, { test: "test", test2: "test2" });
+		assert.undefined(result.error);
+		assert.undefined(result.errors);
+	});
+
+	it("#validate - should not pass, when additionalProperties are disabled", ({ validator }) => {
+		validator.addSchema({
+			$id: "test",
+			additionalProperties: false,
+			properties: {
+				test: {
+					type: "string",
+				},
+			},
+			required: ["test"],
+			type: "object",
+		});
+
+		const result = validator.validate("test", { test: "test", test2: "test2" });
+
+		assert.equal(result.value, { test: "test", test2: "test2" });
+		assert.equal(result.error, "data must NOT have additional properties");
+		assert.array(result.errors);
+		assert.length(result.errors, 1);
+	});
+
 	it("#addFormat - should add format", ({ validator }) => {
 		validator.addFormat("testFormat", {
 			type: "number",
