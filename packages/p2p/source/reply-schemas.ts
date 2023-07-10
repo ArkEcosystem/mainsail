@@ -1,13 +1,21 @@
 import { constants } from "./constants";
 
 const headers = {
+	additionalProperties: false,
 	properties: {
 		height: {
 			minimum: 1,
 			type: "integer",
 		},
 		proposedBlockId: {
-			type: ["string", "null"], // TODO: blockId
+			oneOf: [
+				{
+					ref: "blockId",
+				},
+				{
+					type: "null",
+				},
+			],
 		},
 		round: {
 			minimum: 0,
