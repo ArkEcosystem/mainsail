@@ -12,7 +12,7 @@ export class Validator implements Contracts.Crypto.IValidator {
 	public postConstruct(): void {
 		this.#ajv = new Ajv({
 			$data: true,
-			removeAdditional: true,
+			strict: true,
 		});
 
 		keywords(this.#ajv);
