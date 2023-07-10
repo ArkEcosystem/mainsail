@@ -8,9 +8,9 @@ const strictTransaction = {
 export const extendSchema = (parent, properties): Contracts.Crypto.ITransactionSchema =>
 	merge(parent, properties, {
 		arrayMerge(target, source, options) {
-			const result = target;
+			const result = source;
 
-			for (const item of source) {
+			for (const item of target) {
 				if (!result.includes(item)) {
 					result.push(item);
 				}
