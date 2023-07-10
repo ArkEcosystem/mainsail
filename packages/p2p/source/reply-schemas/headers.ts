@@ -8,7 +8,7 @@ export const headers = {
 		proposedBlockId: {
 			oneOf: [
 				{
-					ref: "blockId",
+					$ref: "blockId",
 				},
 				{
 					type: "null",
@@ -25,12 +25,14 @@ export const headers = {
 			type: "integer",
 		},
 		validatorsSignedPrecommit: {
+			// TODO: Add size
 			items: {
 				type: "boolean",
 			},
 			type: "array",
 		},
 		validatorsSignedPrevote: {
+			// TODO: Add size
 			items: {
 				type: "boolean",
 			},
