@@ -17,6 +17,9 @@ export const defaults = {
 		logLevel: process.env[Constants.Flags.CORE_NETWORK_NAME] === "testnet" ? 1 : 0,
 		port: process.env[Constants.Flags.CORE_P2P_PORT] || 4002,
 	},
+	testMode: {
+		enabled: process.env[Constants.Flags.CORE_P2P_TEST_MODE_ENABLED] || false,
+	},
 	verifyTimeout: 60_000,
-	whitelist: ["*"], // postTransactions endpoint
+	whitelist: ["*"],
 };
