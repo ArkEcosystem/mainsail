@@ -35,7 +35,9 @@ export interface IGetMessagesResponse {
 	prevotes: string[];
 }
 
-export type IGetPeersResponse = PeerBroadcast[];
+export type IGetPeersResponse = {
+	peers: PeerBroadcast[];
+};
 
 export type IGetStatusResponse = PeerPingResponse;
 

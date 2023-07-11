@@ -29,7 +29,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 						.slice(0, 8)
 						.map(async (peer: Contracts.P2P.Peer) => {
 							try {
-								const hisPeers = await this.communicator.getPeers(peer);
+								const { peers: hisPeers } = await this.communicator.getPeers(peer);
 								return hisPeers || [];
 							} catch (error) {
 								this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
