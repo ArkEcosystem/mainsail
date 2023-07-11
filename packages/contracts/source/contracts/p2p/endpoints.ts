@@ -79,4 +79,6 @@ export interface IPostTransactionsRequest extends Hapi.Request {
 	};
 }
 
-export type IPostTransactionsResponse = string[];
+export type IPostTransactionsResponse = {
+	accept: string[];
+};
