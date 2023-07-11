@@ -1,4 +1,15 @@
+import { headers } from "./headers";
+
 export const postTransactions = {
-	// TODO: Add headers
-	type: "array",
+	properties: {
+		accept: {
+			items: {
+				$ref: "transactionId",
+			},
+			type: "array",
+		},
+		headers,
+	},
+	required: ["headers", "accept"],
+	type: "object",
 };
