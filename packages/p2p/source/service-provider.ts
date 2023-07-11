@@ -74,6 +74,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				port: Joi.number().integer().min(1).max(65_535).required(), // TODO: Check
 			}).required(),
 			skipDiscovery: Joi.bool(),
+			testMode: Joi.object({
+				enabled: Joi.bool().required(),
+			}).required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
