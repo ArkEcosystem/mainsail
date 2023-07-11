@@ -25,6 +25,6 @@ export const getPeers = {
 		required: ["ip", "port"],
 		type: "object",
 	},
-	maxItems: constants.MAX_PEERS_GETPEERS, // TODO: Rename to MAX_PEERS_GET_PEERS
+	maxItems: constants.MAX_PEERS_GET_PEERS,
 	type: "array",
 };

@@ -8,5 +8,5 @@ export const constants = {
 	DEFAULT_MAX_PAYLOAD_CLIENT: 100 * Constants.Units.KILOBYTE,
 	MAX_DOWNLOAD_BLOCKS: 400,
 	// default maxPayload value on the client WS socket
-	MAX_PEERS_GETPEERS: 2000,
+	MAX_PEERS_GET_PEERS: 2000,
 };
