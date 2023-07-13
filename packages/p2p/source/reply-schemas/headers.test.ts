@@ -55,7 +55,7 @@ describe<Context>("Schemas", ({ it, assert, beforeEach, each }) => {
 	);
 
 	each(
-		"proposedBlockId - should pass if blockId or null",
+		"proposedBlockId - should pass if blockId or undefined",
 		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
 			const result = validator.validate(headers, {
 				...data,
@@ -64,11 +64,11 @@ describe<Context>("Schemas", ({ it, assert, beforeEach, each }) => {
 
 			assert.undefined(result.error);
 		},
-		["a".repeat(64), null],
+		["a".repeat(64), undefined],
 	);
 
 	each(
-		"proposedBlockId - fail if not blockId or null",
+		"proposedBlockId - fail if not blockId or undefined",
 		({ context: { validator }, dataset }: { context: Context; dataset: any }) => {
 			const result = validator.validate(headers, {
 				...data,
@@ -77,7 +77,7 @@ describe<Context>("Schemas", ({ it, assert, beforeEach, each }) => {
 
 			assert.defined(result.error);
 		},
-		["a".repeat(63), "a".repeat(65), 1, undefined],
+		["a".repeat(63), "a".repeat(65), 1, null],
 	);
 
 	each(
