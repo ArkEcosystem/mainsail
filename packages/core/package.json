@@ -92,7 +92,7 @@
 		"@types/tmp": "0.2.1"
 	},
 	"peerDependencies": {
-		"pm2": "^4.5.0"
+		"pm2": "^5.3.0"
 	},
 	"engines": {
 		"node": ">=20.x"
