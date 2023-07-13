@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 export type Codec = {
@@ -27,6 +28,10 @@ export abstract class Route {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	public register(server: Hapi.Server): void {
 		const controller = this.getController();
 		server.bind(controller);
@@ -36,7 +41,7 @@ export abstract class Route {
 				options: {
 					handler: config.handler,
 					id: config.id,
-					isInternal: true,
+					isInternal: !this.configuration.getRequired("developmentMode.enabled"), // Routes are exposed when developmentMode is enabled
 					payload: {
 						maxBytes: config.maxBytes,
 					},

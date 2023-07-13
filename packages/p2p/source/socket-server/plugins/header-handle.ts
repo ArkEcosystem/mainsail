@@ -19,8 +19,8 @@ export class HeaderHandlePlugin {
 		const peerRepository = this.peerRepository;
 
 		server.ext({
-			async method(request, h) {
-				const peerIp = request.socket ? getPeerIp(request.socket) : request.info.remoteAddress;
+			async method(request: Contracts.P2P.Request, h) {
+				const peerIp = getPeerIp(request);
 
 				if (peerRepository.hasPeer(peerIp)) {
 					const peer = peerRepository.getPeer(peerIp);
