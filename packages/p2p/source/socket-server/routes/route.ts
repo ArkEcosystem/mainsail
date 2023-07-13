@@ -41,7 +41,7 @@ export abstract class Route {
 				options: {
 					handler: config.handler,
 					id: config.id,
-					isInternal: !this.configuration.getRequired("testMode.enabled"), // Routes are exposed when testMode is enabled
+					isInternal: !this.configuration.getRequired("developmentMode.enabled"), // Routes are exposed when developmentMode is enabled
 					payload: {
 						maxBytes: config.maxBytes,
 					},

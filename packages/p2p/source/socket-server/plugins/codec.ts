@@ -29,7 +29,7 @@ export class CodecPlugin {
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	public register(server) {
-		if (this.configuration.getRequired("testMode.enabled")) {
+		if (this.configuration.getRequired("developmentMode.enabled")) {
 			return;
 		}
 
