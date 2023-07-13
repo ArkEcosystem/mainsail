@@ -4,14 +4,14 @@ import { schemas as cryptoBlockSchemas } from "../../../crypto-block";
 import { schemas as cryptoValidationSchemas } from "../../../crypto-validation";
 import { describe, Sandbox } from "../../../test-framework";
 import { headers } from "../../test/fixtures/responses/headers";
-import { postPrecommit } from "./post-precommit";
+import { postProposal } from "./post-proposal";
 
 type Context = {
 	sandbox: Sandbox;
 	validator: Validator;
 };
 
-describe<Context>("PostPrecommit Schema", ({ it, assert, beforeEach, each }) => {
+describe<Context>("PostProposal Schema", ({ it, assert, beforeEach, each }) => {
 	const data = {
 		headers,
 	};
@@ -26,13 +26,13 @@ describe<Context>("PostPrecommit Schema", ({ it, assert, beforeEach, each }) => 
 	});
 
 	it("should pass validation", ({ validator }) => {
-		const result = validator.validate(postPrecommit, data);
+		const result = validator.validate(postProposal, data);
 
 		assert.undefined(result.error);
 	});
 
 	it("should not pass if headers are undefined", ({ validator }) => {
-		const result = validator.validate(postPrecommit, {});
+		const result = validator.validate(postProposal, {});
 
 		assert.defined(result.error);
 	});

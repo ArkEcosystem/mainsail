@@ -3,15 +3,15 @@ import { Validator } from "@mainsail/validation/source/validator";
 import { schemas as cryptoBlockSchemas } from "../../../crypto-block";
 import { schemas as cryptoValidationSchemas } from "../../../crypto-validation";
 import { describe, Sandbox } from "../../../test-framework";
-import { headers } from "./headers";
 import { headers as data } from "../../test/fixtures/responses/headers";
+import { headers } from "./headers";
 
 type Context = {
 	sandbox: Sandbox;
 	validator: Validator;
 };
 
-describe<Context>("Schemas", ({ it, assert, beforeEach, each }) => {
+describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
