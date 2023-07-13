@@ -42,10 +42,9 @@ describe<{
 		};
 		const peersBroadcast = await controller.handle(request, {});
 
-		assert.equal(
-			peersBroadcast,
-			[peers[2], peers[1], peers[3], peers[4]].map((p) => p.toBroadcast()),
-		);
+		assert.equal(peersBroadcast, {
+			peers: [peers[2], peers[1], peers[3], peers[4]].map((p) => p.toBroadcast()),
+		});
 	});
 
 	it("should return the peers except forwarded peer sorted by latency", async ({ controller, sandbox }) => {
@@ -70,9 +69,8 @@ describe<{
 		};
 		const peersBroadcast = await controller.handle(request, {});
 
-		assert.equal(
-			peersBroadcast,
-			[peers[2], peers[1], peers[3], peers[4]].map((p) => p.toBroadcast()),
-		);
+		assert.equal(peersBroadcast, {
+			peers: [peers[2], peers[1], peers[3], peers[4]].map((p) => p.toBroadcast()),
+		});
 	});
 });

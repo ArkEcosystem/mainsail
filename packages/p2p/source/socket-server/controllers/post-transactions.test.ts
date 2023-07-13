@@ -20,6 +20,6 @@ describe<{
 	it("should use processor it to process the transactions", async ({ controller }) => {
 		stub(processor, "process").resolvedValue({ accept: ["123"] });
 
-		assert.equal(await controller.handle({ payload: { transactions: Buffer.from("") } }, {}), ["123"]);
+		assert.equal(await controller.handle({ payload: { transactions: Buffer.from("") } }, {}), { accept: ["123"] });
 	});
 });

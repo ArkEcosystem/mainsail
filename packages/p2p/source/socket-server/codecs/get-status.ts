@@ -12,7 +12,7 @@ export const getStatus = {
 	},
 	response: {
 		deserialize: (payload: Buffer): Contracts.P2P.PeerPingResponse => {
-			const decoded = proto.GetStatusResponse.decode(payload);
+			const decoded = proto.GetStatusResponse.decode(payload).toJSON();
 
 			Utils.assert.defined<string>(decoded.state?.header?.totalAmount);
 			Utils.assert.defined<string>(decoded.state?.header?.totalFee);

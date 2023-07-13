@@ -3,7 +3,7 @@ export type IHeaderData = {
 	height: number;
 	round: number;
 	step: number;
-	proposedBlockId: string | null;
+	proposedBlockId?: string;
 	validatorsSignedPrevote: boolean[];
 	validatorsSignedPrecommit: boolean[];
 };

@@ -1,5 +1,3 @@
-import { Contracts } from "@mainsail/contracts";
-
 import { getPeers as proto } from "./proto/protos";
 
 export const getPeers = {
@@ -9,9 +7,8 @@ export const getPeers = {
 			Buffer.from(proto.GetPeersRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): Contracts.P2P.PeerBroadcast[] =>
-			proto.GetPeersResponse.decode(payload).peers as Contracts.P2P.PeerBroadcast[],
-		serialize: (peers: Contracts.P2P.PeerBroadcast[]): Buffer =>
-			Buffer.from(proto.GetPeersResponse.encode({ peers }).finish()),
+		deserialize: (payload: Buffer): proto.IGetPeersResponse => proto.GetPeersResponse.decode(payload).toJSON(),
+		serialize: (object: proto.IGetPeersResponse): Buffer =>
+			Buffer.from(proto.GetPeersResponse.encode(object).finish()),
 	},
 };

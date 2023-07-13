@@ -7,7 +7,7 @@ export const getBlocks = {
 			Buffer.from(proto.GetBlocksRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IGetBlocksResponse => proto.GetBlocksResponse.decode(payload),
+		deserialize: (payload: Buffer): proto.IGetBlocksResponse => proto.GetBlocksResponse.decode(payload).toJSON(),
 		serialize: (object: proto.IGetBlocksResponse): Buffer =>
 			Buffer.from(proto.GetBlocksResponse.encode(object).finish()),
 	},

@@ -12,6 +12,8 @@ export class PostTransactionsController implements Contracts.P2P.Controller {
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.IPostTransactionsResponse> {
 		const result = await this.processor.process(request.payload.transactions);
-		return result.accept;
+		return {
+			accept: result.accept,
+		};
 	}
 }

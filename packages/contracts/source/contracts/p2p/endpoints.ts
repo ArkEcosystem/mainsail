@@ -45,7 +45,9 @@ export interface IGetMessagesResponse {
 	prevotes: string[];
 }
 
-export type IGetPeersResponse = PeerBroadcast[];
+export type IGetPeersResponse = {
+	peers: PeerBroadcast[];
+};
 
 export type IGetStatusResponse = PeerPingResponse;
 
@@ -93,4 +95,6 @@ export interface IPostTransactionsRequest extends Request {
 	};
 }
 
-export type IPostTransactionsResponse = string[];
+export type IPostTransactionsResponse = {
+	accept: string[];
+};
