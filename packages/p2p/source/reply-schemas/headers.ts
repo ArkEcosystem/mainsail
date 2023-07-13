@@ -6,14 +6,7 @@ export const headers = {
 			type: "integer",
 		},
 		proposedBlockId: {
-			oneOf: [
-				{
-					$ref: "blockId",
-				},
-				{
-					type: "null",
-				},
-			],
+			$ref: "blockId",
 		},
 		round: {
 			minimum: 0,
@@ -45,7 +38,7 @@ export const headers = {
 	},
 	required: [
 		"height",
-		"proposedBlockId",
+		// "proposedBlockId",
 		"round",
 		"step",
 		"validatorsSignedPrecommit",
