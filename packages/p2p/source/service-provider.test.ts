@@ -149,7 +149,7 @@ describe<{
 		assert.string(result.value.server.hostname);
 		assert.number(result.value.server.logLevel);
 		assert.number(result.value.server.port);
-		assert.false(result.value.testMode.enabled);
+		assert.false(result.value.developmentMode.enabled);
 		assert.number(result.value.verifyTimeout);
 		assert.array(result.value.whitelist);
 	});
@@ -314,22 +314,22 @@ describe<{
 		assert.equal(result.error?.message, '"rateLimitPostTransactions" must be a number');
 	});
 
-	it("should parse process.env.CORE_P2P_TEST_MODE_ENABLED", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_TEST_MODE_ENABLED = "true";
+	it("should parse CORE_P2P_DEVELOPMENT_MODE_ENABLED", async ({ serviceProvider }) => {
+		process.env.CORE_P2P_DEVELOPMENT_MODE_ENABLED = "true";
 
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
 		assert.undefined(result.error);
-		assert.equal(result.value.testMode.enabled, true);
+		assert.equal(result.value.developmentMode.enabled, true);
 	});
 
-	it("should throw if process.env.CORE_P2P_TEST_MODE_ENABLED is not booelan", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_TEST_MODE_ENABLED = "1";
+	it("should throw if process.env.CORE_P2P_DEVELOPMENT_MODE_ENABLED is not booelan", async ({ serviceProvider }) => {
+		process.env.CORE_P2P_DEVELOPMENT_MODE_ENABLED = "1";
 
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
 		assert.defined(result.error);
-		assert.equal(result.error?.message, '"testMode.enabled" must be a boolean');
+		assert.equal(result.error?.message, '"developmentMode.enabled" must be a boolean');
 	});
 
 	it("#schemaRestrictions - server is required && is object", async ({ serviceProvider }) => {
@@ -693,30 +693,30 @@ describe<{
 		assert.equal(result.error?.message, '"rateLimitPostTransactions" is required');
 	});
 
-	it("#schemaRestrictions - testMode is required && is object", async ({ serviceProvider }) => {
+	it("#schemaRestrictions - developmentMode is required && is object", async ({ serviceProvider }) => {
 		const defaults = importDefaults();
-		defaults.testMode = false;
+		defaults.developmentMode = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"testMode" must be of type object');
+		assert.equal(result.error?.message, '"developmentMode" must be of type object');
 
-		delete defaults.testMode;
+		delete defaults.developmentMode;
 		result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"testMode" is required');
+		assert.equal(result.error?.message, '"developmentMode" is required');
 	});
 
-	it("#schemaRestrictions - testMode.enabled is required && is boolean", async ({ serviceProvider }) => {
+	it("#schemaRestrictions - developmentMode.enabled is required && is boolean", async ({ serviceProvider }) => {
 		const defaults = importDefaults();
-		defaults.testMode.enabled = 1;
+		defaults.developmentMode.enabled = 1;
 		let result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"testMode.enabled" must be a boolean');
+		assert.equal(result.error?.message, '"developmentMode.enabled" must be a boolean');
 
-		delete defaults.testMode.enabled;
+		delete defaults.developmentMode.enabled;
 		result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"testMode.enabled" is required');
+		assert.equal(result.error?.message, '"developmentMode.enabled" is required');
 	});
 
 	it("#schemaRestrictions - disableDiscovery is optional && is boolean", async ({ serviceProvider }) => {
