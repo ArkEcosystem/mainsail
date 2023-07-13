@@ -1,9 +1,9 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../../../test-framework";
 import { Server } from "@hapi/hapi";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import Joi from "joi";
 import rewiremock from "rewiremock";
 
+import { describe, Sandbox } from "../../../../test-framework";
 import { ValidatePlugin } from "./validate";
 
 describe<{
@@ -21,6 +21,7 @@ describe<{
 	});
 
 	const logger = { debug: () => {}, warning: () => {} };
+	const configuration = { getRequired: () => {} };
 
 	const responsePayload = { status: "ok" };
 	const mockRouteByPath = {
@@ -43,6 +44,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
 
 		context.validatePlugin = context.sandbox.app.resolve(ValidatePluginProxy);
 	});
@@ -54,9 +56,12 @@ describe<{
 		server.route(mockRoute);
 
 		const spyExtension = spy(server, "ext");
+		const spyConfiguration = stub(configuration, "getRequired").returnValue(false);
 
 		validatePlugin.register(server);
 
+		spyConfiguration.calledOnce();
+		spyConfiguration.calledWith("developmentMode.enabled");
 		spyExtension.calledOnce();
 		spyExtension.calledWith(match.has("type", "onPostAuth"));
 
@@ -119,5 +124,21 @@ describe<{
 
 		assert.equal(JSON.parse(responseValidAnotherRoute.payload), responsePayload);
 		assert.equal(responseValidAnotherRoute.statusCode, 200);
+	});
+
+	it("should not register the validate plugin if development mode is used", async ({ validatePlugin, sandbox }) => {
+		stub(sandbox.app, "resolve").returnValue({ getRoutesConfigByPath: () => mockRouteByPath });
+
+		const server = new Server({ port: 4100 });
+		server.route(mockRoute);
+
+		const spyExtension = spy(server, "ext");
+		const spyConfiguration = stub(configuration, "getRequired").returnValue(true);
+
+		validatePlugin.register(server);
+
+		spyConfiguration.calledOnce();
+		spyConfiguration.calledWith("developmentMode.enabled");
+		spyExtension.neverCalled();
 	});
 });

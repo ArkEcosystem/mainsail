@@ -15,8 +15,8 @@ export class AcceptPeerPlugin {
 		const peerProcessor = this.peerProcessor;
 
 		server.ext({
-			async method(request, h) {
-				const ip = request.socket ? getPeerIp(request.socket) : request.info.remoteAddress;
+			async method(request: Contracts.P2P.Request, h) {
+				const ip = getPeerIp(request);
 				void peerProcessor.validateAndAcceptPeer(ip);
 
 				return h.continue;

@@ -1,6 +1,7 @@
 import Boom from "@hapi/boom";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 
 import { isValidVersion } from "../../utils";
 import {
@@ -21,7 +22,15 @@ export class ValidatePlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	public register(server) {
+		if (this.configuration.getRequired("developmentMode.enabled")) {
+			return;
+		}
+
 		const allRoutesConfigByPath = {
 			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetCommonBlocksRoute).getRoutesConfigByPath(),
