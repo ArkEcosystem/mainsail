@@ -7,7 +7,8 @@ export const getProposal = {
 			Buffer.from(proto.GetProposalRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IGetProposalResponse => proto.GetProposalResponse.decode(payload),
+		deserialize: (payload: Buffer): proto.IGetProposalResponse =>
+			proto.GetProposalResponse.decode(payload).toJSON(),
 		serialize: (object: proto.IGetProposalResponse): Buffer =>
 			Buffer.from(proto.GetProposalResponse.encode(object).finish()),
 	},
