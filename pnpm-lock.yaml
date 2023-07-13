@@ -2041,8 +2041,8 @@ importers:
         specifier: 1.0.1
         version: 1.0.1
       moment-timezone:
-        specifier: 0.5.33
-        version: 0.5.33
+        specifier: 0.5.43
+        version: 0.5.43
       tmp:
         specifier: 0.2.1
         version: 0.2.1
@@ -7692,7 +7692,7 @@ packages:
   /cron@1.8.2:
     resolution: {integrity: sha512-Gk2c4y6xKEO8FSAUTklqtfSr7oTq0CiPQeLBG5Fl0qoXpZyMcj1SG59YL+hqq04bu6/IuEA7lMkYDAplQNKkyg==}
     dependencies:
-      moment-timezone: 0.5.33
+      moment-timezone: 0.5.43
     dev: false
 
   /cross-env@7.0.3:
@@ -12405,8 +12405,8 @@ packages:
       micro-memoize: 2.1.2
     dev: false
 
-  /moment-timezone@0.5.33:
-    resolution: {integrity: sha512-PTc2vcT8K9J5/9rDEPe5czSIKgLoGsH8UNpA4qZTVw0Vd/Uz19geE9abbIOQKaAQFcnQ3v5YEXrbSc5BpshH+w==}
+  /moment-timezone@0.5.43:
+    resolution: {integrity: sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==}
     dependencies:
       moment: 2.29.4
 
