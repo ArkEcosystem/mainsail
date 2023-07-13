@@ -4,17 +4,17 @@ export const getMessages = {
 	properties: {
 		headers,
 		precommits: {
-			// TODO: Set max items
 			items: {
 				$ref: "hex",
 			},
+			maxItems: 51, // TODO: Form milestones
 			type: "array",
 		},
 		prevotes: {
-			// TODO: Set max items
 			items: {
 				$ref: "hex",
 			},
+			maxItems: 51, // TODO: Form milestones
 			type: "array",
 		},
 	},
