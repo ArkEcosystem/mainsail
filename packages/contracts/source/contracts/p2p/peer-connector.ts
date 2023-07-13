@@ -1,4 +1,4 @@
-import { Client } from "./nes-client";
+import { Client } from "./nes";
 import { Peer } from "./peer";
 
 export interface PeerConnector {

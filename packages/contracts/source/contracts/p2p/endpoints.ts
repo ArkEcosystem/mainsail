@@ -2,9 +2,14 @@ import Hapi from "@hapi/hapi";
 
 import { IBlockData } from "../crypto";
 import { IHeaderData } from "./header";
+import { Socket } from "./nes";
 import { PeerBroadcast, PeerPingResponse } from "./peer";
 
-export interface IGetBlocksRequest extends Hapi.Request {
+export interface Request extends Hapi.Request {
+	socket?: Socket;
+}
+
+export interface IGetBlocksRequest extends Request {
 	payload: {
 		fromHeight: number;
 		limit: number;
@@ -13,7 +18,7 @@ export interface IGetBlocksRequest extends Hapi.Request {
 
 export type IGetBlocksResponse = { blocks: String[] };
 
-export interface IGetCommonBlocksRequest extends Hapi.Request {
+export interface IGetCommonBlocksRequest extends Request {
 	payload: {
 		ids: string[];
 	};
@@ -24,7 +29,7 @@ export interface IGetCommonBlocksResponse {
 	lastBlockHeight: number;
 }
 
-export interface IGetMessagesRequest extends Hapi.Request {
+export interface IGetMessagesRequest extends Request {
 	payload: {
 		headers: IHeaderData;
 	};
@@ -39,7 +44,7 @@ export type IGetPeersResponse = PeerBroadcast[];
 
 export type IGetStatusResponse = PeerPingResponse;
 
-export interface IGetProposalRequest extends Hapi.Request {
+export interface IGetProposalRequest extends Request {
 	payload: {
 		headers: IHeaderData;
 	};
@@ -49,7 +54,7 @@ export interface IGetProposalResponse {
 	proposal: string;
 }
 
-export interface IPostPrecommitRequest extends Hapi.Request {
+export interface IPostPrecommitRequest extends Request {
 	payload: {
 		precommit: Buffer;
 	};
@@ -57,7 +62,7 @@ export interface IPostPrecommitRequest extends Hapi.Request {
 
 export interface IPostPrecommitResponse {}
 
-export interface IPostPrevoteRequest extends Hapi.Request {
+export interface IPostPrevoteRequest extends Request {
 	payload: {
 		prevote: Buffer;
 	};
@@ -65,7 +70,7 @@ export interface IPostPrevoteRequest extends Hapi.Request {
 
 export interface IPostPrevoteResponse {}
 
-export interface IPostProposalRequest extends Hapi.Request {
+export interface IPostProposalRequest extends Request {
 	payload: {
 		proposal: Buffer;
 	};
@@ -73,7 +78,7 @@ export interface IPostProposalRequest extends Hapi.Request {
 
 export interface IPostProposalResponse {}
 
-export interface IPostTransactionsRequest extends Hapi.Request {
+export interface IPostTransactionsRequest extends Request {
 	payload: {
 		transactions: Buffer[];
 	};
