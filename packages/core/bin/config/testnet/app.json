@@ -85,9 +85,6 @@
 			"package": "@mainsail/processor"
 		},
 		{
-			"package": "@mainsail/blockchain"
-		},
-		{
 			"package": "@mainsail/crypto-messages"
 		},
 		{
