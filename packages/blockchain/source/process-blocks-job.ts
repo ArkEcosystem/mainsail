@@ -52,8 +52,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			this.logger.warning(
 				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.#blocks[0]),
 			);
-			// Discard remaining blocks as it won't go anywhere anyway.
-			this.blockchain.clearQueue();
 			this.blockchain.resetLastDownloadedBlock();
 			return;
 		}
@@ -114,7 +112,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 		if (!!lastProcessResult && lastProcessedBlock) {
 		} else {
-			this.blockchain.clearQueue();
 			this.blockchain.resetLastDownloadedBlock();
 		}
 	}

@@ -56,7 +56,6 @@ export class DownloadBlocks implements Action {
 			);
 
 			try {
-				this.blockchain.enqueueBlocks(blocks);
 				// eslint-disable-next-line unicorn/prefer-at
 				this.stateStore.setLastDownloadedBlock(blocks[blocks.length - 1]);
 				this.blockchain.dispatch("DOWNLOADED");
@@ -77,14 +76,10 @@ export class DownloadBlocks implements Action {
 			} else {
 				this.logger.warning(`Downloaded block not accepted: ${JSON.stringify(blocks[0])}`);
 				this.logger.warning(`Last downloaded block: ${JSON.stringify(lastDownloadedBlock)}`);
-
-				this.blockchain.clearQueue();
 			}
 
-			if (this.blockchain.getQueue().size() === 0) {
-				this.stateStore.setNoBlockCounter(this.stateStore.getNoBlockCounter() + 1);
-				this.stateStore.setLastDownloadedBlock(this.stateStore.getLastBlock().data);
-			}
+			this.stateStore.setNoBlockCounter(this.stateStore.getNoBlockCounter() + 1);
+			this.stateStore.setLastDownloadedBlock(this.stateStore.getLastBlock().data);
 
 			this.blockchain.dispatch("NOBLOCK");
 		}
