@@ -46,12 +46,6 @@ export enum PeerEvent {
 	Removed = "peer.removed",
 }
 
-export enum RoundEvent {
-	Applied = "round.applied",
-	Created = "round.created",
-	Missed = "round.missed",
-}
-
 export enum StateEvent {
 	BuilderFinished = "state.builder.finished",
 	Started = "state.started",
