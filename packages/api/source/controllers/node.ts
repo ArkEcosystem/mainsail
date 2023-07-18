@@ -6,8 +6,8 @@ import { Controller } from "./controller";
 
 @injectable()
 export class NodeController extends Controller {
-	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
@@ -16,21 +16,21 @@ export class NodeController extends Controller {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.blockchain.getLastBlock();
+		const lastBlock = this.stateStore.getLastBlock();
 		const networkHeight = this.networkMonitor.getNetworkHeight();
 
 		return {
 			data: {
 				blocksCount: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
 				now: lastBlock ? lastBlock.data.height : 0,
-				synced: this.blockchain.isSynced(),
+				synced: true, // TODO: Determine from p2p
 				// timestamp: Crypto.Slots.getTime(),
 			},
 		};
 	}
 
 	public async syncing(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.blockchain.getLastBlock();
+		const lastBlock = this.stateStore.getLastBlock();
 		const networkHeight = this.networkMonitor.getNetworkHeight();
 
 		return {
@@ -38,7 +38,7 @@ export class NodeController extends Controller {
 				blocks: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
 				height: lastBlock ? lastBlock.data.height : 0,
 				id: lastBlock?.data?.id,
-				syncing: !this.blockchain.isSynced(),
+				syncing: true, // TODO: Determine from p2p
 			},
 		};
 	}
@@ -48,7 +48,7 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				constants: this.configuration.getMilestone(this.blockchain.getLastHeight()),
+				constants: this.configuration.getMilestone(this.stateStore.getLastHeight()),
 				core: {
 					version: this.app.version(),
 				},
