@@ -76,5 +76,16 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 		modifying: true,
 	};
 
-	return { bignum, maxBytes };
+	const buffer: FuncKeywordDefinition = {
+		compile() {
+			return (data) => Buffer.isBuffer(data);
+		},
+		errors: false,
+		keyword: "buffer",
+		metaSchema: {
+			type: "object",
+		},
+	};
+
+	return { bignum, buffer, maxBytes };
 };
