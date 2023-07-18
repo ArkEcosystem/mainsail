@@ -101,6 +101,9 @@
 		},
 		{
 			"package": "@mainsail/webhooks"
+		},
+		{
+			"package": "@mainsail/bootstrap"
 		}
 	]
 }

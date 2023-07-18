@@ -187,6 +187,22 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/bootstrap:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/cli:
     dependencies:
       '@mainsail/container':
@@ -509,6 +525,9 @@ importers:
       '@mainsail/api':
         specifier: workspace:*
         version: link:../api
+      '@mainsail/bootstrap':
+        specifier: workspace:*
+        version: link:../bootstrap
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
