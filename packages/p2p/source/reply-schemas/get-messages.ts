@@ -5,14 +5,14 @@ export const getMessages = {
 		headers,
 		precommits: {
 			items: {
-				$ref: "hex",
+				buffer: {},
 			},
 			maxItems: 51, // TODO: Form milestones
 			type: "array",
 		},
 		prevotes: {
 			items: {
-				$ref: "hex",
+				buffer: {},
 			},
 			maxItems: 51, // TODO: Form milestones
 			type: "array",
