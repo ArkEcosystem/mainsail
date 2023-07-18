@@ -187,49 +187,6 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/blockchain:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../state
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.9.2
-        version: 17.9.2
-      xstate:
-        specifier: 4.23.4
-        version: 4.23.4
-    devDependencies:
-      '@types/delay':
-        specifier: 3.1.0
-        version: 3.1.0
-      '@types/sinon':
-        specifier: ^10.0.14
-        version: 10.0.14
-      delay:
-        specifier: 4.4.1
-        version: 4.4.1
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^15.0.4
-        version: 15.0.4
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
   packages/cli:
     dependencies:
       '@mainsail/container':
@@ -552,9 +509,6 @@ importers:
       '@mainsail/api':
         specifier: workspace:*
         version: link:../api
-      '@mainsail/blockchain':
-        specifier: workspace:*
-        version: link:../blockchain
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
@@ -2410,9 +2364,6 @@ importers:
 
   packages/test-framework:
     dependencies:
-      '@mainsail/blockchain':
-        specifier: workspace:*
-        version: link:../blockchain
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
@@ -7614,11 +7565,6 @@ packages:
       p-map: 5.5.0
       rimraf: 3.0.2
       slash: 4.0.0
-    dev: true
-
-  /delay@4.4.1:
-    resolution: {integrity: sha512-aL3AhqtfhOlT/3ai6sWXeqwnw63ATNpnUiN4HL7x9q+My5QtHlO3OIkasmug9LKzpheLdmUKGRKnYXYAS7FQkQ==}
-    engines: {node: '>=6'}
     dev: true
 
   /delay@5.0.0:
@@ -15859,10 +15805,6 @@ packages:
 
   /xregexp@2.0.0:
     resolution: {integrity: sha512-xl/50/Cf32VsGq/1R8jJE5ajH1yMCQkpmoS10QbFZWl2Oor4H0Me64Pu2yxvsRWK3m6soJbmGfzSR7BYmDcWAA==}
-    dev: false
-
-  /xstate@4.23.4:
-    resolution: {integrity: sha512-lWaUvyrd0HGhosyKnf8i9wBlszVaS+/uIs0EfnuPYNsZIh1BW9ed4bZ64P57wVYk2uln7v3u+Mv98FC+r8xrxQ==}
     dev: false
 
   /xtend@4.0.2:

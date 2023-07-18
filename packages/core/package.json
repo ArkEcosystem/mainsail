@@ -26,7 +26,6 @@
 	},
 	"dependencies": {
 		"@mainsail/api": "workspace:*",
-		"@mainsail/blockchain": "workspace:*",
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
