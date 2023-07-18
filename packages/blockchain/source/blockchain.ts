@@ -29,13 +29,8 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
-
 	#stopped!: boolean;
 	#booted = false;
-	#missedBlocks = 0;
-	#lastCheckNetworkHealthTs = 0;
 
 	@postConstruct()
 	public async initialize(): Promise<void> {
@@ -138,21 +133,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 		return this.stateStore.getLastDownloadedBlock() || this.getLastBlock().data;
 	}
 
-	public async checkMissingBlocks(): Promise<void> {
-		this.#missedBlocks++;
-		if (this.#missedBlocks >= this.configuration.getMilestone().activeValidators / 3 - 1 && Math.random() <= 0.8) {
-			this.#resetMissedBlocks();
-
-			// do not check network health here more than every 10 minutes
-			const nowTs = Date.now();
-			if (nowTs - this.#lastCheckNetworkHealthTs < 10 * 60 * 1000) {
-				return;
-			}
-			this.#lastCheckNetworkHealthTs = nowTs;
-		}
-	}
-
 	#resetMissedBlocks(): void {
-		this.#missedBlocks = 0;
+		// this.#missedBlocks = 0;
 	}
 }
