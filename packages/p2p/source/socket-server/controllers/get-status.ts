@@ -8,11 +8,11 @@ export class GetStatusController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.IGetStatusResponse> {
-		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
+		const lastBlock = this.stateStore.getLastBlock();
 
 		return {
 			config: getPeerConfig(this.app),

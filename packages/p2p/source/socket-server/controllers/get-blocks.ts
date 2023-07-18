@@ -11,8 +11,8 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.IDatabaseService;
@@ -24,7 +24,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		const requestBlockHeight: number = request.payload.fromHeight;
 		const requestBlockLimit: number = request.payload.limit || 400;
 
-		const lastHeight: number = this.blockchain.getLastHeight();
+		const lastHeight: number = this.stateStore.getLastHeight();
 		if (requestBlockHeight > lastHeight) {
 			return { blocks: [] };
 		}
