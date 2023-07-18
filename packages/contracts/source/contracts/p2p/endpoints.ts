@@ -41,8 +41,8 @@ export interface IGetMessagesRequest extends Request {
 }
 
 export interface IGetMessagesResponse {
-	precommits: string[];
-	prevotes: string[];
+	precommits: Buffer[];
+	prevotes: Buffer[];
 }
 
 export type IGetPeersResponse = {

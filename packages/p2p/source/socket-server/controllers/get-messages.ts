@@ -45,7 +45,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 	private getPrevotes(
 		validatorsSignedPrevote: boolean[],
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<string[]> {
+	): Promise<Buffer[]> {
 		const prevotes: Contracts.Crypto.IPrevote[] = [];
 
 		for (const [index, voted] of validatorsSignedPrevote.entries()) {
@@ -60,15 +60,13 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 			}
 		}
 
-		return Promise.all(
-			prevotes.map(async (prevote) => (await this.serializer.serializePrevote(prevote)).toString("hex")),
-		);
+		return Promise.all(prevotes.map(async (prevote) => await this.serializer.serializePrevote(prevote)));
 	}
 
 	private getPrecommits(
 		validatorsSignedPrecommit: boolean[],
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<string[]> {
+	): Promise<Buffer[]> {
 		const precommits: Contracts.Crypto.IPrecommit[] = [];
 
 		for (const [index, voted] of validatorsSignedPrecommit.entries()) {
@@ -83,8 +81,6 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 			}
 		}
 
-		return Promise.all(
-			precommits.map(async (prevote) => (await this.serializer.serializePrecommit(prevote)).toString("hex")),
-		);
+		return Promise.all(precommits.map(async (prevote) => await this.serializer.serializePrecommit(prevote)));
 	}
 }

@@ -122,14 +122,14 @@ export class Downloader {
 		try {
 			const result = await this.communicator.getMessages(peer);
 
-			for (const prevoteHex of result.prevotes) {
-				const prevote = await this.messageFactory.makePrevoteFromBytes(Buffer.from(prevoteHex, "hex"));
+			for (const prevoteBuffer of result.prevotes) {
+				const prevote = await this.messageFactory.makePrevoteFromBytes(prevoteBuffer);
 
 				await this.handler.onPrevote(prevote);
 			}
 
-			for (const precommitHex of result.precommits) {
-				const precommit = await this.messageFactory.makePrecommitFromBytes(Buffer.from(precommitHex, "hex"));
+			for (const precommitBuffer of result.precommits) {
+				const precommit = await this.messageFactory.makePrecommitFromBytes(precommitBuffer);
 
 				await this.handler.onPrecommit(precommit);
 			}
