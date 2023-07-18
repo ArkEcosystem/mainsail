@@ -639,10 +639,10 @@ export namespace getMessages {
         headers?: (shared.IHeaders|null);
 
         /** GetMessagesResponse prevotes */
-        prevotes?: (string[]|null);
+        prevotes?: (Uint8Array[]|null);
 
         /** GetMessagesResponse precommits */
-        precommits?: (string[]|null);
+        precommits?: (Uint8Array[]|null);
     }
 
     /** Represents a GetMessagesResponse. */
@@ -658,10 +658,10 @@ export namespace getMessages {
         public headers?: (shared.IHeaders|null);
 
         /** GetMessagesResponse prevotes. */
-        public prevotes: string[];
+        public prevotes: Uint8Array[];
 
         /** GetMessagesResponse precommits. */
-        public precommits: string[];
+        public precommits: Uint8Array[];
 
         /**
          * Creates a new GetMessagesResponse instance using the specified properties.

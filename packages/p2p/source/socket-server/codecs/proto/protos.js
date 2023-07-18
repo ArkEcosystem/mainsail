@@ -1472,8 +1472,8 @@ $root.getMessages = (function() {
          * @memberof getMessages
          * @interface IGetMessagesResponse
          * @property {shared.IHeaders|null} [headers] GetMessagesResponse headers
-         * @property {Array.<string>|null} [prevotes] GetMessagesResponse prevotes
-         * @property {Array.<string>|null} [precommits] GetMessagesResponse precommits
+         * @property {Array.<Uint8Array>|null} [prevotes] GetMessagesResponse prevotes
+         * @property {Array.<Uint8Array>|null} [precommits] GetMessagesResponse precommits
          */
 
         /**
@@ -1503,7 +1503,7 @@ $root.getMessages = (function() {
 
         /**
          * GetMessagesResponse prevotes.
-         * @member {Array.<string>} prevotes
+         * @member {Array.<Uint8Array>} prevotes
          * @memberof getMessages.GetMessagesResponse
          * @instance
          */
@@ -1511,7 +1511,7 @@ $root.getMessages = (function() {
 
         /**
          * GetMessagesResponse precommits.
-         * @member {Array.<string>} precommits
+         * @member {Array.<Uint8Array>} precommits
          * @memberof getMessages.GetMessagesResponse
          * @instance
          */
@@ -1545,10 +1545,10 @@ $root.getMessages = (function() {
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.prevotes != null && message.prevotes.length)
                 for (var i = 0; i < message.prevotes.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.prevotes[i]);
+                    writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.prevotes[i]);
             if (message.precommits != null && message.precommits.length)
                 for (var i = 0; i < message.precommits.length; ++i)
-                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.precommits[i]);
+                    writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.precommits[i]);
             return writer;
         };
 
@@ -1590,13 +1590,13 @@ $root.getMessages = (function() {
                 case 2: {
                         if (!(message.prevotes && message.prevotes.length))
                             message.prevotes = [];
-                        message.prevotes.push(reader.string());
+                        message.prevotes.push(reader.bytes());
                         break;
                     }
                 case 3: {
                         if (!(message.precommits && message.precommits.length))
                             message.precommits = [];
-                        message.precommits.push(reader.string());
+                        message.precommits.push(reader.bytes());
                         break;
                     }
                 default:
@@ -1643,15 +1643,15 @@ $root.getMessages = (function() {
                 if (!Array.isArray(message.prevotes))
                     return "prevotes: array expected";
                 for (var i = 0; i < message.prevotes.length; ++i)
-                    if (!$util.isString(message.prevotes[i]))
-                        return "prevotes: string[] expected";
+                    if (!(message.prevotes[i] && typeof message.prevotes[i].length === "number" || $util.isString(message.prevotes[i])))
+                        return "prevotes: buffer[] expected";
             }
             if (message.precommits != null && message.hasOwnProperty("precommits")) {
                 if (!Array.isArray(message.precommits))
                     return "precommits: array expected";
                 for (var i = 0; i < message.precommits.length; ++i)
-                    if (!$util.isString(message.precommits[i]))
-                        return "precommits: string[] expected";
+                    if (!(message.precommits[i] && typeof message.precommits[i].length === "number" || $util.isString(message.precommits[i])))
+                        return "precommits: buffer[] expected";
             }
             return null;
         };
@@ -1678,14 +1678,20 @@ $root.getMessages = (function() {
                     throw TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");
                 message.prevotes = [];
                 for (var i = 0; i < object.prevotes.length; ++i)
-                    message.prevotes[i] = String(object.prevotes[i]);
+                    if (typeof object.prevotes[i] === "string")
+                        $util.base64.decode(object.prevotes[i], message.prevotes[i] = $util.newBuffer($util.base64.length(object.prevotes[i])), 0);
+                    else if (object.prevotes[i].length >= 0)
+                        message.prevotes[i] = object.prevotes[i];
             }
             if (object.precommits) {
                 if (!Array.isArray(object.precommits))
                     throw TypeError(".getMessages.GetMessagesResponse.precommits: array expected");
                 message.precommits = [];
                 for (var i = 0; i < object.precommits.length; ++i)
-                    message.precommits[i] = String(object.precommits[i]);
+                    if (typeof object.precommits[i] === "string")
+                        $util.base64.decode(object.precommits[i], message.precommits[i] = $util.newBuffer($util.base64.length(object.precommits[i])), 0);
+                    else if (object.precommits[i].length >= 0)
+                        message.precommits[i] = object.precommits[i];
             }
             return message;
         };
@@ -1714,12 +1720,12 @@ $root.getMessages = (function() {
             if (message.prevotes && message.prevotes.length) {
                 object.prevotes = [];
                 for (var j = 0; j < message.prevotes.length; ++j)
-                    object.prevotes[j] = message.prevotes[j];
+                    object.prevotes[j] = options.bytes === String ? $util.base64.encode(message.prevotes[j], 0, message.prevotes[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.prevotes[j]) : message.prevotes[j];
             }
             if (message.precommits && message.precommits.length) {
                 object.precommits = [];
                 for (var j = 0; j < message.precommits.length; ++j)
-                    object.precommits[j] = message.precommits[j];
+                    object.precommits[j] = options.bytes === String ? $util.base64.encode(message.precommits[j], 0, message.precommits[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.precommits[j]) : message.precommits[j];
             }
             return object;
         };

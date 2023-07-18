@@ -8,6 +8,6 @@ message GetMessagesRequest {
 
 message GetMessagesResponse {
 	shared.Headers headers = 1;
-    repeated string prevotes = 2;
-    repeated string precommits = 3;
+    repeated bytes prevotes = 2;
+    repeated bytes precommits = 3;
 }
