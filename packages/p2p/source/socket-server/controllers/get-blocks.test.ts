@@ -38,7 +38,7 @@ describe<{
 
 		const response = await controller.handle({ info: { remoteAddress: ip }, payload }, {});
 
-		assert.equal(response, { blocks: mockBlocks.map((b) => b.toString("hex")) });
+		assert.equal(response, { blocks: mockBlocks });
 		spyGetBlocksForDownload.calledOnce();
 		spyGetBlocksForDownload.calledWith(payload.fromHeight, payload.fromHeight + payload.limit);
 	});

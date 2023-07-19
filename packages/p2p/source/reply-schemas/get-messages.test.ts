@@ -26,7 +26,6 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 		context.validator = context.sandbox.app.resolve(Validator);
 
 		const keywords = makeKeywords({});
-
 		context.validator.addKeyword(keywords.buffer);
 
 		context.validator.addSchema(cryptoValidationSchemas.hex);

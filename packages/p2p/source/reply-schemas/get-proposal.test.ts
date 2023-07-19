@@ -1,7 +1,7 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
-import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
+import { makeKeywords, schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
 import { getProposal } from "./get-proposal";
@@ -17,12 +17,15 @@ describe<Context>("GetProposal Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
 		data = {
 			headers,
-			proposal: "",
+			proposal: Buffer.alloc(0),
 		};
 
 		context.sandbox = new Sandbox();
 
 		context.validator = context.sandbox.app.resolve(Validator);
+
+		const keywords = makeKeywords({});
+		context.validator.addKeyword(keywords.buffer);
 
 		context.validator.addSchema(cryptoValidationSchemas.hex);
 		context.validator.addSchema(cryptoBlockSchemas.blockId);
@@ -33,7 +36,7 @@ describe<Context>("GetProposal Schema", ({ it, assert, beforeEach, each }) => {
 		assert.undefined(result.error);
 	});
 
-	it("should not pass if proposal is not string", ({ validator }) => {
+	it("should not pass if proposal is not buffer", ({ validator }) => {
 		const result = validator.validate(getProposal, {
 			...data,
 			proposal: 1,
