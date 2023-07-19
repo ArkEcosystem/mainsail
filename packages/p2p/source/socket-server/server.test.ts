@@ -44,7 +44,6 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
 			.whenTargetTagged("plugin", "transaction-pool");
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});

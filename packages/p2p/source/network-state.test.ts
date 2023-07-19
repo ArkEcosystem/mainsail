@@ -33,7 +33,7 @@ describe<{
 		transactions: [],
 	};
 
-	const blockchainService = { getLastBlock: () => lastBlock };
+	const stateStore = { getLastBlock: () => lastBlock };
 	const networkMonitor = { app: undefined };
 	const slots = { getSlotNumber: () => 8 };
 
@@ -46,7 +46,7 @@ describe<{
 			.bind(Identifiers.PluginConfiguration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
-		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchainService);
+		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
 		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
 

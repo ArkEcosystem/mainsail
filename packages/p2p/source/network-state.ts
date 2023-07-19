@@ -40,7 +40,9 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		repository: Contracts.P2P.PeerRepository,
 	): Promise<Contracts.P2P.NetworkState> {
 		// @ts-ignore - app exists but isn't on the interface for now
-		const lastBlock: Contracts.Crypto.IBlock = monitor.app.get<any>(Identifiers.BlockchainService).getLastBlock();
+		const lastBlock: Contracts.Crypto.IBlock = monitor.app
+			.get<Contracts.State.StateStore>(Identifiers.StateStore)
+			.getLastBlock();
 
 		const peers: Contracts.P2P.Peer[] = repository.getPeers();
 		// @ts-ignore - app exists but isn't on the interface for now
