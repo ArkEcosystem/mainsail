@@ -1,4 +1,3 @@
-export * as Blockchain from "./blockchain";
 export * as NetworkMonitor from "./network-monitor";
 export * as PeerRepository from "./peer-repository";
 export * as TransactionPoolQuery from "./query";

@@ -8,9 +8,6 @@ import { Controller } from "./controller";
 
 @injectable()
 export class BlocksController extends Controller {
-	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
-
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.IDatabaseService;
 
@@ -18,7 +15,7 @@ export class BlocksController extends Controller {
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.blockchain.getLastBlock();
+		const lastBlock = this.stateStore.getLastBlock();
 
 		const pagination = this.getQueryPagination(request.query);
 
@@ -62,7 +59,7 @@ export class BlocksController extends Controller {
 	}
 
 	public async last(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const block = this.blockchain.getLastBlock();
+		const block = this.stateStore.getLastBlock();
 
 		if (request.query.transform) {
 			return this.respondWithResource(block, BlockWithTransactionsResource, true);

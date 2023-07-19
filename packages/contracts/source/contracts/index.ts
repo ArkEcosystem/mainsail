@@ -1,5 +1,4 @@
 export * as BlockProcessor from "./block-processor";
-export * as Blockchain from "./blockchain";
 export * as Consensus from "./consensus";
 export * as Crypto from "./crypto";
 export * as Database from "./database";

@@ -1,17 +1,15 @@
 import { Identifiers } from "@mainsail/contracts";
-import { describe } from "../../../../test-framework";
 
+import { describe } from "../../../../test-framework";
 import { getHeaders } from "./get-headers";
 
 describe("getHeaders", ({ it, assert }) => {
 	let port = 4007;
 	const version = "3.0.9";
 	const height = 387;
-	const stateStore = { isStarted: () => true };
-	const blockchain = { getLastHeight: () => height };
+	const stateStore = { getLastHeight: () => height, isStarted: () => true };
 	const appGet = {
 		[Identifiers.StateStore]: stateStore,
-		[Identifiers.BlockchainService]: blockchain,
 	};
 	const app = {
 		get: (key) => appGet[key],

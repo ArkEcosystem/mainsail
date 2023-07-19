@@ -37,24 +37,12 @@ export enum VoteEvent {
 	Unvote = "wallet.unvote",
 }
 
-export enum ForgerEvent {
-	Failed = "forger.failed",
-	Missing = "forger.missing",
-	Started = "forger.started",
-}
-
 export enum PeerEvent {
 	Added = "peer.added",
 	Disconnect = "peer.disconnect",
 	Disconnected = "peer.disconnected",
 	Disconnecting = "peer.disconnecting",
 	Removed = "peer.removed",
-}
-
-export enum RoundEvent {
-	Applied = "round.applied",
-	Created = "round.created",
-	Missed = "round.missed",
 }
 
 export enum StateEvent {

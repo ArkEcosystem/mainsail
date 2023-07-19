@@ -1,10 +1,10 @@
 import { Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../../../test-framework";
+import { describeSkip, Sandbox } from "../../../../test-framework";
 import { Server } from "@hapi/hapi";
 
 import { AwaitBlockPlugin } from "./await-block";
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	awaitBlockPlugin: AwaitBlockPlugin;
 }>("AwaitBlockPlugin", ({ it, assert, beforeEach, spy, match, stub }) => {

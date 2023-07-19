@@ -7,8 +7,8 @@ export class GetCommonBlocksController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async handle(
 		request: Contracts.P2P.IGetCommonBlocksRequest,
@@ -27,7 +27,7 @@ export class GetCommonBlocksController implements Contracts.P2P.Controller {
 			common: commonBlocks.map((block) => block.data).sort((a, b) => a.height - b.height)[
 				commonBlocks.length - 1
 			],
-			lastBlockHeight: this.blockchain.getLastBlock().data.height,
+			lastBlockHeight: this.stateStore.getLastBlock().data.height,
 		};
 	}
 }
