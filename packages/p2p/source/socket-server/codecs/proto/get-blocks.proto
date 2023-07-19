@@ -10,5 +10,5 @@ message GetBlocksRequest {
 
 message GetBlocksResponse {
 	shared.Headers headers = 1;
-    repeated string blocks = 2;
+    repeated bytes blocks = 2;
 }

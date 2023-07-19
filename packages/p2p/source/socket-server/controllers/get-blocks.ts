@@ -35,7 +35,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
-		const blocksToReturn: String[] = [];
+		const blocksToReturn: Buffer[] = [];
 		const maxPayloadWithMargin = constants.DEFAULT_MAX_PAYLOAD;
 		let totalSize = 0;
 
@@ -45,7 +45,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 				break;
 			}
 
-			blocksToReturn.push(committedBlock.toString("hex"));
+			blocksToReturn.push(committedBlock);
 		}
 
 		this.logger.info(

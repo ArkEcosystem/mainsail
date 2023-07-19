@@ -4,6 +4,7 @@ import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distributio
 import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
+import { makeKeywords } from "../validation/keywords";
 import { getBlocks } from "./get-blocks";
 
 type Context = {
@@ -16,13 +17,16 @@ describe<Context>("GetBlocks Schema", ({ it, assert, beforeEach, each }) => {
 
 	beforeEach((context) => {
 		data = {
-			blocks: ["a"], // TODO: Add type
+			blocks: [Buffer.from("a")],
 			headers,
 		};
 
 		context.sandbox = new Sandbox();
 
 		context.validator = context.sandbox.app.resolve(Validator);
+
+		const keywords = makeKeywords({});
+		context.validator.addKeyword(keywords.buffer);
 
 		context.validator.addSchema(cryptoValidationSchemas.hex);
 		context.validator.addSchema(cryptoBlockSchemas.blockId);
@@ -34,7 +38,7 @@ describe<Context>("GetBlocks Schema", ({ it, assert, beforeEach, each }) => {
 		assert.undefined(result.error);
 	});
 
-	it("should not pass if blocks is not hex", ({ validator }) => {
+	it("should not pass if blocks is not buffer", ({ validator }) => {
 		const result = validator.validate(getBlocks, { ...data, blocks: [1] });
 
 		assert.defined(result.error);

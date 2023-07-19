@@ -12,7 +12,7 @@ describe<{
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
 	const triggerService = { bind: () => {} };
-	const validator = { addFormat: () => {} };
+	const validator = { addFormat: () => {}, addKeyword: () => {} };
 	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
 
 	beforeEach((context) => {

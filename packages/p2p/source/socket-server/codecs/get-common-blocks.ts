@@ -8,7 +8,7 @@ export const getCommonBlocks = {
 	},
 	response: {
 		deserialize: (payload: Buffer): proto.IGetCommonBlocksResponse =>
-			proto.GetCommonBlocksResponse.decode(payload).toJSON(),
+			proto.GetCommonBlocksResponse.toObject(proto.GetCommonBlocksResponse.decode(payload), { defaults: true }),
 		serialize: (object: proto.IGetCommonBlocksResponse): Buffer =>
 			Buffer.from(proto.GetCommonBlocksResponse.encode(object).finish()),
 	},

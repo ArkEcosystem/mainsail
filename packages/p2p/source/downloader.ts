@@ -69,7 +69,7 @@ export class Downloader {
 			});
 
 			const blocks = await Promise.all(
-				result.blocks.map(async (hex) => await this.blockFactory.fromCommittedBytes(Buffer.from(hex, "hex"))),
+				result.blocks.map(async (buff) => await this.blockFactory.fromCommittedBytes(buff)),
 			);
 
 			for (const block of blocks) {
@@ -98,7 +98,7 @@ export class Downloader {
 				return;
 			}
 
-			const proposal = await this.messageFactory.makeProposalFromBytes(Buffer.from(result.proposal, "hex"));
+			const proposal = await this.messageFactory.makeProposalFromBytes(result.proposal);
 
 			await this.handler.onProposal(proposal);
 		} catch {
@@ -122,14 +122,14 @@ export class Downloader {
 		try {
 			const result = await this.communicator.getMessages(peer);
 
-			for (const prevoteHex of result.prevotes) {
-				const prevote = await this.messageFactory.makePrevoteFromBytes(Buffer.from(prevoteHex, "hex"));
+			for (const prevoteBuffer of result.prevotes) {
+				const prevote = await this.messageFactory.makePrevoteFromBytes(prevoteBuffer);
 
 				await this.handler.onPrevote(prevote);
 			}
 
-			for (const precommitHex of result.precommits) {
-				const precommit = await this.messageFactory.makePrecommitFromBytes(Buffer.from(precommitHex, "hex"));
+			for (const precommitBuffer of result.precommits) {
+				const precommit = await this.messageFactory.makePrecommitFromBytes(precommitBuffer);
 
 				await this.handler.onPrecommit(precommit);
 			}

@@ -7,7 +7,8 @@ export const getPeers = {
 			Buffer.from(proto.GetPeersRequest.encode(object).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IGetPeersResponse => proto.GetPeersResponse.decode(payload).toJSON(),
+		deserialize: (payload: Buffer): proto.IGetPeersResponse =>
+			proto.GetPeersResponse.toObject(proto.GetPeersResponse.decode(payload), { defaults: true }),
 		serialize: (object: proto.IGetPeersResponse): Buffer =>
 			Buffer.from(proto.GetPeersResponse.encode(object).finish()),
 	},

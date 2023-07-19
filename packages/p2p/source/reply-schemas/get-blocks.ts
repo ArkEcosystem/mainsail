@@ -4,7 +4,7 @@ export const getBlocks = {
 	properties: {
 		blocks: {
 			items: {
-				$ref: "hex",
+				buffer: {},
 			},
 			maxItems: 400,
 			type: "array",

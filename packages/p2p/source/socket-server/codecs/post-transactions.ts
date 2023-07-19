@@ -40,7 +40,7 @@ export const postTransactions = {
 	},
 	response: {
 		deserialize: (payload: Buffer): proto.IPostTransactionsResponse =>
-			proto.PostTransactionsResponse.decode(payload).toJSON(),
+			proto.PostTransactionsResponse.toObject(proto.PostTransactionsResponse.decode(payload), { defaults: true }),
 		serialize: (object: proto.IPostTransactionsResponse): Buffer =>
 			Buffer.from(proto.PostTransactionsResponse.encode(object).finish()),
 	},

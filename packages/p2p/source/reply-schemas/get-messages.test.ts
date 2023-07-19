@@ -4,6 +4,7 @@ import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distributio
 import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
+import { makeKeywords } from "../validation/keywords";
 import { getMessages } from "./get-messages";
 
 type Context = {
@@ -25,6 +26,9 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
+		const keywords = makeKeywords({});
+		context.validator.addKeyword(keywords.buffer);
+
 		context.validator.addSchema(cryptoValidationSchemas.hex);
 		context.validator.addSchema(cryptoBlockSchemas.blockId);
 	});
@@ -35,13 +39,14 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 
 		result = validator.validate(getMessages, {
 			...data,
-			precommits: ["a"],
-			prevotes: ["b"],
+			precommits: [Buffer.from("a")],
+			prevotes: [Buffer.from("b")],
 		});
+
 		assert.undefined(result.error);
 	});
 
-	it("should not pass if precommits is not hex", ({ validator }) => {
+	it("should not pass if precommits is not buffer", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
 			precommits: [1],
@@ -53,13 +58,13 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 	it("should not pass if precommits.len > 51", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
-			precommits: new Array(52).fill("a"),
+			precommits: Array.from({ length: 52 }).fill(Buffer.from("a")),
 		});
 
 		assert.defined(result.error);
 	});
 
-	it("should not pass if prevotes is not hex", ({ validator }) => {
+	it("should not pass if prevotes is not buffer", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
 			prevotes: [1],
@@ -71,7 +76,7 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 	it("should not pass if prevotes.len > 51", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
-			prevotes: new Array(52).fill("a"),
+			prevotes: Array.from({ length: 52 }).fill(Buffer.from("b")),
 		});
 
 		assert.defined(result.error);

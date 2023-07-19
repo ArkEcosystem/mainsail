@@ -119,7 +119,7 @@ export namespace getBlocks {
         headers?: (shared.IHeaders|null);
 
         /** GetBlocksResponse blocks */
-        blocks?: (string[]|null);
+        blocks?: (Uint8Array[]|null);
     }
 
     /** Represents a GetBlocksResponse. */
@@ -135,7 +135,7 @@ export namespace getBlocks {
         public headers?: (shared.IHeaders|null);
 
         /** GetBlocksResponse blocks. */
-        public blocks: string[];
+        public blocks: Uint8Array[];
 
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.
@@ -639,10 +639,10 @@ export namespace getMessages {
         headers?: (shared.IHeaders|null);
 
         /** GetMessagesResponse prevotes */
-        prevotes?: (string[]|null);
+        prevotes?: (Uint8Array[]|null);
 
         /** GetMessagesResponse precommits */
-        precommits?: (string[]|null);
+        precommits?: (Uint8Array[]|null);
     }
 
     /** Represents a GetMessagesResponse. */
@@ -658,10 +658,10 @@ export namespace getMessages {
         public headers?: (shared.IHeaders|null);
 
         /** GetMessagesResponse prevotes. */
-        public prevotes: string[];
+        public prevotes: Uint8Array[];
 
         /** GetMessagesResponse precommits. */
-        public precommits: string[];
+        public precommits: Uint8Array[];
 
         /**
          * Creates a new GetMessagesResponse instance using the specified properties.
@@ -1159,7 +1159,7 @@ export namespace getProposal {
         headers?: (shared.IHeaders|null);
 
         /** GetProposalResponse proposal */
-        proposal?: (string|null);
+        proposal?: (Uint8Array|null);
     }
 
     /** Represents a GetProposalResponse. */
@@ -1175,7 +1175,7 @@ export namespace getProposal {
         public headers?: (shared.IHeaders|null);
 
         /** GetProposalResponse proposal. */
-        public proposal: string;
+        public proposal: Uint8Array;
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.

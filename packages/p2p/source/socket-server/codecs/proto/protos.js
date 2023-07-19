@@ -280,7 +280,7 @@ $root.getBlocks = (function() {
          * @memberof getBlocks
          * @interface IGetBlocksResponse
          * @property {shared.IHeaders|null} [headers] GetBlocksResponse headers
-         * @property {Array.<string>|null} [blocks] GetBlocksResponse blocks
+         * @property {Array.<Uint8Array>|null} [blocks] GetBlocksResponse blocks
          */
 
         /**
@@ -309,7 +309,7 @@ $root.getBlocks = (function() {
 
         /**
          * GetBlocksResponse blocks.
-         * @member {Array.<string>} blocks
+         * @member {Array.<Uint8Array>} blocks
          * @memberof getBlocks.GetBlocksResponse
          * @instance
          */
@@ -343,7 +343,7 @@ $root.getBlocks = (function() {
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.blocks != null && message.blocks.length)
                 for (var i = 0; i < message.blocks.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.blocks[i]);
+                    writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.blocks[i]);
             return writer;
         };
 
@@ -385,7 +385,7 @@ $root.getBlocks = (function() {
                 case 2: {
                         if (!(message.blocks && message.blocks.length))
                             message.blocks = [];
-                        message.blocks.push(reader.string());
+                        message.blocks.push(reader.bytes());
                         break;
                     }
                 default:
@@ -432,8 +432,8 @@ $root.getBlocks = (function() {
                 if (!Array.isArray(message.blocks))
                     return "blocks: array expected";
                 for (var i = 0; i < message.blocks.length; ++i)
-                    if (!$util.isString(message.blocks[i]))
-                        return "blocks: string[] expected";
+                    if (!(message.blocks[i] && typeof message.blocks[i].length === "number" || $util.isString(message.blocks[i])))
+                        return "blocks: buffer[] expected";
             }
             return null;
         };
@@ -460,7 +460,10 @@ $root.getBlocks = (function() {
                     throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
                 message.blocks = [];
                 for (var i = 0; i < object.blocks.length; ++i)
-                    message.blocks[i] = String(object.blocks[i]);
+                    if (typeof object.blocks[i] === "string")
+                        $util.base64.decode(object.blocks[i], message.blocks[i] = $util.newBuffer($util.base64.length(object.blocks[i])), 0);
+                    else if (object.blocks[i].length >= 0)
+                        message.blocks[i] = object.blocks[i];
             }
             return message;
         };
@@ -487,7 +490,7 @@ $root.getBlocks = (function() {
             if (message.blocks && message.blocks.length) {
                 object.blocks = [];
                 for (var j = 0; j < message.blocks.length; ++j)
-                    object.blocks[j] = message.blocks[j];
+                    object.blocks[j] = options.bytes === String ? $util.base64.encode(message.blocks[j], 0, message.blocks[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks[j]) : message.blocks[j];
             }
             return object;
         };
@@ -1472,8 +1475,8 @@ $root.getMessages = (function() {
          * @memberof getMessages
          * @interface IGetMessagesResponse
          * @property {shared.IHeaders|null} [headers] GetMessagesResponse headers
-         * @property {Array.<string>|null} [prevotes] GetMessagesResponse prevotes
-         * @property {Array.<string>|null} [precommits] GetMessagesResponse precommits
+         * @property {Array.<Uint8Array>|null} [prevotes] GetMessagesResponse prevotes
+         * @property {Array.<Uint8Array>|null} [precommits] GetMessagesResponse precommits
          */
 
         /**
@@ -1503,7 +1506,7 @@ $root.getMessages = (function() {
 
         /**
          * GetMessagesResponse prevotes.
-         * @member {Array.<string>} prevotes
+         * @member {Array.<Uint8Array>} prevotes
          * @memberof getMessages.GetMessagesResponse
          * @instance
          */
@@ -1511,7 +1514,7 @@ $root.getMessages = (function() {
 
         /**
          * GetMessagesResponse precommits.
-         * @member {Array.<string>} precommits
+         * @member {Array.<Uint8Array>} precommits
          * @memberof getMessages.GetMessagesResponse
          * @instance
          */
@@ -1545,10 +1548,10 @@ $root.getMessages = (function() {
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.prevotes != null && message.prevotes.length)
                 for (var i = 0; i < message.prevotes.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.prevotes[i]);
+                    writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.prevotes[i]);
             if (message.precommits != null && message.precommits.length)
                 for (var i = 0; i < message.precommits.length; ++i)
-                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.precommits[i]);
+                    writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.precommits[i]);
             return writer;
         };
 
@@ -1590,13 +1593,13 @@ $root.getMessages = (function() {
                 case 2: {
                         if (!(message.prevotes && message.prevotes.length))
                             message.prevotes = [];
-                        message.prevotes.push(reader.string());
+                        message.prevotes.push(reader.bytes());
                         break;
                     }
                 case 3: {
                         if (!(message.precommits && message.precommits.length))
                             message.precommits = [];
-                        message.precommits.push(reader.string());
+                        message.precommits.push(reader.bytes());
                         break;
                     }
                 default:
@@ -1643,15 +1646,15 @@ $root.getMessages = (function() {
                 if (!Array.isArray(message.prevotes))
                     return "prevotes: array expected";
                 for (var i = 0; i < message.prevotes.length; ++i)
-                    if (!$util.isString(message.prevotes[i]))
-                        return "prevotes: string[] expected";
+                    if (!(message.prevotes[i] && typeof message.prevotes[i].length === "number" || $util.isString(message.prevotes[i])))
+                        return "prevotes: buffer[] expected";
             }
             if (message.precommits != null && message.hasOwnProperty("precommits")) {
                 if (!Array.isArray(message.precommits))
                     return "precommits: array expected";
                 for (var i = 0; i < message.precommits.length; ++i)
-                    if (!$util.isString(message.precommits[i]))
-                        return "precommits: string[] expected";
+                    if (!(message.precommits[i] && typeof message.precommits[i].length === "number" || $util.isString(message.precommits[i])))
+                        return "precommits: buffer[] expected";
             }
             return null;
         };
@@ -1678,14 +1681,20 @@ $root.getMessages = (function() {
                     throw TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");
                 message.prevotes = [];
                 for (var i = 0; i < object.prevotes.length; ++i)
-                    message.prevotes[i] = String(object.prevotes[i]);
+                    if (typeof object.prevotes[i] === "string")
+                        $util.base64.decode(object.prevotes[i], message.prevotes[i] = $util.newBuffer($util.base64.length(object.prevotes[i])), 0);
+                    else if (object.prevotes[i].length >= 0)
+                        message.prevotes[i] = object.prevotes[i];
             }
             if (object.precommits) {
                 if (!Array.isArray(object.precommits))
                     throw TypeError(".getMessages.GetMessagesResponse.precommits: array expected");
                 message.precommits = [];
                 for (var i = 0; i < object.precommits.length; ++i)
-                    message.precommits[i] = String(object.precommits[i]);
+                    if (typeof object.precommits[i] === "string")
+                        $util.base64.decode(object.precommits[i], message.precommits[i] = $util.newBuffer($util.base64.length(object.precommits[i])), 0);
+                    else if (object.precommits[i].length >= 0)
+                        message.precommits[i] = object.precommits[i];
             }
             return message;
         };
@@ -1714,12 +1723,12 @@ $root.getMessages = (function() {
             if (message.prevotes && message.prevotes.length) {
                 object.prevotes = [];
                 for (var j = 0; j < message.prevotes.length; ++j)
-                    object.prevotes[j] = message.prevotes[j];
+                    object.prevotes[j] = options.bytes === String ? $util.base64.encode(message.prevotes[j], 0, message.prevotes[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.prevotes[j]) : message.prevotes[j];
             }
             if (message.precommits && message.precommits.length) {
                 object.precommits = [];
                 for (var j = 0; j < message.precommits.length; ++j)
-                    object.precommits[j] = message.precommits[j];
+                    object.precommits[j] = options.bytes === String ? $util.base64.encode(message.precommits[j], 0, message.precommits[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.precommits[j]) : message.precommits[j];
             }
             return object;
         };
@@ -2680,7 +2689,7 @@ $root.getProposal = (function() {
          * @memberof getProposal
          * @interface IGetProposalResponse
          * @property {shared.IHeaders|null} [headers] GetProposalResponse headers
-         * @property {string|null} [proposal] GetProposalResponse proposal
+         * @property {Uint8Array|null} [proposal] GetProposalResponse proposal
          */
 
         /**
@@ -2708,11 +2717,11 @@ $root.getProposal = (function() {
 
         /**
          * GetProposalResponse proposal.
-         * @member {string} proposal
+         * @member {Uint8Array} proposal
          * @memberof getProposal.GetProposalResponse
          * @instance
          */
-        GetProposalResponse.prototype.proposal = "";
+        GetProposalResponse.prototype.proposal = $util.newBuffer([]);
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.
@@ -2741,7 +2750,7 @@ $root.getProposal = (function() {
             if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.proposal);
+                writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.proposal);
             return writer;
         };
 
@@ -2781,7 +2790,7 @@ $root.getProposal = (function() {
                         break;
                     }
                 case 2: {
-                        message.proposal = reader.string();
+                        message.proposal = reader.bytes();
                         break;
                     }
                 default:
@@ -2825,8 +2834,8 @@ $root.getProposal = (function() {
                     return "headers." + error;
             }
             if (message.proposal != null && message.hasOwnProperty("proposal"))
-                if (!$util.isString(message.proposal))
-                    return "proposal: string expected";
+                if (!(message.proposal && typeof message.proposal.length === "number" || $util.isString(message.proposal)))
+                    return "proposal: buffer expected";
             return null;
         };
 
@@ -2848,7 +2857,10 @@ $root.getProposal = (function() {
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             if (object.proposal != null)
-                message.proposal = String(object.proposal);
+                if (typeof object.proposal === "string")
+                    $util.base64.decode(object.proposal, message.proposal = $util.newBuffer($util.base64.length(object.proposal)), 0);
+                else if (object.proposal.length >= 0)
+                    message.proposal = object.proposal;
             return message;
         };
 
@@ -2867,12 +2879,18 @@ $root.getProposal = (function() {
             var object = {};
             if (options.defaults) {
                 object.headers = null;
-                object.proposal = "";
+                if (options.bytes === String)
+                    object.proposal = "";
+                else {
+                    object.proposal = [];
+                    if (options.bytes !== Array)
+                        object.proposal = $util.newBuffer(object.proposal);
+                }
             }
             if (message.headers != null && message.hasOwnProperty("headers"))
                 object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.proposal != null && message.hasOwnProperty("proposal"))
-                object.proposal = message.proposal;
+                object.proposal = options.bytes === String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;
             return object;
         };
 

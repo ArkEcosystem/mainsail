@@ -20,7 +20,7 @@ export interface IGetBlocksRequest extends Request {
 	};
 }
 
-export type IGetBlocksResponse = { blocks: String[] };
+export type IGetBlocksResponse = { blocks: Buffer[] };
 
 export interface IGetCommonBlocksRequest extends Request {
 	payload: {
@@ -41,8 +41,8 @@ export interface IGetMessagesRequest extends Request {
 }
 
 export interface IGetMessagesResponse {
-	precommits: string[];
-	prevotes: string[];
+	precommits: Buffer[];
+	prevotes: Buffer[];
 }
 
 export type IGetPeersResponse = {
@@ -58,7 +58,7 @@ export interface IGetProposalRequest extends Request {
 }
 
 export interface IGetProposalResponse {
-	proposal: string;
+	proposal: Buffer;
 }
 
 export interface IPostPrecommitRequest extends Request {
