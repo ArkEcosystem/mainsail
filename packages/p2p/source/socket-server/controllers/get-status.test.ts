@@ -16,13 +16,13 @@ describe<{
 		},
 	});
 
-	const blockchain = { getLastBlock: () => {} };
+	const stateStore = { getLastBlock: () => {} };
 	const slots = { getSlotInfo: () => {} };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
 		context.controller = context.sandbox.app.resolve(GetStatusControllerProxy);
 	});
@@ -35,7 +35,7 @@ describe<{
 			header,
 		};
 
-		stub(blockchain, "getLastBlock").returnValue(lastBlock);
+		stub(stateStore, "getLastBlock").returnValue(lastBlock);
 		const slotInfo = {
 			blockTime: 8000,
 			endTime: 99_000,

@@ -9,7 +9,7 @@ describe<{
 }>("GetBlocksController", ({ it, assert, beforeEach, spy, match, stub }) => {
 	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
 	const database = { findCommittedBlocks: () => {} };
-	const blockchain = {
+	const stateStore = {
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
 	};
@@ -19,7 +19,7 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
-		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
 		context.controller = context.sandbox.app.resolve(GetBlocksController);
 	});
