@@ -25,7 +25,6 @@ const init = (context: Context) => {
 	const app = new Application(new Container());
 	app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.StateStore).toConstantValue({});
-	app.bind(Identifiers.BlockchainService).toConstantValue({});
 	app.bind(Identifiers.WalletRepository).toConstantValue({});
 	app.bind(Identifiers.PeerNetworkMonitor).toConstantValue({});
 	app.bind(Identifiers.PeerRepository).toConstantValue({});
