@@ -10,7 +10,7 @@ describe<{
 	config: Configuration;
 	validator: any;
 	createTransactionValidator: any;
-	blockchain: any;
+	stateStore: any;
 	pool: any;
 	expirationService: any;
 	poolQuery: any;
@@ -19,7 +19,7 @@ describe<{
 	beforeAll((context) => {
 		context.validator = { validate: () => {} };
 		context.createTransactionValidator = () => context.validator;
-		context.blockchain = { getLastBlock: () => {} };
+		context.stateStore = { getLastBlock: () => {} };
 		context.pool = { removeTransaction: () => {} };
 		context.expirationService = { isExpired: () => {} };
 		context.poolQuery = {
@@ -33,7 +33,7 @@ describe<{
 		context.container
 			.bind(Identifiers.TransactionValidatorFactory)
 			.toConstantValue(context.createTransactionValidator);
-		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
 		context.container.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
 		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
@@ -57,7 +57,7 @@ describe<{
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
-		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
+		stub(context.stateStore, "getLastBlock").returnValueOnce(lastBlock);
 		stub(context.poolQuery, "getFromHighestPriority").returnValue({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
@@ -85,7 +85,7 @@ describe<{
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
-		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
+		stub(context.stateStore, "getLastBlock").returnValueOnce(lastBlock);
 		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
@@ -113,7 +113,7 @@ describe<{
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
-		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
+		stub(context.stateStore, "getLastBlock").returnValueOnce(lastBlock);
 		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 
 		const expiredStub = stub(context.expirationService, "isExpired");
@@ -147,7 +147,7 @@ describe<{
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
-		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
+		stub(context.stateStore, "getLastBlock").returnValueOnce(lastBlock);
 		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
