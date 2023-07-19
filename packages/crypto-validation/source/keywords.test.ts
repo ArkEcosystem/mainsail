@@ -61,33 +61,6 @@ describe<{
 		assert.true(context.validator.validate("test", "1234").error.includes("data must be >= 0"));
 	});
 
-	it("keyword buffer should be ok", (context) => {
-		const schema = {
-			$id: "test",
-			buffer: {},
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", Buffer.from("")).error);
-		assert.undefined(context.validator.validate("test", Buffer.from("abc")).error);
-		assert.undefined(context.validator.validate("test", Buffer.alloc(0)).error);
-		assert.undefined(context.validator.validate("test", Buffer.alloc(10)).error);
-	});
-
-	it("keyword buffer should not be ok", (context) => {
-		const schema = {
-			$id: "test",
-			buffer: {},
-		};
-		context.validator.addSchema(schema);
-
-		assert.defined(context.validator.validate("test", 1).error);
-		assert.defined(context.validator.validate("test", "abc").error);
-		assert.defined(context.validator.validate("test", undefined).error);
-		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test", {}).error);
-	});
-
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
 		const schema = {
 			$id: "test",
