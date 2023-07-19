@@ -15,7 +15,7 @@ export class GetProposalController implements Contracts.P2P.Controller {
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.IGetProposalResponse> {
 		const result = {
-			proposal: "",
+			proposal: Buffer.alloc(0),
 		};
 
 		const { height, round } = request.payload.headers;
@@ -41,7 +41,7 @@ export class GetProposalController implements Contracts.P2P.Controller {
 		}
 
 		return {
-			proposal: (await this.serializer.serializeProposal(proposal)).toString("hex"),
+			proposal: await this.serializer.serializeProposal(proposal),
 		};
 	}
 }

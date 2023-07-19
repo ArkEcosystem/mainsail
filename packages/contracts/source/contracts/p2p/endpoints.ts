@@ -58,7 +58,7 @@ export interface IGetProposalRequest extends Request {
 }
 
 export interface IGetProposalResponse {
-	proposal: string;
+	proposal: Buffer;
 }
 
 export interface IPostPrecommitRequest extends Request {

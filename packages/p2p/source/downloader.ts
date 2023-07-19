@@ -98,7 +98,7 @@ export class Downloader {
 				return;
 			}
 
-			const proposal = await this.messageFactory.makeProposalFromBytes(Buffer.from(result.proposal, "hex"));
+			const proposal = await this.messageFactory.makeProposalFromBytes(result.proposal);
 
 			await this.handler.onProposal(proposal);
 		} catch {
