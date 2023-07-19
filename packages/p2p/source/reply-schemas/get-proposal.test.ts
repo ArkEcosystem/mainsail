@@ -1,9 +1,10 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
 import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
-import { makeKeywords, schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
+import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
+import { makeKeywords } from "../validation/keywords";
 import { getProposal } from "./get-proposal";
 
 type Context = {
