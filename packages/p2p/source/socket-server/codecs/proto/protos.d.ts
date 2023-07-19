@@ -119,7 +119,7 @@ export namespace getBlocks {
         headers?: (shared.IHeaders|null);
 
         /** GetBlocksResponse blocks */
-        blocks?: (string[]|null);
+        blocks?: (Uint8Array[]|null);
     }
 
     /** Represents a GetBlocksResponse. */
@@ -135,7 +135,7 @@ export namespace getBlocks {
         public headers?: (shared.IHeaders|null);
 
         /** GetBlocksResponse blocks. */
-        public blocks: string[];
+        public blocks: Uint8Array[];
 
         /**
          * Creates a new GetBlocksResponse instance using the specified properties.

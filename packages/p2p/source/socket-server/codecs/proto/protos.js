@@ -280,7 +280,7 @@ $root.getBlocks = (function() {
          * @memberof getBlocks
          * @interface IGetBlocksResponse
          * @property {shared.IHeaders|null} [headers] GetBlocksResponse headers
-         * @property {Array.<string>|null} [blocks] GetBlocksResponse blocks
+         * @property {Array.<Uint8Array>|null} [blocks] GetBlocksResponse blocks
          */
 
         /**
@@ -309,7 +309,7 @@ $root.getBlocks = (function() {
 
         /**
          * GetBlocksResponse blocks.
-         * @member {Array.<string>} blocks
+         * @member {Array.<Uint8Array>} blocks
          * @memberof getBlocks.GetBlocksResponse
          * @instance
          */
@@ -343,7 +343,7 @@ $root.getBlocks = (function() {
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.blocks != null && message.blocks.length)
                 for (var i = 0; i < message.blocks.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.blocks[i]);
+                    writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.blocks[i]);
             return writer;
         };
 
@@ -385,7 +385,7 @@ $root.getBlocks = (function() {
                 case 2: {
                         if (!(message.blocks && message.blocks.length))
                             message.blocks = [];
-                        message.blocks.push(reader.string());
+                        message.blocks.push(reader.bytes());
                         break;
                     }
                 default:
@@ -432,8 +432,8 @@ $root.getBlocks = (function() {
                 if (!Array.isArray(message.blocks))
                     return "blocks: array expected";
                 for (var i = 0; i < message.blocks.length; ++i)
-                    if (!$util.isString(message.blocks[i]))
-                        return "blocks: string[] expected";
+                    if (!(message.blocks[i] && typeof message.blocks[i].length === "number" || $util.isString(message.blocks[i])))
+                        return "blocks: buffer[] expected";
             }
             return null;
         };
@@ -460,7 +460,10 @@ $root.getBlocks = (function() {
                     throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
                 message.blocks = [];
                 for (var i = 0; i < object.blocks.length; ++i)
-                    message.blocks[i] = String(object.blocks[i]);
+                    if (typeof object.blocks[i] === "string")
+                        $util.base64.decode(object.blocks[i], message.blocks[i] = $util.newBuffer($util.base64.length(object.blocks[i])), 0);
+                    else if (object.blocks[i].length >= 0)
+                        message.blocks[i] = object.blocks[i];
             }
             return message;
         };
@@ -487,7 +490,7 @@ $root.getBlocks = (function() {
             if (message.blocks && message.blocks.length) {
                 object.blocks = [];
                 for (var j = 0; j < message.blocks.length; ++j)
-                    object.blocks[j] = message.blocks[j];
+                    object.blocks[j] = options.bytes === String ? $util.base64.encode(message.blocks[j], 0, message.blocks[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks[j]) : message.blocks[j];
             }
             return object;
         };
