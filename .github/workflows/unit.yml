@@ -38,8 +38,8 @@ jobs:
               run: pnpm run build
             - name: Test api
               run: cd packages/api && pnpm run test
-            - name: Test blockchain
-              run: cd packages/blockchain && pnpm run test
+            - name: Test bootstrap
+              run: cd packages/bootstrap && pnpm run test
             - name: Test cli
               run: cd packages/cli && pnpm run test
             - name: Test configuration-generator
