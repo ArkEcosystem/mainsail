@@ -213,7 +213,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return true;
 	}
 
-	private async validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
+	private validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
 		const schema = replySchemas[endpoint];
 		if (schema === undefined) {
 			this.logger.error(`Can't validate reply from "${endpoint}": none of the predefined schemas matches.`);
