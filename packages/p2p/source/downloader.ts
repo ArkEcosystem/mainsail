@@ -69,7 +69,7 @@ export class Downloader {
 			});
 
 			const blocks = await Promise.all(
-				result.blocks.map(async (hex) => await this.blockFactory.fromCommittedBytes(Buffer.from(hex, "hex"))),
+				result.blocks.map(async (buff) => await this.blockFactory.fromCommittedBytes(buff)),
 			);
 
 			for (const block of blocks) {

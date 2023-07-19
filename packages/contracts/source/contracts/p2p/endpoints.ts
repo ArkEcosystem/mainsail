@@ -20,7 +20,7 @@ export interface IGetBlocksRequest extends Request {
 	};
 }
 
-export type IGetBlocksResponse = { blocks: String[] };
+export type IGetBlocksResponse = { blocks: Buffer[] };
 
 export interface IGetCommonBlocksRequest extends Request {
 	payload: {
