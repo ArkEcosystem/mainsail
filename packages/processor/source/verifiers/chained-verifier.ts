@@ -7,10 +7,10 @@ export class ChainedVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.BlockchainService)
-	private readonly blockchain!: Contracts.Blockchain.Blockchain;
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
-		return Utils.isBlockChained(this.blockchain.getLastBlock().data, unit.getBlock().data);
+		return Utils.isBlockChained(this.stateStore.getLastBlock().data, unit.getBlock().data);
 	}
 }

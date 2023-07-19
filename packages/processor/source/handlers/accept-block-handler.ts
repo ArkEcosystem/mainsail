@@ -7,8 +7,8 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.BlockchainService)
-	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
+	// @inject(Identifiers.BlockchainService)
+	// protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -40,7 +40,7 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 			// no new blocks.
 
 			if (this.state.isStarted()) {
-				this.blockchain.resetWakeUp();
+				// this.blockchain.resetWakeUp();
 			}
 
 			// Ensure the lastDownloadedBlock is never behind the last accepted block.
@@ -54,7 +54,7 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 			this.logger.warning(`Refused new block ${JSON.stringify(block.data)}`);
 			this.logger.debug(error.stack);
 
-			this.blockchain.resetLastDownloadedBlock();
+			// this.blockchain.resetLastDownloadedBlock();
 
 			return false;
 		}

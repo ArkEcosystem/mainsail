@@ -8,7 +8,7 @@ describe<{
 	controller: GetCommonBlocksController;
 }>("GetCommonBlocksController", ({ it, assert, beforeEach, stub }) => {
 	const database = { getBlock: () => {} };
-	const blockchain = {
+	const stateStore = {
 		getLastBlock: () => {},
 	};
 
@@ -16,7 +16,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
-		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
+		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
 		context.controller = context.sandbox.app.resolve(GetCommonBlocksController);
 	});
@@ -27,7 +27,7 @@ describe<{
 
 		stub(database, "getBlock").resolvedValueSequence(blocks);
 		const height = 1433;
-		stub(blockchain, "getLastBlock").returnValue({ data: { height: 1433 } });
+		stub(stateStore, "getLastBlock").returnValue({ data: { height: 1433 } });
 
 		const commonBlocks = await controller.handle(request, {});
 

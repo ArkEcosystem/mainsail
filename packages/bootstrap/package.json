@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/blockchain",
+	"name": "@mainsail/bootstrap",
 	"version": "0.0.1",
-	"description": "Blockchain Manager for Mainsail",
+	"description": "Bootstrap Manager for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -21,26 +21,12 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/state": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"joi": "17.9.2",
-		"xstate": "4.23.4"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/delay": "3.1.0",
-		"@types/sinon": "^10.0.14",
-		"delay": "4.4.1",
-		"import-fresh": "3.3.0",
-		"sinon": "^15.0.4",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"
-	},
-	"arkecosystem": {
-		"core": {
-			"alias": "blockchain"
-		}
 	}
 }

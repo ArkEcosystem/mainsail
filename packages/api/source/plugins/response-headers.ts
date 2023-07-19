@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
 		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
-			const blockHeight = app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService).getLastHeight();
+			const blockHeight = app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
 
 			const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
 			responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};

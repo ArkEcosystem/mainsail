@@ -28,7 +28,6 @@ export class Command extends Commands.Command {
 		await Utils.Builder.buildApplication({
 			flags,
 			plugins: {
-				"@mainsail/blockchain": {},
 				"@mainsail/p2p": Utils.Builder.buildPeerFlags(flags),
 			},
 		});
