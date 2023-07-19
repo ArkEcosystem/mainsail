@@ -15,7 +15,6 @@ export const injectMilestone = (
 export const getLastHeight = (app: Contracts.Kernel.Application): number =>
 	app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
 
-
 export const getWalletNonce = async (app: Contracts.Kernel.Application, publicKey: string): Promise<BigNumber> =>
 	(
 		await app

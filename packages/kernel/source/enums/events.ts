@@ -37,7 +37,6 @@ export enum VoteEvent {
 	Unvote = "wallet.unvote",
 }
 
-
 export enum PeerEvent {
 	Added = "peer.added",
 	Disconnect = "peer.disconnect",
