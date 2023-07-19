@@ -2686,7 +2686,7 @@ $root.getProposal = (function() {
          * @memberof getProposal
          * @interface IGetProposalResponse
          * @property {shared.IHeaders|null} [headers] GetProposalResponse headers
-         * @property {string|null} [proposal] GetProposalResponse proposal
+         * @property {Uint8Array|null} [proposal] GetProposalResponse proposal
          */
 
         /**
@@ -2714,11 +2714,11 @@ $root.getProposal = (function() {
 
         /**
          * GetProposalResponse proposal.
-         * @member {string} proposal
+         * @member {Uint8Array} proposal
          * @memberof getProposal.GetProposalResponse
          * @instance
          */
-        GetProposalResponse.prototype.proposal = "";
+        GetProposalResponse.prototype.proposal = $util.newBuffer([]);
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.
@@ -2747,7 +2747,7 @@ $root.getProposal = (function() {
             if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.proposal);
+                writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.proposal);
             return writer;
         };
 
@@ -2787,7 +2787,7 @@ $root.getProposal = (function() {
                         break;
                     }
                 case 2: {
-                        message.proposal = reader.string();
+                        message.proposal = reader.bytes();
                         break;
                     }
                 default:
@@ -2831,8 +2831,8 @@ $root.getProposal = (function() {
                     return "headers." + error;
             }
             if (message.proposal != null && message.hasOwnProperty("proposal"))
-                if (!$util.isString(message.proposal))
-                    return "proposal: string expected";
+                if (!(message.proposal && typeof message.proposal.length === "number" || $util.isString(message.proposal)))
+                    return "proposal: buffer expected";
             return null;
         };
 
@@ -2854,7 +2854,10 @@ $root.getProposal = (function() {
                 message.headers = $root.shared.Headers.fromObject(object.headers);
             }
             if (object.proposal != null)
-                message.proposal = String(object.proposal);
+                if (typeof object.proposal === "string")
+                    $util.base64.decode(object.proposal, message.proposal = $util.newBuffer($util.base64.length(object.proposal)), 0);
+                else if (object.proposal.length >= 0)
+                    message.proposal = object.proposal;
             return message;
         };
 
@@ -2873,12 +2876,18 @@ $root.getProposal = (function() {
             var object = {};
             if (options.defaults) {
                 object.headers = null;
-                object.proposal = "";
+                if (options.bytes === String)
+                    object.proposal = "";
+                else {
+                    object.proposal = [];
+                    if (options.bytes !== Array)
+                        object.proposal = $util.newBuffer(object.proposal);
+                }
             }
             if (message.headers != null && message.hasOwnProperty("headers"))
                 object.headers = $root.shared.Headers.toObject(message.headers, options);
             if (message.proposal != null && message.hasOwnProperty("proposal"))
-                object.proposal = message.proposal;
+                object.proposal = options.bytes === String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;
             return object;
         };
 

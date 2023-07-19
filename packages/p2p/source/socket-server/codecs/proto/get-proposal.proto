@@ -8,5 +8,5 @@ message GetProposalRequest {
 
 message GetProposalResponse {
 	shared.Headers headers = 1;
-    string proposal = 2;
+    bytes proposal = 2;
 }

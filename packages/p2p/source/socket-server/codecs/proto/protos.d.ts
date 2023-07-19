@@ -1159,7 +1159,7 @@ export namespace getProposal {
         headers?: (shared.IHeaders|null);
 
         /** GetProposalResponse proposal */
-        proposal?: (string|null);
+        proposal?: (Uint8Array|null);
     }
 
     /** Represents a GetProposalResponse. */
@@ -1175,7 +1175,7 @@ export namespace getProposal {
         public headers?: (shared.IHeaders|null);
 
         /** GetProposalResponse proposal. */
-        public proposal: string;
+        public proposal: Uint8Array;
 
         /**
          * Creates a new GetProposalResponse instance using the specified properties.
