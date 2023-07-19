@@ -21,13 +21,13 @@ import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		this.#registerValidation();
+
 		this.#registerFactories();
 
 		this.#registerServices();
 
 		this.#registerActions();
-
-		this.#registerValidation();
 	}
 
 	public async bootWhen(): Promise<boolean> {
