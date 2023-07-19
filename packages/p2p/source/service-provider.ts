@@ -17,7 +17,7 @@ import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { Server } from "./socket-server/server";
-import { makeFormats, sanitizeRemoteAddress } from "./validation";
+import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -136,6 +136,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerValidation(): void {
+		for (const keyword of Object.values(makeKeywords())) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+		}
+
 		for (const [name, format] of Object.entries(makeFormats())) {
 			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}
