@@ -3,9 +3,8 @@ import { headers } from "./headers";
 export const getProposal = {
 	properties: {
 		headers,
-		// TODO: Make optional
 		proposal: {
-			type: "string",
+			buffer: {},
 		},
 	},
 	required: ["headers", "proposal"],
