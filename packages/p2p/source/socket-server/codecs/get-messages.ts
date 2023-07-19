@@ -8,7 +8,7 @@ export const getMessages = {
 	},
 	response: {
 		deserialize: (payload: Buffer): proto.IGetMessagesResponse =>
-			proto.GetMessagesResponse.decode(payload).toJSON(),
+			proto.GetMessagesResponse.toObject(proto.GetMessagesResponse.decode(payload)),
 		serialize: (object: proto.IGetMessagesResponse): Buffer =>
 			Buffer.from(proto.GetMessagesResponse.encode(object).finish()),
 	},
