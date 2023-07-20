@@ -23,6 +23,9 @@ export class BlockDownloader {
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
 
+	@inject(Identifiers.LogService)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#downloadJobs: DownloadJob[] = [];
 	#isProcessing = false;
 
@@ -50,13 +53,19 @@ export class BlockDownloader {
 
 	async #downloadBlocksFromPeer(job: DownloadJob): Promise<void> {
 		try {
+			this.logger.debug(`Downloading blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
+
 			const result = await this.communicator.getBlocks(job.peer, {
 				fromHeight: job.heightFrom,
 				limit: job.heightTo - job.heightFrom + 1,
 			});
 
 			job.blocks = result.blocks;
-		} catch {
+		} catch (error) {
+			this.logger.debug(
+				`Error downloading blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}. Message: ${error.message}`,
+			);
+
 			// TODO: Handle errors
 		}
 
@@ -65,6 +74,8 @@ export class BlockDownloader {
 	}
 
 	async #processBlocks(job: DownloadJob) {
+		this.logger.debug(`Processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
+
 		try {
 			for (const buff of job.blocks) {
 				const block = await this.blockFactory.fromCommittedBytes(buff);
@@ -74,7 +85,11 @@ export class BlockDownloader {
 			}
 
 			this.#isProcessing = false;
-		} catch {
+		} catch (error) {
+			this.logger.error(
+				`Error processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}. Message: ${error.message}`,
+			);
+
 			// TODO: Handle errors
 		}
 
