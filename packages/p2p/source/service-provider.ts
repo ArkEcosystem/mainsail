@@ -110,7 +110,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
+		// this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerDownloader).to(Downloader).inSingletonScope();
 
