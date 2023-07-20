@@ -88,7 +88,6 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 			this.#handleJobError(job, error);
 		}
 
-		// TODO: Handle missing blocks
 		this.#processNextJob();
 	}
 
@@ -107,8 +106,6 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 				// TODO: Handle response
 				await this.handler.onCommittedBlock(block);
 			}
-
-			// this.#isProcessing = false;
 		} catch (error) {
 			this.#handleJobError(job, error);
 		}
