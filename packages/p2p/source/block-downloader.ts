@@ -129,6 +129,12 @@ export class BlockDownloader {
 	}
 
 	#handleJobError(job: DownloadJob, error: Error): void {
+		const index = this.#downloadJobs.indexOf(job);
+
+		if (index === -1) {
+			return; // Job was already removed
+		}
+
 		this.logger.debug(
 			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
 				job.heightTo
@@ -139,11 +145,12 @@ export class BlockDownloader {
 		const peers = this.repository.getPeers().filter((peer) => header.canDownloadBlocks(peer.state));
 
 		if (peers.length === 0) {
+			// Remove higher jobs, because peer is no longer available
+			this.#downloadJobs = this.#downloadJobs.slice(0, index);
 			return;
 		}
 
 		const peer = this.#getRandomPeer(peers);
-		const index = this.#downloadJobs.indexOf(job);
 
 		const newJob = {
 			...job,
