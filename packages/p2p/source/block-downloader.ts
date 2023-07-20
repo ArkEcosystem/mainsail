@@ -46,15 +46,10 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 			return;
 		}
 
-		const heightTo =
-			peer.state.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
-				? this.#getLastRequestedBlockHeight() + constants.MAX_DOWNLOAD_BLOCKS
-				: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
-
 		const downloadJob: DownloadJob = {
 			blocks: [],
 			heightFrom: this.#getLastRequestedBlockHeight() + 1,
-			heightTo,
+			heightTo: this.#calculateHeightTo(peer),
 			peer,
 			peerHeight: peer.state.height - 1,
 			status: JobStatus.Downloading,
@@ -169,15 +164,10 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 
 		const peer = this.#getRandomPeer(peers);
 
-		const heightTo =
-			peer.state.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
-				? this.#getLastRequestedBlockHeight() + constants.MAX_DOWNLOAD_BLOCKS
-				: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
-
 		const newJob: DownloadJob = {
 			blocks: [],
 			heightFrom: index === 0 ? this.stateStore.getLastHeight() + 1 : job.heightFrom,
-			heightTo: this.#downloadJobs.length === 1 ? heightTo : job.heightTo,
+			heightTo: this.#downloadJobs.length === 1 ? this.#calculateHeightTo(peer) : job.heightTo,
 			peer,
 			peerHeight: peer.state.height - 1,
 			status: JobStatus.Downloading,
@@ -190,5 +180,12 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 
 	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
 		return peers[randomNumber(0, peers.length - 1)];
+	}
+
+	#calculateHeightTo(peer: Contracts.P2P.Peer): number {
+		// Check that we don't exceed maxDownloadBlocks
+		return peer.state.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
+			? this.#getLastRequestedBlockHeight() + constants.MAX_DOWNLOAD_BLOCKS
+			: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
 	}
 }
