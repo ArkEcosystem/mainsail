@@ -42,7 +42,10 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 	#downloadJobs: DownloadJob[] = [];
 
 	public downloadBlocks(peer: Contracts.P2P.Peer): void {
-		if (peer.state.height - 1 <= this.#getLastRequestedBlockHeight()) {
+		if (
+			peer.state.height - 1 <= this.#getLastRequestedBlockHeight() ||
+			this.#downloadJobs.length >= constants.MAX_DOWNLOAD_BLOCKS_JOBS
+		) {
 			return;
 		}
 
