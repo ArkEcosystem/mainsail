@@ -5,7 +5,6 @@ import Joi from "joi";
 import { ValidateAndAcceptPeerAction } from "./actions";
 import { BlockDownloader } from "./block-downloader";
 import { Broadcaster } from "./broadcaster";
-import { ChunkCache } from "./chunk-cache";
 import { Downloader } from "./downloader";
 import { Header } from "./header";
 import { HeaderService } from "./header-service";
@@ -107,8 +106,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerHeaderService).to(HeaderService).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerDiscoverer).to(PeerDiscoverer).inSingletonScope();
-
-		this.app.bind(Identifiers.PeerChunkCache).to(ChunkCache).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
 

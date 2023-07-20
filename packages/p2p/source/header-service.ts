@@ -29,12 +29,10 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		await this.#delay(peer);
 
-		const header = this.headerFactory();
-		const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
+		this.app.get<Contracts.P2P.BlockDownloader>(Identifiers.PeerBlockDownloader).downloadBlocks(peer);
 
-		if (header.canDownloadBlocks(peerHeader)) {
-			await downloader.downloadBlocks(peer);
-		}
+		const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
+		const header = this.headerFactory();
 
 		if (header.canDownloadProposal(peerHeader)) {
 			await downloader.downloadProposal(peer);
@@ -52,6 +50,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 	async #delay(peer: Contracts.P2P.Peer): Promise<void> {
 		this.#pending.add(peer);
 
+		// TODO: use delay
 		await new Promise((resolve) => setTimeout(resolve, constants.CHECK_HEADER_DELAY));
 
 		this.#pending.delete(peer);

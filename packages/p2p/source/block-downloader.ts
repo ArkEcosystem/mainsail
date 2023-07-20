@@ -1,188 +1,194 @@
-/* eslint-disable sonarjs/no-one-iteration-loop */
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { randomNumber } from "@mainsail/utils";
 
 import { constants } from "./constants";
 
+enum JobStatus {
+	Downloading,
+	ReadyToProcess,
+	Processing,
+}
+
+type DownloadJob = {
+	peer: Contracts.P2P.Peer;
+	peerHeight: number;
+	heightFrom: number;
+	heightTo: number;
+	blocks: Buffer[];
+	status: JobStatus;
+};
+
 @injectable()
 export class BlockDownloader implements Contracts.P2P.BlockDownloader {
-	@inject(Identifiers.PeerNetworkMonitor)
-	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
+	@inject(Identifiers.PeerCommunicator)
+	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
+
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+
+	@inject(Identifiers.Consensus.Handler)
+	private readonly handler!: Contracts.Consensus.IHandler;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerCommunicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
-
-	@inject(Identifiers.PeerChunkCache)
-	private readonly chunkCache!: Contracts.P2P.ChunkCache;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#downloadChunkSize = constants.MAX_DOWNLOAD_BLOCKS;
-	#maxParallelDownloads = 10;
+	#downloadJobs: DownloadJob[] = [];
 
-	public async downloadBlocksFromHeight(fromBlockHeight: number): Promise<Contracts.Crypto.IBlockData[]> {
-		return [];
-
-		const peersAll: Contracts.P2P.Peer[] = this.repository.getPeers();
-
-		if (peersAll.length === 0) {
-			this.logger.error(`Could not download blocks: we have 0 peers`);
-			return [];
+	public downloadBlocks(peer: Contracts.P2P.Peer): void {
+		if (
+			peer.state.height - 1 <= this.#getLastRequestedBlockHeight() ||
+			this.#downloadJobs.length >= constants.MAX_DOWNLOAD_BLOCKS_JOBS
+		) {
+			return;
 		}
 
-		const peersNotForked: Contracts.P2P.Peer[] = Utils.shuffle(peersAll.filter((peer) => !peer.isForked()));
+		const downloadJob: DownloadJob = {
+			blocks: [],
+			heightFrom: this.#getLastRequestedBlockHeight() + 1,
+			heightTo: this.#calculateHeightTo(peer),
+			peer,
+			peerHeight: peer.state.height - 1,
+			status: JobStatus.Downloading,
+		};
 
-		if (peersNotForked.length === 0) {
-			this.logger.error(
-				`Could not download blocks: We have ${peersAll.length} peer(s) but all ` +
-					`of them are on a different chain than us`,
-			);
-			return [];
+		this.#downloadJobs.push(downloadJob);
+
+		void this.#downloadBlocksFromPeer(downloadJob);
+	}
+
+	#getLastRequestedBlockHeight(): number {
+		if (this.#downloadJobs.length === 0) {
+			return this.stateStore.getLastHeight();
 		}
 
-		const networkHeight: number = this.networkMonitor.getNetworkHeight();
-		let chunksMissingToSync: number;
+		return this.#downloadJobs[this.#downloadJobs.length - 1].heightTo;
+	}
 
-		if (!networkHeight || networkHeight <= fromBlockHeight) {
-			chunksMissingToSync = 1;
-		} else {
-			chunksMissingToSync = Math.ceil((networkHeight - fromBlockHeight) / this.#downloadChunkSize);
-		}
-		const chunksToDownload: number = Math.min(
-			chunksMissingToSync,
-			peersNotForked.length,
-			this.#maxParallelDownloads,
-		);
+	async #downloadBlocksFromPeer(job: DownloadJob): Promise<void> {
+		try {
+			this.logger.debug(`Downloading blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
 
-		// We must return an uninterrupted sequence of blocks, starting from `fromBlockHeight`,
-		// with sequential heights, without gaps.
-
-		const downloadJobs = [];
-		const downloadResults: any = [];
-		let someJobFailed = false;
-		let chunksHumanReadable = "";
-
-		for (let index = 0; index < chunksToDownload; index++) {
-			const height: number = fromBlockHeight + this.#downloadChunkSize * index;
-			const isLastChunk: boolean = index === chunksToDownload - 1;
-			const blocksRange = `[${(height + 1).toLocaleString()}, ${(isLastChunk
-				? ".."
-				: height + this.#downloadChunkSize
-			).toLocaleString()}]`;
-
-			//@ts-ignore
-			downloadJobs.push(async () => {
-				if (this.chunkCache.has(blocksRange)) {
-					downloadResults[index] = this.chunkCache.get(blocksRange);
-					// Remove it from the cache so that it does not get served many times
-					// from the cache. In case of network reorganization or downloading
-					// flawed chunks we want to re-download from another peer.
-					this.chunkCache.remove(blocksRange);
-					return;
-				}
-
-				let blocks!: Contracts.Crypto.IBlockData[];
-				let peer: Contracts.P2P.Peer;
-				let peerPrint!: string;
-
-				// As a first peer to try, pick such a peer that different jobs use different peers.
-				// If that peer fails then pick randomly from the remaining peers that have not
-				// been first-attempt for any job.
-				const peersToTry = [peersNotForked[index], ...Utils.shuffle(peersNotForked.slice(chunksToDownload))];
-				if (peersToTry.length === 1) {
-					// special case where we don't have "backup peers" (that have not been first-attempt for any job)
-					// so add peers that have been first-attempt as backup peers
-					peersToTry.push(...peersNotForked.filter((p) => p.ip !== peersNotForked[index].ip));
-				}
-
-				for (peer of peersToTry) {
-					peerPrint = `${peer.ip}:${peer.port}`;
-					try {
-						// TODO: Blocks are now buffers
-						blocks = (await this.communicator.getBlocks(peer, {
-							fromHeight: height,
-							limit: this.#downloadChunkSize,
-						})) as any;
-
-						if (blocks.length > 0 || isLastChunk) {
-							// when `isLastChunk` it can be normal that the peer does not send any block (when none were forged)
-							this.logger.debug(
-								`Downloaded blocks ${blocksRange} (${blocks.length}) ` + `from ${peerPrint}`,
-							);
-							downloadResults[index] = blocks;
-							return;
-						} else {
-							throw new Error("Peer did not return any block");
-						}
-					} catch (error) {
-						this.logger.info(
-							`Failed to download blocks ${blocksRange} from ${peerPrint}: ${error.message}`,
-						);
-					}
-
-					if (someJobFailed) {
-						this.logger.info(
-							`Giving up on trying to download blocks ${blocksRange}: ` + `another download job failed`,
-						);
-					}
-				}
-
-				someJobFailed = true;
-				throw new Error(
-					`Could not download blocks ${blocksRange} from any of ${peersToTry.length} ` +
-						`peer(s). Last attempt returned ${blocks.length} block(s) from peer ${peerPrint}.`,
-				);
+			const result = await this.communicator.getBlocks(job.peer, {
+				fromHeight: job.heightFrom,
+				limit: job.heightTo - job.heightFrom,
 			});
 
-			if (chunksHumanReadable.length > 0) {
-				chunksHumanReadable += ", ";
-			}
-			chunksHumanReadable += blocksRange;
+			job.blocks = result.blocks;
+			job.status = JobStatus.ReadyToProcess;
+		} catch (error) {
+			this.#handleJobError(job, error);
 		}
 
-		this.logger.debug(`Downloading blocks in chunks: ${chunksHumanReadable}`);
-		let firstFailureMessage!: string;
+		this.#processNextJob();
+	}
+
+	async #processBlocks(job: DownloadJob) {
+		if (job.status !== JobStatus.ReadyToProcess) {
+			return;
+		}
+
+		this.logger.debug(`Processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
 
 		try {
-			// Convert the array of AsyncFunction to an array of Promise by calling the functions.
-			// @ts-ignore
-			await Promise.all(downloadJobs.map((f) => f()));
+			job.status = JobStatus.Processing;
+			for (const buff of job.blocks) {
+				const block = await this.blockFactory.fromCommittedBytes(buff);
+
+				// TODO: Handle response
+				await this.handler.onCommittedBlock(block);
+			}
 		} catch (error) {
-			firstFailureMessage = error.message;
+			this.#handleJobError(job, error);
 		}
 
-		let downloadedBlocks: Contracts.Crypto.IBlockData[] = [];
-
-		let index;
-
-		for (index = 0; index < chunksToDownload; index++) {
-			if (downloadResults[index] === undefined) {
-				this.logger.error(firstFailureMessage);
-				break;
-			}
-			downloadedBlocks = [...downloadedBlocks, ...downloadResults[index]];
-		}
-		// Save any downloaded chunks that are higher than a failed chunk for later reuse.
-		for (index++; index < chunksToDownload; index++) {
-			if (downloadResults[index]) {
-				const height: number = fromBlockHeight + this.#downloadChunkSize * index;
-				const blocksRange = `[${(height + 1).toLocaleString()}, ${(
-					height + this.#downloadChunkSize
-				).toLocaleString()}]`;
-
-				this.chunkCache.set(blocksRange, downloadResults[index]);
-			}
+		if (this.stateStore.getLastHeight() !== job.heightTo) {
+			this.#handleJobError(job, new Error("Blocks are missing"));
 		}
 
-		// if we did not manage to download any block, reduce chunk size for next time
-		this.#downloadChunkSize =
-			downloadedBlocks.length === 0 ? Math.ceil(this.#downloadChunkSize / 10) : constants.MAX_DOWNLOAD_BLOCKS;
+		if (job.heightTo !== this.stateStore.getLastHeight()) {
+			this.#handleMissingBlocks(job);
+			return;
+		}
 
-		return downloadedBlocks;
+		this.#downloadJobs.shift();
+		this.#processNextJob();
+	}
+
+	#processNextJob(): void {
+		if (this.#downloadJobs.length === 0) {
+			return;
+		}
+
+		void this.#processBlocks(this.#downloadJobs[0]);
+	}
+
+	#handleJobError(job: DownloadJob, error: Error): void {
+		const index = this.#downloadJobs.indexOf(job);
+		if (index === -1) {
+			return; // Job was already removed
+		}
+
+		this.logger.debug(
+			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
+				job.heightTo
+			} from ${job.peer.ip}. ${error.message}`,
+		);
+
+		// TODO: Ban peer
+
+		this.#replyJob(job);
+	}
+
+	#handleMissingBlocks(job: DownloadJob): void {
+		console.log("Handling missing blocks");
+
+		// TODO: Check if peer should be banned
+
+		this.#replyJob(job);
+	}
+
+	#replyJob(job: DownloadJob) {
+		const index = this.#downloadJobs.indexOf(job);
+
+		const peers = this.repository.getPeers().filter((peer) => peer.state.height >= job.heightTo);
+
+		if (peers.length === 0) {
+			// Remove higher jobs, because peer is no longer available
+			this.#downloadJobs = this.#downloadJobs.slice(0, index);
+			return;
+		}
+
+		const peer = this.#getRandomPeer(peers);
+
+		const newJob: DownloadJob = {
+			blocks: [],
+			heightFrom: index === 0 ? this.stateStore.getLastHeight() + 1 : job.heightFrom,
+			heightTo: this.#downloadJobs.length === 1 ? this.#calculateHeightTo(peer) : job.heightTo,
+			peer,
+			peerHeight: peer.state.height - 1,
+			status: JobStatus.Downloading,
+		};
+
+		this.#downloadJobs[index] = newJob;
+
+		void this.#downloadBlocksFromPeer(newJob);
+	}
+
+	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
+		return peers[randomNumber(0, peers.length - 1)];
+	}
+
+	#calculateHeightTo(peer: Contracts.P2P.Peer): number {
+		// Check that we don't exceed maxDownloadBlocks
+		return peer.state.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
+			? this.#getLastRequestedBlockHeight() + constants.MAX_DOWNLOAD_BLOCKS
+			: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
 	}
 }

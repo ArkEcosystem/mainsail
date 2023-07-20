@@ -1,5 +1,5 @@
-import { IBlockData } from "../crypto";
+import { Peer } from "./peer";
 
 export interface BlockDownloader {
-	downloadBlocksFromHeight(fromBlockHeight: number): Promise<IBlockData[]>;
+	downloadBlocks(peer: Peer): void;
 }

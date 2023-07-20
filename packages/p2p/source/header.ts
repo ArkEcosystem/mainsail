@@ -41,10 +41,6 @@ export class Header implements Contracts.P2P.IHeader {
 		};
 	}
 
-	public canDownloadBlocks(data: Contracts.P2P.IHeaderData): boolean {
-		return data.height > this.height;
-	}
-
 	public canDownloadProposal(data: Contracts.P2P.IHeaderData): boolean {
 		if (!this.#isRoundSufficient(data)) {
 			return false;
