@@ -47,9 +47,9 @@ export class BlockDownloader {
 		const downloadJob: DownloadJob = {
 			blocks: [],
 			heightFrom: this.#getLastRequestedBlockHeight() + 1,
-			heightTo: peer.state.height,
+			heightTo: peer.state.height - 1, // Stored block height is always 1 less than the consensus height
 			peer,
-			peerHeight: peer.state.height,
+			peerHeight: peer.state.height - 1,
 			status: JobStatus.Downloading,
 		};
 
@@ -68,7 +68,7 @@ export class BlockDownloader {
 
 			const result = await this.communicator.getBlocks(job.peer, {
 				fromHeight: job.heightFrom,
-				limit: job.heightTo - job.heightFrom + 1,
+				limit: job.heightTo - job.heightFrom,
 			});
 
 			job.blocks = result.blocks;
