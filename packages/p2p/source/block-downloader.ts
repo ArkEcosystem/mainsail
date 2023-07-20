@@ -113,6 +113,15 @@ export class BlockDownloader {
 			this.#handleJobError(job, error);
 		}
 
+		if (this.stateStore.getLastHeight() !== job.heightTo) {
+			this.#handleJobError(job, new Error("Blocks are missing"));
+		}
+
+		if (job.heightTo !== this.stateStore.getLastHeight()) {
+			this.#handleMissingBlocks(job);
+			return;
+		}
+
 		this.#downloadJobs.shift();
 		this.#processNextJob();
 	}
@@ -127,7 +136,6 @@ export class BlockDownloader {
 
 	#handleJobError(job: DownloadJob, error: Error): void {
 		const index = this.#downloadJobs.indexOf(job);
-
 		if (index === -1) {
 			return; // Job was already removed
 		}
@@ -137,6 +145,22 @@ export class BlockDownloader {
 				job.heightTo
 			} from ${job.peer.ip}. ${error.message}`,
 		);
+
+		// TODO: Ban peer
+
+		this.#replyJob(job);
+	}
+
+	#handleMissingBlocks(job: DownloadJob): void {
+		console.log("Handling missing blocks");
+
+		// TODO: Check if peer should be banned
+
+		this.#replyJob(job);
+	}
+
+	#replyJob(job: DownloadJob) {
+		const index = this.#downloadJobs.indexOf(job);
 
 		const peers = this.repository.getPeers().filter((peer) => peer.state.height >= job.heightTo);
 
@@ -148,9 +172,13 @@ export class BlockDownloader {
 
 		const peer = this.#getRandomPeer(peers);
 
-		const newJob = {
-			...job,
+		const newJob: DownloadJob = {
 			blocks: [],
+			heightFrom: index === 0 ? this.stateStore.getLastHeight() + 1 : job.heightFrom,
+			heightTo:
+				this.#downloadJobs.length === 1
+					? this.stateStore.getLastHeight() + MAX_BLOCKS_PER_DOWNLOAD
+					: job.heightTo,
 			peer,
 			peerHeight: peer.state.height - 1,
 			status: JobStatus.Downloading,
