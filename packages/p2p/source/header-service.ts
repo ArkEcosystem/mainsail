@@ -50,6 +50,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 	async #delay(peer: Contracts.P2P.Peer): Promise<void> {
 		this.#pending.add(peer);
 
+		// TODO: use delay
 		await new Promise((resolve) => setTimeout(resolve, constants.CHECK_HEADER_DELAY));
 
 		this.#pending.delete(peer);
