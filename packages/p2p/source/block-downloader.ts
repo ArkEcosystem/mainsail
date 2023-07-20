@@ -36,9 +36,6 @@ export class BlockDownloader {
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerHeaderFactory)
-	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -141,8 +138,7 @@ export class BlockDownloader {
 			} from ${job.peer.ip}. ${error.message}`,
 		);
 
-		const header = this.headerFactory();
-		const peers = this.repository.getPeers().filter((peer) => header.canDownloadBlocks(peer.state));
+		const peers = this.repository.getPeers().filter((peer) => peer.state.height >= job.heightTo);
 
 		if (peers.length === 0) {
 			// Remove higher jobs, because peer is no longer available
