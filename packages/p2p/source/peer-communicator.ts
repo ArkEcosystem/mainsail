@@ -290,10 +290,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	private async throttle(peer: Contracts.P2P.Peer, event: string): Promise<void> {
 		const msBeforeReCheck = 1000;
+		let logged = false;
 		while (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
-			this.logger.debug(
-				`Throttling outgoing requests to ${peer.ip}/${event} to avoid triggering their rate limit`,
-			);
+			if (!logged) {
+				this.logger.debug(
+					`Throttling outgoing requests to ${peer.ip}/${event} to avoid triggering their rate limit`,
+				);
+				logged = true;
+			}
 			await delay(msBeforeReCheck);
 		}
 		try {
