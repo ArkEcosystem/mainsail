@@ -1,12 +1,19 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+enum JobStatus {
+	Downloading,
+	ReadyToProcess,
+	Processing,
+}
+
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
 	peerHeight: number;
 	heightFrom: number;
 	heightTo: number;
 	blocks: Buffer[];
+	status: JobStatus;
 };
 
 @injectable()
@@ -27,10 +34,13 @@ export class BlockDownloader {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#downloadJobs: DownloadJob[] = [];
-	#isProcessing = false;
 
 	public downloadBlocks(peer: Contracts.P2P.Peer): void {
 		if (peer.state.height <= this.#getLastRequestedBlockHeight()) {
+			return;
+		}
+
+		if (this.#downloadJobs.length > 0) {
 			return;
 		}
 
@@ -40,6 +50,7 @@ export class BlockDownloader {
 			heightTo: peer.state.height,
 			peer,
 			peerHeight: peer.state.height,
+			status: JobStatus.Downloading,
 		};
 
 		this.#downloadJobs.push(downloadJob);
@@ -61,6 +72,7 @@ export class BlockDownloader {
 			});
 
 			job.blocks = result.blocks;
+			job.status = JobStatus.ReadyToProcess;
 		} catch (error) {
 			this.logger.debug(
 				`Error downloading blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}. Message: ${error.message}`,
@@ -74,9 +86,14 @@ export class BlockDownloader {
 	}
 
 	async #processBlocks(job: DownloadJob) {
+		if (job.status !== JobStatus.ReadyToProcess) {
+			return;
+		}
+
 		this.logger.debug(`Processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
 
 		try {
+			job.status = JobStatus.Processing;
 			for (const buff of job.blocks) {
 				const block = await this.blockFactory.fromCommittedBytes(buff);
 
@@ -84,7 +101,7 @@ export class BlockDownloader {
 				await this.handler.onCommittedBlock(block);
 			}
 
-			this.#isProcessing = false;
+			// this.#isProcessing = false;
 		} catch (error) {
 			this.logger.error(
 				`Error processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}. Message: ${error.message}`,
@@ -97,7 +114,7 @@ export class BlockDownloader {
 	}
 
 	#processNextJob(): void {
-		if (this.#isProcessing || this.#downloadJobs.length === 0 || this.#downloadJobs[0].blocks.length === 0) {
+		if (this.#downloadJobs.length === 0) {
 			return;
 		}
 
