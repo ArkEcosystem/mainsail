@@ -10,7 +10,6 @@ export type IHeaderData = {
 
 export interface IHeader {
 	toData(): IHeaderData;
-	canDownloadBlocks(headerData: IHeaderData): boolean;
 	canDownloadProposal(headerData: IHeaderData): boolean;
 	canDownloadMessages(headerData: IHeaderData): boolean;
 }
