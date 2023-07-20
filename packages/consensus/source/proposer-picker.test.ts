@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => { },
+			getLastBlock: () => {},
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		context.sandbox = new Sandbox();
@@ -43,22 +43,14 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 
 	// Calculated indexes seeded from height 1 for the first 51 validators
 	const expectedIndexesRound1 = [
-		13, 33, 43, 25, 9, 38, 7, 21, 47, 35,
-		30, 19, 16, 34, 6, 24, 5, 26, 10, 44,
-		39, 23, 3, 37, 28, 1, 4, 27, 46, 15,
-		22, 48, 20, 2, 12, 8, 0, 11, 49, 17,
-		29, 41, 45, 50, 40, 32, 31, 42, 14, 18,
-		36
+		13, 33, 43, 25, 9, 38, 7, 21, 47, 35, 30, 19, 16, 34, 6, 24, 5, 26, 10, 44, 39, 23, 3, 37, 28, 1, 4, 27, 46, 15,
+		22, 48, 20, 2, 12, 8, 0, 11, 49, 17, 29, 41, 45, 50, 40, 32, 31, 42, 14, 18, 36,
 	];
 
 	const expectedIndexesRound2 = [
-		5, 11, 33, 10, 0, 22, 30, 4, 25, 13,
-		28, 15, 21, 27, 36, 38, 18, 42, 6, 41,
-		34, 9, 50, 39, 26, 37, 45, 29, 3, 46,
-		12, 47, 16, 31, 2, 49, 20, 7, 44, 24,
-		1, 48, 8, 43, 17, 14, 32, 23, 35, 19,
-		40
-	]
+		5, 11, 33, 10, 0, 22, 30, 4, 25, 13, 28, 15, 21, 27, 36, 38, 18, 42, 6, 41, 34, 9, 50, 39, 26, 37, 45, 29, 3,
+		46, 12, 47, 16, 31, 2, 49, 20, 7, 44, 24, 1, 48, 8, 43, 17, 14, 32, 23, 35, 19, 40,
+	];
 
 	it("#validatorIndexMatrix - should return empty matrix", async ({ proposerPicker }) => {
 		assert.equal(proposerPicker.validatorIndexMatrix, []);

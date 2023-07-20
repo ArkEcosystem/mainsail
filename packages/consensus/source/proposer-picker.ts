@@ -20,7 +20,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 		const { activeValidators } = this.configuration.getMilestone();
 
 		const { height } = commit;
-		if (this.validatorIndexMatrix.length === 0 || ((height - 1) % activeValidators === 0)) {
+		if (this.validatorIndexMatrix.length === 0 || (height - 1) % activeValidators === 0) {
 			const roundHeight = height - (height % activeValidators) + 1;
 			this.#updateValidatorMatrix(activeValidators, roundHeight);
 		}
@@ -38,13 +38,12 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 		const seed = this.#calculateSeed(height);
 		const rng = seedrandom(seed);
 
-		const matrix = [...Array(activeValidators).keys()];
+		const matrix = [...new Array(activeValidators).keys()];
 
 		// Based on https://stackoverflow.com/a/12646864
-		for (let i = matrix.length - 1; i > 0; i--) {
-			const j = Math.floor(rng() * (i + 1));
-			[matrix[i], matrix[j]] =
-				[matrix[j], matrix[i]];
+		for (let index = matrix.length - 1; index > 0; index--) {
+			const index_ = Math.floor(rng() * (index + 1));
+			[matrix[index], matrix[index_]] = [matrix[index_], matrix[index]];
 		}
 
 		this.#validatorIndexMatrix = matrix;
