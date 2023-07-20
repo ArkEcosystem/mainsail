@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { BlockDownloader } from "./block-downloader";
 import { constants } from "./constants";
 // import { Downloader } from "./downloader";
 
@@ -34,7 +33,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 		// const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
 
 		if (header.canDownloadBlocks(peerHeader)) {
-			this.app.get<BlockDownloader>(Identifiers.PeerBlockDownloader).downloadBlocks(peer);
+			this.app.get<Contracts.P2P.BlockDownloader>(Identifiers.PeerBlockDownloader).downloadBlocks(peer);
 		}
 
 		// if (header.canDownloadProposal(peerHeader)) {

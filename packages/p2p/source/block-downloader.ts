@@ -20,7 +20,7 @@ type DownloadJob = {
 };
 
 @injectable()
-export class BlockDownloader {
+export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
