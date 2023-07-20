@@ -16,6 +16,8 @@ type DownloadJob = {
 	status: JobStatus;
 };
 
+const MAX_BLOCKS_PER_DOWNLOAD = 3;
+
 @injectable()
 export class BlockDownloader {
 	@inject(Identifiers.PeerCommunicator)
@@ -36,18 +38,19 @@ export class BlockDownloader {
 	#downloadJobs: DownloadJob[] = [];
 
 	public downloadBlocks(peer: Contracts.P2P.Peer): void {
-		if (peer.state.height <= this.#getLastRequestedBlockHeight()) {
+		if (peer.state.height - 1 <= this.#getLastRequestedBlockHeight()) {
 			return;
 		}
 
-		if (this.#downloadJobs.length > 0) {
-			return;
-		}
+		const heightTo =
+			peer.state.height - this.#getLastRequestedBlockHeight() > MAX_BLOCKS_PER_DOWNLOAD
+				? this.#getLastRequestedBlockHeight() + MAX_BLOCKS_PER_DOWNLOAD
+				: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
 
 		const downloadJob: DownloadJob = {
 			blocks: [],
 			heightFrom: this.#getLastRequestedBlockHeight() + 1,
-			heightTo: peer.state.height - 1, // Stored block height is always 1 less than the consensus height
+			heightTo,
 			peer,
 			peerHeight: peer.state.height - 1,
 			status: JobStatus.Downloading,
@@ -59,7 +62,11 @@ export class BlockDownloader {
 	}
 
 	#getLastRequestedBlockHeight(): number {
-		return this.stateStore.getLastHeight();
+		if (this.#downloadJobs.length === 0) {
+			return this.stateStore.getLastHeight();
+		}
+
+		return this.#downloadJobs[this.#downloadJobs.length - 1].heightTo;
 	}
 
 	async #downloadBlocksFromPeer(job: DownloadJob): Promise<void> {
