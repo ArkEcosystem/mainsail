@@ -94,15 +94,10 @@ describe<{
 		context.walletRepository = context.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 		context.validatorSet = context.sandbox.app.resolve(ValidatorSet);
 
-		await buildValidatorAndVoteWallets(
-			5,
-			context.walletRepository,
-		);
+		await buildValidatorAndVoteWallets(5, context.walletRepository);
 	});
 
-	it("buildValidatorRanking - should build ranking and sort validators by vote balance", async ({
-		validatorSet,
-	}) => {
+	it("buildValidatorRanking - should build ranking and sort validators by vote balance", async ({ validatorSet }) => {
 		await validatorSet.initialize();
 
 		const validators = validatorSet.getActiveValidators();
