@@ -10,9 +10,11 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	#firstValidatorIndex: number = 0;
+	#firstValidatorIndex = 0;
 
-	get firstValidatorIndex(): number { return this.#firstValidatorIndex };
+	get firstValidatorIndex(): number {
+		return this.#firstValidatorIndex;
+	}
 
 	public handleCommittedBlock(commit: Contracts.Crypto.IBlockCommit): void {
 		const { activeValidators } = this.configuration.getMilestone();

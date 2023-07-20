@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => { },
+			getLastBlock: () => {},
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		context.sandbox = new Sandbox();
@@ -68,7 +68,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 
 		// shuffled index wraps around
 		for (let i = 0; i < 51; i++) {
-			const index = (proposerPicker.firstValidatorIndex + i) % 51
+			const index = (proposerPicker.firstValidatorIndex + i) % 51;
 			assert.equal(proposerPicker.getValidatorIndex(i), index);
 		}
 	});
