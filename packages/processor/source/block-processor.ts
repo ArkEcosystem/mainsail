@@ -63,7 +63,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		this.state.setLastBlock(commitBlock.block);
 
-		await this.proposerPicker.handleCommittedBlock(commitBlock);
+		this.proposerPicker.handleCommittedBlock(commitBlock.commit);
 
 		this.logger.info(`Block ${commitBlock.block.header.height.toLocaleString()} committed`);
 
