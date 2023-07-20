@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 
-import { describeSkip, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework/distribution";
 import { BlockDownloader } from "./block-downloader";
 import { ChunkCache } from "./chunk-cache";
 import { Peer } from "./peer";
