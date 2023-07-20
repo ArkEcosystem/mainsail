@@ -23,6 +23,7 @@ import {
 } from "../../crypto-transaction";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
+import { ProposerPicker } from "../../consensus/source/proposer-picker";
 import { StateBuilder } from "../source";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
@@ -138,9 +139,9 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
 	sandbox.app.bind(Identifiers.Database.BlockStorage).toConstantValue({
-		deleteBlocks: () => {},
-		deleteTopBlocks: () => {},
-		saveBlocks: () => {},
+		deleteBlocks: () => { },
+		deleteTopBlocks: () => { },
+		saveBlocks: () => { },
 	});
 
 	const stateStore: StateStore = sandbox.app.get(Identifiers.StateStore);
@@ -262,7 +263,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 	const blockFactory = {
-		fromData: () => {},
+		fromData: () => { },
 	};
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);
@@ -280,6 +281,8 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
 
 	const transactionValidator = sandbox.app.get<TransactionValidator>(Identifiers.TransactionValidator);
+
+	sandbox.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker);
 
 	const stateBuilder = sandbox.app.resolve<StateBuilder>(StateBuilder);
 
