@@ -117,6 +117,7 @@ export class BlockDownloader {
 			// TODO: Handle errors
 		}
 
+		this.#downloadJobs.shift();
 		this.#processNextJob();
 	}
 
