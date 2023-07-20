@@ -10,11 +10,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	#validatorIndexMatrix: Array<number> = [];
-
-	public get validatorIndexMatrix(): ReadonlyArray<number> {
-		return this.#validatorIndexMatrix;
-	}
+	private validatorIndexMatrix: Array<number> = [];
 
 	public handleCommittedBlock(commit: Contracts.Crypto.IBlockCommit): void {
 		const { activeValidators } = this.configuration.getMilestone();
@@ -30,8 +26,8 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 		const totalRound = this.#getTotalRound(round);
 		const { activeValidators } = this.configuration.getMilestone();
 
-		const offset = (totalRound - 1) % activeValidators;
-		return this.#validatorIndexMatrix[offset % activeValidators];
+		const offset = totalRound % activeValidators;
+		return this.validatorIndexMatrix[offset % activeValidators];
 	}
 
 	#updateValidatorMatrix(activeValidators: number, height: number): void {
@@ -46,7 +42,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 			[matrix[index], matrix[index_]] = [matrix[index_], matrix[index]];
 		}
 
-		this.#validatorIndexMatrix = matrix;
+		this.validatorIndexMatrix = matrix;
 	}
 
 	#calculateSeed(round: number): string {
@@ -59,6 +55,6 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 
 	#getTotalRound(round: number): number {
 		const committedRound = this.state.getLastCommittedRound();
-		return committedRound + round + 1;
+		return committedRound + round;
 	}
 }
