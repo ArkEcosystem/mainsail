@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { randomNumber } from "@mainsail/utils";
 
 enum JobStatus {
 	Downloading,
@@ -31,6 +32,12 @@ export class BlockDownloader {
 
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
+
+	@inject(Identifiers.PeerRepository)
+	private readonly repository!: Contracts.P2P.PeerRepository;
+
+	@inject(Identifiers.PeerHeaderFactory)
+	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -81,11 +88,7 @@ export class BlockDownloader {
 			job.blocks = result.blocks;
 			job.status = JobStatus.ReadyToProcess;
 		} catch (error) {
-			this.logger.debug(
-				`Error downloading blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}. Message: ${error.message}`,
-			);
-
-			// TODO: Handle errors
+			this.#handleJobError(job, error);
 		}
 
 		// TODO: Handle missing blocks
@@ -110,11 +113,7 @@ export class BlockDownloader {
 
 			// this.#isProcessing = false;
 		} catch (error) {
-			this.logger.error(
-				`Error processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}. Message: ${error.message}`,
-			);
-
-			// TODO: Handle errors
+			this.#handleJobError(job, error);
 		}
 
 		this.#downloadJobs.shift();
@@ -127,5 +126,39 @@ export class BlockDownloader {
 		}
 
 		void this.#processBlocks(this.#downloadJobs[0]);
+	}
+
+	#handleJobError(job: DownloadJob, error: Error): void {
+		this.logger.debug(
+			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
+				job.heightTo
+			} from ${job.peer.ip}. ${error.message}`,
+		);
+
+		const header = this.headerFactory();
+		const peers = this.repository.getPeers().filter((peer) => header.canDownloadBlocks(peer.state));
+
+		if (peers.length === 0) {
+			return;
+		}
+
+		const peer = this.#getRandomPeer(peers);
+		const index = this.#downloadJobs.indexOf(job);
+
+		const newJob = {
+			...job,
+			blocks: [],
+			peer,
+			peerHeight: peer.state.height - 1,
+			status: JobStatus.Downloading,
+		};
+
+		this.#downloadJobs[index] = newJob;
+
+		void this.#downloadBlocksFromPeer(newJob);
+	}
+
+	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
+		return peers[randomNumber(0, peers.length - 1)];
 	}
 }
