@@ -10,35 +10,44 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	#firstValidatorIndex = 0;
+	#validatorIndexMatrix: Array<number> = [];
 
-	get firstValidatorIndex(): number {
-		return this.#firstValidatorIndex;
+	public get validatorIndexMatrix(): ReadonlyArray<number> {
+		return this.#validatorIndexMatrix;
 	}
 
 	public handleCommittedBlock(commit: Contracts.Crypto.IBlockCommit): void {
 		const { activeValidators } = this.configuration.getMilestone();
 
-		const { height: currentHeight } = commit;
-		const roundHeight = currentHeight - (currentHeight % activeValidators);
-
-		this.#updateValidatorIndex(activeValidators, roundHeight);
+		const { height } = commit;
+		if (this.validatorIndexMatrix.length === 0 || ((height - 1) % activeValidators === 0)) {
+			const roundHeight = height - (height % activeValidators) + 1;
+			this.#updateValidatorMatrix(activeValidators, roundHeight);
+		}
 	}
 
 	public getValidatorIndex(round: number): number {
 		const totalRound = this.#getTotalRound(round);
 		const { activeValidators } = this.configuration.getMilestone();
-		// On each round, move from the first index by offset with wrap around
-		// to traverse all active validators once each.
+
 		const offset = (totalRound - 1) % activeValidators;
-		return (this.#firstValidatorIndex + offset) % activeValidators;
+		return this.#validatorIndexMatrix[offset % activeValidators];
 	}
 
-	#updateValidatorIndex(activeValidators: number, height: number): void {
-		// Calculate a random validator starting index for the next 'activeValidators' rounds.
+	#updateValidatorMatrix(activeValidators: number, height: number): void {
 		const seed = this.#calculateSeed(height);
 		const rng = seedrandom(seed);
-		this.#firstValidatorIndex = Math.floor(rng() * (activeValidators - 1));
+
+		const matrix = [...Array(activeValidators).keys()];
+
+		// Based on https://stackoverflow.com/a/12646864
+		for (let i = matrix.length - 1; i > 0; i--) {
+			const j = Math.floor(rng() * (i + 1));
+			[matrix[i], matrix[j]] =
+				[matrix[j], matrix[i]];
+		}
+
+		this.#validatorIndexMatrix = matrix;
 	}
 
 	#calculateSeed(round: number): string {

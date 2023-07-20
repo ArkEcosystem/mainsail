@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => {},
+			getLastBlock: () => { },
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => {},
+			getActiveValidators: () => { },
 		};
 
 		context.logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -41,35 +41,58 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 		context.proposerPicker = context.sandbox.app.resolve(ProposerPicker);
 	});
 
-	it("#firstValidatorIndex - should return initial value", async ({ proposerPicker }) => {
-		assert.equal(proposerPicker.firstValidatorIndex, 0);
+	// Calculated indexes seeded from height 1 for the first 51 validators
+	const expectedIndexesRound1 = [
+		13, 33, 43, 25, 9, 38, 7, 21, 47, 35,
+		30, 19, 16, 34, 6, 24, 5, 26, 10, 44,
+		39, 23, 3, 37, 28, 1, 4, 27, 46, 15,
+		22, 48, 20, 2, 12, 8, 0, 11, 49, 17,
+		29, 41, 45, 50, 40, 32, 31, 42, 14, 18,
+		36
+	];
+
+	const expectedIndexesRound2 = [
+		5, 11, 33, 10, 0, 22, 30, 4, 25, 13,
+		28, 15, 21, 27, 36, 38, 18, 42, 6, 41,
+		34, 9, 50, 39, 26, 37, 45, 29, 3, 46,
+		12, 47, 16, 31, 2, 49, 20, 7, 44, 24,
+		1, 48, 8, 43, 17, 14, 32, 23, 35, 19,
+		40
+	]
+
+	it("#validatorIndexMatrix - should return empty matrix", async ({ proposerPicker }) => {
+		assert.equal(proposerPicker.validatorIndexMatrix, []);
 	});
 
 	it("#getValidatorIndex - should return validator index for round", async ({ proposerPicker }) => {
+		proposerPicker.handleCommittedBlock({ height: 1 } as Contracts.Crypto.IBlockCommit);
+
 		for (let i = 0; i < 51; i++) {
-			assert.equal(proposerPicker.getValidatorIndex(i), i);
+			assert.equal(proposerPicker.getValidatorIndex(i), expectedIndexesRound1[i]);
 		}
 
-		assert.equal(proposerPicker.getValidatorIndex(51), 0);
-		assert.equal(proposerPicker.getValidatorIndex(52), 1);
+		assert.equal(proposerPicker.getValidatorIndex(51), expectedIndexesRound1[0]);
 	});
 
-	it("#handleCommittedBlock - should shuffle validator index on full round", async ({ proposerPicker }) => {
-		assert.equal(proposerPicker.firstValidatorIndex, 0);
-
-		for (let i = 0; i < 51; i++) {
+	it("#getValidatorIndex - should wrap around", async ({ proposerPicker }) => {
+		for (let i = 1; i < 51; i++) {
 			proposerPicker.handleCommittedBlock({ height: i } as Contracts.Crypto.IBlockCommit);
-			assert.equal(proposerPicker.firstValidatorIndex, 13);
+			assert.equal(proposerPicker.validatorIndexMatrix, expectedIndexesRound1);
 		}
+	});
 
-		// Starts next round
-		proposerPicker.handleCommittedBlock({ height: 51 } as Contracts.Crypto.IBlockCommit);
-		assert.equal(proposerPicker.firstValidatorIndex, 25);
+	it("#handleCommittedBlock - builds validator matrix based on round height", async ({ proposerPicker }) => {
+		proposerPicker.handleCommittedBlock({ height: 5 } as Contracts.Crypto.IBlockCommit);
+		assert.equal(proposerPicker.validatorIndexMatrix, expectedIndexesRound1);
+	});
 
-		// shuffled index wraps around
-		for (let i = 0; i < 51; i++) {
-			const index = (proposerPicker.firstValidatorIndex + i) % 51;
-			assert.equal(proposerPicker.getValidatorIndex(i), index);
+	it("#handleCommittedBlock - should shuffle validator matrix on full round", async ({ proposerPicker }) => {
+		proposerPicker.handleCommittedBlock({ height: 1 } as Contracts.Crypto.IBlockCommit);
+		assert.equal(proposerPicker.validatorIndexMatrix, expectedIndexesRound1);
+
+		// shuffled index wraps around (e.g. prolonged rounds)
+		for (let i = 0; i < 51 * 4; i++) {
+			assert.equal(proposerPicker.getValidatorIndex(i), expectedIndexesRound1[i % 51]);
 		}
 	});
 });
