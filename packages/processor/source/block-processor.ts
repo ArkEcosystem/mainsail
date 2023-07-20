@@ -27,6 +27,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
+	@inject(Identifiers.Consensus.ProposerPicker)
+	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
+
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -64,6 +67,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		this.state.setLastCommittedRound(committedRound + unit.round + 1);
 
 		this.state.setLastBlock(commitBlock.block);
+
+		this.proposerPicker.handleCommittedBlock(commitBlock.commit);
 
 		this.logger.info(`Block ${commitBlock.block.header.height.toLocaleString()} committed`);
 

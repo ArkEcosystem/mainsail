@@ -32,6 +32,9 @@ export class StateBuilder {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
+	@inject(Identifiers.Consensus.ProposerPicker)
+	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -99,6 +102,7 @@ export class StateBuilder {
 	#buildCommittedRound(commit: Contracts.Crypto.IBlockCommit): void {
 		const lastCommittedRound = this.stateStore.getLastCommittedRound();
 		this.stateStore.setLastCommittedRound(lastCommittedRound + commit.round + 1);
+		this.proposerPicker.handleCommittedBlock(commit);
 	}
 
 	#verifyWalletsConsistency(): void {

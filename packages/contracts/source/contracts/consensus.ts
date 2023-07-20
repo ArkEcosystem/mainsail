@@ -1,6 +1,7 @@
 import { IProcessableUnit } from "./block-processor";
 import {
 	IBlock,
+	IBlockCommit,
 	ICommittedBlock,
 	IKeyPair,
 	IPrecommit,
@@ -99,6 +100,7 @@ export interface IScheduler {
 }
 
 export interface IProposerPicker {
+	handleCommittedBlock(block: IBlockCommit): void;
 	getValidatorIndex(round: number): number;
 }
 
