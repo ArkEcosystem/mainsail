@@ -35,6 +35,9 @@ export class StateBuilder {
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+
 	public async run(): Promise<void> {
 		this.events = this.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService);
 
@@ -65,10 +68,6 @@ export class StateBuilder {
 				}
 			}
 
-			// this.logger.info(`State Generation - Vote Balances & Validator Ranking`);
-			// this.dposState.buildVoteBalances();
-			// this.dposState.buildValidatorRanking();
-
 			this.logger.info(
 				`Number of registered validators: ${Object.keys(
 					this.walletRepository.allByUsername(),
@@ -78,6 +77,8 @@ export class StateBuilder {
 			this.logger.debug(`Last committed round: ${this.stateStore.getLastCommittedRound()}`);
 
 			this.#verifyWalletsConsistency();
+
+			await this.validatorSet.initialize();
 
 			await this.events.dispatch(Enums.StateEvent.BuilderFinished);
 		} catch (error) {

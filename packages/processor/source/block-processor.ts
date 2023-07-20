@@ -36,6 +36,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+
 	public async process(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
 		try {
 			if (!(await this.#verify(unit))) {
@@ -57,6 +60,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		const commitBlock = await unit.getProposedCommitBlock();
 		await this.databaseService.saveBlocks([commitBlock]);
+
+		await this.validatorSet.handleCommitBlock(commitBlock);
 
 		const committedRound = this.state.getLastCommittedRound();
 		this.state.setLastCommittedRound(committedRound + unit.round + 1);
