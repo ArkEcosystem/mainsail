@@ -282,7 +282,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			void this.headerService.handle(peer, parsedResponsePayload.headers);
 		} catch (error) {
 			await this.handleSocketError(peer, event, error, disconnectOnError);
-			return;
+			throw error;
 		}
 
 		return parsedResponsePayload;
