@@ -2,6 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { randomNumber } from "@mainsail/utils";
 
+import { constants } from "./constants";
+
 enum JobStatus {
 	Downloading,
 	ReadyToProcess,
@@ -16,8 +18,6 @@ type DownloadJob = {
 	blocks: Buffer[];
 	status: JobStatus;
 };
-
-const MAX_BLOCKS_PER_DOWNLOAD = 3;
 
 @injectable()
 export class BlockDownloader {
@@ -47,8 +47,8 @@ export class BlockDownloader {
 		}
 
 		const heightTo =
-			peer.state.height - this.#getLastRequestedBlockHeight() > MAX_BLOCKS_PER_DOWNLOAD
-				? this.#getLastRequestedBlockHeight() + MAX_BLOCKS_PER_DOWNLOAD
+			peer.state.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
+				? this.#getLastRequestedBlockHeight() + constants.MAX_DOWNLOAD_BLOCKS
 				: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
 
 		const downloadJob: DownloadJob = {
@@ -173,8 +173,8 @@ export class BlockDownloader {
 		const peer = this.#getRandomPeer(peers);
 
 		const heightTo =
-			peer.state.height - this.#getLastRequestedBlockHeight() > MAX_BLOCKS_PER_DOWNLOAD
-				? this.#getLastRequestedBlockHeight() + MAX_BLOCKS_PER_DOWNLOAD
+			peer.state.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
+				? this.#getLastRequestedBlockHeight() + constants.MAX_DOWNLOAD_BLOCKS
 				: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
 
 		const newJob: DownloadJob = {
