@@ -252,7 +252,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			const timeBeforeSocketCall: number = Date.now();
 
 			maxPayload = maxPayload || constants.DEFAULT_MAX_PAYLOAD_CLIENT;
-			await this.connector.connect(peer, maxPayload);
+			await this.connector.connect(peer);
 
 			response = await this.connector.emit(
 				peer,

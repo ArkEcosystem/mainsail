@@ -26,7 +26,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		return connection;
 	}
 
-	public async connect(peer: Contracts.P2P.Peer, maxPayload?: number): Promise<Client> {
+	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
 		if (!this.connection(peer)) {
 			// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
 			const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);

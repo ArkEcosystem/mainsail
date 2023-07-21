@@ -6,7 +6,7 @@ export interface PeerConnector {
 
 	connection(peer: Peer): Client | undefined;
 
-	connect(peer: Peer, maxPayload?: number): Promise<Client>;
+	connect(peer: Peer): Promise<Client>;
 
 	disconnect(peer: Peer): void;
 
