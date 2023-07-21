@@ -34,11 +34,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 				await delay(TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate);
 			}
 		}
-		const connection = this.connection(peer) || (await this.create(peer));
-		if (maxPayload) {
-			connection.setMaxPayload(maxPayload);
-		}
-		return connection;
+		return this.connection(peer) || (await this.create(peer));
 	}
 
 	public disconnect(peer: Contracts.P2P.Peer): void {
