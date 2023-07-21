@@ -50,12 +50,10 @@ export class StateBuilder {
 
 			this.logger.info(`State Generation - Bootstrap - Blocks: ${lastBlockHeight}`);
 
-			for await (
-				const {
-					block: { data, transactions },
-					commit
-				} of this.databaseService.readCommittedBlocksByHeight(1, lastBlockHeight)
-			) {
+			for await (const {
+				block: { data, transactions },
+				commit,
+			} of this.databaseService.readCommittedBlocksByHeight(1, lastBlockHeight)) {
 				this.#buildCommittedRound(commit);
 
 				await this.#buildBlockRewards(data);
@@ -137,5 +135,4 @@ export class StateBuilder {
 
 		return lastBlock.header.height;
 	}
-
 }
