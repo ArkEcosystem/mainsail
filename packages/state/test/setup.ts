@@ -148,6 +148,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		handleCommitBlock: () => {},
 		getActiveValidators: () => {},
 	});
+	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 
 	const stateStore: StateStore = sandbox.app.get(Identifiers.StateStore);
 

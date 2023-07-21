@@ -14,6 +14,8 @@ export interface IDatabaseService {
 
 	findCommittedBlocks(start: number, end: number): Promise<Buffer[]>;
 
+	readCommittedBlocksByHeight(start: number, end: number): AsyncGenerator<ICommittedBlock>;
+
 	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
 
 	getBlocks(start: number, end: number): Promise<IBlockData[]>;
