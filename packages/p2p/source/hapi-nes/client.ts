@@ -203,12 +203,6 @@ export class Client {
 		return this._ws && this._ws.readyState === WebSocket.OPEN;
 	}
 
-	public setMaxPayload(maxPayload: number) {
-		if (this._ws?._receiver) {
-			this._ws._receiver._maxPayload = maxPayload;
-		}
-	}
-
 	public setTimeout(timeout: number) {
 		this._settings.timeout = timeout;
 	}
@@ -465,10 +459,6 @@ export class Client {
 		return this._send(request, true);
 	}
 
-	private _resetMaxPayload() {
-		this.setMaxPayload(this._settings.ws.maxPayload);
-	}
-
 	private _onMessage(message) {
 		this._beat();
 
@@ -507,8 +497,6 @@ export class Client {
 			this._lastPinged = Date.now();
 			return this._send({ type: "ping" }, false).catch(ignore); // Ignore errors
 		}
-
-		this._resetMaxPayload();
 
 		// Lookup request (message must include an id from this point)
 		const request = this._requests[update.id];

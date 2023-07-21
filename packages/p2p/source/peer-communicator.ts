@@ -178,8 +178,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		peer: Contracts.P2P.Peer,
 		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
 	): Promise<Contracts.P2P.IGetBlocksResponse> {
-		const maxPayload = constants.DEFAULT_MAX_PAYLOAD;
-
 		const result = await this.emit(
 			peer,
 			Routes.GetBlocks,
@@ -188,7 +186,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				limit,
 			},
 			this.configuration.getRequired<number>("getBlocksTimeout"),
-			maxPayload,
 			false, //TODO: check why this is false
 		);
 
@@ -237,7 +234,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		event: Routes,
 		payload: any,
 		timeout?: number,
-		maxPayload?: number,
 		disconnectOnError = true,
 	) {
 		await this.throttle(peer, event);
@@ -251,8 +247,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			const timeBeforeSocketCall: number = Date.now();
 
-			maxPayload = maxPayload || constants.DEFAULT_MAX_PAYLOAD_CLIENT;
-			await this.connector.connect(peer, maxPayload);
+			await this.connector.connect(peer);
 
 			response = await this.connector.emit(
 				peer,
