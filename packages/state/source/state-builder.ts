@@ -2,7 +2,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application, Enums } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
-import lmdb from "lmdb";
 
 // @TODO review the implementation
 @injectable()
@@ -23,11 +22,8 @@ export class StateBuilder {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
-
-	@inject(Identifiers.Database.BlockStorage)
-	private readonly blockStorage!: lmdb.Database;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
@@ -50,14 +46,16 @@ export class StateBuilder {
 			.getRegisteredHandlers();
 
 		try {
-			this.logger.info(`State Generation - Bootstrap - Blocks: ${this.blockStorage.getCount({})}`);
+			const lastBlockHeight = await this.#lastCommittedBlockHeight();
 
-			for (const { value } of this.blockStorage.getRange({})) {
+			this.logger.info(`State Generation - Bootstrap - Blocks: ${lastBlockHeight}`);
+
+			for await (
 				const {
 					block: { data, transactions },
-					commit,
-				} = await this.blockFactory.fromCommittedBytes(value);
-
+					commit
+				} of this.databaseService.readCommittedBlocksByHeight(1, lastBlockHeight)
+			) {
 				this.#buildCommittedRound(commit);
 
 				await this.#buildBlockRewards(data);
@@ -130,4 +128,14 @@ export class StateBuilder {
 			}
 		}
 	}
+
+	async #lastCommittedBlockHeight(): Promise<number> {
+		const lastBlock = await this.databaseService.getLastBlock();
+		if (!lastBlock) {
+			return 0;
+		}
+
+		return lastBlock.header.height;
+	}
+
 }
