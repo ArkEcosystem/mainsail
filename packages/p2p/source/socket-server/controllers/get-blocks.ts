@@ -31,7 +31,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 
 		const committedBlocks: Buffer[] = await this.database.findCommittedBlocks(
 			requestBlockHeight,
-			requestBlockHeight + requestBlockLimit,
+			requestBlockHeight + requestBlockLimit - 1,
 		);
 
 		// Only return the blocks fetched while we are below the p2p maxPayload limit
