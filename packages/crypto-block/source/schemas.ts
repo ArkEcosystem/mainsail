@@ -18,7 +18,7 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 		$id: "blockHeader",
 		properties: {
 			generatorPublicKey: { $ref: "publicKey" },
-			height: { minimum: 1, type: "integer" },
+			height: { minimum: 0, type: "integer" },
 			id: { $ref: "blockId" },
 			numberOfTransactions: { minimum: 0, type: "integer" },
 			payloadHash: { $ref: "hex" },

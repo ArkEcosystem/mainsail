@@ -19,7 +19,7 @@ export class MilestonesGenerator {
 				},
 				blockTime: options.blockTime,
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
-				height: 1,
+				height: 0,
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: {

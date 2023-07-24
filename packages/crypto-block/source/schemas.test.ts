@@ -63,7 +63,7 @@ describe<{
 	const blockOriginal = {
 		blockSignature: "123",
 		generatorPublicKey: "a".repeat(64),
-		height: 1,
+		height: 0,
 		id: "1".repeat(64),
 		numberOfTransactions: 0,
 		payloadHash: "123",
@@ -134,33 +134,30 @@ describe<{
 		);
 	});
 
-	it("blockHeader - height should be integer & min 1", ({ validator }) => {
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					height: "1",
-				})
-				.error.includes("height"),
-		);
+	it("blockHeader - height should be integer & min 0", ({ validator }) => {
+		// Integer OK
+		for (const height of [0, 1, 2]) {
+			assert.undefined(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						height,
+					})
+					.error,
+			);
+		}
 
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					height: 0,
-				})
-				.error.includes("height"),
-		);
-
-		assert.true(
-			validator
-				.validate("blockHeader", {
-					...blockOriginal,
-					height: -1,
-				})
-				.error.includes("height"),
-		);
+		// NOT OK
+		for (const height of ["0", "1", 0.12, 1.234, -1.0, -0.23, null, undefined]) {
+			assert.true(
+				validator
+					.validate("blockHeader", {
+						...blockOriginal,
+						height,
+					})
+					.error.includes("height"),
+			);
+		}
 	});
 
 	it("blockHeader - id should be blockId", ({ validator }) => {

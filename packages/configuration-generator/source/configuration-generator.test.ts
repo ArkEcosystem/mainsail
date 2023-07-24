@@ -46,7 +46,7 @@ describe<{
 				genesisBlock: {
 					block: {
 						generatorPublicKey: match.string,
-						height: 1,
+						height: 0,
 						id: match.string,
 						numberOfTransactions: 103,
 						payloadHash: match.string,
@@ -67,7 +67,7 @@ describe<{
 						block: match.object,
 						blockTime: 8000,
 						epoch: match.string,
-						height: 1,
+						height: 0,
 						multiPaymentLimit: 256,
 						reward: "0",
 						satoshi: match.object,
@@ -178,7 +178,7 @@ describe<{
 				genesisBlock: {
 					block: {
 						generatorPublicKey: match.string,
-						height: 1,
+						height: 0,
 						id: match.string,
 						numberOfTransactions: 153,
 						payloadHash: match.string,
@@ -199,7 +199,7 @@ describe<{
 						block: match.object,
 						blockTime: 9000,
 						epoch: match.string,
-						height: 1,
+						height: 0,
 						multiPaymentLimit: 256,
 						reward: "0", // TODO: Check
 						satoshi: match.object,

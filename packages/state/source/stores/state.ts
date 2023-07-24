@@ -24,7 +24,7 @@ export class StateStore implements Contracts.State.StateStore {
 	#blockchain: any = {};
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastDownloadedBlock?: Contracts.Crypto.IBlockData;
-	#lastStoredBlockHeight = 1;
+	#lastStoredBlockHeight = 0;
 	#started = false;
 	#wakeUpTimeout?: NodeJS.Timeout;
 	#noBlockCounter = 0;

@@ -23,10 +23,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 
 		// Update ranking every `activeValidators` blocks.
-		// Height is reduced by 1 to take the genesis block into account or otherwise
-		// the first 'round' would only cover `activeValidators - 1` blocks.
-		const height = block.commit.height - 1;
-		if (height > 1 && height % activeValidators === 0) {
+		const height = block.commit.height;
+		if (height % activeValidators === 0) {
 			this.buildValidatorRanking();
 		}
 	}
@@ -91,7 +89,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 					const username = a.getAttribute("validator.username");
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-							`Validator "${username}" appears twice in the list.`,
+						`Validator "${username}" appears twice in the list.`,
 					);
 				}
 

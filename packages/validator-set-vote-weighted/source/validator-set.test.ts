@@ -121,19 +121,22 @@ describe<{
 
 		assert.true(buildValidatorRankingSpy.notCalled);
 
-		let currentHeight = 1;
+		let currentHeight = 0;
 		for (let i = 0; i < activeValidators; i++) {
 			await validatorSet.handleCommitBlock({
 				commit: { height: currentHeight },
 			} as Contracts.Crypto.ICommittedBlock);
-			assert.true(buildValidatorRankingSpy.notCalled);
+
+			// Genesis block (= height 0) builds the ranking too
+			assert.equal(buildValidatorRankingSpy.callCount, 1);
+
 			currentHeight++;
 		}
 
-		// Called first time after activeValidators + 1 heights (since genesisBlock accounts for the first one)
-		assert.equal(currentHeight, 6);
+		// The ranking got updated twice, once for the genesis block and again after `activeDelegators` blocks
+		assert.equal(currentHeight, 5);
 		await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
-		assert.true(buildValidatorRankingSpy.calledOnce);
+		assert.equal(buildValidatorRankingSpy.callCount, 2);
 		currentHeight++;
 
 		buildValidatorRankingSpy.resetHistory();
@@ -148,7 +151,7 @@ describe<{
 		}
 
 		// Called again after another round
-		assert.equal(currentHeight, 11);
+		assert.equal(currentHeight, 10);
 		await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});

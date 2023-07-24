@@ -16,7 +16,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 		const { activeValidators } = this.configuration.getMilestone();
 
 		const { height } = commit;
-		if (this.validatorIndexMatrix.length === 0 || (height - 1) % activeValidators === 0) {
+		if (this.validatorIndexMatrix.length === 0 || (height % activeValidators === 0)) {
 			const roundHeight = height - (height % activeValidators) + 1;
 			this.#updateValidatorMatrix(activeValidators, roundHeight);
 		}
