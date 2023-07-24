@@ -508,7 +508,7 @@ describeSkip<{
 	it("isWakeUpTimeoutSet - should return true if timer is set", async (context) => {
 		const timer = clock();
 
-		context.stateStorage.setWakeUpTimeout(() => { }, 100);
+		context.stateStorage.setWakeUpTimeout(() => {}, 100);
 
 		assert.true(context.stateStorage.isWakeUpTimeoutSet());
 
@@ -520,10 +520,10 @@ describeSkip<{
 	it("setWakeUpTimeout - should call callback and clear timeout", async (context) => {
 		const timer = clock();
 
-		const spyFunction = spy(() => { });
+		const spyFunction = spy(() => {});
 		const spyOnClearWakeUpTimeout = spy(context.stateStorage, "clearWakeUpTimeout");
 
-		context.stateStorage.setWakeUpTimeout(() => { }, 100);
+		context.stateStorage.setWakeUpTimeout(() => {}, 100);
 
 		timer.tick(200);
 

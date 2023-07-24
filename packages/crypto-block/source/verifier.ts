@@ -27,7 +27,10 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 		try {
 			const constants = this.configuration.getMilestone(blockData.height);
 
-			if (blockData.height === 0 && blockData.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
+			if (
+				blockData.height === 0 &&
+				blockData.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000"
+			) {
 				result.errors.push("Genesis block has invalid previous block");
 			}
 

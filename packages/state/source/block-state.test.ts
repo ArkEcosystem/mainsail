@@ -282,7 +282,7 @@ describeSkip<{
 	it("should create forger wallet if it doesn't exist genesis block", async (context) => {
 		context.spyApplyBlockToForger.restore();
 
-		stub(context.blockState, "applyBlockToForger").callsFake(() => { });
+		stub(context.blockState, "applyBlockToForger").callsFake(() => {});
 		const spyCreateWallet = spy(context.walletRepo, "createWallet");
 
 		context.blocks[0].data.height = 0;

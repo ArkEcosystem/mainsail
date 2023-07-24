@@ -138,12 +138,10 @@ describe<{
 		// Integer OK
 		for (const height of [0, 1, 2]) {
 			assert.undefined(
-				validator
-					.validate("blockHeader", {
-						...blockOriginal,
-						height,
-					})
-					.error,
+				validator.validate("blockHeader", {
+					...blockOriginal,
+					height,
+				}).error,
 			);
 		}
 

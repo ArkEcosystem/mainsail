@@ -1,14 +1,14 @@
 {
-    "address": "ark1le8szpau4ex8w9xg8qrgvl3j6uez5addwgyj9kwxq6ethyqc54jstpc7w5",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "09acfb0197b144973a11e356735f6b5e1bc29df61c421040dda080e5f367e65a",
-        "publicKey": "a6bfdb02c0db3f6c3c4d24d47e235bbb271455f7f43c58dff811a20f8faa3c507c028389d535aaf38f6b325bbfdea110"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "8be7d3dad77216beeb13ff5d342f178c78f890d80f7d71885ccc9b92265a2f6b",
-        "publicKey": "fe4f0107bcae4c7714c83806867e32d7322a75ad720922d9c606b2bb9018a565"
-    },
-    "passphrase": "wedding property one deputy denial start pave car debate runway error order tail bachelor diet ask buddy addict couch goat tide arrest label brief"
+	"address": "ark1le8szpau4ex8w9xg8qrgvl3j6uez5addwgyj9kwxq6ethyqc54jstpc7w5",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "09acfb0197b144973a11e356735f6b5e1bc29df61c421040dda080e5f367e65a",
+		"publicKey": "a6bfdb02c0db3f6c3c4d24d47e235bbb271455f7f43c58dff811a20f8faa3c507c028389d535aaf38f6b325bbfdea110"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "8be7d3dad77216beeb13ff5d342f178c78f890d80f7d71885ccc9b92265a2f6b",
+		"publicKey": "fe4f0107bcae4c7714c83806867e32d7322a75ad720922d9c606b2bb9018a565"
+	},
+	"passphrase": "wedding property one deputy denial start pave car debate runway error order tail bachelor diet ask buddy addict couch goat tide arrest label brief"
 }
