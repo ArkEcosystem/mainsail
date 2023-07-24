@@ -40,6 +40,6 @@ describe<{
 
 		assert.equal(response, { blocks: mockBlocks });
 		spyGetBlocksForDownload.calledOnce();
-		spyGetBlocksForDownload.calledWith(payload.fromHeight, payload.fromHeight + payload.limit);
+		spyGetBlocksForDownload.calledWith(payload.fromHeight, payload.fromHeight + payload.limit - 1);
 	});
 });
