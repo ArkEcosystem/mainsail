@@ -77,7 +77,7 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 
 			const result = await this.communicator.getBlocks(job.peer, {
 				fromHeight: job.heightFrom,
-				limit: job.heightTo - job.heightFrom,
+				limit: job.heightTo - job.heightFrom + 1,
 			});
 
 			job.blocks = result.blocks;
