@@ -45,6 +45,9 @@ export abstract class Route {
 					payload: {
 						maxBytes: config.maxBytes,
 					},
+					validate: {
+						payload: config.validation,
+					},
 				},
 				path,
 			});
