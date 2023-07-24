@@ -1,14 +1,14 @@
 {
-	"address": "ark1ym9j6pprxhufmhpt0f7fu0pln4wl3729hzd5960s64rh36mxjl2s83t3sw",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "56852bfd41a1fb3a730770538410f2d595fad3aeb58ea9f7ad7bde92a21e7551",
-		"publicKey": "8c3c301af0a92aa61fac502a8ba9378ef9f6529ede6124e6945c814ec3904598f782af3365848c2a2f896381c1124579"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "d98bb8f6a1d2ff4e859e659bb143994fd71bb3544017c7a00b1863319b8aceb1",
-		"publicKey": "26cb2d042335f89ddc2b7a7c9e3c3f9d5df8f945b89b42e9f0d54778eb6697d5"
-	},
-	"passphrase": "talent enlist ocean aunt way parade tower secret lab car puppy boss eight inherit snake salon arch concert casual guess raccoon visa vacant isolate"
+    "address": "ark1le8szpau4ex8w9xg8qrgvl3j6uez5addwgyj9kwxq6ethyqc54jstpc7w5",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "09acfb0197b144973a11e356735f6b5e1bc29df61c421040dda080e5f367e65a",
+        "publicKey": "a6bfdb02c0db3f6c3c4d24d47e235bbb271455f7f43c58dff811a20f8faa3c507c028389d535aaf38f6b325bbfdea110"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "8be7d3dad77216beeb13ff5d342f178c78f890d80f7d71885ccc9b92265a2f6b",
+        "publicKey": "fe4f0107bcae4c7714c83806867e32d7322a75ad720922d9c606b2bb9018a565"
+    },
+    "passphrase": "wedding property one deputy denial start pave car debate runway error order tail bachelor diet ask buddy addict couch goat tide arrest label brief"
 }
