@@ -76,7 +76,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 		proposerPicker.handleCommittedBlock({ height: 5 } as Contracts.Crypto.IBlockCommit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
-		proposerPicker.handleCommittedBlock({ height: 52 } as Contracts.Crypto.IBlockCommit);
+		proposerPicker.handleCommittedBlock({ height: 51 } as Contracts.Crypto.IBlockCommit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
 	});
 

@@ -273,7 +273,7 @@ describeSkip<{
 	it("should init foring wallet on genesis block", async (context) => {
 		stub(context.stateStore, "getLastBlock").returnValue(context.blocks[0]);
 
-		context.blocks[0].data.height = 1;
+		context.blocks[0].data.height = 0;
 		await context.blockState.applyBlock(context.blocks[0]);
 
 		context.spyInitGenesisForgerWallet.calledWith(context.blocks[0].data.generatorPublicKey);
@@ -285,7 +285,7 @@ describeSkip<{
 		stub(context.blockState, "applyBlockToForger").callsFake(() => {});
 		const spyCreateWallet = spy(context.walletRepo, "createWallet");
 
-		context.blocks[0].data.height = 1;
+		context.blocks[0].data.height = 0;
 		context.blocks[0].data.generatorPublicKey =
 			"03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
 

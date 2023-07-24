@@ -230,7 +230,7 @@ export class GenesisBlockGenerator extends Generator {
 		return {
 			block: await this.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
 				generatorPublicKey: keys.publicKey,
-				height: 1,
+				height: 0,
 				numberOfTransactions: transactions.length,
 				payloadHash: (
 					await this.app

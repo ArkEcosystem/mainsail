@@ -40,7 +40,7 @@ describe<{
 					},
 					blockTime: 8000,
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
-					height: 1,
+					height: 0,
 					multiPaymentLimit: 256,
 					reward: "0",
 					satoshi: {

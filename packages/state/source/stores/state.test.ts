@@ -236,7 +236,7 @@ describeSkip<{
 	});
 
 	it("getLastBlocksData - should handle milestones", (context) => {
-		context.blocks[0].data.height = 1;
+		context.blocks[0].data.height = 0;
 		context.stateStorage.setLastBlock(context.blocks[0]);
 
 		assert.true(context.dispatchSpy.calledWith("crypto.milestone.changed"));

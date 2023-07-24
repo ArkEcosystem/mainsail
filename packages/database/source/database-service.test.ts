@@ -183,7 +183,7 @@ describe<{
 	it("#findCommittedBlocks - should return buffers", async ({ databaseService }) => {
 		await databaseService.saveBlocks(await generateBlocks(4));
 
-		const result = await databaseService.findCommittedBlocks(2, 5);
+		const result = await databaseService.findCommittedBlocks(1, 4);
 		assert.equal(result.length, 4);
 		assert.instance(result[0], Buffer);
 		assert.instance(result[1], Buffer);
@@ -202,7 +202,7 @@ describe<{
 		await databaseService.saveBlocks(blocks);
 
 		assert.equal(
-			await databaseService.findBlocksByHeightRange(2, 5),
+			await databaseService.findBlocksByHeightRange(1, 4),
 			blocks.map(({ block }) => block),
 		);
 	});
@@ -218,7 +218,7 @@ describe<{
 		await databaseService.saveBlocks(blocks);
 
 		assert.equal(
-			await databaseService.getBlocks(2, 5),
+			await databaseService.getBlocks(1, 4),
 			blocks.map((block) => block.block.data),
 		);
 	});
@@ -234,7 +234,7 @@ describe<{
 		await databaseService.saveBlocks(blocks);
 
 		assert.equal(
-			await databaseService.findBlockByHeights([2, 3, 4, 5]),
+			await databaseService.findBlockByHeights([1, 2, 3, 4]),
 			blocks.map(({ block }) => block),
 		);
 	});

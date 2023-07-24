@@ -27,7 +27,14 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 		try {
 			const constants = this.configuration.getMilestone(blockData.height);
 
-			if (blockData.height !== 1 && !blockData.previousBlock) {
+			if (
+				blockData.height === 0 &&
+				blockData.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000"
+			) {
+				result.errors.push("Genesis block has invalid previous block");
+			}
+
+			if (blockData.height !== 0 && !blockData.previousBlock) {
 				result.errors.push("Invalid previous block");
 			}
 
@@ -76,7 +83,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				result.errors.push("Invalid number of transactions");
 			}
 
-			if (block.transactions.length > constants.block.maxTransactions && blockData.height > 1) {
+			if (block.transactions.length > constants.block.maxTransactions && blockData.height > 0) {
 				result.errors.push("Transactions length is too high");
 			}
 

@@ -21,7 +21,7 @@ export const isNewRound = (height: number, configuration: Contracts.Crypto.IConf
 		}
 	}
 
-	return height === 1 || (height - milestone.height) % milestone.activeValidators === 0;
+	return height === 1 || (height - Math.max(milestone.height, 1)) % milestone.activeValidators === 0;
 };
 
 export const calculateRound = (

@@ -53,7 +53,7 @@ export class StateBuilder {
 			for await (const {
 				block: { data, transactions },
 				commit,
-			} of this.databaseService.readCommittedBlocksByHeight(1, lastBlockHeight)) {
+			} of this.databaseService.readCommittedBlocksByHeight(0, lastBlockHeight)) {
 				this.#buildCommittedRound(commit);
 
 				await this.#buildBlockRewards(data);

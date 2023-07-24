@@ -36,7 +36,7 @@ describe<{
 			...cryptoJson,
 			milestones: [
 				{
-					height: 1,
+					height: 0,
 					multiPaymentLimit: 10,
 				},
 			],
@@ -61,7 +61,7 @@ describe<{
 			...cryptoJson,
 			milestones: [
 				{
-					height: 1,
+					height: 0,
 				},
 			],
 		});

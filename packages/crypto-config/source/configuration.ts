@@ -83,7 +83,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		}
 
 		if (!height) {
-			height = 1;
+			height = 0;
 		}
 
 		while (

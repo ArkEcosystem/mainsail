@@ -39,7 +39,7 @@ describe<{
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
-				height: 1,
+				height: 0,
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: { decimals: 8, denomination: 100_000_000 },

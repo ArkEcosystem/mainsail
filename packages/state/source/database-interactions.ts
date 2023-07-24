@@ -53,7 +53,7 @@ export class DatabaseInteraction {
 	async #initializeLastBlock(): Promise<void> {
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
-		let lastHeight = 1;
+		let lastHeight = 0;
 		const latest: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
 		if (latest) {
 			lastHeight = latest.data.height;
