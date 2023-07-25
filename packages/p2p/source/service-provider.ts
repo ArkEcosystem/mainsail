@@ -15,7 +15,7 @@ import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
-import { ProposalDownloader } from "./proposal-downloader";
+import { ProposalDownloader } from "./downloader/proposal-downloader";
 import { Server } from "./socket-server/server";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 

@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
 import { Downloader } from "./downloader/downloader";
-import { ProposalDownloader } from "./proposal-downloader";
+import { ProposalDownloader } from "./downloader/proposal-downloader";
 
 export interface CompareResponse {
 	downloadBlocks?: true;
