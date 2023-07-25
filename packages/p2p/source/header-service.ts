@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
 import { Downloader } from "./downloader";
+import { ProposalDownloader } from "./proposal-downloader";
 
 export interface CompareResponse {
 	downloadBlocks?: true;
@@ -31,15 +32,13 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		this.app.get<Contracts.P2P.BlockDownloader>(Identifiers.PeerBlockDownloader).downloadBlocks(peer);
 
-		const downloader = this.app.get<Downloader>(Identifiers.PeerDownloader);
 		const header = this.headerFactory();
-
 		if (header.canDownloadProposal(peerHeader)) {
-			await downloader.downloadProposal(peer);
+			await this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).downloadProposal(peer);
 		}
 
 		if (header.canDownloadMessages(peerHeader)) {
-			await downloader.downloadMessages(peer);
+			await this.app.get<Downloader>(Identifiers.PeerDownloader).downloadMessages(peer);
 		}
 	}
 

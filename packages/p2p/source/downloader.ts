@@ -19,17 +19,7 @@ export class Downloader {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
 
-	#isDownloadingProposal = false;
 	#isDownloadingMessages = false;
-
-	public tryToDownloadProposal(): void {
-		const header = this.headerFactory();
-		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.state));
-
-		if (peers.length > 0) {
-			void this.downloadProposal(this.#getRandomPeer(peers));
-		}
-	}
 
 	public tryToDownloadMessages(): void {
 		const header = this.headerFactory();
@@ -38,34 +28,6 @@ export class Downloader {
 		if (peers.length > 0) {
 			void this.downloadMessages(this.#getRandomPeer(peers));
 		}
-	}
-
-	// TODO: Handle errors & response checks
-	public async downloadProposal(peer: Contracts.P2P.Peer): Promise<void> {
-		if (this.#isDownloadingProposal) {
-			return;
-		}
-
-		this.#isDownloadingProposal = true;
-
-		try {
-			const result = await this.communicator.getProposal(peer);
-
-			if (result.proposal.length === 0) {
-				return;
-			}
-
-			const proposal = await this.messageFactory.makeProposalFromBytes(result.proposal);
-
-			await this.handler.onProposal(proposal);
-		} catch {
-			// TODO: Handle errors
-		} finally {
-			this.#isDownloadingProposal = false;
-			this.tryToDownloadProposal();
-		}
-
-		// TODO: Check if we have any missing blocks
 	}
 
 	// TODO: Handle errors
