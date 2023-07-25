@@ -34,7 +34,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		const header = this.headerFactory();
 		if (header.canDownloadProposal(peerHeader)) {
-			await this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).downloadProposal(peer);
+			this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).downloadProposal(peer);
 		}
 
 		if (header.canDownloadMessages(peerHeader)) {

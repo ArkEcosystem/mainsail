@@ -2,6 +2,10 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { randomNumber } from "@mainsail/utils";
 
+type DownloadJob = {
+	peer: Contracts.P2P.Peer;
+	height: number;
+};
 @injectable()
 export class ProposalDownloader {
 	@inject(Identifiers.PeerCommunicator)
@@ -19,27 +23,33 @@ export class ProposalDownloader {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
 
-	#isDownloadingProposal = false;
+	#downloadingProposalByHeight = new Set<number>();
 
 	public tryToDownloadProposal(): void {
 		const header = this.headerFactory();
 		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.state));
 
 		if (peers.length > 0) {
-			void this.downloadProposal(this.#getRandomPeer(peers));
+			this.downloadProposal(this.#getRandomPeer(peers));
 		}
 	}
 
-	// TODO: Handle errors & response checks
-	public async downloadProposal(peer: Contracts.P2P.Peer): Promise<void> {
-		if (this.#isDownloadingProposal) {
+	public downloadProposal(peer: Contracts.P2P.Peer): void {
+		if (this.#downloadingProposalByHeight.has(peer.state.height)) {
 			return;
 		}
 
-		this.#isDownloadingProposal = true;
+		this.#downloadingProposalByHeight.add(peer.state.height);
+
+		void this.#downloadProposalFromPeer({ height: peer.state.height, peer });
+	}
+
+	// TODO: Handle errors & response checks
+	async #downloadProposalFromPeer(job: DownloadJob): Promise<void> {
+		let isError = false;
 
 		try {
-			const result = await this.communicator.getProposal(peer);
+			const result = await this.communicator.getProposal(job.peer);
 
 			if (result.proposal.length === 0) {
 				return;
@@ -49,13 +59,20 @@ export class ProposalDownloader {
 
 			await this.handler.onProposal(proposal);
 		} catch {
-			// TODO: Handle errors
-		} finally {
-			this.#isDownloadingProposal = false;
-			this.tryToDownloadProposal();
+			isError = true;
 		}
 
-		// TODO: Check if we have any missing blocks
+		this.#downloadingProposalByHeight.delete(job.height);
+
+		if (isError) {
+			this.#handleError(job);
+		}
+	}
+
+	#handleError(jod: DownloadJob) {
+		// TODO: Ban peer
+
+		this.tryToDownloadProposal();
 	}
 
 	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
