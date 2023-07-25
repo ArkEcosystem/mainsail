@@ -38,10 +38,12 @@ export class Downloader {
 
 	public tryToDownloadMessages(): void {
 		const header = this.headerFactory();
-		const peers = this.repository.getPeers().filter((peer) => header.canDownloadMessages(peer.state));
 
-		if (peers.length > 0) {
+		let peers = this.repository.getPeers().filter((peer) => header.canDownloadMessages(peer.state));
+
+		while (peers.length > 0) {
 			void this.downloadMessages(this.#getRandomPeer(peers));
+			peers = peers.filter((peer) => header.canDownloadMessages(peer.state));
 		}
 	}
 
@@ -112,6 +114,8 @@ export class Downloader {
 
 	#handleError(job: DownloadJob): void {
 		// TODO: Remove peer from repository
+
+		this.tryToDownloadMessages();
 	}
 
 	#setDownloadJob(job: DownloadJob, downloadsByHeight: DownloadsByHeight): void {
