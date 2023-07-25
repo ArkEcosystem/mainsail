@@ -47,8 +47,12 @@ export class MessageDownloader {
 		}
 	}
 
-	// TODO: Handle errors
-	public async downloadMessages(peer: Contracts.P2P.Peer): Promise<void> {
+	public downloadMessages(peer: Contracts.P2P.Peer): void {
+		const header = this.headerFactory();
+		if (!header.canDownloadMessages(peer.state)) {
+			return;
+		}
+
 		const downloads = this.#getDownloadsByHeight(peer.state.height);
 
 		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes);

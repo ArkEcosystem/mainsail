@@ -16,9 +16,6 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerHeaderFactory)
-	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
-
 	#pending = new Set<Contracts.P2P.Peer>();
 
 	public async handle(peer: Contracts.P2P.Peer, peerHeader: Contracts.P2P.IHeaderData): Promise<void> {
@@ -34,10 +31,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).downloadProposal(peer);
 
-		const header = this.headerFactory();
-		if (header.canDownloadMessages(peerHeader)) {
-			await this.app.get<MessageDownloader>(Identifiers.PeerDownloader).downloadMessages(peer);
-		}
+		this.app.get<MessageDownloader>(Identifiers.PeerDownloader).downloadMessages(peer);
 	}
 
 	#hasPendingCheck(peer: Contracts.P2P.Peer): boolean {
