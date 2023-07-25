@@ -15,8 +15,7 @@ export class Header implements Contracts.P2P.IHeader {
 	public height!: number;
 	public round!: number;
 	public step!: Contracts.Consensus.Step;
-
-	#roundState!: Contracts.Consensus.IRoundState;
+	public roundState!: Contracts.Consensus.IRoundState;
 
 	@postConstruct()
 	public init() {
@@ -24,19 +23,19 @@ export class Header implements Contracts.P2P.IHeader {
 		this.round = this.consensus.getRound();
 		this.step = this.consensus.getStep();
 
-		this.#roundState = this.roundStateRepo.getRoundState(this.height, this.round);
+		this.roundState = this.roundStateRepo.getRoundState(this.height, this.round);
 	}
 
 	public toData(): Contracts.P2P.IHeaderData {
-		const proposal = this.#roundState.getProposal();
+		const proposal = this.roundState.getProposal();
 
 		return {
 			height: this.height,
 			proposedBlockId: proposal ? proposal.block.block.data.id : undefined,
 			round: this.round,
 			step: this.step,
-			validatorsSignedPrecommit: this.#roundState.getValidatorsSignedPrecommit(),
-			validatorsSignedPrevote: this.#roundState.getValidatorsSignedPrevote(),
+			validatorsSignedPrecommit: this.roundState.getValidatorsSignedPrecommit(),
+			validatorsSignedPrevote: this.roundState.getValidatorsSignedPrevote(),
 			version: this.app.version(),
 		};
 	}
@@ -46,7 +45,7 @@ export class Header implements Contracts.P2P.IHeader {
 			return false;
 		}
 
-		return this.#roundState.getProposal() === undefined && !!data.proposedBlockId;
+		return this.roundState.getProposal() === undefined && !!data.proposedBlockId;
 	}
 
 	public canDownloadMessages(data: Contracts.P2P.IHeaderData): boolean {
@@ -56,14 +55,14 @@ export class Header implements Contracts.P2P.IHeader {
 
 		if ([Contracts.Consensus.Step.Prevote, Contracts.Consensus.Step.Propose].includes(this.step)) {
 			for (let index = 0; index < data.validatorsSignedPrevote.length; index++) {
-				if (data.validatorsSignedPrevote[index] && !this.#roundState.getValidatorsSignedPrevote()[index]) {
+				if (data.validatorsSignedPrevote[index] && !this.roundState.getValidatorsSignedPrevote()[index]) {
 					return true;
 				}
 			}
 		}
 
 		for (let index = 0; index < data.validatorsSignedPrecommit.length; index++) {
-			if (data.validatorsSignedPrecommit[index] && !this.#roundState.getValidatorsSignedPrecommit()[index]) {
+			if (data.validatorsSignedPrecommit[index] && !this.roundState.getValidatorsSignedPrecommit()[index]) {
 				return true;
 			}
 		}
