@@ -140,7 +140,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			isError = true;
 		}
 
-		this.#removeDownloadJob(job, this.#getDownloadsByHeight(job.height));
+		this.#removeDownloadJob(job);
 
 		if (isError) {
 			this.#handleError(job);
@@ -163,7 +163,14 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
-	#removeDownloadJob(job: DownloadJob, downloadsByHeight: DownloadsByHeight): void {
+	#removeDownloadJob(job: DownloadJob): void {
+		// Return if the height was already removed, because the block was applied.
+		if (!this.#downloadsByHeight.has(job.height)) {
+			return;
+		}
+
+		const downloadsByHeight = this.#downloadsByHeight.get(job.height)!;
+
 		for (const index of job.prevoteIndexes) {
 			downloadsByHeight.prevotes[index] = false;
 		}
