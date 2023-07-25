@@ -63,6 +63,10 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 		void this.#downloadBlocksFromPeer(downloadJob);
 	}
 
+	public isDownloading(): boolean {
+		return this.#downloadJobs.length > 0;
+	}
+
 	#getLastRequestedBlockHeight(): number {
 		if (this.#downloadJobs.length === 0) {
 			return this.stateStore.getLastHeight();

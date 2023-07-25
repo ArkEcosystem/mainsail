@@ -2,6 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { randomNumber } from "@mainsail/utils";
 
+import { BlockDownloader } from "./block-downloader";
+
 type DownloadsByHeight = {
 	precommits: boolean[];
 	prevotes: boolean[];
@@ -25,6 +27,9 @@ export class MessageDownloader {
 	@inject(Identifiers.PeerHeaderFactory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
+	@inject(Identifiers.PeerBlockDownloader)
+	private readonly blockDownloader!: BlockDownloader;
+
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
 
@@ -37,8 +42,11 @@ export class MessageDownloader {
 	#downloadsByHeight = new Map<number, DownloadsByHeight>();
 
 	public tryToDownloadMessages(): void {
-		const header = this.headerFactory();
+		if (this.blockDownloader.isDownloading()) {
+			return;
+		}
 
+		const header = this.headerFactory();
 		let peers = this.repository.getPeers().filter((peer) => header.canDownloadMessages(peer.state));
 
 		while (peers.length > 0) {
@@ -48,6 +56,10 @@ export class MessageDownloader {
 	}
 
 	public downloadMessages(peer: Contracts.P2P.Peer): void {
+		if (this.blockDownloader.isDownloading()) {
+			return;
+		}
+
 		const header = this.headerFactory();
 		if (!header.canDownloadMessages(peer.state)) {
 			return;
