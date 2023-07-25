@@ -30,7 +30,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 
 	#downloadingProposalByHeight = new Set<number>();
 
-	public tryToDownloadProposal(): void {
+	public tryToDownload(): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
 		}
@@ -94,7 +94,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	#handleError(jod: DownloadJob) {
 		// TODO: Ban peer
 
-		this.tryToDownloadProposal();
+		this.tryToDownload();
 	}
 
 	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {

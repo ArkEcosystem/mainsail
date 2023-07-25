@@ -41,17 +41,16 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#downloadsByHeight = new Map<number, DownloadsByHeight>();
 
-	public tryToDownloadMessages(): void {
+	public tryToDownload(): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
 		}
 
 		const header = this.headerFactory();
-		let peers = this.repository.getPeers().filter((peer) => header.canDownloadMessages(peer.state));
+		let peers = this.repository.getPeers();
 
-		while (peers.length > 0) {
+		while ((peers = peers.filter((peer) => header.canDownloadMessages(peer.state))) && peers.length > 0) {
 			void this.download(this.#getRandomPeer(peers));
-			peers = peers.filter((peer) => header.canDownloadMessages(peer.state));
 		}
 	}
 
@@ -135,7 +134,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	#handleError(job: DownloadJob): void {
 		// TODO: Remove peer from repository
 
-		this.tryToDownloadMessages();
+		this.tryToDownload();
 	}
 
 	#setDownloadJob(job: DownloadJob, downloadsByHeight: DownloadsByHeight): void {

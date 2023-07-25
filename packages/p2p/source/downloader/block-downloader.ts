@@ -41,6 +41,17 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	#downloadJobs: DownloadJob[] = [];
 
+	public tryToDownload(): void {
+		let peers = this.repository.getPeers();
+
+		while (
+			(peers = peers.filter((peer) => peer.state.height > this.#getLastRequestedBlockHeight())) &&
+			peers.length > 0
+		) {
+			void this.download(this.#getRandomPeer(peers));
+		}
+	}
+
 	public download(peer: Contracts.P2P.Peer): void {
 		if (
 			peer.state.height - 1 <= this.#getLastRequestedBlockHeight() ||
