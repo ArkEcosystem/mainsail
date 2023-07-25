@@ -100,7 +100,7 @@ export class Downloader {
 				await this.handler.onPrecommit(precommit);
 			}
 		} catch {
-			// TODO: Handle errors
+			isError = true;
 		}
 
 		this.#removeDownloadJob(job, this.#getDownloadsByHeight(job.height));
