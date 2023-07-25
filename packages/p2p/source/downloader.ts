@@ -2,6 +2,18 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { randomNumber } from "@mainsail/utils";
 
+type DownloadsByHeight = {
+	precommits: boolean[];
+	prevotes: boolean[];
+};
+
+type DownloadJob = {
+	peer: Contracts.P2P.Peer;
+	height: number;
+	prevoteIndexes: number[];
+	precommitIndexes: number[];
+};
+
 @injectable()
 export class Downloader {
 	@inject(Identifiers.PeerCommunicator)
@@ -19,7 +31,10 @@ export class Downloader {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
 
-	#isDownloadingMessages = false;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+
+	#downloadsByHeight = new Map<number, DownloadsByHeight>();
 
 	public tryToDownloadMessages(): void {
 		const header = this.headerFactory();
@@ -32,14 +47,47 @@ export class Downloader {
 
 	// TODO: Handle errors
 	public async downloadMessages(peer: Contracts.P2P.Peer): Promise<void> {
-		if (this.#isDownloadingMessages) {
+		const downloads = this.#getDownloadsByHeight(peer.height);
+
+		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes);
+		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits);
+
+		if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
 			return;
 		}
 
-		this.#isDownloadingMessages = true;
+		const job: DownloadJob = {
+			height: peer.height,
+			peer,
+			precommitIndexes,
+			prevoteIndexes,
+		};
+
+		this.#setDownloadJob(job, downloads);
+
+		void this.#downloadMessagesFromPeer(job);
+	}
+
+	#getDownloadsByHeight(height: number): DownloadsByHeight {
+		if (!this.#downloadsByHeight.has(height)) {
+			this.#downloadsByHeight.set(height, {
+				precommits: Array.from<boolean>({
+					length: this.cryptoConfiguration.getMilestone().activeValidators,
+				}).fill(true),
+				prevotes: Array.from<boolean>({
+					length: this.cryptoConfiguration.getMilestone().activeValidators,
+				}).fill(true),
+			});
+		}
+
+		return this.#downloadsByHeight.get(height)!;
+	}
+
+	async #downloadMessagesFromPeer(job: DownloadJob): Promise<void> {
+		let isError = false;
 
 		try {
-			const result = await this.communicator.getMessages(peer);
+			const result = await this.communicator.getMessages(job.peer);
 
 			for (const prevoteBuffer of result.prevotes) {
 				const prevote = await this.messageFactory.makePrevoteFromBytes(prevoteBuffer);
@@ -54,10 +102,61 @@ export class Downloader {
 			}
 		} catch {
 			// TODO: Handle errors
-		} finally {
-			this.#isDownloadingMessages = false;
-			this.tryToDownloadMessages();
 		}
+
+		this.#removeDownloadJob(job, this.#getDownloadsByHeight(job.height));
+
+		if (isError) {
+			this.#handleError(job);
+		}
+	}
+
+	#handleError(job: DownloadJob): void {
+		// TODO: Remove peer from repository
+	}
+
+	#setDownloadJob(job: DownloadJob, downloadsByHeight: DownloadsByHeight): void {
+		for (const index of job.prevoteIndexes) {
+			downloadsByHeight.prevotes[index] = true;
+		}
+
+		for (const index of job.precommitIndexes) {
+			downloadsByHeight.precommits[index] = true;
+		}
+	}
+
+	#removeDownloadJob(job: DownloadJob, downloadsByHeight: DownloadsByHeight): void {
+		for (const index of job.prevoteIndexes) {
+			downloadsByHeight.prevotes[index] = false;
+		}
+
+		for (const index of job.precommitIndexes) {
+			downloadsByHeight.precommits[index] = false;
+		}
+	}
+
+	#getPrevoteIndexesToDownload(peer: Contracts.P2P.Peer, prevotes: boolean[]): number[] {
+		const indexes: number[] = [];
+
+		for (const [index, prevote] of prevotes.entries()) {
+			if (peer.state.validatorsSignedPrevote[index] && !prevote) {
+				indexes.push(index);
+			}
+		}
+
+		return indexes;
+	}
+
+	#getPrecommitIndexesToDownload(peer: Contracts.P2P.Peer, precommits: boolean[]): number[] {
+		const indexes: number[] = [];
+
+		for (const [index, precommit] of precommits.entries()) {
+			if (peer.state.validatorsSignedPrecommit[index] && !precommit) {
+				indexes.push(index);
+			}
+		}
+
+		return indexes;
 	}
 
 	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
