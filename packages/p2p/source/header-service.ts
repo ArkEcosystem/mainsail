@@ -32,11 +32,9 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		this.app.get<Contracts.P2P.BlockDownloader>(Identifiers.PeerBlockDownloader).downloadBlocks(peer);
 
-		const header = this.headerFactory();
-		if (header.canDownloadProposal(peerHeader)) {
-			this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).downloadProposal(peer);
-		}
+		this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).downloadProposal(peer);
 
+		const header = this.headerFactory();
 		if (header.canDownloadMessages(peerHeader)) {
 			await this.app.get<Downloader>(Identifiers.PeerDownloader).downloadMessages(peer);
 		}

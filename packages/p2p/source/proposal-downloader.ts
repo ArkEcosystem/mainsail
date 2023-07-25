@@ -39,6 +39,11 @@ export class ProposalDownloader {
 			return;
 		}
 
+		const header = this.headerFactory();
+		if (!header.canDownloadProposal(peer.state)) {
+			return;
+		}
+
 		this.#downloadingProposalByHeight.add(peer.state.height);
 
 		void this.#downloadProposalFromPeer({ height: peer.state.height, peer });
