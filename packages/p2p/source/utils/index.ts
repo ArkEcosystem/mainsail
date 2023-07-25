@@ -1,2 +1,3 @@
-export { buildRateLimiter } from "./build-rate-limiter";
-export { isValidVersion } from "./is-valid-version";
+export * from "./build-rate-limiter";
+export * from "./get-random-peer";
+export * from "./is-valid-version";

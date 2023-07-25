@@ -3,9 +3,10 @@ import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
-import { BlockDownloader } from "./block-downloader";
 import { Broadcaster } from "./broadcaster";
-import { Downloader } from "./downloader";
+import { BlockDownloader } from "./downloader/block-downloader";
+import { MessageDownloader } from "./downloader/message-downloader";
+import { ProposalDownloader } from "./downloader/proposal-downloader";
 import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { NetworkMonitor } from "./network-monitor";
@@ -109,7 +110,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerDownloader).to(Downloader).inSingletonScope();
+		this.app.bind(Identifiers.PeerProposalDownloader).to(ProposalDownloader).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerMessageDownloader).to(MessageDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 

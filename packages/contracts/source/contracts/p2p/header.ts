@@ -1,3 +1,5 @@
+import { IRoundState } from "../consensus";
+
 export type IHeaderData = {
 	version: string;
 	height: number;
@@ -9,6 +11,10 @@ export type IHeaderData = {
 };
 
 export interface IHeader {
+	height: number;
+	round: number;
+	roundState: IRoundState;
+
 	toData(): IHeaderData;
 	canDownloadProposal(headerData: IHeaderData): boolean;
 	canDownloadMessages(headerData: IHeaderData): boolean;

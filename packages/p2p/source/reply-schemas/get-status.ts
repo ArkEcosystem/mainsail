@@ -108,7 +108,7 @@ export const getStatus = {
 					],
 				},
 				height: {
-					minimum: 1,
+					minimum: 0,
 					type: "integer",
 				},
 			},

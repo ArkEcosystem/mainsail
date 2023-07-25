@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { randomNumber } from "@mainsail/utils";
 
-import { constants } from "./constants";
+import { constants } from "../constants";
+import { getRandomPeer } from "../utils";
 
 enum JobStatus {
 	Downloading,
@@ -20,7 +20,7 @@ type DownloadJob = {
 };
 
 @injectable()
-export class BlockDownloader implements Contracts.P2P.BlockDownloader {
+export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
@@ -41,7 +41,18 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 
 	#downloadJobs: DownloadJob[] = [];
 
-	public downloadBlocks(peer: Contracts.P2P.Peer): void {
+	public tryToDownload(): void {
+		let peers = this.repository.getPeers();
+
+		while (
+			(peers = peers.filter((peer) => peer.state.height > this.#getLastRequestedBlockHeight())) &&
+			peers.length > 0
+		) {
+			void this.download(getRandomPeer(peers));
+		}
+	}
+
+	public download(peer: Contracts.P2P.Peer): void {
 		if (
 			peer.state.height - 1 <= this.#getLastRequestedBlockHeight() ||
 			this.#downloadJobs.length >= constants.MAX_DOWNLOAD_BLOCKS_JOBS
@@ -61,6 +72,10 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 		this.#downloadJobs.push(downloadJob);
 
 		void this.#downloadBlocksFromPeer(downloadJob);
+	}
+
+	public isDownloading(): boolean {
+		return this.#downloadJobs.length > 0;
 	}
 
 	#getLastRequestedBlockHeight(): number {
@@ -106,10 +121,12 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 			}
 		} catch (error) {
 			this.#handleJobError(job, error);
+			return;
 		}
 
 		if (this.stateStore.getLastHeight() !== job.heightTo) {
 			this.#handleJobError(job, new Error("Blocks are missing"));
+			return;
 		}
 
 		if (job.heightTo !== this.stateStore.getLastHeight()) {
@@ -165,7 +182,7 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 			return;
 		}
 
-		const peer = this.#getRandomPeer(peers);
+		const peer = getRandomPeer(peers);
 
 		const newJob: DownloadJob = {
 			blocks: [],
@@ -179,10 +196,6 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 		this.#downloadJobs[index] = newJob;
 
 		void this.#downloadBlocksFromPeer(newJob);
-	}
-
-	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
-		return peers[randomNumber(0, peers.length - 1)];
 	}
 
 	#calculateHeightTo(peer: Contracts.P2P.Peer): number {
