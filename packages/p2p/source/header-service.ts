@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
-import { Downloader } from "./downloader";
+import { Downloader } from "./downloader/downloader";
 import { ProposalDownloader } from "./proposal-downloader";
 
 export interface CompareResponse {

@@ -5,7 +5,7 @@ import Joi from "joi";
 import { ValidateAndAcceptPeerAction } from "./actions";
 import { BlockDownloader } from "./block-downloader";
 import { Broadcaster } from "./broadcaster";
-import { Downloader } from "./downloader";
+import { Downloader } from "./downloader/downloader";
 import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { NetworkMonitor } from "./network-monitor";
