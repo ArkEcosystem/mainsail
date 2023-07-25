@@ -1,0 +1,32 @@
+import { Identifiers } from "@mainsail/contracts";
+import { Configuration } from "../../../crypto-config/distribution";
+import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
+import { makeKeywords } from "../../source/validation/keywords";
+import { makeKeywords as makeMessageKeywords } from "../../../crypto-messages/distribution/keywords";
+import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
+import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
+import { schemas as cryptoTransactionSchemas } from "../../../crypto-transaction/distribution";
+import { Sandbox } from "../../../test-framework/distribution";
+import { Validator } from "@mainsail/validation/source/validator";
+
+type Context = {
+	sandbox: Sandbox;
+	validator: Validator;
+};
+
+export const prepareValidatorContext = (context: Context) => {
+	context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+	context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+
+	const keywords = makeKeywords();
+	context.validator.addKeyword(keywords.buffer);
+
+	const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+	const messageKeywords = makeMessageKeywords(configuration);
+	context.validator.addKeyword(messageKeywords.isValidatorBitmap);
+	context.validator.addKeyword(messageKeywords.isValidatorIndex);
+
+	context.validator.addSchema(cryptoValidationSchemas.hex);
+	context.validator.addSchema(cryptoBlockSchemas.blockId);
+	context.validator.addSchema(cryptoTransactionSchemas.transactionId);
+};

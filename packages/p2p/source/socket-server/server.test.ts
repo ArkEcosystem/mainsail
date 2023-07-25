@@ -31,6 +31,11 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 	const options = { hostname: "127.0.0.1", port: 4000 };
 
 	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
+	const config = {
+		getMilestone: () => ({
+			activeValidators: 51,
+		}),
+	};
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -46,7 +51,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue({});

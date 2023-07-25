@@ -1,11 +1,9 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
-import { schemas as cryptoTransactionSchemas } from "../../../crypto-transaction/distribution";
-import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
 import { postTransactions } from "./post-transactions";
+import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 
 type Context = {
 	sandbox: Sandbox;
@@ -25,9 +23,7 @@ describe<Context>("PostTransactions Schema", ({ it, assert, beforeEach, each }) 
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		context.validator.addSchema(cryptoValidationSchemas.hex);
-		context.validator.addSchema(cryptoBlockSchemas.blockId);
-		context.validator.addSchema(cryptoTransactionSchemas.transactionId);
+		prepareValidatorContext(context);
 	});
 
 	it("should pass validation", ({ validator }) => {

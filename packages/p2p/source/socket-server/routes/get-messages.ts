@@ -13,7 +13,7 @@ export class GetMessagesRoute extends Route {
 				handler: controller.handle,
 				id: Routes.GetMessages,
 				maxBytes: 1024,
-				validation: Schemas.getMessages,
+				validation: Schemas.getMessages(this.cryptoConfiguration),
 			},
 		};
 	}

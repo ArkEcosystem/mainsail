@@ -1,7 +1,9 @@
+import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { headers } from "./shared";
+import { makeHeaders } from "./shared";
 
-export const getProposal = Joi.object({
-	headers,
-});
+export const getProposal = (configuration: Contracts.Crypto.IConfiguration) =>
+	Joi.object({
+		headers: makeHeaders(configuration),
+	});

@@ -1,9 +1,8 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { schemas as cryptoBlockSchemas } from "../../../crypto-block";
-import { schemas as cryptoValidationSchemas } from "../../../crypto-validation";
 import { describe, Sandbox } from "../../../test-framework";
 import { headers as data } from "../../test/fixtures/responses/headers";
+import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { headers } from "./headers";
 
 type Context = {
@@ -17,8 +16,7 @@ describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		context.validator.addSchema(cryptoValidationSchemas.hex);
-		context.validator.addSchema(cryptoBlockSchemas.blockId);
+		prepareValidatorContext(context);
 	});
 
 	it("should pass validation", ({ validator }) => {
@@ -28,15 +26,7 @@ describe<Context>("Headers Schema", ({ it, assert, beforeEach, each }) => {
 	});
 
 	it("should pass validation", ({ validator }) => {
-		const result = validator.validate(headers, {
-			height: 1,
-			proposedBlockId: "a".repeat(64),
-			round: 1,
-			step: 1,
-			validatorsSignedPrecommit: [true],
-			validatorsSignedPrevote: [true],
-			version: "2.0.0",
-		});
+		const result = validator.validate(headers, data);
 
 		assert.undefined(result.error);
 	});

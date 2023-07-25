@@ -27,10 +27,14 @@ export class RateLimitPlugin {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+
 	private rateLimiter!: RateLimiter;
 
 	public register(server) {
 		this.rateLimiter = buildRateLimiter({
+			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
 			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
 			remoteAccess: this.configuration.getOptional<Array<string>>("remoteAccess", []),

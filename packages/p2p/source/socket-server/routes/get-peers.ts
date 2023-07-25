@@ -13,7 +13,7 @@ export class GetPeersRoute extends Route {
 				handler: controller.handle,
 				id: Routes.GetPeers,
 				maxBytes: 1024,
-				validation: Schemas.getPeers,
+				validation: Schemas.getPeers(this.cryptoConfiguration),
 			},
 		};
 	}

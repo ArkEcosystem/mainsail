@@ -31,7 +31,6 @@
 	"devDependencies": {
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"uvu": "^0.5.6"
 	},

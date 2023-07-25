@@ -1322,9 +1322,6 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2398,6 +2395,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-messages':
+        specifier: workspace:*
+        version: link:../crypto-messages
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction

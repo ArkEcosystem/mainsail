@@ -14,7 +14,7 @@ export class PostPrevoteRoute extends Route {
 				handler: controller.handle,
 				id: Routes.PostPrevote,
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
-				validation: Schemas.postPrevote,
+				validation: Schemas.postPrevote(this.cryptoConfiguration),
 			},
 		};
 	}

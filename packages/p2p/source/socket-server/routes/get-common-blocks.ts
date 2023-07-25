@@ -12,7 +12,7 @@ export class GetCommonBlocksRoute extends Route {
 				handler: controller.handle,
 				id: Routes.GetCommonBlocks,
 				maxBytes: 10 * 1024,
-				validation: Schemas.getCommonBlocks,
+				validation: Schemas.getCommonBlocks(this.cryptoConfiguration),
 			},
 		};
 	}
