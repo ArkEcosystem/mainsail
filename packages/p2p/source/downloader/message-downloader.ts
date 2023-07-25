@@ -1,5 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Enums } from "@mainsail/kernel";
 import { randomNumber } from "@mainsail/utils";
 
 import { BlockDownloader } from "./block-downloader";
@@ -39,7 +40,22 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
+	@inject(Identifiers.EventDispatcherService)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
+	@inject(Identifiers.StateStore)
+	private readonly state!: Contracts.State.StateStore;
+
 	#downloadsByHeight = new Map<number, DownloadsByHeight>();
+
+	@postConstruct()
+	public initialize(): void {
+		this.events.listen(Enums.BlockEvent.Applied, {
+			handle: () => {
+				this.#downloadsByHeight.delete(this.state.getLastHeight());
+			},
+		});
+	}
 
 	public tryToDownload(): void {
 		if (this.blockDownloader.isDownloading()) {
