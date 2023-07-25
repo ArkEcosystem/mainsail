@@ -2,8 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
-import { MessageDownloader } from "./downloader/message-downloader";
-import { ProposalDownloader } from "./downloader/proposal-downloader";
 
 export interface CompareResponse {
 	downloadBlocks?: true;
@@ -28,10 +26,8 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 		await this.#delay(peer);
 
 		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerBlockDownloader).download(peer);
-
-		this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).download(peer);
-
-		this.app.get<MessageDownloader>(Identifiers.PeerDownloader).download(peer);
+		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerProposalDownloader).download(peer);
+		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerDownloader).download(peer);
 	}
 
 	#hasPendingCheck(peer: Contracts.P2P.Peer): boolean {
