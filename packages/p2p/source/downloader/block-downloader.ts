@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { randomNumber } from "@mainsail/utils";
 
-import { constants } from "./constants";
+import { constants } from "../constants";
 
 enum JobStatus {
 	Downloading,

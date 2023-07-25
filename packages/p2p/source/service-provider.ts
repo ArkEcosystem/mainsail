@@ -3,7 +3,7 @@ import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
-import { BlockDownloader } from "./block-downloader";
+import { BlockDownloader } from "./downloader/block-downloader";
 import { Broadcaster } from "./broadcaster";
 import { Downloader } from "./downloader/downloader";
 import { Header } from "./header";
