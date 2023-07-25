@@ -85,6 +85,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		void this.#downloadMessagesFromPeer(job);
 	}
 
+	public isDownloading(): boolean {
+		return this.#downloadsByHeight.size > 0;
+	}
+
 	#getDownloadsByHeight(height: number): DownloadsByHeight {
 		if (!this.#downloadsByHeight.has(height)) {
 			this.#downloadsByHeight.set(height, {

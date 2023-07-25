@@ -62,6 +62,10 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		void this.#downloadProposalFromPeer({ height: peer.state.height, peer });
 	}
 
+	public isDownloading(): boolean {
+		return this.#downloadingProposalByHeight.size > 0;
+	}
+
 	// TODO: Handle errors & response checks
 	async #downloadProposalFromPeer(job: DownloadJob): Promise<void> {
 		let isError = false;
