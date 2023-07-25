@@ -17,7 +17,7 @@ type DownloadJob = {
 };
 
 @injectable()
-export class MessageDownloader {
+export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
@@ -50,12 +50,12 @@ export class MessageDownloader {
 		let peers = this.repository.getPeers().filter((peer) => header.canDownloadMessages(peer.state));
 
 		while (peers.length > 0) {
-			void this.downloadMessages(this.#getRandomPeer(peers));
+			void this.download(this.#getRandomPeer(peers));
 			peers = peers.filter((peer) => header.canDownloadMessages(peer.state));
 		}
 	}
 
-	public downloadMessages(peer: Contracts.P2P.Peer): void {
+	public download(peer: Contracts.P2P.Peer): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
 		}

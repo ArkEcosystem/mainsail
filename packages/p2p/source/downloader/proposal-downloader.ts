@@ -9,7 +9,7 @@ type DownloadJob = {
 	height: number;
 };
 @injectable()
-export class ProposalDownloader {
+export class ProposalDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
@@ -39,11 +39,11 @@ export class ProposalDownloader {
 		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.state));
 
 		if (peers.length > 0) {
-			this.downloadProposal(this.#getRandomPeer(peers));
+			this.download(this.#getRandomPeer(peers));
 		}
 	}
 
-	public downloadProposal(peer: Contracts.P2P.Peer): void {
+	public download(peer: Contracts.P2P.Peer): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
 		}
