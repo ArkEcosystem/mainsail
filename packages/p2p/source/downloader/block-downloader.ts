@@ -20,7 +20,7 @@ type DownloadJob = {
 };
 
 @injectable()
-export class BlockDownloader implements Contracts.P2P.BlockDownloader {
+export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
@@ -41,7 +41,7 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 
 	#downloadJobs: DownloadJob[] = [];
 
-	public downloadBlocks(peer: Contracts.P2P.Peer): void {
+	public download(peer: Contracts.P2P.Peer): void {
 		if (
 			peer.state.height - 1 <= this.#getLastRequestedBlockHeight() ||
 			this.#downloadJobs.length >= constants.MAX_DOWNLOAD_BLOCKS_JOBS

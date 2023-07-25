@@ -27,7 +27,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		await this.#delay(peer);
 
-		this.app.get<Contracts.P2P.BlockDownloader>(Identifiers.PeerBlockDownloader).downloadBlocks(peer);
+		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerBlockDownloader).download(peer);
 
 		this.app.get<ProposalDownloader>(Identifiers.PeerProposalDownloader).downloadProposal(peer);
 
