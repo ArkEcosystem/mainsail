@@ -15,6 +15,7 @@ import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
+import { ProposalDownloader } from "./proposal-downloader";
 import { Server } from "./socket-server/server";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
@@ -109,7 +110,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
+		this.app.bind(Identifiers.PeerProposalDownloader).to(ProposalDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerDownloader).to(Downloader).inSingletonScope();
 
