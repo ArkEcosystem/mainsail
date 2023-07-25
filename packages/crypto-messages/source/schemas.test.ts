@@ -8,6 +8,7 @@ import { Validator } from "@mainsail/validation/source/validator";
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../test-framework";
 import { schemas } from "./schemas";
+import { makeKeywords as makeMessageKeywords } from "./keywords";
 import {
 	precommitData,
 	precommitDataNoBlock,
@@ -20,7 +21,6 @@ describe<{
 	sandbox: Sandbox;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
-	const length = 96;
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -32,6 +32,7 @@ describe<{
 
 		for (const keyword of Object.values({
 			...makeBaseKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeMessageKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
 		}

@@ -3,7 +3,7 @@ import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { describeSkip, Sandbox } from "../../test-framework";
-import { Peer } from "../distribution";
+import { Peer } from "./peer";
 import { Broadcaster } from "./broadcaster";
 
 describeSkip<{
@@ -12,12 +12,12 @@ describeSkip<{
 	peers: Peer[];
 	block: any;
 }>("Broadcaster", ({ it, assert, beforeEach, stub, spy, each }) => {
-	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
-	const configuration = { getRequired: () => {} };
-	const repository = { getPeers: () => {} };
-	const communicator = { postBlock: () => {}, postTransactions: () => {} };
-	const serializer = { serialize: () => {} };
-	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
+	const logger = { debug: () => { }, info: () => { }, warning: () => { } };
+	const configuration = { getRequired: () => { } };
+	const repository = { getPeers: () => { } };
+	const communicator = { postBlock: () => { }, postTransactions: () => { } };
+	const serializer = { serialize: () => { } };
+	const blockchain = { getBlockPing: () => { }, getLastBlock: () => { } };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();

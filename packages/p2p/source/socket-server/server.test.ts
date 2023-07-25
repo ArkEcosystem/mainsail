@@ -11,13 +11,13 @@ import { Server } from "./server";
 class HapiServerMock {
 	info = { uri: "127.0.0.1" };
 
-	register() {}
-	start() {}
-	stop() {}
-	bind() {}
-	route() {}
-	inject() {}
-	ext() {}
+	register() { }
+	start() { }
+	stop() { }
+	bind() { }
+	route() { }
+	inject() { }
+	ext() { }
 }
 
 const { Server: ServerProxy } = rewiremock.proxy<{ Server: Contracts.Types.Class<Server> }>("./server", {
@@ -30,7 +30,12 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 	const name = "P2P server";
 	const options = { hostname: "127.0.0.1", port: 4000 };
 
-	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
+	const logger = { debug: () => { }, info: () => { }, warning: () => { } };
+	const config = {
+		getMilestone: () => ({
+			activeValidators: 51,
+		}),
+	};
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -46,7 +51,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue({});
@@ -87,7 +92,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		const spyHapiServerStart = stub(HapiServerMock.prototype, "start").rejectedValue(
 			new Error("failed starting hapi server"),
 		);
-		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
+		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => { });
 
 		await server.initialize(name, options);
 		await server.boot();
@@ -111,7 +116,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		const spyHapiServerStop = stub(HapiServerMock.prototype, "stop").rejectedValue(
 			new Error("failed stopping hapi server"),
 		);
-		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
+		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => { });
 
 		await server.initialize(name, options);
 		await server.dispose();

@@ -79,13 +79,13 @@
 			"package": "@mainsail/transaction-pool"
 		},
 		{
+			"package": "@mainsail/crypto-messages"
+		},
+		{
 			"package": "@mainsail/p2p"
 		},
 		{
 			"package": "@mainsail/processor"
-		},
-		{
-			"package": "@mainsail/crypto-messages"
 		},
 		{
 			"package": "@mainsail/validator-set-static"

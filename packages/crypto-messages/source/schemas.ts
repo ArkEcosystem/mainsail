@@ -13,7 +13,7 @@ export const schemas: Record<
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Contracts.Crypto.MessageType.Precommit] },
-			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
+			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["type", "height", "round", "validatorIndex", "signature"],
 		type: "object",
@@ -26,7 +26,7 @@ export const schemas: Record<
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Contracts.Crypto.MessageType.Prevote] },
-			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
+			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["type", "height", "round", "validatorIndex", "signature"],
 		type: "object",
@@ -45,7 +45,7 @@ export const schemas: Record<
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			validRound: { minimum: 0, type: "integer" },
-			validatorIndex: { maximum: 50, minimum: 0, /* TODO: milestone */ type: "integer" },
+			validatorIndex: { isValidatorIndex: {} },
 		},
 		required: ["height", "round", "block", "validatorIndex", "signature"],
 		type: "object",
@@ -63,9 +63,6 @@ export const schemas: Record<
 	},
 	validatorBitmap: {
 		$id: "validatorBitmap",
-		items: { type: "boolean" },
-		maxItems: 51,
-		minItems: 51, // TODO: milestone
-		type: "array",
+		isValidatorBitmap: {},
 	},
 };

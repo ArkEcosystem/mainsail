@@ -1,12 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+import { makeHeaders } from "./shared";
 import Joi from "joi";
-
-import { headers } from "./shared";
 
 export const createPostTransactionsSchema = (app: Contracts.Kernel.Application): Joi.AnySchema =>
 	Joi.object({
-		headers,
+		headers: makeHeaders(app.get(Identifiers.Cryptography.Configuration)),
 		transactions: Joi.array()
 			.items(Joi.binary())
 			.max(

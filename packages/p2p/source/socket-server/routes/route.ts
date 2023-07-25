@@ -32,6 +32,9 @@ export abstract class Route {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	protected readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+
 	public register(server: Hapi.Server): void {
 		const controller = this.getController();
 		server.bind(controller);

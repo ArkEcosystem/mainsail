@@ -50,6 +50,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
 
+			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
+
 			remoteAccess: [],
 			// White listing anybody here means we would not throttle ourselves when sending
 			// them requests, ie we could spam them.
@@ -143,7 +145,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
 					}
-				} catch {}
+				} catch { }
 			}),
 		);
 	}

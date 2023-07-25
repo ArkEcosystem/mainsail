@@ -13,7 +13,7 @@ export class GetBlocksRoute extends Route {
 				handler: controller.handle,
 				id: Routes.GetBlocks,
 				maxBytes: 1024,
-				validation: Schemas.getBlocks,
+				validation: Schemas.getBlocks(this.cryptoConfiguration),
 			},
 		};
 	}

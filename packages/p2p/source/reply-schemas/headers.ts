@@ -18,18 +18,10 @@ export const headers = {
 			type: "integer",
 		},
 		validatorsSignedPrecommit: {
-			// TODO: Add size
-			items: {
-				type: "boolean",
-			},
-			type: "array",
+			isValidatorBitmap: { minimum: 0 },
 		},
 		validatorsSignedPrevote: {
-			// TODO: Add size
-			items: {
-				type: "boolean",
-			},
-			type: "array",
+			isValidatorBitmap: { minimum: 0 },
 		},
 		version: {
 			pattern: "^\\d+\\.\\d+\\.\\d+$",

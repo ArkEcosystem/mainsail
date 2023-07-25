@@ -11,9 +11,9 @@ describe<{
 	sandbox: Sandbox;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
-	const triggerService = { bind: () => {} };
-	const validator = { addFormat: () => {}, addKeyword: () => {} };
-	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
+	const triggerService = { bind: () => { } };
+	const validator = { addFormat: () => { }, addKeyword: () => { } };
+	const server = { boot: async () => { }, dispose: async () => { }, initialize: async () => { } };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -40,7 +40,7 @@ describe<{
 	});
 
 	it("#boot - should call the server boot method", async ({ sandbox, serviceProvider }) => {
-		const peerEventListener = { initialize: () => {} };
+		const peerEventListener = { initialize: () => { } };
 
 		const spyServerInitialize = stub(server, "initialize");
 		const spyServerBoot = stub(server, "boot");
@@ -111,13 +111,18 @@ describe<{
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;
 
-	const triggerService = { bind: () => {} };
-	const validator = { addFormat: () => {} };
+	const triggerService = { bind: () => { } };
+	const validator = { addFormat: () => { } };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+			getMilestone: () => ({
+				activeValidators: 2,
+			}),
+		});
 		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 
 		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
@@ -133,7 +138,6 @@ describe<{
 		const defaults = importDefaults();
 
 		const result = serviceProvider.configSchema().validate(defaults);
-
 		assert.undefined(result.error);
 
 		assert.array(result.value.blacklist);

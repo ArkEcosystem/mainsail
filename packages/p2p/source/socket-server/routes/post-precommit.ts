@@ -14,7 +14,7 @@ export class PostPrecommitRoute extends Route {
 				handler: controller.handle,
 				id: Routes.PostPrecommit,
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
-				validation: Schemas.postPrecommit,
+				validation: Schemas.postPrecommit(this.cryptoConfiguration),
 			},
 		};
 	}

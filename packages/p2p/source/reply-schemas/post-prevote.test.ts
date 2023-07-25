@@ -1,10 +1,9 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { schemas as cryptoBlockSchemas } from "../../../crypto-block";
-import { schemas as cryptoValidationSchemas } from "../../../crypto-validation";
 import { describe, Sandbox } from "../../../test-framework";
 import { headers } from "../../test/fixtures/responses/headers";
 import { postPrevote } from "./post-prevote";
+import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 
 type Context = {
 	sandbox: Sandbox;
@@ -21,8 +20,7 @@ describe<Context>("PostPrevote Schema", ({ it, assert, beforeEach, each }) => {
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		context.validator.addSchema(cryptoValidationSchemas.hex);
-		context.validator.addSchema(cryptoBlockSchemas.blockId);
+		prepareValidatorContext(context);
 	});
 
 	it("should pass validation", ({ validator }) => {

@@ -1,9 +1,11 @@
+import { Contracts } from "@mainsail/contracts";
+import { makeHeaders } from "./shared";
 import Joi from "joi";
 
-import { headers } from "./shared";
-
-export const getBlocks = Joi.object({
-	fromHeight: Joi.number().integer().min(1).required(),
-	headers,
-	limit: Joi.number().integer().min(1).max(400).required(),
-}).required();
+export const getBlocks = (configuration: Contracts.Crypto.IConfiguration) => {
+	return Joi.object({
+		headers: makeHeaders(configuration),
+		fromHeight: Joi.number().integer().min(1).required(),
+		limit: Joi.number().integer().min(1).max(400).required(),
+	}).required();
+}
