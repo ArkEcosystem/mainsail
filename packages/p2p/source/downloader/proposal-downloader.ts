@@ -2,8 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { randomNumber } from "@mainsail/utils";
 
-import { BlockDownloader } from "./block-downloader";
-
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
 	height: number;
@@ -20,7 +18,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
 	@inject(Identifiers.PeerBlockDownloader)
-	private readonly blockDownloader!: BlockDownloader;
+	private readonly blockDownloader!: Contracts.P2P.Downloader;
 
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
