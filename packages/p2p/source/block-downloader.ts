@@ -106,10 +106,12 @@ export class BlockDownloader implements Contracts.P2P.BlockDownloader {
 			}
 		} catch (error) {
 			this.#handleJobError(job, error);
+			return;
 		}
 
 		if (this.stateStore.getLastHeight() !== job.heightTo) {
 			this.#handleJobError(job, new Error("Blocks are missing"));
+			return;
 		}
 
 		if (job.heightTo !== this.stateStore.getLastHeight()) {
