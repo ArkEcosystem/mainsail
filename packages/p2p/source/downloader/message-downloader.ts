@@ -3,8 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 import { randomNumber } from "@mainsail/utils";
 
-import { BlockDownloader } from "./block-downloader";
-
 type DownloadsByHeight = {
 	precommits: boolean[];
 	prevotes: boolean[];
@@ -29,7 +27,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
 	@inject(Identifiers.PeerBlockDownloader)
-	private readonly blockDownloader!: BlockDownloader;
+	private readonly blockDownloader!: Contracts.P2P.Downloader;
 
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
