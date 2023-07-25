@@ -15,7 +15,7 @@ type DownloadJob = {
 };
 
 @injectable()
-export class Downloader {
+export class MessageDownloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 

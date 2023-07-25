@@ -3,9 +3,10 @@ import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
-import { BlockDownloader } from "./downloader/block-downloader";
 import { Broadcaster } from "./broadcaster";
-import { Downloader } from "./downloader/downloader";
+import { BlockDownloader } from "./downloader/block-downloader";
+import { MessageDownloader } from "./downloader/message-downloader";
+import { ProposalDownloader } from "./downloader/proposal-downloader";
 import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { NetworkMonitor } from "./network-monitor";
@@ -15,7 +16,6 @@ import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
-import { ProposalDownloader } from "./downloader/proposal-downloader";
 import { Server } from "./socket-server/server";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
@@ -112,7 +112,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerProposalDownloader).to(ProposalDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerDownloader).to(Downloader).inSingletonScope();
+		this.app.bind(Identifiers.PeerDownloader).to(MessageDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 

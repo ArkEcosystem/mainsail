@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
-import { Downloader } from "./downloader/downloader";
+import { MessageDownloader } from "./downloader/message-downloader";
 import { ProposalDownloader } from "./downloader/proposal-downloader";
 
 export interface CompareResponse {
@@ -36,7 +36,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		const header = this.headerFactory();
 		if (header.canDownloadMessages(peerHeader)) {
-			await this.app.get<Downloader>(Identifiers.PeerDownloader).downloadMessages(peer);
+			await this.app.get<MessageDownloader>(Identifiers.PeerDownloader).downloadMessages(peer);
 		}
 	}
 
