@@ -1,7 +1,8 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
-import { randomNumber } from "@mainsail/utils";
+
+import { getRandomPeer } from "../utils";
 
 type DownloadsByHeight = {
 	precommits: boolean[];
@@ -64,7 +65,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		let peers = this.repository.getPeers();
 
 		while ((peers = peers.filter((peer) => header.canDownloadMessages(peer.state))) && peers.length > 0) {
-			void this.download(this.#getRandomPeer(peers));
+			void this.download(getRandomPeer(peers));
 		}
 	}
 
@@ -210,9 +211,5 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		return indexes;
-	}
-
-	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
-		return peers[randomNumber(0, peers.length - 1)];
 	}
 }

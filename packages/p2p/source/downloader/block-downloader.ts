@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { randomNumber } from "@mainsail/utils";
 
 import { constants } from "../constants";
+import { getRandomPeer } from "../utils";
 
 enum JobStatus {
 	Downloading,
@@ -48,7 +48,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			(peers = peers.filter((peer) => peer.state.height > this.#getLastRequestedBlockHeight())) &&
 			peers.length > 0
 		) {
-			void this.download(this.#getRandomPeer(peers));
+			void this.download(getRandomPeer(peers));
 		}
 	}
 
@@ -182,7 +182,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		const peer = this.#getRandomPeer(peers);
+		const peer = getRandomPeer(peers);
 
 		const newJob: DownloadJob = {
 			blocks: [],
@@ -196,10 +196,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		this.#downloadJobs[index] = newJob;
 
 		void this.#downloadBlocksFromPeer(newJob);
-	}
-
-	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
-		return peers[randomNumber(0, peers.length - 1)];
 	}
 
 	#calculateHeightTo(peer: Contracts.P2P.Peer): number {

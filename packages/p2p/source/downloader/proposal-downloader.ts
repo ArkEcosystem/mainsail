@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { randomNumber } from "@mainsail/utils";
+
+import { getRandomPeer } from "../utils";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
@@ -37,7 +38,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.state));
 
 		if (peers.length > 0) {
-			this.download(this.#getRandomPeer(peers));
+			this.download(getRandomPeer(peers));
 		}
 	}
 
@@ -93,9 +94,5 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		// TODO: Ban peer
 
 		this.tryToDownload();
-	}
-
-	#getRandomPeer(peers: Contracts.P2P.Peer[]): Contracts.P2P.Peer {
-		return peers[randomNumber(0, peers.length - 1)];
 	}
 }
