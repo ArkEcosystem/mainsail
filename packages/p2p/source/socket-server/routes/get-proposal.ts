@@ -13,7 +13,7 @@ export class GetProposalRoute extends Route {
 				handler: controller.handle,
 				id: Routes.GetProposal,
 				maxBytes: 1024,
-				validation: Schemas.getProposal,
+				validation: Schemas.getProposal(this.cryptoConfiguration),
 			},
 		};
 	}

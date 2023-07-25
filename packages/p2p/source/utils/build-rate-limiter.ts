@@ -31,11 +31,11 @@ export const buildRateLimiter = (options) =>
 				},
 				{
 					endpoint: Routes.PostPrevote,
-					rateLimit: 51, // TODO: From milestones
+					rateLimit: options.activeValidators,
 				},
 				{
 					endpoint: Routes.PostPrecommit,
-					rateLimit: 51, // TODO: From milestones
+					rateLimit: options.activeValidators,
 				},
 				{
 					endpoint: Routes.GetMessages,

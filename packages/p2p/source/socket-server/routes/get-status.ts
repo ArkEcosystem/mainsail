@@ -13,7 +13,7 @@ export class GetStatusRoute extends Route {
 				handler: controller.handle,
 				id: Routes.GetStatus,
 				maxBytes: 1024,
-				validation: Schemas.getStatus,
+				validation: Schemas.getStatus(this.cryptoConfiguration),
 			},
 		};
 	}

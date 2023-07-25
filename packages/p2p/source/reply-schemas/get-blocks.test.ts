@@ -1,11 +1,8 @@
 import { Validator } from "@mainsail/validation/source/validator";
-
-import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
-import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
-import { makeKeywords } from "../validation/keywords";
 import { getBlocks } from "./get-blocks";
+import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 
 type Context = {
 	sandbox: Sandbox;
@@ -25,11 +22,7 @@ describe<Context>("GetBlocks Schema", ({ it, assert, beforeEach, each }) => {
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		const keywords = makeKeywords({});
-		context.validator.addKeyword(keywords.buffer);
-
-		context.validator.addSchema(cryptoValidationSchemas.hex);
-		context.validator.addSchema(cryptoBlockSchemas.blockId);
+		prepareValidatorContext(context);
 	});
 
 	it("should pass validation", ({ validator }) => {

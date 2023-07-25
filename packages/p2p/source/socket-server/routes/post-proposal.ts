@@ -14,7 +14,7 @@ export class PostProposalRoute extends Route {
 				handler: controller.handle,
 				id: Routes.PostProposal,
 				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
-				validation: Schemas.postProposal,
+				validation: Schemas.postProposal(this.cryptoConfiguration),
 			},
 		};
 	}

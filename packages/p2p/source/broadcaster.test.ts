@@ -3,7 +3,7 @@ import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { describeSkip, Sandbox } from "../../test-framework";
-import { Peer } from "../distribution";
+import { Peer } from "./peer";
 import { Broadcaster } from "./broadcaster";
 
 describeSkip<{

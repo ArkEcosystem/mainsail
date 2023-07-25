@@ -118,6 +118,11 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+			getMilestone: () => ({
+				activeValidators: 2,
+			}),
+		});
 		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 
 		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
@@ -133,7 +138,6 @@ describe<{
 		const defaults = importDefaults();
 
 		const result = serviceProvider.configSchema().validate(defaults);
-
 		assert.undefined(result.error);
 
 		assert.array(result.value.blacklist);
