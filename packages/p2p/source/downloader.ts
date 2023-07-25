@@ -64,7 +64,6 @@ export class Downloader {
 		};
 
 		this.#setDownloadJob(job, downloads);
-
 		void this.#downloadMessagesFromPeer(job);
 	}
 
@@ -73,10 +72,10 @@ export class Downloader {
 			this.#downloadsByHeight.set(height, {
 				precommits: Array.from<boolean>({
 					length: this.cryptoConfiguration.getMilestone().activeValidators,
-				}).fill(true),
+				}).fill(false),
 				prevotes: Array.from<boolean>({
 					length: this.cryptoConfiguration.getMilestone().activeValidators,
-				}).fill(true),
+				}).fill(false),
 			});
 		}
 
@@ -138,8 +137,13 @@ export class Downloader {
 	#getPrevoteIndexesToDownload(peer: Contracts.P2P.Peer, prevotes: boolean[]): number[] {
 		const indexes: number[] = [];
 
+		const header = this.headerFactory();
 		for (const [index, prevote] of prevotes.entries()) {
-			if (peer.state.validatorsSignedPrevote[index] && !prevote) {
+			if (
+				peer.state.validatorsSignedPrevote[index] &&
+				!prevote &&
+				!header.roundState.getValidatorsSignedPrevote()[index]
+			) {
 				indexes.push(index);
 			}
 		}
@@ -150,8 +154,13 @@ export class Downloader {
 	#getPrecommitIndexesToDownload(peer: Contracts.P2P.Peer, precommits: boolean[]): number[] {
 		const indexes: number[] = [];
 
+		const header = this.headerFactory();
 		for (const [index, precommit] of precommits.entries()) {
-			if (peer.state.validatorsSignedPrecommit[index] && !precommit) {
+			if (
+				peer.state.validatorsSignedPrecommit[index] &&
+				!precommit &&
+				!header.roundState.getValidatorsSignedPrecommit()[index]
+			) {
 				indexes.push(index);
 			}
 		}
