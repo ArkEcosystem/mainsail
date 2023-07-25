@@ -3,12 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { constants } from "./constants";
 
-export interface CompareResponse {
-	downloadBlocks?: true;
-	downloadMessages?: true;
-	downloadProposal?: true;
-}
-
 @injectable()
 export class HeaderService implements Contracts.P2P.IHeaderService {
 	@inject(Identifiers.Application)
