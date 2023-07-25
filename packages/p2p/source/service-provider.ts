@@ -112,7 +112,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerProposalDownloader).to(ProposalDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerDownloader).to(MessageDownloader).inSingletonScope();
+		this.app.bind(Identifiers.PeerMessageDownloader).to(MessageDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
 

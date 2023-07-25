@@ -21,7 +21,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 
 		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerBlockDownloader).download(peer);
 		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerProposalDownloader).download(peer);
-		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerDownloader).download(peer);
+		this.app.get<Contracts.P2P.Downloader>(Identifiers.PeerMessageDownloader).download(peer);
 	}
 
 	#hasPendingCheck(peer: Contracts.P2P.Peer): boolean {
