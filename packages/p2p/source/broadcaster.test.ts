@@ -12,12 +12,12 @@ describeSkip<{
 	peers: Peer[];
 	block: any;
 }>("Broadcaster", ({ it, assert, beforeEach, stub, spy, each }) => {
-	const logger = { debug: () => { }, info: () => { }, warning: () => { } };
-	const configuration = { getRequired: () => { } };
-	const repository = { getPeers: () => { } };
-	const communicator = { postBlock: () => { }, postTransactions: () => { } };
-	const serializer = { serialize: () => { } };
-	const blockchain = { getBlockPing: () => { }, getLastBlock: () => { } };
+	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
+	const configuration = { getRequired: () => {} };
+	const repository = { getPeers: () => {} };
+	const communicator = { postBlock: () => {}, postTransactions: () => {} };
+	const serializer = { serialize: () => {} };
+	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();

@@ -30,18 +30,20 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		const { activeValidators } = context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const { activeValidators } = context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
 
-		let matrix = new Array(activeValidators).fill(true)
+		let matrix = new Array(activeValidators).fill(true);
 		assert.undefined(context.validator.validate("test", matrix).error);
 
-		matrix = new Array(activeValidators).fill(false)
+		matrix = new Array(activeValidators).fill(false);
 		assert.undefined(context.validator.validate("test", matrix).error);
 
-		matrix = new Array(activeValidators).fill(1)
+		matrix = new Array(activeValidators).fill(1);
 		assert.defined(context.validator.validate("test", matrix).error);
 
-		matrix = new Array(activeValidators - 1).fill(false)
+		matrix = new Array(activeValidators - 1).fill(false);
 		assert.defined(context.validator.validate("test", matrix).error);
 
 		assert.defined(context.validator.validate("test", {}).error);
@@ -61,12 +63,14 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		const { activeValidators } = context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const { activeValidators } = context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
 
-		let matrix = new Array(activeValidators).fill(true)
+		let matrix = new Array(activeValidators).fill(true);
 		assert.undefined(context.validator.validate("test", matrix).error);
 
-		matrix = new Array(activeValidators + 1).fill(true)
+		matrix = new Array(activeValidators + 1).fill(true);
 		assert.defined(context.validator.validate("test", matrix).error);
 
 		assert.undefined(context.validator.validate("test", []).error);
@@ -81,7 +85,9 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		const { activeValidators } = context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const { activeValidators } = context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
 
 		for (let i = 0; i < activeValidators; i++) {
 			assert.undefined(context.validator.validate("test", i).error);

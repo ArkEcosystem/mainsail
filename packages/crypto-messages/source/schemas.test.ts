@@ -21,7 +21,6 @@ describe<{
 	sandbox: Sandbox;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
-
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 

@@ -48,7 +48,6 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 		},
 	};
 
-
 	return {
 		isValidatorBitmap,
 		isValidatorIndex,

@@ -13,5 +13,5 @@ export const makeHeaders = (configuration: Contracts.Crypto.IConfiguration) => {
 		validatorsSignedPrecommit: Joi.array().items(Joi.boolean()).max(activeValidators).required(),
 		validatorsSignedPrevote: Joi.array().items(Joi.boolean()).max(activeValidators).required(),
 		version: Joi.string().required(),
-	}).required()
+	}).required();
 };

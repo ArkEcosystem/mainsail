@@ -34,10 +34,10 @@ export class RateLimitPlugin {
 
 	public register(server) {
 		this.rateLimiter = buildRateLimiter({
+			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
 			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
 			remoteAccess: this.configuration.getOptional<Array<string>>("remoteAccess", []),
-			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 			whitelist: [],
 		});
 

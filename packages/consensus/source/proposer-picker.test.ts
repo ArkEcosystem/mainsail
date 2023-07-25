@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => { },
+			getLastBlock: () => {},
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		context.sandbox = new Sandbox();
@@ -57,7 +57,9 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	});
 
 	it("#getValidatorIndex - should return validator index for round", async ({ proposerPicker, sandbox }) => {
-		const { activeValidators } = sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const { activeValidators } = sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
 
 		proposerPicker.handleCommittedBlock({ height: 1 } as Contracts.Crypto.IBlockCommit);
 		for (let i = 0; i < activeValidators; i++) {
@@ -68,7 +70,9 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	});
 
 	it("#getValidatorIndex - should wrap around", async ({ proposerPicker, sandbox }) => {
-		const { activeValidators } = sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const { activeValidators } = sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
 
 		for (let i = 1; i < activeValidators; i++) {
 			proposerPicker.handleCommittedBlock({ height: i } as Contracts.Crypto.IBlockCommit);
@@ -77,7 +81,9 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	});
 
 	it("#handleCommittedBlock - builds validator matrix based on round height", async ({ proposerPicker, sandbox }) => {
-		const { activeValidators } = sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const { activeValidators } = sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
 
 		proposerPicker.handleCommittedBlock({ height: 5 } as Contracts.Crypto.IBlockCommit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
@@ -87,7 +93,9 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	});
 
 	it("#handleCommittedBlock - should shuffle validator matrix on full round", async ({ proposerPicker, sandbox }) => {
-		const { activeValidators } = sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const { activeValidators } = sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
 
 		proposerPicker.handleCommittedBlock({ height: 1 } as Contracts.Crypto.IBlockCommit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);

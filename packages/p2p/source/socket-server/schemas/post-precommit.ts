@@ -1,10 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
-import { makeHeaders } from "./shared";
 import Joi from "joi";
 
-export const postPrecommit = (configuration: Contracts.Crypto.IConfiguration) => {
-	return Joi.object({
+import { makeHeaders } from "./shared";
+
+export const postPrecommit = (configuration: Contracts.Crypto.IConfiguration) =>
+	Joi.object({
 		headers: makeHeaders(configuration),
 		precommit: Joi.binary(),
 	});
-}

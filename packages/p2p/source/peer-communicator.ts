@@ -46,11 +46,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@postConstruct()
 	public initialize(): void {
 		this.#outgoingRateLimiter = buildRateLimiter({
+			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
+
 			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
 
 			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
-
-			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 
 			remoteAccess: [],
 			// White listing anybody here means we would not throttle ourselves when sending
@@ -145,7 +145,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
 					}
-				} catch { }
+				} catch {}
 			}),
 		);
 	}

@@ -1,7 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { makeHeaders } from "./shared";
 import Joi from "joi";
+
+import { makeHeaders } from "./shared";
 
 export const createPostTransactionsSchema = (app: Contracts.Kernel.Application): Joi.AnySchema =>
 	Joi.object({
