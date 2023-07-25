@@ -47,7 +47,7 @@ export class Downloader {
 
 	// TODO: Handle errors
 	public async downloadMessages(peer: Contracts.P2P.Peer): Promise<void> {
-		const downloads = this.#getDownloadsByHeight(peer.height);
+		const downloads = this.#getDownloadsByHeight(peer.state.height);
 
 		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes);
 		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits);
@@ -57,7 +57,7 @@ export class Downloader {
 		}
 
 		const job: DownloadJob = {
-			height: peer.height,
+			height: peer.state.height,
 			peer,
 			precommitIndexes,
 			prevoteIndexes,
