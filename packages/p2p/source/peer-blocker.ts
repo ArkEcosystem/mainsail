@@ -13,6 +13,10 @@ export class PeerBlocker implements Contracts.P2P.PeerBlocker {
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
 	public blockPeer(peer: Contracts.P2P.Peer): void {
+		if (this.isBlocked(peer.ip)) {
+			return;
+		}
+
 		this.logger.debug(`Banning peer ${peer.ip}`);
 
 		this.#blacklist.set(peer.ip, dayjs().add(20, "minute"));
