@@ -11,6 +11,7 @@ import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
+import { PeerBlocker } from "./peer-blocker";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
@@ -103,6 +104,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerCommunicator).to(PeerCommunicator).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerBlocker).to(PeerBlocker).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerHeaderService).to(HeaderService).inSingletonScope();
 
