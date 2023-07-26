@@ -14,5 +14,5 @@ export interface PeerProcessor {
 
 	isWhitelisted(peer): boolean;
 
-	dispose(peer: Peer): Promise<void>;
+	dispose(peer: Peer): void;
 }

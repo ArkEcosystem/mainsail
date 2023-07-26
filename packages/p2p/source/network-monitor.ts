@@ -131,7 +131,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						peerErrors[error] = peerErrors[error] || [];
 						peerErrors[error].push(peer);
 
-						await this.processor.dispose(peer);
+						this.processor.dispose(peer);
 					}
 				}),
 			).then(resolvesFirst);

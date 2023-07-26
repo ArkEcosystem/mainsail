@@ -319,7 +319,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		this.connector.setError(peer, error.name);
 		peer.sequentialErrorCounter++;
 		if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
-			await processor.dispose(peer);
+			processor.dispose(peer);
 		}
 
 		switch (error.name) {
@@ -337,7 +337,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				}
 
 				if (disconnect) {
-					await processor.dispose(peer);
+					processor.dispose(peer);
 				}
 		}
 	}

@@ -17,7 +17,7 @@ export class PeerBlocker implements Contracts.P2P.PeerBlocker {
 
 		this.#blacklist.set(peer.ip, dayjs().add(20, "minute"));
 
-		await this.peerProcessor.dispose(peer);
+		this.peerProcessor.dispose(peer);
 	}
 
 	public isBlocked(peerIp: string): boolean {
