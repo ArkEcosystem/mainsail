@@ -30,6 +30,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerBlocker)
 	private readonly peerBlocker!: Contracts.P2P.PeerBlocker;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
@@ -162,7 +165,15 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#handleMissingBlocks(job: DownloadJob): void {
-		this.peerBlocker.blockPeer(job.peer);
+		const configuration = this.configuration.getMilestone(this.stateStore.getLastHeight() + 1);
+
+		const size = job.blocks.reduce((size, block) => size + block.length, 0);
+
+		// TODO: Take header size into account
+		if (size + configuration.block.maxPayload < constants.DEFAULT_MAX_PAYLOAD) {
+			// Peer did't respond with all requested blocks and didn't exceed maxPayload
+			this.peerBlocker.blockPeer(job.peer);
+		}
 
 		this.#replyJob(job);
 	}
