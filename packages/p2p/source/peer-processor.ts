@@ -64,13 +64,15 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		// Is Whitelisted
 		if (!KernelUtils.isWhitelisted(this.configuration.getRequired("whitelist"), ip)) {
 			return false;
 		}
 
-		// Is Blacklisted
 		if (KernelUtils.isBlacklisted(this.configuration.getRequired("blacklist"), ip)) {
+			return false;
+		}
+
+		if (this.peerDisposer.isBlocked(ip)) {
 			return false;
 		}
 
