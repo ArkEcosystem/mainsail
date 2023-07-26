@@ -6,7 +6,7 @@ import delay from "delay";
 
 import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
-import { PeerVerifier } from "./peer-verifier";
+import { PeerVerifier } from "./peer-verifier-old";
 import { RateLimiter } from "./rate-limiter";
 // eslint-disable-next-line import/no-namespace
 import * as replySchemas from "./reply-schemas";

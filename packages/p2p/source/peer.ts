@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Types, Utils } from "@mainsail/kernel";
 import dayjs, { Dayjs } from "dayjs";
 
-import { PeerVerificationResult } from "./peer-verifier";
+import { PeerVerificationResult } from "./peer-verifier-old";
 
 @injectable()
 export class Peer implements Contracts.P2P.Peer {
