@@ -128,7 +128,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		for (const peer of peers) {
 			if (!isValidVersion(this.app, peer)) {
-				await this.dispose(peer);
+				this.dispose(peer);
 			}
 		}
 	}
