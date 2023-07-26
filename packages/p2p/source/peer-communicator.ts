@@ -188,7 +188,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				limit,
 			},
 			this.configuration.getRequired<number>("getBlocksTimeout"),
-			false, //TODO: check why this is false
 		);
 
 		if (result.blocks.length === 0) {
@@ -231,13 +230,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return true;
 	}
 
-	private async emit(
-		peer: Contracts.P2P.Peer,
-		event: Routes,
-		payload: any,
-		timeout?: number,
-		disconnectOnError = true,
-	) {
+	private async emit(peer: Contracts.P2P.Peer, event: Routes, payload: any, timeout?: number) {
 		await this.throttle(peer, event);
 
 		const codec = Codecs[event];
@@ -278,7 +271,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			void this.headerService.handle(peer, parsedResponsePayload.headers);
 		} catch (error) {
-			await this.handleSocketError(peer, event, error, disconnectOnError);
+			this.handleSocketError(peer, event, error);
 			throw error;
 		}
 
@@ -304,41 +297,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	private async handleSocketError(
-		peer: Contracts.P2P.Peer,
-		event: string,
-		error: Error,
-		disconnect = true,
-	): Promise<void> {
-		if (!error.name) {
-			return;
-		}
-
-		const processor = this.app.get<Contracts.P2P.PeerProcessor>(Identifiers.PeerProcessor);
-
-		this.connector.setError(peer, error.name);
-		peer.sequentialErrorCounter++;
-		if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
-			processor.dispose(peer);
-		}
-
-		switch (error.name) {
-			case SocketErrors.Validation:
-				this.logger.debug(`Socket data validation error (peer ${peer.ip}) : ${error.message}`);
-				break;
-			case "Error":
-				if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
-					this.logger.debug(`Response error (peer ${peer.ip}/${event}) : ${error.message}`);
-				}
-				break;
-			default:
-				if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
-					this.logger.debug(`Socket error (peer ${peer.ip}) : ${error.message}`);
-				}
-
-				if (disconnect) {
-					processor.dispose(peer);
-				}
-		}
+	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error): void {
+		this.app.get<Contracts.P2P.PeerBlocker>(Identifiers.PeerBlocker).blockPeer(peer);
 	}
 }
