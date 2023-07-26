@@ -112,6 +112,7 @@ export const Identifiers = {
 	},
 	P2PServer: Symbol.for("Server<P2P>"),
 	PeerBlockDownloader: Symbol.for("Peer<BlockDownloader>"),
+	PeerBlocker: Symbol.for("Peer<Blocker>"),
 	PeerBroadcaster: Symbol.for("Peer<Broadcaster>"),
 	PeerCommunicator: Symbol.for("Peer<Communicator>"),
 	PeerConnector: Symbol.for("Peer<Connector>"),
