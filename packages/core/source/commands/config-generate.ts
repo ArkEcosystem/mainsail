@@ -52,7 +52,7 @@ export class Command extends Commands.Command {
 			description: "The number of validators to generate.",
 			schema: Joi.number(),
 			promptType: "number",
-			default: 51,
+			default: 53,
 		},
 		{
 			name: "blockTime",

@@ -39,7 +39,7 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 			rewardHeight: 75_600,
 			symbol: "DѦ",
 			token: "DARK",
-			validators: 51,
+			validators: 53,
 			wif: 186,
 		};
 

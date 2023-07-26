@@ -34,7 +34,7 @@ describe<{
 	it("should build milestones", ({ configManager }) => {
 		assert.equal(configManager.getMilestones(), [
 			{
-				activeValidators: 51,
+				activeValidators: 53,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
@@ -48,7 +48,7 @@ describe<{
 				vendorFieldLength: 255,
 			},
 			{
-				activeValidators: 51,
+				activeValidators: 53,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,

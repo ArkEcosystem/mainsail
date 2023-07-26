@@ -79,7 +79,7 @@ export class ConfigurationGenerator {
 			pubKeyHash: 30,
 			rewardAmount: "200000000",
 			rewardHeight: 75_600,
-			validators: 51,
+			validators: 53,
 			vendorFieldLength: 255,
 			wif: 186,
 			...options,
