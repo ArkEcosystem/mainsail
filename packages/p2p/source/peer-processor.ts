@@ -89,7 +89,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	public async dispose(peer: Contracts.P2P.Peer): Promise<void> {
 		this.connector.disconnect(peer);
 		this.repository.forgetPeer(peer);
-		await peer.dispose();
+		peer.dispose();
 
 		await this.events.dispatch(Enums.PeerEvent.Removed, peer);
 	}
