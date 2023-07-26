@@ -209,11 +209,11 @@ describe<{
 
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 51 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 52 });
+		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 53 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 102 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 103 });
+		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 106 });
 		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 153 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 154 });
+		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 159 });
 
 		await delay(100);
 

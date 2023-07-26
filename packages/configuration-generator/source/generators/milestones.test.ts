@@ -23,13 +23,13 @@ describe<{
 					epoch: date,
 					maxBlockPayload: 2000,
 					maxTxPerBlock: 100,
-					validators: 51,
+					validators: 53,
 					vendorFieldLength: 255,
 				})
 				.generate(),
 			[
 				{
-					activeValidators: 51,
+					activeValidators: 53,
 					address: {
 						bech32m: "ark",
 					},

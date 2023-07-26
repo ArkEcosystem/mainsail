@@ -23,7 +23,9 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	beforeEach(setup);
 
 	it("static delegate count - should calculate the round when nextRound is the same", ({ configuration }) => {
-		for (let index = 0, height = 51; index < 1000; index++, height += 51) {
+		const { activeValidators } = configuration.getMilestone();
+
+		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
 			const { round, nextRound } = calculateRound(height - 1, configuration);
 			assert.is(round, index + 1);
 			assert.is(nextRound, index + 1);
@@ -31,7 +33,9 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	});
 
 	it("static delegate count - should calculate the round when nextRound is not the same", ({ configuration }) => {
-		for (let index = 0, height = 51; index < 1000; index++, height += 51) {
+		const { activeValidators } = configuration.getMilestone();
+
+		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
 			const { round, nextRound } = calculateRound(height, configuration);
 			assert.is(round, index + 1);
 			assert.is(nextRound, index + 2);
@@ -39,11 +43,12 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	});
 
 	it("static delegate count - should calculate the correct round", ({ configuration }) => {
-		const activeDelegates = 51;
+		const { activeValidators } = configuration.getMilestone();
+
 		for (let index = 0; index < 1000; index++) {
 			const { round, nextRound } = calculateRound(index + 1, configuration);
-			assert.is(round, Math.floor(index / activeDelegates) + 1);
-			assert.is(nextRound, Math.floor((index + 1) / activeDelegates) + 1);
+			assert.is(round, Math.floor(index / activeValidators) + 1);
+			assert.is(nextRound, Math.floor((index + 1) / activeValidators) + 1);
 		}
 	});
 
@@ -175,12 +180,12 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 	it("should determine the beginning of a new round", ({ configuration }) => {
 		assert.true(isNewRound(1, configuration));
 		assert.false(isNewRound(2, configuration));
-		assert.true(isNewRound(52, configuration));
+		assert.false(isNewRound(52, configuration));
 		assert.false(isNewRound(53, configuration));
-		assert.false(isNewRound(54, configuration));
-		assert.true(isNewRound(103, configuration));
-		assert.false(isNewRound(104, configuration));
-		assert.true(isNewRound(154, configuration));
+		assert.true(isNewRound(54, configuration));
+		assert.false(isNewRound(103, configuration));
+		assert.true(isNewRound(107, configuration));
+		assert.false(isNewRound(159, configuration));
 	});
 
 	it("should be ok when changing delegate count", ({ configuration }) => {
@@ -188,8 +193,8 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 			{ activeValidators: 2, height: 1 }, // R1
 			{ activeValidators: 3, height: 3 }, // R2
 			{ activeValidators: 1, height: 6 }, // R3
-			{ activeValidators: 51, height: 10 }, // R7
-			{ activeValidators: 51, height: 62 }, // R8
+			{ activeValidators: 53, height: 10 }, // R7
+			{ activeValidators: 53, height: 62 }, // R8
 		];
 
 		configuration.set("milestones", milestones);
@@ -212,6 +217,6 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 		// 51 Delegates
 		assert.true(isNewRound(10, configuration));
 		assert.false(isNewRound(11, configuration));
-		assert.true(isNewRound(61, configuration));
+		assert.true(isNewRound(63, configuration));
 	});
 });

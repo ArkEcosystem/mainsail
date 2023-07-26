@@ -48,9 +48,9 @@ describe<{
 						generatorPublicKey: match.string,
 						height: 0,
 						id: match.string,
-						numberOfTransactions: 103,
+						numberOfTransactions: 107,
 						payloadHash: match.string,
-						payloadLength: 17776,
+						payloadLength: 18466,
 						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 						reward: BigNumber.ZERO,
 						timestamp: match.number,
@@ -62,7 +62,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 51,
+						activeValidators: 53,
 						address: match.object,
 						block: match.object,
 						blockTime: 8000,
@@ -94,7 +94,7 @@ describe<{
 
 	it("should log if logger is provided", async ({ generator, app }) => {
 		const logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		app.bind(InternalIdentifiers.LogService).toConstantValue(logger);
@@ -162,7 +162,7 @@ describe<{
 			rewardHeight: 23_000,
 			symbol: "my",
 			token: "myn",
-			validators: 51,
+			validators: 53,
 			vendorFieldLength: 255,
 			wif: 27,
 		});
@@ -180,13 +180,13 @@ describe<{
 						generatorPublicKey: match.string,
 						height: 0,
 						id: match.string,
-						numberOfTransactions: 153,
+						numberOfTransactions: 159,
 						payloadHash: match.string,
-						payloadLength: 27276,
+						payloadLength: 28346,
 						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 						reward: BigNumber.ZERO,
 						timestamp: match.number,
-						totalAmount: BigNumber.make("12499999999999986"),
+						totalAmount: BigNumber.make("12499999999999969"),
 						totalFee: BigNumber.ZERO,
 						transactions: match.array,
 						version: 1,
@@ -194,7 +194,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 51,
+						activeValidators: 53,
 						address: match.object,
 						block: match.object,
 						blockTime: 9000,

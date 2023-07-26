@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => {},
+			getLastBlock: () => { },
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => {},
+			getActiveValidators: () => { },
 		};
 
 		context.logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -33,7 +33,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 
 		const config = {
 			getMilestone: () => ({
-				activeValidators: 51,
+				activeValidators: 53,
 			}),
 		};
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
@@ -43,13 +43,19 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 
 	// Calculated indexes seeded from height 1 for the first 51 validators
 	const expectedIndexesRound1 = [
-		36, 10, 48, 14, 43, 29, 35, 27, 38, 28, 16, 3, 40, 47, 6, 5, 46, 31, 41, 26, 8, 19, 7, 39, 2, 20, 45, 44, 49,
-		17, 30, 12, 15, 24, 34, 32, 22, 1, 50, 37, 4, 0, 18, 9, 33, 23, 25, 11, 42, 21, 13,
+		17, 18, 16, 49, 20, 29, 11, 47, 6, 3, 37, 30,
+		27, 31, 4, 33, 7, 42, 10, 40, 43, 28, 45, 21,
+		8, 41, 2, 51, 46, 48, 38, 50, 32, 13, 15, 25,
+		36, 34, 23, 1, 52, 39, 5, 0, 19, 9, 35, 24,
+		26, 12, 44, 22, 14
 	];
 
 	const expectedIndexesRound2 = [
-		18, 26, 37, 31, 14, 17, 38, 49, 20, 1, 47, 19, 13, 36, 30, 27, 21, 16, 50, 29, 23, 22, 40, 43, 5, 34, 12, 2, 10,
-		46, 4, 28, 45, 15, 6, 11, 9, 44, 48, 24, 32, 7, 39, 35, 33, 3, 42, 0, 8, 41, 25,
+		48, 18, 50, 47, 33, 39, 38, 22, 9, 43, 16, 0,
+		30, 12, 37, 34, 46, 44, 23, 27, 45, 3, 19, 40,
+		42, 31, 49, 7, 26, 17, 20, 51, 13, 21, 32, 28,
+		8, 4, 24, 14, 11, 6, 2, 1, 35, 25, 15, 10,
+		29, 41, 36, 52, 5
 	];
 
 	it("#validatorIndexMatrix - should return empty matrix", async ({ proposerPicker }) => {
@@ -61,7 +67,8 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		proposerPicker.handleCommittedBlock({ height: 1 } as Contracts.Crypto.IBlockCommit);
+		proposerPicker.handleCommittedBlock({ height: 0 } as Contracts.Crypto.IBlockCommit);
+
 		for (let i = 0; i < activeValidators; i++) {
 			assert.equal(proposerPicker.getValidatorIndex(i), expectedIndexesRound1[i]);
 		}
