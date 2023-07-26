@@ -298,6 +298,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error): void {
-		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).blockPeer(peer);
+		// TODO: Don't ban if the peer not responding to a ping, when we are trying to connect to it. Improve logic
+		if (event === Routes.GetStatus) {
+			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).disposePeer(peer);
+		} else {
+			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).blockPeer(peer);
+		}
 	}
 }
