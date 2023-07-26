@@ -21,6 +21,9 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerBlockDownloader)
 	private readonly blockDownloader!: Contracts.P2P.Downloader;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
 
@@ -86,13 +89,8 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		this.#downloadingProposalByHeight.delete(job.height);
 
 		if (isError) {
-			this.#handleError(job);
+			this.peerDisposer.blockPeer(job.peer);
+			this.tryToDownload();
 		}
-	}
-
-	#handleError(jod: DownloadJob) {
-		// TODO: Ban peer
-
-		this.tryToDownload();
 	}
 }

@@ -34,7 +34,7 @@ export interface Peer {
 	toBroadcast(): PeerBroadcast;
 
 	getTransactionsQueue(): Promise<Queue>;
-	dispose(): Promise<void>;
+	dispose(): void;
 }
 
 export interface PeerBroadcast {

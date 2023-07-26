@@ -1,5 +1,3 @@
-import { Peer } from "./peer";
-
 export interface AcceptNewPeerOptions {
 	seed?: boolean;
 	lessVerbose?: boolean;
@@ -13,6 +11,4 @@ export interface PeerProcessor {
 	validatePeerIp(peer, options?: AcceptNewPeerOptions): boolean;
 
 	isWhitelisted(peer): boolean;
-
-	dispose(peer: Peer): Promise<void>;
 }

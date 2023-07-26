@@ -24,6 +24,9 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -61,13 +64,15 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		// Is Whitelisted
 		if (!KernelUtils.isWhitelisted(this.configuration.getRequired("whitelist"), ip)) {
 			return false;
 		}
 
-		// Is Blacklisted
 		if (KernelUtils.isBlacklisted(this.configuration.getRequired("blacklist"), ip)) {
+			return false;
+		}
+
+		if (this.peerDisposer.isBlocked(ip)) {
 			return false;
 		}
 
@@ -84,14 +89,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		}
 
 		return true;
-	}
-
-	public async dispose(peer: Contracts.P2P.Peer): Promise<void> {
-		this.connector.disconnect(peer);
-		this.repository.forgetPeer(peer);
-		await peer.dispose();
-
-		await this.events.dispatch(Enums.PeerEvent.Removed, peer);
 	}
 
 	async #acceptNewPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
@@ -128,7 +125,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		for (const peer of peers) {
 			if (!isValidVersion(this.app, peer)) {
-				await this.dispose(peer);
+				this.peerDisposer.disposePeer(peer);
 			}
 		}
 	}
