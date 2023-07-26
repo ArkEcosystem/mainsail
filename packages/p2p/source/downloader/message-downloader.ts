@@ -30,8 +30,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerBlockDownloader)
 	private readonly blockDownloader!: Contracts.P2P.Downloader;
 
-	@inject(Identifiers.PeerBlocker)
-	private readonly peerBlocker!: Contracts.P2P.PeerDisposer;
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
@@ -145,7 +145,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		this.#removeDownloadJob(job);
 
 		if (isError) {
-			this.peerBlocker.blockPeer(job.peer);
+			this.peerDisposer.blockPeer(job.peer);
 			this.tryToDownload();
 		}
 	}

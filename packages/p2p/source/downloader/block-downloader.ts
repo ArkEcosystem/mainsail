@@ -27,8 +27,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerBlocker)
-	private readonly peerBlocker!: Contracts.P2P.PeerDisposer;
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
@@ -126,7 +126,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				await this.handler.onCommittedBlock(block);
 			}
 		} catch (error) {
-			this.peerBlocker.blockPeer(job.peer);
+			this.peerDisposer.blockPeer(job.peer);
 
 			this.#handleJobError(job, error);
 			return;
@@ -172,7 +172,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		// TODO: Take header size into account
 		if (size + configuration.block.maxPayload < constants.DEFAULT_MAX_PAYLOAD) {
 			// Peer did't respond with all requested blocks and didn't exceed maxPayload
-			this.peerBlocker.blockPeer(job.peer);
+			this.peerDisposer.blockPeer(job.peer);
 		}
 
 		this.#replyJob(job);
