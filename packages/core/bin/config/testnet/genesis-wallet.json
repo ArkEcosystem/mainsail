@@ -1,14 +1,14 @@
 {
-    "address": "ark1kgvwd38f0jyy6fzmccdgpsyq69tks58wuxm383j6z0jwcxp8l50qjq4k8h",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "0daae2338e6b273a91d75dd2a05fb0d52f9b4f0327da98d472d58e0e4c03231e",
-        "publicKey": "8398e9cf37b7b9768a0f01c5ff0608e44c6cd025e468f5a2fdb42369d323d37f05ca7c141f64f339cf6a39b5aa284f4a"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "d167b13910cc204ebf1aea6d05e1350da807dc6d9431458641fe9ac1b4fb28df",
-        "publicKey": "b218e6c4e97c884d245bc61a80c080d1576850eee1b713c65a13e4ec1827fd1e"
-    },
-    "passphrase": "eager coffee scene suit diet squirrel core oyster symptom arm neutral price enroll switch train truth bargain goat turtle differ evolve return royal bachelor"
+	"address": "ark1kgvwd38f0jyy6fzmccdgpsyq69tks58wuxm383j6z0jwcxp8l50qjq4k8h",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "0daae2338e6b273a91d75dd2a05fb0d52f9b4f0327da98d472d58e0e4c03231e",
+		"publicKey": "8398e9cf37b7b9768a0f01c5ff0608e44c6cd025e468f5a2fdb42369d323d37f05ca7c141f64f339cf6a39b5aa284f4a"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "d167b13910cc204ebf1aea6d05e1350da807dc6d9431458641fe9ac1b4fb28df",
+		"publicKey": "b218e6c4e97c884d245bc61a80c080d1576850eee1b713c65a13e4ec1827fd1e"
+	},
+	"passphrase": "eager coffee scene suit diet squirrel core oyster symptom arm neutral price enroll switch train truth bargain goat turtle differ evolve return royal bachelor"
 }
