@@ -24,6 +24,12 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
+	@inject(Identifiers.PeerRepository)
+	private readonly repository!: Contracts.P2P.PeerRepository;
+
+	@inject(Identifiers.PeerBlocker)
+	private readonly peerBlocker!: Contracts.P2P.PeerBlocker;
+
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
@@ -32,9 +38,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
-
-	@inject(Identifiers.PeerRepository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -120,12 +123,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				await this.handler.onCommittedBlock(block);
 			}
 		} catch (error) {
-			this.#handleJobError(job, error);
-			return;
-		}
+			this.peerBlocker.blockPeer(job.peer);
 
-		if (this.stateStore.getLastHeight() !== job.heightTo) {
-			this.#handleJobError(job, new Error("Blocks are missing"));
+			this.#handleJobError(job, error);
 			return;
 		}
 
@@ -158,15 +158,11 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			} from ${job.peer.ip}. ${error.message}`,
 		);
 
-		// TODO: Ban peer
-
 		this.#replyJob(job);
 	}
 
 	#handleMissingBlocks(job: DownloadJob): void {
-		console.log("Handling missing blocks");
-
-		// TODO: Check if peer should be banned
+		this.peerBlocker.blockPeer(job.peer);
 
 		this.#replyJob(job);
 	}
