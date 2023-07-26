@@ -28,7 +28,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.PeerBlocker)
-	private readonly peerBlocker!: Contracts.P2P.PeerBlocker;
+	private readonly peerBlocker!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;

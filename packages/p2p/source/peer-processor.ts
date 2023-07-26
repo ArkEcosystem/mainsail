@@ -25,7 +25,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.PeerBlocker)
-	private readonly peerBlocker!: Contracts.P2P.PeerBlocker;
+	private readonly peerBlocker!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;

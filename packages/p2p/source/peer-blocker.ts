@@ -4,7 +4,7 @@ import { Enums } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 @injectable()
-export class PeerBlocker implements Contracts.P2P.PeerBlocker {
+export class PeerBlocker implements Contracts.P2P.PeerDisposer {
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 

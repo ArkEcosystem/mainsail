@@ -26,7 +26,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.PeerBlocker)
-	private readonly peerBlocker!: Contracts.P2P.PeerBlocker;
+	private readonly peerBlocker!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
