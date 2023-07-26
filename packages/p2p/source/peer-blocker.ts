@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 @injectable()
-export class PeerBlocker {
+export class PeerBlocker implements Contracts.P2P.PeerBlocker {
 	@inject(Identifiers.PeerProcessor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
@@ -20,15 +20,15 @@ export class PeerBlocker {
 		await this.peerProcessor.dispose(peer);
 	}
 
-	public async isBlocked(peer: Contracts.P2P.Peer): Promise<boolean> {
-		const bannedUntil = this.#blacklist.get(peer.ip);
+	public isBlocked(peerIp: string): boolean {
+		const bannedUntil = this.#blacklist.get(peerIp);
 
 		if (bannedUntil) {
 			if (bannedUntil.isAfter(dayjs())) {
 				return true;
 			}
 
-			this.#blacklist.delete(peer.ip);
+			this.#blacklist.delete(peerIp);
 		}
 
 		return false;
