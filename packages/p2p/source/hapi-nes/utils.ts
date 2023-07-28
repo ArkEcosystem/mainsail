@@ -65,14 +65,14 @@ export const parseNesMessage = (buf: Buffer): NesMessage => {
 	if (pathLength > MAX_PATH_LENGTH || buf.byteLength < HEADER_BYTE_LENGTH + pathLength) {
 		throw new Error("Invalid path length");
 	}
-	const path = buf.slice(HEADER_BYTE_LENGTH, HEADER_BYTE_LENGTH + pathLength).toString();
+	const path = buf.subarray(HEADER_BYTE_LENGTH, HEADER_BYTE_LENGTH + pathLength).toString();
 
 	const socketLength = buf.readUInt8(OFFSETS.SOCKET_LENGTH);
 	if (socketLength > MAX_SOCKET_LENGTH || buf.byteLength < HEADER_BYTE_LENGTH + pathLength + socketLength) {
 		throw new Error("Invalid socket length");
 	}
 	const socket = buf
-		.slice(HEADER_BYTE_LENGTH + pathLength, HEADER_BYTE_LENGTH + pathLength + socketLength)
+		.subarray(HEADER_BYTE_LENGTH + pathLength, HEADER_BYTE_LENGTH + pathLength + socketLength)
 		.toString();
 
 	const heartbeat = {
@@ -80,7 +80,7 @@ export const parseNesMessage = (buf: Buffer): NesMessage => {
 		timeout: buf.readUInt16BE(OFFSETS.HEARTBEAT_TIMEOUT),
 	};
 
-	const payload = buf.slice(HEADER_BYTE_LENGTH + pathLength + socketLength);
+	const payload = buf.subarray(HEADER_BYTE_LENGTH + pathLength + socketLength);
 
 	return {
 		heartbeat,

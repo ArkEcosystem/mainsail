@@ -74,10 +74,10 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 
 	#decodeCheck(address: string): Buffer {
 		const buffer: Buffer = base58.decode(address);
-		const payload: Buffer = buffer.slice(0, -4);
+		const payload: Buffer = buffer.subarray(0, -4);
 		const checksum: Buffer = SHA256.digest(payload);
 
-		if (checksum.readUInt32LE(0) !== buffer.slice(-4).readUInt32LE(0)) {
+		if (checksum.readUInt32LE(0) !== buffer.subarray(-4).readUInt32LE(0)) {
 			throw new Error("Invalid checksum for base58 string.");
 		}
 
