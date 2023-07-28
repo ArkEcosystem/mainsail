@@ -18,6 +18,10 @@ type Flag = {
 type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
 	peers: string;
 	rewardAmount: number | string;
+
+	address: "base58" | "bech32m";
+	base58Prefix: number;
+	bech32mPrefix: string;
 };
 
 @injectable()
@@ -131,7 +135,6 @@ export class Command extends Commands.Command {
 			promptType: "confirm",
 			default: false,
 		},
-
 		{
 			name: "epoch",
 			description: "Start time of the network.",
@@ -144,7 +147,24 @@ export class Command extends Commands.Command {
 			schema: Joi.number().min(0).max(255),
 			default: 255,
 		},
-
+		{
+			name: "address",
+			description: "The desired address format of the network.",
+			schema: Joi.valid("bech32m", "base58"),
+			default: "bech32m",
+		},
+		{
+			name: "base58Prefix",
+			description: "The desired address prefix when using base58.",
+			schema: Joi.number().min(1).max(255),
+			default: 30,
+		},
+		{
+			name: "bech32mPrefix",
+			description: "The desired address prefix when using bech32m.",
+			schema: Joi.string().min(3).max(3),
+			default: "ark",
+		},
 		// Env
 		{ name: "coreP2PPort", description: "Core P2P port.", schema: Joi.number(), default: 4000 },
 		{ name: "coreWebhooksPort", description: "Core Webhooks port.", schema: Joi.number(), default: 4004 },
@@ -202,7 +222,7 @@ export class Command extends Commands.Command {
 			...flags,
 		};
 
-		const configurationApp = await makeApplication(this.#getConfigurationPath(options));
+		const configurationApp = await makeApplication(this.#getConfigurationPath(options), options);
 		configurationApp.bind(Identifiers.LogService).toConstantValue(this.logger);
 
 		if (flags.force || allFlagsSet) {
@@ -266,6 +286,8 @@ export class Command extends Commands.Command {
 	#convertFlags(options: Flags): AppContracts.NetworkGenerator.Options {
 		return {
 			...options,
+			address:
+				options.address === "bech32m" ? { bech32m: options.bech32mPrefix } : { base58: options.base58Prefix },
 			peers: options.peers.replace(" ", "").split(","),
 			rewardAmount: options.rewardAmount.toString(),
 		};

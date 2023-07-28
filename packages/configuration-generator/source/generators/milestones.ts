@@ -9,9 +9,7 @@ export class MilestonesGenerator {
 		this.#data = [
 			{
 				activeValidators: options.validators,
-				address: {
-					bech32m: "ark",
-				},
+				address: options.address,
 				block: {
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
