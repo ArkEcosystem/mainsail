@@ -478,7 +478,7 @@ export class Client {
 		if (update.statusCode && update.statusCode >= 400) {
 			update.payload =
 				update.payload instanceof Buffer
-					? (update.payload as Buffer).slice(0, 512).toString() // slicing to reduce possible intensive toString() call
+					? (update.payload as Buffer).subarray(0, 512).toString() // slicing to reduce possible intensive toString() call
 					: "Error";
 			error = NesError(update.payload, errorTypes.SERVER);
 			error.statusCode = update.statusCode;

@@ -1,4 +1,3 @@
-import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "../../test-framework";
 import { Precommit } from "./precommit";
 import { precommitData } from "../test/fixtures/proposal";
@@ -6,7 +5,7 @@ import { precommitData } from "../test/fixtures/proposal";
 describe<{
 	sandbox: Sandbox;
 }>("Precommit", ({ it, assert }) => {
-	const precommit = new Precommit(precommitData);
+	const precommit = new Precommit({ ...precommitData, serialized: Buffer.from("dead", "hex") });
 
 	it("#height", async () => {
 		assert.equal(precommit.height, 1);
@@ -26,6 +25,10 @@ describe<{
 
 	it("#signature", async () => {
 		assert.equal(precommit.signature, precommitData.signature);
+	});
+
+	it("#signature", async () => {
+		assert.equal(precommit.serialized.toString("hex"), "dead");
 	});
 
 	it("#toString", async () => {

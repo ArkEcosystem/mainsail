@@ -31,6 +31,7 @@ export interface IProposalData {
 
 export interface IProposal extends IProposalData {
 	readonly block: IProposedBlock;
+	readonly serialized: Buffer;
 
 	toSignatureData(): ISignatureProposalData;
 	toData(): IProposalData;
@@ -52,6 +53,8 @@ export interface IPrevoteData {
 }
 
 export interface IPrevote extends IPrevoteData {
+	readonly serialized: Buffer;
+
 	toSignatureData(): ISignaturePrevoteData;
 	toData(): IPrevoteData;
 	toString(): string;
@@ -67,6 +70,8 @@ export interface IPrecommitData {
 }
 
 export interface IPrecommit extends IPrecommitData {
+	readonly serialized: Buffer;
+
 	toSignatureData(): ISignaturePrecommitData;
 	toData(): IPrecommitData;
 	toString(): string;

@@ -20,9 +20,6 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.ITransactionSerializer;
 
-	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
-
 	public async broadcastTransactions(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
 		if (transactions.length === 0) {
 			this.logger.warning("Broadcasting 0 transactions");
@@ -49,8 +46,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	}
 
 	async broadcastProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
-		// TODO: Remove once serialized field is on IProposal
-		const serialized = await this.messageSerializer.serializeProposal(proposal);
+		const { serialized } = proposal;
 
 		const promises = this.#getPeersForBroadcast().map((peer) => this.communicator.postProposal(peer, serialized));
 
@@ -58,8 +54,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	}
 
 	public async broadcastPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
-		// TODO: Remove once serialized field is on IPrevote
-		const serialized = await this.messageSerializer.serializePrevote(prevote);
+		const { serialized } = prevote;
 
 		const promises = this.#getPeersForBroadcast().map((peer) => this.communicator.postPrevote(peer, serialized));
 
@@ -67,8 +62,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	}
 
 	async broadcastPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
-		// TODO: Remove once serialized field is on IPrecommit
-		const serialized = await this.messageSerializer.serializePrecommit(precommit);
+		const { serialized } = precommit;
 
 		const promises = this.#getPeersForBroadcast().map((peer) => this.communicator.postPrecommit(peer, serialized));
 
