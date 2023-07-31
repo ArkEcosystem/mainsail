@@ -11,7 +11,7 @@ import { RateLimiter } from "./rate-limiter";
 // eslint-disable-next-line import/no-namespace
 import * as replySchemas from "./reply-schemas";
 import { Codecs } from "./socket-server/codecs";
-import { buildRateLimiter, isValidVersion } from "./utils";
+import { buildRateLimiter } from "./utils";
 
 // @TODO review the implementation
 @injectable()
