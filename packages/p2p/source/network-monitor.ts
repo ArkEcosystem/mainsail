@@ -170,12 +170,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		return await NetworkState.analyze(this, this.repository);
 	}
 
-	public async refreshPeersAfterFork(): Promise<void> {
-		this.logger.info(`Refreshing ${Utils.pluralize("peer", this.repository.getPeers().length, true)} after fork.`);
-
-		await this.cleansePeers({ forcePing: true });
-	}
-
 	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
 		if (this.nextUpdateNetworkStatusScheduled) {
 			return;

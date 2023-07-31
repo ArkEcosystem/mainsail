@@ -19,5 +19,4 @@ export interface NetworkMonitor {
 	}): Promise<void>;
 	getNetworkHeight(): number;
 	getNetworkState(): Promise<NetworkState>;
-	refreshPeersAfterFork(): Promise<void>;
 }
