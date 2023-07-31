@@ -8,7 +8,14 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 	#signature: string;
 	#serialized: Buffer;
 
-	constructor({ height, round, blockId, validatorIndex, signature, serialized }: Contracts.Crypto.IPrecommitData & { serialized: Buffer }) {
+	constructor({
+		height,
+		round,
+		blockId,
+		validatorIndex,
+		signature,
+		serialized,
+	}: Contracts.Crypto.IPrecommitData & { serialized: Buffer }) {
 		this.#height = height;
 		this.#round = round;
 		this.#blockId = blockId;

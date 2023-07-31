@@ -39,10 +39,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		};
 	}
 
-	private getPrevotes(
-		validatorsSignedPrevote: boolean[],
-		roundState: Contracts.Consensus.IRoundState,
-	): Buffer[] {
+	private getPrevotes(validatorsSignedPrevote: boolean[], roundState: Contracts.Consensus.IRoundState): Buffer[] {
 		const prevotes: Buffer[] = [];
 
 		for (const [index, voted] of validatorsSignedPrevote.entries()) {
@@ -60,10 +57,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		return prevotes;
 	}
 
-	private getPrecommits(
-		validatorsSignedPrecommit: boolean[],
-		roundState: Contracts.Consensus.IRoundState,
-	): Buffer[] {
+	private getPrecommits(validatorsSignedPrecommit: boolean[], roundState: Contracts.Consensus.IRoundState): Buffer[] {
 		const precommits: Buffer[] = [];
 
 		for (const [index, voted] of validatorsSignedPrecommit.entries()) {

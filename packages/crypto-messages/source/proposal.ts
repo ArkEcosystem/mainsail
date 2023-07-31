@@ -17,7 +17,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.IProposalData & { block: Contracts.Crypto.IProposedBlock, serialized: Buffer }) {
+	}: Contracts.Crypto.IProposalData & { block: Contracts.Crypto.IProposedBlock; serialized: Buffer }) {
 		this.#height = height;
 		this.#round = round;
 		this.#validRound = validRound;

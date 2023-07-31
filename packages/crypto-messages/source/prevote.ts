@@ -8,7 +8,14 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 	#signature: string;
 	#serialized: Buffer;
 
-	constructor({ height, round, blockId, validatorIndex, signature, serialized }: Contracts.Crypto.IPrevoteData & { serialized: Buffer }) {
+	constructor({
+		height,
+		round,
+		blockId,
+		validatorIndex,
+		signature,
+		serialized,
+	}: Contracts.Crypto.IPrevoteData & { serialized: Buffer }) {
 		this.#height = height;
 		this.#round = round;
 		this.#blockId = blockId;
