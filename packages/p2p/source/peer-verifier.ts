@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { isValidVersion } from "./utils";
 
 @injectable()
-export class PeerVerifier {
+export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 

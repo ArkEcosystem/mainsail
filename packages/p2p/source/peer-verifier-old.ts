@@ -22,7 +22,7 @@ export class PeerVerificationResult {
 
 // @TODO review the implementation
 @injectable()
-export class PeerVerifier implements Contracts.P2P.PeerVerifier {
+export class PeerVerifier {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
