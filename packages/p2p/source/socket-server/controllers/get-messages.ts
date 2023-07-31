@@ -7,9 +7,6 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
-
 	public async handle(
 		request: Contracts.P2P.IGetMessagesRequest,
 		h: Hapi.ResponseToolkit,
@@ -37,16 +34,16 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		const roundState = roundStateRepo.getRoundState(height, round);
 
 		return {
-			precommits: await this.getPrecommits(validatorsSignedPrecommit, roundState),
-			prevotes: await this.getPrevotes(validatorsSignedPrevote, roundState),
+			precommits: this.getPrecommits(validatorsSignedPrecommit, roundState),
+			prevotes: this.getPrevotes(validatorsSignedPrevote, roundState),
 		};
 	}
 
 	private getPrevotes(
 		validatorsSignedPrevote: boolean[],
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Buffer[]> {
-		const prevotes: Contracts.Crypto.IPrevote[] = [];
+	): Buffer[] {
+		const prevotes: Buffer[] = [];
 
 		for (const [index, voted] of validatorsSignedPrevote.entries()) {
 			if (voted) {
@@ -56,18 +53,18 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 			const prevote = roundState.getPrevote(index);
 
 			if (prevote) {
-				prevotes.push(prevote);
+				prevotes.push(prevote.serialized);
 			}
 		}
 
-		return Promise.all(prevotes.map(async (prevote) => await this.serializer.serializePrevote(prevote)));
+		return prevotes;
 	}
 
 	private getPrecommits(
 		validatorsSignedPrecommit: boolean[],
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Buffer[]> {
-		const precommits: Contracts.Crypto.IPrecommit[] = [];
+	): Buffer[] {
+		const precommits: Buffer[] = [];
 
 		for (const [index, voted] of validatorsSignedPrecommit.entries()) {
 			if (voted) {
@@ -77,10 +74,10 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 			const precommit = roundState.getPrecommit(index);
 
 			if (precommit) {
-				precommits.push(precommit);
+				precommits.push(precommit.serialized);
 			}
 		}
 
-		return Promise.all(precommits.map(async (prevote) => await this.serializer.serializePrecommit(prevote)));
+		return precommits;
 	}
 }

@@ -6,13 +6,15 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 	#blockId: string | undefined;
 	#validatorIndex: number;
 	#signature: string;
+	#serialized: Buffer;
 
-	constructor({ height, round, blockId, validatorIndex, signature }: Contracts.Crypto.IPrecommitData) {
+	constructor({ height, round, blockId, validatorIndex, signature, serialized }: Contracts.Crypto.IPrecommitData & { serialized: Buffer }) {
 		this.#height = height;
 		this.#round = round;
 		this.#blockId = blockId;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
+		this.#serialized = serialized;
 	}
 
 	get type(): Contracts.Crypto.MessageType {
@@ -37,6 +39,10 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 
 	get signature(): string {
 		return this.#signature;
+	}
+
+	get serialized(): Buffer {
+		return this.#serialized;
 	}
 
 	toString(): string {

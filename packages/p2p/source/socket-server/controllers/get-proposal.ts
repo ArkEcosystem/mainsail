@@ -7,9 +7,6 @@ export class GetProposalController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
-
 	public async handle(
 		request: Contracts.P2P.IGetProposalRequest,
 		h: Hapi.ResponseToolkit,
@@ -41,7 +38,7 @@ export class GetProposalController implements Contracts.P2P.Controller {
 		}
 
 		return {
-			proposal: await this.serializer.serializeProposal(proposal),
+			proposal: proposal.serialized,
 		};
 	}
 }

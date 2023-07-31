@@ -16,9 +16,9 @@ export interface ISignatureMessageData {
 export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> {}
-export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
-export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> { }
+export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> { }
+export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> { }
 
 export interface IProposalData {
 	readonly height: number;
@@ -31,6 +31,7 @@ export interface IProposalData {
 
 export interface IProposal extends IProposalData {
 	readonly block: IProposedBlock;
+	readonly serialized: Buffer;
 
 	toSignatureData(): ISignatureProposalData;
 	toData(): IProposalData;
@@ -52,6 +53,8 @@ export interface IPrevoteData {
 }
 
 export interface IPrevote extends IPrevoteData {
+	readonly serialized: Buffer;
+
 	toSignatureData(): ISignaturePrevoteData;
 	toData(): IPrevoteData;
 	toString(): string;
@@ -67,6 +70,8 @@ export interface IPrecommitData {
 }
 
 export interface IPrecommit extends IPrecommitData {
+	readonly serialized: Buffer;
+
 	toSignatureData(): ISignaturePrecommitData;
 	toData(): IPrecommitData;
 	toString(): string;

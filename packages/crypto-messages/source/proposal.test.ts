@@ -16,7 +16,7 @@ describe<{
 		serialized: serializedBlock,
 	};
 
-	const proposal = new Proposal({ ...proposalData, block });
+	const proposal = new Proposal({ ...proposalData, block, serialized: Buffer.from("dead", "hex") });
 
 	it("#height", async () => {
 		assert.equal(proposal.height, 1);
@@ -40,6 +40,10 @@ describe<{
 
 	it("#signature", async () => {
 		assert.equal(proposal.signature, proposalData.signature);
+	});
+
+	it("#serialized", async () => {
+		assert.equal(proposal.serialized.toString("hex"), "dead");
 	});
 
 	it("#toString", async () => {
