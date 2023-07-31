@@ -110,10 +110,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] !== "true") {
-			if (!this.#validatePeerConfig(peer, pingResponse.config)) {
-				throw new Exceptions.PeerVerificationFailedError();
-			}
-
 			const peerVerifier = this.app.resolve(PeerVerifier);
 
 			if (deadline <= Date.now()) {
@@ -198,20 +194,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		return result;
-	}
-
-	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
-		if (config.network.nethash !== this.cryptoConfiguration.get("network.nethash")) {
-			return false;
-		}
-
-		peer.version = config.version;
-
-		if (!isValidVersion(this.app, peer)) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
