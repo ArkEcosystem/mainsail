@@ -6,7 +6,7 @@ import delay from "delay";
 
 import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
-import { PeerVerifier } from "./peer-verifier-old";
+import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 // eslint-disable-next-line import/no-namespace
 import * as replySchemas from "./reply-schemas";
@@ -114,20 +114,16 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				throw new Exceptions.PeerVerificationFailedError();
 			}
 
-			const peerVerifier = this.app.resolve(PeerVerifier).initialize(peer);
+			const peerVerifier = this.app.resolve(PeerVerifier);
 
 			if (deadline <= Date.now()) {
 				throw new Exceptions.PeerPingTimeoutError(timeoutMsec);
 			}
 
 			// TODO: verify peer
-			await peerVerifier.checkState(pingResponse.state, deadline);
-
-			// peer.verificationResult = await peerVerifier.checkState(pingResponse.state, deadline);
-
-			// if (!peer.isVerified()) {
-			// 	throw new Exceptions.PeerVerificationFailedError();
-			// }
+			if (!(await peerVerifier.verify(peer))) {
+				throw new Exceptions.PeerVerificationFailedError();
+			}
 		}
 
 		peer.lastPinged = dayjs();
