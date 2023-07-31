@@ -12,8 +12,6 @@ class QuorumDetails {
 
 	public peersOverHeightBlockHeaders: { [id: string]: any } = {};
 
-	public peersForked = 0;
-
 	public getQuorum() {
 		const quorum = this.peersQuorum / (this.peersQuorum + this.peersNoQuorum);
 
@@ -127,14 +125,8 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		if (peer.state.height > this.#nodeHeight) {
 			this.#quorumDetails.peersNoQuorum++;
 			this.#quorumDetails.peersOverHeight++;
-			// this.#quorumDetails.peersOverHeightBlockHeaders[peer.state.header.id] = peer.state.header;
 		} else {
-			if (peer.isForked()) {
-				this.#quorumDetails.peersNoQuorum++;
-				this.#quorumDetails.peersForked++;
-			} else {
-				this.#quorumDetails.peersQuorum++;
-			}
+			this.#quorumDetails.peersQuorum++;
 		}
 	}
 }

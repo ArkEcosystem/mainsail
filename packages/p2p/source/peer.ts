@@ -58,10 +58,6 @@ export class Peer implements Contracts.P2P.Peer {
 		return this.verificationResult instanceof PeerVerificationResult;
 	}
 
-	public isForked(): boolean {
-		return !!(this.isVerified() && this.verificationResult && this.verificationResult.forked);
-	}
-
 	public recentlyPinged(): boolean {
 		return !!this.lastPinged && dayjs().diff(this.lastPinged, "minute") < 2;
 	}

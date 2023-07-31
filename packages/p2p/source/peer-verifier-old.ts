@@ -14,10 +14,6 @@ export class PeerVerificationResult {
 		public readonly hisHeight: number,
 		public readonly highestCommonHeight: number,
 	) {}
-
-	public get forked(): boolean {
-		return this.highestCommonHeight !== this.myHeight && this.highestCommonHeight !== this.hisHeight;
-	}
 }
 
 // @TODO review the implementation
