@@ -88,7 +88,7 @@ export class ByteBuffer {
 			);
 		}
 
-		const value = this.#buffer.slice(this.#offset, this.#offset + length);
+		const value = this.#buffer.subarray(this.#offset, this.#offset + length);
 		this.#offset += length;
 		return value;
 	}
@@ -98,7 +98,7 @@ export class ByteBuffer {
 	}
 
 	public getRemainder(): Buffer {
-		return this.#buffer.slice(this.#offset);
+		return this.#buffer.subarray(this.#offset);
 	}
 
 	public getRemainderLength(): number {
@@ -106,7 +106,7 @@ export class ByteBuffer {
 	}
 
 	public getResult(): Buffer {
-		return this.#buffer.slice(0, this.#offset);
+		return this.#buffer.subarray(0, this.#offset);
 	}
 
 	public getResultLength(): number {

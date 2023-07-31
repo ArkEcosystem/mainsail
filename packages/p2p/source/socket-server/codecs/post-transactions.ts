@@ -11,7 +11,7 @@ export const postTransactions = {
 			const txs: Buffer[] = [];
 			for (let offset = 0; offset < txsBuffer.byteLength - 4; ) {
 				const txLength = txsBuffer.readUInt32BE(offset);
-				txs.push(txsBuffer.slice(offset + 4, offset + 4 + txLength));
+				txs.push(txsBuffer.subarray(offset + 4, offset + 4 + txLength));
 				offset += 4 + txLength;
 				if (txs.length > hardLimitNumberOfTransactions) {
 					break;
