@@ -1,10 +1,5 @@
 import { NetworkState } from "./network-state";
 
-export interface NetworkStatus {
-	forked: boolean;
-	blocksToRollback?: number;
-}
-
 export interface IRateLimitStatus {
 	blocked: boolean;
 	exceededLimitOnEndpoint: boolean;
