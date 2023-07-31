@@ -39,14 +39,21 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 
 	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IProposal> {
 		const data = await this.deserializer.deserializeProposal(bytes);
-		return this.makeProposalFromData(data);
+		return this.makeProposalFromData(data, bytes);
 	}
 
-	public async makeProposalFromData(data: Contracts.Crypto.IProposalData): Promise<Contracts.Crypto.IProposal> {
+	public async makeProposalFromData(
+		data: Contracts.Crypto.IProposalData,
+		serialized?: Buffer,
+	): Promise<Contracts.Crypto.IProposal> {
 		this.#applySchema("proposal", data);
 		const block = await this.blockFactory.fromProposedBytes(Buffer.from(data.block.serialized, "hex"));
 
-		return new Proposal({ ...data, block });
+		if (!serialized) {
+			serialized = await this.serializer.serializeProposal(data);
+		}
+
+		return new Proposal({ ...data, block, serialized });
 	}
 
 	public async makePrevote(
@@ -66,12 +73,20 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 
 	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
 		const data = await this.deserializer.deserializePrevote(bytes);
-		return this.makePrevoteFromData(data);
+		return this.makePrevoteFromData(data, bytes);
 	}
 
-	public async makePrevoteFromData(data: Contracts.Crypto.IPrevoteData): Promise<Contracts.Crypto.IPrevote> {
+	public async makePrevoteFromData(
+		data: Contracts.Crypto.IPrevoteData,
+		serialized?: Buffer,
+	): Promise<Contracts.Crypto.IPrevote> {
 		this.#applySchema("prevote", data);
-		return new Prevote(data);
+
+		if (!serialized) {
+			serialized = await this.serializer.serializePrevote(data);
+		}
+
+		return new Prevote({ ...data, serialized });
 	}
 
 	public async makePrecommit(
@@ -92,13 +107,20 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 
 	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
 		const data = await this.deserializer.deserializePrecommit(bytes);
-		this.#applySchema("precommit", data);
-		return new Precommit(data);
+		return this.makePrecommitFromData(data, bytes);
 	}
 
-	public async makePrecommitFromData(data: Contracts.Crypto.IPrecommitData): Promise<Contracts.Crypto.IPrecommit> {
+	public async makePrecommitFromData(
+		data: Contracts.Crypto.IPrecommitData,
+		serialized?: Buffer,
+	): Promise<Contracts.Crypto.IPrecommit> {
 		this.#applySchema("precommit", data);
-		return new Precommit(data);
+
+		if (!serialized) {
+			serialized = await this.serializer.serializePrecommit(data);
+		}
+
+		return new Precommit({ ...data, serialized });
 	}
 
 	#applySchema<T>(schema: string, data: T): T {
