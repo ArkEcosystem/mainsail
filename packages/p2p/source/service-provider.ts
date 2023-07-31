@@ -17,6 +17,7 @@ import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerDisposer } from "./peer-disposer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
+import { PeerVerifier } from "./peer-verifier";
 import { Server } from "./socket-server/server";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
@@ -106,6 +107,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerDisposer).to(PeerDisposer).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerVerifier).to(PeerVerifier).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerHeaderService).to(HeaderService).inSingletonScope();
 
