@@ -120,11 +120,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				throw new Exceptions.PeerPingTimeoutError(timeoutMsec);
 			}
 
-			peer.verificationResult = await peerVerifier.checkState(pingResponse.state, deadline);
+			// TODO: verify peer
+			await peerVerifier.checkState(pingResponse.state, deadline);
 
-			if (!peer.isVerified()) {
-				throw new Exceptions.PeerVerificationFailedError();
-			}
+			// peer.verificationResult = await peerVerifier.checkState(pingResponse.state, deadline);
+
+			// if (!peer.isVerified()) {
+			// 	throw new Exceptions.PeerVerificationFailedError();
+			// }
 		}
 
 		peer.lastPinged = dayjs();
