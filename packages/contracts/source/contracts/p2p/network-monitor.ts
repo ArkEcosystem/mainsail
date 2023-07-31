@@ -25,5 +25,4 @@ export interface NetworkMonitor {
 	getNetworkHeight(): number;
 	getNetworkState(): Promise<NetworkState>;
 	refreshPeersAfterFork(): Promise<void>;
-	checkNetworkHealth(): Promise<NetworkStatus>;
 }
