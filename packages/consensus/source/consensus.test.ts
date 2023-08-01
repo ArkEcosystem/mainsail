@@ -69,7 +69,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.bootstrapper = {
-			run: () => { },
+			run: () => {},
 		};
 
 		context.aggregator = {};
@@ -113,18 +113,18 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.roundStateRepository = {
-			getRoundState: () => { },
+			getRoundState: () => {},
 		};
 
 		context.roundState = {
-			getBlock: () => { },
+			getBlock: () => {},
 			getProposal: () => context.proposal,
 			hasPrecommit: () => false,
 			hasPrevote: () => false,
 			hasProposal: () => false,
 			height: 2,
 			round: 0,
-			setProcessorResult: () => { },
+			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
 
 		context.roundStateRepository = {
@@ -133,7 +133,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.verifier = {
 			hasValidProposalLockProof: () => true,
-		}
+		};
 
 		context.sandbox = new Sandbox();
 

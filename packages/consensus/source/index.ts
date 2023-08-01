@@ -2,6 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { RootDatabase } from "lmdb";
 
+import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
@@ -9,7 +10,6 @@ import { ProposerPicker } from "./proposer-picker";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
 import { Storage } from "./storage";
-import { Aggregator } from "./aggregator";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
