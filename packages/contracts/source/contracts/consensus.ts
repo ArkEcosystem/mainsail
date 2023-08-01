@@ -35,7 +35,6 @@ export interface IRoundState extends IProcessableUnit {
 	getValidatorPrecommitSignatures(): Map<string, { signature: string }>;
 	getValidatorsSignedPrevote(): boolean[];
 	getValidatorsSignedPrecommit(): boolean[];
-	setProposedCommitBlock(block: ICommittedBlock): void;
 }
 
 export interface IAggregator {

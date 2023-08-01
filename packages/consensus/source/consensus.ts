@@ -2,8 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { RoundState } from "./round-state";
-
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Bootstrapper)
@@ -327,11 +325,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
-
-		if (roundState instanceof RoundState) {
-			const committedBlock = await this.aggregator.getProposedCommitBlock(roundState);
-			roundState.setProposedCommitBlock(committedBlock);
-		}
 
 		await this.processor.commit(roundState);
 

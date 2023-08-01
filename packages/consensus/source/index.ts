@@ -14,9 +14,9 @@ import { Storage } from "./storage";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Aggregator).to(Aggregator).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.Aggregator).to(Aggregator).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(this.app.resolve(ProposerPicker));
 
 		// Storage for uncommitted blocks

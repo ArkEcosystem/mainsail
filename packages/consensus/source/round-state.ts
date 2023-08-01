@@ -4,6 +4,9 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class RoundState implements Contracts.Consensus.IRoundState {
+	@inject(Identifiers.Consensus.Aggregator)
+	private readonly aggregator!: Contracts.Consensus.IAggregator;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
@@ -19,7 +22,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	#height = 0;
 	#round = 0;
-	#committedBlock?: Contracts.Crypto.ICommittedBlock;
 	#proposal?: Contracts.Crypto.IProposal;
 	#processorResult?: boolean;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
@@ -113,20 +115,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		throw new Error("Block is not available, because proposal is not set");
 	}
 
-	public getProposedCommitBlock(): Contracts.Crypto.ICommittedBlock {
-		if (this.#committedBlock) {
-			return this.#committedBlock;
-		}
-
-		throw new Error("Committed block has not been set");
-	}
-
-	public setProposedCommitBlock(block: Contracts.Crypto.ICommittedBlock): void {
-		if (this.#committedBlock) {
-			throw new Error("Committed block has already been set");
-		}
-
-		this.#committedBlock = block;
+	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
+		return this.aggregator.getProposedCommitBlock(this);
 	}
 
 	public setProcessorResult(processorResult: boolean): void {
