@@ -51,6 +51,6 @@ export class Logger implements Contracts.P2P.Logger {
 	}
 
 	#allowExtra(): boolean {
-		return process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA] === "true";
+		return process.env[Constants.Flags.CORE_P2P_PEER_LOG_EXTRA] === "true";
 	}
 }
