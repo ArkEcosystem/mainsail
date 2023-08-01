@@ -1,6 +1,5 @@
 export interface AcceptNewPeerOptions {
 	seed?: boolean;
-	lessVerbose?: boolean;
 }
 
 export interface PeerProcessor {
