@@ -32,21 +32,11 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		try {
 			const status = await this.communicator.getStatus(peer);
 
-			if (!status) {
-				return false;
-			}
+			this.#verifyConfig(status.config);
 
-			if (!this.#verifyConfig(status.config)) {
-				return false;
-			}
+			this.#verifyVersion(peer);
 
-			if (!this.#verifyVersion(peer)) {
-				return false;
-			}
-
-			if (!(await this.#verifyHighestCommonBlock(peer, status.state))) {
-				return false;
-			}
+			await this.#verifyHighestCommonBlock(peer, status.state);
 
 			peer.lastPinged = dayjs();
 			peer.plugins = status.config.plugins;
@@ -59,15 +49,21 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		}
 	}
 
-	#verifyConfig(config: Contracts.P2P.PeerConfig): boolean {
-		return config.network.nethash === this.cryptoConfiguration.get("network.nethash");
+	#verifyConfig(config: Contracts.P2P.PeerConfig): void {
+		if (config.network.nethash !== this.cryptoConfiguration.get("network.nethash")) {
+			throw new Error("Invalid nethash");
+		}
+
+		// TODO: Verify genesis block id
 	}
 
-	#verifyVersion(peer: Contracts.P2P.Peer): boolean {
-		return !isValidVersion(this.app, peer);
+	#verifyVersion(peer: Contracts.P2P.Peer): void {
+		if (!isValidVersion(this.app, peer)) {
+			throw new Error("Invalid version");
+		}
 	}
 
-	async #verifyHighestCommonBlock(peer: Contracts.P2P.Peer, state: Contracts.P2P.PeerState): Promise<boolean> {
+	async #verifyHighestCommonBlock(peer: Contracts.P2P.Peer, state: Contracts.P2P.PeerState): Promise<void> {
 		const block = this.stateStore.getLastBlock();
 
 		const heightToRequest = state.header.height < block.data.height ? state.header.height : block.data.height;
@@ -90,7 +86,5 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		if (receivedCommittedBlock.block.data.id !== block.data.id) {
 			throw new Error("Received block does not match the requested id. Peer is on a different chain.");
 		}
-
-		return true;
 	}
 }
