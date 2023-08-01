@@ -21,17 +21,15 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
-	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
-		console.log("Verifying peer");
-		/// TODO: Debug extra
-		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] === "true") {
-			console.log("Skipping peer verification");
+	@inject(Identifiers.P2PLogger)
+	private readonly logger!: Contracts.P2P.Logger;
 
+	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
+		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] === "true") {
 			return true;
 		}
 
 		try {
-			// TODO: Debug extra
 			const status = await this.communicator.getStatus(peer);
 
 			if (!status) {
@@ -53,13 +51,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			peer.lastPinged = dayjs();
 			peer.plugins = status.config.plugins;
 
-			// TODO: Debug extra
-			console.log("Peer verified");
-
 			return true;
 		} catch (error) {
-			// TODO: Debug extra
-			console.log("Peer verification error: ", error.message);
+			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`);
 
 			return false;
 		}
