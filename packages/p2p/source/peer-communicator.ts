@@ -33,8 +33,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PeerHeaderService)
 	private readonly headerService!: Contracts.P2P.IHeaderService;
 
-	@inject(Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.P2PLogger)
+	private readonly logger!: Contracts.P2P.Logger;
 
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
@@ -160,9 +160,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 		const { error } = this.validator.validate(schema, reply);
 		if (error) {
-			if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
-				this.logger.debug(`Got unexpected reply from ${peer.url}/${endpoint}: ${error}`);
-			}
+			this.logger.debugExtra(`Got unexpected reply from ${peer.url}/${endpoint}: ${error}`);
 
 			return false;
 		}
