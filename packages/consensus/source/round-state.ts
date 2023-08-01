@@ -11,24 +11,15 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@tagged("state", "clone")
 	private readonly walletRepository!: Contracts.State.WalletRepositoryClone;
 
-	@inject(Identifiers.Cryptography.Signature)
-	@tagged("type", "consensus")
-	private readonly signatureFactory!: Contracts.Crypto.ISignature;
-
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
-
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
-	@inject(Identifiers.Cryptography.Message.Verifier)
-	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
-
 	#height = 0;
 	#round = 0;
+	#committedBlock?: Contracts.Crypto.ICommittedBlock;
 	#proposal?: Contracts.Crypto.IProposal;
 	#processorResult?: boolean;
 	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
@@ -75,6 +66,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this;
 	}
 
+	public getValidator(validatorPublicKey: string): Contracts.State.Wallet {
+		const validator = this.#validators.get(validatorPublicKey);
+		Utils.assert.defined<Contracts.State.Wallet>(validator);
+		return validator;
+	}
+
 	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
 		return this.walletRepository;
 	}
@@ -114,6 +111,22 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		}
 
 		throw new Error("Block is not available, because proposal is not set");
+	}
+
+	public getProposedCommitBlock(): Contracts.Crypto.ICommittedBlock {
+		if (this.#committedBlock) {
+			return this.#committedBlock;
+		}
+
+		throw new Error("Committed block has not been set");
+	}
+
+	public setProposedCommitBlock(block: Contracts.Crypto.ICommittedBlock): void {
+		if (this.#committedBlock) {
+			throw new Error("Committed block has already been set");
+		}
+
+		this.#committedBlock = block;
 	}
 
 	public setProcessorResult(processorResult: boolean): void {
@@ -198,13 +211,13 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
 	}
 
-	getPrevote(validatorIndex: number): Contracts.Crypto.IPrevote | undefined {
+	public getPrevote(validatorIndex: number): Contracts.Crypto.IPrevote | undefined {
 		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex);
 
 		return this.#prevotes.get(validatorPublicKey);
 	}
 
-	getPrecommit(validatorIndex: number): Contracts.Crypto.IPrecommit | undefined {
+	public getPrecommit(validatorIndex: number): Contracts.Crypto.IPrecommit | undefined {
 		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex);
 
 		return this.#precommits.get(validatorPublicKey);
@@ -218,26 +231,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#validatorsSignedPrecommit;
 	}
 
-	public async hasValidProposalLockProof(): Promise<boolean> {
-		const proposal = this.#proposal;
-		const lockProof = this.#proposal?.block?.lockProof;
-		if (!lockProof) {
-			return false;
-		}
+	public getValidatorPrevoteSignatures(): Map<string, { signature: string }> {
+		return this.#getValidatorMajority(this.#prevotes);
+	}
 
-		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
-
-		const { verified } = await this.verifier.verifyProposalLockProof(
-			{
-				blockId: proposal.block.block.header.id,
-				height: proposal.height,
-				round: proposal.round,
-				type: Contracts.Crypto.MessageType.Prevote,
-			},
-			lockProof,
-		);
-
-		return verified;
+	public getValidatorPrecommitSignatures(): Map<string, { signature: string }> {
+		return this.#getValidatorMajority(this.#precommits);
 	}
 
 	#hasMinorityPrevotes(): boolean {
@@ -272,51 +271,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#precommitsCount.get(blockId) ?? 0;
 	}
 
-	public async aggregateMajorityPrevotes(): Promise<Contracts.Crypto.IValidatorSetMajority> {
-		if (!this.hasMajorityPrevotes()) {
-			throw new Error("called #aggregateMajorityPrevotes without majority");
-		}
-
-		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#prevotes));
-	}
-
-	public async aggregateMajorityPrecommits(): Promise<Contracts.Crypto.IValidatorSetMajority> {
-		if (!this.hasMajorityPrecommits()) {
-			throw new Error("called #aggregateMajorityPrecommits without majority");
-		}
-
-		return this.#aggregateValidatorSetMajority(this.#getValidatorMajority(this.#precommits));
-	}
-
-	async #aggregateValidatorSetMajority(
-		majority: Map<string, { signature: string }>,
-	): Promise<Contracts.Crypto.IValidatorSetMajority> {
-		const signatures: Buffer[] = [];
-
-		const numberOfValidators = this.configuration.getMilestone().activeValidators;
-		const validators: boolean[] = new Array(numberOfValidators).fill(false);
-
-		for (const [key, { signature }] of majority) {
-			signatures.push(Buffer.from(signature, "hex"));
-
-			const validator = this.#validators.get(key);
-			Utils.assert.defined<Contracts.State.Wallet>(validator);
-
-			const walletPublicKey = validator.getPublicKey();
-			Utils.assert.defined<string>(walletPublicKey);
-
-			const validatorIndex = this.validatorSet.getValidatorIndexByPublicKey(walletPublicKey);
-			validators[validatorIndex] = true;
-		}
-
-		const signature = await this.signatureFactory.aggregate(signatures);
-
-		return {
-			signature,
-			validators,
-		};
-	}
-
 	#getValidatorMajority(s: Map<string, { signature: string; blockId?: string }>): Map<string, { signature: string }> {
 		Utils.assert.defined<Contracts.Crypto.IProposal>(this.#proposal);
 		const filtered = new Map();
@@ -328,45 +282,5 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		}
 
 		return filtered;
-	}
-
-	public async getProposalLockProof(): Promise<Contracts.Crypto.IProposalLockProof> {
-		const majority = await this.aggregateMajorityPrevotes();
-
-		const proposal = this.getProposal();
-		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
-
-		return {
-			...majority,
-		};
-	}
-
-	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
-		const majority = await this.aggregateMajorityPrecommits();
-
-		const proposal = this.getProposal();
-		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
-
-		const {
-			round,
-			block: { block },
-		} = proposal;
-
-		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
-			block,
-			commit: {
-				blockId: block.data.id,
-				height: block.data.height,
-				round,
-				...majority,
-			},
-		};
-
-		const serialized = await this.blockSerializer.serializeFull(commitBlock);
-
-		return {
-			...commitBlock,
-			serialized: serialized.toString("hex"),
-		};
 	}
 }

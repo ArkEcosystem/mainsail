@@ -54,7 +54,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 		return !!this.#processorResult;
 	}
 
-	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
+	public getProposedCommitBlock(): Contracts.Crypto.ICommittedBlock {
 		return this.#committedBlock;
 	}
 }

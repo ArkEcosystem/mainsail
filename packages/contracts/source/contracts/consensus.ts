@@ -10,6 +10,7 @@ import {
 	IProposalLockProof,
 	IValidatorSetMajority,
 } from "./crypto";
+import { Wallet } from "./state";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
@@ -29,12 +30,23 @@ export interface IRoundState extends IProcessableUnit {
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	getPrevote(validatorIndex: number): IPrevote | undefined;
 	getPrecommit(validatorIndex: number): IPrecommit | undefined;
+	getValidator(validatorPublicKey: string): Wallet;
+	getValidatorPrevoteSignatures(): Map<string, { signature: string }>;
+	getValidatorPrecommitSignatures(): Map<string, { signature: string }>;
 	getValidatorsSignedPrevote(): boolean[];
 	getValidatorsSignedPrecommit(): boolean[];
-	hasValidProposalLockProof(): Promise<boolean>;
-	aggregateMajorityPrevotes(): Promise<IValidatorSetMajority>;
-	aggregateMajorityPrecommits(): Promise<IValidatorSetMajority>;
-	getProposalLockProof(): Promise<IProposalLockProof>;
+	setProposedCommitBlock(block: ICommittedBlock): void;
+}
+
+export interface IAggregator {
+	aggregateMajorityPrevotes(roundState: IRoundState): Promise<IValidatorSetMajority>;
+	aggregateMajorityPrecommits(roundState: IRoundState): Promise<IValidatorSetMajority>;
+	getProposalLockProof(roundState: IRoundState): Promise<IProposalLockProof>;
+	getProposedCommitBlock(roundState: IRoundState): Promise<ICommittedBlock>;
+}
+
+export interface IVerifier {
+	hasValidProposalLockProof(roundState: IRoundState): Promise<boolean>;
 }
 
 export interface IConsensusStateData {

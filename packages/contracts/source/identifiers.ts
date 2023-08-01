@@ -18,6 +18,7 @@ export const Identifiers = {
 	ConfigRepository: Symbol.for("Repository<Config>"),
 	ConfigService: Symbol.for("Service<Config>"),
 	Consensus: {
+		Aggregator: Symbol.for("Aggregator<Consensus>"),
 		Bootstrapper: Symbol.for("Bootstrapper<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
 		ProposerPicker: Symbol.for("Consensus<ProposerPicker>"),
@@ -26,6 +27,7 @@ export const Identifiers = {
 		Service: Symbol.for("Service<Consensus>"),
 		Storage: Symbol.for("Storage<Consensus>"),
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
+		Verifier: Symbol.for("Verifier<Consensus>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {

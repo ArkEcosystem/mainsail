@@ -18,6 +18,8 @@ type Context = {
 	proposerPicker: any;
 	logger: any;
 	block: any;
+	aggregator: any;
+	verifier: any;
 	proposal: any;
 	roundState: Contracts.Consensus.IRoundState;
 	roundStateRepository: any;
@@ -67,8 +69,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.bootstrapper = {
-			run: () => {},
+			run: () => { },
 		};
+
+		context.aggregator = {};
 
 		context.validatorsRepository = {
 			getValidator: () => {},
@@ -109,24 +113,27 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.roundStateRepository = {
-			getRoundState: () => {},
+			getRoundState: () => { },
 		};
 
 		context.roundState = {
-			getBlock: () => {},
+			getBlock: () => { },
 			getProposal: () => context.proposal,
 			hasPrecommit: () => false,
 			hasPrevote: () => false,
 			hasProposal: () => false,
-			hasValidProposalLockProof: () => true,
 			height: 2,
 			round: 0,
-			setProcessorResult: () => {},
+			setProcessorResult: () => { },
 		} as unknown as Contracts.Consensus.IRoundState;
 
 		context.roundStateRepository = {
 			getRoundState: () => context.roundState,
 		};
+
+		context.verifier = {
+			hasValidProposalLockProof: () => true,
+		}
 
 		context.sandbox = new Sandbox();
 
@@ -137,6 +144,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
+		context.sandbox.app.bind(Identifiers.Consensus.Aggregator).toConstantValue(context.aggregator);
+		context.sandbox.app.bind(Identifiers.Consensus.Verifier).toConstantValue(context.verifier);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);
