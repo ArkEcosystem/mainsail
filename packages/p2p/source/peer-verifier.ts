@@ -15,17 +15,23 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
-	// TODO: Handle timeouts
-	// const verifyTimeout = this.configuration.getRequired<number>("verifyTimeout");
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
+
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
-		// TODO: Use defaults
-		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] !== "true") {
+		console.log("Verifying peer");
+		/// TODO: Debug extra
+		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] === "true") {
+			console.log("Skipping peer verification");
+
 			return true;
 		}
 
 		try {
-			// TODO: support timeout and block handling
+			// TODO: Debug extra
 			const status = await this.communicator.getStatus(peer);
 
 			if (!status) {
@@ -47,8 +53,14 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			peer.lastPinged = dayjs();
 			peer.plugins = status.config.plugins;
 
+			// TODO: Debug extra
+			console.log("Peer verified");
+
 			return true;
-		} catch {
+		} catch (error) {
+			// TODO: Debug extra
+			console.log("Peer verification error: ", error.message);
+
 			return false;
 		}
 	}
@@ -62,7 +74,28 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	async #verifyHighestCommonBlock(peer: Contracts.P2P.Peer, state: Contracts.P2P.PeerState): Promise<boolean> {
-		// TODO: Verify highest common block
+		const block = this.stateStore.getLastBlock();
+
+		const heightToRequest = state.header.height < block.data.height ? state.header.height : block.data.height;
+
+		const { blocks } = await this.communicator.getBlocks(peer, { fromHeight: heightToRequest, limit: 1 });
+
+		if (blocks.length !== 1) {
+			throw new Error("Failed to get blocks from peer");
+		}
+
+		// TODO: Support header only requests
+		const receivedCommittedBlock = await this.blockFactory.fromCommittedBytes(blocks[0]);
+
+		if (receivedCommittedBlock.block.data.height !== block.data.height) {
+			console.log(heightToRequest, block);
+
+			throw new Error("Received block does not match the requested height");
+		}
+
+		if (receivedCommittedBlock.block.data.id !== block.data.id) {
+			throw new Error("Received block does not match the requested id. Peer is on a different chain.");
+		}
 
 		return true;
 	}
