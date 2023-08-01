@@ -9,6 +9,8 @@ export interface Logger {
 
 	warning(message: any): void;
 
+	warningExtra(message: any): void;
+
 	notice(message: any): void;
 
 	info(message: any): void;

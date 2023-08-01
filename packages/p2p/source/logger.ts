@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Logger implements Contracts.P2P.Logger {
@@ -26,6 +26,12 @@ export class Logger implements Contracts.P2P.Logger {
 		this.logger.warning(message);
 	}
 
+	warningExtra(message: any): void {
+		if (process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
+			this.logger.warning(message);
+		}
+	}
+
 	notice(message: any): void {
 		this.logger.notice(message);
 	}
@@ -39,6 +45,8 @@ export class Logger implements Contracts.P2P.Logger {
 	}
 
 	debugExtra(message: any): void {
-		this.logger.debug(message);
+		if (process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
+			this.logger.debug(message);
+		}
 	}
 }

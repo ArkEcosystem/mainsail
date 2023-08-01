@@ -1,12 +1,10 @@
 /* eslint-disable unicorn/prefer-at */
 import { inject, injectable } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import assert from "assert";
 import pluralize from "pluralize";
 import { inspect } from "util";
-
-import { Severity } from "./enums";
 
 export class PeerVerificationResult {
 	public constructor(
@@ -77,7 +75,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return undefined;
 		}
 
-		this.#log(Severity.DEBUG_EXTRA, "success");
+		this.#log("success");
 
 		return new PeerVerificationResult(ourHeight, claimedHeight, highestCommonBlockHeight);
 	}
@@ -87,7 +85,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const claimedHeight = Number(blockHeader.height);
 		if (claimedHeight !== claimedState.height) {
 			this.#log(
-				Severity.DEBUG_EXTRA,
 				`Peer claimed contradicting heights: state height=${claimedState.height} vs ` +
 					`state header height: ${claimedHeight}`,
 			);
@@ -120,14 +117,10 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 				}
 			}
 
-			this.#log(
-				Severity.DEBUG_EXTRA,
-				`Claimed block header ${blockHeader.height}:${blockHeader.id} failed signature verification`,
-			);
+			this.#log(`Claimed block header ${blockHeader.height}:${blockHeader.id} failed signature verification`);
 			return false;
 		} catch (error) {
 			this.#log(
-				Severity.DEBUG_EXTRA,
 				`Claimed block header ${blockHeader.height}:${blockHeader.id} failed verification: ` + error.message,
 			);
 			return false;
@@ -154,7 +147,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		if (claimedHeight > ourHeight) {
 			const blocksAhead = claimedHeight - ourHeight;
 			this.#log(
-				Severity.DEBUG_EXTRA,
 				`peer's claimed chain is ${pluralize("block", blocksAhead, true)} higher than ` +
 					`ours (our height ${ourHeight}, his claimed height ${claimedHeight})`,
 			);
@@ -177,13 +169,11 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		if (ourBlockAtHisHeight.data.id === claimedState.header.id) {
 			if (claimedHeight === ourHeight) {
 				this.#log(
-					Severity.DEBUG_EXTRA,
 					`success: peer's latest block is the same as our latest ` +
 						`block (height=${claimedHeight}, id=${claimedState.header.id}). Identical chains.`,
 				);
 			} else {
 				this.#log(
-					Severity.DEBUG_EXTRA,
 					`success: peer's latest block ` +
 						`(height=${claimedHeight}, id=${claimedState.header.id}) is part of our chain. ` +
 						`Peer is ${pluralize("block", ourHeight - claimedHeight, true)} behind us.`,
@@ -193,7 +183,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		}
 
 		this.#log(
-			Severity.DEBUG,
 			`peer's latest block (height=${claimedHeight}, id=${claimedState.header.id}), is different than the ` +
 				`block at the same height in our chain (id=${ourBlockAtHisHeight.data.id}). Peer has ` +
 				(claimedHeight < ourHeight ? `a shorter and` : `an equal-height but`) +
@@ -243,7 +232,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			const msRemaining = this.#throwIfPastDeadline(deadline);
 
-			this.#log(Severity.DEBUG_EXTRA, `probe for common blocks in range ${rangePrint}`);
+			this.#log(`probe for common blocks in range ${rangePrint}`);
 
 			const highestCommon = await this.communicator.hasCommonBlocks(
 				this.#peer,
@@ -257,7 +246,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			if (!probesHeightById[highestCommon.id]) {
 				this.#log(
-					Severity.DEBUG_EXTRA,
 					`failure: bogus reply from peer for common blocks ${ourBlocksPrint}: ` +
 						`peer replied with block id ${highestCommon.id} which we did not ask for`,
 				);
@@ -266,7 +254,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			if (probesHeightById[highestCommon.id] !== highestCommon.height) {
 				this.#log(
-					Severity.DEBUG_EXTRA,
 					`failure: bogus reply from peer for common blocks ${ourBlocksPrint}: ` +
 						`peer pretends to have block with id ${highestCommon.id} at height ` +
 						`${highestCommon.height}, however a block with the same id is at ` +
@@ -283,9 +270,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const highestCommonBlockHeight = await nSect.find(1, Math.min(claimedHeight, ourHeight));
 
 		if (highestCommonBlockHeight === undefined) {
-			this.#log(Severity.INFO, `failure: could not determine a common block`);
+			this.#log(`failure: could not determine a common block`);
 		} else {
-			this.#log(Severity.DEBUG_EXTRA, `highest common block height: ${highestCommonBlockHeight}`);
+			this.#log(`highest common block height: ${highestCommonBlockHeight}`);
 		}
 
 		return highestCommonBlockHeight;
@@ -379,7 +366,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			});
 		} catch (error) {
 			this.#log(
-				Severity.DEBUG_EXTRA,
 				`failure: could not get blocks starting from height ${height} from peer: exception: ${error.message}`,
 			);
 			return false;
@@ -387,7 +373,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		if (!response || response.length === 0) {
 			this.#log(
-				Severity.DEBUG_EXTRA,
 				`failure: could not get blocks starting from height ${height} ` +
 					`from peer: unexpected response: ${this.#anyToString(response)}`,
 			);
@@ -424,23 +409,18 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		if (height !== expectedHeight) {
 			this.#log(
-				Severity.DEBUG_EXTRA,
 				`failure: asked for block at height ${expectedHeight}, but got a block with height ${height} instead`,
 			);
 			return false;
 		}
 
 		if (validatorsByPublicKey[block.data.generatorPublicKey]) {
-			this.#log(
-				Severity.DEBUG_EXTRA,
-				`successfully verified block at height ${height}, signed by ` + block.data.generatorPublicKey,
-			);
+			this.#log(`successfully verified block at height ${height}, signed by ` + block.data.generatorPublicKey);
 
 			return true;
 		}
 
 		this.#log(
-			Severity.DEBUG_EXTRA,
 			`failure: block ${this.#anyToString(blockData)} is not signed by any of the validators ` +
 				`for the corresponding round: ` +
 				this.#anyToString(Object.values(validatorsByPublicKey)),
@@ -464,20 +444,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return inspect(value, { breakLength: Number.POSITIVE_INFINITY, sorted: true });
 	}
 
-	#log(severity: Severity, message: string): void {
+	#log(message: string): void {
 		const fullMessage = `${this.#logPrefix} ${message}`;
-		switch (severity) {
-			case Severity.DEBUG_EXTRA:
-				if (process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
-					this.logger.debug(fullMessage);
-				}
-				break;
-			case Severity.DEBUG:
-				this.logger.debug(fullMessage);
-				break;
-			case Severity.INFO:
-				this.logger.info(fullMessage);
-				break;
-		}
+
+		this.logger.debug(fullMessage);
 	}
 }

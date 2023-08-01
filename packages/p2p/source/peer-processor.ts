@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Utils as KernelUtils } from "@mainsail/kernel";
 
 import { isValidVersion } from "./utils";
@@ -30,8 +30,8 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.P2PLogger)
+	private readonly logger!: Contracts.P2P.Logger;
 
 	public server: any;
 	public nextUpdateNetworkStatusScheduled = false;
@@ -79,11 +79,9 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
 
 		if (this.repository.getSameSubnetPeers(ip).length >= maxSameSubnetPeers && !options.seed) {
-			if (process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
-				this.logger.warning(
-					`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
-				);
-			}
+			this.logger.warningExtra(
+				`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
+			);
 
 			return false;
 		}
@@ -107,9 +105,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 			this.repository.setPeer(peer);
 
-			if (!options.lessVerbose || process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
-				this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
-			}
+			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.PeerEvent.Added, peer);
