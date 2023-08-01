@@ -98,26 +98,21 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(ip);
 
-		try {
-			this.repository.setPendingPeer(peer);
+		this.repository.setPendingPeer(peer);
 
-			if (!(await this.peerVerifier.verify(peer))) {
-				throw new Error("Peer verification failed");
-			}
-
+		if (await this.peerVerifier.verify(peer)) {
 			this.repository.setPeer(peer);
 
 			if (!options.lessVerbose || process.env[Constants.Flags.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA]) {
 				this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 			}
 
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(Enums.PeerEvent.Added, peer);
-		} catch {
+			void this.events.dispatch(Enums.PeerEvent.Added, peer);
+		} else {
 			this.connector.disconnect(peer);
-		} finally {
-			this.repository.forgetPendingPeer(peer);
 		}
+
+		this.repository.forgetPendingPeer(peer);
 	}
 
 	async #disconnectInvalidPeers(): Promise<void> {

@@ -24,29 +24,33 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return true;
 		}
 
-		// TODO: support timeout and block handling
-		const status = await this.communicator.getStatus(peer);
+		try {
+			// TODO: support timeout and block handling
+			const status = await this.communicator.getStatus(peer);
 
-		if (!status) {
+			if (!status) {
+				return false;
+			}
+
+			if (!this.#verifyConfig(status.config)) {
+				return false;
+			}
+
+			if (!this.#verifyVersion(peer)) {
+				return false;
+			}
+
+			if (!(await this.#verifyHighestCommonBlock(peer, status.state))) {
+				return false;
+			}
+
+			peer.lastPinged = dayjs();
+			peer.plugins = status.config.plugins;
+
+			return true;
+		} catch {
 			return false;
 		}
-
-		if (!this.#verifyConfig(status.config)) {
-			return false;
-		}
-
-		if (!this.#verifyVersion(peer)) {
-			return false;
-		}
-
-		if (!(await this.#verifyHighestCommonBlock(peer, status.state))) {
-			return false;
-		}
-
-		peer.lastPinged = dayjs();
-		peer.plugins = status.config.plugins;
-
-		return true;
 	}
 
 	#verifyConfig(config: Contracts.P2P.PeerConfig): boolean {

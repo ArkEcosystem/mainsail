@@ -119,15 +119,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 			await Promise.all(
 				peers.map(async (peer) => {
-					try {
-						if (await this.peerVerifier.verify(peer)) {
-							throw new Error("Peer verification error");
-						}
-					} catch (error) {
+					if (!(await this.peerVerifier.verify(peer))) {
 						unresponsivePeers++;
-
-						peerErrors[error] = peerErrors[error] || [];
-						peerErrors[error].push(peer);
 
 						this.peerDisposer.disposePeer(peer);
 					}
