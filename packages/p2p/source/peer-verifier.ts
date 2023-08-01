@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 
 import { isValidVersion } from "./utils";
 
@@ -14,7 +14,14 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
+	// TODO: Handle timeouts
+
 	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
+		// TODO: Use defaults
+		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] !== "true") {
+			return true;
+		}
+
 		// TODO: Verify peer IP
 		const status = await this.communicator.getStatus(peer);
 

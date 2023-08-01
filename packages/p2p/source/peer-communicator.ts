@@ -109,17 +109,15 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			throw new Exceptions.PeerStatusResponseError(peer.ip);
 		}
 
-		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] !== "true") {
-			const peerVerifier = this.app.resolve(PeerVerifier);
+		const peerVerifier = this.app.resolve(PeerVerifier);
 
-			if (deadline <= Date.now()) {
-				throw new Exceptions.PeerPingTimeoutError(timeoutMsec);
-			}
+		// if (deadline <= Date.now()) {
+		// 	throw new Exceptions.PeerPingTimeoutError(timeoutMsec);
+		// }
 
-			// TODO: verify peer
-			if (!(await peerVerifier.verify(peer))) {
-				throw new Exceptions.PeerVerificationFailedError();
-			}
+		// TODO: verify peer
+		if (!(await peerVerifier.verify(peer))) {
+			throw new Exceptions.PeerVerificationFailedError();
 		}
 
 		peer.lastPinged = dayjs();
