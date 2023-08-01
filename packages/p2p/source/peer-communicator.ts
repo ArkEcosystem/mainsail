@@ -97,35 +97,14 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			return undefined;
 		}
 
-		const getStatusTimeout = timeoutMsec < 5000 ? timeoutMsec : 5000;
-		const pingResponse: Contracts.P2P.PeerPingResponse = await this.emit(
-			peer,
-			Routes.GetStatus,
-			{},
-			getStatusTimeout,
-		);
-
-		if (!pingResponse) {
-			throw new Exceptions.PeerStatusResponseError(peer.ip);
-		}
-
 		const peerVerifier = this.app.resolve(PeerVerifier);
-
-		// if (deadline <= Date.now()) {
-		// 	throw new Exceptions.PeerPingTimeoutError(timeoutMsec);
-		// }
 
 		// TODO: verify peer
 		if (!(await peerVerifier.verify(peer))) {
 			throw new Exceptions.PeerVerificationFailedError();
 		}
 
-		peer.lastPinged = dayjs();
-		// TODO: Update state
-		// peer.state = pingResponse.state;
-		peer.plugins = pingResponse.config.plugins;
-
-		return pingResponse.state;
+		return {};
 	}
 
 	public async pingPorts(peer: Contracts.P2P.Peer): Promise<void> {

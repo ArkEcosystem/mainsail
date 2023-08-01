@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import dayjs from "dayjs";
 
 import { isValidVersion } from "./utils";
 
@@ -22,7 +23,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return true;
 		}
 
-		// TODO: Verify peer IP
+		// TODO: support timeout and block handling
 		const status = await this.communicator.getStatus(peer);
 
 		if (!status) {
@@ -40,6 +41,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		if (!(await this.#verifyHighestCommonBlock(peer, status.state))) {
 			return false;
 		}
+
+		peer.lastPinged = dayjs();
+		peer.plugins = status.config.plugins;
 
 		return true;
 	}
