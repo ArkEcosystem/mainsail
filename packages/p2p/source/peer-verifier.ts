@@ -31,10 +31,11 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		try {
 			const status = await this.communicator.getStatus(peer);
+			peer.version = status.config.version;
 
 			this.#verifyConfig(status.config);
 
-			this.#verifyVersion(peer);
+			this.#verifyVersion(status.config);
 
 			await this.#verifyHighestCommonBlock(peer, status.state);
 
@@ -57,8 +58,10 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		// TODO: Verify genesis block id
 	}
 
-	#verifyVersion(peer: Contracts.P2P.Peer): void {
-		if (!isValidVersion(this.app, peer)) {
+	#verifyVersion(config: Contracts.P2P.PeerConfig): void {
+		console.log(this.app.version(), config.version, isValidVersion(this.app, config.version));
+
+		if (!isValidVersion(this.app, config.version)) {
 			throw new Error("Invalid version");
 		}
 	}
