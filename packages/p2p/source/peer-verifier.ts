@@ -16,6 +16,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	// TODO: Handle timeouts
+	// const verifyTimeout = this.configuration.getRequired<number>("verifyTimeout");
 
 	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
 		// TODO: Use defaults
