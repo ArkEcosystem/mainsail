@@ -2,13 +2,9 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class Logger implements Contracts.Kernel.Logger {
+export class Logger implements Contracts.P2P.Logger {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	async make(): Promise<Contracts.Kernel.Logger> {
-		return this;
-	}
 
 	emergency(message: any): void {
 		this.logger.emergency(message);
@@ -42,11 +38,7 @@ export class Logger implements Contracts.Kernel.Logger {
 		this.logger.debug(message);
 	}
 
-	suppressConsoleOutput(suppress: boolean): void {
-		this.logger.suppressConsoleOutput(suppress);
-	}
-
-	async dispose(): Promise<void> {
-		await this.logger.dispose();
+	debugExtra(message: any): void {
+		this.logger.debug(message);
 	}
 }
