@@ -1,12 +1,10 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import dayjs from "dayjs";
 import delay from "delay";
 
 import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
-import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 // eslint-disable-next-line import/no-namespace
 import * as replySchemas from "./reply-schemas";
@@ -85,26 +83,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
 		await this.emit(peer, Routes.PostPrecommit, { precommit }, 10_000);
-	}
-
-	// ! do not rely on parameter timeoutMsec as guarantee that ping method will resolve within it !
-	// ! peerVerifier.checkState can take more time !
-	// TODO refactor ?
-	public async ping(peer: Contracts.P2P.Peer, timeoutMsec: number, force = false): Promise<any> {
-		const deadline = Date.now() + timeoutMsec;
-
-		if (peer.recentlyPinged() && !force) {
-			return undefined;
-		}
-
-		const peerVerifier = this.app.resolve(PeerVerifier);
-
-		// TODO: verify peer
-		if (!(await peerVerifier.verify(peer))) {
-			throw new Exceptions.PeerVerificationFailedError();
-		}
-
-		return {};
 	}
 
 	public async pingPorts(peer: Contracts.P2P.Peer): Promise<void> {

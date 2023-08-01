@@ -4,7 +4,6 @@ import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";
-import { PeerCommunicator } from "./peer-communicator";
 
 // @TODO review the implementation
 @injectable()
@@ -16,8 +15,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.PeerDiscoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
-	@inject(Identifiers.PeerCommunicator)
-	private readonly communicator!: PeerCommunicator;
+	@inject(Identifiers.PeerVerifier)
+	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
@@ -121,7 +120,9 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			await Promise.all(
 				peers.map(async (peer) => {
 					try {
-						await this.communicator.ping(peer, pingDelay, forcePing);
+						if (await this.peerVerifier.verify(peer)) {
+							throw new Error("Peer verification error");
+						}
 					} catch (error) {
 						unresponsivePeers++;
 

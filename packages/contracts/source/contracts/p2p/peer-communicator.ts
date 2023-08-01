@@ -15,8 +15,6 @@ export interface PeerCommunicator {
 	postPrevote(peer: Peer, prevote: Buffer): Promise<void>;
 	postPrecommit(peer: Peer, prevote: Buffer): Promise<void>;
 
-	ping(peer: Peer, timeoutMsec: number, force?: boolean): Promise<any>;
-
 	pingPorts(peer: Peer): Promise<void>;
 
 	getPeers(peer: Peer): Promise<IGetPeersResponse>;
