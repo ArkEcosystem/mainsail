@@ -29,12 +29,6 @@ export interface StateStore {
 
 	setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void;
 
-	isWakeUpTimeoutSet(): boolean;
-
-	setWakeUpTimeout(callback: Function, timeout: number): void;
-
-	clearWakeUpTimeout(): void;
-
 	getMaxLastBlocks(): number;
 
 	getLastHeight(): number;

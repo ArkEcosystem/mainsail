@@ -25,7 +25,6 @@ export class StateStore implements Contracts.State.StateStore {
 	#lastDownloadedBlock?: Contracts.Crypto.IBlockData;
 	#lastStoredBlockHeight = 0;
 	#started = false;
-	#wakeUpTimeout?: NodeJS.Timeout;
 	#noBlockCounter = 0;
 	#p2pUpdateCounter = 0;
 	#restoredDatabaseIntegrity = false;
@@ -96,24 +95,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void {
 		this.#restoredDatabaseIntegrity = restoredDatabaseIntegrity;
-	}
-
-	public isWakeUpTimeoutSet(): boolean {
-		return !!this.#wakeUpTimeout;
-	}
-
-	public setWakeUpTimeout(callback: Function, timeout: number): void {
-		this.#wakeUpTimeout = setTimeout(() => {
-			this.clearWakeUpTimeout();
-			callback();
-		}, timeout);
-	}
-
-	public clearWakeUpTimeout(): void {
-		if (this.#wakeUpTimeout) {
-			clearTimeout(this.#wakeUpTimeout);
-			this.#wakeUpTimeout = undefined;
-		}
 	}
 
 	public getMaxLastBlocks(): number {
