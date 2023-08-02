@@ -3,12 +3,12 @@ import { Providers } from "@mainsail/kernel";
 import semver from "semver";
 
 // @TODO review the implementation
-export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contracts.P2P.Peer): boolean => {
-	if (!peer.version) {
+export const isValidVersion = (app: Contracts.Kernel.Application, version: string): boolean => {
+	if (!version) {
 		return false;
 	}
 
-	if (!semver.valid(peer.version)) {
+	if (!semver.valid(version)) {
 		return false;
 	}
 
@@ -32,7 +32,6 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 
 	const includePrerelease: boolean = cryptoConfiguration.get("network.name") !== "mainnet";
 	return minimumVersions.some((minimumVersion: string) =>
-		// @ts-ignore - check why the peer.version errors even though we exit early
-		semver.satisfies(peer.version, minimumVersion, { includePrerelease }),
+		semver.satisfies(version, minimumVersion, { includePrerelease }),
 	);
 };

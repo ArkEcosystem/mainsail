@@ -3,8 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Types, Utils } from "@mainsail/kernel";
 import dayjs, { Dayjs } from "dayjs";
 
-import { PeerVerificationResult } from "./peer-verifier";
-
 @injectable()
 export class Peer implements Contracts.P2P.Peer {
 	@inject(Identifiers.QueueFactory)
@@ -23,8 +21,6 @@ export class Peer implements Contracts.P2P.Peer {
 	public lastPinged: Dayjs | undefined;
 
 	public sequentialErrorCounter = 0;
-
-	public verificationResult: PeerVerificationResult | undefined;
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
 
@@ -52,14 +48,6 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public set state(state: Contracts.P2P.IHeaderData) {
 		this.#state = state;
-	}
-
-	public isVerified(): boolean {
-		return this.verificationResult instanceof PeerVerificationResult;
-	}
-
-	public isForked(): boolean {
-		return !!(this.isVerified() && this.verificationResult && this.verificationResult.forked);
 	}
 
 	public recentlyPinged(): boolean {

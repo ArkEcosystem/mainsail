@@ -47,7 +47,7 @@ export class ValidatePlugin {
 		server.ext({
 			method: async (request, h) => {
 				const version = request.payload?.headers?.version;
-				if (version && !isValidVersion(this.app, { version } as Contracts.P2P.Peer)) {
+				if (version && !isValidVersion(this.app, version)) {
 					return Boom.badRequest("Validation failed (invalid version)");
 				}
 

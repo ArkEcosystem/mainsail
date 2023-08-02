@@ -25,10 +25,7 @@ export interface Peer {
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;
-	verificationResult: PeerVerificationResult | undefined;
 
-	isVerified(): boolean;
-	isForked(): boolean;
 	recentlyPinged(): boolean;
 
 	toBroadcast(): PeerBroadcast;
@@ -76,7 +73,6 @@ export interface PeerVerificationResult {
 	readonly myHeight: number;
 	readonly hisHeight: number;
 	readonly highestCommonHeight: number;
-	readonly forked: boolean;
 }
 
 export type PeerFactory = (ip: string) => Peer;

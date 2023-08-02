@@ -1,5 +1,16 @@
-import { IGetBlocksResponse, IGetMessagesResponse, IGetPeersResponse, IGetProposalResponse } from "./endpoints";
+import {
+	IGetBlocksResponse,
+	IGetMessagesResponse,
+	IGetPeersResponse,
+	IGetProposalResponse,
+	IGetStatusResponse,
+} from "./endpoints";
 import { Peer } from "./peer";
+
+export type EmitOptions = {
+	timeout: number;
+	blockOnError?: boolean;
+};
 
 export interface PeerCommunicator {
 	initialize();
@@ -9,14 +20,17 @@ export interface PeerCommunicator {
 	postPrevote(peer: Peer, prevote: Buffer): Promise<void>;
 	postPrecommit(peer: Peer, prevote: Buffer): Promise<void>;
 
-	ping(peer: Peer, timeoutMsec: number, force?: boolean): Promise<any>;
-
 	pingPorts(peer: Peer): Promise<void>;
 
 	getPeers(peer: Peer): Promise<IGetPeersResponse>;
 	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
 	getProposal(peer: Peer): Promise<IGetProposalResponse>;
-	getBlocks(peer: Peer, { fromHeight, limit }: { fromHeight: number; limit?: number }): Promise<IGetBlocksResponse>;
+	getBlocks(
+		peer: Peer,
+		{ fromHeight, limit }: { fromHeight: number; limit?: number },
+		options?: Partial<EmitOptions>,
+	): Promise<IGetBlocksResponse>;
+	getStatus(peer: Peer, options?: Partial<EmitOptions>): Promise<IGetStatusResponse>;
 
 	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
 }

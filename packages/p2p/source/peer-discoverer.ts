@@ -59,7 +59,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 				theirPeers.map((p) =>
 					this.app
 						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-						.call("validateAndAcceptPeer", { ip: p.ip, options: { lessVerbose: true } }),
+						.call("validateAndAcceptPeer", { ip: p.ip, options: {} }),
 				),
 			);
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -108,7 +108,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 				return this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("validateAndAcceptPeer", { ip: peer.ip, options: { lessVerbose: true, seed: true } });
+					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } });
 			}),
 		);
 	}

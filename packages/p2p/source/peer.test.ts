@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 
 import { describe, Sandbox } from "../../test-framework";
 import { Peer } from "./peer";
-import { PeerVerificationResult } from "./peer-verifier";
 
 describe<{
 	sandbox: Sandbox;
@@ -30,34 +29,6 @@ describe<{
 		},
 		[443, 886],
 	);
-
-	it("#isVerified - should return true when this.verificationResult is instanceof PeerVerificationResult", ({
-		peer,
-	}) => {
-		peer.verificationResult = new PeerVerificationResult(12, 12, 12);
-
-		assert.true(peer.isVerified());
-	});
-
-	it("#isVerified  - should return false when this.verificationResult is undefined", ({ peer }) => {
-		assert.false(peer.isVerified());
-	});
-
-	it("#isForked - should return true when this.verificationResult.forked", ({ peer }) => {
-		peer.verificationResult = new PeerVerificationResult(12, 12, 8);
-
-		assert.true(peer.isForked());
-	});
-
-	it("#isForked - should return false when this.verificationResult is undefined", ({ peer }) => {
-		assert.false(peer.isForked());
-	});
-
-	it("#isForked - should return false when this.verificationResult.forked is false", ({ peer }) => {
-		peer.verificationResult = new PeerVerificationResult(12, 12, 12);
-
-		assert.false(peer.isForked());
-	});
 
 	it("#recentlyPinged - should return true when lastPinged is less than 2 minutes ago", ({ peer }) => {
 		peer.lastPinged = dayjs();

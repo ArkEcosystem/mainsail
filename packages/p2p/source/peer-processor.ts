@@ -15,14 +15,14 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerCommunicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
-
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
+
+	@inject(Identifiers.PeerVerifier)
+	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
 
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
@@ -96,31 +96,26 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(ip);
 
-		try {
-			this.repository.setPendingPeer(peer);
+		this.repository.setPendingPeer(peer);
 
-			const verifyTimeout = this.configuration.getRequired<number>("verifyTimeout");
-
-			await this.communicator.ping(peer, verifyTimeout);
-
+		if (await this.peerVerifier.verify(peer)) {
 			this.repository.setPeer(peer);
 
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(Enums.PeerEvent.Added, peer);
-		} catch {
+			void this.events.dispatch(Enums.PeerEvent.Added, peer);
+		} else {
 			this.connector.disconnect(peer);
-		} finally {
-			this.repository.forgetPendingPeer(peer);
 		}
+
+		this.repository.forgetPendingPeer(peer);
 	}
 
 	async #disconnectInvalidPeers(): Promise<void> {
 		const peers = this.repository.getPeers();
 
 		for (const peer of peers) {
-			if (!isValidVersion(this.app, peer)) {
+			if (!peer.version || !isValidVersion(this.app, peer.version)) {
 				this.peerDisposer.disposePeer(peer);
 			}
 		}

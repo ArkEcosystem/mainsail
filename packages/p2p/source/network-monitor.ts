@@ -4,14 +4,10 @@ import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { NetworkState } from "./network-state";
-import { PeerCommunicator } from "./peer-communicator";
 
 // @TODO review the implementation
 @injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
@@ -19,8 +15,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.PeerDiscoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
-	@inject(Identifiers.PeerCommunicator)
-	private readonly communicator!: PeerCommunicator;
+	@inject(Identifiers.PeerVerifier)
+	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
@@ -123,13 +119,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 			await Promise.all(
 				peers.map(async (peer) => {
-					try {
-						await this.communicator.ping(peer, pingDelay, forcePing);
-					} catch (error) {
+					if (!(await this.peerVerifier.verify(peer))) {
 						unresponsivePeers++;
-
-						peerErrors[error] = peerErrors[error] || [];
-						peerErrors[error].push(peer);
 
 						this.peerDisposer.disposePeer(peer);
 					}
@@ -171,70 +162,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		await this.cleansePeers({ fast: true, forcePing: true });
 
 		return await NetworkState.analyze(this, this.repository);
-	}
-
-	public async refreshPeersAfterFork(): Promise<void> {
-		this.logger.info(`Refreshing ${Utils.pluralize("peer", this.repository.getPeers().length, true)} after fork.`);
-
-		await this.cleansePeers({ forcePing: true });
-	}
-
-	public async checkNetworkHealth(): Promise<Contracts.P2P.NetworkStatus> {
-		await this.peerDiscoverer.discoverPeers(true);
-		await this.cleansePeers({ forcePing: true });
-
-		const lastBlock: Contracts.Crypto.IBlock = this.app
-			.get<Contracts.State.StateStore>(Identifiers.StateStore)
-			.getLastBlock();
-
-		// @ts-ignore
-		const verificationResults: Contracts.P2P.PeerVerificationResult[] = this.repository
-			.getPeers()
-			.filter((peer) => peer.verificationResult)
-			.map((peer) => peer.verificationResult);
-
-		if (verificationResults.length === 0) {
-			this.logger.info("No verified peers available.");
-
-			return { forked: false };
-		}
-
-		const forkVerificationResults: Contracts.P2P.PeerVerificationResult[] = verificationResults.filter(
-			(verificationResult: Contracts.P2P.PeerVerificationResult) => verificationResult.forked,
-		);
-
-		const forkHeights: number[] = forkVerificationResults
-			.map((verificationResult: Contracts.P2P.PeerVerificationResult) => verificationResult.highestCommonHeight)
-			.filter((forkHeight, index, array) => array.indexOf(forkHeight) === index) // unique
-			.sort()
-			.reverse();
-
-		for (const forkHeight of forkHeights) {
-			const forkPeerCount = forkVerificationResults.filter((vr) => vr.highestCommonHeight === forkHeight).length;
-			const ourPeerCount = verificationResults.filter((vr) => vr.highestCommonHeight > forkHeight).length + 1;
-
-			if (forkPeerCount > ourPeerCount) {
-				const blocksToRollback = lastBlock.data.height - forkHeight;
-
-				if (blocksToRollback > 5000) {
-					this.logger.info(
-						`Rolling back 5000/${blocksToRollback} blocks to fork at height ${forkHeight} (${ourPeerCount} vs ${forkPeerCount}).`,
-					);
-
-					return { blocksToRollback: 5000, forked: true };
-				} else {
-					this.logger.info(
-						`Rolling back ${blocksToRollback} blocks to fork at height ${forkHeight} (${ourPeerCount} vs ${forkPeerCount}).`,
-					);
-
-					return { blocksToRollback, forked: true };
-				}
-			} else {
-				this.logger.debug(`Ignoring fork at height ${forkHeight} (${ourPeerCount} vs ${forkPeerCount}).`);
-			}
-		}
-
-		return { forked: false };
 	}
 
 	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {

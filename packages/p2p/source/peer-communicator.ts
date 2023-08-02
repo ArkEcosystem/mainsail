@@ -1,17 +1,15 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import dayjs from "dayjs";
 import delay from "delay";
 
 import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
-import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 // eslint-disable-next-line import/no-namespace
 import * as replySchemas from "./reply-schemas";
 import { Codecs } from "./socket-server/codecs";
-import { buildRateLimiter, isValidVersion } from "./utils";
+import { buildRateLimiter } from "./utils";
 
 // @TODO review the implementation
 @injectable()
@@ -60,14 +58,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
-		const postTransactionsTimeout = 10_000;
 		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
 
 		const queue = await peer.getTransactionsQueue();
 		void queue.resume();
 		void queue.push({
 			handle: async () => {
-				await this.emit(peer, Routes.PostTransactions, { transactions }, postTransactionsTimeout);
+				await this.emit(peer, Routes.PostTransactions, { transactions }, { timeout: 10_000 });
 				await delay(Math.ceil(1000 / postTransactionsRateLimit));
 				// to space up between consecutive calls to postTransactions according to rate limit
 				// optimized here because default throttling would not be effective for postTransactions
@@ -76,63 +73,15 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
-		await this.emit(peer, Routes.PostProposal, { proposal }, 10_000);
+		await this.emit(peer, Routes.PostProposal, { proposal }, { timeout: 2000 });
 	}
 
 	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
-		await this.emit(peer, Routes.PostPrevote, { prevote }, 10_000);
+		await this.emit(peer, Routes.PostPrevote, { prevote }, { timeout: 2000 });
 	}
 
 	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
-		await this.emit(peer, Routes.PostPrecommit, { precommit }, 10_000);
-	}
-
-	// ! do not rely on parameter timeoutMsec as guarantee that ping method will resolve within it !
-	// ! peerVerifier.checkState can take more time !
-	// TODO refactor ?
-	public async ping(peer: Contracts.P2P.Peer, timeoutMsec: number, force = false): Promise<any> {
-		const deadline = Date.now() + timeoutMsec;
-
-		if (peer.recentlyPinged() && !force) {
-			return undefined;
-		}
-
-		const getStatusTimeout = timeoutMsec < 5000 ? timeoutMsec : 5000;
-		const pingResponse: Contracts.P2P.PeerPingResponse = await this.emit(
-			peer,
-			Routes.GetStatus,
-			{},
-			getStatusTimeout,
-		);
-
-		if (!pingResponse) {
-			throw new Exceptions.PeerStatusResponseError(peer.ip);
-		}
-
-		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] !== "true") {
-			if (!this.#validatePeerConfig(peer, pingResponse.config)) {
-				throw new Exceptions.PeerVerificationFailedError();
-			}
-
-			const peerVerifier = this.app.resolve(PeerVerifier).initialize(peer);
-
-			if (deadline <= Date.now()) {
-				throw new Exceptions.PeerPingTimeoutError(timeoutMsec);
-			}
-
-			peer.verificationResult = await peerVerifier.checkState(pingResponse.state, deadline);
-
-			if (!peer.isVerified()) {
-				throw new Exceptions.PeerVerificationFailedError();
-			}
-		}
-
-		peer.lastPinged = dayjs();
-		// TODO: Update state
-		// peer.state = pingResponse.state;
-		peer.plugins = pingResponse.config.plugins;
-
-		return pingResponse.state;
+		await this.emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 2000 });
 	}
 
 	public async pingPorts(peer: Contracts.P2P.Peer): Promise<void> {
@@ -151,23 +100,32 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetMessagesResponse> {
-		return this.emit(peer, Routes.GetMessages, {}, 5000);
+		return this.emit(peer, Routes.GetMessages, {}, { timeout: 5000 });
 	}
 
 	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetProposalResponse> {
-		return this.emit(peer, Routes.GetProposal, {}, 5000);
+		return this.emit(peer, Routes.GetProposal, {}, { timeout: 5000 });
 	}
 
 	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetPeersResponse> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
+		return this.emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
+	}
 
-		const getPeersTimeout = 5000;
-		return this.emit(peer, Routes.GetPeers, {}, getPeersTimeout);
+	public async getStatus(
+		peer: Contracts.P2P.Peer,
+		options: Partial<Contracts.P2P.EmitOptions> = {},
+	): Promise<Contracts.P2P.IGetStatusResponse> {
+		return this.emit(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
 	}
 
 	public async hasCommonBlocks(peer: Contracts.P2P.Peer, ids: string[], timeoutMsec?: number): Promise<any> {
-		const getCommonBlocksTimeout = timeoutMsec && timeoutMsec < 5000 ? timeoutMsec : 5000;
-		const body: any = await this.emit(peer, Routes.GetCommonBlocks, { ids }, getCommonBlocksTimeout);
+		const body: any = await this.emit(
+			peer,
+			Routes.GetCommonBlocks,
+			{ ids },
+			{ timeout: timeoutMsec && timeoutMsec < 5000 ? timeoutMsec : 5000 },
+		);
 
 		if (!body || !body.common) {
 			return false;
@@ -179,6 +137,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
 		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
+		options: Partial<Contracts.P2P.EmitOptions> = {},
 	): Promise<Contracts.P2P.IGetBlocksResponse> {
 		const result = await this.emit(
 			peer,
@@ -187,7 +146,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				fromHeight,
 				limit,
 			},
-			this.configuration.getRequired<number>("getBlocksTimeout"),
+			{
+				timeout: this.configuration.getRequired<number>("getBlocksTimeout"),
+				...options,
+			},
 		);
 
 		if (result.blocks.length === 0) {
@@ -195,20 +157,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		return result;
-	}
-
-	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
-		if (config.network.nethash !== this.cryptoConfiguration.get("network.nethash")) {
-			return false;
-		}
-
-		peer.version = config.version;
-
-		if (!isValidVersion(this.app, peer)) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private validateReply(peer: Contracts.P2P.Peer, reply: any, endpoint: string) {
@@ -228,7 +176,12 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return true;
 	}
 
-	private async emit(peer: Contracts.P2P.Peer, event: Routes, payload: any, timeout?: number) {
+	private async emit(peer: Contracts.P2P.Peer, event: Routes, payload: any, options: Contracts.P2P.EmitOptions) {
+		options = {
+			blockOnError: true,
+			...options,
+		};
+
 		await this.throttle(peer, event);
 
 		const codec = Codecs[event];
@@ -251,7 +204,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 						...this.headerFactory().toData(),
 					},
 				}),
-				timeout,
+				options.timeout,
 			);
 			parsedResponsePayload = codec.response.deserialize(response.payload);
 
@@ -269,7 +222,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			void this.headerService.handle(peer, parsedResponsePayload.headers);
 		} catch (error) {
-			this.handleSocketError(peer, event, error);
+			if (options.blockOnError) {
+				this.handleSocketError(peer, event, error);
+			}
 			throw error;
 		}
 
@@ -296,11 +251,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error): void {
-		// TODO: Don't ban if the peer not responding to a ping, when we are trying to connect to it. Improve logic
-		if (event === Routes.GetStatus) {
-			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).disposePeer(peer);
-		} else {
-			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).blockPeer(peer);
-		}
+		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).blockPeer(peer);
 	}
 }
