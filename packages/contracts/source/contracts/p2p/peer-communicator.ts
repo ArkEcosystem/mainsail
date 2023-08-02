@@ -28,9 +28,9 @@ export interface PeerCommunicator {
 	getBlocks(
 		peer: Peer,
 		{ fromHeight, limit }: { fromHeight: number; limit?: number },
-		options?: EmitOptions,
+		options?: Partial<EmitOptions>,
 	): Promise<IGetBlocksResponse>;
-	getStatus(peer: Peer, options?: EmitOptions): Promise<IGetStatusResponse>;
+	getStatus(peer: Peer, options?: Partial<EmitOptions>): Promise<IGetStatusResponse>;
 
 	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
 }

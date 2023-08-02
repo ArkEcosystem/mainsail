@@ -30,7 +30,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		}
 
 		try {
-			const status = await this.communicator.getStatus(peer);
+			const status = await this.communicator.getStatus(peer, { blockOnError: false });
 			peer.version = status.config.version;
 
 			this.#verifyConfig(status.config);
@@ -71,7 +71,11 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		const heightToRequest = state.header.height < block.data.height ? state.header.height : block.data.height;
 
-		const { blocks } = await this.communicator.getBlocks(peer, { fromHeight: heightToRequest, limit: 1 });
+		const { blocks } = await this.communicator.getBlocks(
+			peer,
+			{ fromHeight: heightToRequest, limit: 1 },
+			{ blockOnError: false },
+		);
 
 		if (blocks.length !== 1) {
 			throw new Error("Failed to get blocks from peer");

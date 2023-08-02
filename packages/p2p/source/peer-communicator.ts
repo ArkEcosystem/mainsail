@@ -112,8 +112,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return this.emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
 	}
 
-	public async getStatus(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetStatusResponse> {
-		return this.emit(peer, Routes.GetStatus, {}, { timeout: 5000 });
+	public async getStatus(
+		peer: Contracts.P2P.Peer,
+		options: Partial<Contracts.P2P.EmitOptions> = {},
+	): Promise<Contracts.P2P.IGetStatusResponse> {
+		return this.emit(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
 	}
 
 	public async hasCommonBlocks(peer: Contracts.P2P.Peer, ids: string[], timeoutMsec?: number): Promise<any> {
@@ -134,6 +137,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
 		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
+		options: Partial<Contracts.P2P.EmitOptions> = {},
 	): Promise<Contracts.P2P.IGetBlocksResponse> {
 		const result = await this.emit(
 			peer,
@@ -144,6 +148,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			},
 			{
 				timeout: this.configuration.getRequired<number>("getBlocksTimeout"),
+				...options,
 			},
 		);
 
