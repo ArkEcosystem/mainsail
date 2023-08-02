@@ -1,10 +1,6 @@
 import { IBlock, IBlockData, ICommittedBlock, ITransactionData } from "../crypto";
 
 export interface StateStore {
-	getBlockchain(): any;
-
-	setBlockchain(blockchain: any): void;
-
 	getGenesisBlock(): ICommittedBlock;
 
 	setGenesisBlock(block: ICommittedBlock): void;
@@ -32,8 +28,6 @@ export interface StateStore {
 	getRestoredDatabaseIntegrity(): boolean;
 
 	setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void;
-
-	reset(blockchainMachine): void;
 
 	isWakeUpTimeoutSet(): boolean;
 

@@ -21,7 +21,6 @@ export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	#blockchain: any = {};
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastDownloadedBlock?: Contracts.Crypto.IBlockData;
 	#lastStoredBlockHeight = 0;
@@ -40,14 +39,6 @@ export class StateStore implements Contracts.State.StateStore {
 	// Stores the last n incoming transaction ids. The amount of transaction ids
 	// can be configured with the option `state.maxLastTransactionIds`.
 	#cachedTransactionIds: OrderedSet<string> = OrderedSet();
-
-	public getBlockchain(): any {
-		return this.#blockchain;
-	}
-
-	public setBlockchain(blockchain: any): void {
-		this.#blockchain = blockchain;
-	}
 
 	public getGenesisBlock(): Contracts.Crypto.ICommittedBlock {
 		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(this.#genesisBlock);
@@ -105,10 +96,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void {
 		this.#restoredDatabaseIntegrity = restoredDatabaseIntegrity;
-	}
-
-	public reset(blockchainMachine): void {
-		this.#blockchain = blockchainMachine.initialState;
 	}
 
 	public isWakeUpTimeoutSet(): boolean {
