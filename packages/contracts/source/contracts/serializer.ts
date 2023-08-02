@@ -4,6 +4,7 @@ export type MandatoryPropertyType =
 	| "uint8"
 	| "uint16"
 	| "uint32"
+	| "uint48"
 	| "uint64"
 	| "address"
 	| "bigint"

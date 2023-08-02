@@ -70,6 +70,11 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				continue;
 			}
 
+			if (schema.type === "uint48") {
+				result.writeUint48(value);
+				continue;
+			}
+
 			if (schema.type === "uint64") {
 				result.writeUint64(value);
 				continue;
@@ -182,6 +187,11 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 			if (schema.type === "uint32") {
 				target[property] = source.readUint32();
+				continue;
+			}
+
+			if (schema.type === "uint48") {
+				target[property] = source.readUint48();
 				continue;
 			}
 
