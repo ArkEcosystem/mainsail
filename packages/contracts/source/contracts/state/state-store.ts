@@ -5,14 +5,6 @@ export interface StateStore {
 
 	setGenesisBlock(block: ICommittedBlock): void;
 
-	getNoBlockCounter(): number;
-
-	setNoBlockCounter(noBlockCounter: number): void;
-
-	getP2pUpdateCounter(): number;
-
-	setP2pUpdateCounter(p2pUpdateCounter: number): void;
-
 	getRestoredDatabaseIntegrity(): boolean;
 
 	setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void;

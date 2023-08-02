@@ -22,8 +22,6 @@ export class StateStore implements Contracts.State.StateStore {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
-	#noBlockCounter = 0;
-	#p2pUpdateCounter = 0;
 	#restoredDatabaseIntegrity = false;
 
 	// The last committed round
@@ -44,22 +42,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setGenesisBlock(block: Contracts.Crypto.ICommittedBlock): void {
 		this.#genesisBlock = block;
-	}
-
-	public getNoBlockCounter(): number {
-		return this.#noBlockCounter;
-	}
-
-	public setNoBlockCounter(noBlockCounter: number): void {
-		this.#noBlockCounter = noBlockCounter;
-	}
-
-	public getP2pUpdateCounter(): number {
-		return this.#p2pUpdateCounter;
-	}
-
-	public setP2pUpdateCounter(p2pUpdateCounter: number): void {
-		this.#p2pUpdateCounter = p2pUpdateCounter;
 	}
 
 	public getRestoredDatabaseIntegrity(): boolean {
@@ -112,9 +94,6 @@ export class StateStore implements Contracts.State.StateStore {
 		if (this.#lastBlocks.size > this.getMaxLastBlocks()) {
 			this.#lastBlocks = this.#lastBlocks.delete(this.#lastBlocks.first<Contracts.Crypto.IBlock>().data.height);
 		}
-
-		this.#noBlockCounter = 0;
-		this.#p2pUpdateCounter = 0;
 	}
 
 	public getLastBlocks(): Contracts.Crypto.IBlock[] {
