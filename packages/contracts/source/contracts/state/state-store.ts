@@ -5,10 +5,6 @@ export interface StateStore {
 
 	setGenesisBlock(block: ICommittedBlock): void;
 
-	getRestoredDatabaseIntegrity(): boolean;
-
-	setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void;
-
 	getMaxLastBlocks(): number;
 
 	getLastHeight(): number;

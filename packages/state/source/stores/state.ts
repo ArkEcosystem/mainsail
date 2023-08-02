@@ -22,7 +22,6 @@ export class StateStore implements Contracts.State.StateStore {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
-	#restoredDatabaseIntegrity = false;
 
 	// The last committed round
 	#committedRound = 0;
@@ -42,14 +41,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setGenesisBlock(block: Contracts.Crypto.ICommittedBlock): void {
 		this.#genesisBlock = block;
-	}
-
-	public getRestoredDatabaseIntegrity(): boolean {
-		return this.#restoredDatabaseIntegrity;
-	}
-
-	public setRestoredDatabaseIntegrity(restoredDatabaseIntegrity: boolean): void {
-		this.#restoredDatabaseIntegrity = restoredDatabaseIntegrity;
 	}
 
 	public getMaxLastBlocks(): number {
