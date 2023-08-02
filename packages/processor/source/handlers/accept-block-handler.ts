@@ -13,8 +13,8 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	// @inject(Identifiers.StateStore)
+	// private readonly state!: Contracts.State.StateStore;
 
 	// @inject(Identifiers.DatabaseInteraction)
 	// private readonly databaseInteraction!: DatabaseInteraction;
@@ -39,9 +39,9 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 			// wake up at all if blocks arrive periodically. Only wake up when there are
 			// no new blocks.
 
-			if (this.state.isStarted()) {
-				// this.blockchain.resetWakeUp();
-			}
+			// if (this.state.isStarted()) {
+			// 	// this.blockchain.resetWakeUp();
+			// }
 
 			return true;
 		} catch (error) {

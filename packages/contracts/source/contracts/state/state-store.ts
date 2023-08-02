@@ -9,10 +9,6 @@ export interface StateStore {
 
 	setLastStoredBlockHeight(height: number): void;
 
-	isStarted(): boolean;
-
-	setStarted(started: boolean): void;
-
 	getNoBlockCounter(): number;
 
 	setNoBlockCounter(noBlockCounter: number): void;

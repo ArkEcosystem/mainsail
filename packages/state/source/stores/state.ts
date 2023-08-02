@@ -23,7 +23,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastStoredBlockHeight = 0;
-	#started = false;
 	#noBlockCounter = 0;
 	#p2pUpdateCounter = 0;
 	#restoredDatabaseIntegrity = false;
@@ -54,14 +53,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setLastStoredBlockHeight(height: number): void {
 		this.#lastStoredBlockHeight = height;
-	}
-
-	public isStarted(): boolean {
-		return this.#started;
-	}
-
-	public setStarted(started: boolean): void {
-		this.#started = started;
 	}
 
 	public getNoBlockCounter(): number {
