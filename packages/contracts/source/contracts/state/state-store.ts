@@ -1,4 +1,4 @@
-import { IBlock, IBlockData, ICommittedBlock, ITransactionData } from "../crypto";
+import { IBlock, IBlockData, ICommittedBlock } from "../crypto";
 
 export interface StateStore {
 	getGenesisBlock(): ICommittedBlock;
@@ -24,12 +24,4 @@ export interface StateStore {
 	getLastCommittedRound(): number;
 
 	setLastCommittedRound(committedRound: number): void;
-
-	cacheTransactions(transactions: ITransactionData[]): {
-		[key in "added" | "notAdded"]: ITransactionData[];
-	};
-
-	clearCachedTransactionIds(): void;
-
-	getCachedTransactionIds(): string[];
 }

@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Utils } from "@mainsail/kernel";
 import assert from "assert";
-import { OrderedMap, OrderedSet, Seq } from "immutable";
+import { OrderedMap, Seq } from "immutable";
 
 // @TODO extract block and transaction behaviours into their respective stores
 // @TODO review the implementation
@@ -29,9 +29,6 @@ export class StateStore implements Contracts.State.StateStore {
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
 	#lastBlocks: OrderedMap<number, Contracts.Crypto.IBlock> = OrderedMap<number, Contracts.Crypto.IBlock>();
-	// Stores the last n incoming transaction ids. The amount of transaction ids
-	// can be configured with the option `state.maxLastTransactionIds`.
-	#cachedTransactionIds: OrderedSet<string> = OrderedSet();
 
 	public getGenesisBlock(): Contracts.Crypto.ICommittedBlock {
 		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(this.#genesisBlock);
@@ -133,49 +130,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setLastCommittedRound(committedRound: number): void {
 		this.#committedRound = committedRound;
-	}
-
-	public cacheTransactions(transactions: Contracts.Crypto.ITransactionData[]): {
-		added: Contracts.Crypto.ITransactionData[];
-		notAdded: Contracts.Crypto.ITransactionData[];
-	} {
-		const notAdded: Contracts.Crypto.ITransactionData[] = [];
-		const added: Contracts.Crypto.ITransactionData[] = transactions.filter((tx) => {
-			Utils.assert.defined<string>(tx.id);
-
-			if (this.#cachedTransactionIds.has(tx.id)) {
-				notAdded.push(tx);
-
-				return false;
-			}
-
-			return true;
-		});
-
-		this.#cachedTransactionIds = this.#cachedTransactionIds.withMutations((cache) => {
-			for (const tx of added) {
-				Utils.assert.defined<string>(tx.id);
-
-				cache.add(tx.id);
-			}
-		});
-
-		// Cap the Set of last transaction ids to maxLastTransactionIds
-		const maxLastTransactionIds = this.pluginConfiguration.getRequired<number>("storage.maxLastTransactionIds");
-
-		if (this.#cachedTransactionIds.size > maxLastTransactionIds) {
-			this.#cachedTransactionIds = this.#cachedTransactionIds.takeLast(maxLastTransactionIds);
-		}
-
-		return { added, notAdded };
-	}
-
-	public clearCachedTransactionIds(): void {
-		this.#cachedTransactionIds = this.#cachedTransactionIds.clear();
-	}
-
-	public getCachedTransactionIds(): string[] {
-		return this.#cachedTransactionIds.toArray();
 	}
 
 	// Map Block instances to block data.
