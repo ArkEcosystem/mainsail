@@ -2,6 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { RootDatabase } from "lmdb";
 
+import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
@@ -13,6 +14,7 @@ import { Storage } from "./storage";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Aggregator).to(Aggregator).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(this.app.resolve(ProposerPicker));

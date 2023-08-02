@@ -7,6 +7,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Bootstrapper)
 	private readonly bootstrapper!: Contracts.Consensus.IBootstrapper;
 
+	@inject(Identifiers.Consensus.Aggregator)
+	private readonly aggregator!: Contracts.Consensus.IAggregator;
+
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
@@ -34,6 +37,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+
+	@inject(Identifiers.Consensus.Verifier)
+	private readonly verifier!: Contracts.Consensus.IVerifier;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -220,7 +226,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
 
-		if (!(await roundState.hasValidProposalLockProof())) {
+		if (!(await this.verifier.hasValidProposalLockProof(roundState))) {
 			this.logger.info(
 				`Lock block ${block.data.id} on height ${this.#height} received +2/3 prevotes but the proof is invalid`,
 			);
@@ -394,7 +400,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (this.#validValue) {
 			block = roundState.getBlock();
-			lockProof = await this.#validValue.getProposalLockProof();
+			lockProof = await this.aggregator.getProposalLockProof(roundState);
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
 		}
