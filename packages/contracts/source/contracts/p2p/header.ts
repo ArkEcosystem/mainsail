@@ -1,4 +1,4 @@
-import { IRoundState } from "../consensus";
+import { IRoundState } from "../consensus/consensus";
 
 export type IHeaderData = {
 	version: string;

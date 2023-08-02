@@ -1,4 +1,4 @@
-import { IProcessableUnit } from "./block-processor";
+import { IProcessableUnit } from "../block-processor";
 import {
 	IBlock,
 	IBlockCommit,
@@ -9,8 +9,8 @@ import {
 	IProposal,
 	IProposalLockProof,
 	IValidatorSetMajority,
-} from "./crypto";
-import { Wallet } from "./state";
+} from "../crypto";
+import { Wallet } from "../state";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
