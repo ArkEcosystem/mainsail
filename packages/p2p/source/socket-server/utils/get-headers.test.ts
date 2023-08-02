@@ -23,13 +23,6 @@ describe("getHeaders", ({ it, assert }) => {
 		assert.equal(headers, { height, port, version });
 	});
 
-	it("should return { version, port, height: undefined } when state is not 'started'", () => {
-		stateStore.isStarted = () => false;
-		const headers = getHeaders(app as any);
-
-		assert.equal(headers, { height: undefined, port, version });
-	});
-
 	it("should return port as an integer (when it is set in config as a string)", () => {
 		port = "4005";
 

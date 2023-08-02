@@ -7,15 +7,15 @@ export class AwaitBlockPlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	// @inject(Identifiers.StateStore)
+	// private readonly stateStore!: Contracts.State.StateStore;
 
 	public register(server: Server): void {
 		server.ext({
-			method: async (request, h) => {
-				if (this.stateStore.getBlockchain().value !== "newBlock") {
-					return h.continue;
-				}
+			method: async (request, h) =>
+				// if (this.stateStore.getBlockchain().value !== "newBlock") {
+				// 	return h.continue;
+				// }
 
 				// const queue = this.blockchain.getQueue();
 				// if (!queue.isRunning()) {
@@ -28,8 +28,7 @@ export class AwaitBlockPlugin {
 				// 	});
 				// });
 
-				return h.continue;
-			},
+				h.continue,
 			type: "onPreAuth",
 		});
 	}

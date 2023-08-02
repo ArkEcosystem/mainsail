@@ -91,7 +91,7 @@ export class BlockState implements Contracts.State.BlockState {
 			AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.asset?.votes);
 			AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.asset?.unvotes);
 
-			const senderValidatordAmount = sender
+			const senderValidatorAmount = sender
 				.getBalance()
 				// balance already includes reverted fee when #updateVoteBalances is called
 				.minus(revert ? transaction.fee : BigNumber.ZERO);
@@ -101,9 +101,7 @@ export class BlockState implements Contracts.State.BlockState {
 				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(unvote);
 
 				// unvote also changes vote balance by fee
-				const voteBalanceChange: BigNumber = senderValidatordAmount
-					.plus(transaction.fee)
-					.times(revert ? 1 : -1);
+				const voteBalanceChange: BigNumber = senderValidatorAmount.plus(transaction.fee).times(revert ? 1 : -1);
 
 				const voteBalance: BigNumber = validator
 					.getAttribute("validator.voteBalance", BigNumber.ZERO)
@@ -116,7 +114,7 @@ export class BlockState implements Contracts.State.BlockState {
 				const vote: string = transaction.asset.votes[0];
 				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(vote);
 
-				const voteBalanceChange: BigNumber = senderValidatordAmount.times(revert ? -1 : 1);
+				const voteBalanceChange: BigNumber = senderValidatorAmount.times(revert ? -1 : 1);
 
 				const voteBalance: BigNumber = validator
 					.getAttribute("validator.voteBalance", BigNumber.ZERO)
