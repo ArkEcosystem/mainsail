@@ -7,6 +7,11 @@ import {
 } from "./endpoints";
 import { Peer } from "./peer";
 
+export type EmitOptions = {
+	timeout: number;
+	blockOnError?: boolean;
+};
+
 export interface PeerCommunicator {
 	initialize();
 
@@ -20,8 +25,12 @@ export interface PeerCommunicator {
 	getPeers(peer: Peer): Promise<IGetPeersResponse>;
 	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
 	getProposal(peer: Peer): Promise<IGetProposalResponse>;
-	getBlocks(peer: Peer, { fromHeight, limit }: { fromHeight: number; limit?: number }): Promise<IGetBlocksResponse>;
-	getStatus(peer: Peer): Promise<IGetStatusResponse>;
+	getBlocks(
+		peer: Peer,
+		{ fromHeight, limit }: { fromHeight: number; limit?: number },
+		options?: EmitOptions,
+	): Promise<IGetBlocksResponse>;
+	getStatus(peer: Peer, options?: EmitOptions): Promise<IGetStatusResponse>;
 
 	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
 }
