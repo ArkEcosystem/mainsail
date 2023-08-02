@@ -11,7 +11,7 @@ describe<{
 	let currentTimestamp = 0;
 
 	const { Scheduler: SchedulerProxy } = rewiremock.proxy<{ Scheduler: Scheduler }>("./scheduler", {
-		dayjs: () => ({ unix: () => currentTimestamp }),
+		dayjs: () => ({ valueOf: () => currentTimestamp }),
 	});
 
 	const delays = [1000, 3000, 5000];

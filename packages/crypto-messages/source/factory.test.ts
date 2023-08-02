@@ -81,7 +81,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"a0e335c16132d3049c10ae2d013b8acd4404c79894787578fef37b8a5a0844bda59cdd13f24f19eb7908763b6f42184f010747c8f3011b0abfb907d830fbb6336e2151a72df426215e291bc79a4c194b4843eb260d5fb1081f3460feba09d226",
+			"95cd81768db0a8e3ce3811606f82825ba4c741fe3d465dd20a1082f93b659cf2040b39733f22326bf289e04dc6fabad7129abe7a8cd600fbd74a8050581f8137bf9e2a39279e960efa0e3b733af287f96acb2aa15218b88ff0eab13d52d0a714",
 		);
 
 		const { verified, errors } = await verifier.verifyProposal(proposal);
@@ -103,7 +103,7 @@ describe<{
 
 		assert.equal(
 			precommit.signature,
-			"b58caa80f1fefffd2fc890fc21462a021d3cb3575368d6e349b9bbff9d8425dc407f915e81af33f5b20c8335d4ec02c3159463bd05a218feb0e4ca2ba368040cdfdf440de3a3b73c7e4e6820196f208ca81cea992fada3d29812339e2e31a77c",
+			"8b8ec21cbbe54aa59e2f7590e3abb7d88339ebed43ec0c2dab4917b963ae614db4316d7d26b80ac2d31d2ff4e0fa4af90a7343e5a15636f81d9c41f7a67af8b6f090acc4384299fc60d14235b377251b6c2f4db948d6c03996e832cbcf676b0a",
 		);
 
 		const { verified, errors } = await verifier.verifyPrecommit(precommit);
@@ -147,7 +147,7 @@ describe<{
 
 		assert.equal(
 			prevote.signature,
-			"aa33ad938e8d8ef0446faa6548e2bd57f0be6cc8f924ea31d4432f0de0a8a76d24cf277af818098a289b28343d724f61127595eb1258b68487abf4921af7ddb1ef4313aa8307b6721f916b6ee1385c722d773edb8f34864015369f7b9c7bb14e",
+			"85f3ddb26799dcc8d83dad963f9f4747c68d84dbd3af45dd85485e172071b27e40fe178c277d6a2e9625d03783ca9265165adc48c4ec0d46802a53b96142f7bf336431e0046cf44ff593381c30f03a9e9204a9b959bf0562c1d1c41394b0c6fd",
 		);
 
 		const { verified, errors } = await verifier.verifyPrevote(prevote);

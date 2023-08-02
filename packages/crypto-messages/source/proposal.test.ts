@@ -49,7 +49,7 @@ describe<{
 	it("#toString", async () => {
 		assert.equal(
 			proposal.toString(),
-			`{"block":"de6fbaaf4535dee0e243d455793a0f869a5af59de7989271d45583df5f710e8a","height":1,"round":1,"validatorIndex":0}`,
+			`{"block":"b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0","height":1,"round":1,"validatorIndex":0}`,
 		);
 	});
 
