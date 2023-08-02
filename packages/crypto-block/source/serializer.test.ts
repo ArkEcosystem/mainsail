@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework";
 import { blockData, blockDataWithTransactions } from "../test/fixtures/block";
@@ -20,13 +20,13 @@ describe<{
 	});
 
 	it("#size - should return size", ({ serializer }) => {
-		assert.equal(serializer.headerSize(), 140);
+		assert.equal(serializer.headerSize(), 139);
 
-		assert.equal(serializer.totalSize(blockData), 140);
+		assert.equal(serializer.totalSize(blockData), 139);
 	});
 
 	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
-		assert.equal(serializer.totalSize(blockDataWithTransactions), 520);
+		assert.equal(serializer.totalSize(blockDataWithTransactions), 519);
 	});
 
 	it("#size - should return proof size", async ({ serializer, sandbox }) => {

@@ -21,8 +21,8 @@ export const registerBlockFactory = async (
 		const previousBlock: Contracts.Crypto.IBlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
 			: await app
-					.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
-					.get("genesisBlock.block");
+				.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+				.get("genesisBlock.block");
 
 		const { reward } = app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
@@ -91,7 +91,7 @@ export const registerBlockFactory = async (
 				payloadLength,
 				previousBlock: previousBlock.id,
 				reward: options.reward || reward,
-				timestamp: options.timestamp || dayjs().unix(),
+				timestamp: options.timestamp || dayjs().valueOf(),
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions: transactionData,

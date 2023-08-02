@@ -25,7 +25,7 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 			payloadLength: { minimum: 0, type: "integer" },
 			previousBlock: { $ref: "blockId" },
 			reward: { bignumber: { minimum: 0 } },
-			timestamp: { minimum: 0, type: "integer" },
+			timestamp: { minimum: 0, maximum: (2 ** 48) - 1, type: "integer" },
 			totalAmount: { bignumber: { minimum: 0 } },
 			totalFee: { bignumber: { minimum: 0 } },
 			version: { enum: [1] },
