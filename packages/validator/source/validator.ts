@@ -156,7 +156,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 			payloadLength,
 			previousBlock: previousBlock.data.id,
 			reward: BigNumber.make(this.cryptoConfiguration.getMilestone().reward),
-			timestamp: dayjs().unix(),
+			timestamp: dayjs().valueOf(),
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
 			transactions: transactionData,

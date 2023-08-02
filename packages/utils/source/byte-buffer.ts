@@ -45,6 +45,22 @@ export class ByteBuffer {
 		return value;
 	}
 
+	public writeUint48(value: number): void {
+		if (value < 0 || value > 2 ** 48 - 1) {
+			throw new Error(
+				`The value of "value" is out of range. It must be >= 0 and <= ${2 ** 48 - 1}. Received ${value}`,
+			);
+		}
+
+		this.#offset = this.#buffer.writeUIntLE(value, this.#offset, 6);
+	}
+
+	public readUint48(): number {
+		const value = this.#buffer.readUIntLE(this.#offset, 6);
+		this.#offset += 6;
+		return value;
+	}
+
 	public writeUint64(value: bigint): void {
 		if (typeof value !== "bigint") {
 			value = BigInt(value);

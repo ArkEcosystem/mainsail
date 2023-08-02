@@ -21,8 +21,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 
 	public headerSize(): number {
 		return (
-			4 + // version
-			4 + // timestamp
+			1 + // version
+			6 + // timestamp
 			4 + // height
 			this.hashByteLength + // previousBlock
 			4 + // numberOfTransactions
@@ -62,10 +62,10 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			skip: 0,
 			schema: {
 				version: {
-					type: "uint32",
+					type: "uint8",
 				},
 				timestamp: {
-					type: "uint32",
+					type: "uint48",
 				},
 				height: {
 					type: "uint32",
@@ -104,10 +104,10 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			skip: 0,
 			schema: {
 				version: {
-					type: "uint32",
+					type: "uint8",
 				},
 				timestamp: {
-					type: "uint32",
+					type: "uint48",
 				},
 				height: {
 					type: "uint32",

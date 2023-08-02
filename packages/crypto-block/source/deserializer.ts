@@ -103,10 +103,10 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 			length: this.blockSerializer.headerSize(),
 			schema: {
 				version: {
-					type: "uint32",
+					type: "uint8",
 				},
 				timestamp: {
-					type: "uint32",
+					type: "uint48",
 				},
 				height: {
 					type: "uint32",

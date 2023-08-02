@@ -323,7 +323,7 @@ describe<{
 			nonce: BigNumber.ONE,
 			recipientId: "APyFYXxXtUrvZFnEuwLopfst94GMY5Zkeq",
 			senderPublicKey: keys.publicKey,
-			timestamp: dayjs().unix(),
+			timestamp: dayjs().valueOf(),
 			type: TEST_TRANSACTION_TYPE,
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 1,

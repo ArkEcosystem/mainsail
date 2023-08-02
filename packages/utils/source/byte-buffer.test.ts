@@ -198,6 +198,46 @@ describe("writeUint32", ({ each, assert }) => {
 	);
 });
 
+describe("writeUint48", ({ each, assert }) => {
+	const bufferSize = 6;
+	const min = 0;
+	const max = 281_474_976_710_655;
+	const validValues = [min, max];
+	const invalidValues = [min - 1, max + 1];
+
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = ByteBuffer.fromBuffer(buffer);
+
+			byteBuffer.writeUint48(dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readUint48(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = ByteBuffer.fromBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeUint48(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
+});
+
 describe("writeUint64", ({ each, assert }) => {
 	const bufferSize = 8;
 	const min = 0n;
