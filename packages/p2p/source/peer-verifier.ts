@@ -59,8 +59,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	#verifyVersion(config: Contracts.P2P.PeerConfig): void {
-		console.log(this.app.version(), config.version, isValidVersion(this.app, config.version));
-
 		if (!isValidVersion(this.app, config.version)) {
 			throw new Error("Invalid version");
 		}
@@ -85,8 +83,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const receivedCommittedBlock = await this.blockFactory.fromCommittedBytes(blocks[0]);
 
 		if (receivedCommittedBlock.block.data.height !== block.data.height) {
-			console.log(heightToRequest, block);
-
 			throw new Error("Received block does not match the requested height");
 		}
 
