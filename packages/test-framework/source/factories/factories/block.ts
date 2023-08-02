@@ -21,8 +21,8 @@ export const registerBlockFactory = async (
 		const previousBlock: Contracts.Crypto.IBlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
 			: await app
-				.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
-				.get("genesisBlock.block");
+					.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+					.get("genesisBlock.block");
 
 		const { reward } = app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)

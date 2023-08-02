@@ -46,8 +46,10 @@ export class ByteBuffer {
 	}
 
 	public writeUint48(value: number): void {
-		if (value < 0 || value > (2 ** 48) - 1) {
-			throw new Error(`The value of "value" is out of range. It must be >= 0 and <= ${(2 ** 48) - 1}. Received ${value}`);
+		if (value < 0 || value > 2 ** 48 - 1) {
+			throw new Error(
+				`The value of "value" is out of range. It must be >= 0 and <= ${2 ** 48 - 1}. Received ${value}`,
+			);
 		}
 
 		this.#offset = this.#buffer.writeUIntLE(value, this.#offset, 6);
