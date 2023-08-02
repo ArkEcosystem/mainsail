@@ -22,7 +22,6 @@ export class StateStore implements Contracts.State.StateStore {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
-	#lastDownloadedBlock?: Contracts.Crypto.IBlockData;
 	#lastStoredBlockHeight = 0;
 	#started = false;
 	#noBlockCounter = 0;
@@ -47,14 +46,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setGenesisBlock(block: Contracts.Crypto.ICommittedBlock): void {
 		this.#genesisBlock = block;
-	}
-
-	public getLastDownloadedBlock(): Contracts.Crypto.IBlockData | undefined {
-		return this.#lastDownloadedBlock;
-	}
-
-	public setLastDownloadedBlock(block: Contracts.Crypto.IBlockData): void {
-		this.#lastDownloadedBlock = block;
 	}
 
 	public getLastStoredBlockHeight(): number {

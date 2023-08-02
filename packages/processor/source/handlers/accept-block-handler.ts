@@ -43,12 +43,6 @@ export class AcceptBlockHandler implements Contracts.BlockProcessor.Handler {
 				// this.blockchain.resetWakeUp();
 			}
 
-			// Ensure the lastDownloadedBlock is never behind the last accepted block.
-			const lastDownloadedBock = this.state.getLastDownloadedBlock();
-			if (lastDownloadedBock && lastDownloadedBock.height < block.data.height) {
-				this.state.setLastDownloadedBlock(block.data);
-			}
-
 			return true;
 		} catch (error) {
 			this.logger.warning(`Refused new block ${JSON.stringify(block.data)}`);
