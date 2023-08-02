@@ -5,10 +5,6 @@ export interface StateStore {
 
 	setGenesisBlock(block: ICommittedBlock): void;
 
-	getLastStoredBlockHeight(): number;
-
-	setLastStoredBlockHeight(height: number): void;
-
 	getNoBlockCounter(): number;
 
 	setNoBlockCounter(noBlockCounter: number): void;

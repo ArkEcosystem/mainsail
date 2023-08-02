@@ -13,8 +13,8 @@ export class ForgedTransactionsVerifier implements Contracts.BlockProcessor.Hand
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	// @inject(Identifiers.StateStore)
+	// private readonly stateStore!: Contracts.State.StateStore;
 
 	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
 		const block = unit.getBlock();
@@ -28,21 +28,21 @@ export class ForgedTransactionsVerifier implements Contracts.BlockProcessor.Hand
 
 			const forgedIds: string[] = await this.databaseService.getForgedTransactionsIds(transactionIds);
 
-			if (this.stateStore.getLastBlock().data.height !== this.stateStore.getLastStoredBlockHeight()) {
-				const transactionIdsSet = new Set<string>(transactionIds);
+			// if (this.stateStore.getLastBlock().data.height !== this.stateStore.getLastStoredBlockHeight()) {
+			// 	const transactionIdsSet = new Set<string>(transactionIds);
 
-				for (const stateBlock of this.stateStore
-					.getLastBlocks()
-					.filter((block) => block.data.height > this.stateStore.getLastStoredBlockHeight())) {
-					for (const tx of stateBlock.transactions) {
-						Utils.assert.defined<string>(tx.id);
+			// 	for (const stateBlock of this.stateStore
+			// 		.getLastBlocks()
+			// 		.filter((block) => block.data.height > this.stateStore.getLastStoredBlockHeight())) {
+			// 		for (const tx of stateBlock.transactions) {
+			// 			Utils.assert.defined<string>(tx.id);
 
-						if (transactionIdsSet.has(tx.id)) {
-							forgedIds.push(tx.id);
-						}
-					}
-				}
-			}
+			// 			if (transactionIdsSet.has(tx.id)) {
+			// 				forgedIds.push(tx.id);
+			// 			}
+			// 		}
+			// 	}
+			// }
 
 			if (forgedIds.length > 0) {
 				this.logger.warning(
