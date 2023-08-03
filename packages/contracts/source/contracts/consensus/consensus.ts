@@ -11,6 +11,7 @@ import {
 	IValidatorSetMajority,
 } from "../crypto";
 import { Wallet } from "../state";
+import { HandlerResult, Step } from "./enums";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
@@ -96,7 +97,7 @@ export interface IBootstrapper {
 }
 
 export interface IHandler {
-	onProposal(proposal: IProposal): Promise<void>;
+	onProposal(proposal: IProposal): Promise<HandlerResult>;
 	onPrevote(prevote: IPrevote): Promise<void>;
 	onPrecommit(precommit: IPrecommit): Promise<void>;
 	onCommittedBlock(committedBlock: ICommittedBlock): Promise<void>;
@@ -133,10 +134,4 @@ export interface IValidator {
 export interface IValidatorRepository {
 	getValidator(publicKey: string): IValidator | undefined;
 	getValidators(publicKeys: string[]): IValidator[];
-}
-
-export enum Step {
-	Propose = 0,
-	Prevote = 1,
-	Precommit = 2,
 }

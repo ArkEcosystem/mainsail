@@ -87,17 +87,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async addProposal(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(proposal.validatorIndex);
-
-		if (this.#proposer !== validatorPublicKey) {
-			return false;
-		}
-
-		if (this.#proposal) {
-			// TODO: Handle evidence
-			return false;
-		}
-
 		this.#proposal = proposal;
 
 		return true;
