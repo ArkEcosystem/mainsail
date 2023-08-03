@@ -136,5 +136,5 @@ export interface IValidatorRepository {
 }
 
 export interface IProposalProcessor {
-	process(data: Buffer): Promise<ProcessorResult>;
+	process(data: Buffer, broadcast?: boolean): Promise<ProcessorResult>;
 }

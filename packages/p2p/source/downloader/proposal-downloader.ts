@@ -77,7 +77,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			}
 
 			// TODO: Handle response
-			await this.proposalProcessor.process(result.proposal);
+			await this.proposalProcessor.process(result.proposal, false);
 		} catch {
 			isError = true;
 		}

@@ -27,7 +27,7 @@ export class ProposalProcessor implements Contracts.Consensus.IProposalProcessor
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async process(data: Buffer): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(data: Buffer, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		const proposal = await this.#makeProposal(data);
 
 		if (!proposal) {
@@ -54,7 +54,9 @@ export class ProposalProcessor implements Contracts.Consensus.IProposalProcessor
 		await roundState.addProposal(proposal);
 		await this.storage.saveProposal(proposal);
 
-		void this.broadcaster.broadcastProposal(proposal);
+		if (broadcast) {
+			void this.broadcaster.broadcastProposal(proposal);
+		}
 
 		void this.#getConsensus().handle(roundState);
 
