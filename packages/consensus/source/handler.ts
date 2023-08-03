@@ -23,15 +23,15 @@ export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Cryptography.Message.Verifier)
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
 
-	public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<Contracts.Consensus.HandlerResult> {
+	public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		if (!this.#isValidHeightAndRound(proposal)) {
-			return Contracts.Consensus.HandlerResult.Applied;
+			return;
 		}
 
 		const { errors } = await this.verifier.verifyProposal(proposal);
 		if (errors.length > 0) {
 			this.logger.warning(`received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
-			return Contracts.Consensus.HandlerResult.Invalid;
+			return;
 		}
 
 		const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
@@ -40,11 +40,7 @@ export class Handler implements Contracts.Consensus.IHandler {
 			await this.storage.saveProposal(proposal);
 
 			await this.#getConsensus().handle(roundState);
-
-			return Contracts.Consensus.HandlerResult.CanBeBroadcasted;
 		}
-
-		return Contracts.Consensus.HandlerResult.Applied;
 	}
 
 	public async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {

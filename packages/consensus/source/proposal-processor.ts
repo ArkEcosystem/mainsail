@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class ProposalProcessor {
+export class ProposalProcessor implements Contracts.Consensus.IProposalProcessor {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -21,33 +21,35 @@ export class ProposalProcessor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async process(data: Buffer): Promise<string> {
+	async process(data: Buffer): Promise<Contracts.Consensus.ProcessorResult> {
 		const proposal = await this.#makeProposal(data);
 
 		if (!proposal) {
-			return "invalid";
+			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
 		if (this.#isInvalidHeightOrRound(proposal)) {
-			return "skip";
+			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
 		if (this.#isInvalidProposer(proposal)) {
-			return "invalid";
+			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
 		if (await this.#hasInvalidSignature(proposal)) {
-			return "invalid";
+			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
 		const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 		if (roundState.hasProposal()) {
-			return "skipped";
+			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
 		await roundState.addProposal(proposal);
 
-		return "accepted";
+		// TODO: Process block
+
+		return Contracts.Consensus.ProcessorResult.Accepted;
 	}
 
 	async #makeProposal(data: Buffer): Promise<Contracts.Crypto.IProposal | undefined> {

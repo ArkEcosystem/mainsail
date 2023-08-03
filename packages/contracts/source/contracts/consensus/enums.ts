@@ -4,8 +4,8 @@ export enum Step {
 	Precommit = 2,
 }
 
-export enum HandlerResult {
+export enum ProcessorResult {
 	Invalid,
-	Applied,
-	CanBeBroadcasted,
+	Accepted,
+	Skipped,
 }
