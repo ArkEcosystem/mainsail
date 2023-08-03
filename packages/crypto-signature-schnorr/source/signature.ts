@@ -10,7 +10,7 @@ export class Signature implements Contracts.Crypto.ISignature {
 	}
 
 	public async verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
-		return schnorr.verify(message, signature, publicKey);
+		return schnorr.verify(signature, message, publicKey);
 	}
 
 	public serialize(buffer: ByteBuffer, signature: string): void {

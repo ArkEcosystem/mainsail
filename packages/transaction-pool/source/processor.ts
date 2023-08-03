@@ -25,7 +25,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	private readonly deserializer!: Contracts.Crypto.ITransactionDeserializer;
 
 	public async process(
-		data: Contracts.Crypto.ITransactionData[] | Buffer[],
+		data: Contracts.Crypto.ITransactionJson[] | Buffer[],
 	): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: string[] = [];
 		const broadcast: string[] = [];
@@ -43,7 +43,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 					const transaction =
 						transactionData instanceof Buffer
 							? await this.#getTransactionFromBuffer(transactionData)
-							: await this.#getTransactionFromData(transactionData);
+							: await this.#getTransactionFromJson(transactionData);
 					await this.pool.addTransaction(transaction);
 					accept.push(entryId);
 
@@ -51,7 +51,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 						await Promise.all(this.extensions.map((e) => e.throwIfCannotBroadcast(transaction)));
 						broadcastTransactions.push(transaction);
 						broadcast.push(entryId);
-					} catch {}
+					} catch { }
 				} catch (error) {
 					invalid.push(entryId);
 
@@ -101,11 +101,11 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		}
 	}
 
-	async #getTransactionFromData(
-		transactionData: Contracts.Crypto.ITransactionData,
+	async #getTransactionFromJson(
+		transactionData: Contracts.Crypto.ITransactionJson,
 	): Promise<Contracts.Crypto.ITransaction> {
 		try {
-			return this.transactionFactory.fromData(transactionData);
+			return this.transactionFactory.fromJson(transactionData);
 		} catch (error) {
 			throw new Exceptions.InvalidTransactionDataError(error.message);
 		}

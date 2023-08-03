@@ -34,6 +34,7 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 		const data: Contracts.Crypto.ITransactionData = { ...json } as unknown as Contracts.Crypto.ITransactionData;
 		data.amount = BigNumber.make(data.amount);
 		data.fee = BigNumber.make(data.fee);
+		data.nonce = BigNumber.make(data.nonce);
 
 		return this.fromData(data);
 	}
