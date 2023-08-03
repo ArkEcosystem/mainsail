@@ -21,6 +21,9 @@ export class ProposalProcessor implements Contracts.Consensus.IProposalProcessor
 	@inject(Identifiers.Consensus.Storage)
 	private readonly storage!: Contracts.Consensus.IConsensusStorage;
 
+	@inject(Identifiers.PeerBroadcaster)
+	private readonly broadcaster!: Contracts.P2P.Broadcaster;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -49,11 +52,11 @@ export class ProposalProcessor implements Contracts.Consensus.IProposalProcessor
 		}
 
 		await roundState.addProposal(proposal);
-
 		await this.storage.saveProposal(proposal);
 
-		// TODO: Process block
-		await this.#getConsensus().handle(roundState);
+		void this.broadcaster.broadcastProposal(proposal);
+
+		void this.#getConsensus().handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}

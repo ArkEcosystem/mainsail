@@ -200,14 +200,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		// TODO: Check proposer
+		this.#step = Contracts.Consensus.Step.Prevote;
+
 		const { block } = proposal.block;
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 
 		const result = await this.processor.process(roundState);
 		roundState.setProcessorResult(result);
-
-		this.#step = Contracts.Consensus.Step.Prevote;
 
 		await this.#prevote(result ? block.data.id : undefined);
 	}
@@ -410,7 +409,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const proposal = await proposer.propose(this.#height, this.#round, block, lockProof, this.#validRound);
 
-		void this.broadcaster.broadcastProposal(proposal);
 		void this.proposalProcessor.process(proposal.serialized);
 	}
 
