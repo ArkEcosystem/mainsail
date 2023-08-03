@@ -23,25 +23,25 @@ export class Handler implements Contracts.Consensus.IHandler {
 	@inject(Identifiers.Cryptography.Message.Verifier)
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
 
-	public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
-		if (!this.#isValidHeightAndRound(proposal)) {
-			return;
-		}
+	// public async onProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
+	// 	if (!this.#isValidHeightAndRound(proposal)) {
+	// 		return;
+	// 	}
 
-		const { errors } = await this.verifier.verifyProposal(proposal);
-		if (errors.length > 0) {
-			this.logger.warning(`received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
-			return;
-		}
+	// 	const { errors } = await this.verifier.verifyProposal(proposal);
+	// 	if (errors.length > 0) {
+	// 		this.logger.warning(`received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
+	// 		return;
+	// 	}
 
-		const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
+	// 	const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 
-		if (await roundState.addProposal(proposal)) {
-			await this.storage.saveProposal(proposal);
+	// 	if (await roundState.addProposal(proposal)) {
+	// 		await this.storage.saveProposal(proposal);
 
-			await this.#getConsensus().handle(roundState);
-		}
-	}
+	// 		await this.#getConsensus().handle(roundState);
+	// 	}
+	// }
 
 	public async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
 		if (!this.#isValidHeightAndRound(prevote)) {

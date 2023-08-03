@@ -19,6 +19,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Handler)
 	private readonly handler!: Contracts.Consensus.IHandler;
 
+	@inject(Identifiers.Consensus.ProposalProcessor)
+	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
+
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
@@ -408,7 +411,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const proposal = await proposer.propose(this.#height, this.#round, block, lockProof, this.#validRound);
 
 		void this.broadcaster.broadcastProposal(proposal);
-		void this.handler.onProposal(proposal);
+		void this.proposalProcessor.process(proposal.serialized);
 	}
 
 	async #prevote(value?: string): Promise<void> {

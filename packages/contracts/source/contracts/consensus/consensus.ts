@@ -97,7 +97,6 @@ export interface IBootstrapper {
 }
 
 export interface IHandler {
-	onProposal(proposal: IProposal): Promise<void>;
 	onPrevote(prevote: IPrevote): Promise<void>;
 	onPrecommit(precommit: IPrecommit): Promise<void>;
 	onCommittedBlock(committedBlock: ICommittedBlock): Promise<void>;
