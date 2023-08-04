@@ -96,12 +96,6 @@ export interface IBootstrapper {
 	run(): Promise<IConsensusState | undefined>;
 }
 
-export interface IHandler {
-	// onPrevote(prevote: IPrevote): Promise<void>;
-	// onPrecommit(precommit: IPrecommit): Promise<void>;
-	onCommittedBlock(committedBlock: ICommittedBlock): Promise<void>;
-}
-
 export interface IScheduler {
 	scheduleTimeoutStartRound(): void;
 	scheduleTimeoutPropose(height: number, round: number): void;
