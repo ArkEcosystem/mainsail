@@ -4,6 +4,7 @@ import { RootDatabase } from "lmdb";
 
 import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
+import { CommittedBlockProcessor } from "./committed-block-processor";
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
 import { PrecommitProcessor } from "./precommit-processor";
@@ -25,6 +26,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.ProposalProcessor).to(ProposalProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.PrevoteProcessor).to(PrevoteProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.CommittedBlockProcessor).to(CommittedBlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker).inSingletonScope();
 
 		// Storage for uncommitted blocks
