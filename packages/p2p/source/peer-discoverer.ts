@@ -101,15 +101,12 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		});
 
 		return Promise.all(
-			// @ts-ignore
-			Object.values(peers).map((peer: Contracts.P2P.Peer) => {
-				// TODO: Check if this is ok
-				this.repository.forgetPeer(peer);
-
-				return this.app
+			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
+				// TODO: disconnect peer on error
+				this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } });
-			}),
+					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } }),
+			),
 		);
 	}
 
