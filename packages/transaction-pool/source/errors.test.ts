@@ -31,7 +31,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_RETRY");
-		assert.equal(error.message, `${context.transaction} cannot be added to pool, please retry`);
+		assert.equal(error.message, `tx ${context.transaction.id} cannot be added to pool, please retry`);
 	});
 
 	it("TransactionAlreadyInPoolError", (context) => {
@@ -39,7 +39,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_DUPLICATE");
-		assert.equal(error.message, `${context.transaction} is already in pool`);
+		assert.equal(error.message, `tx ${context.transaction.id} is already in pool`);
 	});
 
 	it("TransactionExceedsMaximumByteSizeError", (context) => {
@@ -47,7 +47,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_TOO_LARGE");
-		assert.equal(error.message, `${context.transaction} exceeds size limit of bytes`);
+		assert.equal(error.message, `tx ${context.transaction.id} exceeds size limit of bytes`);
 	});
 
 	it("TransactionHasExpiredError", (context) => {
@@ -55,7 +55,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_EXPIRED");
-		assert.equal(error.message, `${context.transaction} expired at height 100`);
+		assert.equal(error.message, `tx ${context.transaction.id} expired at height 100`);
 	});
 
 	it("TransactionFeeToLowError", (context) => {
@@ -63,7 +63,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_LOW_FEE");
-		assert.equal(error.message, `${context.transaction} fee is to low to enter the pool`);
+		assert.equal(error.message, `tx ${context.transaction.id} fee is to low to enter the pool`);
 	});
 
 	it("SenderExceededMaximumTransactionCountError", (context) => {
@@ -71,7 +71,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_EXCEEDS_MAX_COUNT");
-		assert.equal(error.message, `${context.transaction} exceeds sender's transaction count limit`);
+		assert.equal(error.message, `tx ${context.transaction.id} exceeds sender's transaction count limit`);
 	});
 
 	it("TransactionPoolFullError", (context) => {
@@ -79,7 +79,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_POOL_FULL");
-		assert.equal(error.message, `${context.transaction} fee 900 is lower than 1000 already in pool`);
+		assert.equal(error.message, `tx ${context.transaction.id} fee 900 is lower than 1000 already in pool`);
 	});
 
 	it("TransactionFailedToApplyError", (context) => {
@@ -90,7 +90,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_APPLY");
-		assert.equal(error.message, `${context.transaction} cannot be applied: Something went horribly wrong`);
+		assert.equal(error.message, `tx ${context.transaction.id} cannot be applied: Something went horribly wrong`);
 	});
 
 	it("TransactionFailedToVerifyError", (context) => {
@@ -98,7 +98,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_BAD_DATA");
-		assert.equal(error.message, `${context.transaction} didn't passed verification`);
+		assert.equal(error.message, `tx ${context.transaction.id} didn't passed verification`);
 	});
 
 	it("TransactionFromWrongNetworkError", (context) => {
@@ -106,7 +106,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_WRONG_NETWORK");
-		assert.equal(error.message, `${context.transaction} network 30 doesn't match node's network 23`);
+		assert.equal(error.message, `tx ${context.transaction.id} network 30 doesn't match node's network 23`);
 	});
 
 	it("InvalidTransactionDataError", (context) => {
