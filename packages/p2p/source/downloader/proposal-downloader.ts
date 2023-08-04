@@ -25,7 +25,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Consensus.ProposalProcessor)
-	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
+	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
 
 	#downloadingProposalByHeight = new Set<number>();
 

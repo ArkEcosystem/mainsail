@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class PrevoteProcessor implements Contracts.Consensus.IProposalProcessor {
+export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 

@@ -20,7 +20,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly handler!: Contracts.Consensus.IHandler;
 
 	@inject(Identifiers.Consensus.ProposalProcessor)
-	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
+	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
 
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;

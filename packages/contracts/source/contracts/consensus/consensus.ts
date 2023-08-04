@@ -135,6 +135,6 @@ export interface IValidatorRepository {
 	getValidators(publicKeys: string[]): IValidator[];
 }
 
-export interface IProposalProcessor {
+export interface IProcessor {
 	process(data: Buffer, broadcast?: boolean): Promise<ProcessorResult>;
 }

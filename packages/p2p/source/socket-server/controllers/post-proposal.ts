@@ -5,7 +5,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class PostProposalController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Consensus.ProposalProcessor)
-	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
+	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
 
 	public async handle(
 		request: Contracts.P2P.IPostProposalRequest,
