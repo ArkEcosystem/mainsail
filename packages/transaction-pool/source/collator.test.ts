@@ -19,18 +19,17 @@ describe<{
 	blockSerializer: any;
 }>("Collator", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
-		context.validator = { validate: () => { } };
+		context.validator = { validate: () => {} };
 		context.createTransactionValidator = () => context.validator;
-		context.stateStore = { getLastBlock: () => { } };
-		context.pool = { removeTransaction: () => { } };
-		context.expirationService = { isExpired: () => { } };
+		context.stateStore = { getLastBlock: () => {} };
+		context.pool = { removeTransaction: () => {} };
+		context.expirationService = { isExpired: () => {} };
 		context.poolQuery = {
 			getFromHighestPriority: () => {
-				() => { };
+				() => {};
 			},
 		};
-		context.logger = { error: () => { }, warning: () => { } };
-
+		context.logger = { error: () => {}, warning: () => {} };
 
 		context.blockSerializer = {
 			headerSize: () => 152,

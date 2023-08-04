@@ -21,22 +21,22 @@ describe<{
 }>("SenderState", ({ it, assert, beforeEach, stub, spy }) => {
 	beforeEach((context) => {
 		context.configuration = {
-			get: () => { },
-			getOptional: () => { },
-			getRequired: () => { },
+			get: () => {},
+			getOptional: () => {},
+			getRequired: () => {},
 		};
 		context.handlerRegistry = {
-			getActivatedHandlerForData: () => { },
+			getActivatedHandlerForData: () => {},
 		};
 		context.expirationService = {
-			getExpirationHeight: () => { },
-			isExpired: () => { },
+			getExpirationHeight: () => {},
+			isExpired: () => {},
 		};
 		context.triggers = {
-			call: () => { },
+			call: () => {},
 		};
 		context.emitter = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.blockSerializer = {
@@ -184,7 +184,7 @@ describe<{
 		handlerStub.resolvedValueNth(1, handler);
 		triggerStub.resolvedValueNth(1, true); // verifyTransaction
 
-		await senderState.revert(context.transaction).catch(() => { });
+		await senderState.revert(context.transaction).catch(() => {});
 		const promise = senderState.apply(context.transaction);
 
 		await assert.rejects(() => promise);
