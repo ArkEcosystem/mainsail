@@ -34,12 +34,12 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		const minFeeString = this.#formatSatoshi(minFee);
 
 		if (transaction.data.fee.isGreaterThanEqual(minFee)) {
-			this.logger.debug(`${transaction} eligible for ${action} (fee ${feeString} >= ${minFeeString})`);
+			this.logger.debug(`Tx ${transaction} eligible for ${action} (fee ${feeString} >= ${minFeeString})`);
 
 			return;
 		}
 
-		this.logger.notice(`${transaction} not eligible for ${action} (fee ${feeString} < ${minFeeString})`);
+		this.logger.notice(`Tx ${transaction} not eligible for ${action} (fee ${feeString} < ${minFeeString})`);
 
 		throw new Exceptions.TransactionFeeToLowError(transaction);
 	}

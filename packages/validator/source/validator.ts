@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { BigNumber, isEmpty, pluralize } from "@mainsail/utils";
+import { BigNumber, isEmpty } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -118,8 +118,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		}
 
 		this.logger.debug(
-			`Received ${pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
+			`Received ${transactions.length} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 
 		return transactions;
