@@ -19,10 +19,6 @@ export class NonceVerifier implements Contracts.BlockProcessor.Handler {
 		for (const transaction of block.transactions) {
 			const data = transaction.data;
 
-			if (data.version && data.version < 2) {
-				break;
-			}
-
 			Utils.assert.defined<string>(data.senderPublicKey);
 
 			const sender: string = data.senderPublicKey;
