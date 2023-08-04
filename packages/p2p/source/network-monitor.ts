@@ -65,7 +65,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		try {
 			if (await this.peerDiscoverer.discoverPeers(initialRun)) {
-				await this.cleansePeers();
+				// await this.cleansePeers();
 			}
 		} catch (error) {
 			this.logger.error(`Network Status: ${error.message}`);
@@ -159,7 +159,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async getNetworkState(): Promise<Contracts.P2P.NetworkState> {
-		await this.cleansePeers({ fast: true, forcePing: true });
+		// await this.cleansePeers({ fast: true, forcePing: true });
 
 		return await NetworkState.analyze(this, this.repository);
 	}
