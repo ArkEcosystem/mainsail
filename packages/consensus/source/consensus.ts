@@ -16,17 +16,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@inject(Identifiers.Consensus.Handler)
-	private readonly handler!: Contracts.Consensus.IHandler;
-
 	@inject(Identifiers.Consensus.ProposalProcessor)
 	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
 
 	@inject(Identifiers.Consensus.PrevoteProcessor)
 	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
 
-	@inject(Identifiers.PeerBroadcaster)
-	private readonly broadcaster!: Contracts.P2P.Broadcaster;
+	@inject(Identifiers.Consensus.PrecommitProcessor)
+	private readonly precommitProcessor!: Contracts.Consensus.IProcessor;
 
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler!: Contracts.Consensus.IScheduler;
@@ -441,8 +438,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
-			void this.broadcaster.broadcastPrecommit(precommit);
-			void this.handler.onPrecommit(precommit);
+			void this.precommitProcessor.process(precommit.serialized);
 		}
 
 		await this.#saveState();
