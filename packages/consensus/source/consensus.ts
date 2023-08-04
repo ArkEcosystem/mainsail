@@ -415,7 +415,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	async #prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (roundState.hasPrevote(validator)) {
+			if (
+				// TODO: Check if this publicKey is correct
+				roundState.hasPrevote(this.validatorSet.getValidatorIndexByPublicKey(validator.getConsensusPublicKey()))
+			) {
 				continue;
 			}
 

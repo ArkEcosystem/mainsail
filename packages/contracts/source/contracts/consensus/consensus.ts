@@ -18,7 +18,7 @@ export interface IRoundState extends IProcessableUnit {
 	readonly proposer: string;
 	getProposal(): IProposal | undefined;
 	hasProposal(): boolean;
-	hasPrevote(validator: IValidator): boolean;
+	hasPrevote(validatorIndex: number): boolean;
 	hasPrecommit(validator: IValidator): boolean;
 	addProposal(proposal: IProposal): Promise<boolean>;
 	addPrevote(prevote: IPrevote): Promise<boolean>;

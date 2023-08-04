@@ -116,20 +116,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return !!this.#processorResult;
 	}
 
-	public hasPrevote(validator: Contracts.Consensus.IValidator): boolean {
-		return this.#prevotes.has(validator.getConsensusPublicKey());
+	public hasPrevote(validatorIndex: number): boolean {
+		return this.#prevotes.has(this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex));
 	}
 
 	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
 		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(prevote.validatorIndex);
 		if (!this.#validators.has(validatorPublicKey)) {
-			return false;
-		}
-
-		if (this.#prevotes.has(validatorPublicKey)) {
-			// TODO: Handle evidence
-
-			return false;
+			throw new Error(`Prevote by ${validatorPublicKey} is already set`);
 		}
 
 		this.#prevotes.set(validatorPublicKey, prevote);
