@@ -21,6 +21,7 @@ export const Identifiers = {
 		Aggregator: Symbol.for("Aggregator<Consensus>"),
 		Bootstrapper: Symbol.for("Bootstrapper<Consensus>"),
 		Handler: Symbol.for("Handler<Consensus>"),
+		PrevoteProcessor: Symbol.for("Consensus<Prevote.Processor>"),
 		ProposalProcessor: Symbol.for("Consensus<Proposal.Processor>"),
 		ProposerPicker: Symbol.for("Consensus<ProposerPicker>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
