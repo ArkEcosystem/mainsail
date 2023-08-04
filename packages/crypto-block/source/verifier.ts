@@ -92,7 +92,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;
-			let totalPayloadLength = 0;
+			let totalPayloadLength = 4 * block.transactions.length;
 
 			const payloadBuffers: Buffer[] = [];
 			for (const transaction of block.transactions) {
