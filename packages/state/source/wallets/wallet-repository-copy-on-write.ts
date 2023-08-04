@@ -15,7 +15,10 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		if (publicKey && !this.hasByPublicKey(publicKey)) {
-			this.cloneWallet(this.blockchainWalletRepository, await this.blockchainWalletRepository.findByPublicKey(publicKey));
+			this.cloneWallet(
+				this.blockchainWalletRepository,
+				await this.blockchainWalletRepository.findByPublicKey(publicKey),
+			);
 		}
 		return this.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)!;
 	}
