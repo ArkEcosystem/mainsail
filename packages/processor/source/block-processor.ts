@@ -24,6 +24,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
+	@inject(Identifiers.TransactionPoolService)
+	private readonly transactionPool!: Contracts.TransactionPool.Service;
+
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
@@ -73,6 +76,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		this.logger.info(`Block ${commitBlock.block.header.height.toLocaleString()} with ${commitBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`);
 
 		for (const transaction of commitBlock.block.transactions) {
+			await this.transactionPool.removeForgedTransaction(transaction);
 			await this.#emitTransactionEvents(transaction);
 		}
 
