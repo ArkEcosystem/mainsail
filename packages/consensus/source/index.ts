@@ -6,6 +6,7 @@ import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
 import { Consensus } from "./consensus";
 import { Handler } from "./handler";
+import { PrecommitProcessor } from "./precommit-processor";
 import { PrevoteProcessor } from "./prevote-processor";
 import { ProposalProcessor } from "./proposal-processor";
 import { ProposerPicker } from "./proposer-picker";
@@ -23,6 +24,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.ProposalProcessor).to(ProposalProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.PrevoteProcessor).to(PrevoteProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker).inSingletonScope();
 
 		// Storage for uncommitted blocks
