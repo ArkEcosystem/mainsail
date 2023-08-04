@@ -73,7 +73,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		this.proposerPicker.handleCommittedBlock(commitBlock.commit);
 
-		this.logger.info(`Block ${commitBlock.block.header.height.toLocaleString()} with ${commitBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`);
+		this.logger.info(
+			`Block ${commitBlock.block.header.height.toLocaleString()} with ${commitBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
+		);
 
 		for (const transaction of commitBlock.block.transactions) {
 			await this.transactionPool.removeForgedTransaction(transaction);

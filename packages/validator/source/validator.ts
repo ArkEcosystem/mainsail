@@ -118,7 +118,9 @@ export class Validator implements Contracts.Consensus.IValidator {
 		}
 
 		this.logger.debug(
-			`Received ${transactions.length} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
+			`Received ${
+				transactions.length
+			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 
 		return transactions;
