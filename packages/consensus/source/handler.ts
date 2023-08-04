@@ -43,25 +43,25 @@ export class Handler implements Contracts.Consensus.IHandler {
 	// 	}
 	// }
 
-	public async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
-		if (!this.#isValidHeightAndRound(prevote)) {
-			return;
-		}
+	// public async onPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
+	// 	if (!this.#isValidHeightAndRound(prevote)) {
+	// 		return;
+	// 	}
 
-		const { errors } = await this.verifier.verifyPrevote(prevote);
-		if (errors.length > 0) {
-			this.logger.warning(`received invalid prevote: ${prevote.toString()} errors: ${JSON.stringify(errors)}`);
-			return;
-		}
+	// 	const { errors } = await this.verifier.verifyPrevote(prevote);
+	// 	if (errors.length > 0) {
+	// 		this.logger.warning(`received invalid prevote: ${prevote.toString()} errors: ${JSON.stringify(errors)}`);
+	// 		return;
+	// 	}
 
-		const roundState = this.roundStateRepo.getRoundState(prevote.height, prevote.round);
+	// 	const roundState = this.roundStateRepo.getRoundState(prevote.height, prevote.round);
 
-		if (await roundState.addPrevote(prevote)) {
-			await this.storage.savePrevote(prevote);
+	// 	if (await roundState.addPrevote(prevote)) {
+	// 		await this.storage.savePrevote(prevote);
 
-			await this.#getConsensus().handle(roundState);
-		}
-	}
+	// 		await this.#getConsensus().handle(roundState);
+	// 	}
+	// }
 
 	public async onPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
 		if (!this.#isValidHeightAndRound(precommit)) {

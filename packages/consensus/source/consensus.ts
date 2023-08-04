@@ -22,6 +22,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.ProposalProcessor)
 	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
 
+	@inject(Identifiers.Consensus.PrevoteProcessor)
+	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
+
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
@@ -415,17 +418,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	async #prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (
-				// TODO: Check if this publicKey is correct
-				roundState.hasPrevote(this.validatorSet.getValidatorIndexByPublicKey(validator.getConsensusPublicKey()))
-			) {
+			if (roundState.hasPrevote(this.validatorSet.getValidatorIndexByPublicKey(validator.getWalletPublicKey()))) {
 				continue;
 			}
 
 			const prevote = await validator.prevote(this.#height, this.#round, value);
 
-			void this.broadcaster.broadcastPrevote(prevote);
-			void this.handler.onPrevote(prevote);
+			void this.prevoteProcessor.process(prevote.serialized);
 		}
 
 		await this.#saveState();

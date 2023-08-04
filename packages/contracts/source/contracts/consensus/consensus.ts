@@ -97,7 +97,7 @@ export interface IBootstrapper {
 }
 
 export interface IHandler {
-	onPrevote(prevote: IPrevote): Promise<void>;
+	// onPrevote(prevote: IPrevote): Promise<void>;
 	onPrecommit(precommit: IPrecommit): Promise<void>;
 	onCommittedBlock(committedBlock: ICommittedBlock): Promise<void>;
 }
@@ -117,6 +117,7 @@ export interface IProposerPicker {
 
 export interface IValidator {
 	configure(publicKey: string, keyPair: IKeyPair): IValidator;
+	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<IBlock>;
 	propose(
