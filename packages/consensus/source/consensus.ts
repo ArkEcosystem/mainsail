@@ -433,7 +433,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	async #precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (roundState.hasPrecommit(validator)) {
+			if (
+				roundState.hasPrecommit(this.validatorSet.getValidatorIndexByPublicKey(validator.getWalletPublicKey()))
+			) {
 				continue;
 			}
 

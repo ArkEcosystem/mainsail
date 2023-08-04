@@ -132,8 +132,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return true;
 	}
 
-	public hasPrecommit(validator: Contracts.Consensus.IValidator): boolean {
-		return this.#precommits.has(validator.getConsensusPublicKey());
+	public hasPrecommit(validatorIndex: number): boolean {
+		return this.#precommits.has(this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex));
 	}
 
 	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
