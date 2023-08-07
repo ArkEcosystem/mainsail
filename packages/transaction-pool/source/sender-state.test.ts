@@ -3,6 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Enums } from "@mainsail/kernel";
 
+import crypto from "../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../test-framework";
 import { SenderState } from ".";
 
@@ -15,9 +16,10 @@ describe<{
 	container: Container;
 	transaction: Contracts.Crypto.ITransaction;
 	config: Configuration;
+	blockSerializer: any;
 	walletRepository: any;
-}>("SenderState", ({ it, assert, beforeAll, stub, spy }) => {
-	beforeAll((context) => {
+}>("SenderState", ({ it, assert, beforeEach, stub, spy }) => {
+	beforeEach((context) => {
 		context.configuration = {
 			get: () => {},
 			getOptional: () => {},
@@ -37,22 +39,28 @@ describe<{
 			dispatch: () => {},
 		};
 
+		context.blockSerializer = {
+			headerSize: () => 152,
+		};
+
 		context.walletRepository = {};
 
 		context.container = new Container();
 		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 		context.container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
+		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
 		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
 		context.container.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
 		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.emitter);
 		context.container.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
 
 		// @ts-ignore
 		context.transaction = {
-			data: { network: 123, senderPublicKey: "sender's public key" },
+			data: { network: 30, senderPublicKey: "sender's public key" },
 			id: "tx1",
 			serialized: Buffer.alloc(10),
 			timestamp: 13_600,
@@ -68,7 +76,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((error) => {
+		await promise.catch((error) => {
 			assert.instance(error, Exceptions.PoolError);
 			assert.equal(error.type, "ERR_TOO_LARGE");
 		});
@@ -77,14 +85,20 @@ describe<{
 	it("apply - should throw when transaction is from wrong network", async (context) => {
 		const senderState = context.container.resolve(SenderState);
 
-		stub(context.configuration, "get").returnValue(321); // network.pubKeyHash
+		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+			...crypto,
+			network: {
+				pubKeyHash: 123,
+			},
+		} as unknown as Contracts.Crypto.NetworkConfig);
+
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 
 		const promise = senderState.apply(context.transaction);
 
 		await assert.rejects(() => promise);
 
-		promise.catch((error) => {
+		await promise.catch((error) => {
 			assert.instance(error, Exceptions.PoolError);
 			assert.equal(error.type, "ERR_WRONG_NETWORK");
 		});
@@ -100,7 +114,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((error) => {
+		await promise.catch((error) => {
 			assert.instance(error, Exceptions.PoolError);
 			assert.equal(error.type, "ERR_FROM_FUTURE");
 		});
@@ -118,7 +132,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((error) => {
+		await promise.catch((error) => {
 			assert.instance(error, Exceptions.PoolError);
 			assert.equal(error.type, "ERR_EXPIRED");
 		});
@@ -140,7 +154,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((error) => {
+		await promise.catch((error) => {
 			assert.instance(error, Exceptions.PoolError);
 			assert.equal(error.type, "ERR_BAD_DATA");
 		});
@@ -175,7 +189,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((error) => {
+		await promise.catch((error) => {
 			assert.instance(error, Exceptions.PoolError);
 			assert.equal(error.type, "ERR_RETRY");
 		});
@@ -212,7 +226,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch((error) => {
+		await promise.catch((error) => {
 			assert.instance(error, Exceptions.PoolError);
 			assert.equal(error.type, "ERR_APPLY");
 		});

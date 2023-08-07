@@ -2,8 +2,10 @@ import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
+import crypto from "../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../test-framework";
 import { Processor } from "./processor";
+import { Configuration } from "@mainsail/crypto-config";
 
 describe<{
 	container: Container;
@@ -13,6 +15,7 @@ describe<{
 	transaction1: any;
 	transaction2: any;
 	factory: any;
+	blockSerializer: any;
 }>("Processor", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.pool = {
@@ -26,10 +29,20 @@ describe<{
 		};
 
 		context.factory = {
-			fromData: () => {},
+			fromJson: (tx) => {
+				return tx;
+			},
+		};
+
+		context.blockSerializer = {
+			headerSize: () => 152,
 		};
 
 		context.container = new Container();
+		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
+		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+
 		context.container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[0]);
 		context.container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[1]);
 		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
@@ -76,7 +89,7 @@ describe<{
 
 	it("should parse transactions through factory pool", async (context) => {
 		const poolSpy = spy(context.pool, "addTransaction");
-		const factoryStub = stub(context.factory, "fromData");
+		const factoryStub = stub(context.factory, "fromJson");
 		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
 		factoryStub.resolvedValueNth(0, context.transaction1).resolvedValueNth(1, context.transaction2);
@@ -188,7 +201,7 @@ describe<{
 		const exceedsError = new Exceptions.SenderExceededMaximumTransactionCountError(context.transaction1, 1);
 
 		const poolStub = stub(context.pool, "addTransaction").rejectedValueNth(0, exceedsError);
-		stub(context.factory, "fromData").returnValue(context.transaction1);
+		stub(context.factory, "fromJson").returnValue(context.transaction1);
 
 		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");

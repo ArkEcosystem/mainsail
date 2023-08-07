@@ -24,23 +24,14 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+
 	public async getBlockCandidateTransactions(): Promise<Contracts.Crypto.ITransaction[]> {
 		const height: number = this.stateStore.getLastBlock().data.height;
 		const milestone = this.configuration.getMilestone(height);
-		const blockHeaderSize =
-			4 + // version
-			8 + // timestamp
-			4 + // height
-			32 + // previousBlockId
-			4 + // numberOfTransactions
-			8 + // totalAmount
-			8 + // totalFee
-			8 + // reward
-			4 + // payloadLength
-			32 + // payloadHash
-			32; // generatorPublicKey
 
-		let bytesLeft: number = milestone.block.maxPayload - blockHeaderSize;
+		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 
 		const candidateTransactions: Contracts.Crypto.ITransaction[] = [];
 		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
@@ -71,7 +62,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 				bytesLeft -= 4;
 				bytesLeft -= transaction.serialized.length;
 			} catch (error) {
-				this.logger.warning(`${transaction} failed to collate: ${error.message}`);
+				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
 				failedTransactions.push(transaction);
 			}
 		}

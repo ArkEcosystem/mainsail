@@ -2,6 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
+import crypto from "../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../test-framework";
 import { Collator } from ".";
 
@@ -15,6 +16,7 @@ describe<{
 	expirationService: any;
 	poolQuery: any;
 	logger: any;
+	blockSerializer: any;
 }>("Collator", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.validator = { validate: () => {} };
@@ -29,7 +31,12 @@ describe<{
 		};
 		context.logger = { error: () => {}, warning: () => {} };
 
+		context.blockSerializer = {
+			headerSize: () => 152,
+		};
+
 		context.container = new Container();
+		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
 		context.container
 			.bind(Identifiers.TransactionValidatorFactory)
 			.toConstantValue(context.createTransactionValidator);
@@ -39,6 +46,7 @@ describe<{
 		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
 	});
@@ -81,7 +89,7 @@ describe<{
 			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxPayload: 141 + 10 + 4 + 10 + 7, maxTransactions: 5 } };
+		const milestone = { block: { idFullSha256: true, maxPayload: 152 + (10 + 4) * 2, maxTransactions: 5 } };
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);

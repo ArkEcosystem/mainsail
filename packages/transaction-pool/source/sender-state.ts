@@ -8,6 +8,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
@@ -32,7 +35,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new Exceptions.TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
 
-		const currentNetwork: number = this.configuration.getRequired<number>("network.pubKeyHash");
+		const currentNetwork: number = this.cryptoConfiguration.get("network.pubKeyHash");
 		if (transaction.data.network && transaction.data.network !== currentNetwork) {
 			throw new Exceptions.TransactionFromWrongNetworkError(transaction, currentNetwork);
 		}

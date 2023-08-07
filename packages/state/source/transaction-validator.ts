@@ -8,7 +8,7 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
+	@tagged("state", "clone")
 	private walletRepository!: Contracts.State.WalletRepository;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)

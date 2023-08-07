@@ -1,4 +1,4 @@
-import { ITransaction, ITransactionData } from "../crypto";
+import { ITransaction, ITransactionJson } from "../crypto";
 
 export type ProcessorError = {
 	type: string;
@@ -18,7 +18,7 @@ export interface ProcessorExtension {
 }
 
 export interface Processor {
-	process(data: ITransactionData[] | Buffer[]): Promise<ProcessorResult>;
+	process(data: ITransactionJson[] | Buffer[]): Promise<ProcessorResult>;
 }
 
 export type ProcessorFactory = () => Processor;

@@ -52,8 +52,8 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 
 				if (
 					await this.signatureFactory.verify(
-						hash,
 						Buffer.from(partialSignature, "hex"),
+						hash,
 						Buffer.from(publicKey, "hex"),
 					)
 				) {
@@ -83,7 +83,7 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 			excludeSignature: true,
 		});
 
-		return this.signatureFactory.verify(hash, Buffer.from(signature, "hex"), Buffer.from(senderPublicKey, "hex"));
+		return this.signatureFactory.verify(Buffer.from(signature, "hex"), hash, Buffer.from(senderPublicKey, "hex"));
 	}
 
 	public async verifySchema(
