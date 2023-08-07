@@ -13,8 +13,6 @@ export type EmitOptions = {
 };
 
 export interface PeerCommunicator {
-	initialize();
-
 	postTransactions(peer: Peer, transactions: Buffer[]): Promise<void>;
 	postProposal(peer: Peer, proposal: Buffer): Promise<void>;
 	postPrevote(peer: Peer, prevote: Buffer): Promise<void>;
