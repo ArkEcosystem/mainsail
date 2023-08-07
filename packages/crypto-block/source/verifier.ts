@@ -92,6 +92,9 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;
+
+			// The initial payload length takes the overhead for each serialized transaction into account
+			// which is a uint32 per transaction to store the individual length.
 			let totalPayloadLength = 4 * block.transactions.length;
 
 			const payloadBuffers: Buffer[] = [];

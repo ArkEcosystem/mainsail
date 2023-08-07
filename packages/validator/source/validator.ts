@@ -134,6 +134,9 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.ITransactionData[] = [];
+
+		// The initial payload length takes the overhead for each serialized transaction into account
+		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
 		for (const { data, serialized } of transactions) {
 			Utils.assert.defined<string>(data.id);

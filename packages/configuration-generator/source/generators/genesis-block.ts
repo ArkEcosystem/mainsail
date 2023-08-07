@@ -213,6 +213,8 @@ export class GenesisBlockGenerator extends Generator {
 			return a.type - b.type;
 		});
 
+		// The initial payload length takes the overhead for each serialized transaction into account
+		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
 
 		const transactionData: Contracts.Crypto.ITransactionData[] = [];
