@@ -46,19 +46,19 @@ export class Throttle {
 		return new Promise<void>((resolve) => {
 			void this.#queue.push({
 				handle: async () => {
-					await this.#doJob(peer, event, resolve);
+					await this.#process(peer, event, resolve);
 				},
 			});
 		});
 	}
 
-	async #doJob(peer: Contracts.P2P.Peer, event: string, resolve: () => void): Promise<void> {
+	async #process(peer: Contracts.P2P.Peer, event: string, resolve: () => void): Promise<void> {
 		if (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
 			await delay(100);
 
 			void this.#queue.push({
 				handle: async () => {
-					await this.#doJob(peer, event, resolve);
+					await this.#process(peer, event, resolve);
 				},
 			});
 		} else {
