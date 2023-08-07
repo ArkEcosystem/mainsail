@@ -18,6 +18,9 @@ export class Throttle {
 	@inject(Identifiers.QueueFactory)
 	private readonly createQueue!: Types.QueueFactory;
 
+	@inject(Identifiers.LogService)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#queue!: Contracts.Kernel.Queue;
 
 	#outgoingRateLimiter!: RateLimiter;
@@ -54,6 +57,10 @@ export class Throttle {
 
 	async #process(peer: Contracts.P2P.Peer, event: string, resolve: () => void): Promise<void> {
 		if (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
+			this.logger.debug(
+				`Throttling outgoing requests to ${peer.ip}/${event} to avoid triggering their rate limit`,
+			);
+
 			await delay(100);
 
 			void this.#queue.push({
