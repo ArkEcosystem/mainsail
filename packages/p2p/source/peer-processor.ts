@@ -48,6 +48,10 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	}
 
 	public async validateAndAcceptPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip)) {
+			return;
+		}
+
 		if (this.validatePeerIp(ip, options)) {
 			await this.#acceptNewPeer(ip, options);
 		}
@@ -90,10 +94,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	}
 
 	async #acceptNewPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
-		if (this.repository.hasPeer(ip)) {
-			return;
-		}
-
 		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(ip);
 
 		this.repository.setPendingPeer(peer);

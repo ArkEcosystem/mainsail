@@ -18,6 +18,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
+	@inject(Identifiers.Database.Service)
+	private readonly database!: Contracts.Database.IDatabaseService;
+
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
@@ -82,11 +85,16 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		// TODO: Support header only requests
 		const receivedCommittedBlock = await this.blockFactory.fromCommittedBytes(blocks[0]);
 
-		if (receivedCommittedBlock.block.data.height !== block.data.height) {
+		const blockToCompare =
+			block.data.height === heightToRequest
+				? block
+				: await this.database.findBlockByHeights([heightToRequest])[0];
+
+		if (receivedCommittedBlock.block.data.height !== blockToCompare.data.height) {
 			throw new Error("Received block does not match the requested height");
 		}
 
-		if (receivedCommittedBlock.block.data.id !== block.data.id) {
+		if (receivedCommittedBlock.block.data.id !== blockToCompare.data.id) {
 			throw new Error("Received block does not match the requested id. Peer is on a different chain.");
 		}
 	}
