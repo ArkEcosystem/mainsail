@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types } from "@mainsail/kernel";
 import delay from "delay";
@@ -24,7 +24,7 @@ export class Throttle {
 
 	#outgoingRateLimiter!: RateLimiter;
 
-	public async initialize(): Promise<void> {
+	public async initialize(): Promise<Throttle> {
 		this.#queue = await this.createQueue();
 
 		this.#outgoingRateLimiter = buildRateLimiter({
@@ -39,6 +39,8 @@ export class Throttle {
 			// them requests, ie we could spam them.
 			whitelist: [],
 		});
+
+		return this;
 	}
 
 	public async throttle(peer: Contracts.P2P.Peer, event: string): Promise<void> {

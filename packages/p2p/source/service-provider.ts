@@ -20,6 +20,7 @@ import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { PeerVerifier } from "./peer-verifier";
 import { Server } from "./socket-server/server";
+import { Throttle } from "./throttle";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -28,7 +29,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.#registerFactories();
 
-		this.#registerServices();
+		await this.#registerServices();
 
 		this.#registerActions();
 	}
@@ -98,7 +99,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toFactory<Contracts.P2P.IHeader>(() => () => this.app.resolve(Header));
 	}
 
-	#registerServices(): void {
+	async #registerServices(): Promise<void> {
+		this.app.bind(Identifiers.PeerThrottle).toConstantValue(await this.app.resolve(Throttle).initialize());
+
 		this.app.bind(Identifiers.P2PLogger).to(Logger).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
