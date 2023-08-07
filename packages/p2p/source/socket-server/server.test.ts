@@ -56,7 +56,9 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Consensus.PrecommitProcessor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerHeaderService).toConstantValue({});
