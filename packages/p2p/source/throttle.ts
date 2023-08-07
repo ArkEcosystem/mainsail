@@ -25,8 +25,6 @@ export class Throttle {
 	#outgoingRateLimiter!: RateLimiter;
 
 	public async initialize(): Promise<Throttle> {
-		this.#queue = await this.createQueue();
-
 		this.#outgoingRateLimiter = buildRateLimiter({
 			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 
@@ -39,6 +37,9 @@ export class Throttle {
 			// them requests, ie we could spam them.
 			whitelist: [],
 		});
+
+		this.#queue = await this.createQueue();
+		await this.#queue.start();
 
 		return this;
 	}
@@ -67,7 +68,7 @@ export class Throttle {
 
 	async #doJob(peer: Contracts.P2P.Peer, event: string, resolve: () => void): Promise<void> {
 		if (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
-			await delay(1000);
+			await delay(100);
 
 			void this.#queue.push({
 				handle: async () => {
@@ -76,6 +77,7 @@ export class Throttle {
 			});
 		} else {
 			await this.#outgoingRateLimiter.consume(peer.ip, event);
+
 			resolve();
 		}
 	}
