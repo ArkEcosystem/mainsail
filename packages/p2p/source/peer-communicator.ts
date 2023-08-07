@@ -46,9 +46,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		this.#outgoingRateLimiter = buildRateLimiter({
 			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 
-			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
+			rateLimit: this.configuration.getRequired<number>("rateLimit"),
 
-			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
+			rateLimitPostTransactions: this.configuration.getRequired<number>("rateLimitPostTransactions"),
 
 			remoteAccess: [],
 			// White listing anybody here means we would not throttle ourselves when sending
@@ -58,7 +58,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
-		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
+		const postTransactionsRateLimit = this.configuration.getRequired<number>("rateLimitPostTransactions");
 
 		const queue = await peer.getTransactionsQueue();
 		void queue.resume();
