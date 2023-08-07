@@ -46,6 +46,10 @@ export class Validator implements Contracts.Consensus.IValidator {
 		return this;
 	}
 
+	public getWalletPublicKey(): string {
+		return this.#walletPublicKey;
+	}
+
 	public getConsensusPublicKey(): string {
 		return this.#keyPair.publicKey;
 	}

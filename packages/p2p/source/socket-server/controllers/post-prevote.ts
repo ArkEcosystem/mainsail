@@ -4,19 +4,15 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class PostPrevoteController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Consensus.Handler)
-	private readonly consensusHandler!: Contracts.Consensus.IHandler;
-
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
+	@inject(Identifiers.Consensus.PrevoteProcessor)
+	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
 
 	public async handle(
 		request: Contracts.P2P.IPostPrevoteRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.IPostPrevoteResponse> {
-		const prevote = await this.factory.makePrevoteFromBytes(request.payload.prevote);
-
-		await this.consensusHandler.onPrevote(prevote);
+		// TODO: Handle response
+		await this.prevoteProcessor.process(request.payload.prevote);
 
 		return {};
 	}

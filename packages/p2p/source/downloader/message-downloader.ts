@@ -33,11 +33,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.Consensus.Handler)
-	private readonly handler!: Contracts.Consensus.IHandler;
+	@inject(Identifiers.Consensus.PrevoteProcessor)
+	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
 
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
+	@inject(Identifiers.Consensus.PrecommitProcessor)
+	private readonly precommitProcessor!: Contracts.Consensus.IProcessor;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
@@ -128,15 +128,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			const result = await this.communicator.getMessages(job.peer);
 
 			for (const prevoteBuffer of result.prevotes) {
-				const prevote = await this.messageFactory.makePrevoteFromBytes(prevoteBuffer);
-
-				await this.handler.onPrevote(prevote);
+				// TODO: handle response
+				await this.prevoteProcessor.process(prevoteBuffer, false);
 			}
 
 			for (const precommitBuffer of result.precommits) {
-				const precommit = await this.messageFactory.makePrecommitFromBytes(precommitBuffer);
-
-				await this.handler.onPrecommit(precommit);
+				// TODO: handle response
+				await this.precommitProcessor.process(precommitBuffer, false);
 			}
 		} catch {
 			isError = true;

@@ -51,6 +51,7 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 		await this.consensusStorage.put("consensus-state", data);
 	}
 
+	// TODO: Support multiple rounds
 	public async saveProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
 		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(proposal.validatorIndex);
 		await this.proposalStorage.put(validatorPublicKey, proposal.toData());

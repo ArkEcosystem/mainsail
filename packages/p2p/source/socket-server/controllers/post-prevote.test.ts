@@ -6,28 +6,23 @@ import { PostPrevoteController } from "./post-prevote";
 describe<{
 	sandbox: Sandbox;
 	controller: PostPrevoteController;
-}>("PostProvoteController", ({ it, assert, beforeEach, stub, spy }) => {
-	const factory = { makePrevoteFromBytes: () => {} };
-	const handler = {
-		onPrevote: () => {},
+}>("PostPrevoteController", ({ it, beforeEach, spy }) => {
+	const processor = {
+		process: () => {},
 	};
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.Consensus.Handler).toConstantValue(handler);
-		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
+		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(processor);
 
 		context.controller = context.sandbox.app.resolve(PostPrevoteController);
 	});
 
-	it("#handle - should deserialize prevote and call onPrevote handler", async ({ controller }) => {
-		const prevote = { height: 1 };
-
-		stub(factory, "makePrevoteFromBytes").resolvedValue(prevote);
-		const spyOnPrevote = spy(handler, "onPrevote");
+	it("#handle - should call processor", async ({ controller }) => {
+		const spyOnProcess = spy(processor, "process");
 
 		await controller.handle({ payload: { prevote: Buffer.from("") } }, {});
-		spyOnPrevote.calledOnce();
+		spyOnProcess.calledOnce();
 	});
 });

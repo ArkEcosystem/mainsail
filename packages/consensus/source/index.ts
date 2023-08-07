@@ -4,8 +4,11 @@ import { RootDatabase } from "lmdb";
 
 import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
+import { CommittedBlockProcessor } from "./committed-block-processor";
 import { Consensus } from "./consensus";
-import { Handler } from "./handler";
+import { PrecommitProcessor } from "./precommit-processor";
+import { PrevoteProcessor } from "./prevote-processor";
+import { ProposalProcessor } from "./proposal-processor";
 import { ProposerPicker } from "./proposer-picker";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
@@ -14,12 +17,15 @@ import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Consensus.Handler).to(Handler).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Aggregator).to(Aggregator).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Verifier).to(Verifier).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(this.app.resolve(ProposerPicker));
+		this.app.bind(Identifiers.Consensus.ProposalProcessor).to(ProposalProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.PrevoteProcessor).to(PrevoteProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.CommittedBlockProcessor).to(CommittedBlockProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker).inSingletonScope();
 
 		// Storage for uncommitted blocks
 		const rootStorage = this.app.get<RootDatabase>(Identifiers.Database.RootStorage);

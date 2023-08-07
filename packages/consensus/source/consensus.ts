@@ -16,11 +16,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@inject(Identifiers.Consensus.Handler)
-	private readonly handler!: Contracts.Consensus.IHandler;
+	@inject(Identifiers.Consensus.ProposalProcessor)
+	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
 
-	@inject(Identifiers.PeerBroadcaster)
-	private readonly broadcaster!: Contracts.P2P.Broadcaster;
+	@inject(Identifiers.Consensus.PrevoteProcessor)
+	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
+
+	@inject(Identifiers.Consensus.PrecommitProcessor)
+	private readonly precommitProcessor!: Contracts.Consensus.IProcessor;
 
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler!: Contracts.Consensus.IScheduler;
@@ -197,14 +200,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		// TODO: Check proposer
+		this.#step = Contracts.Consensus.Step.Prevote;
+
 		const { block } = proposal.block;
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 
 		const result = await this.processor.process(roundState);
 		roundState.setProcessorResult(result);
-
-		this.#step = Contracts.Consensus.Step.Prevote;
 
 		await this.#prevote(result ? block.data.id : undefined);
 	}
@@ -407,21 +409,19 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		const proposal = await proposer.propose(this.#height, this.#round, block, lockProof, this.#validRound);
 
-		void this.broadcaster.broadcastProposal(proposal);
-		void this.handler.onProposal(proposal);
+		void this.proposalProcessor.process(proposal.serialized);
 	}
 
 	async #prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (roundState.hasPrevote(validator)) {
+			if (roundState.hasPrevote(this.validatorSet.getValidatorIndexByPublicKey(validator.getWalletPublicKey()))) {
 				continue;
 			}
 
 			const prevote = await validator.prevote(this.#height, this.#round, value);
 
-			void this.broadcaster.broadcastPrevote(prevote);
-			void this.handler.onPrevote(prevote);
+			void this.prevoteProcessor.process(prevote.serialized);
 		}
 
 		await this.#saveState();
@@ -430,14 +430,15 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	async #precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (roundState.hasPrecommit(validator)) {
+			if (
+				roundState.hasPrecommit(this.validatorSet.getValidatorIndexByPublicKey(validator.getWalletPublicKey()))
+			) {
 				continue;
 			}
 
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
-			void this.broadcaster.broadcastPrecommit(precommit);
-			void this.handler.onPrecommit(precommit);
+			void this.precommitProcessor.process(precommit.serialized);
 		}
 
 		await this.#saveState();

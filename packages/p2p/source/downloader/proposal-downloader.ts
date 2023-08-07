@@ -24,11 +24,8 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.Consensus.Handler)
-	private readonly handler!: Contracts.Consensus.IHandler;
-
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
+	@inject(Identifiers.Consensus.ProposalProcessor)
+	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
 
 	#downloadingProposalByHeight = new Set<number>();
 
@@ -79,9 +76,8 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 				return;
 			}
 
-			const proposal = await this.messageFactory.makeProposalFromBytes(result.proposal);
-
-			await this.handler.onProposal(proposal);
+			// TODO: Handle response
+			await this.proposalProcessor.process(result.proposal, false);
 		} catch {
 			isError = true;
 		}

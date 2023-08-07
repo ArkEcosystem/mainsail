@@ -1,4 +1,4 @@
-import { IProcessableUnit } from "./block-processor";
+import { IProcessableUnit } from "../block-processor";
 import {
 	IBlock,
 	IBlockCommit,
@@ -9,16 +9,17 @@ import {
 	IProposal,
 	IProposalLockProof,
 	IValidatorSetMajority,
-} from "./crypto";
-import { Wallet } from "./state";
+} from "../crypto";
+import { Wallet } from "../state";
+import { ProcessorResult, Step } from "./enums";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
 	readonly proposer: string;
 	getProposal(): IProposal | undefined;
 	hasProposal(): boolean;
-	hasPrevote(validator: IValidator): boolean;
-	hasPrecommit(validator: IValidator): boolean;
+	hasPrevote(validatorIndex: number): boolean;
+	hasPrecommit(validatorIndex: number): boolean;
 	addProposal(proposal: IProposal): Promise<boolean>;
 	addPrevote(prevote: IPrevote): Promise<boolean>;
 	addPrecommit(precommit: IPrecommit): Promise<boolean>;
@@ -95,13 +96,6 @@ export interface IBootstrapper {
 	run(): Promise<IConsensusState | undefined>;
 }
 
-export interface IHandler {
-	onProposal(proposal: IProposal): Promise<void>;
-	onPrevote(prevote: IPrevote): Promise<void>;
-	onPrecommit(precommit: IPrecommit): Promise<void>;
-	onCommittedBlock(committedBlock: ICommittedBlock): Promise<void>;
-}
-
 export interface IScheduler {
 	scheduleTimeoutStartRound(): void;
 	scheduleTimeoutPropose(height: number, round: number): void;
@@ -117,6 +111,7 @@ export interface IProposerPicker {
 
 export interface IValidator {
 	configure(publicKey: string, keyPair: IKeyPair): IValidator;
+	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<IBlock>;
 	propose(
@@ -135,8 +130,6 @@ export interface IValidatorRepository {
 	getValidators(publicKeys: string[]): IValidator[];
 }
 
-export enum Step {
-	Propose = 0,
-	Prevote = 1,
-	Precommit = 2,
+export interface IProcessor {
+	process(data: Buffer, broadcast?: boolean): Promise<ProcessorResult>;
 }

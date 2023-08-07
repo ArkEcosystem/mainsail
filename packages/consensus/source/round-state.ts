@@ -87,17 +87,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async addProposal(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(proposal.validatorIndex);
-
-		if (this.#proposer !== validatorPublicKey) {
-			return false;
-		}
-
-		if (this.#proposal) {
-			// TODO: Handle evidence
-			return false;
-		}
-
 		this.#proposal = proposal;
 
 		return true;
@@ -127,20 +116,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return !!this.#processorResult;
 	}
 
-	public hasPrevote(validator: Contracts.Consensus.IValidator): boolean {
-		return this.#prevotes.has(validator.getConsensusPublicKey());
+	public hasPrevote(validatorIndex: number): boolean {
+		return this.#prevotes.has(this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex));
 	}
 
 	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
 		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(prevote.validatorIndex);
 		if (!this.#validators.has(validatorPublicKey)) {
-			return false;
-		}
-
-		if (this.#prevotes.has(validatorPublicKey)) {
-			// TODO: Handle evidence
-
-			return false;
+			throw new Error(`Prevote by ${validatorPublicKey} is already set`);
 		}
 
 		this.#prevotes.set(validatorPublicKey, prevote);
@@ -149,8 +132,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return true;
 	}
 
-	public hasPrecommit(validator: Contracts.Consensus.IValidator): boolean {
-		return this.#precommits.has(validator.getConsensusPublicKey());
+	public hasPrecommit(validatorIndex: number): boolean {
+		return this.#precommits.has(this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex));
 	}
 
 	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
