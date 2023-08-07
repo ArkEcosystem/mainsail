@@ -20,8 +20,6 @@ export class Throttle {
 
 	#queue!: Contracts.Kernel.Queue;
 
-	// #isProcessing = false;
-
 	#outgoingRateLimiter!: RateLimiter;
 
 	public async initialize(): Promise<Throttle> {
@@ -52,18 +50,6 @@ export class Throttle {
 				},
 			});
 		});
-
-		// this.#queue().push(async () => {});
-
-		// return new Promise((resolve) => {
-		// 	this.#jobs.push({
-		// 		event,
-		// 		peer,
-		// 		resolve,
-		// 	});
-
-		// 	void this.#processJobs();
-		// });
 	}
 
 	async #doJob(peer: Contracts.P2P.Peer, event: string, resolve: () => void): Promise<void> {
@@ -81,31 +67,4 @@ export class Throttle {
 			resolve();
 		}
 	}
-
-	// async #processJobs(): Promise<void> {
-	// 	if (this.#isProcessing) {
-	// 		return;
-	// 	}
-
-	// 	const job = this.#jobs.shift();
-
-	// 	if (!job) {
-	// 		return;
-	// 	}
-
-	// 	this.#isProcessing = true;
-
-	// 	const { event, peer, resolve } = job;
-
-	// 	if (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
-	// 		this.#jobs.push(job);
-	// 	} else {
-	// 		await this.#outgoingRateLimiter.consume(peer.ip, event);
-	// 		resolve();
-	// 	}
-
-	// 	this.#isProcessing = false;
-
-	// 	void this.#processJobs();
-	// }
 }
