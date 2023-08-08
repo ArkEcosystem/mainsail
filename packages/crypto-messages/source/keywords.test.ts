@@ -19,14 +19,14 @@ describe<{
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
 		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
-		context.validator.addKeyword(keywords.isValidatorBitmap);
+		context.validator.addKeyword(keywords.limitToActiveValidators);
 		context.validator.addKeyword(keywords.isValidatorIndex);
 	});
 
-	it("keyword isValidatorBitmap - should be ok", (context) => {
+	it("keyword limitToActiveValidators - should be ok", (context) => {
 		const schema = {
 			$id: "test",
-			isValidatorBitmap: {},
+			limitToActiveValidators: {},
 		};
 		context.validator.addSchema(schema);
 
@@ -41,23 +41,23 @@ describe<{
 		assert.undefined(context.validator.validate("test", matrix).error);
 
 		matrix = new Array(activeValidators).fill(1);
-		assert.defined(context.validator.validate("test", matrix).error);
+		assert.undefined(context.validator.validate("test", matrix).error);
 
 		matrix = new Array(activeValidators - 1).fill(false);
 		assert.defined(context.validator.validate("test", matrix).error);
 
 		assert.defined(context.validator.validate("test", {}).error);
-		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test").error);
 		assert.defined(context.validator.validate("test", null).error);
 		assert.defined(context.validator.validate("test", "12134354").error);
 		assert.defined(context.validator.validate("test", []).error);
 		assert.defined(context.validator.validate("test", 1).error);
 	});
 
-	it("keyword isValidatorBitmap - should be ok with minimum", (context) => {
+	it("keyword limitToActiveValidators - should be ok with minimum", (context) => {
 		const schema = {
 			$id: "test",
-			isValidatorBitmap: {
+			limitToActiveValidators: {
 				minimum: 0,
 			},
 		};
@@ -89,14 +89,14 @@ describe<{
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		for (let i = 0; i < activeValidators; i++) {
-			assert.undefined(context.validator.validate("test", i).error);
+		for (let index = 0; index < activeValidators; index++) {
+			assert.undefined(context.validator.validate("test", index).error);
 		}
 
-		assert.defined(context.validator.validate("test", 50.00001).error);
+		assert.defined(context.validator.validate("test", 50.000_01).error);
 		assert.defined(context.validator.validate("test", activeValidators).error);
 		assert.defined(context.validator.validate("test", activeValidators + 1).error);
 		assert.defined(context.validator.validate("test", "a").error);
-		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test").error);
 	});
 });
