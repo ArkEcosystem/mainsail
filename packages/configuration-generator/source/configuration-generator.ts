@@ -62,6 +62,9 @@ export class ConfigurationGenerator {
 		writeOptions?: Contracts.NetworkGenerator.WriteOptions,
 	): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
+			address: {
+				bech32m: "ark",
+			},
 			blockTime: 8000,
 			coreDBHost: "localhost",
 			coreDBPort: 5432,
@@ -164,32 +167,31 @@ export class ConfigurationGenerator {
 		}
 
 		if (writeOptions.writeValidators) {
-			tasks.push({
-				task: async () => {
-					this.configurationWriter.writeValidators(validatorsMnemonics);
+			tasks.push(
+				{
+					task: async () => {
+						this.configurationWriter.writeValidators(validatorsMnemonics);
+					},
+					title: "Writing validators.json in core config path.",
 				},
-				title: "Writing validators.json in core config path.",
-			});
-		}
-
-		if (writeOptions.writeValidators) {
-			tasks.push({
-				task: async () => {
-					this.configurationWriter.writeEnvironment(
-						this.environmentGenerator
-							.addInitialRecords()
-							.addRecords(this.#preparteEnvironmentOptions(internalOptions))
-							.generate(),
-					);
+				{
+					task: async () => {
+						this.configurationWriter.writeEnvironment(
+							this.environmentGenerator
+								.addInitialRecords()
+								.addRecords(this.#preparteEnvironmentOptions(internalOptions))
+								.generate(),
+						);
+					},
+					title: "Writing .env in core config path.",
 				},
-				title: "Writing .env in core config path.",
-			});
+			);
 		}
 
 		if (writeOptions.writeApp) {
 			tasks.push({
 				task: async () => {
-					this.configurationWriter.writeApp(this.appGenerator.generateDefault());
+					this.configurationWriter.writeApp(this.appGenerator.generate(internalOptions));
 				},
 				title: "Writing app.json in core config path.",
 			});

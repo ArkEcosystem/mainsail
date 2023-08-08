@@ -43,11 +43,11 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	}
 
 	public async fromBuffer(buffer: Buffer): Promise<string> {
-		return base58.encodeCheck(buffer);
+		return this.#encodeCheck(buffer);
 	}
 
 	public async toBuffer(address: string): Promise<Buffer> {
-		const result: Buffer = base58.decodeCheck(address);
+		const result: Buffer = this.#decodeCheck(address);
 
 		const pubKeyHash = this.configuration.getMilestone().address.base58;
 

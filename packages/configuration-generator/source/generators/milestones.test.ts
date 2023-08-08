@@ -25,6 +25,9 @@ describe<{
 					maxTxPerBlock: 100,
 					validators: 53,
 					vendorFieldLength: 255,
+					address: {
+						bech32m: "ark",
+					},
 				})
 				.generate(),
 			[

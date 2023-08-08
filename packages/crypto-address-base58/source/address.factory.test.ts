@@ -80,4 +80,15 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 				.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"),
 		);
 	});
+
+	it("should convert between buffer", async (context) => {
+		await context.app.resolve<ECDSA>(ECDSA).register();
+
+		const addressFactory = context.app.resolve(AddressFactory);
+
+		assert.equal(
+			await addressFactory.fromBuffer(await addressFactory.toBuffer("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu")),
+			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
+		);
+	});
 });

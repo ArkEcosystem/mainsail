@@ -1,5 +1,6 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@mainsail/crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
@@ -33,7 +34,9 @@ import {
 } from "./generators";
 import { Identifiers as InternalIdentifiers } from "./identifiers";
 
-export const makeApplication = async (configurationPath?: string) => {
+export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
+	options = { address: "bech32m", bech32mPrefix: "ark", ...options };
+
 	const app = new Application(new Container());
 
 	await app.resolve(CoreSerializer).register();
@@ -43,7 +46,24 @@ export const makeApplication = async (configurationPath?: string) => {
 	await app.resolve(CoreCryptoHashBcrypto).register();
 	await app.resolve(CoreCryptoSignatureSchnorr).register();
 	await app.resolve(CoreCryptoKeyPairSchnorr).register();
-	await app.resolve(CoreCryptoAddressBech32m).register();
+
+	let addressMilestone;
+
+	switch (options.address) {
+		case "base58": {
+			await app.resolve(CoreCryptoAddressBase58).register();
+			addressMilestone = { base58: options.base58Prefix };
+			break;
+		}
+		case "bech32m": {
+			await app.resolve(CoreCryptoAddressBech32m).register();
+			addressMilestone = { bech32m: options.bech32mPrefix };
+			break;
+		}
+		default:
+			throw new Exceptions.NotImplemented(options.addressFormat, "makeApplication");
+	}
+
 	await app.resolve(CoreCryptoConsensus).register();
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();
@@ -56,7 +76,7 @@ export const makeApplication = async (configurationPath?: string) => {
 
 	// @ts-ignore
 	app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
-		milestones: [{ address: { bech32m: "ark" }, blockTime: 8000, height: 0 }],
+		milestones: [{ address: addressMilestone, blockTime: 8000, height: 0 }],
 	});
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
