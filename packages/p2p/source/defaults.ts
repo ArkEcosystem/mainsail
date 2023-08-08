@@ -12,7 +12,7 @@ export const defaults = {
 	minimumNetworkReach: process.env[Constants.Flags.CORE_P2P_MIN_NETWORK_REACH] || 20,
 	minimumVersions: ["^0.0.1"],
 
-	rateLimit: process.env[Constants.Flags.CORE_P2P_RATE_LIMIT] || 100,
+	rateLimit: process.env[Constants.Flags.CORE_P2P_RATE_LIMIT] || 150,
 	// max number of messages per second per socket connection
 	rateLimitPostTransactions: process.env[Constants.Flags.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS] || 25,
 	remoteAccess: ["127.0.0.1", "::ffff:127.0.0.1", "::1"],

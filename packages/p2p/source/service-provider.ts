@@ -20,6 +20,7 @@ import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { PeerVerifier } from "./peer-verifier";
 import { Server } from "./socket-server/server";
+import { Throttle } from "./throttle";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -99,6 +100,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerServices(): void {
+		this.app
+			.bind(Identifiers.PeerThrottleFactory)
+			.toFactory(() => async () => await this.app.resolve(Throttle).initialize());
+
 		this.app.bind(Identifiers.P2PLogger).to(Logger).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();

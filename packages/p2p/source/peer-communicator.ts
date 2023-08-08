@@ -1,15 +1,14 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 import { constants } from "./constants";
 import { Routes, SocketErrors } from "./enums";
-import { RateLimiter } from "./rate-limiter";
 // eslint-disable-next-line import/no-namespace
 import * as replySchemas from "./reply-schemas";
 import { Codecs } from "./socket-server/codecs";
-import { buildRateLimiter } from "./utils";
+import { Throttle } from "./throttle";
 
 // @TODO review the implementation
 @injectable()
@@ -20,9 +19,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
@@ -39,26 +35,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
 
-	#outgoingRateLimiter!: RateLimiter;
+	@inject(Identifiers.PeerThrottleFactory)
+	private readonly throttleFactory!: () => Promise<Throttle>;
 
-	@postConstruct()
-	public initialize(): void {
-		this.#outgoingRateLimiter = buildRateLimiter({
-			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
-
-			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
-
-			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
-
-			remoteAccess: [],
-			// White listing anybody here means we would not throttle ourselves when sending
-			// them requests, ie we could spam them.
-			whitelist: [],
-		});
-	}
+	#throttle?: Throttle;
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
-		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
+		const postTransactionsRateLimit = this.configuration.getRequired<number>("rateLimitPostTransactions");
 
 		const queue = await peer.getTransactionsQueue();
 		void queue.resume();
@@ -182,7 +165,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			...options,
 		};
 
-		await this.throttle(peer, event);
+		const throttle = await this.#getThrottle();
+		await throttle.throttle(peer, event);
 
 		const codec = Codecs[event];
 
@@ -231,26 +215,15 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return parsedResponsePayload;
 	}
 
-	private async throttle(peer: Contracts.P2P.Peer, event: string): Promise<void> {
-		const msBeforeReCheck = 1000;
-		let logged = false;
-		while (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
-			if (!logged) {
-				this.logger.debug(
-					`Throttling outgoing requests to ${peer.ip}/${event} to avoid triggering their rate limit`,
-				);
-				logged = true;
-			}
-			await delay(msBeforeReCheck);
-		}
-		try {
-			await this.#outgoingRateLimiter.consume(peer.ip, event);
-		} catch {
-			//@ts-ignore
-		}
-	}
-
 	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error): void {
 		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).blockPeer(peer);
+	}
+
+	async #getThrottle(): Promise<Throttle> {
+		if (!this.#throttle) {
+			this.#throttle = await this.throttleFactory();
+		}
+
+		return this.#throttle;
 	}
 }

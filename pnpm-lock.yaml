@@ -2238,8 +2238,8 @@ importers:
         specifier: 7.2.4
         version: 7.2.4
       rate-limiter-flexible:
-        specifier: 2.4.1
-        version: 2.4.1
+        specifier: 2.4.2
+        version: 2.4.2
       semver:
         specifier: 7.5.0
         version: 7.5.0
@@ -14234,8 +14234,8 @@ packages:
     resolution: {integrity: sha512-f+xNvGn+52G4nZVok9VB3LTE1kfDmqbnWKRayX5n2k/LEQ7doWrYvzmzFVh7ltmLgwEdEzoYwxGaXlfCjFg4Ag==}
     dev: false
 
-  /rate-limiter-flexible@2.4.1:
-    resolution: {integrity: sha512-dgH4T44TzKVO9CLArNto62hJOwlWJMLUjVVr/ii0uUzZXEXthDNr7/yefW5z/1vvHAfycc1tnuiYyNJ8CTRB3g==}
+  /rate-limiter-flexible@2.4.2:
+    resolution: {integrity: sha512-rMATGGOdO1suFyf/mI5LYhts71g1sbdhmd6YvdiXO2gJnd42Tt6QS4JUKJKSWVVkMtBacm6l40FR7Trjo6Iruw==}
     dev: false
 
   /raw-body@2.5.2:
