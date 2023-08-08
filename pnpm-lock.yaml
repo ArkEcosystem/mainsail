@@ -546,6 +546,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m

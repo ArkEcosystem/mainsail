@@ -191,7 +191,7 @@ export class ConfigurationGenerator {
 		if (writeOptions.writeApp) {
 			tasks.push({
 				task: async () => {
-					this.configurationWriter.writeApp(this.appGenerator.generateDefault());
+					this.configurationWriter.writeApp(this.appGenerator.generate(internalOptions));
 				},
 				title: "Writing app.json in core config path.",
 			});
