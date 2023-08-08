@@ -2,8 +2,8 @@ import { Validator } from "@mainsail/validation/source/validator";
 
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
-import { getMessages } from "./get-messages";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
+import { getMessages } from "./get-messages";
 
 type Context = {
 	sandbox: Sandbox;
@@ -49,10 +49,10 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 		assert.defined(result.error);
 	});
 
-	it("should not pass if precommits.len > 51", ({ validator }) => {
+	it("should not pass if precommits.len > activeValidators", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
-			precommits: Array.from({ length: 52 }).fill(Buffer.from("a")),
+			precommits: Array.from({ length: 55 }).fill(Buffer.from("a")),
 		});
 
 		assert.defined(result.error);
@@ -67,10 +67,10 @@ describe<Context>("GetMessages Schema", ({ it, assert, beforeEach, each }) => {
 		assert.defined(result.error);
 	});
 
-	it("should not pass if prevotes.len > 51", ({ validator }) => {
+	it("should not pass if prevotes.len > activeValidators", ({ validator }) => {
 		const result = validator.validate(getMessages, {
 			...data,
-			prevotes: Array.from({ length: 52 }).fill(Buffer.from("b")),
+			prevotes: Array.from({ length: 55 }).fill(Buffer.from("b")),
 		});
 
 		assert.defined(result.error);

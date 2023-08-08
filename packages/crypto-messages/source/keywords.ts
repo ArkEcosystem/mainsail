@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
-	const isValidatorBitmap: FuncKeywordDefinition = {
+	const limitToActiveValidators: FuncKeywordDefinition = {
 		compile(schema) {
 			return (data) => {
 				const { activeValidators } = configuration.getMilestone();
@@ -16,11 +16,11 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 					return false;
 				}
 
-				return data.every((element: any) => typeof element === "boolean");
+				return true;
 			};
 		},
 		errors: false,
-		keyword: "isValidatorBitmap",
+		keyword: "limitToActiveValidators",
 		metaSchema: {
 			properties: {
 				minimum: { type: "integer" },
@@ -49,7 +49,7 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 	};
 
 	return {
-		isValidatorBitmap,
 		isValidatorIndex,
+		limitToActiveValidators,
 	};
 };

@@ -7,14 +7,14 @@ export const getMessages = {
 			items: {
 				buffer: {},
 			},
-			maxItems: 51, // TODO: Form milestones
+			limitToActiveValidators: { minimum: 0 },
 			type: "array",
 		},
 		prevotes: {
 			items: {
 				buffer: {},
 			},
-			maxItems: 51, // TODO: Form milestones
+			limitToActiveValidators: { minimum: 0 },
 			type: "array",
 		},
 	},

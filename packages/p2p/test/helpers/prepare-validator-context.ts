@@ -1,13 +1,14 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Configuration } from "../../../crypto-config/distribution";
-import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
-import { makeKeywords } from "../../source/validation/keywords";
-import { makeKeywords as makeMessageKeywords } from "../../../crypto-messages/distribution/keywords";
-import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
-import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
-import { schemas as cryptoTransactionSchemas } from "../../../crypto-transaction/distribution";
-import { Sandbox } from "../../../test-framework/distribution";
 import { Validator } from "@mainsail/validation/source/validator";
+
+import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
+import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
+import { Configuration } from "../../../crypto-config/distribution";
+import { makeKeywords as makeMessageKeywords } from "../../../crypto-messages/distribution/keywords";
+import { schemas as cryptoTransactionSchemas } from "../../../crypto-transaction/distribution";
+import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
+import { Sandbox } from "../../../test-framework/distribution";
+import { makeKeywords } from "../../source/validation/keywords";
 
 type Context = {
 	sandbox: Sandbox;
@@ -23,7 +24,7 @@ export const prepareValidatorContext = (context: Context) => {
 
 	const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 	const messageKeywords = makeMessageKeywords(configuration);
-	context.validator.addKeyword(messageKeywords.isValidatorBitmap);
+	context.validator.addKeyword(messageKeywords.limitToActiveValidators);
 	context.validator.addKeyword(messageKeywords.isValidatorIndex);
 
 	context.validator.addSchema(cryptoValidationSchemas.hex);
