@@ -29,14 +29,16 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.PeerHeaderService)
 	private readonly headerService!: Contracts.P2P.IHeaderService;
 
-	@inject(Identifiers.PeerThrottle)
-	private readonly throttle!: Throttle;
-
 	@inject(Identifiers.P2PLogger)
 	private readonly logger!: Contracts.P2P.Logger;
 
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
+
+	@inject(Identifiers.PeerThrottleFactory)
+	private readonly throttleFactory!: () => Promise<Throttle>;
+
+	#throttle?: Throttle;
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
 		const postTransactionsRateLimit = this.configuration.getRequired<number>("rateLimitPostTransactions");
@@ -163,7 +165,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			...options,
 		};
 
-		await this.throttle.throttle(peer, event);
+		const throttle = await this.#getThrottle();
+		await throttle.throttle(peer, event);
 
 		const codec = Codecs[event];
 
@@ -214,5 +217,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error): void {
 		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).blockPeer(peer);
+	}
+
+	async #getThrottle(): Promise<Throttle> {
+		if (!this.#throttle) {
+			this.#throttle = await this.throttleFactory();
+		}
+
+		return this.#throttle;
 	}
 }

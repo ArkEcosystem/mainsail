@@ -29,7 +29,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.#registerFactories();
 
-		await this.#registerServices();
+		this.#registerServices();
 
 		this.#registerActions();
 	}
@@ -99,8 +99,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toFactory<Contracts.P2P.IHeader>(() => () => this.app.resolve(Header));
 	}
 
-	async #registerServices(): Promise<void> {
-		this.app.bind(Identifiers.PeerThrottle).toConstantValue(await this.app.resolve(Throttle).initialize());
+	#registerServices(): void {
+		this.app
+			.bind(Identifiers.PeerThrottleFactory)
+			.toFactory(() => async () => await this.app.resolve(Throttle).initialize());
 
 		this.app.bind(Identifiers.P2PLogger).to(Logger).inSingletonScope();
 
