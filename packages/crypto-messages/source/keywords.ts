@@ -29,33 +29,6 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 		},
 	};
 
-	const isValidatorBitmap: FuncKeywordDefinition = {
-		compile(schema) {
-			return (data) => {
-				const { activeValidators } = configuration.getMilestone();
-				if (!Array.isArray(data)) {
-					return false;
-				}
-
-				const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : activeValidators;
-
-				if (data.length < minimum || data.length > activeValidators) {
-					return false;
-				}
-
-				return data.every((element: any) => typeof element === "boolean");
-			};
-		},
-		errors: false,
-		keyword: "isValidatorBitmap",
-		metaSchema: {
-			properties: {
-				minimum: { type: "integer" },
-			},
-			type: "object",
-		},
-	};
-
 	const isValidatorIndex: FuncKeywordDefinition = {
 		compile() {
 			return (data) => {
@@ -76,7 +49,6 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 	};
 
 	return {
-		isValidatorBitmap,
 		isValidatorIndex,
 		limitToActiveValidators,
 	};
