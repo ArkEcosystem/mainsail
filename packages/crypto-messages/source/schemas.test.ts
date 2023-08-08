@@ -1,14 +1,12 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Configuration } from "@mainsail/crypto-config";
-import { schemas as baseSchemas, makeKeywords as makeBaseKeywords } from "@mainsail/crypto-validation";
 import { schemas as blockSchemas } from "@mainsail/crypto-block";
+import { Configuration } from "@mainsail/crypto-config";
 import { schemas as consensusSchemas } from "@mainsail/crypto-consensus-bls12-381";
+import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../test-framework";
-import { schemas } from "./schemas";
-import { makeKeywords as makeMessageKeywords } from "./keywords";
 import {
 	precommitData,
 	precommitDataNoBlock,
@@ -16,6 +14,8 @@ import {
 	prevoteDataNoBlock,
 	proposalData,
 } from "../test/fixtures/proposal";
+import { makeKeywords as makeMessageKeywords } from "./keywords";
+import { schemas } from "./schemas";
 
 describe<{
 	sandbox: Sandbox;

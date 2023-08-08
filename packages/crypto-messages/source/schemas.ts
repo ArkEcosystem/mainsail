@@ -63,6 +63,10 @@ export const schemas: Record<
 	},
 	validatorBitmap: {
 		$id: "validatorBitmap",
-		isValidatorBitmap: {},
+		items: {
+			buffer: {},
+		},
+		limitToActiveValidators: {},
+		type: "array",
 	},
 };
