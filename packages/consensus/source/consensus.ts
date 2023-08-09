@@ -51,7 +51,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
 	#lockedValue?: Contracts.Consensus.IRoundState;
-	#lockedRound?: number = undefined;
 	#validValue?: Contracts.Consensus.IRoundState;
 
 	#didMajorityPrevote = false;
@@ -86,7 +85,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public getLockedRound(): number | undefined {
-		return this.#lockedRound;
+		return this.#lockedValue ? this.#lockedValue.round : undefined;
 	}
 
 	public getValidValue(): unknown {
@@ -100,7 +99,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public getState(): Contracts.Consensus.IConsensusState {
 		return {
 			height: this.#height,
-			lockedRound: this.#lockedRound,
+			lockedRound: this.getLockedRound(),
 			round: this.#round,
 			step: this.#step,
 			validRound: this.getValidRound(),
@@ -235,7 +234,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.#step = Contracts.Consensus.Step.Prevote;
-		if (!this.#lockedRound || this.#lockedRound <= proposal.validRound) {
+
+		const lockedRound = this.getLockedRound();
+		if (!lockedRound || lockedRound <= proposal.validRound) {
 			const result = await this.processor.process(roundState);
 			roundState.setProcessorResult(result);
 
@@ -269,7 +270,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (this.#step === Contracts.Consensus.Step.Prevote) {
 			this.#lockedValue = roundState;
-			this.#lockedRound = this.#round;
 			this.#validValue = roundState;
 			this.#step = Contracts.Consensus.Step.Precommit;
 
@@ -328,7 +328,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.processor.commit(roundState);
 
 		this.#height++;
-		this.#lockedRound = undefined;
 		this.#lockedValue = undefined;
 		this.#validValue = undefined;
 
@@ -459,7 +458,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#step = state.step;
 			this.#height = state.height;
 			this.#round = state.round;
-			this.#lockedRound = state.lockedRound;
 			this.#lockedValue = state.lockedValue;
 			this.#validValue = state.validValue;
 		} else {
