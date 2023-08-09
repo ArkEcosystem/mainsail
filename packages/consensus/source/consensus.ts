@@ -80,16 +80,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#step = step;
 	}
 
-	public getLockedValue(): unknown {
-		return this.#lockedValue;
-	}
-
 	public getLockedRound(): number | undefined {
 		return this.#lockedValue ? this.#lockedValue.round : undefined;
-	}
-
-	public getValidValue(): unknown {
-		return this.#validValue;
 	}
 
 	public getValidRound(): number | undefined {

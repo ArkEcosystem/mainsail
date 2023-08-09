@@ -175,16 +175,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#getLockedValue - should return initial value", async ({ consensus }) => {
-		assert.undefined(consensus.getLockedValue());
-	});
-
 	it("#getLockedRound - should return initial value", async ({ consensus }) => {
 		assert.undefined(consensus.getLockedRound());
-	});
-
-	it("#getValidValue - should return initial value", async ({ consensus }) => {
-		assert.undefined(consensus.getValidValue());
 	});
 
 	it("#getValidRound - should return initial value", async ({ consensus }) => {
@@ -753,9 +745,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState.getProcessorResult = () => true;
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevote(roundState);
@@ -770,9 +760,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 
 		assert.equal(consensus.getLockedRound(), 0);
-		assert.equal(consensus.getLockedValue(), roundState);
 		assert.equal(consensus.getValidRound(), 0);
-		assert.equal(consensus.getValidValue(), roundState);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
 
@@ -783,17 +771,13 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState.getProcessorResult = () => true;
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 
 		consensus.setStep(Contracts.Consensus.Step.Precommit);
 		await consensus.onMajorityPrevote(roundState);
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.equal(consensus.getValidRound(), 0);
-		assert.equal(consensus.getValidValue(), roundState);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
 
@@ -829,9 +813,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState.getProcessorResult = () => true;
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevote(roundState);
@@ -845,9 +827,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyPrecommitProcess.calledWith(precommit.serialized);
 
 		assert.equal(consensus.getLockedRound(), 0);
-		assert.equal(consensus.getLockedValue(), roundState);
 		assert.equal(consensus.getValidRound(), 0);
-		assert.equal(consensus.getValidValue(), roundState);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
@@ -862,9 +842,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyPrecommitProcess.calledWith(precommit.serialized);
 
 		assert.equal(consensus.getLockedRound(), 0);
-		assert.equal(consensus.getLockedValue(), roundState);
 		assert.equal(consensus.getValidRound(), 0);
-		assert.equal(consensus.getValidValue(), roundState);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 	});
 
@@ -917,9 +895,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.onMajorityPrevote(roundState);
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 	});
 
 	it("#onMajorityPrevote - should return if height doesn't match", async ({ consensus, roundState }) => {
@@ -928,9 +904,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.onMajorityPrevote(roundState);
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 	});
 
 	it("#onMajorityPrevote - should return if round doesn't match", async ({ consensus, roundState }) => {
@@ -939,9 +913,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.onMajorityPrevote(roundState);
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 	});
 
 	it("#onMajorityPrevote - should return if proposal is undefined", async ({ consensus, roundState }) => {
@@ -950,9 +922,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.onMajorityPrevote(roundState);
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 	});
 
 	it("#onMajorityPrevote - should return if processor result is false", async ({ consensus, roundState }) => {
@@ -961,9 +931,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.onMajorityPrevote(roundState);
 
 		assert.undefined(consensus.getLockedRound());
-		assert.undefined(consensus.getLockedValue());
 		assert.undefined(consensus.getValidRound());
-		assert.undefined(consensus.getValidValue());
 	});
 
 	it("#onMajorityPrevoteAny - should schedule timeout prevote", async ({ consensus, scheduler, roundState }) => {
