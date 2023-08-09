@@ -175,11 +175,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer ${proposerPublicKey}`);
 
 		if (proposer) {
+			this.logger.info(`Found registered proposer ${proposerPublicKey}`);
+
 			// TODO: Error handling
 			await this.#propose(proposer);
 		} else {
-			this.logger.info(`No registered proposer for ${proposerPublicKey}`);
-
 			// TODO: Can we call this even even proposer is known?
 			this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 		}
@@ -294,7 +294,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		// ADD: Log info
+		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round} blockId: null`);
 
 		this.#step = Contracts.Consensus.Step.Precommit;
 
@@ -348,6 +348,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				return;
 			}
 
+			this.logger.info(`Timeout to propose ${this.#height}/${this.#round} expired`);
+
 			this.#step = Contracts.Consensus.Step.Prevote;
 			await this.#prevote();
 		});
@@ -359,6 +361,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				return;
 			}
 
+			this.logger.info(`Timeout to prevote ${this.#height}/${this.#round} expired`);
+
 			this.#step = Contracts.Consensus.Step.Precommit;
 			await this.#precommit();
 		});
@@ -369,6 +373,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			if (this.#height !== height || this.#round !== round) {
 				return;
 			}
+
+			this.logger.info(`Timeout to precommit ${this.#height}/${this.#round} expired`);
 
 			await this.startRound(this.#round + 1);
 		});
@@ -398,8 +404,16 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		if (this.#validValue) {
 			block = this.#validValue.getBlock();
 			lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
+
+			this.logger.info(
+				`Proposing valid block ${this.#height}/${
+					this.#round
+				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
+			);
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
+
+			this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
 		}
 
 		const proposal = await proposer.propose(this.#round, block, lockProof);
