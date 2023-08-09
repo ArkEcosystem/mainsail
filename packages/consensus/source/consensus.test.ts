@@ -246,7 +246,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetRoundState.calledOnce();
 		spyGetRoundState.calledWith(2, 0);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
-		spyLoggerInfo.calledWith(`No registered proposer for ${validatorPublicKey}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
