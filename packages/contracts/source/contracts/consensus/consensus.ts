@@ -114,13 +114,7 @@ export interface IValidator {
 	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<IBlock>;
-	propose(
-		height: number,
-		round: number,
-		block: IBlock,
-		lockProof?: IProposalLockProof,
-		validRound?: number,
-	): Promise<IProposal>;
+	propose(round: number, block: IBlock, lockProof?: IProposalLockProof): Promise<IProposal>;
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
 	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
 }

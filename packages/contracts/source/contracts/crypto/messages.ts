@@ -16,7 +16,6 @@ export interface ISignatureMessageData {
 export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignatureProposalData extends Omit<ISignatureMessageData, "type"> {}
 export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
 export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
 
@@ -29,11 +28,18 @@ export interface IProposalData {
 	readonly signature: string;
 }
 
+export interface ISerializableProposalData {
+	readonly round: number;
+	readonly block: { serialized: string };
+	readonly validatorIndex: number;
+	readonly signature?: string;
+}
+
 export interface IProposal extends IProposalData {
 	readonly block: IProposedBlock;
 	readonly serialized: Buffer;
 
-	toSignatureData(): ISignatureProposalData;
+	toSerializableData(): ISerializableProposalData;
 	toData(): IProposalData;
 	toString(): string;
 }
@@ -82,10 +88,14 @@ export interface IValidatorSetMajority {
 	validators: boolean[];
 }
 
+export interface SerializeProposalOptions {
+	includeSignature?: boolean;
+}
+
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type IMakeProposalData = WithoutSignature<IProposalData & { block: IProposedBlock }>;
+export type IMakeProposalData = WithoutSignature<ISerializableProposalData>;
 export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
 export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
 
@@ -102,8 +112,7 @@ export interface IMessageFactory {
 }
 
 export interface IMessageSerializer {
-	serializeProposal(proposal: IProposalData): Promise<Buffer>;
-	serializeProposalForSignature(proposal: ISignatureProposalData): Promise<Buffer>;
+	serializeProposal(proposal: ISerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
 	serializePrevote(prevote: IPrevoteData): Promise<Buffer>;
 	serializePrevoteForSignature(prevote: ISignaturePrevoteData): Promise<Buffer>;
 	serializePrecommit(precommit: IPrecommitData): Promise<Buffer>;

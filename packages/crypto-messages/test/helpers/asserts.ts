@@ -1,11 +1,5 @@
 export const assertProposal = (assert, data1, data2) => {
-	const fields = [
-		"height",
-		"round",
-		// "block", TODO
-		"validatorIndex",
-		"signature",
-	];
+	const fields = ["round", "block", "validatorIndex", "signature"];
 	for (const field of fields) {
 		assert.equal(data1[field].toString(), data2[field].toString());
 	}

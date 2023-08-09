@@ -27,13 +27,16 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakeProposalData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IProposal> {
-		const bytes = await this.serializer.serializeProposalForSignature({
-			blockId: data.block.block.header.id,
-			height: data.height,
-			round: data.round,
-		});
+		const bytes = await this.serializer.serializeProposal(
+			{
+				block: data.block,
+				round: data.round,
+				validatorIndex: data.validatorIndex,
+			},
+			{ includeSignature: false },
+		);
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
-		const serialized = await this.serializer.serializeProposal({ ...data, signature });
+		const serialized = Buffer.concat([bytes, Buffer.from(signature, "hex")]);
 		return this.makeProposalFromBytes(serialized);
 	}
 
@@ -50,7 +53,7 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		const block = await this.blockFactory.fromProposedBytes(Buffer.from(data.block.serialized, "hex"));
 
 		if (!serialized) {
-			serialized = await this.serializer.serializeProposal(data);
+			serialized = await this.serializer.serializeProposal(data, { includeSignature: true });
 		}
 
 		return new Proposal({ ...data, block, serialized });

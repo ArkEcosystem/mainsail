@@ -14,20 +14,19 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@inject(Identifiers.Cryptography.Size.SHA256)
 	private readonly hashSize!: number;
 
-	public async serializeProposal(proposal: Contracts.Crypto.IProposalData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IProposalData>(proposal, {
+	public async serializeProposal(
+		proposal: Contracts.Crypto.ISerializableProposalData,
+		options: Contracts.Crypto.SerializeProposalOptions,
+	): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.ISerializableProposalData>(proposal, {
 			length:
-				4 + // height
 				4 + // round
-				4 +
+				4 + // serialized block length
 				proposal.block.serialized.length / 2 + // serialized block
 				1 + // validatorIndex
-				this.signatureSize, // signature
+				(options.includeSignature ? this.signatureSize : 0), // signature
 			skip: 0,
 			schema: {
-				height: {
-					type: "uint32",
-				},
 				round: {
 					type: "uint32",
 				},
@@ -37,31 +36,13 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				validatorIndex: {
 					type: "uint8",
 				},
-				signature: {
-					type: "consensusSignature",
-				},
-			},
-		});
-	}
-
-	public async serializeProposalForSignature(proposal: Contracts.Crypto.ISignatureProposalData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.ISignatureProposalData>(proposal, {
-			length:
-				4 + // height
-				4 + // round
-				this.hashSize, // blockId
-			skip: 0,
-			schema: {
-				height: {
-					type: "uint32",
-				},
-				round: {
-					type: "uint32",
-				},
-				blockId: {
-					type: "blockId",
-					optional: false,
-				},
+				...(options.includeSignature
+					? {
+							signature: {
+								type: "consensusSignature",
+							},
+					  }
+					: {}),
 			},
 		});
 	}

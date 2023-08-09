@@ -72,7 +72,6 @@ describe<{
 		const proposal = await factory.makeProposal(
 			{
 				block,
-				height: 1,
 				round: 1,
 				validatorIndex: 0,
 			},
@@ -81,7 +80,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"95cd81768db0a8e3ce3811606f82825ba4c741fe3d465dd20a1082f93b659cf2040b39733f22326bf289e04dc6fabad7129abe7a8cd600fbd74a8050581f8137bf9e2a39279e960efa0e3b733af287f96acb2aa15218b88ff0eab13d52d0a714",
+			"9474091adfe65f47d6f07bf3c31bbfdae66fb289fabc3aa69c70319990ac78a8b19d83766c18fdb25d3f3f0edc238dde01e5121806adf3c483c36e6d94813b33d76e3d823e8db8615cceb1ff9cfa0471cbd543bfd91d7aca939af533c7eb9b3d",
 		);
 
 		const { verified, errors } = await verifier.verifyProposal(proposal);
