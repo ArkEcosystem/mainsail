@@ -348,6 +348,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				return;
 			}
 
+			this.logger.info(`Timeout to propose ${this.#height}/${this.#round} expired`);
+
 			this.#step = Contracts.Consensus.Step.Prevote;
 			await this.#prevote();
 		});
@@ -359,6 +361,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				return;
 			}
 
+			this.logger.info(`Timeout to prevote ${this.#height}/${this.#round} expired`);
+
 			this.#step = Contracts.Consensus.Step.Precommit;
 			await this.#precommit();
 		});
@@ -369,6 +373,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			if (this.#height !== height || this.#round !== round) {
 				return;
 			}
+
+			this.logger.info(`Timeout to precommit ${this.#height}/${this.#round} expired`);
 
 			await this.startRound(this.#round + 1);
 		});
