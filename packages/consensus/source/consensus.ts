@@ -404,8 +404,16 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		if (this.#validValue) {
 			block = this.#validValue.getBlock();
 			lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
+
+			this.logger.info(
+				`Proposing valid block ${this.#height}/${
+					this.#round
+				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
+			);
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
+
+			this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
 		}
 
 		const proposal = await proposer.propose(this.#round, block, lockProof);
