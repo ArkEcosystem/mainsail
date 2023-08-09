@@ -53,7 +53,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#lockedValue?: Contracts.Consensus.IRoundState;
 	#lockedRound?: number = undefined;
 	#validValue?: Contracts.Consensus.IRoundState;
-	#validRound?: number = undefined;
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
@@ -95,7 +94,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public getValidRound(): number | undefined {
-		return this.#validRound;
+		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
 	public getState(): Contracts.Consensus.IConsensusState {
@@ -104,7 +103,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			lockedRound: this.#lockedRound,
 			round: this.#round,
 			step: this.#step,
-			validRound: this.#validRound,
+			validRound: this.getValidRound(),
 		};
 	}
 
@@ -272,13 +271,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#lockedValue = roundState;
 			this.#lockedRound = this.#round;
 			this.#validValue = roundState;
-			this.#validRound = this.#round;
 			this.#step = Contracts.Consensus.Step.Precommit;
 
 			await this.#precommit(block.data.id);
 		} else {
 			this.#validValue = roundState;
-			this.#validRound = this.#round;
 
 			await this.#saveState();
 		}
@@ -333,7 +330,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#height++;
 		this.#lockedRound = undefined;
 		this.#lockedValue = undefined;
-		this.#validRound = undefined;
 		this.#validValue = undefined;
 
 		await this.startRound(0);
@@ -401,8 +397,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
 
 		if (this.#validValue) {
-			block = roundState.getBlock();
-			lockProof = await this.aggregator.getProposalLockProof(roundState);
+			// const lockedRoundState = this.roundStateRepository.getRoundState(this.#height, this.#validRound);
+			block = this.#validValue.getBlock();
+			lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
 		}
@@ -464,7 +461,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#round = state.round;
 			this.#lockedRound = state.lockedRound;
 			this.#lockedValue = state.lockedValue;
-			this.#validRound = state.validRound;
 			this.#validValue = state.validValue;
 		} else {
 			const lastBlock = this.state.getLastBlock();
