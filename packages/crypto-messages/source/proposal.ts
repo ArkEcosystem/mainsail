@@ -63,10 +63,10 @@ export class Proposal implements Contracts.Crypto.IProposal {
 
 	toSerializableData(): Contracts.Crypto.ISerializableProposalData {
 		return {
-			round: this.#round,
-			validatorIndex: this.#validatorIndex,
 			block: this.#block,
+			round: this.#round,
 			signature: this.#signature,
+			validatorIndex: this.#validatorIndex,
 		};
 	}
 

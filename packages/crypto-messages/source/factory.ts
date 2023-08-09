@@ -27,11 +27,14 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakeProposalData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IProposal> {
-		const bytes = await this.serializer.serializeProposal({
-			block: data.block,
-			round: data.round,
-			validatorIndex: data.validatorIndex,
-		}, { includeSignature: false });
+		const bytes = await this.serializer.serializeProposal(
+			{
+				block: data.block,
+				round: data.round,
+				validatorIndex: data.validatorIndex,
+			},
+			{ includeSignature: false },
+		);
 		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
 		const serialized = Buffer.concat([bytes, Buffer.from(signature, "hex")]);
 		return this.makeProposalFromBytes(serialized);

@@ -31,23 +31,31 @@ describe<{
 
 	it("#serializeProposal - should correctly serialize for signature", async ({ serializer }) => {
 		const serialized = (
-			await serializer.serializeProposal({
-				round: proposalData.round,
-				validatorIndex: proposalData.validatorIndex,
-				block: { serialized: serializedBlock },
-			}, { includeSignature: false })
+			await serializer.serializeProposal(
+				{
+					round: proposalData.round,
+					validatorIndex: proposalData.validatorIndex,
+					block: { serialized: serializedBlock },
+				},
+				{ includeSignature: false },
+			)
 		).toString("hex");
 
 		assert.equal(serialized, serializedProposalForSignature);
 	});
 
 	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposal({
-			round: proposalData.round,
-			validatorIndex: proposalData.validatorIndex,
-			block: { serialized: serializedBlock },
-			signature: proposalData.signature,
-		}, { includeSignature: true })).toString("hex");
+		const serialized = (
+			await serializer.serializeProposal(
+				{
+					round: proposalData.round,
+					validatorIndex: proposalData.validatorIndex,
+					block: { serialized: serializedBlock },
+					signature: proposalData.signature,
+				},
+				{ includeSignature: true },
+			)
+		).toString("hex");
 
 		assert.equal(serialized, serializedProposal);
 	});

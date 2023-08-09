@@ -58,6 +58,11 @@ describe<{
 	});
 
 	it("#toSerializableData", () => {
-		assert.equal(proposal.toSerializableData(), { round: proposalData.round, block: block, validatorIndex: proposalData.validatorIndex, signature: proposalData.signature });
+		assert.equal(proposal.toSerializableData(), {
+			round: proposalData.round,
+			block: block,
+			validatorIndex: proposalData.validatorIndex,
+			signature: proposalData.signature,
+		});
 	});
 });

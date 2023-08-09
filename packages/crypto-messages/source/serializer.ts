@@ -14,7 +14,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	@inject(Identifiers.Cryptography.Size.SHA256)
 	private readonly hashSize!: number;
 
-	public async serializeProposal(proposal: Contracts.Crypto.ISerializableProposalData, options: Contracts.Crypto.SerializeProposalOptions): Promise<Buffer> {
+	public async serializeProposal(
+		proposal: Contracts.Crypto.ISerializableProposalData,
+		options: Contracts.Crypto.SerializeProposalOptions,
+	): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.ISerializableProposalData>(proposal, {
 			length:
 				4 + // round
@@ -33,11 +36,13 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				validatorIndex: {
 					type: "uint8",
 				},
-				...(options.includeSignature ? {
-					signature: {
-						type: "consensusSignature",
-					},
-				} : {})
+				...(options.includeSignature
+					? {
+							signature: {
+								type: "consensusSignature",
+							},
+					  }
+					: {}),
 			},
 		});
 	}

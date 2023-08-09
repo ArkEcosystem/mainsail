@@ -16,8 +16,8 @@ export interface ISignatureMessageData {
 export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> { }
-export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> { }
+export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
 
 export interface IProposalData {
 	readonly height: number;
