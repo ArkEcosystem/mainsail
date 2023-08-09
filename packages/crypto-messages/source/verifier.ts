@@ -23,7 +23,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 
-		const bytes = await this.serializer.serializeProposalForSignature(proposal.toSignatureData());
+		const bytes = await this.serializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false });
 		if (!(await this.#verifySignature(proposal.signature, proposal.validatorIndex, bytes))) {
 			errors.push("invalid signature");
 		}

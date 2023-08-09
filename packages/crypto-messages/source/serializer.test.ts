@@ -14,6 +14,7 @@ import {
 	serializedPrevoteForSignature,
 	serializedProposal,
 	serializedProposalForSignature,
+	serializedBlock,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Serializer } from "./serializer";
@@ -30,17 +31,24 @@ describe<{
 
 	it("#serializeProposal - should correctly serialize for signature", async ({ serializer }) => {
 		const serialized = (
-			await serializer.serializeProposalForSignature({
-				height: proposalData.height,
+			await serializer.serializeProposal({
 				round: proposalData.round,
-				blockId: blockData.id,
-			})
+				validatorIndex: proposalData.validatorIndex,
+				block: { serialized: serializedBlock },
+			}, { includeSignature: false })
 		).toString("hex");
+
 		assert.equal(serialized, serializedProposalForSignature);
 	});
 
 	it("#serializeProposal - should correctly serialize with signature", async ({ serializer }) => {
-		const serialized = (await serializer.serializeProposal(proposalData)).toString("hex");
+		const serialized = (await serializer.serializeProposal({
+			round: proposalData.round,
+			validatorIndex: proposalData.validatorIndex,
+			block: { serialized: serializedBlock },
+			signature: proposalData.signature,
+		}, { includeSignature: true })).toString("hex");
+
 		assert.equal(serialized, serializedProposal);
 	});
 

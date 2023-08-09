@@ -407,7 +407,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			block = await proposer.prepareBlock(this.#height, this.#round);
 		}
 
-		const proposal = await proposer.propose(this.#height, this.#round, block, lockProof, this.#validRound);
+		const proposal = await proposer.propose(this.#round, block, lockProof);
 
 		void this.proposalProcessor.process(proposal.serialized);
 	}

@@ -18,42 +18,46 @@ describe<{
 
 	const proposal = new Proposal({ ...proposalData, block, serialized: Buffer.from("dead", "hex") });
 
-	it("#height", async () => {
-		assert.equal(proposal.height, 1);
+	it("#height", () => {
+		assert.equal(proposal.height, 2);
 	});
 
-	it("#round", async () => {
+	it("#round", () => {
 		assert.equal(proposal.round, 1);
 	});
 
-	it("#validRound", async () => {
+	it("#validRound", () => {
 		assert.undefined(proposal.validRound);
 	});
 
-	it("#block", async () => {
+	it("#block", () => {
 		assert.equal(proposal.block, block);
 	});
 
-	it("#validatorIndex", async () => {
+	it("#validatorIndex", () => {
 		assert.equal(proposal.validatorIndex, 0);
 	});
 
-	it("#signature", async () => {
+	it("#signature", () => {
 		assert.equal(proposal.signature, proposalData.signature);
 	});
 
-	it("#serialized", async () => {
+	it("#serialized", () => {
 		assert.equal(proposal.serialized.toString("hex"), "dead");
 	});
 
-	it("#toString", async () => {
+	it("#toString", () => {
 		assert.equal(
 			proposal.toString(),
-			`{"block":"b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0","height":1,"round":1,"validatorIndex":0}`,
+			`{"block":"b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0","height":2,"round":1,"validatorIndex":0}`,
 		);
 	});
 
-	it("#toData", async () => {
+	it("#toData", () => {
 		assert.equal(proposal.toData(), proposalData);
+	});
+
+	it("#toSerializableData", () => {
+		assert.equal(proposal.toSerializableData(), { round: proposalData.round, block: block, validatorIndex: proposalData.validatorIndex, signature: proposalData.signature });
 	});
 });

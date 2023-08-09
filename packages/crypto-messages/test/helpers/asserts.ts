@@ -1,8 +1,7 @@
 export const assertProposal = (assert, data1, data2) => {
 	const fields = [
-		"height",
 		"round",
-		// "block", TODO
+		"block",
 		"validatorIndex",
 		"signature",
 	];

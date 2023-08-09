@@ -61,19 +61,15 @@ export class Validator implements Contracts.Consensus.IValidator {
 	}
 
 	public async propose(
-		height: number,
 		round: number,
 		block: Contracts.Crypto.IBlock,
 		lockProof?: Contracts.Crypto.IProposalLockProof,
-		validRound?: number,
 	): Promise<Contracts.Crypto.IProposal> {
 		const serializedProposedBlock = await this.blockSerializer.serializeProposed({ block, lockProof });
 		return this.messagesFactory.makeProposal(
 			{
-				block: { block, lockProof, serialized: serializedProposedBlock.toString("hex") },
-				height,
+				block: { serialized: serializedProposedBlock.toString("hex") },
 				round,
-				validRound,
 				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
 			},
 			this.#keyPair,
@@ -122,8 +118,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		}
 
 		this.logger.debug(
-			`Received ${
-				transactions.length
+			`Received ${transactions.length
 			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 

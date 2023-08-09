@@ -15,9 +15,6 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 
 		await this.serializer.deserialize<Contracts.Crypto.IProposal>(buffer, proposal, {
 			schema: {
-				height: {
-					type: "uint32",
-				},
 				round: {
 					type: "uint32",
 				},
