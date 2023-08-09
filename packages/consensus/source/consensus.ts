@@ -51,9 +51,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
 	#lockedValue?: Contracts.Consensus.IRoundState;
-	#lockedRound?: number = undefined;
 	#validValue?: Contracts.Consensus.IRoundState;
-	#validRound?: number = undefined;
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
@@ -87,7 +85,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public getLockedRound(): number | undefined {
-		return this.#lockedRound;
+		return this.#lockedValue ? this.#lockedValue.round : undefined;
 	}
 
 	public getValidValue(): unknown {
@@ -95,16 +93,16 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public getValidRound(): number | undefined {
-		return this.#validRound;
+		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
 	public getState(): Contracts.Consensus.IConsensusState {
 		return {
 			height: this.#height,
-			lockedRound: this.#lockedRound,
+			lockedRound: this.getLockedRound(),
 			round: this.#round,
 			step: this.#step,
-			validRound: this.#validRound,
+			validRound: this.getValidRound(),
 		};
 	}
 
@@ -236,7 +234,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.#step = Contracts.Consensus.Step.Prevote;
-		if (!this.#lockedRound || this.#lockedRound <= proposal.validRound) {
+
+		const lockedRound = this.getLockedRound();
+		if (!lockedRound || lockedRound <= proposal.validRound) {
 			const result = await this.processor.process(roundState);
 			roundState.setProcessorResult(result);
 
@@ -270,15 +270,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (this.#step === Contracts.Consensus.Step.Prevote) {
 			this.#lockedValue = roundState;
-			this.#lockedRound = this.#round;
 			this.#validValue = roundState;
-			this.#validRound = this.#round;
 			this.#step = Contracts.Consensus.Step.Precommit;
 
 			await this.#precommit(block.data.id);
 		} else {
 			this.#validValue = roundState;
-			this.#validRound = this.#round;
 
 			await this.#saveState();
 		}
@@ -331,9 +328,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.processor.commit(roundState);
 
 		this.#height++;
-		this.#lockedRound = undefined;
 		this.#lockedValue = undefined;
-		this.#validRound = undefined;
 		this.#validValue = undefined;
 
 		await this.startRound(0);
@@ -401,8 +396,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
 
 		if (this.#validValue) {
-			block = roundState.getBlock();
-			lockProof = await this.aggregator.getProposalLockProof(roundState);
+			block = this.#validValue.getBlock();
+			lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
 		} else {
 			block = await proposer.prepareBlock(this.#height, this.#round);
 		}
@@ -462,9 +457,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#step = state.step;
 			this.#height = state.height;
 			this.#round = state.round;
-			this.#lockedRound = state.lockedRound;
 			this.#lockedValue = state.lockedValue;
-			this.#validRound = state.validRound;
 			this.#validValue = state.validValue;
 		} else {
 			const lastBlock = this.state.getLastBlock();
