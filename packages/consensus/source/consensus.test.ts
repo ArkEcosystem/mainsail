@@ -81,8 +81,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.roundStateRepository = {
-			getRoundState: () => context.roundState,
 			clear: () => {},
+			getRoundState: () => context.roundState,
 		};
 
 		context.validatorSet = {
@@ -186,27 +186,19 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		});
 	});
 
-	it("#startRound - should clear storage if round === 0", async ({ consensus, storage, scheduler }) => {
-		const spyClear = spy(storage, "clear");
-		const spySaveState = spy(storage, "saveState");
-		const spyScheduleTimeoutStartRound = spy(scheduler, "scheduleTimeoutStartRound");
-
-		await consensus.startRound(0);
-
-		spyClear.calledOnce();
-		spySaveState.calledOnce();
-		spyScheduleTimeoutStartRound.calledOnce();
-	});
-
-	it("#startRound - should not clear storage if round !== 0", async ({ consensus, storage, scheduler }) => {
-		const spyClear = spy(storage, "clear");
-		const spySaveState = spy(storage, "saveState");
+	it("#startRound - should clear scheduler, scheduleTimeout & save state", async ({
+		consensus,
+		storage,
+		scheduler,
+	}) => {
+		const spyStorageSaveState = spy(storage, "saveState");
+		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutStartRound = spy(scheduler, "scheduleTimeoutStartRound");
 
 		await consensus.startRound(1);
 
-		spyClear.neverCalled();
-		spySaveState.calledOnce();
+		spyScheduleClear.calledOnce();
+		spyStorageSaveState.calledOnce();
 		spyScheduleTimeoutStartRound.calledOnce();
 	});
 
@@ -1057,16 +1049,20 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#onMajorityPrecommit - should commit & increase height", async ({
+	it("#onMajorityPrecommit - should commit, increase height & clear", async ({
 		consensus,
 		blockProcessor,
 		roundState,
+		roundStateRepository,
 		logger,
+		storage,
 		proposal,
 	}) => {
 		const fakeTimers = clock();
 
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
+		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
+		const spyStorageClear = stub(storage, "clear");
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
@@ -1082,6 +1078,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.calledWith(roundState);
 		spyConsensusStartRound.calledOnce();
 		spyConsensusStartRound.calledWith(0);
+		spyRoundStateRepositoryClear.calledOnce();
+		spyStorageClear.calledOnce();
 		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 		assert.equal(consensus.getHeight(), 3);
 	});
@@ -1092,12 +1090,16 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState,
 		logger,
 		block,
+		storage,
+		roundStateRepository,
 		proposal,
 	}) => {
 		const fakeTimers = clock();
 
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
+		const spyStorageClear = stub(storage, "clear");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
 
@@ -1110,6 +1112,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyRoundStateGetBlock.calledOnce();
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
+		spyRoundStateRepositoryClear.neverCalled();
+		spyStorageClear.neverCalled();
 		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${2} received +2/3 precommit but is invalid`);
 		assert.equal(consensus.getHeight(), 2);
 	});
