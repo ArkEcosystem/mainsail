@@ -29,8 +29,7 @@ export class ConsensusController extends Controller {
 
 		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.IPrevote | Contracts.Crypto.IPrecommit>) => {
 			const collected = {
-				// public keys
-				absent: [] as string[],
+				absent: validators.map(v => v.getPublicKey()),
 			};
 
 			for (const message of messages) {
@@ -42,8 +41,7 @@ export class ConsensusController extends Controller {
 					}
 
 					collected[key][`v-${validatorKey}`] = message.signature;
-				} else {
-					collected.absent.push(validatorKey);
+					collected.absent.splice(collected.absent.indexOf(validatorKey), 1);
 				}
 			}
 
