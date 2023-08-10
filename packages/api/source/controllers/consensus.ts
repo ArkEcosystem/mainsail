@@ -48,27 +48,27 @@ export class ConsensusController extends Controller {
 			}
 
 			return collected;
-		}
+		};
 
 		return {
 			data: {
 				height: state.height,
 				lockedRound: state.lockedRound,
 				lockedValue: state.lockedValue ? state.lockedValue.getProposal()?.block.block.header.id : null,
+				precommits: collectMessages(precommits),
+				prevotes: collectMessages(prevotes),
+				proposals: proposals.map((p) => ({
+					data: p.toData(),
+					lockProof: p.block.lockProof,
+				})),
 				round: state.round,
 				step: state.step,
 				validRound: state.validRound,
 				validValue: state.validValue ? state.validValue.getProposal()?.block.block.header.id : null,
-				proposals: proposals.map(p => ({
-					lockProof: p.block.lockProof,
-					data: p.toData(),
-				})),
-				prevotes: collectMessages(prevotes),
-				precommits: collectMessages(precommits),
-				validators: validators.map(v => ({
+				validators: validators.map((v) => ({
+					consensusPublicKey: v.getAttribute<string>("validator.consensusPublicKey"),
 					index: this.validatorSet.getValidatorIndexByPublicKey(v.getPublicKey()!),
 					publicKey: v.getPublicKey(),
-					consensusPublicKey: v.getAttribute<string>("validator.consensusPublicKey")
 				})),
 			},
 		};
