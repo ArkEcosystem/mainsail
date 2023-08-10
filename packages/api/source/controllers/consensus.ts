@@ -29,7 +29,7 @@ export class ConsensusController extends Controller {
 
 		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.IPrevote | Contracts.Crypto.IPrecommit>) => {
 			const collected = {
-				absent: validators.map(v => v.getPublicKey()),
+				absent: validators.map((v) => v.getPublicKey()),
 			};
 
 			for (const message of messages) {
