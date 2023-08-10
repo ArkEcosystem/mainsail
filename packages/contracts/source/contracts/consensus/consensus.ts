@@ -59,6 +59,7 @@ export interface IConsensusStateData {
 
 export interface IRoundStateRepository {
 	getRoundState(height: number, round: number): IRoundState;
+	clear(): void;
 }
 
 export interface IConsensusService {

@@ -152,9 +152,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.scheduler.clear();
 
 		if (round === 0) {
-			// Remove persisted state, because new heigh is reached
+			// Remove persisted state, because new height is reached
 			await this.storage.clear();
+			this.roundStateRepository.clear();
 		}
+
 		await this.#saveState();
 
 		this.scheduler.scheduleTimeoutStartRound();
