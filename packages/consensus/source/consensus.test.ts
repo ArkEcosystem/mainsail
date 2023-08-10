@@ -81,7 +81,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.roundStateRepository = {
-			getRoundState: () => {},
+			getRoundState: () => context.roundState,
+			clear: () => {},
 		};
 
 		context.validatorSet = {
@@ -115,10 +116,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			validatorPublicKey: "validatorPublicKey",
 		};
 
-		context.roundStateRepository = {
-			getRoundState: () => {},
-		};
-
 		context.roundState = {
 			getBlock: () => {},
 			getProposal: () => context.proposal,
@@ -129,10 +126,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			round: 0,
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
-
-		context.roundStateRepository = {
-			getRoundState: () => context.roundState,
-		};
 
 		context.verifier = {
 			hasValidProposalLockProof: () => true,

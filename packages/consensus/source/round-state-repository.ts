@@ -20,6 +20,10 @@ export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepo
 		return this.#roundStates.get(key)!;
 	}
 
+	public clear(): void {
+		this.#roundStates.clear();
+	}
+
 	#createRoundState(height: number, round: number): Contracts.Consensus.IRoundState {
 		return this.app.resolve(RoundState).configure(height, round);
 	}
