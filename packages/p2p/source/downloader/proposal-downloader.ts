@@ -67,7 +67,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 
 	// TODO: Handle errors & response checks
 	async #downloadProposalFromPeer(job: DownloadJob): Promise<void> {
-		let error: Error | undefined = undefined;
+		let error: Error | undefined;
 
 		try {
 			const result = await this.communicator.getProposal(job.peer);

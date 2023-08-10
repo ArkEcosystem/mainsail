@@ -122,7 +122,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	async #downloadMessagesFromPeer(job: DownloadJob): Promise<void> {
-		let error: Error | undefined = undefined;
+		let error: Error | undefined;
 
 		try {
 			const result = await this.communicator.getMessages(job.peer);
