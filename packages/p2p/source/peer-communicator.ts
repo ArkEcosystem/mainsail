@@ -216,7 +216,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	private handleSocketError(peer: Contracts.P2P.Peer, event: string, error: Error): void {
-		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).blockPeer(peer);
+		this.app
+			.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer)
+			.blockPeer(peer, `Error on request ${event} - ${error.message}`);
 	}
 
 	async #getThrottle(): Promise<Throttle> {

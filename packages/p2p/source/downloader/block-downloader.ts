@@ -121,7 +121,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				await this.committedBlockProcessor.process(buff);
 			}
 		} catch (error) {
-			this.peerDisposer.blockPeer(job.peer);
+			this.peerDisposer.blockPeer(job.peer, `Error processing downloaded blocks - ${error.message}}`);
 
 			this.#handleJobError(job, error);
 			return;
@@ -167,7 +167,10 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		// TODO: Take header size into account
 		if (size + configuration.block.maxPayload < constants.DEFAULT_MAX_PAYLOAD) {
 			// Peer did't respond with all requested blocks and didn't exceed maxPayload
-			this.peerDisposer.blockPeer(job.peer);
+			this.peerDisposer.blockPeer(
+				job.peer,
+				"Peer didn't respond with all requested blocks and didn't exceed maxPayload",
+			);
 		}
 
 		this.#replyJob(job);
