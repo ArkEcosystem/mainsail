@@ -67,7 +67,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 
 	// TODO: Handle errors & response checks
 	async #downloadProposalFromPeer(job: DownloadJob): Promise<void> {
-		let isError = false;
+		let error: Error | undefined;
 
 		try {
 			const result = await this.communicator.getProposal(job.peer);
@@ -78,14 +78,14 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 
 			// TODO: Handle response
 			await this.proposalProcessor.process(result.proposal, false);
-		} catch {
-			isError = true;
+		} catch (error_) {
+			error = error_;
 		}
 
 		this.#downloadingProposalByHeight.delete(job.height);
 
-		if (isError) {
-			this.peerDisposer.blockPeer(job.peer);
+		if (error) {
+			this.peerDisposer.blockPeer(job.peer, `Error downloading or processing proposal - ${error.message}}`);
 			this.tryToDownload();
 		}
 	}

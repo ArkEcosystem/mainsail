@@ -122,7 +122,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	async #downloadMessagesFromPeer(job: DownloadJob): Promise<void> {
-		let isError = false;
+		let error: Error | undefined;
 
 		try {
 			const result = await this.communicator.getMessages(job.peer);
@@ -136,14 +136,14 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				// TODO: handle response
 				await this.precommitProcessor.process(precommitBuffer, false);
 			}
-		} catch {
-			isError = true;
+		} catch (error_) {
+			error = error_;
 		}
 
 		this.#removeDownloadJob(job);
 
-		if (isError) {
-			this.peerDisposer.blockPeer(job.peer);
+		if (error) {
+			this.peerDisposer.blockPeer(job.peer, `Error downloading or processing messages - ${error.message}}`);
 			this.tryToDownload();
 		}
 	}
