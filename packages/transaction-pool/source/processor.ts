@@ -37,7 +37,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 
 		try {
 			for (const [index, transactionData] of data.entries()) {
-				const entryId = transactionData instanceof Buffer ? String(index) : transactionData.id ?? String(index);
+				const entryId = String(index);
 
 				try {
 					const transaction =
@@ -51,7 +51,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 						await Promise.all(this.extensions.map((e) => e.throwIfCannotBroadcast(transaction)));
 						broadcastTransactions.push(transaction);
 						broadcast.push(entryId);
-					} catch {}
+					} catch { }
 				} catch (error) {
 					invalid.push(entryId);
 

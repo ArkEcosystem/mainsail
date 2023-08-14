@@ -19,10 +19,10 @@ describe<{
 }>("Processor", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.pool = {
-			addTransaction: () => {},
+			addTransaction: () => { },
 		};
 
-		context.extensions = [{ throwIfCannotBroadcast: () => {} }, { throwIfCannotBroadcast: () => {} }];
+		context.extensions = [{ throwIfCannotBroadcast: () => { } }, { throwIfCannotBroadcast: () => { } }];
 
 		context.transactionBroadcaster = {
 			broadcastTransactions: () => Promise.resolve(),
@@ -50,7 +50,7 @@ describe<{
 		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
 		context.container.bind(Identifiers.PeerBroadcaster).toConstantValue(context.transactionBroadcaster);
 		context.container.bind(Identifiers.LogService).toConstantValue({
-			error: () => {},
+			error: () => { },
 		});
 
 		context.transaction1 = {
@@ -114,7 +114,7 @@ describe<{
 		spiedExtension1.calledTimes(2);
 		spiedBroadcaster.neverCalled();
 
-		assert.equal(result.accept, [context.transaction1.id, context.transaction2.id]);
+		assert.equal(result.accept, ["0", "1"]);
 		assert.equal(result.broadcast, []);
 		assert.equal(result.invalid, []);
 		assert.equal(result.excess, []);
@@ -125,7 +125,7 @@ describe<{
 		const poolStub = stub(context.pool, "addTransaction");
 
 		poolStub
-			.callsFakeNth(0, async (transaction) => {})
+			.callsFakeNth(0, async (transaction) => { })
 			.callsFakeNth(1, async (transaction) => {
 				throw new Exceptions.TransactionFeeToLowError(transaction);
 			});
@@ -142,12 +142,12 @@ describe<{
 		spiedExtension1.calledOnce();
 		spiedBroadcaster.calledOnce();
 
-		assert.equal(result.accept, [context.transaction1.id]);
-		assert.equal(result.broadcast, [context.transaction1.id]);
-		assert.equal(result.invalid, [context.transaction2.id]);
+		assert.equal(result.accept, ["0"]);
+		assert.equal(result.broadcast, ["0"]);
+		assert.equal(result.invalid, ["1"]);
 		assert.equal(result.excess, []);
-		assert.truthy(result.errors[context.transaction2.id]);
-		assert.equal(result.errors[context.transaction2.id].type, "ERR_LOW_FEE");
+		assert.truthy(result.errors["1"]);
+		assert.equal(result.errors["1"].type, "ERR_LOW_FEE");
 	});
 
 	it("should add broadcast eligible transaction", async (context) => {
@@ -157,7 +157,7 @@ describe<{
 		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
 		spiedExtension0
-			.callsFakeNth(0, async (transaction) => {})
+			.callsFakeNth(0, async (transaction) => { })
 			.callsFakeNth(1, async (transaction) => {
 				throw new Exceptions.TransactionFeeToLowError(transaction);
 			});
@@ -172,8 +172,8 @@ describe<{
 		spiedExtension1.calledTimes(2);
 		spiedBroadcaster.called();
 
-		assert.equal(result.accept, [context.transaction1.id, context.transaction2.id]);
-		assert.equal(result.broadcast, [context.transaction1.id]);
+		assert.equal(result.accept, ["0", "1"]);
+		assert.equal(result.broadcast, ["0"]);
 		assert.equal(result.invalid, []);
 		assert.equal(result.excess, []);
 		assert.undefined(result.errors);
@@ -217,9 +217,9 @@ describe<{
 
 		assert.equal(result.accept, []);
 		assert.equal(result.broadcast, []);
-		assert.equal(result.invalid, [context.transaction1.id]);
-		assert.equal(result.excess, [context.transaction1.id]);
-		assert.truthy(result.errors[context.transaction1.id]);
-		assert.equal(result.errors[context.transaction1.id].type, "ERR_EXCEEDS_MAX_COUNT");
+		assert.equal(result.invalid, ["0"]);
+		assert.equal(result.excess, ["0"]);
+		assert.truthy(result.errors["0"]);
+		assert.equal(result.errors["0"].type, "ERR_EXCEEDS_MAX_COUNT");
 	});
 });

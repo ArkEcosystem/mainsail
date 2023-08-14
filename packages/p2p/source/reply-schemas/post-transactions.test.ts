@@ -15,7 +15,7 @@ describe<Context>("PostTransactions Schema", ({ it, assert, beforeEach, each }) 
 
 	beforeEach((context) => {
 		data = {
-			accept: ["a".repeat(64)],
+			accept: ["1"],
 			headers,
 		};
 
