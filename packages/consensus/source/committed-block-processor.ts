@@ -25,7 +25,7 @@ export class CommittedBlockProcessor implements Contracts.Consensus.IProcessor {
 		}
 
 		const committedBlockState = this.app.resolve(CommittedBlockState).configure(committedBlock);
-		if (!await this.verifier.verify(committedBlockState)) {
+		if (!await this.verifier.verifyCommittedBlock(committedBlockState)) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
