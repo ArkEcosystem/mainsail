@@ -13,12 +13,11 @@ import { CommitVerifier } from "./verifiers/commit-verifier";
 
 @injectable()
 export class BlockVerifier implements Contracts.BlockProcessor.Verifier {
-
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public async verifyCommittedBlock(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
-		if (!await this.verify(unit)) {
+		if (!(await this.verify(unit))) {
 			return false;
 		}
 
@@ -37,7 +36,7 @@ export class BlockVerifier implements Contracts.BlockProcessor.Verifier {
 			return false;
 		}
 
-		// TODO: might not be needed 
+		// TODO: might not be needed
 		if (!(await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit))) {
 			return false;
 		}
@@ -60,5 +59,4 @@ export class BlockVerifier implements Contracts.BlockProcessor.Verifier {
 
 		return true;
 	}
-
 }

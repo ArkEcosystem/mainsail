@@ -48,15 +48,15 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 			const expectedValidatorName: string = expectedValidator.getAttribute("validator.username");
 
 			this.logger.warning(
-				`Validator ${receivedValidatorName} (${block.data.generatorPublicKey
-				}) not allowed to forge, should be ${expectedValidatorName} (${expectedValidatorPublicKey})`,
+				`Validator ${receivedValidatorName} (${block.data.generatorPublicKey}) not allowed to forge, should be ${expectedValidatorName} (${expectedValidatorPublicKey})`,
 			);
 
 			return false;
 		}
 
 		this.logger.debug(
-			`Validator ${receivedValidatorName} (${block.data.generatorPublicKey
+			`Validator ${receivedValidatorName} (${
+				block.data.generatorPublicKey
 			}) allowed to forge block ${block.data.height.toLocaleString()}`,
 		);
 
