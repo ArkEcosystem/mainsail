@@ -14,6 +14,9 @@ export class CommittedBlockProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
+	@inject(Identifiers.BlockVerifier)
+	private readonly verifier!: Contracts.BlockProcessor.Verifier;
+
 	async process(data: Buffer): Promise<Contracts.Consensus.ProcessorResult> {
 		const committedBlock = await this.#makeCommittedBlock(data);
 
@@ -22,6 +25,9 @@ export class CommittedBlockProcessor implements Contracts.Consensus.IProcessor {
 		}
 
 		const committedBlockState = this.app.resolve(CommittedBlockState).configure(committedBlock);
+		if (!await this.verifier.verify(committedBlockState)) {
+			return Contracts.Consensus.ProcessorResult.Invalid;
+		}
 
 		const result = await this.processor.process(committedBlockState);
 

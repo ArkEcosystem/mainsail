@@ -3,18 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 // TODO: Move enums to contracts
 import { Enums } from "@mainsail/kernel";
 
-import {
-	ForgedTransactionsVerifier,
-	IncompatibleTransactionsVerifier,
-	NonceVerifier,
-	VerifyBlockVerifier,
-} from "./verifiers";
-
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
@@ -42,9 +32,12 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	@inject(Identifiers.BlockVerifier)
+	private readonly verifier!: Contracts.BlockProcessor.Verifier;
+
 	public async process(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
 		try {
-			if (!(await this.#verify(unit))) {
+			if (!(await this.verifier.verify(unit))) {
 				return false;
 			}
 
@@ -83,34 +76,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		}
 
 		void this.events.dispatch(Enums.BlockEvent.Applied, commitBlock);
-	}
-
-	async #verify(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
-		if (!(await this.app.resolve(VerifyBlockVerifier).execute(unit))) {
-			return false;
-		}
-
-		if (!(await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit))) {
-			return false;
-		}
-
-		if (!(await this.app.resolve(NonceVerifier).execute(unit))) {
-			return false;
-		}
-
-		// if (!(await this.app.resolve(ValidatorVerifier).execute(roundState))) {
-		// 	return false;
-		// }
-
-		// if (!(await this.app.resolve(ChainedVerifier).execute(roundState))) {
-		// 	return false;
-		// }
-
-		if (!(await this.app.resolve(ForgedTransactionsVerifier).execute(unit))) {
-			return false;
-		}
-
-		return true;
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {

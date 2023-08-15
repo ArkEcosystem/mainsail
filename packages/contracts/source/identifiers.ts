@@ -8,6 +8,7 @@ export const Identifiers = {
 	ApplicationVersion: Symbol.for("Application<Version>"),
 	BlockHistoryService: Symbol.for("Service<BlockHistory>"),
 	BlockProcessor: Symbol.for("Block<Processor>"),
+	BlockVerifier: Symbol.for("Block<Verifier>"),
 	BlockState: Symbol.for("State<Block>"),
 	CacheFactory: Symbol.for("Factory<Cache>"),
 	CacheManager: Symbol.for("Manager<Cache>"),
