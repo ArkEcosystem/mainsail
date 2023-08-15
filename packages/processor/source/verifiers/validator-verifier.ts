@@ -44,7 +44,6 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 		// Match expected and received validator keys
 		const receivedValidatorName = receivedValidator.getAttribute("validator.username");
 		if (expectedValidatorPublicKey !== block.data.generatorPublicKey) {
-			const expectedValidator = await this.walletRepository.findByPublicKey(expectedValidatorPublicKey);
 			const expectedValidatorName: string = expectedValidator.getAttribute("validator.username");
 
 			this.logger.warning(
