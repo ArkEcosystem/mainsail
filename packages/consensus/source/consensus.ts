@@ -103,6 +103,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.startRound(this.#round);
 
 		await this.handle(this.roundStateRepository.getRoundState(this.#height, this.#round));
+
+		for (let index = 0; index < this.#round; index++) {
+			await this.handle(this.roundStateRepository.getRoundState(this.#height, index));
+		}
 	}
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
