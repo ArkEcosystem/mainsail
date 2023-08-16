@@ -9,6 +9,7 @@ export const Identifiers = {
 	BlockHistoryService: Symbol.for("Service<BlockHistory>"),
 	BlockProcessor: Symbol.for("Block<Processor>"),
 	BlockState: Symbol.for("State<Block>"),
+	BlockVerifier: Symbol.for("Block<Verifier>"),
 	CacheFactory: Symbol.for("Factory<Cache>"),
 	CacheManager: Symbol.for("Manager<Cache>"),
 	CacheService: Symbol.for("Service<Cache>"),

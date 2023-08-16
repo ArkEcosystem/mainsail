@@ -12,10 +12,15 @@ export interface IProcessableUnit {
 }
 
 export interface Handler {
-	execute(roundState: IProcessableUnit): Promise<boolean>;
+	execute(unit: IProcessableUnit): Promise<boolean>;
 }
 
 export interface Processor {
-	process(roundState: IProcessableUnit): Promise<boolean>;
-	commit(roundState: IProcessableUnit): Promise<void>;
+	process(unit: IProcessableUnit): Promise<boolean>;
+	commit(unit: IProcessableUnit): Promise<void>;
+}
+
+export interface Verifier {
+	verify(unit: IProcessableUnit): Promise<boolean>;
+	verifyCommittedBlock(unit: IProcessableUnit): Promise<boolean>;
 }
