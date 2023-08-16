@@ -31,7 +31,6 @@ export const Identifiers = {
 		Service: Symbol.for("Service<Consensus>"),
 		Storage: Symbol.for("Storage<Consensus>"),
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
-		Verifier: Symbol.for("Verifier<Consensus>"),
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {
