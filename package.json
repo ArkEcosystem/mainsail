@@ -9,6 +9,7 @@
 	"scripts": {
 		"build": "lerna run build",
 		"clean": "lerna run clean --parallel",
+		"clean:all": "pnpm run clean && pnpm run clean:node_modules && rm -r .cache",
 		"clean:node_modules": "del packages/*/node_modules && del node_modules",
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
 		"deps:missing": "node ./scripts/deps/missing.js",
