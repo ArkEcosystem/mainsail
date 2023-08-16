@@ -46,6 +46,10 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
+		if (await this.#hasInvalidLockProof(proposal)) {
+			return Contracts.Consensus.ProcessorResult.Invalid;
+		}
+
 		const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 		if (roundState.hasProposal()) {
 			return Contracts.Consensus.ProcessorResult.Skipped;
@@ -74,11 +78,38 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 	async #hasInvalidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
 		const { errors } = await this.verifier.verifyProposal(proposal);
 		if (errors.length > 0) {
-			this.logger.warning(`received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
+			this.logger.debug(`Received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
 			return true;
 		}
 
 		return false;
+	}
+
+	async #hasInvalidLockProof(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
+		if (!proposal.validRound) {
+			return false;
+		}
+
+		const lockProof = proposal.block.lockProof;
+		if (!lockProof) {
+			return true;
+		}
+
+		const { verified } = await this.verifier.verifyProposalLockProof(
+			{
+				blockId: proposal.block.block.header.id,
+				height: proposal.height,
+				round: proposal.round,
+				type: Contracts.Crypto.MessageType.Prevote,
+			},
+			lockProof,
+		);
+
+		if (!verified) {
+			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with invalid lock proof`);
+		}
+
+		return !verified;
 	}
 
 	#isInvalidProposer(proposal: Contracts.Crypto.IProposal): boolean {
