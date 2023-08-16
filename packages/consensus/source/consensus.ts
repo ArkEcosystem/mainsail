@@ -310,14 +310,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.#didMajorityPrecommit = true;
-		// TODO: Check if block can be missing
 		const block = roundState.getBlock();
 
 		if (!roundState.getProcessorResult()) {
 			this.logger.info(`Block ${block.data.id} on height ${this.#height} received +2/3 precommit but is invalid`);
 			return;
 		}
-		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
+		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} blockId: ${block.data.id}`);
 
 		await this.processor.commit(roundState);
 
