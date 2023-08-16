@@ -111,6 +111,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		await this.#lock.runExclusive(async () => {
+			if (!roundState.hasProcessorResult() && roundState.hasProposal()) {
+				const result = await this.processor.process(roundState);
+				roundState.setProcessorResult(result);
+			}
+
 			await this.onProposal(roundState);
 			await this.onProposalLocked(roundState);
 
@@ -195,10 +200,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 
-		const result = await this.processor.process(roundState);
-		roundState.setProcessorResult(result);
-
-		await this.#prevote(result ? block.data.id : undefined);
+		await this.#prevote(roundState.getProcessorResult() ? block.data.id : undefined);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.IRoundState): Promise<void> {
