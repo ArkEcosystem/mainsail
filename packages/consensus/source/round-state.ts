@@ -112,8 +112,16 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		this.#processorResult = processorResult;
 	}
 
+	public hasProcessorResult(): boolean {
+		return this.#processorResult !== undefined;
+	}
+
 	public getProcessorResult(): boolean {
-		return !!this.#processorResult;
+		if (this.#processorResult === undefined) {
+			throw new Error("Processor result is undefined.");
+		}
+
+		return this.#processorResult;
 	}
 
 	public hasPrevote(validatorIndex: number): boolean {

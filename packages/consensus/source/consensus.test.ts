@@ -118,9 +118,11 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.roundState = {
 			getBlock: () => {},
+			getProcessorResult: () => false,
 			getProposal: () => context.proposal,
 			hasPrecommit: () => false,
 			hasPrevote: () => false,
+			hasProcessorResult: () => false,
 			hasProposal: () => false,
 			height: 2,
 			round: 0,
@@ -358,16 +360,14 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - broadcast prevote block id, if block is valid & not locked", async ({
 		consensus,
-		blockProcessor,
 		validatorSet,
 		validatorsRepository,
-		prevoteProcessor,
 		roundState,
 		block,
 		logger,
 		proposal,
 	}) => {
-		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
+		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue(true);
 
 		const prevote = {
 			height: 2,
@@ -384,22 +384,19 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorsRepositoryGetValidators = stub(validatorsRepository, "getValidators").returnValue([
 			validator,
 		]);
-		const spyPrevoteProcess = spy(prevoteProcessor, "process");
 		const spyLoggerInfo = spy(logger, "info");
 
 		await consensus.onProposal(roundState);
 
-		spyBlockProcessorProcess.calledOnce();
-		spyBlockProcessorProcess.calledWith(roundState);
+		spyGetProcessorResult.calledOnce();
 
 		spyValidatorSetGetActiveValidators.calledOnce();
 		spyValidatorsRepositoryGetValidators.calledOnce();
 
+		spyGetProcessorResult.calledOnce();
 		spyValidatorPrevote.calledOnce();
 		spyValidatorPrevote.calledWith(2, 0, block.data.id);
 
-		spyPrevoteProcess.calledOnce();
-		spyPrevoteProcess.calledWith(prevote.serialized);
 		spyLoggerInfo.calledWith(`Received proposal ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
@@ -407,7 +404,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - broadcast prevote undefined, if block is invalid", async ({
 		consensus,
-		blockProcessor,
 		validatorSet,
 		validatorsRepository,
 		prevoteProcessor,
@@ -415,7 +411,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		logger,
 		proposal,
 	}) => {
-		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(false);
+		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue(false);
 
 		const prevote = {
 			height: 2,
@@ -438,8 +434,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		await consensus.onProposal(roundState);
 
-		spyBlockProcessorProcess.calledOnce();
-		spyBlockProcessorProcess.calledWith(roundState);
+		spyGetProcessorResult.calledOnce();
 
 		spyValidatorSetGetActiveValidators.calledOnce();
 		spyValidatorsRepositoryGetValidators.calledOnce();
@@ -456,7 +451,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - should skip prevote if already prevoted", async ({
 		consensus,
-		blockProcessor,
 		validatorSet,
 		validatorsRepository,
 		prevoteProcessor,
@@ -464,7 +458,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		logger,
 		proposal,
 	}) => {
-		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
+		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue(true);
 
 		const prevote = {
 			height: 2,
@@ -487,8 +481,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState.hasPrevote = () => true;
 		await consensus.onProposal(roundState);
 
-		spyBlockProcessorProcess.calledOnce();
-		spyBlockProcessorProcess.calledWith(roundState);
+		spyGetProcessorResult.calledOnce();
 
 		spyValidatorSetGetActiveValidators.calledOnce();
 		spyValidatorsRepositoryGetValidators.calledOnce();
@@ -506,9 +499,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
 
-	it("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
+	it.only("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
 		consensus,
-		blockProcessor,
 		validatorSet,
 		validatorsRepository,
 		prevoteProcessor,
@@ -517,7 +509,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposal,
 		logger,
 	}) => {
-		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(true);
+		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue(true);
 
 		const prevote = {
 			height: 2,
@@ -543,8 +535,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus.setRound(1);
 		await consensus.onProposalLocked(roundState);
 
-		spyBlockProcessorProcess.calledOnce();
-		spyBlockProcessorProcess.calledWith(roundState);
+		spyGetProcessorResult.calledOnce();
 
 		spyValidatorSetGetActiveValidators.calledOnce();
 		spyValidatorsRepositoryGetValidators.calledOnce();
@@ -563,14 +554,13 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is undefined", async ({
 		consensus,
-		blockProcessor,
 		validatorSet,
 		validatorsRepository,
 		prevoteProcessor,
 		roundState,
 		proposal,
 	}) => {
-		const spyBlockProcessorProcess = stub(blockProcessor, "process").returnValue(false);
+		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue(true);
 
 		const prevote = {
 			height: 2,
@@ -596,8 +586,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus.setRound(1);
 		await consensus.onProposalLocked(roundState);
 
-		spyBlockProcessorProcess.calledOnce();
-		spyBlockProcessorProcess.calledWith(roundState);
+		spyGetProcessorResult.neverCalled();
 
 		spyValidatorSetGetActiveValidators.calledOnce();
 		spyValidatorsRepositoryGetValidators.calledOnce();

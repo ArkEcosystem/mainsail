@@ -103,10 +103,20 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.startRound(this.#round);
 
 		await this.handle(this.roundStateRepository.getRoundState(this.#height, this.#round));
+
+		// Rerun previous rounds, in case proposal & +2/3 precommits were received
+		for (let index = 0; index < this.#round; index++) {
+			await this.handle(this.roundStateRepository.getRoundState(this.#height, index));
+		}
 	}
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		await this.#lock.runExclusive(async () => {
+			if (!roundState.hasProcessorResult() && roundState.hasProposal()) {
+				const result = await this.processor.process(roundState);
+				roundState.setProcessorResult(result);
+			}
+
 			await this.onProposal(roundState);
 			await this.onProposalLocked(roundState);
 
@@ -191,10 +201,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 
-		const result = await this.processor.process(roundState);
-		roundState.setProcessorResult(result);
-
-		await this.#prevote(result ? block.data.id : undefined);
+		await this.#prevote(roundState.getProcessorResult() ? block.data.id : undefined);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -224,17 +231,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		const lockedRound = this.getLockedRound();
-		if (!lockedRound || lockedRound <= proposal.validRound) {
-			const result = await this.processor.process(roundState);
-			roundState.setProcessorResult(result);
 
-			if (result) {
-				await this.#prevote(block.data.id);
-				return;
-			}
+		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult()) {
+			await this.#prevote(block.data.id);
+		} else {
+			await this.#prevote();
 		}
-
-		await this.#prevote();
 	}
 
 	protected async onMajorityPrevote(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -304,14 +306,16 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.#didMajorityPrecommit = true;
-		// TODO: Check if block can be missing
 		const block = roundState.getBlock();
 
 		if (!roundState.getProcessorResult()) {
-			this.logger.info(`Block ${block.data.id} on height ${this.#height} received +2/3 precommit but is invalid`);
+			this.logger.info(
+				`Block ${block.data.id} on height ${this.#height} received +2/3 precommits but is invalid`,
+			);
 			return;
 		}
-		this.logger.info(`Received +2/3 precommits for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
+
+		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} blockId: ${block.data.id}`);
 
 		await this.processor.commit(roundState);
 

@@ -50,8 +50,16 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 		this.#processorResult = processorResult;
 	}
 
+	public hasProcessorResult(): boolean {
+		return this.#processorResult !== undefined;
+	}
+
 	public getProcessorResult(): boolean {
-		return !!this.#processorResult;
+		if (this.#processorResult == undefined) {
+			throw new Error("Processor result is undefined.");
+		}
+
+		return this.#processorResult;
 	}
 
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {

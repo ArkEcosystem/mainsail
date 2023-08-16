@@ -5,6 +5,7 @@ export interface IProcessableUnit {
 	readonly height: number;
 	readonly round: number;
 	getWalletRepository(): WalletRepositoryClone;
+	hasProcessorResult(): boolean;
 	getProcessorResult(): boolean;
 	setProcessorResult(processorResult: boolean): void;
 	getBlock(): IBlock;
