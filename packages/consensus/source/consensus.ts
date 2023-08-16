@@ -104,6 +104,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		await this.handle(this.roundStateRepository.getRoundState(this.#height, this.#round));
 
+		// Rerun previous rounds, in case proposal & +2/3 precommits were received
 		for (let index = 0; index < this.#round; index++) {
 			await this.handle(this.roundStateRepository.getRoundState(this.#height, index));
 		}
