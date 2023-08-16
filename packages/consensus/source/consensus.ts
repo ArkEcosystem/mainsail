@@ -309,9 +309,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const block = roundState.getBlock();
 
 		if (!roundState.getProcessorResult()) {
-			this.logger.info(`Block ${block.data.id} on height ${this.#height} received +2/3 precommit but is invalid`);
+			this.logger.info(
+				`Block ${block.data.id} on height ${this.#height} received +2/3 precommits but is invalid`,
+			);
 			return;
 		}
+
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} blockId: ${block.data.id}`);
 
 		await this.processor.commit(roundState);
