@@ -231,17 +231,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		const lockedRound = this.getLockedRound();
-		if (!lockedRound || lockedRound <= proposal.validRound) {
-			const result = await this.processor.process(roundState);
-			roundState.setProcessorResult(result);
-
-			if (result) {
-				await this.#prevote(block.data.id);
-				return;
-			}
+		if (!lockedRound || (lockedRound <= proposal.validRound && roundState.getProcessorResult())) {
+			await this.#prevote(block.data.id);
+		} else {
+			await this.#prevote();
 		}
-
-		await this.#prevote();
 	}
 
 	protected async onMajorityPrevote(roundState: Contracts.Consensus.IRoundState): Promise<void> {
