@@ -20,7 +20,6 @@ type Context = {
 	logger: any;
 	block: any;
 	aggregator: any;
-	verifier: any;
 	proposal: any;
 	roundState: Contracts.Consensus.IRoundState;
 	roundStateRepository: any;
@@ -129,10 +128,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
 
-		context.verifier = {
-			hasValidProposalLockProof: () => true,
-		};
-
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(context.blockProcessor);
@@ -144,7 +139,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
 		context.sandbox.app.bind(Identifiers.Consensus.Aggregator).toConstantValue(context.aggregator);
-		context.sandbox.app.bind(Identifiers.Consensus.Verifier).toConstantValue(context.verifier);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);
