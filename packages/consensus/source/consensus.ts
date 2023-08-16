@@ -41,9 +41,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
-	@inject(Identifiers.Consensus.Verifier)
-	private readonly verifier!: Contracts.Consensus.IVerifier;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -220,13 +217,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const { block } = proposal.block;
 
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
-
-		if (!(await this.verifier.hasValidProposalLockProof(roundState))) {
-			this.logger.info(
-				`Lock block ${block.data.id} on height ${this.#height} received +2/3 prevotes but the proof is invalid`,
-			);
-			return;
-		}
 
 		this.#step = Contracts.Consensus.Step.Prevote;
 
