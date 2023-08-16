@@ -37,7 +37,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 
 		try {
 			for (const [index, transactionData] of data.entries()) {
-				const entryId = transactionData instanceof Buffer ? String(index) : transactionData.id ?? String(index);
+				const entryId = String(index);
 
 				try {
 					const transaction =

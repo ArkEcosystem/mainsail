@@ -4,9 +4,11 @@ export const postTransactions = {
 	properties: {
 		accept: {
 			items: {
-				$ref: "transactionId",
+				pattern: "^[0123456789]+$",
+				type: "string",
 			},
 			type: "array",
+			uniqueItems: true,
 		},
 		headers,
 	},
