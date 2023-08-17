@@ -3,7 +3,8 @@ import { describe } from "../../../test-framework";
 import { isMinority } from "./is-minority";
 
 describe("isMinority", ({ assert, it }) => {
-	const makeMilestones = (activeValidators: number) => ({ getMilestone: () => ({ activeValidators }) } as Contracts.Crypto.IConfiguration);
+	const makeMilestones = (activeValidators: number) =>
+		({ getMilestone: () => ({ activeValidators }) } as Contracts.Crypto.IConfiguration);
 
 	it("should be true", () => {
 		for (let i = 53 / 3 + 1; i <= 53; i++) {
