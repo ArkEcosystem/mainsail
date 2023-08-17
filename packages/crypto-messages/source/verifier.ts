@@ -92,9 +92,9 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 		const activeValidators = this.validatorSet.getActiveValidators();
 
 		const validator = activeValidators[validatorIndex];
-		Utils.assert.defined<Contracts.State.Wallet>(validator);
+		Utils.assert.defined(validator);
 
-		const validatorPublicKey = validator.getAttribute("validator.consensusPublicKey");
+		const validatorPublicKey = validator.getConsensusPublicKey();
 		Utils.assert.defined<string>(validatorPublicKey);
 
 		return this.signature.verify(Buffer.from(signature, "hex"), message, Buffer.from(validatorPublicKey, "hex"));
