@@ -70,7 +70,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 			{
 				block: { serialized: serializedProposedBlock.toString("hex") },
 				round,
-				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
+				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
 			},
 			this.#keyPair,
 		);
@@ -87,7 +87,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 				height,
 				round,
 				type: Contracts.Crypto.MessageType.Prevote,
-				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
+				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
 			},
 			this.#keyPair,
 		);
@@ -104,7 +104,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 				height,
 				round,
 				type: Contracts.Crypto.MessageType.Precommit,
-				validatorIndex: this.validatorSet.getValidatorIndexByPublicKey(this.#walletPublicKey),
+				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
 			},
 			this.#keyPair,
 		);
@@ -118,8 +118,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 		}
 
 		this.logger.debug(
-			`Received ${
-				transactions.length
+			`Received ${transactions.length
 			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 

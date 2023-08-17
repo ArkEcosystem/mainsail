@@ -10,8 +10,8 @@ import {
 	IProposalLockProof,
 	IValidatorSetMajority,
 } from "../crypto";
-import { Wallet } from "../state";
 import { ProcessorResult, Step } from "./enums";
+import { BigNumber } from "@mainsail/utils";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
@@ -31,7 +31,7 @@ export interface IRoundState extends IProcessableUnit {
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	getPrevote(validatorIndex: number): IPrevote | undefined;
 	getPrecommit(validatorIndex: number): IPrecommit | undefined;
-	getValidator(validatorPublicKey: string): Wallet;
+	getValidator(consensusPublicKey: string): IValidatorWallet;
 	getValidatorPrevoteSignatures(): Map<string, { signature: string }>;
 	getValidatorPrecommitSignatures(): Map<string, { signature: string }>;
 	getValidatorsSignedPrevote(): boolean[];
@@ -118,6 +118,17 @@ export interface IValidator {
 	propose(round: number, block: IBlock, lockProof?: IProposalLockProof): Promise<IProposal>;
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
 	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
+}
+
+export interface IValidatorWallet {
+	getWalletPublicKey(): string;
+	getConsensusPublicKey(): string;
+	getUsername(): string;
+	getVoteBalance(): BigNumber;
+	getRank(): number;
+	setRank(rank: number): void;
+	unsetRank(): void;
+	isResigned(): boolean;
 }
 
 export interface IValidatorRepository {

@@ -86,7 +86,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.validatorSet = {
 			getActiveValidators: () => {},
-			getValidatorIndexByPublicKey: () => "",
+			getValidatorIndexByWalletPublicKey: () => "",
 		};
 
 		context.proposerPicker = {

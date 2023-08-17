@@ -12,7 +12,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 
 	#committedBlock!: Contracts.Crypto.ICommittedBlock;
 	#processorResult?: boolean;
-	#validators = new Map<string, Contracts.State.Wallet>();
+	#validators = new Map<string, Contracts.Consensus.IValidatorWallet>();
 
 	get height(): number {
 		return this.#committedBlock.commit.height;
@@ -31,7 +31,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 
 		const validators = this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
-			const consensusPublicKey = validator.getAttribute<string>("validator.consensusPublicKey");
+			const consensusPublicKey = validator.getConsensusPublicKey();
 			this.#validators.set(consensusPublicKey, validator);
 		}
 

@@ -29,12 +29,12 @@ export class ConsensusController extends Controller {
 		const nameLookup = new Map<string, string>();
 
 		for (const validator of validators) {
-			nameLookup.set(validator.getPublicKey()!, validator.getAttribute<string>("validator.username"));
+			nameLookup.set(validator.getWalletPublicKey(), validator.getUsername());
 		}
 
 		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.IPrevote | Contracts.Crypto.IPrecommit>) => {
 			const collected = {
-				absent: validators.map((v) => nameLookup.get(v.getPublicKey()!) ?? v.getPublicKey()),
+				absent: validators.map((v) => nameLookup.get(v.getWalletPublicKey()!) ?? v.getWalletPublicKey()),
 			};
 
 			for (const message of messages) {
@@ -45,7 +45,7 @@ export class ConsensusController extends Controller {
 						collected[key] = {};
 					}
 
-					const name = nameLookup.get(validator.getPublicKey()!) ?? validator.getPublicKey();
+					const name = nameLookup.get(validator.getWalletPublicKey()!) ?? validator.getWalletPublicKey();
 					collected[key][name] = message.signature;
 					collected.absent.splice(collected.absent.indexOf(name), 1);
 				}
@@ -65,18 +65,18 @@ export class ConsensusController extends Controller {
 					data: p.toData(),
 					lockProof: p.block.lockProof,
 					name:
-						nameLookup.get(validators[p.validatorIndex].getPublicKey()!) ??
-						validators[p.validatorIndex].getPublicKey(),
+						nameLookup.get(validators[p.validatorIndex].getWalletPublicKey()!) ??
+						validators[p.validatorIndex].getWalletPublicKey(),
 				})),
 				round: state.round,
 				step: state.step,
 				validRound: state.validRound,
 				validValue: state.validValue ? state.validValue.getProposal()?.block.block.header.id : null,
 				validators: validators.map((v) => ({
-					consensusPublicKey: v.getAttribute<string>("validator.consensusPublicKey"),
-					index: this.validatorSet.getValidatorIndexByPublicKey(v.getPublicKey()!),
-					name: v.getAttribute<string>("validator.username"),
-					walletPublicKey: v.getPublicKey(),
+					consensusPublicKey: v.getConsensusPublicKey(),
+					index: this.validatorSet.getValidatorIndexByWalletPublicKey(v.getWalletPublicKey()),
+					name: v.getUsername(),
+					walletPublicKey: v.getWalletPublicKey(),
 				})),
 			},
 		};
