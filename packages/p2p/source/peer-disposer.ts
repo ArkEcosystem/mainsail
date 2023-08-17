@@ -30,7 +30,7 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 		this.logger.debug(`Banning peer ${peer.ip}, because: ${reason}`);
 
-		const timeout = this.configuration.getRequired<number>("peerBlockTime");
+		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {
 			this.#blacklist.set(peer.ip, dayjs().add(timeout, "minute"));
 		}

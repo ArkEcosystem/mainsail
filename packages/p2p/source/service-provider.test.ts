@@ -147,7 +147,7 @@ describe<{
 		assert.number(result.value.maxSameSubnetPeers);
 		assert.number(result.value.minimumNetworkReach);
 		assert.array(result.value.minimumVersions);
-		assert.number(result.value.peerBlockTime);
+		assert.number(result.value.peerBanTime);
 		assert.number(result.value.rateLimit);
 		assert.number(result.value.rateLimitPostTransactions);
 		assert.array(result.value.remoteAccess);
@@ -305,7 +305,7 @@ describe<{
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
 		assert.undefined(result.error);
-		assert.equal(result.value.peerBlockTime, 5000);
+		assert.equal(result.value.peerBanTime, 5000);
 	});
 
 	it("should throw if process.env.CORE_P2P_PEER_BAN_TIME is not number", async ({ serviceProvider }) => {
@@ -314,7 +314,7 @@ describe<{
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
 		assert.defined(result.error);
-		assert.equal(result.error?.message, '"peerBlockTime" must be a number');
+		assert.equal(result.error?.message, '"peerBanTime" must be a number');
 	});
 
 	it("should parse process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS", async ({ serviceProvider }) => {
@@ -668,27 +668,27 @@ describe<{
 		assert.equal(result.error?.message, '"remoteAccess" is required');
 	});
 
-	it("#schemaRestrictions - peerBlockTime is required && is integer && >= 0", async ({ serviceProvider }) => {
+	it("#schemaRestrictions - peerBanTime is required && is integer && >= 0", async ({ serviceProvider }) => {
 		const defaults = importDefaults();
-		defaults.peerBlockTime = false;
+		defaults.peerBanTime = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"peerBlockTime" must be a number');
+		assert.equal(result.error?.message, '"peerBanTime" must be a number');
 
-		defaults.peerBlockTime = 1.12;
+		defaults.peerBanTime = 1.12;
 		result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"peerBlockTime" must be an integer');
+		assert.equal(result.error?.message, '"peerBanTime" must be an integer');
 
-		defaults.peerBlockTime = -1;
+		defaults.peerBanTime = -1;
 		result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"peerBlockTime" must be greater than or equal to 0');
+		assert.equal(result.error?.message, '"peerBanTime" must be greater than or equal to 0');
 
-		delete defaults.peerBlockTime;
+		delete defaults.peerBanTime;
 		result = serviceProvider.configSchema().validate(defaults);
 
-		assert.equal(result.error?.message, '"peerBlockTime" is required');
+		assert.equal(result.error?.message, '"peerBanTime" is required');
 	});
 
 	it("#schemaRestrictions - rateLimit is required && is integer && >= 1", async ({ serviceProvider }) => {
