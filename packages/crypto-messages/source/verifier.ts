@@ -4,6 +4,9 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.IMessageVerifier {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
 
@@ -108,6 +111,10 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 					: undefined,
 			)
 			.filter((v) => v !== undefined);
+
+		if (!Utils.isMajority(validatorPublicKeys.length, this.configuration)) {
+			return false;
+		}
 
 		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys as unknown as Buffer[]);
 
