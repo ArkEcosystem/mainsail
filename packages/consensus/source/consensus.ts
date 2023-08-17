@@ -391,7 +391,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
 
 			this.logger.info(
-				`Proposing valid block ${this.#height}/${this.#round
+				`Proposing valid block ${this.#height}/${
+					this.#round
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
 		} else {
@@ -408,7 +409,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	async #prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (roundState.hasPrevote(this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()))) {
+			if (
+				roundState.hasPrevote(
+					this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()),
+				)
+			) {
 				continue;
 			}
 
@@ -424,7 +429,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
 			if (
-				roundState.hasPrecommit(this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()))
+				roundState.hasPrecommit(
+					this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()),
+				)
 			) {
 				continue;
 			}

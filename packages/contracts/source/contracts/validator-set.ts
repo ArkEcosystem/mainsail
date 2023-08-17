@@ -1,5 +1,5 @@
-import { ICommittedBlock } from "./crypto";
 import { IValidatorWallet } from "./consensus";
+import { ICommittedBlock } from "./crypto";
 
 export interface IValidatorSet {
 	initialize(): Promise<void>;

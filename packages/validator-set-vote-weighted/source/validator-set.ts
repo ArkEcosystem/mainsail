@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Wallets } from "@mainsail/state";
 import { Utils } from "@mainsail/kernel";
+import { Wallets } from "@mainsail/state";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
@@ -91,7 +91,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 					const username = a.getUsername();
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-						`Validator "${username}" appears twice in the list.`,
+							`Validator "${username}" appears twice in the list.`,
 					);
 				}
 

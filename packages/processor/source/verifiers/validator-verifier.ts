@@ -54,7 +54,8 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 		}
 
 		this.logger.debug(
-			`Validator ${receivedValidatorName} (${block.data.generatorPublicKey
+			`Validator ${receivedValidatorName} (${
+				block.data.generatorPublicKey
 			}) allowed to forge block ${block.data.height.toLocaleString()}`,
 		);
 

@@ -1,3 +1,5 @@
+import { BigNumber } from "@mainsail/utils";
+
 import { IProcessableUnit } from "../block-processor";
 import {
 	IBlock,
@@ -11,7 +13,6 @@ import {
 	IValidatorSetMajority,
 } from "../crypto";
 import { ProcessorResult, Step } from "./enums";
-import { BigNumber } from "@mainsail/utils";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
