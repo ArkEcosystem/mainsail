@@ -299,8 +299,8 @@ describe<{
 		assert.equal(result.error?.message, '"rateLimit" must be a number');
 	});
 
-	it("should parse process.env.CORE_P2P_PEER_BLOCK_TIME", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_PEER_BLOCK_TIME = "5000";
+	it("should parse process.env.CORE_P2P_PEER_BAN_TIME", async ({ serviceProvider }) => {
+		process.env.CORE_P2P_PEER_BAN_TIME = "5000";
 
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
@@ -308,8 +308,8 @@ describe<{
 		assert.equal(result.value.peerBlockTime, 5000);
 	});
 
-	it("should throw if process.env.CORE_P2P_PEER_BLOCK_TIME is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_PEER_BLOCK_TIME = "false";
+	it("should throw if process.env.CORE_P2P_PEER_BAN_TIME is not number", async ({ serviceProvider }) => {
+		process.env.CORE_P2P_PEER_BAN_TIME = "false";
 
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
