@@ -1,10 +1,14 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
+import { Enums, Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
@@ -19,14 +23,17 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
-	public blockPeer(peer: Contracts.P2P.Peer, reason: string): void {
-		if (this.isBlocked(peer.ip)) {
+	public banPeer(peer: Contracts.P2P.Peer, reason: string): void {
+		if (this.isBanned(peer.ip)) {
 			return;
 		}
 
 		this.logger.debug(`Banning peer ${peer.ip}, because: ${reason}`);
 
-		this.#blacklist.set(peer.ip, dayjs().add(20, "minute"));
+		const timeout = this.configuration.getRequired<number>("peerBanTime");
+		if (timeout > 0) {
+			this.#blacklist.set(peer.ip, dayjs().add(timeout, "minute"));
+		}
 
 		this.disposePeer(peer);
 	}
@@ -39,7 +46,7 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		void this.events.dispatch(Enums.PeerEvent.Removed, peer);
 	}
 
-	public isBlocked(peerIp: string): boolean {
+	public isBanned(peerIp: string): boolean {
 		const bannedUntil = this.#blacklist.get(peerIp);
 
 		if (bannedUntil) {

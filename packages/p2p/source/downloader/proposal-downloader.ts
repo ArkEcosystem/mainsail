@@ -85,7 +85,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		this.#downloadingProposalByHeight.delete(job.height);
 
 		if (error) {
-			this.peerDisposer.blockPeer(job.peer, `Error downloading or processing proposal - ${error.message}}`);
+			this.peerDisposer.banPeer(job.peer, `Error downloading or processing proposal - ${error.message}}`);
 			this.tryToDownload();
 		}
 	}

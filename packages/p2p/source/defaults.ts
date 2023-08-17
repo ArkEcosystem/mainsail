@@ -11,6 +11,7 @@ export const defaults = {
 	maxSameSubnetPeers: process.env[Constants.Flags.CORE_P2P_MAX_PEERS_SAME_SUBNET] || 5,
 	minimumNetworkReach: process.env[Constants.Flags.CORE_P2P_MIN_NETWORK_REACH] || 20,
 	minimumVersions: ["^0.0.1"],
+	peerBanTime: process.env[Constants.Flags.CORE_P2P_PEER_BAN_TIME] || 0,
 
 	rateLimit: process.env[Constants.Flags.CORE_P2P_RATE_LIMIT] || 150,
 	// max number of messages per second per socket connection
