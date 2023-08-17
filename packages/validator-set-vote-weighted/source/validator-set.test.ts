@@ -107,8 +107,8 @@ describe<{
 			const validator = validators[index];
 			const total = Utils.BigNumber.make((5 - index) * 1000).times(Utils.BigNumber.SATOSHI);
 
-			assert.equal(validator.getAttribute<number>("validator.rank"), index + 1);
-			assert.equal(validator.getAttribute<Utils.BigNumber>("validator.voteBalance"), total);
+			assert.equal(validator.getRank(), index + 1);
+			assert.equal(validator.getVoteBalance(), total);
 		}
 	});
 

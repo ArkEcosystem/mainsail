@@ -52,17 +52,17 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 	}
 
 	public async saveProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(proposal.validatorIndex);
+		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(proposal.validatorIndex);
 		await this.proposalStorage.put(`${proposal.round}-${validatorPublicKey}`, proposal.toData());
 	}
 
 	public async savePrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(prevote.validatorIndex);
+		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(prevote.validatorIndex);
 		await this.prevoteStorage.put(`${prevote.round}-${validatorPublicKey}`, prevote.toData());
 	}
 
 	public async savePrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(precommit.validatorIndex);
+		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(precommit.validatorIndex);
 		await this.precommitStorage.put(`${precommit.round}-${validatorPublicKey}`, precommit.toData());
 	}
 

@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { Wallets } from "@mainsail/state";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
@@ -11,7 +12,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
-	#validators: Contracts.State.Wallet[] = [];
+	#validators: Contracts.Consensus.IValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
 	public async initialize(): Promise<void> {
@@ -29,20 +30,20 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		}
 	}
 
-	public getActiveValidators(): Contracts.State.Wallet[] {
+	public getActiveValidators(): Contracts.Consensus.IValidatorWallet[] {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 		return this.#validators.slice(0, activeValidators);
 	}
 
-	public getValidatorPublicKeyByIndex(index: number): string {
-		return this.#validators[index].getAttribute<string>("validator.consensusPublicKey");
+	public getValidatorConsensusPublicKeyByIndex(index: number): string {
+		return this.#validators[index].getConsensusPublicKey();
 	}
 
-	public getValidatorIndexByPublicKey(publicKey: string): number {
-		const result = this.#indexByPublicKey.get(publicKey);
+	public getValidatorIndexByWalletPublicKey(walletPublicKey: string): number {
+		const result = this.#indexByPublicKey.get(walletPublicKey);
 
 		if (result === undefined) {
-			throw new Error(`Validator ${publicKey} not found.`);
+			throw new Error(`Validator ${walletPublicKey} not found.`);
 		}
 
 		return result;
@@ -68,43 +69,44 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#indexByPublicKey = new Map();
 
 		for (const validator of this.walletRepository.allByUsername()) {
-			if (validator.hasAttribute("validator.resigned")) {
-				validator.forgetAttribute("validator.rank");
+			const validatorWallet = new Wallets.ValidatorWallet(validator);
+			if (validatorWallet.isResigned()) {
+				validatorWallet.unsetRank();
 			} else {
-				this.#validators.push(validator);
+				this.#validators.push(validatorWallet);
 			}
 		}
 
 		this.#validators.sort((a, b) => {
-			const voteBalanceA: Utils.BigNumber = a.getAttribute("validator.voteBalance");
-			const voteBalanceB: Utils.BigNumber = b.getAttribute("validator.voteBalance");
+			const voteBalanceA: Utils.BigNumber = a.getVoteBalance();
+			const voteBalanceB: Utils.BigNumber = b.getVoteBalance();
 
 			const diff = voteBalanceB.comparedTo(voteBalanceA);
 
 			if (diff === 0) {
-				Utils.assert.defined<string>(a.getPublicKey());
-				Utils.assert.defined<string>(b.getPublicKey());
+				Utils.assert.defined<string>(a.getWalletPublicKey());
+				Utils.assert.defined<string>(b.getWalletPublicKey());
 
-				if (a.getPublicKey() === b.getPublicKey()) {
-					const username = a.getAttribute("validator.username");
+				if (a.getWalletPublicKey() === b.getWalletPublicKey()) {
+					const username = a.getUsername();
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
 							`Validator "${username}" appears twice in the list.`,
 					);
 				}
 
-				return a.getPublicKey()!.localeCompare(b.getPublicKey()!, "en");
+				return a.getWalletPublicKey()!.localeCompare(b.getWalletPublicKey()!, "en");
 			}
 
 			return diff;
 		});
 
 		for (let index = 0; index < this.#validators.length; index++) {
-			this.#validators[index].setAttribute("validator.rank", index + 1);
+			this.#validators[index].setRank(index + 1);
 
-			const publicKey = this.#validators[index].getPublicKey();
-			Utils.assert.defined<string>(publicKey);
-			this.#indexByPublicKey.set(publicKey, index);
+			const walletPublicKey = this.#validators[index].getWalletPublicKey();
+			Utils.assert.defined<string>(walletPublicKey);
+			this.#indexByPublicKey.set(walletPublicKey, index);
 		}
 	}
 }

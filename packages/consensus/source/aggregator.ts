@@ -95,10 +95,9 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 
 			const validator = roundState.getValidator(key);
 
-			const walletPublicKey = validator.getPublicKey();
-			Utils.assert.defined<string>(walletPublicKey);
+			const walletPublicKey = validator.getWalletPublicKey();
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByPublicKey(walletPublicKey);
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletPublicKey(walletPublicKey);
 			validators[validatorIndex] = true;
 		}
 

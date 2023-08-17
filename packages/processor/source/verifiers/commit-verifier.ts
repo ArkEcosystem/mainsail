@@ -39,7 +39,7 @@ export class CommitVerifier implements Contracts.BlockProcessor.Handler {
 				continue;
 			}
 
-			const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(index);
+			const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(index);
 			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
 		}
 

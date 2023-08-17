@@ -28,7 +28,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
 	#precommitsCount = new Map<string | undefined, number>();
-	#validators = new Map<string, Contracts.State.Wallet>();
+	#validators = new Map<string, Contracts.Consensus.IValidatorWallet>();
 	#validatorsSignedPrevote: boolean[] = [];
 	#validatorsSignedPrecommit: boolean[] = [];
 	#proposer!: string;
@@ -55,7 +55,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		const validators = this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
-			const consensusPublicKey = validator.getAttribute<string>("validator.consensusPublicKey");
+			const consensusPublicKey = validator.getConsensusPublicKey();
 			this.#validators.set(consensusPublicKey, validator);
 			this.#validatorsSignedPrecommit.push(false);
 			this.#validatorsSignedPrevote.push(false);
@@ -63,14 +63,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		const validatorIndex = this.proposerPicker.getValidatorIndex(round);
 
-		this.#proposer = validators[validatorIndex].getAttribute<string>("validator.consensusPublicKey");
+		this.#proposer = validators[validatorIndex].getConsensusPublicKey();
 
 		return this;
 	}
 
-	public getValidator(validatorPublicKey: string): Contracts.State.Wallet {
-		const validator = this.#validators.get(validatorPublicKey);
-		Utils.assert.defined<Contracts.State.Wallet>(validator);
+	public getValidator(consensusPublicKey: string): Contracts.Consensus.IValidatorWallet {
+		const validator = this.#validators.get(consensusPublicKey);
+		Utils.assert.defined<Contracts.Consensus.IValidatorWallet>(validator);
 		return validator;
 	}
 
@@ -125,11 +125,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public hasPrevote(validatorIndex: number): boolean {
-		return this.#prevotes.has(this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex));
+		return this.#prevotes.has(this.validatorSet.getValidatorConsensusPublicKeyByIndex(validatorIndex));
 	}
 
 	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(prevote.validatorIndex);
+		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(prevote.validatorIndex);
 		if (!this.#validators.has(validatorPublicKey)) {
 			throw new Error(`Prevote by ${validatorPublicKey} is already set`);
 		}
@@ -141,11 +141,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public hasPrecommit(validatorIndex: number): boolean {
-		return this.#precommits.has(this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex));
+		return this.#precommits.has(this.validatorSet.getValidatorConsensusPublicKeyByIndex(validatorIndex));
 	}
 
 	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(precommit.validatorIndex);
+		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(precommit.validatorIndex);
 		if (!this.#validators.has(validatorPublicKey)) {
 			return false;
 		}
@@ -193,13 +193,13 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public getPrevote(validatorIndex: number): Contracts.Crypto.IPrevote | undefined {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex);
+		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(validatorIndex);
 
 		return this.#prevotes.get(validatorPublicKey);
 	}
 
 	public getPrecommit(validatorIndex: number): Contracts.Crypto.IPrecommit | undefined {
-		const validatorPublicKey = this.validatorSet.getValidatorPublicKeyByIndex(validatorIndex);
+		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(validatorIndex);
 
 		return this.#precommits.get(validatorPublicKey);
 	}

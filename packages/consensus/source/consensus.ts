@@ -409,7 +409,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	async #prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (roundState.hasPrevote(this.validatorSet.getValidatorIndexByPublicKey(validator.getWalletPublicKey()))) {
+			if (
+				roundState.hasPrevote(
+					this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()),
+				)
+			) {
 				continue;
 			}
 
@@ -425,7 +429,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
 			if (
-				roundState.hasPrecommit(this.validatorSet.getValidatorIndexByPublicKey(validator.getWalletPublicKey()))
+				roundState.hasPrecommit(
+					this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()),
+				)
 			) {
 				continue;
 			}
@@ -441,7 +447,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#getActiveValidators(): string[] {
 		const activeValidators = this.validatorSet.getActiveValidators();
 
-		return activeValidators.map((wallet) => wallet.getAttribute("validator.consensusPublicKey"));
+		return activeValidators.map((validator) => validator.getConsensusPublicKey());
 	}
 
 	async #saveState(): Promise<void> {

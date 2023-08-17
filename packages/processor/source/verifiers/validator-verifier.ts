@@ -27,12 +27,12 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 		// Get expected validator for current round
 		const expectedValidatorIndex = this.proposerPicker.getValidatorIndex(round);
 		const expectedValidator = this.validatorSet.getActiveValidators()[expectedValidatorIndex];
-		const expectedValidatorPublicKey = expectedValidator.getPublicKey();
+		const expectedValidatorPublicKey = expectedValidator.getWalletPublicKey();
 		Utils.assert.defined<string>(expectedValidatorPublicKey);
 
 		const receivedValidator = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
 		if (!receivedValidator.isValidator()) {
-			const expectedValidatorName: string = expectedValidator.getAttribute("validator.username");
+			const expectedValidatorName: string = expectedValidator.getUsername();
 
 			this.logger.debug(
 				`Received block is from a non-validator (${block.data.generatorPublicKey}), but expected block from ${expectedValidatorName} (${expectedValidatorPublicKey})`,
@@ -44,7 +44,7 @@ export class ValidatorVerifier implements Contracts.BlockProcessor.Handler {
 		// Match expected and received validator keys
 		const receivedValidatorName = receivedValidator.getAttribute("validator.username");
 		if (expectedValidatorPublicKey !== block.data.generatorPublicKey) {
-			const expectedValidatorName: string = expectedValidator.getAttribute("validator.username");
+			const expectedValidatorName: string = expectedValidator.getUsername();
 
 			this.logger.warning(
 				`Validator ${receivedValidatorName} (${block.data.generatorPublicKey}) not allowed to forge, should be ${expectedValidatorName} (${expectedValidatorPublicKey})`,
