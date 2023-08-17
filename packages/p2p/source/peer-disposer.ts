@@ -1,10 +1,14 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
+import { Enums, Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
@@ -26,7 +30,10 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 		this.logger.debug(`Banning peer ${peer.ip}, because: ${reason}`);
 
-		this.#blacklist.set(peer.ip, dayjs().add(20, "minute"));
+		const timeout = this.configuration.getRequired<number>("peerBlockTime");
+		if (timeout > 0) {
+			this.#blacklist.set(peer.ip, dayjs().add(timeout, "minute"));
+		}
 
 		this.disposePeer(peer);
 	}
