@@ -1,23 +1,15 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../core/bin/config/testnet/crypto.json";
-
 import { describe, Factories, Sandbox } from "../../test-framework";
-import {
-	blockData,
-	precommitData,
-	prevoteData,
-	proposalData,
-	serializedBlock,
-	validatorMnemonic,
-} from "../test/fixtures/proposal";
+import { Types } from "../../test-framework/source/factories";
+import { blockData, precommitData, prevoteData, serializedBlock, validatorMnemonic } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { prepareWallet } from "../test/helpers/prepare-wallet";
-import { Verifier } from "./verifier";
 import { MessageFactory } from "./factory";
 import { Precommit } from "./precommit";
 import { Prevote } from "./prevote";
-import { Types } from "../../test-framework/source/factories";
+import { Verifier } from "./verifier";
 
 describe<{
 	sandbox: Sandbox;

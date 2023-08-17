@@ -1,9 +1,10 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { Wallets } from "../../../state";
 import { Sandbox } from "../../../test-framework";
 import { validatorMnemonic } from "../fixtures/proposal";
 
-export const prepareWallet = async (context: { sandbox: Sandbox }): Promise<Contracts.State.Wallet> => {
+export const prepareWallet = async (context: { sandbox: Sandbox }): Promise<Contracts.Consensus.IValidatorWallet> => {
 	const walletRepository = context.sandbox.app.getTagged<Contracts.State.WalletRepository>(
 		Identifiers.WalletRepository,
 		"state",
@@ -19,5 +20,5 @@ export const prepareWallet = async (context: { sandbox: Sandbox }): Promise<Cont
 	const wallet = walletRepository.findByAddress(mnemonic);
 	wallet.setAttribute("validator.consensusPublicKey", await consensusPublicKeyFactory.fromMnemonic(mnemonic));
 
-	return wallet;
+	return new Wallets.ValidatorWallet(wallet);
 };
