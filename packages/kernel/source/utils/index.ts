@@ -8,4 +8,6 @@ export const roundCalculator = { calculateRound, isNewRound };
 
 export { isBlacklisted } from "./is-blacklisted";
 export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained";
+export { isMajority } from "./is-majority";
+export { isMinority } from "./is-minority";
 export { isWhitelisted } from "./is-whitelisted";
