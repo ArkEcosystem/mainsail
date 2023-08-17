@@ -23,8 +23,8 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
-	public blockPeer(peer: Contracts.P2P.Peer, reason: string): void {
-		if (this.isBlocked(peer.ip)) {
+	public banPeer(peer: Contracts.P2P.Peer, reason: string): void {
+		if (this.isBanned(peer.ip)) {
 			return;
 		}
 
@@ -46,7 +46,7 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		void this.events.dispatch(Enums.PeerEvent.Removed, peer);
 	}
 
-	public isBlocked(peerIp: string): boolean {
+	public isBanned(peerIp: string): boolean {
 		const bannedUntil = this.#blacklist.get(peerIp);
 
 		if (bannedUntil) {
