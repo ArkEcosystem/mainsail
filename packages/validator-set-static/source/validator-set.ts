@@ -29,8 +29,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		return this.#validators;
 	}
 
-	public getValidatorConsensusPublicKeyByIndex(index: number): string {
-		return this.#validators[index].getConsensusPublicKey();
+	public getValidator(index: number): Contracts.Consensus.IValidatorWallet {
+		return this.#validators[index];
 	}
 
 	public getValidatorIndexByWalletPublicKey(walletPublicKey: string): number {
