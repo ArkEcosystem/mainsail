@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class CommitVerifier implements Contracts.BlockProcessor.Handler {
@@ -42,7 +43,7 @@ export class CommitVerifier implements Contracts.BlockProcessor.Handler {
 			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
 		}
 
-		if (!this.#isMajority(publicKeys.length)) {
+		if (!Utils.isMajority(publicKeys.length, this.configuration)) {
 			return false;
 		}
 
@@ -65,9 +66,5 @@ export class CommitVerifier implements Contracts.BlockProcessor.Handler {
 		}
 
 		return true;
-	}
-
-	#isMajority(size: number): boolean {
-		return size >= (this.configuration.getMilestone().activeValidators / 3) * 2 + 1;
 	}
 }

@@ -229,11 +229,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	#isMajority(size: number): boolean {
-		return size >= (this.configuration.getMilestone().activeValidators / 3) * 2 + 1;
+		return Utils.isMajority(size, this.configuration);
 	}
 
 	#isMinority(size: number): boolean {
-		return size >= this.configuration.getMilestone().activeValidators / 3 + 1;
+		return Utils.isMinority(size, this.configuration);
 	}
 
 	#increasePrevoteCount(blockId?: string): void {
