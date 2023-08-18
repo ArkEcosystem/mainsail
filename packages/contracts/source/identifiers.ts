@@ -175,6 +175,7 @@ export const Identifiers = {
 	ValidationManager: Symbol.for("Manager<Validation>"),
 	ValidationService: Symbol.for("Service<Validation>"),
 	ValidatorSet: Symbol.for("Set<ValidatorSet>"),
+	ValidatorWalletFactory: Symbol.for("State<ValidatorWalletFactory>"),
 	WalletAttributes: Symbol.for("Wallet<Attributes>"),
 	WalletFactory: Symbol.for("State<WalletFactory>"),
 	WalletRepository: Symbol.for("Repository<Wallet>"),
