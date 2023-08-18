@@ -15,7 +15,7 @@ import { ProcessorResult, Step } from "./enums";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
-	readonly proposer: string;
+	readonly proposer: IValidatorWallet;
 	getProposal(): IProposal | undefined;
 	hasProposal(): boolean;
 	hasPrevote(validatorIndex: number): boolean;

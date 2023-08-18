@@ -31,7 +31,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#validators = new Map<string, Contracts.State.IValidatorWallet>();
 	#validatorsSignedPrevote: boolean[] = [];
 	#validatorsSignedPrecommit: boolean[] = [];
-	#proposer!: string;
+	#proposer!: Contracts.State.IValidatorWallet;
 
 	get height(): number {
 		return this.#height;
@@ -45,7 +45,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return [...this.#validators.keys()];
 	}
 
-	get proposer(): string {
+	get proposer(): Contracts.State.IValidatorWallet {
 		return this.#proposer;
 	}
 
@@ -63,7 +63,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		const validatorIndex = this.proposerPicker.getValidatorIndex(round);
 
-		this.#proposer = validators[validatorIndex].getConsensusPublicKey();
+		this.#proposer = validators[validatorIndex];
 
 		return this;
 	}
