@@ -15,7 +15,7 @@ import {
 	WalletRepository,
 	WalletRepositoryClone,
 } from ".";
-import { walletFactory } from "./wallet-factory";
+import { walletFactory } from "./factory";
 
 describe<{
 	walletRepositoryBlockchain: WalletRepository;

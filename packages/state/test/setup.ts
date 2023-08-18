@@ -4,6 +4,7 @@ import { Providers, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy, spy } from "sinon";
 
+import { ProposerPicker } from "../../consensus/source/proposer-picker";
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../crypto-config";
@@ -23,7 +24,6 @@ import {
 } from "../../crypto-transaction";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
-import { ProposerPicker } from "../../consensus/source/proposer-picker";
 import { StateBuilder } from "../source";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
@@ -35,7 +35,7 @@ import {
 	WalletRepositoryClone,
 	WalletRepositoryCopyOnWrite,
 } from "../source/wallets";
-import { walletFactory } from "../source/wallets/wallet-factory";
+import { walletFactory } from "../source/wallets/factory";
 
 export interface Spies {
 	applySpy: SinonSpy;
@@ -144,9 +144,9 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		saveBlocks: () => {},
 	});
 	sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
-		initialize: () => {},
-		handleCommitBlock: () => {},
 		getActiveValidators: () => {},
+		handleCommitBlock: () => {},
+		initialize: () => {},
 	});
 	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 
